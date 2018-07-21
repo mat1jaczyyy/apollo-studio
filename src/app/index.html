@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts App</title>
+</head>
+<body>
+    <div class="container" ng-controller="ContactsCtrl as ctrl">
+        <h1>{{ctrl.Title}}</h1>
+        <p style="color: red" ng-show="ctrl.ErrorMessage">{{ctrl.ErrorMessage}}</p>
+        <table >
+            <thead>
+                <tr>
+                    <th style="min-width: 80px;">First name</th>
+                    <th style="min-width: 80px;">Last name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="contact in ctrl.Contacts">
+                    <td>{{ contact.FirstName }}</td>
+                    <td>{{ contact.LastName }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+<script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
+</html>
