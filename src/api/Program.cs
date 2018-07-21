@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-using api.Outbreak;
+using Commons.Music.Midi;
+using api.Devices;
 
 namespace api {
     class Program {
@@ -21,7 +22,7 @@ namespace api {
 
         // Initialize Program
         static void Main(string[] args) {
-            _chain.Add(new Outbreak.Lightweight("/Users/mat1jaczyyy/test.mid")); // Debug
+            _chain.Add(new Devices.Pitch(2)); // Debug
             
             var host = new WebHostBuilder()
                 .UseKestrel()

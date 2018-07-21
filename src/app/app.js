@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 app.controller('ChainCtrl', function (ChainService) {
     var ctrl = this;
-    ctrl.Title = 'Lightshow Studio Chain // Lightweight';
+    ctrl.Title = 'Lightshow Studio Chain // Pitch';
 
     LoadContacts();
 

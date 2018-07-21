@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 
-using api.Outbreak;
+using api.Devices;
 
 namespace api.Controllers {
     [Route("api/[controller]")]
@@ -15,8 +15,8 @@ namespace api.Controllers {
             var result = new List<object>();
 
             foreach (object Device in Program.Chain) {
-                if (Device.GetType() == typeof(Outbreak.Lightweight)) {
-                    result.Add(new { Path = ((Outbreak.Lightweight) Device).Path, FileName = ((Outbreak.Lightweight) Device).FileName });
+                if (Device.GetType() == typeof(Devices.Pitch)) {
+                    result.Add(new { Offset = ((Devices.Pitch) Device).Offset });
                 }
             }
 

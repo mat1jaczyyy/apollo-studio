@@ -1,35 +1,27 @@
 using System;
 using System.Linq;
 
-namespace api.Outbreak {
-    public class Lightweight {
-        // Path to MIDI file
-        private String _path = "";
+namespace api.Devices {
+    public class Pitch {
+        // Note offset
+        private int _offset;
 
-        // Access path to MIDI file
-        public String Path {
+        public int Offset {
             get {
-                return _path;
+                return _offset;
             }
             set {
-                // TODO: Check if MIDI file exists and is valid, open it...
-                _path = value;
+                if (-128 <= _offset && _offset <= 128)
+                    _offset = value;
             }
         }
 
-        // Compute name of the MIDI file
-        public String FileName {
-            get {
-                return _path.Split('/').Last();
-            }
-        }
+        // Create device
+        public Pitch() {}
 
-        // Create device without file loaded
-        public Lightweight() {}
-
-        // Create device with file loaded
-        public Lightweight(string path) {
-            this.Path = path;
+        // Load device
+        public Pitch(int offset) {
+            this.Offset = offset;
         }
     }
 }

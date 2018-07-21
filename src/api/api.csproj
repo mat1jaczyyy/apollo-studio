@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="managed-midi" Version="1.2.2" />
     <PackageReference Include="Microsoft.NETCore.App">
       <Version>2.1.0</Version>
     </PackageReference>
