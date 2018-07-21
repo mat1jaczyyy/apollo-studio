@@ -2,23 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Contacts App</title>
+    <title>Lightshow Studio</title>
 </head>
 <body>
-    <div class="container" ng-controller="ContactsCtrl as ctrl">
+    <div class="container" ng-controller="ChainCtrl as ctrl">
         <h1>{{ctrl.Title}}</h1>
         <p style="color: red" ng-show="ctrl.ErrorMessage">{{ctrl.ErrorMessage}}</p>
-        <table >
+        <table>
             <thead>
                 <tr>
-                    <th style="min-width: 80px;">First name</th>
-                    <th style="min-width: 80px;">Last name</th>
+                    <th style="min-width: 80px;">Path</th>
+                    <th style="min-width: 80px;">File Name</th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="contact in ctrl.Contacts">
-                    <td>{{ contact.FirstName }}</td>
-                    <td>{{ contact.LastName }}</td>
+                <tr ng-repeat="lightweight in ctrl.Chain">
+                    <td>{{ lightweight.Path }}</td>
+                    <td>{{ lightweight.FileName }}</td>
                 </tr>
             </tbody>
         </table>

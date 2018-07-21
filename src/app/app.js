@@ -1,33 +1,33 @@
 'use strict';
 
-var app = angular.module('ContactsApp', []);
+var app = angular.module('LightshowApp', []);
 
 document.addEventListener('DOMContentLoaded', function () {
-    angular.bootstrap(document, ['ContactsApp']);
+    angular.bootstrap(document, ['LightshowApp']);
 });
 
-app.controller('ContactsCtrl', function (ContactsService) {
+app.controller('ChainCtrl', function (ChainService) {
     var ctrl = this;
-    ctrl.Title = 'Contacts List';
+    ctrl.Title = 'Lightshow Studio Chain // Lightweight';
 
     LoadContacts();
 
     function LoadContacts() {
-        ContactsService.Get()
-            .then(function (contacts) {
-                ctrl.Contacts = contacts
+        ChainService.Get()
+            .then(function (chain) {
+                ctrl.Chain = chain
             }, function (error) {
                 ctrl.ErrorMessage = error
             });
     }
 });
 
-app.service('ContactsService', function ($http) {
+app.service('ChainService', function ($http) {
     var svc = this;
     var apiUrl = 'http://localhost:5000/api';
 
     svc.Get = function () {
-        return $http.get(apiUrl + '/contacts')
+        return $http.get(apiUrl + '/set')
             .then(function success(response) {
                 return response.data;
             });
