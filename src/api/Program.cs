@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-using Commons.Music.Midi;
+using RtMidi.Core;
+using RtMidi.Core.Devices;
+using RtMidi.Core.Messages;
 using api.Devices;
 
 namespace api {
     class Program {
+        // MIDI Access
+        static List<IMidiInputDevice> devices = new List<IMidiInputDevice>();
+
         // Chain of the Lights track
         static List<object> _chain = new List<object>();
 
@@ -23,13 +29,37 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain.Add(new Devices.Pitch(2)); // Debug
+
+            // Initialize MIDI I/O
+            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
+                Console.WriteLine($"Available API: {api}");
             
+            Console.WriteLine("api done!");
+            Console.WriteLine("dev count: " + MidiDeviceManager.Default.InputDevices.Count().ToString());
+
+            foreach (var inputDeviceInfo in MidiDeviceManager.Default.InputDevices) {
+                Console.WriteLine($"Opening {inputDeviceInfo.Name}");
+
+                var inputDevice = inputDeviceInfo.CreateDevice();
+                devices.Add(inputDevice);
+
+                inputDevice.ControlChange += ControlChangeHandler;
+                inputDevice.Open();
+
+                Console.Read();
+            }
+
+            // Initialize API
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup<Startup>()
                 .Build();
             
             host.Run(); // Halts the thread!
+        }
+
+        static void ControlChangeHandler(IMidiInputDevice sender, in ControlChangeMessage msg) {   
+            Console.WriteLine($"[{sender.Name}] ControlChange: Channel:{msg.Channel} Control:{msg.Control} Value:{msg.Value}");
         }
     }
 
