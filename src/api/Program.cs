@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-using RtMidi.Core;
-using RtMidi.Core.Devices;
-using RtMidi.Core.Messages;
+using Commons.Music.Midi;
 using api.Devices;
 
 namespace api {
     class Program {
         // MIDI Access
-        static List<IMidiInputDevice> devices = new List<IMidiInputDevice>();
+        static IMidiAccess access = MidiAccessManager.Default;
+        static IMidiInput input;
+        static IMidiOutput output;
 
         // Chain of the Lights track
         static List<object> _chain = new List<object>();
@@ -30,24 +30,13 @@ namespace api {
         static void Main(string[] args) {
             _chain.Add(new Devices.Pitch(2)); // Debug
 
-            // Initialize MIDI I/O
-            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                Console.WriteLine($"Available API: {api}");
-            
-            Console.WriteLine("api done!");
-            Console.WriteLine("dev count: " + MidiDeviceManager.Default.InputDevices.Count().ToString());
+            Console.WriteLine(access.Inputs.Last().Id);
+            Console.WriteLine(access.Outputs.Last().Id);
 
-            foreach (var inputDeviceInfo in MidiDeviceManager.Default.InputDevices) {
-                Console.WriteLine($"Opening {inputDeviceInfo.Name}");
+            input = access.OpenInputAsync(access.Inputs.Last().Id).Result;
+            output = access.OpenOutputAsync(access.Outputs.Last().Id).Result;
 
-                var inputDevice = inputDeviceInfo.CreateDevice();
-                devices.Add(inputDevice);
-
-                inputDevice.ControlChange += ControlChangeHandler;
-                inputDevice.Open();
-
-                Console.Read();
-            }
+            output.Send(new byte[] {0xB0, 0x68, 0x05}, 0, 3, 0);
 
             // Initialize API
             var host = new WebHostBuilder()
@@ -58,8 +47,10 @@ namespace api {
             host.Run(); // Halts the thread!
         }
 
-        static void ControlChangeHandler(IMidiInputDevice sender, in ControlChangeMessage msg) {   
-            Console.WriteLine($"[{sender.Name}] ControlChange: Channel:{msg.Channel} Control:{msg.Control} Value:{msg.Value}");
+        static void MIDIIn(object sender, MidiReceivedEventArgs e) {
+            for (int i = 0; i < e.Length; i++) {
+                Console.WriteLine(e.Data[i].ToString());
+            }
         }
     }
 
