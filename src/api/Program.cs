@@ -8,11 +8,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices;
+using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
 
 using api.Devices;
 
 namespace api {
+    public class Communication {
+        public struct Note {
+            public int p;
+            public int r;
+            public int g;
+            public int b;
+        }
+    }
+
     class Program {
         // MIDI Access
         static IMidiInputDevice iDevice;
@@ -30,7 +40,7 @@ namespace api {
 
         // Initialize Program
         static void Main(string[] args) {
-            _chain.Add(new Devices.Pitch(2));
+            _chain.Add(new Devices.Pitch(3));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -56,6 +66,18 @@ namespace api {
 
         static void NoteOn(object sender, in NoteOnMessage e) {
             Console.WriteLine($"Press! {e.Key.ToString()} {e.Velocity.ToString()}");
+
+            Communication.Note n = new Communication.Note();
+            n.p = (int)(e.Key);
+            n.r = e.Velocity >> 1;
+            n.g = e.Velocity >> 1;
+            n.g = e.Velocity >> 1;
+
+            foreach (object device in _chain) {
+                n = ((Devices.Pitch)device).Process(n);
+            }
+
+            oDevice.Send(new NoteOnMessage(e.Channel, (RtMidi.Core.Enums.Key)(n.p), n.r << 1));
         }
 
         static void NoteOff(object sender, in NoteOffMessage e) {

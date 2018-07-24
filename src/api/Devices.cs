@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 
+using api;
+
 namespace api.Devices {
     public class Pitch {
         // Note offset
@@ -22,6 +24,15 @@ namespace api.Devices {
         // Load device
         public Pitch(int offset) {
             this.Offset = offset;
+        }
+
+        public Communication.Note Process(Communication.Note n) {
+            n.p += _offset;
+            
+            if (n.p < 0) n.p = 0;
+            if (n.p > 127) n.p = 127;
+
+            return n;
         }
     }
 }
