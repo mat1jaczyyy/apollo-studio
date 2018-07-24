@@ -6,15 +6,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-using Commons.Music.Midi;
+using RtMidi.Core;
+using RtMidi.Core.Devices;
+using RtMidi.Core.Messages;
+
 using api.Devices;
 
 namespace api {
     class Program {
         // MIDI Access
-        static IMidiAccess access = MidiAccessManager.Default;
-        static IMidiInput input;
-        static IMidiOutput output;
+        static IMidiInputDevice iDevice;
+        static IMidiOutputDevice oDevice;
 
         // Chain of the Lights track
         static List<object> _chain = new List<object>();
@@ -28,17 +30,22 @@ namespace api {
 
         // Initialize Program
         static void Main(string[] args) {
-            _chain.Add(new Devices.Pitch(2)); // Debug
+            _chain.Add(new Devices.Pitch(2));
 
-            Console.WriteLine(access.Inputs.Last().Id);
-            Console.WriteLine(access.Outputs.Last().Id);
+            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
+                Console.WriteLine($"API: {api}");
+            
+            iDevice = MidiDeviceManager.Default.InputDevices.Last().CreateDevice();
+            Console.WriteLine($"Input: {iDevice.Name}");
+            iDevice.NoteOn += NoteOn;
+            iDevice.NoteOff += NoteOff;
+            iDevice.ControlChange += Control;
+            iDevice.Open();
 
-            input = access.OpenInputAsync(access.Inputs.Last().Id).Result;
-            output = access.OpenOutputAsync(access.Outputs.Last().Id).Result;
+            oDevice = MidiDeviceManager.Default.OutputDevices.Last().CreateDevice();
+            Console.WriteLine($"Output: {oDevice.Name}");
+            oDevice.Open();
 
-            output.Send(new byte[] {0xB0, 0x68, 0x05}, 0, 3, 0);
-
-            // Initialize API
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup<Startup>()
@@ -47,10 +54,16 @@ namespace api {
             host.Run(); // Halts the thread!
         }
 
-        static void MIDIIn(object sender, MidiReceivedEventArgs e) {
-            for (int i = 0; i < e.Length; i++) {
-                Console.WriteLine(e.Data[i].ToString());
-            }
+        static void NoteOn(object sender, in NoteOnMessage e) {
+            Console.WriteLine($"Press! {e.Key.ToString()} {e.Velocity.ToString()}");
+        }
+
+        static void NoteOff(object sender, in NoteOffMessage e) {
+            Console.WriteLine($"Release! {e.Key.ToString()} {e.Velocity.ToString()}");
+        }
+
+        static void Control(object sender, in ControlChangeMessage e) {
+            
         }
     }
 
