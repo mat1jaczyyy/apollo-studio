@@ -6,6 +6,7 @@ using api;
 namespace api.Devices {
     public abstract class Device {
         public abstract void MIDIEnter(Communication.Note n);
+        public Action<Communication.Note> MIDIExit;
     }
 
     public class Pitch: Device {
@@ -22,13 +23,15 @@ namespace api.Devices {
         }
 
         // Create device
-        public Pitch() {
+        public Pitch(Action<Communication.Note> exit) {
             this.Offset = 0;
+            this.MIDIExit = exit;
         }
 
         // Load device
-        public Pitch(int offset) {
+        public Pitch(int offset, Action<Communication.Note> exit) {
             this.Offset = offset;
+            this.MIDIExit = exit;
         }
 
         public override void MIDIEnter(Communication.Note n) {
@@ -37,7 +40,7 @@ namespace api.Devices {
             if (n.p < 0) n.p = 0;
             if (n.p > 127) n.p = 127;
 
-            Console.WriteLine(n.p);
+            this.MIDIExit(n);
         }
     }
 }
