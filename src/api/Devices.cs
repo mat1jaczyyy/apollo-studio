@@ -35,10 +35,14 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Communication.Note n) {
-            n.p += _offset;
+            int result = (int)(n.p);
+
+            result += _offset;
             
-            if (n.p < 0) n.p = 0;
-            if (n.p > 127) n.p = 127;
+            if (result < 0) result = 0;
+            if (result > 127) result = 127;
+
+            n.p = (byte)(result);
 
             this.MIDIExit(n);
         }
@@ -72,10 +76,14 @@ namespace api.Devices {
         public override void MIDIEnter(Communication.Note n) {
             this.MIDIExit(n);
             
-            n.p += _offset;
+            int result = (int)(n.p);
+
+            result += _offset;
             
-            if (n.p < 0) n.p = 0;
-            if (n.p > 127) n.p = 127;
+            if (result < 0) result = 0;
+            if (result > 127) result = 127;
+
+            n.p = (byte)(result);
 
             this.MIDIExit(n);
         }

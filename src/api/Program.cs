@@ -16,10 +16,10 @@ using api.Devices;
 namespace api {
     public class Communication {
         public struct Note {
-            public int p;
-            public int r;
-            public int g;
-            public int b;
+            public byte p;
+            public byte r;
+            public byte g;
+            public byte b;
         }
     }
 
@@ -65,8 +65,9 @@ namespace api {
         }
 
         static void MIDIExit(Communication.Note n) {
-            NoteOnMessage msg = new NoteOnMessage(RtMidi.Core.Enums.Channel.Channel1, (RtMidi.Core.Enums.Key)(n.p), n.r << 1);
-            Console.WriteLine($"OUT <- {msg.Key.ToString()} {msg.Velocity.ToString()}");
+            byte[] data = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.p, n.r, n.g, n.b, 0xF7};
+            SysExMessage msg = new SysExMessage(data);
+            Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }
@@ -75,10 +76,10 @@ namespace api {
             Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
 
             Communication.Note n = new Communication.Note();
-            n.p = (int)(e.Key);
-            n.r = e.Velocity >> 1;
-            n.g = e.Velocity >> 1;
-            n.g = e.Velocity >> 1;
+            n.p = (byte)(e.Key);
+            n.r = (byte)(e.Velocity >> 1);
+            n.g = (byte)(e.Velocity >> 1);
+            n.b = (byte)(e.Velocity >> 1);
 
             _chain[0].MIDIEnter(n);
         }
