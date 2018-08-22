@@ -41,6 +41,8 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain.Add(new Devices.Pitch(3, MIDIExit));
+            _chain.Add(new Devices.Chord(10, MIDIExit));
+            _chain[0].MIDIExit = _chain[1].MIDIEnter;
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -66,13 +68,13 @@ namespace api {
 
         static void MIDIExit(Communication.Note n) {
             NoteOnMessage msg = new NoteOnMessage(RtMidi.Core.Enums.Channel.Channel1, (RtMidi.Core.Enums.Key)(n.p), n.r << 1);
-            Console.WriteLine($"OUT {msg.Key.ToString()} {msg.Velocity.ToString()}");
+            Console.WriteLine($"OUT <- {msg.Key.ToString()} {msg.Velocity.ToString()}");
 
             oDevice.Send(in msg);
         }
 
         static void NoteOn(object sender, in NoteOnMessage e) {
-            Console.WriteLine($"IN  {e.Key.ToString()} {e.Velocity.ToString()}");
+            Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
 
             Communication.Note n = new Communication.Note();
             n.p = (int)(e.Key);
@@ -80,9 +82,7 @@ namespace api {
             n.g = e.Velocity >> 1;
             n.g = e.Velocity >> 1;
 
-            foreach (Devices.Device device in _chain) {
-                device.MIDIEnter(n);
-            }
+            _chain[0].MIDIEnter(n);
         }
 
         static void NoteOff(object sender, in NoteOffMessage e) {
