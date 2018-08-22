@@ -65,7 +65,7 @@ namespace api {
         }
 
         static void MIDIExit(Communication.Note n) {
-            byte[] data = {0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.p, n.r, n.g, n.b, 0xF7};
+            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.p, n.r, n.g, n.b};
             SysExMessage msg = new SysExMessage(data);
             Console.WriteLine($"OUT <- {msg.ToString()}");
 
