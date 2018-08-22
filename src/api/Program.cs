@@ -29,10 +29,10 @@ namespace api {
         static IMidiOutputDevice oDevice;
 
         // Chain of the Lights track
-        static List<object> _chain = new List<object>();
+        static List<Devices.Device> _chain = new List<Devices.Device>();
 
         // Access chain
-        public static List<object> Chain {
+        public static List<Devices.Device> Chain {
             get {
                 return _chain;
             }
@@ -73,8 +73,8 @@ namespace api {
             n.g = e.Velocity >> 1;
             n.g = e.Velocity >> 1;
 
-            foreach (object device in _chain) {
-                n = ((Devices.Pitch)device).Process(n);
+            foreach (Devices.Device device in _chain) {
+                device.MIDIEnter(n);
             }
 
             oDevice.Send(new NoteOnMessage(e.Channel, (RtMidi.Core.Enums.Key)(n.p), n.r << 1));
