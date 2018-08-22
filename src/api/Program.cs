@@ -50,8 +50,6 @@ namespace api {
             iDevice = MidiDeviceManager.Default.InputDevices.Last().CreateDevice();
             Console.WriteLine($"Input: {iDevice.Name}");
             iDevice.NoteOn += NoteOn;
-            iDevice.NoteOff += NoteOff;
-            iDevice.ControlChange += Control;
             iDevice.Open();
 
             oDevice = MidiDeviceManager.Default.OutputDevices.Last().CreateDevice();
@@ -83,14 +81,6 @@ namespace api {
             n.g = e.Velocity >> 1;
 
             _chain[0].MIDIEnter(n);
-        }
-
-        static void NoteOff(object sender, in NoteOffMessage e) {
-            Console.WriteLine($"Release! {e.Key.ToString()} {e.Velocity.ToString()}");
-        }
-
-        static void Control(object sender, in ControlChangeMessage e) {
-            
         }
     }
 
