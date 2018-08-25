@@ -22,6 +22,16 @@ namespace api {
             }
         }
 
+        public Device this[int index] {
+            get {
+                return _devices[index];
+            }
+            set {
+                _devices[index] = value;
+                Reroute();
+            }
+        }
+
         public Action<Signal> MIDIExit {
             get {
                 return _midiexit;
