@@ -22,29 +22,36 @@ namespace api.Devices {
             }
         }
 
-        // Create device
+        public Pitch() {
+            this._offset = 0;
+            this.MIDIExit = null;
+        }
+
+        public Pitch(int offset) {
+            this.Offset = offset;
+            this.MIDIExit = null;
+        }
+
         public Pitch(Action<Signal> exit) {
-            this.Offset = 0;
+            this._offset = 0;
             this.MIDIExit = exit;
         }
 
-        // Load device
         public Pitch(int offset, Action<Signal> exit) {
             this.Offset = offset;
             this.MIDIExit = exit;
         }
 
         public override void MIDIEnter(Signal n) {
-            int result = (int)(n.p);
+            int result = (int)(n.p) + _offset;
 
-            result += _offset;
-            
             if (result < 0) result = 0;
             if (result > 127) result = 127;
 
             n.p = (byte)(result);
 
-            this.MIDIExit(n);
+            if (this.MIDIExit != null)
+                this.MIDIExit(n);
         }
     }
 
@@ -61,31 +68,39 @@ namespace api.Devices {
             }
         }
 
-        // Create device
+        public Chord() {
+            this._offset = 0;
+            this.MIDIExit = null;
+        }
+
+        public Chord(int offset) {
+            this.Offset = offset;
+            this.MIDIExit = null;
+        }
+
         public Chord(Action<Signal> exit) {
-            this.Offset = 0;
+            this._offset = 0;
             this.MIDIExit = exit;
         }
 
-        // Load device
         public Chord(int offset, Action<Signal> exit) {
             this.Offset = offset;
             this.MIDIExit = exit;
         }
 
         public override void MIDIEnter(Signal n) {
-            this.MIDIExit(n);
+            if (this.MIDIExit != null)
+                this.MIDIExit(n);
             
-            int result = (int)(n.p);
-
-            result += _offset;
+            int result = (int)(n.p) + _offset;
             
             if (result < 0) result = 0;
             if (result > 127) result = 127;
 
             n.p = (byte)(result);
 
-            this.MIDIExit(n);
+            if (this.MIDIExit != null)
+                this.MIDIExit(n);
         }
     }
 }
