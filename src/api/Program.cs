@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
@@ -26,21 +25,13 @@ namespace api {
         static IMidiInputDevice iDevice;
         static IMidiOutputDevice oDevice;
 
-        // Chain of the Lights track
-        static List<Devices.Device> _chain = new List<Devices.Device>();
-
-        // Access chain
-        public static List<Devices.Device> Chain {
-            get {
-                return _chain;
-            }
-        }
+        public static Chain _chain;
 
         // Initialize Program
         static void Main(string[] args) {
-            _chain.Add(new Devices.Pitch(3, MIDIExit));
-            _chain.Add(new Devices.Chord(10, MIDIExit));
-            _chain[0].MIDIExit = _chain[1].MIDIEnter;
+            _chain = new Chain(MIDIExit);
+            _chain.Add(new Pitch(3));
+            _chain.Add(new Chord(10));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -79,7 +70,7 @@ namespace api {
             n.g = (byte)(e.Velocity >> 1);
             n.b = (byte)(e.Velocity >> 1);
 
-            _chain[0].MIDIEnter(n);
+            _chain.MIDIEnter(n);
         }
     }
 
