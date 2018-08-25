@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 
-using api.Devices;
+using api;
 
 namespace api.Controllers {
     [Route("api/[controller]")]
@@ -14,11 +14,11 @@ namespace api.Controllers {
         public IActionResult Get() {
             var result = new List<object>();
 
-            foreach (object Device in Program.Chain) {
-                if (Device.GetType() == typeof(Devices.Pitch)) {
-                    result.Add(new { Offset = ((Devices.Pitch) Device).Offset });
+            /*foreach (object Device in Program.Chain) {
+                if (Device.GetType() == typeof(Pitch)) {
+                    result.Add(new { Offset = ((Pitch) Device).Offset });
                 }
-            }
+            }*/
 
             return Ok(result.ToArray());
         }
