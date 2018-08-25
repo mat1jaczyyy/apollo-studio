@@ -14,13 +14,11 @@ using RtMidi.Core.Messages;
 using api.Devices;
 
 namespace api {
-    public class Communication {
-        public struct Note {
-            public byte p;
-            public byte r;
-            public byte g;
-            public byte b;
-        }
+    public struct Signal {
+        public byte p;
+        public byte r;
+        public byte g;
+        public byte b;
     }
 
     class Program {
@@ -64,7 +62,7 @@ namespace api {
             host.Run(); // Halts the thread!
         }
 
-        static void MIDIExit(Communication.Note n) {
+        static void MIDIExit(Signal n) {
             byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.p, n.r, n.g, n.b};
             SysExMessage msg = new SysExMessage(data);
             Console.WriteLine($"OUT <- {msg.ToString()}");
@@ -75,7 +73,7 @@ namespace api {
         static void NoteOn(object sender, in NoteOnMessage e) {
             Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
 
-            Communication.Note n = new Communication.Note();
+            Signal n = new Signal();
             n.p = (byte)(e.Key);
             n.r = (byte)(e.Velocity >> 1);
             n.g = (byte)(e.Velocity >> 1);

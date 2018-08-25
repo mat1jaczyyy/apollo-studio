@@ -5,8 +5,8 @@ using api;
 
 namespace api.Devices {
     public abstract class Device {
-        public abstract void MIDIEnter(Communication.Note n);
-        public Action<Communication.Note> MIDIExit;
+        public abstract void MIDIEnter(Signal n);
+        public Action<Signal> MIDIExit;
     }
 
     public class Pitch: Device {
@@ -23,18 +23,18 @@ namespace api.Devices {
         }
 
         // Create device
-        public Pitch(Action<Communication.Note> exit) {
+        public Pitch(Action<Signal> exit) {
             this.Offset = 0;
             this.MIDIExit = exit;
         }
 
         // Load device
-        public Pitch(int offset, Action<Communication.Note> exit) {
+        public Pitch(int offset, Action<Signal> exit) {
             this.Offset = offset;
             this.MIDIExit = exit;
         }
 
-        public override void MIDIEnter(Communication.Note n) {
+        public override void MIDIEnter(Signal n) {
             int result = (int)(n.p);
 
             result += _offset;
@@ -62,18 +62,18 @@ namespace api.Devices {
         }
 
         // Create device
-        public Chord(Action<Communication.Note> exit) {
+        public Chord(Action<Signal> exit) {
             this.Offset = 0;
             this.MIDIExit = exit;
         }
 
         // Load device
-        public Chord(int offset, Action<Communication.Note> exit) {
+        public Chord(int offset, Action<Signal> exit) {
             this.Offset = offset;
             this.MIDIExit = exit;
         }
 
-        public override void MIDIEnter(Communication.Note n) {
+        public override void MIDIEnter(Signal n) {
             this.MIDIExit(n);
             
             int result = (int)(n.p);
