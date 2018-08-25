@@ -30,8 +30,12 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain = new Chain(MIDIExit);
-            _chain.Add(new Pitch(3));
-            _chain.Add(new Chord(10));
+            Group temp = new Group(MIDIExit);
+            temp.Add();
+            temp[0].Add(new Pitch(19));
+            temp.Add();
+            temp[1].Add(new Chord(12));
+            _chain.Add(temp);
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
