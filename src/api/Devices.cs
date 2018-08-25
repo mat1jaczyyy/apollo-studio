@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using api;
@@ -7,6 +8,52 @@ namespace api.Devices {
     public abstract class Device {
         public abstract void MIDIEnter(Signal n);
         public Action<Signal> MIDIExit;
+    }
+
+    public class Group: Device {
+        private List<Chain> _chains;
+
+        private void ChainExit(Signal n) {
+            if (this.MIDIExit != null)
+                this.MIDIExit(n);
+        }
+
+        public Chain this[int index] {
+            get {
+                return _chains[index];
+            }
+            set {
+                _chains[index] = value;
+                _chains[index].MIDIExit = ChainExit;
+            }
+        }
+
+        public void Insert(int index) {
+            _chains.Insert(index, new Chain(ChainExit));
+        }
+
+        public void Add() {
+            _chains.Add(new Chain(ChainExit));
+        }
+
+        public void Remove(int index) {
+            _chains.RemoveAt(index);
+        }
+
+        public Group() {
+            _chains = new List<Chain>();
+            this.MIDIExit = null;
+        }
+
+        public Group(Action<Signal> exit) {
+            _chains = new List<Chain>();
+            this.MIDIExit = exit;
+        }
+
+        public override void MIDIEnter(Signal n) {
+            foreach (Chain chain in _chains)
+                chain.MIDIEnter(n);
+        }
     }
 
     public class Pitch: Device {
