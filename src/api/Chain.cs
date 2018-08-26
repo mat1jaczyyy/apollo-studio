@@ -15,9 +15,8 @@ namespace api {
                 this._chainenter = this._midiexit;
             } else {
                 this._chainenter = this._devices[0].MIDIEnter;
-                for (int i = 1; i < _devices.Count; i++) {
+                for (int i = 1; i < _devices.Count; i++)
                     _devices[i - 1].MIDIExit = _devices[i].MIDIEnter;
-                }
                 _devices[_devices.Count - 1].MIDIExit = this._midiexit;
             }
         }
@@ -49,7 +48,10 @@ namespace api {
         }
 
         public Chain Clone() {
-            return new Chain(_devices.ToArray());
+            Chain ret = new Chain();
+            foreach (Device device in _devices)
+                ret.Add(device.Clone());
+            return ret;
         }
 
         public void Insert(int index, Device device) {
@@ -63,9 +65,8 @@ namespace api {
         }
 
         public void Add(Device[] devices) {
-            foreach (Device device in devices) {
+            foreach (Device device in devices)
                 _devices.Add(device);
-            }
             Reroute();
         }
 
@@ -81,12 +82,11 @@ namespace api {
 
         public Chain(Device[] init) {
             _devices = new List<Device>();
-            foreach (Device device in init) {
+            foreach (Device device in init)
                 _devices.Add(device);
-            }
             this.MIDIExit = null;
         }
-        
+
         public Chain(List<Device> init) {
             _devices = init;
             this.MIDIExit = null;
@@ -99,9 +99,8 @@ namespace api {
 
         public Chain(Device[] init, Action<Signal> exit) {
             _devices = new List<Device>();
-            foreach (Device device in init) {
+            foreach (Device device in init)
                 _devices.Add(device);
-            }
             this.MIDIExit = exit;
         }
 

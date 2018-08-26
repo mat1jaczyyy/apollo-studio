@@ -36,7 +36,10 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Group(_chains.ToArray());
+            Group ret = new Group();
+            foreach (Chain chain in _chains)
+                ret.Add(chain.Clone());
+            return ret;
         }
 
         public void Insert(int index) {
@@ -84,9 +87,8 @@ namespace api.Devices {
 
         public Group(List<Chain> init) {
             _chains = init;
-            foreach (Chain chain in _chains) {
+            foreach (Chain chain in _chains)
                 chain.MIDIExit = ChainExit;
-            }
             this.MIDIExit = null;
         }
 
@@ -106,9 +108,8 @@ namespace api.Devices {
 
         public Group(List<Chain> init, Action<Signal> exit) {
             _chains = init;
-            foreach (Chain chain in _chains) {
+            foreach (Chain chain in _chains)
                 chain.MIDIExit = ChainExit;
-            }
             this.MIDIExit = exit;
         }
 
@@ -126,7 +127,8 @@ namespace api.Devices {
                 return _offset;
             }
             set {
-                if (-128 <= _offset && _offset <= 128) _offset = value;
+                if (-128 <= value && value <= 128)
+                    _offset = value;
             }
         }
 
@@ -175,7 +177,8 @@ namespace api.Devices {
                 return _offset;
             }
             set {
-                if (-128 <= _offset && _offset <= 128) _offset = value;
+                if (-128 <= value && value <= 128)
+                    _offset = value;
             }
         }
 
@@ -213,6 +216,80 @@ namespace api.Devices {
             if (result > 127) result = 127;
 
             n.p = (byte)(result);
+
+            if (this.MIDIExit != null)
+                this.MIDIExit(n);
+        }
+    }
+
+    public class Velocity: Device {
+        private int _r, _g, _b;
+
+        public int Red {
+            get {
+                return _r;
+            }
+            set {
+                if (0 <= value && value <= 63) _r = value;
+            }
+        }
+
+        public int Green {
+            get {
+                return _g;
+            }
+            set {
+                if (0 <= value && value <= 63) _g = value;
+            }
+        }
+
+        public int Blue {
+            get {
+                return _b;
+            }
+            set {
+                if (0 <= value && value <= 63) _b = value;
+            }
+        }
+
+        public override Device Clone() {
+            return new Velocity(_r, _g, _b);
+        }
+
+        public Velocity() {
+            this._r = 63;
+            this._g = 63;
+            this._b = 63;
+            this.MIDIExit = null;
+        }
+
+        public Velocity(int red, int green, int blue) {
+            this._r = red;
+            this._g = green;
+            this._b = blue;
+            this.MIDIExit = null;
+        }
+        
+        public Velocity(Action<Signal> exit) {
+            this._r = 63;
+            this._g = 63;
+            this._b = 63;
+            this.MIDIExit = exit;
+        }
+        
+        public Velocity(int red, int green, int blue, Action<Signal> exit) {
+            this._r = red;
+            this._g = green;
+            this._b = blue;
+            this.MIDIExit = exit;
+        }
+
+        public override void MIDIEnter(Signal n) {
+            if (n.r != 0 || n.g != 0 || n.b != 0) {
+                n.r = (byte)this._r;
+                n.g = (byte)this._g;
+                n.b = (byte)this._b;
+            }
 
             if (this.MIDIExit != null)
                 this.MIDIExit(n);

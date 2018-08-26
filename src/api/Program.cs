@@ -51,6 +51,10 @@ namespace api {
                 0, new Pitch(51)
             );
 
+            ((Group) _chain[0])[0].Add(new Velocity(63, 0, 0));
+            ((Group) _chain[0])[1].Add(new Velocity(0, 63, 0));
+            ((Group) _chain[0])[2].Add(new Velocity(0, 0, 63));
+
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
             
