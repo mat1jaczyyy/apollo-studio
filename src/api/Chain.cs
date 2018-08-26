@@ -48,6 +48,10 @@ namespace api {
             }
         }
 
+        public Chain Clone() {
+            return new Chain(_devices.ToArray());
+        }
+
         public void Insert(int index, Device device) {
             _devices.Insert(index, device);
             Reroute();
@@ -83,6 +87,11 @@ namespace api {
             this.MIDIExit = null;
         }
         
+        public Chain(List<Device> init) {
+            _devices = init;
+            this.MIDIExit = null;
+        }
+
         public Chain(Action<Signal> exit) {
             _devices = new List<Device>();
             this.MIDIExit = exit;
@@ -93,6 +102,11 @@ namespace api {
             foreach (Device device in init) {
                 _devices.Add(device);
             }
+            this.MIDIExit = exit;
+        }
+
+        public Chain(List<Device> init, Action<Signal> exit) {
+            _devices = init;
             this.MIDIExit = exit;
         }
 

@@ -42,6 +42,14 @@ namespace api {
                     })
                 })
             );
+            
+            ((Group) _chain[0]).Add(
+                ((Group) _chain[0])[1].Clone()
+            );
+
+            ((Group) _chain[0])[2].Insert(
+                0, new Pitch(51)
+            );
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");

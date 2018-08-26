@@ -7,6 +7,7 @@ using api;
 namespace api.Devices {
     public abstract class Device {
         public abstract void MIDIEnter(Signal n);
+        public abstract Device Clone();
         public Action<Signal> MIDIExit;
     }
 
@@ -32,6 +33,10 @@ namespace api.Devices {
             get {
                 return _chains.Count;
             }
+        }
+
+        public override Device Clone() {
+            return new Group(_chains.ToArray());
         }
 
         public void Insert(int index) {
@@ -77,6 +82,14 @@ namespace api.Devices {
             this.MIDIExit = null;
         }
 
+        public Group(List<Chain> init) {
+            _chains = init;
+            foreach (Chain chain in _chains) {
+                chain.MIDIExit = ChainExit;
+            }
+            this.MIDIExit = null;
+        }
+
         public Group(Action<Signal> exit) {
             _chains = new List<Chain>();
             this.MIDIExit = exit;
@@ -91,6 +104,14 @@ namespace api.Devices {
             this.MIDIExit = exit;
         }
 
+        public Group(List<Chain> init, Action<Signal> exit) {
+            _chains = init;
+            foreach (Chain chain in _chains) {
+                chain.MIDIExit = ChainExit;
+            }
+            this.MIDIExit = exit;
+        }
+
         public override void MIDIEnter(Signal n) {
             foreach (Chain chain in _chains)
                 chain.MIDIEnter(n);
@@ -98,7 +119,6 @@ namespace api.Devices {
     }
 
     public class Pitch: Device {
-        // Note offset
         private int _offset;
 
         public int Offset {
@@ -108,6 +128,10 @@ namespace api.Devices {
             set {
                 if (-128 <= _offset && _offset <= 128) _offset = value;
             }
+        }
+
+        public override Device Clone() {
+            return new Pitch(_offset);
         }
 
         public Pitch() {
@@ -144,7 +168,6 @@ namespace api.Devices {
     }
 
     public class Chord: Device {
-        // Note offset
         private int _offset;
 
         public int Offset {
@@ -154,6 +177,10 @@ namespace api.Devices {
             set {
                 if (-128 <= _offset && _offset <= 128) _offset = value;
             }
+        }
+
+        public override Device Clone() {
+            return new Chord(_offset);
         }
 
         public Chord() {
