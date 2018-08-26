@@ -32,6 +32,12 @@ namespace api {
             }
         }
 
+        public int Count {
+            get {
+                return _devices.Count;
+            }
+        }
+
         public Action<Signal> MIDIExit {
             get {
                 return _midiexit;
@@ -49,6 +55,13 @@ namespace api {
 
         public void Add(Device device) {
             _devices.Add(device);
+            Reroute();
+        }
+
+        public void Add(Device[] devices) {
+            foreach (Device device in devices) {
+                _devices.Add(device);
+            }
             Reroute();
         }
 

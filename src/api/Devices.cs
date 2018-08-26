@@ -28,12 +28,35 @@ namespace api.Devices {
             }
         }
 
+        public int Count {
+            get {
+                return _chains.Count;
+            }
+        }
+
         public void Insert(int index) {
             _chains.Insert(index, new Chain(ChainExit));
         }
 
+        public void Insert(int index, Chain chain) {
+            chain.MIDIExit = ChainExit;
+            _chains.Insert(index, chain);
+        }
+
         public void Add() {
             _chains.Add(new Chain(ChainExit));
+        }
+
+        public void Add(Chain chain) {
+            chain.MIDIExit = ChainExit;
+            _chains.Add(chain);  
+        }
+
+        public void Add(Chain[] chains) {
+            foreach (Chain chain in chains) {
+                chain.MIDIExit = ChainExit;
+                _chains.Add(chain);
+            }     
         }
 
         public void Remove(int index) {
