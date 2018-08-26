@@ -61,9 +61,25 @@ namespace api {
             _devices = new List<Device>();
             this.MIDIExit = null;
         }
+
+        public Chain(Device[] init) {
+            _devices = new List<Device>();
+            foreach (Device device in init) {
+                _devices.Add(device);
+            }
+            this.MIDIExit = null;
+        }
         
         public Chain(Action<Signal> exit) {
             _devices = new List<Device>();
+            this.MIDIExit = exit;
+        }
+
+        public Chain(Device[] init, Action<Signal> exit) {
+            _devices = new List<Device>();
+            foreach (Device device in init) {
+                _devices.Add(device);
+            }
             this.MIDIExit = exit;
         }
 

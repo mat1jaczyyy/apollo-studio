@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
@@ -30,12 +31,17 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain = new Chain(MIDIExit);
-            Group temp = new Group(MIDIExit);
-            temp.Add();
-            temp[0].Add(new Pitch(19));
-            temp.Add();
-            temp[1].Add(new Chord(12));
-            _chain.Add(temp);
+            _chain.Add(
+                new Group(new Chain[] {
+                    new Chain(new Device[] {
+                        new Pitch(19),
+                        new Chord(12)
+                    }),
+                    new Chain(new Device[] {
+                        new Chord(12)
+                    })
+                })
+            );
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");

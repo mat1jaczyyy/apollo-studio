@@ -45,8 +45,26 @@ namespace api.Devices {
             this.MIDIExit = null;
         }
 
+        public Group(Chain[] init) {
+            _chains = new List<Chain>();
+            foreach (Chain chain in init) {
+                chain.MIDIExit = ChainExit;
+                _chains.Add(chain);
+            }
+            this.MIDIExit = null;
+        }
+
         public Group(Action<Signal> exit) {
             _chains = new List<Chain>();
+            this.MIDIExit = exit;
+        }
+
+        public Group(Chain[] init, Action<Signal> exit) {
+            _chains = new List<Chain>();
+            foreach (Chain chain in init) {
+                chain.MIDIExit = ChainExit;
+                _chains.Add(chain);
+            }
             this.MIDIExit = exit;
         }
 
