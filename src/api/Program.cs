@@ -51,6 +51,8 @@ namespace api {
             ((Group) _chain[0])[1].Insert(0, new Delay(100));
             ((Group) _chain[0])[2].Insert(0, new Delay(200));
 
+            ((Group) _chain[0])[1].Add(new Hold(1000));
+
             //_chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
