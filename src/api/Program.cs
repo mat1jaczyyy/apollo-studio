@@ -24,7 +24,7 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain = new Chain(MIDIExit);
-            _chain.Add(
+            /*_chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Device[] {
                         new Pitch(19),
@@ -49,7 +49,9 @@ namespace api {
             ((Group) _chain[0])[2].Add(new Velocity(0, 0, 63));
 
             ((Group) _chain[0])[1].Insert(0, new Delay(100));
-            ((Group) _chain[0])[2].Insert(0, new Delay(200));
+            ((Group) _chain[0])[2].Insert(0, new Delay(200));*/
+
+            _chain.Add(new Lightweight("/Users/mat1jaczyyy/Project Files/mat1jaczyyy Ghastly feat. Matthew Koma - We Might Fall (Spock Remix)/Lights/1.mid"));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
