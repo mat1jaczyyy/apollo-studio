@@ -74,6 +74,11 @@ namespace api.Devices {
             MIDIExit = null;
         }
 
+        public Color(byte bright) {
+            _rh = _rl = _gh = _gl = _bh = _bl = bright;
+            MIDIExit = null;
+        }
+
         public Color(byte red, byte green, byte blue) {
             _rh = _rl = red;
             _gh = _gl = green;
