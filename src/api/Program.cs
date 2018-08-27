@@ -14,13 +14,6 @@ using RtMidi.Core.Messages;
 using api.Devices;
 
 namespace api {
-    public struct Signal {
-        public byte p;
-        public byte r;
-        public byte g;
-        public byte b;
-    }
-
     class Program {
         // MIDI Access
         static IMidiInputDevice iDevice;
@@ -79,7 +72,7 @@ namespace api {
         }
 
         static void MIDIExit(Signal n) {
-            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.p, n.r, n.g, n.b};
+            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Red, n.Green, n.Blue};
             SysExMessage msg = new SysExMessage(data);
             Console.WriteLine($"OUT <- {msg.ToString()}");
 
@@ -89,13 +82,7 @@ namespace api {
         static void NoteOn(object sender, in NoteOnMessage e) {
             Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
 
-            Signal n = new Signal();
-            n.p = (byte)(e.Key);
-            n.r = (byte)(e.Velocity >> 1);
-            n.g = (byte)(e.Velocity >> 1);
-            n.b = (byte)(e.Velocity >> 1);
-
-            _chain.MIDIEnter(n);
+            _chain.MIDIEnter(new Signal(e.Key, e.Velocity >> 1));
         }
     }
 

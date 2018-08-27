@@ -44,12 +44,12 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            int result = (int)(n.p) + _offset;
+            int result = n.Index + _offset;
 
             if (result < 0) result = 0;
             if (result > 127) result = 127;
 
-            n.p = (byte)(result);
+            n.Index = (byte)result;
 
             if (this.MIDIExit != null)
                 this.MIDIExit(n);

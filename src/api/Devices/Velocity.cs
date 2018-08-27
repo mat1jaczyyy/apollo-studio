@@ -69,10 +69,10 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.r != 0 || n.g != 0 || n.b != 0) {
-                n.r = (byte)this._r;
-                n.g = (byte)this._g;
-                n.b = (byte)this._b;
+            if (n.Red != 0 || n.Green != 0 || n.Blue != 0) {
+                n.Red = (byte)this._r;
+                n.Green = (byte)this._g;
+                n.Blue = (byte)this._b;
             }
 
             if (this.MIDIExit != null)
