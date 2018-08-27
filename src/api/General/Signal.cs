@@ -44,6 +44,12 @@ namespace api {
             }
         }
 
+        public bool Pressed {
+            get {
+                return (_r != 0 || _g != 0 || _b != 0);
+            }
+        }
+
         public Signal Clone() {
             return new Signal(_p, _r, _g, _b);
         }

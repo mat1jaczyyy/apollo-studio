@@ -206,7 +206,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Red != 0 || n.Green != 0 || n.Blue != 0)
+            if (n.Pressed)
                 for (int i = 0; i < _timers.Count; i++)
                     _timers[i].Change(_timecodes[i] * 10, System.Threading.Timeout.Infinite);
         }
