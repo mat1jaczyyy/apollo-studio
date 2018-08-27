@@ -51,7 +51,7 @@ namespace api {
             ((Group) _chain[0])[1].Insert(0, new Delay(100));
             ((Group) _chain[0])[2].Insert(0, new Delay(200));*/
 
-            _chain.Add(new Lightweight("/Users/mat1jaczyyy/Project Files/mat1jaczyyy Ghastly feat. Matthew Koma - We Might Fall (Spock Remix)/Lights/1.mid"));
+            _chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -76,7 +76,7 @@ namespace api {
         static void MIDIExit(Signal n) {
             byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Red, n.Green, n.Blue};
             SysExMessage msg = new SysExMessage(data);
-            Console.WriteLine($"OUT <- {msg.ToString()}");
+            //Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }
