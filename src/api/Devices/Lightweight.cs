@@ -12,6 +12,7 @@ namespace api.Devices {
         private BinaryReader _read;
         private List<Timer> _timers;
         private List<int> _timecodes;
+        private List<Signal> _signals;
         private TimerCallback _timerexit;
 
         private int ReadVariableLength() {
@@ -114,23 +115,69 @@ namespace api.Devices {
                 long end = _read.BaseStream.Position + BitConverter.ToInt32(_read.ReadBytes(4).Reverse().ToArray()); // Track length
                 List<Timer> timers = new List<Timer>();
                 List<int> timecodes = new List<int>();
+                List<Signal> signals = new List<Signal>();
                 int time = 0;
+                int check = 0;
 
                 while (_read.BaseStream.Position < end) {
-                    int varl = ReadVariableLength();
-                    time += varl;
+                    int delta = ReadVariableLength();
+                    time += delta;
+
+                    if (delta > 0)
+                        check = timers.Count;
                     
                     byte type = _read.ReadByte();
+                    Signal n; bool add; int remove;
+
                     switch (type >> 4) {
                         case 0x8: // Note off
-                            timers.Add(new Timer(_timerexit, new Signal(_read.ReadByte(), 0), System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite));
-                            _read.ReadByte(); // Skip velocity
-                            timecodes.Add(time);
+                            n = new Signal(_read.ReadBytes(2)[0], 0);
+                            add = true;
+
+                            for (int i = check; i < timers.Count; i++) {
+                                if (signals[i].Index == n.Index) {
+                                    add = false;
+                                    break;
+                                }
+                            }
+
+                            if (add) {
+                                timers.Add(new Timer(_timerexit, timers.Count, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite));
+                                timecodes.Add(time);
+                                signals.Add(n);
+                            }
                             break;
                         
                         case 0x9: // Note on
-                            timers.Add(new Timer(_timerexit, new Signal(_read.ReadByte(), (byte)(_read.ReadByte() >> 1)), System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite));
-                            timecodes.Add(time);
+                            n = new Signal(_read.ReadByte(), (byte)(_read.ReadByte() >> 1));
+                            add = true; remove = -1;
+
+                            for (int i = check; i < timers.Count; i++) {
+                                if (signals[i].Index == n.Index) {
+                                    if (signals[i].Pressed) {
+                                        add = false;
+                                        break;
+
+                                    } else
+                                        remove = i;
+                                }
+                            }
+
+                            if (add) {
+                                if (remove != -1) {
+                                    signals.RemoveAt(remove);
+                                    timers.RemoveAt(remove);
+                                    timecodes.RemoveAt(remove);
+
+                                    for (int i = remove; i < timers.Count; i++) {
+                                        timers[i] = new Timer(_timerexit, i, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+                                    }
+                                }
+
+                                timers.Add(new Timer(_timerexit, timers.Count, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite));
+                                timecodes.Add(time);
+                                signals.Add(n);
+                            }
                             break;
                         
                         case 0xA: // Poly Aftertouch
@@ -155,6 +202,7 @@ namespace api.Devices {
                     _path = value;
                     _timers = timers;
                     _timecodes = timecodes;
+                    _signals = signals;
                     
                     _read.Close();
                     _read.Dispose();
@@ -195,8 +243,8 @@ namespace api.Devices {
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof(Signal)) {
-                Signal n = ((Signal)info).Clone();
+            if (info.GetType() == typeof(int)) {
+                Signal n = _signals[(int)info].Clone();
                 
                 n.Index = Conversion.DRtoXY[n.Index];
 
