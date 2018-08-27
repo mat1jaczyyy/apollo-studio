@@ -26,29 +26,29 @@ namespace api.Devices {
         }
 
         public Delay() {
-            this._length = 200;
-            this.MIDIExit = null;
+            _length = 200;
+            MIDIExit = null;
             _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
 
         public Delay(int length) {
-            this.Length = length;
-            this.MIDIExit = null;
+            Length = length;
+            MIDIExit = null;
             _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
 
         public Delay(Action<Signal> exit) {
-            this._length = 200;
-            this.MIDIExit = exit;
+            _length = 200;
+            MIDIExit = exit;
             _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
 
         public Delay(int length, Action<Signal> exit) {
-            this.Length = length;
-            this.MIDIExit = exit;
+            Length = length;
+            MIDIExit = exit;
             _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
@@ -57,8 +57,8 @@ namespace api.Devices {
             if (info.GetType() == typeof(Signal)) {
                 Signal n = (Signal)info;
       
-                if (this.MIDIExit != null)
-                    this.MIDIExit(n);
+                if (MIDIExit != null)
+                    MIDIExit(n);
                 
                 _timers.Dequeue();
             }

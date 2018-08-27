@@ -218,28 +218,28 @@ namespace api.Devices {
             _timerexit = new TimerCallback(Tick);
             _timers = new List<Timer>();
             _path = null;
-            this.MIDIExit = null;
+            MIDIExit = null;
         }
 
         public Lightweight(string path) {
             _timerexit = new TimerCallback(Tick);
             _timers = new List<Timer>();
             Path = path;
-            this.MIDIExit = null;
+            MIDIExit = null;
         }
 
         public Lightweight(Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             _timers = new List<Timer>();
             _path = null;
-            this.MIDIExit = exit;
+            MIDIExit = exit;
         }
 
         public Lightweight(string path, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             _timers = new List<Timer>();
             Path = path;
-            this.MIDIExit = exit;
+            MIDIExit = exit;
         }
 
         private void Tick(object info) {
@@ -248,8 +248,8 @@ namespace api.Devices {
                 
                 n.Index = Conversion.DRtoXY[n.Index];
 
-                if (this.MIDIExit != null)
-                    this.MIDIExit(n);
+                if (MIDIExit != null)
+                    MIDIExit(n);
             }
         }
 

@@ -10,8 +10,8 @@ namespace api.Devices {
         private List<Chain> _chains;
 
         private void ChainExit(Signal n) {
-            if (this.MIDIExit != null)
-                this.MIDIExit(n);
+            if (MIDIExit != null)
+                MIDIExit(n);
         }
 
         public Chain this[int index] {
@@ -68,7 +68,7 @@ namespace api.Devices {
 
         public Group() {
             _chains = new List<Chain>();
-            this.MIDIExit = null;
+            MIDIExit = null;
         }
 
         public Group(Chain[] init) {
@@ -77,19 +77,19 @@ namespace api.Devices {
                 chain.MIDIExit = ChainExit;
                 _chains.Add(chain);
             }
-            this.MIDIExit = null;
+            MIDIExit = null;
         }
 
         public Group(List<Chain> init) {
             _chains = init;
             foreach (Chain chain in _chains)
                 chain.MIDIExit = ChainExit;
-            this.MIDIExit = null;
+            MIDIExit = null;
         }
 
         public Group(Action<Signal> exit) {
             _chains = new List<Chain>();
-            this.MIDIExit = exit;
+            MIDIExit = exit;
         }
 
         public Group(Chain[] init, Action<Signal> exit) {
@@ -98,19 +98,19 @@ namespace api.Devices {
                 chain.MIDIExit = ChainExit;
                 _chains.Add(chain);
             }
-            this.MIDIExit = exit;
+            MIDIExit = exit;
         }
 
         public Group(List<Chain> init, Action<Signal> exit) {
             _chains = init;
             foreach (Chain chain in _chains)
                 chain.MIDIExit = ChainExit;
-            this.MIDIExit = exit;
+            MIDIExit = exit;
         }
 
         public override void MIDIEnter(Signal n) {
             foreach (Chain chain in _chains)
-                chain.MIDIEnter(n);
+                chain.MIDIEnter(n.Clone());
         }
     }
 }
