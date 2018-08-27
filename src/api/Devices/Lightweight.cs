@@ -197,17 +197,16 @@ namespace api.Devices {
         private void Tick(object info) {
             if (info.GetType() == typeof(Signal)) {
                 Signal n = (Signal)info;
-      
+                
                 if (this.MIDIExit != null)
                     this.MIDIExit(n);
-                
-                //_timers.Dequeue();
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            if (this.MIDIExit != null)
-                this.MIDIExit(n);
+            if (n.Red != 0 || n.Green != 0 || n.Blue != 0)
+                for (int i = 0; i < _timers.Count; i++)
+                    _timers[i].Change(_timecodes[i] * 10, System.Threading.Timeout.Infinite);
         }
     }
 }
