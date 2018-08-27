@@ -24,34 +24,73 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain = new Chain(MIDIExit);
-            _chain.Add(
+            _chain.Add(new Device[] {
+                new Translation(-127),
+                new Translation(44),
+                new Hold(250),
                 new Group(new Chain[] {
+                    new Chain(),
                     new Chain(new Device[] {
-                        new Translation(19),
-                        new Duplication(new int[] {12})
+                        new Delay(100),
+                        new Translation(-1),
+                        new Duplication(new int[] {-9})
                     }),
                     new Chain(new Device[] {
-                        new Duplication(new int[] {12})
-                    })
-                })
-            );
-            
-            ((Group) _chain[0]).Add(
-                ((Group) _chain[0])[1].Clone()
-            );
-
-            ((Group) _chain[0])[2].Insert(
-                0, new Translation(51)
-            );
-
-            ((Group) _chain[0])[0].Add(new Color(63, 0, 0));
-            ((Group) _chain[0])[1].Add(new Color(0, 63, 0));
-            ((Group) _chain[0])[2].Add(new Color(0, 0, 63));
-
-            ((Group) _chain[0])[1].Insert(0, new Delay(100));
-            ((Group) _chain[0])[2].Insert(0, new Delay(200));
-
-            ((Group) _chain[0])[1].Add(new Hold(1000));
+                        new Delay(200),
+                        new Translation(-2),
+                        new Duplication(new int[] {-9, -18})
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(300),
+                        new Translation(-3),
+                        new Duplication(new int[] {-9, -18, -27})
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(400),
+                        new Translation(-13),
+                        new Duplication(new int[] {-9, -18})
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(500),
+                        new Translation(-23),
+                        new Duplication(new int[] {-9})
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(600),
+                        new Translation(-33)
+                    }),
+                }),
+                new Group(new Chain[] {
+                    new Chain(new Device[] {
+                        new Color(63, 0, 0)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(100),
+                        new Color(63, 15, 0)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(200),
+                        new Color(63, 63, 0)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(300),
+                        new Color(0, 63, 0)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(400),
+                        new Color(0, 63, 63)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(500),
+                        new Color(0, 0, 63)
+                    }),
+                    new Chain(new Device[] {
+                        new Delay(600),
+                        new Color(7, 0, 63)
+                    }),
+                }),
+                new Hold(110),
+            });
 
             //_chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
 
@@ -78,7 +117,7 @@ namespace api {
         static void MIDIExit(Signal n) {
             byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Red, n.Green, n.Blue};
             SysExMessage msg = new SysExMessage(data);
-            Console.WriteLine($"OUT <- {msg.ToString()}");
+            //Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }
