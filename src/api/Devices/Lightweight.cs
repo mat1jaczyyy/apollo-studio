@@ -196,8 +196,10 @@ namespace api.Devices {
 
         private void Tick(object info) {
             if (info.GetType() == typeof(Signal)) {
-                Signal n = (Signal)info;
+                Signal n = ((Signal)info).Clone();
                 
+                n.Index = Conversion.DRtoXY[n.Index];
+
                 if (this.MIDIExit != null)
                     this.MIDIExit(n);
             }

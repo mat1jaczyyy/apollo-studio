@@ -44,6 +44,10 @@ namespace api {
             }
         }
 
+        public Signal Clone() {
+            return new Signal(_p, _r, _g, _b);
+        }
+
         public Signal() {}
 
         public Signal(byte index) {
