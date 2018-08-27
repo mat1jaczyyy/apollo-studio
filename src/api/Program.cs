@@ -27,7 +27,7 @@ namespace api {
             _chain.Add(new Device[] {
                 new Translation(-127),
                 new Translation(44),
-                new Hold(250),
+                new Infinity(),
                 new Group(new Chain[] {
                     new Chain(),
                     new Chain(new Device[] {
@@ -58,7 +58,7 @@ namespace api {
                     new Chain(new Device[] {
                         new Delay(600),
                         new Translation(-33)
-                    }),
+                    })
                 }),
                 new Group(new Chain[] {
                     new Chain(new Device[] {
@@ -88,8 +88,11 @@ namespace api {
                         new Delay(600),
                         new Color(7, 0, 63)
                     }),
+                    new Chain(new Device[] {
+                        new Delay(700),
+                        new Color(0)
+                    })
                 }),
-                new Hold(110),
             });
 
             //_chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
