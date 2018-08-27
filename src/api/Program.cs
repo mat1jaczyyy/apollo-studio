@@ -24,14 +24,14 @@ namespace api {
         // Initialize Program
         static void Main(string[] args) {
             _chain = new Chain(MIDIExit);
-            /*_chain.Add(
+            _chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Device[] {
-                        new Pitch(19),
-                        new Chord(12)
+                        new Translation(19),
+                        new Duplication(new int[] {12})
                     }),
                     new Chain(new Device[] {
-                        new Chord(12)
+                        new Duplication(new int[] {12})
                     })
                 })
             );
@@ -41,17 +41,17 @@ namespace api {
             );
 
             ((Group) _chain[0])[2].Insert(
-                0, new Pitch(51)
+                0, new Translation(51)
             );
 
-            ((Group) _chain[0])[0].Add(new Velocity(63, 0, 0));
-            ((Group) _chain[0])[1].Add(new Velocity(0, 63, 0));
-            ((Group) _chain[0])[2].Add(new Velocity(0, 0, 63));
+            ((Group) _chain[0])[0].Add(new Color(63, 0, 0));
+            ((Group) _chain[0])[1].Add(new Color(0, 63, 0));
+            ((Group) _chain[0])[2].Add(new Color(0, 0, 63));
 
             ((Group) _chain[0])[1].Insert(0, new Delay(100));
-            ((Group) _chain[0])[2].Insert(0, new Delay(200));*/
+            ((Group) _chain[0])[2].Insert(0, new Delay(200));
 
-            _chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
+            //_chain.Add(new Lightweight("/Users/mat1jaczyyy/Downloads/Long.mid"));
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -76,7 +76,7 @@ namespace api {
         static void MIDIExit(Signal n) {
             byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Red, n.Green, n.Blue};
             SysExMessage msg = new SysExMessage(data);
-            //Console.WriteLine($"OUT <- {msg.ToString()}");
+            Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }

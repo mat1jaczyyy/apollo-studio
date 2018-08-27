@@ -6,7 +6,7 @@ using System.Threading;
 using api;
 
 namespace api.Devices {
-    public class Pitch: Device {
+    public class Translation: Device {
         private int _offset;
 
         public int Offset {
@@ -14,33 +14,33 @@ namespace api.Devices {
                 return _offset;
             }
             set {
-                if (-128 <= value && value <= 128)
+                if (-127 <= value && value <= 127)
                     _offset = value;
             }
         }
 
         public override Device Clone() {
-            return new Pitch(_offset);
+            return new Translation(_offset);
         }
 
-        public Pitch() {
-            this._offset = 0;
-            this.MIDIExit = null;
+        public Translation() {
+            _offset = 0;
+            MIDIExit = null;
         }
 
-        public Pitch(int offset) {
-            this.Offset = offset;
-            this.MIDIExit = null;
+        public Translation(int offset) {
+            Offset = offset;
+            MIDIExit = null;
         }
 
-        public Pitch(Action<Signal> exit) {
-            this._offset = 0;
-            this.MIDIExit = exit;
+        public Translation(Action<Signal> exit) {
+            _offset = 0;
+            MIDIExit = exit;
         }
 
-        public Pitch(int offset, Action<Signal> exit) {
-            this.Offset = offset;
-            this.MIDIExit = exit;
+        public Translation(int offset, Action<Signal> exit) {
+            Offset = offset;
+            MIDIExit = exit;
         }
 
         public override void MIDIEnter(Signal n) {
@@ -51,8 +51,8 @@ namespace api.Devices {
 
             n.Index = (byte)result;
 
-            if (this.MIDIExit != null)
-                this.MIDIExit(n);
+            if (MIDIExit != null)
+                MIDIExit(n);
         }
     }
 }
