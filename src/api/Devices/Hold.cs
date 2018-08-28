@@ -55,7 +55,7 @@ namespace api.Devices {
 
         private void Tick(object info) {
             if (info.GetType() == typeof(byte)) {
-                Signal n = new Signal((byte)info, 0);
+                Signal n = new Signal((byte)info, new Color(0));
       
                 if (MIDIExit != null)
                     MIDIExit(n);

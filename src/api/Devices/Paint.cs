@@ -58,9 +58,9 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Pressed) {
-                n.Red = Scale(n.Red, _high.Red, _low.Red);
-                n.Green = Scale(n.Green, _high.Green, _high.Green);
-                n.Blue = Scale(n.Blue, _high.Blue, _high.Blue);
+                n.Color.Red = Scale(n.Color.Red, _high.Red, _low.Red);
+                n.Color.Green = Scale(n.Color.Green, _high.Green, _high.Green);
+                n.Color.Blue = Scale(n.Color.Blue, _high.Blue, _high.Blue);
             }
 
             if (MIDIExit != null)
