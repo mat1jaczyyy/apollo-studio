@@ -65,7 +65,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            _timers.Enqueue(new Timer(_timerexit, n, _length, System.Threading.Timeout.Infinite));
+            _timers.Enqueue(new Timer(_timerexit, n.Clone(), _length, System.Threading.Timeout.Infinite));
         }
     }
 }
