@@ -21,8 +21,15 @@ namespace api {
 
         public static Chain _chain;
 
+        static bool log;
+
         // Initialize Program
         static void Main(string[] args) {
+            foreach (string arg in args) {
+                if (arg.Equals("--log"))
+                    log = true;
+            }
+
             _chain = new Chain(MIDIExit);
             _chain.Add(
                 new Group(new Chain[] {
@@ -101,8 +108,6 @@ namespace api {
                 })
             );
 
-            //_chain.Add(
-
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
             
@@ -126,13 +131,17 @@ namespace api {
         static void MIDIExit(Signal n) {
             byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue};
             SysExMessage msg = new SysExMessage(data);
-            //Console.WriteLine($"OUT <- {msg.ToString()}");
+            
+            if (log)
+                Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }
 
         static void NoteOn(object sender, in NoteOnMessage e) {
-            //Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
+            if (log)
+                Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
+
             _chain.MIDIEnter(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
         }
     }
