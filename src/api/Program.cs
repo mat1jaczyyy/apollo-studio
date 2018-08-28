@@ -64,35 +64,35 @@ namespace api {
                         }),
                         new Group(new Chain[] {
                             new Chain(new Device[] {
-                                new Color(63, 0, 0)
+                                new Paint(new Color(63, 0, 0))
                             }),
                             new Chain(new Device[] {
                                 new Delay(100),
-                                new Color(63, 15, 0)
+                                new Paint(new Color(63, 15, 0))
                             }),
                             new Chain(new Device[] {
                                 new Delay(200),
-                                new Color(63, 63, 0)
+                                new Paint(new Color(63, 63, 0))
                             }),
                             new Chain(new Device[] {
                                 new Delay(300),
-                                new Color(0, 63, 0)
+                                new Paint(new Color(0, 63, 0))
                             }),
                             new Chain(new Device[] {
                                 new Delay(400),
-                                new Color(0, 63, 63)
+                                new Paint(new Color(0, 63, 63))
                             }),
                             new Chain(new Device[] {
                                 new Delay(500),
-                                new Color(0, 0, 63)
+                                new Paint(new Color(0, 0, 63))
                             }),
                             new Chain(new Device[] {
                                 new Delay(600),
-                                new Color(7, 0, 63)
+                                new Paint(new Color(7, 0, 63))
                             }),
                             new Chain(new Device[] {
                                 new Delay(700),
-                                new Color(0)
+                                new Paint(new Color(0))
                             })
                         })
                     }, new Range(11, 11)),
