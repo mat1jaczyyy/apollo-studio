@@ -15,25 +15,19 @@ using api.Devices;
 
 namespace api {
     class Program {
-        // MIDI Access
         static IMidiInputDevice iDevice;
         static IMidiOutputDevice oDevice;
+        public static Chain _chain = new Chain(MIDIExit);
+        static bool log = false;
 
-        public static Chain _chain;
-
-        static bool log;
-
-        // Initialize Program
         static void Main(string[] args) {
-            foreach (string arg in args) {
+            foreach (string arg in args)
                 if (arg.Equals("--log"))
                     log = true;
-            }
 
-            _chain = new Chain(MIDIExit);
             _chain.Add(
                 new Group(new Chain[] {
-                    new Chain(new Device[] {
+                    new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
                         new Translation(44),
                         new Infinity(),
@@ -102,9 +96,9 @@ namespace api {
                                 new Paint(new Color(0))
                             })
                         })
-                    }, new Range(11, 11)),
+                    }),
                     new Chain(new Range(51, 88)),
-                    new Chain(new Device[] {new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid")}, new Range(18, 18))
+                    new Chain(new Range(18, 18), new Device[] {new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid")})
                 })
             );
 
@@ -120,12 +114,9 @@ namespace api {
             Console.WriteLine($"Output: {oDevice.Name}");
             oDevice.Open();
 
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseStartup<Startup>()
-                .Build();
+            var host = new WebHostBuilder().UseKestrel().UseStartup<Startup>().Build();
             
-            host.Run(); // Halts the thread!
+            host.Run();
         }
 
         static void MIDIExit(Signal n) {

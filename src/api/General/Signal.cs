@@ -15,12 +15,6 @@ namespace api {
             }
         }
 
-        public bool Pressed {
-            get {
-                return (Color.Red != 0 || Color.Green != 0 || Color.Blue != 0);
-            }
-        }
-
         public Signal Clone() {
             return new Signal(_p, Color.Clone());
         }

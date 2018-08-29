@@ -8,11 +8,11 @@ using api;
 
 namespace api.Devices {
     public class Lightweight: Device {
-        private string _path;
+        private string _path = null;
         private BinaryReader _read;
-        private List<Timer> _timers;
-        private List<int> _timecodes;
-        private List<Signal> _signals;
+        private List<Timer> _timers = new List<Timer>();
+        private List<int> _timecodes = new List<int>();
+        private List<Signal> _signals = new List<Signal>();
         private TimerCallback _timerexit;
 
         private int ReadVariableLength() {
@@ -154,7 +154,7 @@ namespace api.Devices {
 
                             for (int i = check; i < timers.Count; i++) {
                                 if (signals[i].Index == n.Index) {
-                                    if (signals[i].Pressed) {
+                                    if (signals[i].Color.Lit) {
                                         add = false;
                                         break;
 
@@ -211,33 +211,25 @@ namespace api.Devices {
         }        
 
         public override Device Clone() {
-            return new Lightweight();
+            return new Lightweight(_path);
         }
 
         public Lightweight() {
             _timerexit = new TimerCallback(Tick);
-            _timers = new List<Timer>();
-            _path = null;
-            MIDIExit = null;
         }
 
         public Lightweight(string path) {
             _timerexit = new TimerCallback(Tick);
-            _timers = new List<Timer>();
             Path = path;
-            MIDIExit = null;
         }
 
         public Lightweight(Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
-            _timers = new List<Timer>();
-            _path = null;
             MIDIExit = exit;
         }
 
         public Lightweight(string path, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
-            _timers = new List<Timer>();
             Path = path;
             MIDIExit = exit;
         }
@@ -254,7 +246,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Pressed)
+            if (n.Color.Lit)
                 for (int i = 0; i < _timers.Count; i++)
                     _timers[i].Change(_timecodes[i] * 10, System.Threading.Timeout.Infinite);
         }

@@ -9,6 +9,6 @@ namespace api.Devices {
     public abstract class Device {
         public abstract void MIDIEnter(Signal n);
         public abstract Device Clone();
-        public Action<Signal> MIDIExit;
+        public Action<Signal> MIDIExit = null;
     }
 }

@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace api {
     public class Color {
-        private byte _r, _g, _b;
+        private byte _r = 63, _g = 63, _b = 63;
 
         private bool IsValid(byte value) {
             return (0 <= value && value <= 63);
@@ -35,13 +35,17 @@ namespace api {
             }
         }
 
+        public bool Lit {
+            get {
+                return _r != 0 || _g != 0 || _b != 0;
+            }
+        }
+
         public Color Clone() {
             return new Color(_r, _g, _b);
         }
 
-        public Color() {
-            _r = _g = _b = 63;
-        }
+        public Color() {}
 
         public Color(byte bright) {
             if (IsValid(bright))

@@ -7,7 +7,7 @@ using api;
 
 namespace api.Devices {
     public class Duplication: Device {
-        private List<int> _offsets;
+        private List<int> _offsets = new List<int>();
 
         public List<int> Offsets {
             get {
@@ -39,23 +39,17 @@ namespace api.Devices {
             _offsets.RemoveAt(index);
         }
 
-        public Duplication() {
-            _offsets = new List<int>();
-            MIDIExit = null;
-        }
+        public Duplication() {}
 
         public Duplication(int[] offsets) {
             Offsets = offsets.ToList();
-            MIDIExit = null;
         }
 
         public Duplication(List<int> offsets) {
             Offsets = offsets;
-            MIDIExit = null;
         }
 
         public Duplication(Action<Signal> exit) {
-            _offsets = new List<int>();
             MIDIExit = exit;
         }
 
