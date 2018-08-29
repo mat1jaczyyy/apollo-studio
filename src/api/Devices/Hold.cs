@@ -30,19 +30,19 @@ namespace api.Devices {
         }
 
         public Hold(int length) {
-            Length = length;
             _timerexit = new TimerCallback(Tick);
+            Length = length;
         }
 
         public Hold(Action<Signal> exit) {
-            MIDIExit = exit;
             _timerexit = new TimerCallback(Tick);
+            MIDIExit = exit;
         }
 
         public Hold(int length, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
             Length = length;
             MIDIExit = exit;
-            _timerexit = new TimerCallback(Tick);
         }
 
         private void Tick(object info) {
