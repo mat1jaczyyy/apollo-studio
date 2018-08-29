@@ -7,9 +7,9 @@ using api;
 
 namespace api.Devices {
     public class Iris: Device {
-        private int _rate; // milliseconds
-        private List<byte> _colors;
-        private Queue<Timer> _timers;
+        private int _rate = 200; // milliseconds
+        private List<Color> _colors = new List<Color>();
+        private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
         public int Rate {
@@ -27,52 +27,106 @@ namespace api.Devices {
         }
 
         public Iris() {
-            _rate = 200;
-            _colors = new List<byte>();
-            MIDIExit = null;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
 
         public Iris(int rate) {
-            Rate = rate;
-            MIDIExit = null;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
+            Rate = rate;
+        }
+
+        public Iris(Color[] colors) {
+            _timerexit = new TimerCallback(Tick);
+            _colors = colors.ToList();
+        }
+
+        public Iris(List<Color> colors) {
+            _timerexit = new TimerCallback(Tick);
+            _colors = colors;
+        }
+
+        public Iris(int rate, Color[] colors) {
+            _timerexit = new TimerCallback(Tick);
+            Rate = rate;
+            _colors = colors.ToList();
+        }
+
+        public Iris(int rate, List<Color> colors) {
+            _timerexit = new TimerCallback(Tick);
+            Rate = rate;
+            _colors = colors;
         }
 
         public Iris(Action<Signal> exit) {
-            _rate = 200;
-            MIDIExit = exit;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
+            MIDIExit = exit;
         }
 
         public Iris(int rate, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
             Rate = rate;
             MIDIExit = exit;
-            _timers = new Queue<Timer>();
+        }
+
+        public Iris(Color[] colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
+            _colors = colors.ToList();
+            MIDIExit = exit;
+        }
+
+        public Iris(List<Color> colors, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
+            _colors = colors;
+            MIDIExit = exit;
+        }
+
+        public Iris(int rate, Color[] colors, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
+            Rate = rate;
+            _colors = colors.ToList();
+            MIDIExit = exit;
+        }
+
+        public Iris(int rate, List<Color> colors, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
+            Rate = rate;
+            _colors = colors;
+            MIDIExit = exit;
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof(byte)) {
-                Signal n = new Signal((byte)info, new Color(0));
-      
-                if (MIDIExit != null)
-                    MIDIExit(n);
+            if (info.GetType() == typeof((byte, int))) {
+                (byte index, int i) = ((byte, int))info;
+                if (++i < _colors.Count) {
+                    _timers[index] = new Timer(_timerexit, (index, i), _rate, System.Threading.Timeout.Infinite);
+                    
+                    Signal n = new Signal(index, _colors[i].Clone());
+
+                    if (MIDIExit != null)
+                        MIDIExit(n);
                 
-                _timers.Dequeue();
+                } else {
+                    Signal n = new Signal(index, new Color(0));
+
+                    if (MIDIExit != null)
+                        MIDIExit(n);
+                }
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Color.Lit) {
-                _timers.Enqueue(new Timer(_timerexit, n.Index, _rate, System.Threading.Timeout.Infinite));
-                
-                if (MIDIExit != null)
-                    MIDIExit(n);
-            }
+            if (_colors.Count > 0)
+                if (n.Color.Lit) {
+                    if (_timers[n.Index] != null)
+                        _timers[n.Index].Dispose();
+
+                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), _rate, System.Threading.Timeout.Infinite);
+
+                    n.Color = _colors[0].Clone();
+
+                    if (MIDIExit != null)
+                        MIDIExit(n);
+                }
         }
     }
 }

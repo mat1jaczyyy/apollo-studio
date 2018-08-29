@@ -63,38 +63,14 @@ namespace api {
                                 new Translation(-33)
                             })
                         }),
-                        new Group(new Chain[] {
-                            new Chain(new Device[] {
-                                new Paint(new Color(63, 0, 0))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(100),
-                                new Paint(new Color(63, 15, 0))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(200),
-                                new Paint(new Color(63, 63, 0))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(300),
-                                new Paint(new Color(0, 63, 0))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(400),
-                                new Paint(new Color(0, 63, 63))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(500),
-                                new Paint(new Color(0, 0, 63))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(600),
-                                new Paint(new Color(7, 0, 63))
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(700),
-                                new Paint(new Color(0))
-                            })
+                        new Iris(100, new Color[] {
+                            new Color(63, 0, 0),
+                            new Color(63, 15, 0),
+                            new Color(63, 63, 0),
+                            new Color(0, 63, 0),
+                            new Color(0, 63, 63),
+                            new Color(0, 0, 63),
+                            new Color(7, 0, 63)
                         })
                     }),
                     new Chain(new Range(51, 88)),
