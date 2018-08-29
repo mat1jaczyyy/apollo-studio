@@ -18,7 +18,7 @@ namespace api {
         static IMidiInputDevice iDevice;
         static IMidiOutputDevice oDevice;
         public static Chain _chain = new Chain(MIDIExit);
-        static bool log = false;
+        public static bool log = false;
 
         static void Main(string[] args) {
             foreach (string arg in args)

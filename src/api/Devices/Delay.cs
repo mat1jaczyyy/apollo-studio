@@ -52,12 +52,22 @@ namespace api.Devices {
                 if (MIDIExit != null)
                     MIDIExit(n);
                 
-                _timers.Dequeue();
+                try {
+                    _timers.Dequeue();
+                } catch {
+                    if (api.Program.log)
+                        Console.WriteLine($"ERR ** Delay Dequeue skipped");
+                } 
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            _timers.Enqueue(new Timer(_timerexit, n.Clone(), _length, System.Threading.Timeout.Infinite));
+            try {
+                _timers.Enqueue(new Timer(_timerexit, n.Clone(), _length, System.Threading.Timeout.Infinite));
+            } catch {
+                if (api.Program.log)
+                    Console.WriteLine($"ERR ** Delay Enqueue skipped");
+            } 
         }
     }
 }
