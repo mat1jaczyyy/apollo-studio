@@ -1,13 +1,3 @@
-.DS_Store
+*.DS_Store
 .vscode/
 dist/
-src/api/bin/
-src/api/obj/
-src/api/librtmidi.dylib
-src/api/rtmidi.dll
-src/api/rtmidi32.dll
-src/app/node_modules/
-src/app/package-lock.json
-src/app/rtmidi.dll
-src/app/rtmidi32.dll
-src/app/librtmidi.dylib

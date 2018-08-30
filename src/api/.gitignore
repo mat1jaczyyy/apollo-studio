@@ -1,0 +1,5 @@
+bin/
+obj/
+librtmidi.dylib
+rtmidi.dll
+rtmidi32.dll
