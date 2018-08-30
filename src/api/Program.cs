@@ -15,17 +15,19 @@ using api.Devices;
 
 namespace api {
     class Program {
-        static IMidiInputDevice iDevice;
-        static IMidiOutputDevice oDevice;
-        public static Chain _chain = new Chain(MIDIExit);
+        public static List<Track> _tracks = new List<Track>();
         public static bool log = false;
 
         static void Main(string[] args) {
+            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
+                Console.WriteLine($"MIDI API: {api}");
+
             foreach (string arg in args)
                 if (arg.Equals("--log"))
                     log = true;
 
-            _chain.Add(
+            _tracks.Add(new Track());
+            _tracks[0].Chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
@@ -78,39 +80,12 @@ namespace api {
                 })
             );
 
-            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                Console.WriteLine($"API: {api}");
-            
-            iDevice = MidiDeviceManager.Default.InputDevices.Last().CreateDevice();
-            Console.WriteLine($"Input: {iDevice.Name}");
-            iDevice.NoteOn += NoteOn;
-            iDevice.Open();
-
-            oDevice = MidiDeviceManager.Default.OutputDevices.Last().CreateDevice();
-            Console.WriteLine($"Output: {oDevice.Name}");
-            oDevice.Open();
+            /*_tracks.Add(new Track());
+            _tracks[1].Chain = _tracks[0].Chain.Clone();*/
 
             var host = new WebHostBuilder().UseKestrel().UseStartup<Startup>().Build();
-            
             host.Run();
-        }
-
-        static void MIDIExit(Signal n) {
-            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue};
-            SysExMessage msg = new SysExMessage(data);
-            
-            if (log)
-                Console.WriteLine($"OUT <- {msg.ToString()}");
-
-            oDevice.Send(in msg);
-        }
-
-        static void NoteOn(object sender, in NoteOnMessage e) {
-            if (log)
-                Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
-
-            _chain.MIDIEnter(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
-        }
+        }  
     }
 
     public class Startup {
