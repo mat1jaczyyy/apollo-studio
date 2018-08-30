@@ -15,18 +15,19 @@ using api.Devices;
 
 namespace api {
     class Program {
-        // MIDI Access
         static IMidiInputDevice iDevice;
         static IMidiOutputDevice oDevice;
+        public static Chain _chain = new Chain(MIDIExit);
+        public static bool log = false;
 
-        public static Chain _chain;
-
-        // Initialize Program
         static void Main(string[] args) {
-            _chain = new Chain(MIDIExit);
+            foreach (string arg in args)
+                if (arg.Equals("--log"))
+                    log = true;
+
             _chain.Add(
                 new Group(new Chain[] {
-                    new Chain(new Device[] {
+                    new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
                         new Translation(44),
                         new Infinity(),
@@ -62,46 +63,20 @@ namespace api {
                                 new Translation(-33)
                             })
                         }),
-                        new Group(new Chain[] {
-                            new Chain(new Device[] {
-                                new Color(63, 0, 0)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(100),
-                                new Color(63, 15, 0)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(200),
-                                new Color(63, 63, 0)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(300),
-                                new Color(0, 63, 0)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(400),
-                                new Color(0, 63, 63)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(500),
-                                new Color(0, 0, 63)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(600),
-                                new Color(7, 0, 63)
-                            }),
-                            new Chain(new Device[] {
-                                new Delay(700),
-                                new Color(0)
-                            })
+                        new Iris(100, new Color[] {
+                            new Color(63, 0, 0),
+                            new Color(63, 15, 0),
+                            new Color(63, 63, 0),
+                            new Color(0, 63, 0),
+                            new Color(0, 63, 63),
+                            new Color(0, 0, 63),
+                            new Color(7, 0, 63)
                         })
-                    }, new Range(11, 11)),
+                    }),
                     new Chain(new Range(51, 88)),
-                    new Chain(new Device[] {new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid")}, new Range(18, 18))
+                    new Chain(new Range(18, 18), new Device[] {new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid")})
                 })
             );
-
-            //_chain.Add(
 
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Console.WriteLine($"API: {api}");
@@ -115,26 +90,26 @@ namespace api {
             Console.WriteLine($"Output: {oDevice.Name}");
             oDevice.Open();
 
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseStartup<Startup>()
-                .Build();
+            var host = new WebHostBuilder().UseKestrel().UseStartup<Startup>().Build();
             
-            host.Run(); // Halts the thread!
+            host.Run();
         }
 
         static void MIDIExit(Signal n) {
-            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Red, n.Green, n.Blue};
+            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue};
             SysExMessage msg = new SysExMessage(data);
-            //Console.WriteLine($"OUT <- {msg.ToString()}");
+            
+            if (log)
+                Console.WriteLine($"OUT <- {msg.ToString()}");
 
             oDevice.Send(in msg);
         }
 
         static void NoteOn(object sender, in NoteOnMessage e) {
-            Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
+            if (log)
+                Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
 
-            _chain.MIDIEnter(new Signal(e.Key, e.Velocity >> 1));
+            _chain.MIDIEnter(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
         }
     }
 

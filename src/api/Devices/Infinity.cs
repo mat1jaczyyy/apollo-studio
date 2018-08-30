@@ -20,7 +20,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Pressed)
+            if (n.Color.Lit)
                 if (MIDIExit != null)
                     MIDIExit(n);
         }

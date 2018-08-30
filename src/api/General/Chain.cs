@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using api.Devices;
 
 namespace api {
     public class Chain {
-        private List<Device> _devices;
-        private Action<Signal> _chainenter;
-        private Action<Signal> _midiexit;
-        public Range Zone;
+        private List<Device> _devices = new List<Device>();
+        private Action<Signal> _chainenter = null;
+        private Action<Signal> _midiexit = null;
+        public Range Zone = new Range();
 
         private void Reroute() {
             if (_devices.Count == 0) {
@@ -74,84 +75,70 @@ namespace api {
             Reroute();
         }
 
-        public Chain() {
-            _devices = new List<Device>();
-            Zone = new Range();
-            MIDIExit = null;
+        public Chain() {}
+
+        public Chain(Range zone) {
+            Zone = zone;
         }
 
         public Chain(Device[] init) {
-            _devices = new List<Device>();
-            foreach (Device device in init)
-                _devices.Add(device);
-            Zone = new Range();
-            MIDIExit = null;
+            _devices = init.ToList();
+            Reroute();
         }
 
         public Chain(List<Device> init) {
             _devices = init;
-            Zone = new Range();
-            MIDIExit = null;
+            Reroute();
+        }
+
+        public Chain(Range zone, Device[] init) {
+            _devices = init.ToList();
+            Zone = zone;
+            Reroute();
+        }
+
+        public Chain(Range zone, List<Device> init) {
+            _devices = init;
+            Zone = zone;
+            Reroute();
         }
 
         public Chain(Action<Signal> exit) {
-            _devices = new List<Device>();
-            Zone = new Range();
-            MIDIExit = exit;
+            _midiexit = exit;
+            Reroute();
+        }
+
+        public Chain(Range zone, Action<Signal> exit) {
+            Zone = zone;
+            _midiexit = exit;
+            Reroute();
         }
 
         public Chain(Device[] init, Action<Signal> exit) {
-            _devices = new List<Device>();
-            foreach (Device device in init)
-                _devices.Add(device);
-            Zone = new Range();
-            MIDIExit = exit;
+            _devices = init.ToList();
+            _midiexit = exit;
+            Reroute();
         }
 
         public Chain(List<Device> init, Action<Signal> exit) {
             _devices = init;
-            Zone = new Range();
-            MIDIExit = exit;
+            _midiexit = exit;
+            Reroute();
         }
 
-        public Chain(Range zone) {
-            _devices = new List<Device>();
+
+        public Chain(Range zone, Device[] init, Action<Signal> exit) {
+            _devices = init.ToList();
             Zone = zone;
-            MIDIExit = null;
+            _midiexit = exit;
+            Reroute();
         }
 
-        public Chain(Device[] init, Range zone) {
-            _devices = new List<Device>();
-            foreach (Device device in init)
-                _devices.Add(device);
-            Zone = zone;
-            MIDIExit = null;
-        }
-
-        public Chain(List<Device> init, Range zone) {
+        public Chain(Range zone, List<Device> init, Action<Signal> exit) {
             _devices = init;
             Zone = zone;
-            MIDIExit = null;
-        }
-
-        public Chain(Action<Signal> exit, Range zone) {
-            _devices = new List<Device>();
-            Zone = zone;
-            MIDIExit = exit;
-        }
-
-        public Chain(Device[] init, Action<Signal> exit, Range zone) {
-            _devices = new List<Device>();
-            foreach (Device device in init)
-                _devices.Add(device);
-            Zone = zone;
-            MIDIExit = exit;
-        }
-
-        public Chain(List<Device> init, Action<Signal> exit, Range zone) {
-            _devices = init;
-            Zone = zone;
-            MIDIExit = exit;
+            _midiexit = exit;
+            Reroute();
         }
 
         public void MIDIEnter(Signal n) {

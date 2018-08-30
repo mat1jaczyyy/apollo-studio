@@ -7,12 +7,7 @@ using api;
 
 namespace api.Devices {
     public class Group: Device {
-        private List<Chain> _chains;
-
-        private void ChainExit(Signal n) {
-            if (MIDIExit != null)
-                MIDIExit(n);
-        }
+        private List<Chain> _chains = new List<Chain>();
 
         public Chain this[int index] {
             get {
@@ -31,10 +26,7 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            Group ret = new Group();
-            foreach (Chain chain in _chains)
-                ret.Add(chain.Clone());
-            return ret;
+            return new Group((from chain in _chains select chain.Clone()).ToList());
         }
 
         public void Insert(int index) {
@@ -66,46 +58,33 @@ namespace api.Devices {
             _chains.RemoveAt(index);
         }
 
-        public Group() {
-            _chains = new List<Chain>();
-            MIDIExit = null;
-        }
+        public Group() {}
 
         public Group(Chain[] init) {
-            _chains = new List<Chain>();
-            foreach (Chain chain in init) {
-                chain.MIDIExit = ChainExit;
-                _chains.Add(chain);
-            }
-            MIDIExit = null;
+            Add(init);
         }
 
         public Group(List<Chain> init) {
-            _chains = init;
-            foreach (Chain chain in _chains)
-                chain.MIDIExit = ChainExit;
-            MIDIExit = null;
+            Add(init.ToArray());
         }
 
         public Group(Action<Signal> exit) {
-            _chains = new List<Chain>();
             MIDIExit = exit;
         }
 
         public Group(Chain[] init, Action<Signal> exit) {
-            _chains = new List<Chain>();
-            foreach (Chain chain in init) {
-                chain.MIDIExit = ChainExit;
-                _chains.Add(chain);
-            }
+            Add(init);
             MIDIExit = exit;
         }
 
         public Group(List<Chain> init, Action<Signal> exit) {
-            _chains = init;
-            foreach (Chain chain in _chains)
-                chain.MIDIExit = ChainExit;
+            Add(init.ToArray());
             MIDIExit = exit;
+        }
+
+        private void ChainExit(Signal n) {
+            if (MIDIExit != null)
+                MIDIExit(n);
         }
 
         public override void MIDIEnter(Signal n) {

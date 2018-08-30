@@ -7,8 +7,8 @@ using api;
 
 namespace api.Devices {
     public class Hold: Device {
-        private int _length; // milliseconds
-        private Queue<Timer> _timers;
+        private int _length = 200; // milliseconds
+        private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
         public int Length {
@@ -22,40 +22,32 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Delay(_length);
+            return new Hold(_length);
         }
 
         public Hold() {
-            _length = 200;
-            MIDIExit = null;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
         }
 
         public Hold(int length) {
-            Length = length;
-            MIDIExit = null;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
+            Length = length;
         }
 
         public Hold(Action<Signal> exit) {
-            _length = 200;
-            MIDIExit = exit;
-            _timers = new Queue<Timer>();
             _timerexit = new TimerCallback(Tick);
+            MIDIExit = exit;
         }
 
         public Hold(int length, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
             Length = length;
             MIDIExit = exit;
-            _timers = new Queue<Timer>();
-            _timerexit = new TimerCallback(Tick);
         }
 
         private void Tick(object info) {
             if (info.GetType() == typeof(byte)) {
-                Signal n = new Signal((byte)info, 0);
+                Signal n = new Signal((byte)info, new Color(0));
       
                 if (MIDIExit != null)
                     MIDIExit(n);
@@ -65,7 +57,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Pressed) {
+            if (n.Color.Lit) {
                 _timers.Enqueue(new Timer(_timerexit, n.Index, _length, System.Threading.Timeout.Infinite));
                 
                 if (MIDIExit != null)

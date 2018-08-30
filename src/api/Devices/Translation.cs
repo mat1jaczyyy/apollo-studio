@@ -7,7 +7,7 @@ using api;
 
 namespace api.Devices {
     public class Translation: Device {
-        private int _offset;
+        private int _offset = 0;
 
         public int Offset {
             get {
@@ -23,18 +23,13 @@ namespace api.Devices {
             return new Translation(_offset);
         }
 
-        public Translation() {
-            _offset = 0;
-            MIDIExit = null;
-        }
+        public Translation() {}
 
         public Translation(int offset) {
             Offset = offset;
-            MIDIExit = null;
         }
 
         public Translation(Action<Signal> exit) {
-            _offset = 0;
             MIDIExit = exit;
         }
 
