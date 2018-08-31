@@ -11,9 +11,7 @@ namespace api.Devices {
             return new Infinity();
         }
 
-        public Infinity() {
-            MIDIExit = null;
-        }
+        public Infinity() {}
 
         public Infinity(Action<Signal> exit) {
             MIDIExit = exit;

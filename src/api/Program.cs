@@ -73,8 +73,11 @@ namespace api {
                             new Color(7, 0, 63)
                         })
                     }),
-                    new Chain(new Range(51, 88)),
-                    new Chain(new Range(18, 18), new Device[] {new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid")})
+                    new Chain(new Range(51, 88), new Device[] {new Layer(1)}),
+                    new Chain(new Range(18, 18), new Device[] {
+                        new Lightweight("/Users/mat1jaczyyy/Downloads/break2.mid"),
+                        new Layer(-1)
+                    })
                 })
             );
 
