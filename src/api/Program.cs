@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices;
@@ -15,8 +12,9 @@ using api.Devices;
 
 namespace api {
     class Program {
-        public static List<Track> _tracks = new List<Track>();
+        public static List<Track> tracks = new List<Track>();
         public static bool log = false;
+        public static ManualResetEvent close = new ManualResetEvent(false);
 
         static void Main(string[] args) {
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
@@ -26,8 +24,8 @@ namespace api {
                 if (arg.Equals("--log"))
                     log = true;
 
-            _tracks.Add(new Track());
-            _tracks[0].Chain.Add(
+            tracks.Add(new Track());
+            tracks[0].Chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
@@ -80,29 +78,10 @@ namespace api {
                 })
             );
 
-            /*_tracks.Add(new Track());
-            _tracks[1].Chain = _tracks[0].Chain.Clone();*/
+            /*tracks.Add(new Track());
+            tracks[1].Chain = tracks[0].Chain.Clone();*/
 
-            var host = new WebHostBuilder().UseKestrel().UseStartup<Startup>().Build();
-            host.Run();
-        }  
-    }
-
-    public class Startup {
-        public Startup(IHostingEnvironment env) {}
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) {
-            // Add framework services.
-            services.AddMvc().AddJsonOptions(options => {
-                //return json format with Camel Case
-                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-            });
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app) {
-            app.UseMvc();
+            close.WaitOne();
         }
     }
 }
