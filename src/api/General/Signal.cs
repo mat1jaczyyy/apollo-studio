@@ -4,7 +4,7 @@ namespace api {
     public class Signal {
         private byte _p = 11;
         public Color Color = new Color(63);
-        private int _l = 0;
+        public int Layer = 0;
 
         public byte Index {
             get {
@@ -16,18 +16,8 @@ namespace api {
             }
         }
 
-        public int Layer {
-            get {
-                return _l;
-            }
-            set {
-                if (0 <= value)
-                    _l = value;
-            }
-        }
-
         public Signal Clone() {
-            return new Signal(_p, Color.Clone(), _l);
+            return new Signal(_p, Color.Clone(), Layer);
         }
 
         public Signal() {}
