@@ -13,6 +13,7 @@ namespace api {
         public Chain Chain;
         private IMidiInputDevice input;
         private IMidiOutputDevice output;
+        private Identification.Launchpad type;
 
         public Track() {
             var inputs = MidiDeviceManager.Default.InputDevices.ToArray();
@@ -25,8 +26,7 @@ namespace api {
             //while (!int.TryParse(Console.ReadLine(), out answer));
 
             input = inputs[answer].CreateDevice();
-            input.NoteOn += MIDIEnter;
-            input.SysEx += WaitForIdentification; // TODO: Doesn't actually work. https://github.com/micdah/RtMidi.Core/issues/16
+            input.SysEx += WaitForIdentification;
             input.Open();
             Console.WriteLine($"Selected input: {input.Name}");
 
@@ -48,7 +48,11 @@ namespace api {
         }
 
         private void WaitForIdentification(object sender, in SysExMessage e) {
-            Identification.Launchpad type = Identification.Identify(e);
+            type = Identification.AttemptIdentify(e);
+            if (type != Identification.Launchpad.Unknown) {
+                input.SysEx -= WaitForIdentification;
+                input.NoteOn += MIDIEnter;
+            }
         }
 
         private void MIDIExit(Signal n) {
