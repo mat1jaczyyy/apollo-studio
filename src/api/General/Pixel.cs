@@ -15,18 +15,20 @@ namespace api {
         }
 
         public void MIDIEnter(Signal n) {
-            if (_signals.ContainsKey(n.Layer)) {
+            int layer = -n.Layer;
+
+            if (_signals.ContainsKey(layer)) {
                 if (n.Color.Lit) {
-                    _signals[n.Layer] = n;
+                    _signals[layer] = n;
                     
-                    if (n.Layer == _highest)
+                    if (layer == _highest)
                         if (MIDIExit != null)
                             MIDIExit(n);
                 
                 } else {
-                    _signals.Remove(n.Layer);
+                    _signals.Remove(layer);
 
-                    if (n.Layer == _highest) {
+                    if (layer == _highest) {
                         if (_signals.Count == 0) {
                             _highest = null;
 
@@ -44,10 +46,10 @@ namespace api {
             
             } else {
                 if (n.Color.Lit) {
-                    _signals.Add(n.Layer, n);
+                    _signals.Add(layer, n);
 
-                    if (!_highest.HasValue || n.Layer < _highest) {
-                        _highest = n.Layer;
+                    if (!_highest.HasValue || layer < _highest) {
+                        _highest = layer;
 
                         if (MIDIExit != null)
                             MIDIExit(n);
