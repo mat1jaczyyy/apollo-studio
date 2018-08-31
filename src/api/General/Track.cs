@@ -13,7 +13,7 @@ namespace api {
         public Chain Chain;
         private IMidiInputDevice input;
         private IMidiOutputDevice output;
-        private Identification.Launchpad type;
+        private Launchpad.Type type;
 
         public Track() {
             var inputs = MidiDeviceManager.Default.InputDevices.ToArray();
@@ -22,8 +22,8 @@ namespace api {
             for (int i = 0; i < inputs.Length; i++)
                 Console.WriteLine($"{i}. {inputs[i].Name}");
             
-            int answer = 0;
-            //while (!int.TryParse(Console.ReadLine(), out answer));
+            int answer;
+            while (!int.TryParse(Console.ReadLine(), out answer));
 
             input = inputs[answer].CreateDevice();
             input.SysEx += WaitForIdentification;
@@ -36,28 +36,29 @@ namespace api {
             for (int i = 0; i < outputs.Length; i++)
                 Console.WriteLine($"{i}. {outputs[i].Name}");
             
-            //while (!int.TryParse(Console.ReadLine(), out answer));
+            while (!int.TryParse(Console.ReadLine(), out answer));
 
             output = outputs[answer].CreateDevice();
             output.Open();
-            Console.WriteLine($"Selected output: {output.Name}");
+            Console.WriteLine($"Selected output: {output.Name}\n");
 
-            output.Send(in Identification.Inquiry);
+            output.Send(in Launchpad.Inquiry);
 
             Chain = new Chain(MIDIExit);
         }
 
         private void WaitForIdentification(object sender, in SysExMessage e) {
-            type = Identification.AttemptIdentify(e);
-            if (type != Identification.Launchpad.Unknown) {
+            type = Launchpad.AttemptIdentify(e);
+            if (type != Launchpad.Type.Unknown) {
                 input.SysEx -= WaitForIdentification;
                 input.NoteOn += MIDIEnter;
+                
+                Console.WriteLine($"\nLaunchpad detected: {type.ToString()}\n");
             }
         }
 
         private void MIDIExit(Signal n) {
-            byte[] data = {0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue};
-            SysExMessage msg = new SysExMessage(data);
+            SysExMessage msg = Launchpad.AssembleMessage(n, type);
             
             if (api.Program.log)
                 Console.WriteLine($"OUT <- {msg.ToString()}");
