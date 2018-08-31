@@ -5,7 +5,7 @@ using System.Linq;
 namespace api {
     public class Pixel {
         private SortedList<int, Signal> _signals = new SortedList<int, Signal>();
-        private int _highest = -1;
+        private int? _highest = null;
         public Action<Signal> MIDIExit = null;
 
         public Pixel() {}
@@ -28,7 +28,7 @@ namespace api {
 
                     if (n.Layer == _highest) {
                         if (_signals.Count == 0) {
-                            _highest = -1;
+                            _highest = null;
 
                             if (MIDIExit != null)
                                 MIDIExit(n);
@@ -37,7 +37,7 @@ namespace api {
                             _highest = _signals.Keys[0];
 
                             if (MIDIExit != null)
-                                MIDIExit(_signals[_highest]);
+                                MIDIExit(_signals[(int)_highest]);
                         }
                     }
                 }
@@ -46,7 +46,7 @@ namespace api {
                 if (n.Color.Lit) {
                     _signals.Add(n.Layer, n);
 
-                    if (_highest == -1 || n.Layer < _highest) {
+                    if (!_highest.HasValue || n.Layer < _highest) {
                         _highest = n.Layer;
 
                         if (MIDIExit != null)
