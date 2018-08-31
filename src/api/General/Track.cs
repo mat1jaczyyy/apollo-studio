@@ -14,9 +14,13 @@ namespace api {
         private IMidiInputDevice input;
         private IMidiOutputDevice output;
         private Launchpad.Type type;
+        private Pixel[] screen = new Pixel[128];
 
         public Track() {
-            Chain = new Chain(MIDIExit);
+            Chain = new Chain(ChainExit);
+            for (int i = 0; i < 128; i++) {
+                screen[i] = new Pixel(MIDIExit);
+            }
 
             var inputs = MidiDeviceManager.Default.InputDevices.ToArray();
             Console.WriteLine("\nSelect input for Track:");
@@ -64,6 +68,10 @@ namespace api {
 
         private void NoteOff(object sender, in NoteOffMessage e) {
             MIDIEnter(new Signal(e.Key, new Color(0)));
+        }
+
+        private void ChainExit(Signal n) {
+            screen[n.Index].MIDIEnter(n);
         }
 
         private void MIDIExit(Signal n) {

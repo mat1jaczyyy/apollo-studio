@@ -247,7 +247,7 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)
-                for (int i = 0; i < _timers.Count; i++)
+                for (int i = 0; i < _timers.Count; i++) // TODO: Accurate time, BPM
                     _timers[i].Change(_timecodes[i] * 10, System.Threading.Timeout.Infinite);
         }
     }
