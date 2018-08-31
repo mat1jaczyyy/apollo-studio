@@ -86,7 +86,7 @@ namespace api {
         }
 
         public override string ToString() {
-            return $"{Index} / {Color.Red}, {Color.Green}, {Color.Blue}";
+            return $"{Index} @ {Layer} / {Color.Red}, {Color.Green}, {Color.Blue}";
         }
     }
 }
