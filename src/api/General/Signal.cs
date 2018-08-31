@@ -42,5 +42,9 @@ namespace api {
             Index = (byte)index;
             Color = color;
         }
+
+        public override string ToString() {
+            return $"{Index} / {Color.Red}, {Color.Green}, {Color.Blue}";
+        }
     }
 }

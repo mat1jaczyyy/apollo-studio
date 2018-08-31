@@ -16,6 +16,8 @@ namespace api {
         private Launchpad.Type type;
 
         public Track() {
+            Chain = new Chain(MIDIExit);
+
             var inputs = MidiDeviceManager.Default.InputDevices.ToArray();
             Console.WriteLine("\nSelect input for Track:");
 
@@ -43,34 +45,40 @@ namespace api {
             Console.WriteLine($"Selected output: {output.Name}\n");
 
             output.Send(in Launchpad.Inquiry);
-
-            Chain = new Chain(MIDIExit);
         }
 
         private void WaitForIdentification(object sender, in SysExMessage e) {
             type = Launchpad.AttemptIdentify(e);
             if (type != Launchpad.Type.Unknown) {
                 input.SysEx -= WaitForIdentification;
-                input.NoteOn += MIDIEnter;
-                
+                input.NoteOn += NoteOn;
+                input.NoteOff += NoteOff;
+
                 Console.WriteLine($"\nLaunchpad detected: {type.ToString()}\n");
             }
         }
 
-        private void MIDIExit(Signal n) {
-            SysExMessage msg = Launchpad.AssembleMessage(n, type);
-            
-            if (api.Program.log)
-                Console.WriteLine($"OUT <- {msg.ToString()}");
+        private void NoteOn(object sender, in NoteOnMessage e) {
+            MIDIEnter(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
+        }
 
+        private void NoteOff(object sender, in NoteOffMessage e) {
+            MIDIEnter(new Signal(e.Key, new Color(0)));
+        }
+
+        private void MIDIExit(Signal n) {
+            if (api.Program.log)
+                Console.WriteLine($"OUT <- {n.ToString()}");
+
+            SysExMessage msg = Launchpad.AssembleMessage(n, type);
             output.Send(in msg);
         }
 
-        private void MIDIEnter(object sender, in NoteOnMessage e) {
+        private void MIDIEnter(Signal n) {
             if (api.Program.log)
-                Console.WriteLine($"IN  -> {e.Key.ToString()} {e.Velocity.ToString()}");
+                Console.WriteLine($"IN  -> {n.ToString()}");
 
-            Chain.MIDIEnter(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
+            Chain.MIDIEnter(n);
         }
     }
 }
