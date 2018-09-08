@@ -17,12 +17,15 @@ namespace api {
         public static ManualResetEvent close = new ManualResetEvent(false);
 
         static void Main(string[] args) {
-            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                Console.WriteLine($"MIDI API: {api}");
-
             foreach (string arg in args)
                 if (arg.Equals("--log"))
                     log = true;
+            
+            if (log)
+                foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
+                    Console.WriteLine($"MIDI API: {api}");
+
+            MIDI.Refresh();
 
             tracks.Add(new Track());
             tracks[0].Chain.Add(
@@ -83,6 +86,12 @@ namespace api {
 
             /*tracks.Add(new Track());
             tracks[1].Chain = tracks[0].Chain.Clone();*/
+
+            while (true) {
+                Console.Write("> ");
+                string cmd = Console.ReadLine();
+                Console.WriteLine(cmd);
+            }
 
             close.WaitOne();
         }
