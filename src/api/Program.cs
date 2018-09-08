@@ -16,6 +16,26 @@ namespace api {
         public static bool log = false;
         public static ManualResetEvent close = new ManualResetEvent(false);
 
+        private static void CLI() {
+            while (true) {
+                Console.Write("> ");
+                string[] cmd = Console.ReadLine().Split(' ');
+                
+                switch (cmd[0]) {
+                    case "t":
+                        if (cmd.Length == 1)
+                            Console.WriteLine(tracks.Count);
+                        else
+                            Console.WriteLine(tracks[Convert.ToInt32(cmd[1])].ToString());
+                        break;
+                    
+                    case "mr":
+                        MIDI.Refresh();
+                        break;
+                }
+            }
+        }
+
         static void Main(string[] args) {
             foreach (string arg in args)
                 if (arg.Equals("--log"))
@@ -87,12 +107,7 @@ namespace api {
             /*tracks.Add(new Track());
             tracks[1].Chain = tracks[0].Chain.Clone();*/
 
-            while (true) {
-                Console.Write("> ");
-                string cmd = Console.ReadLine();
-                Console.WriteLine(cmd);
-            }
-
+            CLI();
             close.WaitOne();
         }
     }
