@@ -25,6 +25,9 @@ namespace api {
                 foreach (IMidiOutputDeviceInfo output in outputs)
                     if (input.Name == output.Name)
                         Devices.Add(new Launchpad(input, output));
+
+            foreach (Track track in Program.tracks)
+                track.Refresh();
         }
     }
 }

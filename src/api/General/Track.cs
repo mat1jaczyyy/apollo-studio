@@ -9,6 +9,15 @@ namespace api {
         public Launchpad Launchpad;
         private Pixel[] screen = new Pixel[128];
 
+        public void Refresh() {
+            foreach (Launchpad device in MIDI.Devices)
+                if (device.Name == Launchpad.Name) {
+                    Launchpad = device;
+                    Launchpad.Receive += MIDIEnter;
+                    return;
+                }
+        }
+
         public Track() {
             Chain = new Chain(ChainExit);
             for (int i = 0; i < 128; i++) {
@@ -35,6 +44,10 @@ namespace api {
                 Console.WriteLine($"IN  -> {n.ToString()}");
 
             Chain.MIDIEnter(n);
+        }
+
+        public override string ToString() {
+            return Launchpad.Name;
         }
     }
 }
