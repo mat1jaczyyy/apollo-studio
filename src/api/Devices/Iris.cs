@@ -136,7 +136,6 @@ namespace api.Devices {
             StringBuilder json = new StringBuilder();
 
             using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.Formatting = Formatting.Indented;
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
