@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using api.Devices;
+using Newtonsoft.Json;
 
 namespace api {
     public class Chain {
@@ -126,7 +129,6 @@ namespace api {
             Reroute();
         }
 
-
         public Chain(Range zone, Device[] init, Action<Signal> exit) {
             _devices = init.ToList();
             Zone = zone;
@@ -145,6 +147,41 @@ namespace api {
             if (Zone.Check(n.Index))
                 if (_chainenter != null)
                     _chainenter(n);
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("chain");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("devices");
+                        writer.WriteStartObject();
+
+                            writer.WritePropertyName("count");
+                            writer.WriteValue(_devices.Count);
+
+                            for (int i = 0; i < _devices.Count; i++) {
+                                writer.WritePropertyName(i.ToString());
+                                writer.WriteRawValue(_devices[i].Encode());
+                            }
+
+                        writer.WritePropertyName("zone");
+                        writer.WriteRawValue(Zone.Encode());
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

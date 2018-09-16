@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using api.Devices;
+using Newtonsoft.Json;
 
 namespace api {
     public class Track {
@@ -48,6 +51,33 @@ namespace api {
 
         public override string ToString() {
             return Launchpad.Name;
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("track");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("chain");
+                        writer.WriteRawValue(Chain.Encode());
+
+                        writer.WritePropertyName("launchpad");
+                        writer.WriteRawValue(Launchpad.Encode());
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

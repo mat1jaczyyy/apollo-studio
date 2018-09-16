@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 using api;
 
@@ -57,6 +60,33 @@ namespace api.Devices {
 
             if (MIDIExit != null)
                 MIDIExit(n);
+        }
+
+        public override string EncodeSpecific() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("device");
+                    writer.WriteValue("paint");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("high");
+                        writer.WriteRawValue(_high.Encode());
+
+                        writer.WritePropertyName("low");
+                        writer.WriteRawValue(_low.Encode());
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

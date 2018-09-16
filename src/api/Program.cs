@@ -9,6 +9,7 @@ using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
 
 using api.Devices;
+using Newtonsoft.Json;
 
 namespace api {
     class Program {
@@ -106,6 +107,8 @@ namespace api {
 
             /*tracks.Add(new Track());
             tracks[1].Chain = tracks[0].Chain.Clone();*/
+
+            Console.WriteLine(tracks[0].Encode());
 
             CLI();
             close.WaitOne();

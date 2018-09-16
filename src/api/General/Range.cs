@@ -1,4 +1,7 @@
 using System.Linq;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace api {
     public class Range {
@@ -33,6 +36,33 @@ namespace api {
         public Range(byte min, byte max) {
             Min = min;
             Max = max;
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("range");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("min");
+                        writer.WriteValue(_min);
+
+                        writer.WritePropertyName("max");
+                        writer.WriteValue(_max);
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

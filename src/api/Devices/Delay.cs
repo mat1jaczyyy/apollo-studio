@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 using api;
 
@@ -68,6 +71,30 @@ namespace api.Devices {
                 if (api.Program.log)
                     Console.WriteLine($"ERR ** Delay Enqueue skipped");
             } 
+        }
+
+        public override string EncodeSpecific() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("device");
+                    writer.WriteValue("delay");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("time");
+                        writer.WriteValue(_length);
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

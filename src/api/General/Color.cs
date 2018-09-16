@@ -1,4 +1,7 @@
 using System.Linq;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace api {
     public class Color {
@@ -56,6 +59,36 @@ namespace api {
             Red = red;
             Green = green;
             Blue = blue;
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("color");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("red");
+                        writer.WriteValue(_r);
+
+                        writer.WritePropertyName("green");
+                        writer.WriteValue(_g);
+
+                        writer.WritePropertyName("red");
+                        writer.WriteValue(_b);
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

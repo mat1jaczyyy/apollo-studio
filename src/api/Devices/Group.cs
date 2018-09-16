@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 using api;
 
@@ -90,6 +93,35 @@ namespace api.Devices {
         public override void MIDIEnter(Signal n) {
             foreach (Chain chain in _chains)
                 chain.MIDIEnter(n.Clone());
+        }
+
+        public override string EncodeSpecific() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("device");
+                    writer.WriteValue("group");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("count");
+                        writer.WriteValue(_chains.Count);
+
+                        for (int i = 0; i < _chains.Count; i++) {
+                            writer.WritePropertyName(i.ToString());
+                            writer.WriteRawValue(_chains[i].Encode());
+                        }
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }

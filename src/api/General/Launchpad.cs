@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices;
@@ -111,6 +114,33 @@ namespace api {
 
         private void NoteOff(object sender, in NoteOffMessage e) {
             Receive.Invoke(new Signal(e.Key, new Color(0)));
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("launchpad");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("port");
+                        writer.WriteValue(Input.Name);
+
+                        writer.WritePropertyName("type");
+                        writer.WriteValue(Type.ToString());
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
     }
 }
