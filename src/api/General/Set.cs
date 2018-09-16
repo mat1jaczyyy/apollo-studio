@@ -15,7 +15,16 @@ namespace api {
         }
 
         public static void Open(string path) {
-            
+            if (File.Exists(path)) {
+                JsonTextReader reader = new JsonTextReader(new StringReader(File.ReadAllText(path)));
+ 
+                while (reader.Read()) {
+                    if (reader.Value != null)
+                        Console.WriteLine("Token: {0}, Value: {1}", reader.TokenType, reader.Value);
+                    else
+                        Console.WriteLine("Token: {0}", reader.TokenType);
+                }
+            }
         }
 
         public static void Save(string path) {

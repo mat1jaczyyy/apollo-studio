@@ -49,7 +49,7 @@ namespace api {
 
             Set.New();
 
-            Set.Tracks[0].Chain.Add(
+            /*Set.Tracks[0].Chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
@@ -103,12 +103,12 @@ namespace api {
                         new Layer(-1)
                     })
                 })
-            );
+            );*/
 
             /*tracks.Add(new Track());
             tracks[1].Chain = tracks[0].Chain.Clone();*/
 
-            Set.Save("/Users/mat1jaczyyy/Code/studiotest.xxx");
+            Set.Open("/Users/mat1jaczyyy/Code/studiotest.xxx");
 
             CLI();
             close.WaitOne();
