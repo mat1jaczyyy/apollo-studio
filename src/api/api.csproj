@@ -8,7 +8,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="RtMidi.Core" Version="1.0.48.1" />
+    <PackageReference Include="RtMidi.Core" Version="1.0.49" />
   </ItemGroup>
   
 </Project>
