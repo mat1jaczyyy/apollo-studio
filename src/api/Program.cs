@@ -13,7 +13,6 @@ using Newtonsoft.Json;
 
 namespace api {
     class Program {
-        public static List<Track> tracks = new List<Track>();
         public static bool log = false;
         public static ManualResetEvent close = new ManualResetEvent(false);
 
@@ -25,9 +24,9 @@ namespace api {
                 switch (cmd[0]) {
                     case "t":
                         if (cmd.Length == 1)
-                            Console.WriteLine(tracks.Count);
+                            Console.WriteLine(Set.Tracks.Count);
                         else
-                            Console.WriteLine(tracks[Convert.ToInt32(cmd[1])].ToString());
+                            Console.WriteLine(Set.Tracks[Convert.ToInt32(cmd[1])].ToString());
                         break;
                     
                     case "mr":
@@ -48,8 +47,9 @@ namespace api {
 
             MIDI.Refresh();
 
-            tracks.Add(new Track());
-            tracks[0].Chain.Add(
+            Set.New();
+
+            Set.Tracks[0].Chain.Add(
                 new Group(new Chain[] {
                     new Chain(new Range(11, 11), new Device[] {
                         new Translation(-127),
@@ -108,7 +108,7 @@ namespace api {
             /*tracks.Add(new Track());
             tracks[1].Chain = tracks[0].Chain.Clone();*/
 
-            Console.WriteLine(tracks[0].Encode());
+            Set.Save("/Users/mat1jaczyyy/Code/studiotest.xxx");
 
             CLI();
             close.WaitOne();

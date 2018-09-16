@@ -26,7 +26,7 @@ namespace api {
                     if (input.Name == output.Name)
                         Devices.Add(new Launchpad(input, output));
 
-            foreach (Track track in Program.tracks)
+            foreach (Track track in Set.Tracks)
                 track.Refresh();
         }
     }
