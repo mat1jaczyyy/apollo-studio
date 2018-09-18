@@ -132,7 +132,22 @@ namespace api.Devices {
                 }
         }
 
-         public override string EncodeSpecific() {
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "iris") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            List<Color> init = new List<Color>();
+            Dictionary<string, object> colors = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["colors"].ToString());
+            for (int i = 0; i < int.Parse(colors["count"].ToString()); i++) {
+                init.Add(Color.Decode(colors[i.ToString()].ToString()));
+            }
+
+            return new Iris(int.Parse(data["rate"].ToString()), init);
+        }
+
+        public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 
             using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {

@@ -95,6 +95,19 @@ namespace api.Devices {
                 chain.MIDIEnter(n.Clone());
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "group") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            List<Chain> init = new List<Chain>();
+            for (int i = 0; i < int.Parse(data["count"].ToString()); i++) {
+                init.Add(Chain.Decode(data[i.ToString()].ToString()));
+            }
+            return new Group(init);
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 

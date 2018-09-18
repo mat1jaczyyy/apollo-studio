@@ -26,7 +26,14 @@ namespace api.Devices {
                     MIDIExit(n);
         }
 
-         public override string EncodeSpecific() {
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "infinity") return null;
+            
+            return new Infinity();
+        }
+
+        public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 
             using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {

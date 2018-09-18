@@ -68,6 +68,15 @@ namespace api.Devices {
             }
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "hold") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Hold(int.Parse(data["time"].ToString()));
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 

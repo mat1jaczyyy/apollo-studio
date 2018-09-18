@@ -155,13 +155,12 @@ namespace api {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            Chain chain = new Chain();
+            List<Device> init = new List<Device>();
             Dictionary<string, object> devices = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["devices"].ToString());
             for (int i = 0; i < int.Parse(devices["count"].ToString()); i++) {
-                chain.Add(Device.Decode(devices[i.ToString()].ToString()));
+                init.Add(Device.Decode(devices[i.ToString()].ToString()));
             }
-
-            return chain;
+            return new Chain(Range.Decode(data["zone"].ToString()), init);
         }
 
         public string Encode() {
@@ -186,6 +185,8 @@ namespace api {
                                 writer.WritePropertyName(i.ToString());
                                 writer.WriteRawValue(_devices[i].Encode());
                             }
+                        
+                        writer.WriteEndObject();
 
                         writer.WritePropertyName("zone");
                         writer.WriteRawValue(Zone.Encode());

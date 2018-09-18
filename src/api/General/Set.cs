@@ -18,14 +18,21 @@ namespace api {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
 
-            Tracks = new List<Track>();
+            Close();
             for (int i = 0; i < int.Parse(tracks["count"].ToString()); i++) {
                 Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
             }
         }
 
-        public static void New() {
+        private static void Close() {
+            foreach (Track track in Tracks)
+                track.Dispose();
+
             Tracks = new List<Track>();
+        }
+
+        public static void New() {
+            Close();
             Tracks.Add(new Track());
         }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
@@ -61,6 +62,15 @@ namespace api {
             Blue = blue;
         }
 
+        public static Color Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "color") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Color(byte.Parse(data["red"].ToString()), byte.Parse(data["green"].ToString()), byte.Parse(data["blue"].ToString()));
+        }
+
         public string Encode() {
             StringBuilder json = new StringBuilder();
 
@@ -79,7 +89,7 @@ namespace api {
                         writer.WritePropertyName("green");
                         writer.WriteValue(_g);
 
-                        writer.WritePropertyName("red");
+                        writer.WritePropertyName("blue");
                         writer.WriteValue(_b);
 
                     writer.WriteEndObject();

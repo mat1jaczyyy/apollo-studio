@@ -73,6 +73,15 @@ namespace api.Devices {
             } 
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "delay") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            return new Delay(int.Parse(data["time"].ToString()));
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
@@ -36,6 +37,15 @@ namespace api {
         public Range(byte min, byte max) {
             Min = min;
             Max = max;
+        }
+
+        public static Range Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "range") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Range(byte.Parse(data["min"].ToString()), byte.Parse(data["max"].ToString()));
         }
 
         public string Encode() {

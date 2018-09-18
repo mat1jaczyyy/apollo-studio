@@ -253,6 +253,15 @@ namespace api.Devices {
                     _timers[i].Change(_timecodes[i] * 10, System.Threading.Timeout.Infinite);
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "lightweight") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Lightweight(data["path"].ToString());
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 

@@ -53,6 +53,15 @@ namespace api.Devices {
                 MIDIExit(n);
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "translation") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Translation(int.Parse(data["offset"].ToString()));
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 
@@ -60,7 +69,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("paint");
+                    writer.WriteValue("translation");
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

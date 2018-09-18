@@ -85,6 +85,19 @@ namespace api.Devices {
             }
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "duplication") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            List<int> offsets = new List<int>();
+            for (int i = 0; i < int.Parse(data["count"].ToString()); i++) {
+                offsets.Add(int.Parse(data[i.ToString()].ToString()));
+            }
+            return new Duplication(offsets);
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 

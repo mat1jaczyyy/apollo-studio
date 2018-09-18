@@ -23,11 +23,47 @@ namespace api {
 
         public Track() {
             Chain = new Chain(ChainExit);
+
             for (int i = 0; i < 128; i++) {
                 screen[i] = new Pixel(MIDIExit);
             }
 
             Launchpad = MIDI.Devices[0];
+            Launchpad.Receive += MIDIEnter;
+        }
+
+        public Track(Chain init) {
+            Chain = init;
+            Chain.MIDIExit = ChainExit;
+            
+            for (int i = 0; i < 128; i++) {
+                screen[i] = new Pixel(MIDIExit);
+            }
+
+            Launchpad = MIDI.Devices[0];
+            Launchpad.Receive += MIDIEnter;
+        }
+
+        public Track(Launchpad launchpad) {
+            Chain = new Chain(ChainExit);
+
+            for (int i = 0; i < 128; i++) {
+                screen[i] = new Pixel(MIDIExit);
+            }
+
+            Launchpad = launchpad;
+            Launchpad.Receive += MIDIEnter;
+        }
+
+        public Track(Chain init, Launchpad launchpad) {
+            Chain = init;
+            Chain.MIDIExit = ChainExit;
+            
+            for (int i = 0; i < 128; i++) {
+                screen[i] = new Pixel(MIDIExit);
+            }
+
+            Launchpad = launchpad;
             Launchpad.Receive += MIDIEnter;
         }
 
@@ -49,6 +85,11 @@ namespace api {
             Chain.MIDIEnter(n);
         }
 
+        public void Dispose() {
+            Launchpad.Receive -= MIDIEnter;
+            Chain = null;
+        }
+
         public override string ToString() {
             return Launchpad.Name;
         }
@@ -59,11 +100,7 @@ namespace api {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            Track track = new Track();
-            track.Chain = Chain.Decode(data["chain"].ToString());
-            track.Launchpad = Launchpad.Decode(data["launchpad"].ToString());
-
-            return track;
+            return new Track(Chain.Decode(data["chain"].ToString()), Launchpad.Decode(data["launchpad"].ToString()));
         }
 
         public string Encode() {

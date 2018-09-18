@@ -62,6 +62,15 @@ namespace api.Devices {
                 MIDIExit(n);
         }
 
+        public static Device DecodeSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["device"].ToString() != "paint") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            return new Paint(Color.Decode(data["high"].ToString()), Color.Decode(data["low"].ToString()));
+        }
+
         public override string EncodeSpecific() {
             StringBuilder json = new StringBuilder();
 
