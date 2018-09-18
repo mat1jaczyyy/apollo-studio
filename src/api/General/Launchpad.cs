@@ -16,10 +16,17 @@ namespace api {
         private IMidiOutputDevice Output;
         private string _name;
         private Types Type = Types.Unknown;
+        private bool _available;
 
         public string Name {
             get {
                 return _name;
+            }
+        }
+
+        public bool Available {
+            get {
+                return _available;
             }
         }
 
@@ -35,7 +42,7 @@ namespace api {
         private Types AttemptIdentify(SysExMessage response) {
             if (response.Data.Length != 15)
                 return Types.Unknown;
-            
+
             if (response.Data[0] != 0x7E || response.Data[2] != 0x06 || response.Data[3] != 0x02)
                 return Types.Unknown;
 
@@ -87,18 +94,6 @@ namespace api {
             Output.Send(in msg);
         }
 
-        public void Dispose() {
-            if (Input.IsOpen)
-                Input.Close();
-            Input.Dispose();
-
-            if (Output.IsOpen)
-                Output.Close();
-            Output.Dispose();
-
-            Receive = null;
-        }
-
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
             Input = input.CreateDevice();
             Output = output.CreateDevice();
@@ -108,6 +103,8 @@ namespace api {
             Input.Open();
             Output.Open();
 
+            _available = true;
+
             Input.SysEx += WaitForIdentification;            
             Output.Send(in Inquiry);
         }
@@ -115,14 +112,40 @@ namespace api {
         public Launchpad(string name, Types type) {
             _name = name;
             Type = type;
+
+            _available = false;
+        }
+
+        public void Connect(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
+            Input = input.CreateDevice();
+            Output = output.CreateDevice();
+
+            Input.Open();
+            Output.Open();
+
+            _available = true;
+        }
+
+        public void Disconnect() {
+            if (Input.IsOpen)
+                Input.Close();
+            Input.Dispose();
+
+            if (Output.IsOpen)
+                Output.Close();
+            Output.Dispose();
+
+            _available = false;
         }
 
         private void NoteOn(object sender, in NoteOnMessage e) {
-            Receive.Invoke(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
+            if (_available)
+                Receive.Invoke(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
         }
 
         private void NoteOff(object sender, in NoteOffMessage e) {
-            Receive.Invoke(new Signal(e.Key, new Color(0)));
+            if (_available)
+                Receive.Invoke(new Signal(e.Key, new Color(0)));
         }
 
         public static Launchpad Decode(string jsonString) {
@@ -137,7 +160,9 @@ namespace api {
                 }
             }
             
-            return new Launchpad(data["port"].ToString(), (Types)Enum.Parse(typeof(Types), data["type"].ToString()));
+            Launchpad lp = new Launchpad(data["port"].ToString(), (Types)Enum.Parse(typeof(Types), data["type"].ToString()));
+            MIDI.Devices.Add(lp);
+            return lp;
         }
 
         public string Encode() {

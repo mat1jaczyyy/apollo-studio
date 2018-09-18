@@ -45,7 +45,7 @@ namespace api {
                 foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                     Console.WriteLine($"MIDI API: {api}");
 
-            MIDI.Refresh();
+            MIDI.Start();
             Set.New();
             
             Set.Open("/Users/mat1jaczyyy/Code/studiotest.xxx");

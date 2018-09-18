@@ -12,24 +12,12 @@ namespace api {
         public Launchpad Launchpad;
         private Pixel[] screen = new Pixel[128];
 
-        public void Refresh() {
-            foreach (Launchpad device in MIDI.Devices)
-                if (device.Name == Launchpad.Name) {
-                    Launchpad = device;
-                    Launchpad.Receive += MIDIEnter;
-                    return;
-                }
-        }
-
         public Track() {
             Chain = new Chain(ChainExit);
 
             for (int i = 0; i < 128; i++) {
                 screen[i] = new Pixel(MIDIExit);
             }
-
-            Launchpad = MIDI.Devices[0];
-            Launchpad.Receive += MIDIEnter;
         }
 
         public Track(Chain init) {
@@ -39,9 +27,6 @@ namespace api {
             for (int i = 0; i < 128; i++) {
                 screen[i] = new Pixel(MIDIExit);
             }
-
-            Launchpad = MIDI.Devices[0];
-            Launchpad.Receive += MIDIEnter;
         }
 
         public Track(Launchpad launchpad) {
@@ -86,7 +71,9 @@ namespace api {
         }
 
         public void Dispose() {
-            Launchpad.Receive -= MIDIEnter;
+            if (Launchpad != null)
+                Launchpad.Receive -= MIDIEnter;
+            
             Chain = null;
         }
 
