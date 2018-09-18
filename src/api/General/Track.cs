@@ -52,6 +52,19 @@ namespace api {
         public override string ToString() {
             return Launchpad.Name;
         }
+        
+        public static Track Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "track") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            Track track = new Track();
+            track.Chain = Chain.Decode(data["chain"].ToString());
+            track.Launchpad = Launchpad.Decode(data["launchpad"].ToString());
+
+            return track;
+        }
 
         public string Encode() {
             StringBuilder json = new StringBuilder();

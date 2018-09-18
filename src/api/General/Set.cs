@@ -5,9 +5,24 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
+using api.Devices;
+
 namespace api {
     public static class Set {
         public static List<Track> Tracks = new List<Track>();
+
+        public static void Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "set") return;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
+
+            Tracks = new List<Track>();
+            for (int i = 0; i < int.Parse(tracks["count"].ToString()); i++) {
+                Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
+            }
+        }
 
         public static void New() {
             Tracks = new List<Track>();
@@ -16,14 +31,7 @@ namespace api {
 
         public static void Open(string path) {
             if (File.Exists(path)) {
-                JsonTextReader reader = new JsonTextReader(new StringReader(File.ReadAllText(path)));
- 
-                while (reader.Read()) {
-                    if (reader.Value != null)
-                        Console.WriteLine("Token: {0}, Value: {1}", reader.TokenType, reader.Value);
-                    else
-                        Console.WriteLine("Token: {0}", reader.TokenType);
-                }
+                Decode(File.ReadAllText(path));
             }
         }
 

@@ -149,6 +149,21 @@ namespace api {
                     _chainenter(n);
         }
 
+        public static Chain Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "chain") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            
+            Chain chain = new Chain();
+            Dictionary<string, object> devices = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["devices"].ToString());
+            for (int i = 0; i < int.Parse(devices["count"].ToString()); i++) {
+                chain.Add(Device.Decode(devices[i.ToString()].ToString()));
+            }
+
+            return chain;
+        }
+
         public string Encode() {
             StringBuilder json = new StringBuilder();
 

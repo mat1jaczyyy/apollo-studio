@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -13,18 +14,19 @@ namespace api {
     public class Launchpad {
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
+        private string _name;
         private Types Type = Types.Unknown;
 
         public string Name {
             get {
-                return Output.Name;
+                return _name;
             }
         }
 
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
-        private enum Types {
+        public enum Types {
             MK2, PRO, CFW, Unknown
         }
 
@@ -95,11 +97,13 @@ namespace api {
             Output.Dispose();
 
             Receive = null;
-        } 
+        }
 
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
             Input = input.CreateDevice();
             Output = output.CreateDevice();
+
+            _name = input.Name;
 
             Input.Open();
             Output.Open();
@@ -108,12 +112,32 @@ namespace api {
             Output.Send(in Inquiry);
         }
 
+        public Launchpad(string name, Types type) {
+            _name = name;
+            Type = type;
+        }
+
         private void NoteOn(object sender, in NoteOnMessage e) {
             Receive.Invoke(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
         }
 
         private void NoteOff(object sender, in NoteOffMessage e) {
             Receive.Invoke(new Signal(e.Key, new Color(0)));
+        }
+
+        public static Launchpad Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "launchpad") return null;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            foreach (Launchpad launchpad in MIDI.Devices) {
+                if (launchpad.Name == data["port"].ToString()) {
+                    return launchpad;
+                }
+            }
+            
+            return new Launchpad(data["port"].ToString(), (Types)Enum.Parse(typeof(Types), data["type"].ToString()));
         }
 
         public string Encode() {
