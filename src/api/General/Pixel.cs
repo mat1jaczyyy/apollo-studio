@@ -46,7 +46,7 @@ namespace api {
             
             } else {
                 if (n.Color.Lit) {
-                    _signals.Add(layer, n);
+                    _signals[layer] = n;
 
                     if (!_highest.HasValue || layer < _highest) {
                         _highest = layer;
