@@ -124,6 +124,14 @@ namespace api {
             Output.Open();
 
             _available = true;
+
+            if (Type == Types.Unknown) {
+                Input.SysEx += WaitForIdentification;
+                Output.Send(in Inquiry);
+            } else {
+                Input.NoteOn += NoteOn;
+                Input.NoteOff += NoteOff;
+            }
         }
 
         public void Disconnect() {
