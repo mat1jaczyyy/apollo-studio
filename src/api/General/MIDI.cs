@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices;
@@ -12,64 +13,64 @@ using RtMidi.Core.Messages;
 namespace api {
     public static class MIDI {
         public static List<Launchpad> Devices = new List<Launchpad>();
-        private static readonly int refreshRate = 200;
-        private static Timer autoRefresh;
+        private static bool started = false;
 
-        public static void Refresh() {
-            IMidiInputDeviceInfo[] inputs = MidiDeviceManager.Default.InputDevices.ToArray();
-            IMidiOutputDeviceInfo[] outputs = MidiDeviceManager.Default.OutputDevices.ToArray();
+        public static async void Start() {
+            if (started) {
+                throw new InvalidOperationException("MIDI.Start: Called twice.");
+            }
 
-            foreach (IMidiInputDeviceInfo input in inputs) {
-                foreach (IMidiOutputDeviceInfo output in outputs) {
-                    if (input.Name == output.Name) {
-                        bool justConnected = true;
+            started = true;
 
-                        foreach (Launchpad device in Devices) {
-                            if (device.Name == output.Name) {
-                                if (!device.Available) {
-                                    device.Connect(input, output);
+            await Task.Run(() => {
+                while (true) {
+                    foreach (var info in MidiDeviceManager.Default.InputDevices)
+                        Console.WriteLine($"> {info.Name}");
+
+                    foreach (var input in MidiDeviceManager.Default.InputDevices) {
+                        foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                            if (input.Name == output.Name) {
+                                bool justConnected = true;
+
+                                foreach (Launchpad device in Devices) {
+                                    if (device.Name == output.Name) {
+                                        if (!device.Available) {
+                                            device.Connect(input, output);
+                                        }
+                                        justConnected = false;
+                                        break;
+                                    }
                                 }
-                                justConnected = false;
-                                break;
+
+                                if (justConnected) {
+                                    Devices.Add(new Launchpad(input, output));
+                                }
                             }
                         }
+                    }
 
-                        if (justConnected) {
-                            Devices.Add(new Launchpad(input, output));
+                    foreach (Launchpad device in Devices) {
+                        if (device.Available) {
+                            bool justDisconnected = true;
+
+                            foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                                if (device.Name == output.Name) {
+                                    justDisconnected = false;
+                                    break;
+                                }
+                            }
+
+                            if (justDisconnected) {
+                                device.Disconnect();
+                            }
                         }
                     }
+
+                    // Using an async timer doesn't work for some reason.
+                    // https://github.com/micdah/RtMidi.Core/issues/18 could make this event-based instead in the future.
+                    Thread.Sleep(200); 
                 }
-            }
-
-            foreach (Launchpad device in Devices) {
-                if (device.Available) {
-                    bool justDisconnected = true;
-
-                    foreach (IMidiOutputDeviceInfo output in outputs) {
-                        if (device.Name == output.Name) {
-                            justDisconnected = false;
-                            break;
-                        }
-                    }
-
-                    if (justDisconnected) {
-                        device.Disconnect();
-                    }
-                }
-            }
-        }
-
-        private static void Callback(object info) {
-            Start();
-        }
-
-        public static void Start() {
-            Refresh();
-            autoRefresh = new Timer(new TimerCallback(Callback), null, refreshRate, System.Threading.Timeout.Infinite);
-        }
-
-        public static void Stop() {
-            autoRefresh = new Timer(new TimerCallback(Callback), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            });
         }
     }
 }
