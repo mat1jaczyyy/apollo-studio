@@ -16,26 +16,6 @@ namespace api {
         public static bool log = false;
         public static ManualResetEvent close = new ManualResetEvent(false);
 
-        private static void CLI() {
-            while (true) {
-                Console.Write("> ");
-                string[] cmd = Console.ReadLine().Split(' ');
-                
-                switch (cmd[0]) {
-                    case "t":
-                        if (cmd.Length == 1)
-                            Console.WriteLine(Set.Tracks.Count);
-                        else
-                            Console.WriteLine(Set.Tracks[Convert.ToInt32(cmd[1])].ToString());
-                        break;
-                    
-                    case "mr":
-                        MIDI.Refresh();
-                        break;
-                }
-            }
-        }
-
         static void Main(string[] args) {
             foreach (string arg in args)
                 if (arg.Equals("--log"))
@@ -50,7 +30,6 @@ namespace api {
             
             Set.Open("/Users/mat1jaczyyy/Code/studiotest.xxx");
 
-            CLI();
             close.WaitOne();
         }
     }
