@@ -24,9 +24,6 @@ namespace api {
 
             await Task.Run(() => {
                 while (true) {
-                    foreach (var info in MidiDeviceManager.Default.InputDevices)
-                        Console.WriteLine($"> {info.Name}");
-
                     foreach (var input in MidiDeviceManager.Default.InputDevices) {
                         foreach (var output in MidiDeviceManager.Default.OutputDevices) {
                             if (input.Name == output.Name) {
