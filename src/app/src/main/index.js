@@ -22,16 +22,25 @@ function createWindow() {
    */
   mainWindow = new BrowserWindow({
     height: 292,
-    useContentSize: true,
     width: 750,
     backgroundColor: "#414141",
     frame: false,
+    show: false,
+    center: true,
+    minHeight: 292,
+    minWidth: 750,
+    maxHeight: 292,
+    alwaysOnTop: true
   })
 
   mainWindow.loadURL(winURL)
 
   mainWindow.on("closed", () => {
     mainWindow = null
+  })
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show()
   })
 }
 

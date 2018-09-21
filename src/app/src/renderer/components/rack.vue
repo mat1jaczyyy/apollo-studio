@@ -1,6 +1,6 @@
 <template lang="pug">
 .rack
-  Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500").rackWrap
+  //- Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh").rackWrap
     Draggable(v-for="item in items" :key="item.id").rackItem
       .inner
         .frame
@@ -8,11 +8,13 @@
           a(@click="remove(item.id)")
             i.material-icons close
         .content
+  dial(:value="dial" @change="dial += $event")
 </template>
 
 <script>
 import { Container, Draggable } from "vue-smooth-dnd"
 import { remote } from "electron"
+import dial from "../ui/dial"
 
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult
@@ -41,10 +43,11 @@ const generateItems = (count, creator) => {
 }
 
 export default {
-  components: { Container, Draggable },
+  components: { Container, Draggable, dial },
   data: () => ({
+    dial: 60,
     window: remote.getCurrentWindow(),
-    items: generateItems(3, i => ({ id: i, data: "panel " + i })),
+    items: generateItems(2, i => ({ id: i, data: "panel " + i })),
   }),
   methods: {
     onDrop: function(dropResult) {
@@ -59,12 +62,17 @@ export default {
 
 <style lang="scss" scoped>
 .rack {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .rackWrap {
     height: 100%;
     display: flex;
     .rackItem {
       height: calc(100% - 8px);
       width: 225px;
+      box-shadow: none;
+      // transition: box-shadow .3s;
       .inner {
         overflow: hidden;
         border-radius: 5px 5px 0 0;
@@ -100,6 +108,10 @@ export default {
           }
         }
       }
+    }
+    .rackItem > .sh {
+      transition: all 0.3s ease;
+      box-shadow: 1px 1px 15px -2.5px rgba(0, 0, 0, 0.5);
     }
   }
 }
