@@ -109,10 +109,8 @@ namespace api {
             Output.Send(in Inquiry);
         }
 
-        public Launchpad(string name, Types type) {
+        public Launchpad(string name) {
             _name = name;
-            Type = type;
-
             _available = false;
         }
 
@@ -168,7 +166,7 @@ namespace api {
                 }
             }
             
-            Launchpad lp = new Launchpad(data["port"].ToString(), (Types)Enum.Parse(typeof(Types), data["type"].ToString()));
+            Launchpad lp = new Launchpad(data["port"].ToString());
             MIDI.Devices.Add(lp);
             return lp;
         }
@@ -186,10 +184,7 @@ namespace api {
                     writer.WriteStartObject();
 
                         writer.WritePropertyName("port");
-                        writer.WriteValue(Input.Name);
-
-                        writer.WritePropertyName("type");
-                        writer.WriteValue(Type.ToString());
+                        writer.WriteValue(_name);
 
                     writer.WriteEndObject();
 
