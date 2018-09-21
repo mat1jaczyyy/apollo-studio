@@ -10,6 +10,7 @@ using api.Devices;
 namespace api {
     public static class Set {
         public static List<Track> Tracks = new List<Track>();
+        public static Decimal BPM = 120;
 
         public static void Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
@@ -19,6 +20,8 @@ namespace api {
             Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
 
             Close();
+
+            BPM = Decimal.Parse(data["bpm"].ToString());
             for (int i = 0; i < int.Parse(tracks["count"].ToString()); i++) {
                 Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
             }
@@ -68,6 +71,9 @@ namespace api {
 
                         writer.WritePropertyName("version");
                         writer.WriteValue("alpha");
+
+                        writer.WritePropertyName("bpm");
+                        writer.WriteValue(BPM);
 
                         writer.WritePropertyName("tracks");
                         writer.WriteStartObject();
