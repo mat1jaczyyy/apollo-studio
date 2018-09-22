@@ -11,7 +11,6 @@ namespace api {
         private List<Device> _devices = new List<Device>();
         private Action<Signal> _chainenter = null;
         private Action<Signal> _midiexit = null;
-        public Range Zone = new Range();
 
         private void Reroute() {
             if (_devices.Count == 0) {
@@ -80,10 +79,6 @@ namespace api {
 
         public Chain() {}
 
-        public Chain(Range zone) {
-            Zone = zone;
-        }
-
         public Chain(Device[] init) {
             _devices = init.ToList();
             Reroute();
@@ -94,25 +89,7 @@ namespace api {
             Reroute();
         }
 
-        public Chain(Range zone, Device[] init) {
-            _devices = init.ToList();
-            Zone = zone;
-            Reroute();
-        }
-
-        public Chain(Range zone, List<Device> init) {
-            _devices = init;
-            Zone = zone;
-            Reroute();
-        }
-
         public Chain(Action<Signal> exit) {
-            _midiexit = exit;
-            Reroute();
-        }
-
-        public Chain(Range zone, Action<Signal> exit) {
-            Zone = zone;
             _midiexit = exit;
             Reroute();
         }
@@ -129,24 +106,9 @@ namespace api {
             Reroute();
         }
 
-        public Chain(Range zone, Device[] init, Action<Signal> exit) {
-            _devices = init.ToList();
-            Zone = zone;
-            _midiexit = exit;
-            Reroute();
-        }
-
-        public Chain(Range zone, List<Device> init, Action<Signal> exit) {
-            _devices = init;
-            Zone = zone;
-            _midiexit = exit;
-            Reroute();
-        }
-
         public void MIDIEnter(Signal n) {
-            if (Zone.Check(n.Index))
-                if (_chainenter != null)
-                    _chainenter(n);
+            if (_chainenter != null)
+                _chainenter(n);
         }
 
         public static Chain Decode(string jsonString) {
@@ -160,7 +122,7 @@ namespace api {
             for (int i = 0; i < int.Parse(devices["count"].ToString()); i++) {
                 init.Add(Device.Decode(devices[i.ToString()].ToString()));
             }
-            return new Chain(Range.Decode(data["zone"].ToString()), init);
+            return new Chain(init);
         }
 
         public string Encode() {
@@ -187,9 +149,6 @@ namespace api {
                             }
                         
                         writer.WriteEndObject();
-
-                        writer.WritePropertyName("zone");
-                        writer.WriteRawValue(Zone.Encode());
 
                     writer.WriteEndObject();
 
