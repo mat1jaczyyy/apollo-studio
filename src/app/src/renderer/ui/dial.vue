@@ -1,22 +1,28 @@
 <template lang="pug">
-.c100(:class="{p50: value > 50}" @mousedown="mdown")
-  span {{value}}%
+.c100(:class="{p50: value > 50}" @mousedown="mdown" @mouseup="mup")
+  span {{value}}
   .slice
     .bar(:style="{transform: `rotate(${value * 3.6}deg)`}")
     .fill
-
 </template>
 
 <script>
-// TODO: please kill me
 export default {
   props: {
     value: { type: Number, default: 69 },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
   },
+  created() {
+    this.v = this.value
+  },
+  data: () => ({
+    acceptLock: false,
+    v: 0,
+  }),
   methods: {
     mdown(e) {
+      this.acceptLock = true
       document.addEventListener("pointerlockchange", this.lockChangeAlert)
       e.target.requestPointerLock()
     },
@@ -27,15 +33,17 @@ export default {
       document.removeEventListener("mousemove", this.updatePosition)
     },
     lockChangeAlert(e) {
-      console.log(e)
+      // console.log(e)
+      if (!this.acceptLock) return
+      else this.acceptLock = false
       document.addEventListener("mousemove", this.updatePosition)
       document.addEventListener("mouseup", this.mup)
     },
     updatePosition(e) {
       let mv = this.value + e.movementY / -2
-      console.log(mv)
+      // console.log(mv)
       if (document.pointerLockElement !== null && mv >= this.min && mv <= this.max)
-        this.$emit("change", e.movementY / -2)
+        this.$emit("update:value", e.movementY / -2)
       else if (document.pointerLockElement === null)
         document.removeEventListener("mousemove", this.updatePosition)
     },
@@ -45,11 +53,11 @@ export default {
 
 
 <style lang="scss">
-$circle-width: 0.08em;
-$circle-width-hover: 0.04em;
-$primary-color: #ff6100;
-$secondary-color: #c0c0c0;
-$bg-color: #333333;
+$circle-width: 0.05em;
+$circle-width-hover: 0.03em;
+$primary-color: #6dd7ff;
+$secondary-color: #282828;
+$bg-color: #414141;
 
 .pie {
   position: absolute;
@@ -76,9 +84,10 @@ $bg-color: #333333;
     box-sizing: content-box;
   }
   position: relative;
-  font-size: 100px;
+  font-size: 75px;
   width: 1em;
   height: 1em;
+  margin: 5px;
   border-radius: 50%;
   float: left;
   background-color: $secondary-color;
@@ -91,7 +100,7 @@ $bg-color: #333333;
     width: 5em;
     line-height: 5em;
     font-size: 0.2em;
-    color: $secondary-color;
+    color: #606060;
     display: block;
     text-align: center;
     white-space: nowrap;

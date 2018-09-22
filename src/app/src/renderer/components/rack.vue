@@ -8,7 +8,8 @@
           a(@click="remove(item.id)")
             i.material-icons close
         .content
-  dial(:value="dial" @change="dial += $event")
+  dial(:value="dial1" @update:value="dial1 += $event")
+  dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
 </template>
 
 <script>
@@ -45,7 +46,8 @@ const generateItems = (count, creator) => {
 export default {
   components: { Container, Draggable, dial },
   data: () => ({
-    dial: 60,
+    dial1: 60,
+    dial2: 33,
     window: remote.getCurrentWindow(),
     items: generateItems(2, i => ({ id: i, data: "panel " + i })),
   }),

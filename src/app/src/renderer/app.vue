@@ -51,7 +51,7 @@ body {
   margin: 0;
   @include wnh(100vw, 100vh);
   user-select: none;
-  background: #414141;
+  background: #373737;
   font-family: "Roboto Mono", sans-serif;
   color: #bbbbbb;
   font-weight: lighter;
@@ -113,7 +113,7 @@ body {
       @include wnh(100%, calc(100% - 32px));
       position: relative;
       z-index: 99;
-      background: #333333;
+      background: #414141;
       border-radius: 10px 10px 0 0;
       overflow: hidden;
       box-shadow: 0 -1px 20px -3px rgba(0, 0, 0, 0.5);
