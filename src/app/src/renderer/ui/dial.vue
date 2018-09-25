@@ -1,9 +1,9 @@
 <template lang="pug">
-.c100(:class="{p50: value > 50}" @mousedown="mdown" @mouseup="mup")
+.c100(:class="{p50: value > 50}" @mousedown="mdown" @mouseup="mup" :style="{color, fontSize: size}")
   span {{value}}
   .slice
-    .bar(:style="{transform: `rotate(${value * 3.6}deg)`}")
-    .fill
+    .bar(:style="{transform: `rotate(${value * 3.6}deg)`, borderColor: color}")
+    .fill(:style="{borderColor: color}")
 </template>
 
 <script>
@@ -12,36 +12,32 @@ export default {
     value: { type: Number, default: 69 },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
+    color: { type: String, default: "#6dd7ff" },
+    size: {type: String, default: "75px"}
   },
-  created() {
-    this.v = this.value
-  },
-  data: () => ({
-    acceptLock: false,
-    v: 0,
-  }),
   methods: {
     mdown(e) {
+      // console.log("mdown")
       this.acceptLock = true
       document.addEventListener("pointerlockchange", this.lockChangeAlert)
       e.target.requestPointerLock()
     },
     mup(e) {
-      console.log("mup")
+      // console.log("mup")
       document.exitPointerLock()
       document.removeEventListener("mouseup", this.mup)
       document.removeEventListener("mousemove", this.updatePosition)
     },
     lockChangeAlert(e) {
-      // console.log(e)
+      // console.log("lockChangeAlert")
       if (!this.acceptLock) return
       else this.acceptLock = false
       document.addEventListener("mousemove", this.updatePosition)
       document.addEventListener("mouseup", this.mup)
     },
     updatePosition(e) {
+      // console.log("updatePosition")
       let mv = this.value + e.movementY / -2
-      // console.log(mv)
       if (document.pointerLockElement !== null && mv >= this.min && mv <= this.max)
         this.$emit("update:value", e.movementY / -2)
       else if (document.pointerLockElement === null)
@@ -55,7 +51,7 @@ export default {
 <style lang="scss">
 $circle-width: 0.05em;
 $circle-width-hover: 0.03em;
-$primary-color: #6dd7ff;
+$primary-color: #FFF;
 $secondary-color: #282828;
 $bg-color: #414141;
 
@@ -91,6 +87,7 @@ $bg-color: #414141;
   border-radius: 50%;
   float: left;
   background-color: $secondary-color;
+  color: #FFF;
   > span {
     position: absolute;
     width: 100%;
@@ -147,7 +144,8 @@ $bg-color: #414141;
       width: 3.33em;
       line-height: 3.33em;
       font-size: 0.3em;
-      color: $primary-color;
+      // color: $primary-color;
+      color: inherit;
     }
     &:after {
       top: $circle-width-hover;

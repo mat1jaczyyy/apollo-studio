@@ -8,8 +8,9 @@
           a(@click="remove(item.id)")
             i.material-icons close
         .content
-  dial(:value="dial1" @update:value="dial1 += $event")
+  dial(:value="dial1" @update:value="dial1 += $event" size="80px")
   dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
+  dial(:value="dial3" @update:value="dial3 += $event" color="#FFF" size="50px")
 </template>
 
 <script>
@@ -48,6 +49,7 @@ export default {
   data: () => ({
     dial1: 60,
     dial2: 33,
+    dial3: 86,
     window: remote.getCurrentWindow(),
     items: generateItems(2, i => ({ id: i, data: "panel " + i })),
   }),
