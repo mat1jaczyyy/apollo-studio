@@ -13,6 +13,7 @@ div#app
 
 <script>
 import { remote } from "electron"
+
 export default {
   name: "orion-studio",
   data: () => ({
