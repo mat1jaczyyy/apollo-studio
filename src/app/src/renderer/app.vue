@@ -14,7 +14,7 @@ div#app
 <script>
 import { remote } from "electron"
 export default {
-  name: "lightshow-studio",
+  name: "orion-studio",
   data: () => ({
     window: remote.getCurrentWindow(),
   }),

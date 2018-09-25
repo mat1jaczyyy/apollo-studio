@@ -1,8 +1,8 @@
 {
-  "name": "lightshow-studio",
+  "name": "orion-studio",
   "version": "0.0.0",
   "author": "vaaski <admin@vaa.ski>",
-  "description": "lightshow-studio",
+  "description": "orion-studio",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -19,8 +19,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "lightshow-studio",
-    "appId": "com.vaaski.lightshow-studio",
+    "productName": "orion-studio",
+    "appId": "com.vaaski.orion-studio",
     "directories": {
       "output": "build"
     },

@@ -1,4 +1,4 @@
-# lightshow-studio
+# orion-studio
 
 #### Electron Build Setup
 
