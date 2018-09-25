@@ -1,22 +1,31 @@
 <template lang="pug">
 .rack
-  //- Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh").rackWrap
-    Draggable(v-for="item in items" :key="item.id").rackItem
+  Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh" drag-handle-selector=".drag").rackWrap
+    //- Draggable(v-for="item in items" :key="item.id").rackItem
       .inner
         .frame
           h6.title {{item.data}}
           a(@click="remove(item.id)")
             i.material-icons close
         .content
-  dial(:value="dial1" @update:value="dial1 += $event" size="80px")
-  dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
-  dial(:value="dial3" @update:value="dial3 += $event" color="#FFF" size="50px")
+    Draggable.rackItem
+      .inner
+        .frame
+          h6.title launchpad
+          a.drag
+            i.material-icons drag_handle
+        .content
+          launchpad
+  //- dial(:value="dial1" @update:value="dial1 += $event" size="80px")
+  //- dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
+  //- dial(:value="dial3" @update:value="dial3 += $event" color="#FFF" size="50px")
 </template>
 
 <script>
 import { Container, Draggable } from "vue-smooth-dnd"
 import { remote } from "electron"
 import dial from "../ui/dial"
+import launchpad from "../ui/launchpad"
 
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult
@@ -45,7 +54,7 @@ const generateItems = (count, creator) => {
 }
 
 export default {
-  components: { Container, Draggable, dial },
+  components: { Container, Draggable, dial, launchpad },
   data: () => ({
     dial1: 60,
     dial2: 33,
@@ -81,9 +90,19 @@ export default {
         overflow: hidden;
         border-radius: 5px 5px 0 0;
         height: 100%;
-        background: #414141;
+        background: #3a3a3a;
+        box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
         margin: 4px 0;
         margin-left: 4px;
+        transition: box-shadow 0.3s;
+        position: relative;
+        .content {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: calc(100% - 20px);
+        }
         .frame {
           display: flex;
           height: 20px;
@@ -102,6 +121,9 @@ export default {
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            &.drag {
+              cursor: -webkit-grab;
+            }
             i {
               font-size: 20px;
               // transition: 0.5s;
@@ -114,8 +136,9 @@ export default {
       }
     }
     .rackItem > .sh {
-      transition: all 0.3s ease;
+      transition: all 0.3s;
       box-shadow: 1px 1px 15px -2.5px rgba(0, 0, 0, 0.5);
+      border: none;
     }
   }
 }
