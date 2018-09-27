@@ -15,8 +15,9 @@ namespace api {
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
         private string _name;
-        private Types Type = Types.Unknown;
+        private LaunchpadType Type = LaunchpadType.Unknown;
         private bool _available;
+        public InputType InputFormat = InputType.XY;
 
         public string Name {
             get {
@@ -33,38 +34,42 @@ namespace api {
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
-        public enum Types {
+        public enum LaunchpadType {
             MK2, PRO, CFW, Unknown
+        }
+
+        public enum InputType {
+            XY, DrumRack
         }
 
         private readonly static SysExMessage Inquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
 
-        private Types AttemptIdentify(SysExMessage response) {
+        private LaunchpadType AttemptIdentify(SysExMessage response) {
             if (response.Data.Length != 15)
-                return Types.Unknown;
+                return LaunchpadType.Unknown;
 
             if (response.Data[0] != 0x7E || response.Data[2] != 0x06 || response.Data[3] != 0x02)
-                return Types.Unknown;
+                return LaunchpadType.Unknown;
 
             if (response.Data[4] == 0x00 && response.Data[5] == 0x20 && response.Data[6] == 0x29) { // Manufacturer = Novation
                 switch (response.Data[7]) {
                     case 0x69: // Launchpad MK2
-                        return Types.MK2;
+                        return LaunchpadType.MK2;
                     
                     case 0x51: // Launchpad Pro
                         if (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w')
-                            return Types.CFW;
+                            return LaunchpadType.CFW;
                         else
-                            return Types.PRO;
+                            return LaunchpadType.PRO;
                 }
             }
 
-            return Types.Unknown;
+            return LaunchpadType.Unknown;
         }
 
         private void WaitForIdentification(object sender, in SysExMessage e) {
             Type = AttemptIdentify(e);
-            if (Type != Types.Unknown) {
+            if (Type != LaunchpadType.Unknown) {
                 Input.SysEx -= WaitForIdentification;
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
@@ -75,14 +80,14 @@ namespace api {
             byte rgb_byte;
 
             switch (Type) {
-                case Types.MK2:
+                case LaunchpadType.MK2:
                     rgb_byte = 0x18;
                     if (91 <= n.Index && n.Index <= 98)
                         n.Index += 13;
                     break;
                 
-                case Types.PRO:
-                case Types.CFW:
+                case LaunchpadType.PRO:
+                case LaunchpadType.CFW:
                     rgb_byte = 0x10;
                     break;
                 
@@ -123,7 +128,7 @@ namespace api {
 
             _available = true;
 
-            if (Type == Types.Unknown) {
+            if (Type == LaunchpadType.Unknown) {
                 Input.SysEx += WaitForIdentification;
                 Output.Send(in Inquiry);
             } else {
@@ -144,14 +149,21 @@ namespace api {
             _available = false;
         }
 
+        private void HandleMessage(Signal n) {
+            if (_available) {
+                if (InputFormat == InputType.DrumRack) 
+                    n.Index = Conversion.DRtoXY[n.Index];
+                
+                Receive.Invoke(n);
+            }
+        }
+
         private void NoteOn(object sender, in NoteOnMessage e) {
-            if (_available)
-                Receive.Invoke(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
+            HandleMessage(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
         }
 
         private void NoteOff(object sender, in NoteOffMessage e) {
-            if (_available)
-                Receive.Invoke(new Signal(e.Key, new Color(0)));
+            HandleMessage(new Signal(e.Key, new Color(0)));
         }
 
         public static Launchpad Decode(string jsonString) {
