@@ -26,7 +26,7 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Iris(_rate);
+            return new Iris(_rate, _colors);
         }
 
         public Iris() {
