@@ -11,7 +11,7 @@ using api;
 namespace api.Devices {
     public class Iris: Device {
         private int _rate = 200; // milliseconds
-        private List<Color> _colors = new List<Color>();
+        public List<Color> Colors = new List<Color>();
         private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
@@ -26,7 +26,7 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Iris(_rate, _colors);
+            return new Iris(_rate, Colors);
         }
 
         public Iris() {
@@ -40,24 +40,24 @@ namespace api.Devices {
 
         public Iris(Color[] colors) {
             _timerexit = new TimerCallback(Tick);
-            _colors = colors.ToList();
+            Colors = colors.ToList();
         }
 
         public Iris(List<Color> colors) {
             _timerexit = new TimerCallback(Tick);
-            _colors = colors;
+            Colors = colors;
         }
 
         public Iris(int rate, Color[] colors) {
             _timerexit = new TimerCallback(Tick);
             Rate = rate;
-            _colors = colors.ToList();
+            Colors = colors.ToList();
         }
 
         public Iris(int rate, List<Color> colors) {
             _timerexit = new TimerCallback(Tick);
             Rate = rate;
-            _colors = colors;
+            Colors = colors;
         }
 
         public Iris(Action<Signal> exit) {
@@ -73,37 +73,37 @@ namespace api.Devices {
 
         public Iris(Color[] colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
-            _colors = colors.ToList();
+            Colors = colors.ToList();
             MIDIExit = exit;
         }
 
         public Iris(List<Color> colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
-            _colors = colors;
+            Colors = colors;
             MIDIExit = exit;
         }
 
         public Iris(int rate, Color[] colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Rate = rate;
-            _colors = colors.ToList();
+            Colors = colors.ToList();
             MIDIExit = exit;
         }
 
         public Iris(int rate, List<Color> colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Rate = rate;
-            _colors = colors;
+            Colors = colors;
             MIDIExit = exit;
         }
 
         private void Tick(object info) {
             if (info.GetType() == typeof((byte, int))) {
                 (byte index, int i) = ((byte, int))info;
-                if (++i < _colors.Count) {
+                if (++i < Colors.Count) {
                     _timers[index] = new Timer(_timerexit, (index, i), _rate, System.Threading.Timeout.Infinite);
                     
-                    Signal n = new Signal(index, _colors[i].Clone());
+                    Signal n = new Signal(index, Colors[i].Clone());
 
                     if (MIDIExit != null)
                         MIDIExit(n);
@@ -118,14 +118,14 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (_colors.Count > 0)
+            if (Colors.Count > 0)
                 if (n.Color.Lit) {
                     if (_timers[n.Index] != null)
                         _timers[n.Index].Dispose();
 
                     _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), _rate, System.Threading.Timeout.Infinite);
 
-                    n.Color = _colors[0].Clone();
+                    n.Color = Colors[0].Clone();
 
                     if (MIDIExit != null)
                         MIDIExit(n);
@@ -166,11 +166,11 @@ namespace api.Devices {
                         writer.WriteStartObject();
 
                             writer.WritePropertyName("count");
-                            writer.WriteValue(_colors.Count);
+                            writer.WriteValue(Colors.Count);
 
-                            for (int i = 0; i < _colors.Count; i++) {
+                            for (int i = 0; i < Colors.Count; i++) {
                                 writer.WritePropertyName(i.ToString());
-                                writer.WriteRawValue(_colors[i].Encode());
+                                writer.WriteRawValue(Colors[i].Encode());
                             }
 
                         writer.WriteEndObject();
