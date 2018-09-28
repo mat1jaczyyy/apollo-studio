@@ -33,8 +33,23 @@ namespace api.Devices {
 
             for (int i = 0; i < _colors.Count - 1; i++) {
                 _positions.Add((double)i / _colors.Count);
+                
+                int n = new int[] {
+                    Math.Abs(_colors[i].Red - _colors[i + 1].Red),
+                    Math.Abs(_colors[i].Green - _colors[i + 1].Green),
+                    Math.Abs(_colors[i].Blue - _colors[i + 1].Blue)
+                }.Max();
 
+                for (int j = 0; j < n; j++) {
+                    _steps.Add(new Color(
+                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / n),
+                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / n),
+                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / n)
+                    ));
+                }
             }
+
+            _steps.Add(_colors.Last());
         }
 
         public override Device Clone() {
@@ -43,56 +58,66 @@ namespace api.Devices {
 
         public Fade() {
             _timerexit = new TimerCallback(Tick);
+            Generate();
         }
 
         public Fade(int time) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
+            Generate();
         }
 
         public Fade(Color[] colors) {
             _timerexit = new TimerCallback(Tick);
             _colors = colors.ToList();
+            Generate();
         }
 
         public Fade(List<Color> colors) {
             _timerexit = new TimerCallback(Tick);
             _colors = colors;
+            Generate();
         }
 
         public Fade(int time, Color[] colors) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors.ToList();
+            Generate();
         }
 
         public Fade(int time, List<Color> colors) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors;
+            Generate();
         }
 
         public Fade(Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             MIDIExit = exit;
+            Generate();
         }
 
         public Fade(int time, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             MIDIExit = exit;
+            Generate();
         }
 
         public Fade(Color[] colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             _colors = colors.ToList();
             MIDIExit = exit;
+            Generate();
         }
 
         public Fade(List<Color> colors, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             _colors = colors;
             MIDIExit = exit;
+            Generate();
         }
 
         public Fade(int time, Color[] colors, Action<Signal> exit) {
@@ -100,6 +125,7 @@ namespace api.Devices {
             Time = time;
             _colors = colors.ToList();
             MIDIExit = exit;
+            Generate();
         }
 
         public Fade(int time, List<Color> colors, Action<Signal> exit) {
@@ -107,6 +133,7 @@ namespace api.Devices {
             Time = time;
             _colors = colors;
             MIDIExit = exit;
+            Generate();
         }
 
         private void Tick(object info) {
