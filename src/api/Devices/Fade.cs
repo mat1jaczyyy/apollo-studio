@@ -14,6 +14,7 @@ namespace api.Devices {
         private List<Color> _colors = new List<Color>();
         private List<double> _positions = new List<double>();
         private List<Color> _steps = new List<Color>();
+        private List<int> _counts = new List<int>();
         private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
@@ -30,21 +31,22 @@ namespace api.Devices {
         private void Generate() {
             _steps = new List<Color>();
             _positions = new List<double>();
+            _counts = new List<int>();
 
             for (int i = 0; i < _colors.Count - 1; i++) {
                 _positions.Add((double)i / _colors.Count);
                 
-                int n = new int[] {
+                _counts.Add(new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
                     Math.Abs(_colors[i].Green - _colors[i + 1].Green),
                     Math.Abs(_colors[i].Blue - _colors[i + 1].Blue)
-                }.Max();
+                }.Max());
 
-                for (int j = 0; j < n; j++) {
+                for (int j = 0; j < _counts.Last(); j++) {
                     _steps.Add(new Color(
-                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / n),
-                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / n),
-                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / n)
+                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / _counts.Last()),
+                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / _counts.Last()),
+                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / _counts.Last())
                     ));
                 }
             }
@@ -139,10 +141,10 @@ namespace api.Devices {
         private void Tick(object info) {
             if (info.GetType() == typeof((byte, int))) {
                 (byte index, int i) = ((byte, int))info;
-                if (++i < _colors.Count) {
-                    _timers[index] = new Timer(_timerexit, (index, i), _time, System.Threading.Timeout.Infinite);
+                if (++i < _steps.Count) {
+                    _timers[index] = new Timer(_timerexit, (index, i), 1, System.Threading.Timeout.Infinite);
                     
-                    Signal n = new Signal(index, _colors[i].Clone());
+                    Signal n = new Signal(index, _steps[i].Clone());
 
                     if (MIDIExit != null)
                         MIDIExit(n);
@@ -162,9 +164,9 @@ namespace api.Devices {
                     if (_timers[n.Index] != null)
                         _timers[n.Index].Dispose();
 
-                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), _time, System.Threading.Timeout.Infinite);
+                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), 1, System.Threading.Timeout.Infinite);
 
-                    n.Color = _colors[0].Clone();
+                    n.Color = _steps[0].Clone();
 
                     if (MIDIExit != null)
                         MIDIExit(n);
