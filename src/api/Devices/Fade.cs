@@ -15,6 +15,7 @@ namespace api.Devices {
         private List<double> _positions = new List<double>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
+        private List<int> _cutoffs = new List<int>();
         private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
@@ -32,9 +33,10 @@ namespace api.Devices {
             _steps = new List<Color>();
             _positions = new List<double>();
             _counts = new List<int>();
+            _cutoffs = new List<int>();
 
             for (int i = 0; i < _colors.Count - 1; i++) {
-                _positions.Add((double)i / _colors.Count);
+                _positions.Add((double)i / (_colors.Count - 1));
                 
                 _counts.Add(new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
@@ -49,9 +51,17 @@ namespace api.Devices {
                         (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / _counts.Last())
                     ));
                 }
+
+                if (i > 0) {
+                    _cutoffs.Add(_counts.Last() + _cutoffs.Last());
+                } else {
+                    _cutoffs.Add(_counts.Last());
+                }
             }
 
             _steps.Add(_colors.Last());
+            _positions.Add(1);
+            _counts.Add(_counts.Last());
         }
 
         public override Device Clone() {
@@ -139,22 +149,28 @@ namespace api.Devices {
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof((byte, int))) {
-                (byte index, int i) = ((byte, int))info;
-                if (++i < _steps.Count) {
-                    _timers[index] = new Timer(_timerexit, (index, i), 1, System.Threading.Timeout.Infinite);
-                    
-                    Signal n = new Signal(index, _steps[i].Clone());
-
-                    if (MIDIExit != null)
-                        MIDIExit(n);
+            if (info.GetType() == typeof((byte, int, int))) {
+                (byte index, int i, int j) = ((byte, int, int))info;
                 
-                } else {
-                    Signal n = new Signal(index, new Color(0));
+                Signal n;
 
-                    if (MIDIExit != null)
-                        MIDIExit(n);
+                if (i == _colors.Count - 1)
+                    n = new Signal(index, new Color(0)); 
+
+                else {
+                    if (_cutoffs[i] == ++j)
+                        i++;
+                    
+                    if (i < _colors.Count - 1)
+                        _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), System.Threading.Timeout.Infinite);
+                    else
+                        _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i] - _positions[i - 1]) * _time / _counts[i - 1]), System.Threading.Timeout.Infinite);
+
+                    n = new Signal(index, _steps[j].Clone());
                 }
+
+                if (MIDIExit != null)
+                    MIDIExit(n);
             }
         }
 
@@ -164,7 +180,7 @@ namespace api.Devices {
                     if (_timers[n.Index] != null)
                         _timers[n.Index].Dispose();
 
-                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), 1, System.Threading.Timeout.Infinite);
+                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0, 0), (int)((_positions[1] - _positions[0]) * _time / _counts[0]), System.Threading.Timeout.Infinite);
 
                     n.Color = _steps[0].Clone();
 
