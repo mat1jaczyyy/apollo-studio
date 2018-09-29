@@ -31,13 +31,10 @@ namespace api.Devices {
 
         private void Generate() {
             _steps = new List<Color>();
-            _positions = new List<double>();
             _counts = new List<int>();
             _cutoffs = new List<int>();
 
             for (int i = 0; i < _colors.Count - 1; i++) {
-                _positions.Add((double)i / (_colors.Count - 1));
-                
                 _counts.Add(new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
                     Math.Abs(_colors[i].Green - _colors[i + 1].Green),
@@ -60,87 +57,22 @@ namespace api.Devices {
             }
 
             _steps.Add(_colors.Last());
-            _positions.Add(1);
             _counts.Add(_counts.Last());
         }
 
         public override Device Clone() {
-            return new Fade(_time, _colors);
+            return new Fade(_time, _colors, _positions);
         }
 
-        public Fade() {
-            _timerexit = new TimerCallback(Tick);
-            Generate();
-        }
-
-        public Fade(int time) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            Generate();
-        }
-
-        public Fade(Color[] colors) {
-            _timerexit = new TimerCallback(Tick);
-            _colors = colors.ToList();
-            Generate();
-        }
-
-        public Fade(List<Color> colors) {
-            _timerexit = new TimerCallback(Tick);
-            _colors = colors;
-            Generate();
-        }
-
-        public Fade(int time, Color[] colors) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            _colors = colors.ToList();
-            Generate();
-        }
-
-        public Fade(int time, List<Color> colors) {
+        public Fade(int time, List<Color> colors, List<double> positions) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors;
+            _positions = positions;
             Generate();
         }
 
-        public Fade(Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            MIDIExit = exit;
-            Generate();
-        }
-
-        public Fade(int time, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            MIDIExit = exit;
-            Generate();
-        }
-
-        public Fade(Color[] colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            _colors = colors.ToList();
-            MIDIExit = exit;
-            Generate();
-        }
-
-        public Fade(List<Color> colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            _colors = colors;
-            MIDIExit = exit;
-            Generate();
-        }
-
-        public Fade(int time, Color[] colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            _colors = colors.ToList();
-            MIDIExit = exit;
-            Generate();
-        }
-
-        public Fade(int time, List<Color> colors, Action<Signal> exit) {
+        public Fade(int time, List<Color> colors, List<double> positions, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors;
@@ -191,17 +123,23 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "Fade") return null;
+            if (json["device"].ToString() != "fade") return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            List<Color> init = new List<Color>();
+            List<Color> initC = new List<Color>();
             Dictionary<string, object> colors = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["colors"].ToString());
             for (int i = 0; i < int.Parse(colors["count"].ToString()); i++) {
-                init.Add(Color.Decode(colors[i.ToString()].ToString()));
+                initC.Add(Color.Decode(colors[i.ToString()].ToString()));
             }
 
-            return new Fade(int.Parse(data["time"].ToString()), init);
+            List<double> initP = new List<double>();
+            Dictionary<string, object> positions = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["positions"].ToString());
+            for (int i = 0; i < int.Parse(positions["count"].ToString()); i++) {
+                initP.Add(double.Parse(positions[i.ToString()].ToString()));
+            }
+
+            return new Fade(int.Parse(data["time"].ToString()), initC, initP);
         }
 
         public override string EncodeSpecific() {
@@ -211,7 +149,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("Fade");
+                    writer.WriteValue("fade");
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -228,6 +166,19 @@ namespace api.Devices {
                             for (int i = 0; i < _colors.Count; i++) {
                                 writer.WritePropertyName(i.ToString());
                                 writer.WriteRawValue(_colors[i].Encode());
+                            }
+
+                        writer.WriteEndObject();
+
+                        writer.WritePropertyName("positions");
+                        writer.WriteStartObject();
+
+                            writer.WritePropertyName("count");
+                            writer.WriteValue(_positions.Count);
+
+                            for (int i = 0; i < _positions.Count; i++) {
+                                writer.WritePropertyName(i.ToString());
+                                writer.WriteRawValue(_positions[i].ToString());
                             }
 
                         writer.WriteEndObject();
