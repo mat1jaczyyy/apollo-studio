@@ -57,16 +57,10 @@ namespace api {
         }
 
         private void MIDIExit(Signal n) {
-            if (api.Program.log)
-                Console.WriteLine($"OUT <- {n.ToString()}");
-
             Launchpad.Send(n);
         }
 
         private void MIDIEnter(Signal n) {
-            if (api.Program.log)
-                Console.WriteLine($"IN  -> {n.ToString()}");
-
             Chain.MIDIEnter(n);
         }
 

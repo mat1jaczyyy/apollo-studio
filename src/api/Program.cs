@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -16,14 +17,22 @@ namespace api {
         public static bool log = false;
         public static ManualResetEvent close = new ManualResetEvent(false);
 
+        public static Stopwatch logTimer = new Stopwatch();
+
+        public static void Log(string text) {
+            Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
+        }
+
         static void Main(string[] args) {
+            logTimer.Start();
+
             foreach (string arg in args)
                 if (arg.Equals("--log"))
                     log = true;
             
             if (log)
                 foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                    Console.WriteLine($"MIDI API: {api}");
+                    Log($"MIDI API: {api}");
 
             MIDI.Start();
             Set.New();
