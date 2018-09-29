@@ -37,8 +37,32 @@ namespace api {
             MIDI.Start();
             Set.New();
             
-            Set.Open("/Users/mat1jaczyyy/Code/studiotest.xxx");
+            /* Go Higher */
+            Console.ReadLine();
 
+            Set.BPM = 160;
+            MIDI.Devices[0].InputFormat = Launchpad.InputType.DrumRack;
+            Set.Tracks[0] = new Track(MIDI.Devices[0]);
+
+            Set.Tracks[0].Chain.Add(new Group(new Chain[] {
+                new Chain(new Device[] {
+                    new Filter(new bool[] {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
+                    new Fade(1000, new List<Color> {
+                        new Color(63, 63, 63),
+                        new Color(63, 63, 0),
+                        new Color(63, 15, 0),
+                        new Color(63, 0, 0),
+                        new Color(0, 0, 0),
+                    }, new List<double> {
+                        0, 0.1, 0.4, 0.6, 1
+                    })
+                })
+            }));
+
+            Set.Save("/Users/mat1jaczyyy/Code/GoHigher.aps");
+            //Set.Open("/Users/mat1jaczyyy/Code/GoHigher.aps");
+
+            Log("ready");
             close.WaitOne();
         }
     }
