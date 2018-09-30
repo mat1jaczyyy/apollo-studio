@@ -15,59 +15,57 @@ namespace api {
         public static List<Launchpad> Devices = new List<Launchpad>();
         private static bool started = false;
 
-        public static async void Start() {
-            if (started) {
-                throw new InvalidOperationException("MIDI.Start: Called twice.");
+        public static void Rescan() {
+            /* 
+              The idea here is that we update Devices as MIDI devices are plugged in or out.
+            RtMidi doesn't provide any kind of callback function for reporting changes,
+            so we must scan manually every x milliseconds and check for changes ourselves.
+            The first attempt was using an async Threading.Timer, which always returned the
+            same data instead of updated devices. The second attempt used an async Task that
+            would have its thread sleep, but this caused segfaults when the app is idling.
+            So, for the time being, this function will have to be called manually.
+            
+              https://github.com/micdah/RtMidi.Core/issues/18
+            */
+
+            foreach (var input in MidiDeviceManager.Default.InputDevices) {
+                foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                    if (input.Name == output.Name) {
+                        bool justConnected = true;
+
+                        foreach (Launchpad device in Devices) {
+                            if (device.Name == output.Name) {
+                                if (!device.Available) {
+                                    device.Connect(input, output);
+                                }
+                                justConnected = false;
+                                break;
+                            }
+                        }
+
+                        if (justConnected) {
+                            Devices.Add(new Launchpad(input, output));
+                        }
+                    }
+                }
             }
 
-            started = true;
+            foreach (Launchpad device in Devices) {
+                if (device.Available) {
+                    bool justDisconnected = true;
 
-            await Task.Run(() => {
-                while (true) {
-                    foreach (var input in MidiDeviceManager.Default.InputDevices) {
-                        foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                            if (input.Name == output.Name) {
-                                bool justConnected = true;
-
-                                foreach (Launchpad device in Devices) {
-                                    if (device.Name == output.Name) {
-                                        if (!device.Available) {
-                                            device.Connect(input, output);
-                                        }
-                                        justConnected = false;
-                                        break;
-                                    }
-                                }
-
-                                if (justConnected) {
-                                    Devices.Add(new Launchpad(input, output));
-                                }
-                            }
+                    foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                        if (device.Name == output.Name) {
+                            justDisconnected = false;
+                            break;
                         }
                     }
 
-                    foreach (Launchpad device in Devices) {
-                        if (device.Available) {
-                            bool justDisconnected = true;
-
-                            foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                                if (device.Name == output.Name) {
-                                    justDisconnected = false;
-                                    break;
-                                }
-                            }
-
-                            if (justDisconnected) {
-                                device.Disconnect();
-                            }
-                        }
+                    if (justDisconnected) {
+                        device.Disconnect();
                     }
-
-                    // Using an async timer doesn't work for some reason.
-                    // https://github.com/micdah/RtMidi.Core/issues/18 could make this event-based instead in the future.
-                    Thread.Sleep(200); 
                 }
-            });
+            }
         }
     }
 }

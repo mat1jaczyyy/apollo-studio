@@ -34,7 +34,7 @@ namespace api {
                 foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                     Log($"MIDI API: {api}");
 
-            MIDI.Start();
+            MIDI.Rescan();
             Set.New();
             
             /* Go Higher */
