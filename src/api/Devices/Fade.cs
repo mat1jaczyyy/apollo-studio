@@ -57,7 +57,13 @@ namespace api.Devices {
             }
 
             _steps.Add(_colors.Last());
-            _counts.Add(_counts.Last());
+
+            if (_steps.Last().Lit) {
+                _steps.Add(new Color(0));
+                _cutoffs[_cutoffs.Count - 1]++;
+            }
+
+            //_counts.Add(_counts.Last());
         }
 
         public override Device Clone() {
@@ -84,25 +90,14 @@ namespace api.Devices {
             if (info.GetType() == typeof((byte, int, int))) {
                 (byte index, int i, int j) = ((byte, int, int))info;
                 
-                Signal n;
-
-                if (i == _colors.Count - 1)
-                    n = new Signal(index, new Color(0)); 
-
-                else {
-                    if (_cutoffs[i] == ++j)
-                        i++;
-                    
-                    if (i < _colors.Count - 1)
-                        _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), System.Threading.Timeout.Infinite);
-                    else
-                        _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i] - _positions[i - 1]) * _time / _counts[i - 1]), System.Threading.Timeout.Infinite);
-
-                    n = new Signal(index, _steps[j].Clone());
-                }
+                if (_cutoffs[i] == ++j)
+                    i++;
+                
+                if (i < _colors.Count - 1)
+                    _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), System.Threading.Timeout.Infinite);
 
                 if (MIDIExit != null)
-                    MIDIExit(n);
+                    MIDIExit(new Signal(index, _steps[j].Clone()));
             }
         }
 

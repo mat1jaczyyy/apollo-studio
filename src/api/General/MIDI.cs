@@ -13,7 +13,6 @@ using RtMidi.Core.Messages;
 namespace api {
     public static class MIDI {
         public static List<Launchpad> Devices = new List<Launchpad>();
-        private static bool started = false;
 
         public static void Rescan() {
             /* 
