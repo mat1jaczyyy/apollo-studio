@@ -1,8 +1,8 @@
 {
-  "name": "orion-studio",
+  "name": "apollo-studio",
   "version": "0.0.0",
   "author": "vaaski <admin@vaa.ski>",
-  "description": "orion-studio",
+  "description": "Apollo Studio",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -19,8 +19,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "orion-studio",
-    "appId": "com.vaaski.orion-studio",
+    "productName": "apollo-studio",
+    "appId": "com.vaaski.apollo-studio",
     "directories": {
       "output": "build"
     },
