@@ -12,7 +12,7 @@ namespace api.Devices {
     public class Fade: Device {
         private int _time = 1000; // milliseconds
         private List<Color> _colors = new List<Color>();
-        private List<double> _positions = new List<double>();
+        private List<Decimal> _positions = new List<Decimal>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
@@ -70,7 +70,7 @@ namespace api.Devices {
             return new Fade(_time, _colors, _positions);
         }
 
-        public Fade(int time, List<Color> colors, List<double> positions) {
+        public Fade(int time, List<Color> colors, List<Decimal> positions) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors;
@@ -78,7 +78,7 @@ namespace api.Devices {
             Generate();
         }
 
-        public Fade(int time, List<Color> colors, List<double> positions, Action<Signal> exit) {
+        public Fade(int time, List<Color> colors, List<Decimal> positions, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Time = time;
             _colors = colors;
@@ -128,10 +128,10 @@ namespace api.Devices {
                 initC.Add(Color.Decode(colors[i.ToString()].ToString()));
             }
 
-            List<double> initP = new List<double>();
+            List<Decimal> initP = new List<Decimal>();
             Dictionary<string, object> positions = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["positions"].ToString());
             for (int i = 0; i < int.Parse(positions["count"].ToString()); i++) {
-                initP.Add(double.Parse(positions[i.ToString()].ToString()));
+                initP.Add(Decimal.Parse(positions[i.ToString()].ToString()));
             }
 
             return new Fade(int.Parse(data["time"].ToString()), initC, initP);

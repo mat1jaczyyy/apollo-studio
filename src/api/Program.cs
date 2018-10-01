@@ -53,8 +53,8 @@ namespace api {
                         new Color(63, 15, 0),
                         new Color(63, 0, 0),
                         new Color(0, 0, 0),
-                    }, new List<double> {
-                        0, 0.1, 0.4, 0.6, 1
+                    }, new List<Decimal> {
+                        new Decimal(0), new Decimal(0.1), new Decimal(0.4), new Decimal(0.6), new Decimal(1)
                     }),
                 }),
                 new Chain(new Device[] {
@@ -66,8 +66,8 @@ namespace api {
                         new Color(63, 0, 63),
                         new Color(7, 0, 63),
                         new Color(0, 0, 0)
-                    }, new List<double> {
-                        0, 0.1, 0.2, 0.4, 0.6, 0.9
+                    }, new List<Decimal> {
+                        new Decimal(0), new Decimal(0.1), new Decimal(0.2), new Decimal(0.4), new Decimal(0.6), new Decimal(1)
                     })
                 })
             }));
