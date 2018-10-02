@@ -1,6 +1,5 @@
-<p align="center"><img align="center" src="https://i.imgur.com/OgDNWwr.png"/></p>
+<p align="center"><img align="center" src="https://raw.githubusercontent.com/mat1jaczyyy/apollo-studio/master/assets/ApolloStudio_TextLogo_Black.png"/></p>
 
-# Apollo Studio
 
 Apollo Studio is an extremely work-in-progress MIDI processing DAW for the lightshow aspect of the Novation Launchpads. The core workflow borrows a lot from Ableton Live's concepts and improves upon them. It supports all 3 major OSes (Windows, macOS and Linux).
 
