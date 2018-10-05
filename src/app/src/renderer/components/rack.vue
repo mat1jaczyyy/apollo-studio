@@ -1,21 +1,14 @@
 <template lang="pug">
 .rack
   Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh" drag-handle-selector=".drag").rackWrap
-    //- Draggable(v-for="item in items" :key="item.id").rackItem
+    Draggable(v-for="device in devices" :key="device.id").rackItem
       .inner
         .frame
-          h6.title {{item.data}}
-          a(@click="remove(item.id)")
+          h6.title {{device.name}}
+          a(@click="remove(device.id)")
             i.material-icons close
         .content
-    Draggable.rackItem
-      .inner
-        .frame
-          h6.title launchpad
-          a.drag
-            i.material-icons drag_handle
-        .content
-          launchpad
+          component(:is="device.component")
   //- dial(:value="dial1" @update:value="dial1 += $event" size="80px")
   //- dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
   //- dial(:value="dial3" @update:value="dial3 += $event" color="#FFF" size="50px")
@@ -26,6 +19,8 @@ import { Container, Draggable } from "vue-smooth-dnd"
 import { remote } from "electron"
 import dial from "../ui/dial"
 import launchpad from "../ui/launchpad"
+import blank from "../ui/blank"
+import translation from "../devices/translation"
 
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult
@@ -45,29 +40,34 @@ const applyDrag = (arr, dragResult) => {
   return result
 }
 
-const generateItems = (count, creator) => {
-  const result = []
-  for (let i = 0; i < count; i++) {
-    result.push(creator(i))
-  }
-  return result
-}
-
 export default {
-  components: { Container, Draggable, dial, launchpad },
+  components: { Container, Draggable, dial, launchpad, translation, blank },
   data: () => ({
-    dial1: 60,
-    dial2: 33,
-    dial3: 86,
+    devices: [
+      {
+        component: "launchpad",
+        name: "launchpad",
+        id: 0,
+      },
+      {
+        component: "translation",
+        name: "translation",
+        id: 1,
+      },
+      {
+        component: "blank",
+        name: "blank",
+        id: 2,
+      },
+    ],
     window: remote.getCurrentWindow(),
-    items: generateItems(2, i => ({ id: i, data: "panel " + i })),
   }),
   methods: {
     onDrop: function(dropResult) {
-      this.items = applyDrag(this.items, dropResult)
+      this.devices = applyDrag(this.devices, dropResult)
     },
     remove: function(id) {
-      this.items.splice(id, 1)
+      this.devices.splice(id, 1)
     },
   },
 }

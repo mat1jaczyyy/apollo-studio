@@ -1,158 +1,92 @@
 <template lang="pug">
-.c100(:class="{p50: value > 50}" @mousedown="mdown" @mouseup="mup" :style="{color, fontSize: size}")
-  span {{value}}
-  .slice
-    .bar(:style="{transform: `rotate(${value * 3.6}deg)`, borderColor: color}")
-    .fill(:style="{borderColor: color}")
+.dial(:class="locked")
+  svg(:width="size + 1" :height="size + 1" :viewBox="`0 0 ${size + 1} ${size + 1}`" @mousedown="md" @mouseup="mu")
+    circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="rgba(0,0,0,.125)" :stroke-width="width")
+    circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" :stroke="color" :stroke-width="width"
+           :stroke-dasharray="circumference" :stroke-dashoffset="offset")
 </template>
 
 <script>
 export default {
   props: {
-    value: { type: Number, default: 69 },
-    min: { type: Number, default: 0 },
-    max: { type: Number, default: 100 },
-    color: { type: String, default: "#6dd7ff" },
-    size: {type: String, default: "75px"}
+    initialValue: {
+      type: Number,
+      default: 0,
+    },
+    min: {
+      type: Number,
+      default: 0,
+    },
+    max: {
+      type: Number,
+      default: 100,
+    },
+    color: {
+      type: String,
+      default: "#0288d1",
+    },
+    width: { type: Number, default: 7 },
+    size: { type: Number, default: 50 },
+  },
+  data() {
+    return {
+      value: this.initialValue,
+      locked: false,
+    }
+  },
+  watch: {
+    value(n) {
+      this.$emit("update:value", n)
+    },
+  },
+  mounted() {
+    document.addEventListener("pointerlockchange", this.lockchange)
+  },
+  beforeDestroy() {
+    document.removeEventListener("pointerlockchange", this.lockchange)
   },
   methods: {
-    mdown(e) {
-      // console.log("mdown")
-      this.acceptLock = true
-      document.addEventListener("pointerlockchange", this.lockChangeAlert)
+    md(e) {
       e.target.requestPointerLock()
+      this.locked = true
     },
-    mup(e) {
-      // console.log("mup")
+    mu(e) {
       document.exitPointerLock()
-      document.removeEventListener("mouseup", this.mup)
-      document.removeEventListener("mousemove", this.updatePosition)
     },
-    lockChangeAlert(e) {
-      // console.log("lockChangeAlert")
-      if (!this.acceptLock) return
-      else this.acceptLock = false
-      document.addEventListener("mousemove", this.updatePosition)
-      document.addEventListener("mouseup", this.mup)
+    lockchange() {
+      if (this.locked)
+        if (document.pointerLockElement !== null) document.addEventListener("mousemove", this.mmve)
+        else if (document.pointerLockElement === null) {
+          document.removeEventListener("mousemove", this.mmve)
+          this.locked = false
+        }
     },
-    updatePosition(e) {
-      // console.log("updatePosition")
+    mmve(e) {
       let mv = this.value + e.movementY / -2
-      if (document.pointerLockElement !== null && mv >= this.min && mv <= this.max)
-        this.$emit("update:value", e.movementY / -2)
-      else if (document.pointerLockElement === null)
-        document.removeEventListener("mousemove", this.updatePosition)
+      if (mv >= this.min && mv <= this.max) {
+        this.value = mv
+      }
+    },
+  },
+  computed: {
+    radius() {
+      return this.size / 2 - this.width / 2
+    },
+    circumference() {
+      return 2 * Math.PI * this.radius
+    },
+    offset() {
+      return this.circumference * (1 - this.value / this.max)
     },
   },
 }
 </script>
 
-
 <style lang="scss">
-$circle-width: 0.05em;
-$circle-width-hover: 0.03em;
-$primary-color: #FFF;
-$secondary-color: #282828;
-$bg-color: #414141;
-
-.pie {
-  position: absolute;
-  border: $circle-width solid $primary-color;
-  width: 1 - (2 * $circle-width);
-  height: 1 - (2 * $circle-width);
-  clip: rect(0em, 0.5em, 1em, 0em);
-  border-radius: 50%;
-  transform: rotate(0deg);
-}
-
-.pie-fill {
-  transform: rotate(180deg);
-}
-
-.rect-auto {
-  clip: rect(auto, auto, auto, auto);
-}
-
-.c100 {
-  *,
-  *:before,
-  *:after {
-    box-sizing: content-box;
-  }
-  position: relative;
-  font-size: 75px;
-  width: 1em;
-  height: 1em;
-  margin: 5px;
-  border-radius: 50%;
-  float: left;
-  background-color: $secondary-color;
-  color: #FFF;
-  > span {
-    position: absolute;
-    width: 100%;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 5em;
-    line-height: 5em;
-    font-size: 0.2em;
-    color: #606060;
-    display: block;
-    text-align: center;
-    white-space: nowrap;
-    transition-property: all;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out;
-  }
-  &:after {
-    position: absolute;
-    top: $circle-width;
-    left: $circle-width;
-    display: block;
-    content: " ";
-    border-radius: 50%;
-    background-color: $bg-color;
-    width: 1 - (2 * $circle-width);
-    height: 1 - (2 * $circle-width);
-    transition-property: all;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in;
-  }
-  .slice {
-    position: absolute;
-    width: 1em;
-    height: 1em;
-    clip: rect(0em, 1em, 1em, 0.5em);
-  }
-  .bar {
-    @extend .pie;
-  }
-  &.p50 .slice {
-    clip: rect(auto, auto, auto, auto);
-  }
-  &.p50 .bar:after {
-    @extend .pie-fill;
-  }
-  &.p50 .fill {
-    @extend .pie;
-    @extend .pie-fill;
-  }
-  &:hover {
-    cursor: default;
-    > span {
-      width: 3.33em;
-      line-height: 3.33em;
-      font-size: 0.3em;
-      // color: $primary-color;
-      color: inherit;
-    }
-    &:after {
-      top: $circle-width-hover;
-      left: $circle-width-hover;
-      width: 1 - (2 * $circle-width-hover);
-      height: 1 - (2 * $circle-width-hover);
-    }
-  }
+.dial > svg {
+  transform: rotate(90deg);
+  // text {
+  //   transform: rotate(-90deg);
+  // }
 }
 </style>

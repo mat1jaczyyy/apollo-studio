@@ -12,6 +12,7 @@ div#app
 </template>
 
 <script>
+// TODO: macos frames, drag padding
 import { remote } from "electron"
 
 export default {
