@@ -20,7 +20,7 @@ import { remote } from "electron"
 import dial from "../ui/dial"
 import launchpad from "../ui/launchpad"
 import blank from "../ui/blank"
-import translation from "../devices/translation"
+import delay from "../devices/delay"
 
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult
@@ -41,7 +41,7 @@ const applyDrag = (arr, dragResult) => {
 }
 
 export default {
-  components: { Container, Draggable, dial, launchpad, translation, blank },
+  components: { Container, Draggable, dial, launchpad, delay, blank },
   data: () => ({
     devices: [
       {
@@ -50,8 +50,8 @@ export default {
         id: 0,
       },
       {
-        component: "translation",
-        name: "translation",
+        component: "delay",
+        name: "delay",
         id: 1,
       },
       {
