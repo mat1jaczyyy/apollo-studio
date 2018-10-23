@@ -49,6 +49,16 @@ export default {
 <style lang="scss">
 @import "./assets/fonts";
 @import "./assets/common";
+@import "~vue-material/dist/theme/engine";
+@include md-register-theme(
+  "default",
+  (
+    primary: #FFFFFF,
+    accent: #0288d1,
+    theme: dark,
+  )
+);
+@import "~vue-material/dist/theme/all";
 body {
   margin: 0;
   @include wnh(100vw, 100vh);
@@ -63,19 +73,18 @@ body {
     & > .frame {
       @include wnh(100%, 32px);
       position: relative;
-      display: flex;
-      // background: rgba(0, 0, 0, 0.25);
+      display: flex; // background: rgba(0, 0, 0, 0.25);
       // background: #515151;
       z-index: 999;
       // .left {
-      //   @include wnh(24px, 24px);
-      //   position: absolute;
-      //   top: 50%;
-      //   transform: translateY(-50%);
-      //   left: 4px;
-      //   img {
-      //     @include wnh(24px, 24px);
-      //   }
+      // @include wnh(24px, 24px);
+      // position: absolute;
+      // top: 50%;
+      // transform: translateY(-50%);
+      // left: 4px;
+      // img {
+      // @include wnh(24px, 24px);
+      // }
       // }
       .right {
         display: flex;

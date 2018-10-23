@@ -1,7 +1,7 @@
 <template lang="pug">
-.dial(:class="locked")
+.dial(:class="{focus}")
   svg(:width="size + 1" :height="size + 1" :viewBox="`0 0 ${size + 1} ${size + 1}`" @mousedown="md" @mouseup="mu")
-    circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="rgba(0,0,0,.125)" :stroke-width="width")
+    circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="rgba(0,0,0,.125)" :stroke-width="width").bg
     circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" :stroke="color" :stroke-width="width"
            :stroke-dasharray="circumference" :stroke-dashoffset="offset")
 </template>
@@ -32,11 +32,24 @@ export default {
     return {
       value: this.initialValue,
       locked: false,
+      focus: false,
     }
   },
   watch: {
     value(n) {
       this.$emit("update:value", n)
+    },
+    focus(n, o) {
+      let self = this
+      const arrowKeys = e => {
+        let mv = e.ctrlKey ? 5 : 1
+        if (e.shiftKey) mv = mv * 2
+        if ((self.value + mv <= self.max && e.keyCode === 38) || e.keyCode === 39) self.value += mv
+        else if ((self.value + mv / -1 >= self.min && e.keyCode === 40) || e.keyCode === 37)
+          self.value += mv / -1
+      }
+      if (n && !o) document.onkeydown = arrowKeys
+      else if (!n && o) document.onkeydown = null
     },
   },
   mounted() {
@@ -47,11 +60,20 @@ export default {
   },
   methods: {
     md(e) {
+      let self = this
       e.target.requestPointerLock()
-      this.locked = true
+      self.locked = true
+      self.focus = true
     },
     mu(e) {
+      let self = this
       document.exitPointerLock()
+      const ocl = event => {
+          if (!e.target.contains(event.target) && self.focus) self.focus = false
+          rcl()
+        },
+        rcl = () => document.removeEventListener("mousedown", ocl)
+      document.addEventListener("mousedown", ocl)
     },
     lockchange() {
       if (this.locked)
@@ -83,10 +105,17 @@ export default {
 </script>
 
 <style lang="scss">
-.dial > svg {
-  transform: rotate(90deg);
-  // text {
-  //   transform: rotate(-90deg);
-  // }
+.dial {
+  > svg {
+    transform: rotate(90deg);
+    > circle.bg {
+      transition: 0.3s;
+    }
+  }
+  &.focus {
+    > svg > circle.bg {
+      stroke: rgba(0, 0, 0, 0.25);
+    }
+  }
 }
 </style>

@@ -55,8 +55,8 @@ export default {
         id: 1,
       },
       {
-        component: "blank",
-        name: "blank",
+        component: "delay",
+        name: "delay",
         id: 2,
       },
     ],
