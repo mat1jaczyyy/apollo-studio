@@ -9,10 +9,6 @@
 <script>
 export default {
   props: {
-    initialValue: {
-      type: Number,
-      default: 0,
-    },
     min: {
       type: Number,
       default: 0,
@@ -27,26 +23,31 @@ export default {
     },
     width: { type: Number, default: 7 },
     size: { type: Number, default: 50 },
+    value: { type: Number, default: 0 },
+    holdfor: { type: Number, default: 5 },
   },
   data() {
     return {
-      value: this.initialValue,
+      hold: 0,
       locked: false,
       focus: false,
+      initial: this.value,
     }
   },
   watch: {
     value(n) {
-      this.$emit("update:value", n)
+      if (n > this.max) this.$emit("update:value", this.max)
+      else if (n < this.min) this.$emit("update:value", this.min)
     },
     focus(n, o) {
       let self = this
       const arrowKeys = e => {
         let mv = e.ctrlKey ? 5 : 1
         if (e.shiftKey) mv = mv * 2
-        if ((self.value + mv <= self.max && e.keyCode === 38) || e.keyCode === 39) self.value += mv
+        if ((self.value + mv <= self.max && e.keyCode === 38) || e.keyCode === 39)
+          self.$emit("update:value", self.value + mv)
         else if ((self.value + mv / -1 >= self.min && e.keyCode === 40) || e.keyCode === 37)
-          self.value += mv / -1
+          self.$emit("update:value", self.value + mv / -1)
       }
       if (n && !o) document.onkeydown = arrowKeys
       else if (!n && o) document.onkeydown = null
@@ -64,6 +65,9 @@ export default {
       e.target.requestPointerLock()
       self.locked = true
       self.focus = true
+      const reset = () => self.$emit("update:value", 0)
+      e.target.addEventListener("mousedown", reset)
+      setTimeout(() => e.target.removeEventListener("mousedown", reset), 250)
     },
     mu(e) {
       let self = this
@@ -84,9 +88,13 @@ export default {
         }
     },
     mmve(e) {
-      let mv = this.value + e.movementY / -2
-      if (mv >= this.min && mv <= this.max) {
-        this.value = mv
+      let self = this
+      if (self.hold < self.holdfor && self.hold > self.holdfor / -1) self.hold += e.movementY / -2
+      else {
+        if (self.hold > 0 && self.value + 1 <= self.max) self.$emit("update:value", self.value + 1)
+        else if (self.hold < 0 && self.value - 1 >= self.min)
+          self.$emit("update:value", self.value + -1)
+        self.hold = 0
       }
     },
   },
