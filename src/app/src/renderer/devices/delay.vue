@@ -1,7 +1,8 @@
 <template lang="pug">
 main.delay
   //- h4 delay
-  dial(:value.sync="delay" :size="150" :width="10" :min="0" :max="60")
+  .d
+    dial(:value.sync="delay" :size="150" :width="10" :min="0" :max="60")
   //- p {{delay}}
   .values
     a(@click="delay += -1") -

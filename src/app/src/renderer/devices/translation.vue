@@ -2,7 +2,7 @@
 main
   .x
     h4 x translation
-    dial(:value.sync="x" :size="50" :width="5" :min="min" :max="max" :holdfor="15")
+    dial(:value.sync="x" :size="50" :width="5" :min="min" :max="max" :holdfor="15" :overflow="true")
     .values
       a(@click="x += -1") -
       md-field
@@ -10,7 +10,7 @@ main
       a(@click="x += 1") +
   .y
     h4 y translation
-    dial(:value.sync="y" :size="50" :width="5" :min="min" :max="max" :holdfor="15")
+    dial(:value.sync="y" :size="50" :width="5" :min="min" :max="max" :holdfor="15" :overflow="true")
     .values
       a(@click="y += -1") -
       md-field
@@ -25,27 +25,29 @@ export default {
   data: () => ({
     x: 0,
     y: 0,
-    min: -8,
-    max: 8,
+    min: -9,
+    max: 9,
   }),
 }
 </script>
 
 <style lang="scss">
+.x {
+  margin-bottom: 10px;
+}
 .x,
 .y {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-bottom: 5px;
   .values {
     display: flex;
     justify-content: center;
     align-items: center;
     .md-field {
       margin: 0;
-      margin-top: -16px;
+      margin-top: -24px;
       .md-input {
         width: 3em;
         text-align: center;
@@ -57,9 +59,6 @@ export default {
       margin: 0 5px;
       text-decoration: none;
     }
-  }
-  circle {
-    transition: 0.3s;
   }
 }
 </style>

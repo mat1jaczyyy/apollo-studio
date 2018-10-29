@@ -3,7 +3,7 @@
   svg(:width="size + 1" :height="size + 1" :viewBox="`0 0 ${size + 1} ${size + 1}`" @mousedown="md" @mouseup="mu")
     circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="rgba(0,0,0,.125)" :stroke-width="width").bg
     circle(:cx="size / 2" :cy="size / 2" :r="radius" fill="none" :stroke="color" :stroke-width="width"
-           :stroke-dasharray="circumference" :stroke-dashoffset="offset")
+           :stroke-dasharray="circumference" :stroke-dashoffset="offset" :class="{locked}")
 </template>
 
 <script>
@@ -25,6 +25,7 @@ export default {
     size: { type: Number, default: 50 },
     value: { type: Number, default: 0 },
     holdfor: { type: Number, default: 5 },
+    overflow: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -36,8 +37,9 @@ export default {
   },
   watch: {
     value(n) {
-      if (n > this.max) this.$emit("update:value", this.max)
-      else if (n < this.min) this.$emit("update:value", this.min)
+      if (!this.overflow)
+        if (n > this.max) this.$emit("update:value", this.max)
+        else if (n < this.min) this.$emit("update:value", this.min)
     },
     focus(n, o) {
       let self = this
@@ -116,13 +118,18 @@ export default {
 .dial {
   > svg {
     transform: rotate(90deg);
-    > circle.bg {
+    > circle {
       transition: 0.3s;
+      &.locked {
+        transition: none;
+      }
     }
   }
   &.focus {
-    > svg > circle.bg {
-      stroke: rgba(0, 0, 0, 0.25);
+    > svg > circle {
+      &.bg {
+        stroke: rgba(0, 0, 0, 0.25);
+      }
     }
   }
 }

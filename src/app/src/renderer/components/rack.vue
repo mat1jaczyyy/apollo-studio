@@ -1,7 +1,7 @@
 <template lang="pug">
 .rack
-  Container(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh" drag-handle-selector=".drag").rackWrap
-    Draggable(v-for="device in devices" :key="device.id").rackItem
+  .rackWrap(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh" drag-handle-selector=".drag")
+    .rackItem(v-for="device in devices" :key="device.id")
       .inner
         .frame
           h6.title {{device.name}}
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { Container, Draggable } from "vue-smooth-dnd"
+// import { Container, Draggable } from "vue-smooth-dnd"
 import { remote } from "electron"
 import dial from "../ui/dial"
 import launchpad from "../ui/launchpad"
@@ -42,7 +42,7 @@ const applyDrag = (arr, dragResult) => {
 }
 
 export default {
-  components: { Container, Draggable, dial, launchpad, translation, blank, delay },
+  components: { dial, launchpad, translation, blank, delay },
   data: () => ({
     devices: [
       {
