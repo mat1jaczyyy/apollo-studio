@@ -101,15 +101,15 @@ body {
           cursor: pointer;
           i {
             color: #515151;
-            transition: 0.5s;
-            &:hover {
-              &.exit {
-                color: #b71c1c;
-              }
-              &.min {
-                color: #f57f17;
-              }
-            }
+            // transition: 0.5s;
+            // &:hover {
+            //   &.exit {
+            //     color: #b71c1c;
+            //   }
+            //   &.min {
+            //     color: #f57f17;
+            //   }
+            // }
           }
         }
       }

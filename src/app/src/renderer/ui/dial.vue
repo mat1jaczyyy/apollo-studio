@@ -64,6 +64,7 @@ export default {
   methods: {
     md(e) {
       let self = this
+      if (e.button === 2) return self.$emit("rclick")
       e.target.requestPointerLock()
       self.locked = true
       self.focus = true
