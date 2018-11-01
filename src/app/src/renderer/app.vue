@@ -14,6 +14,7 @@ div#app
 <script>
 // TODO: macos frames, drag padding
 import { remote } from "electron"
+import ls from "local-storage"
 
 export default {
   name: "orion-studio",
@@ -25,17 +26,6 @@ export default {
       switch (icon) {
         case "minimize":
           this.window.minimize()
-          break
-        case "maximize":
-          if (!this.window.isMaximized()) {
-            this.window.maximize()
-            this.visual.maximized = true
-            ls("maximized", true)
-          } else {
-            this.window.unmaximize()
-            this.visual.maximized = false
-            ls("maximized", false)
-          }
           break
         case "close":
           this.window.close()
@@ -59,11 +49,29 @@ export default {
   )
 );
 @import "~vue-material/dist/theme/all";
+.md-field.md-theme-default.md-disabled label,
+.md-field.md-theme-default.md-disabled .md-input,
+.md-field.md-theme-default.md-disabled .md-textarea {
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5);
+}
+::selection {
+  background: #dbdbdb;
+}
+.md-field {
+  margin: 0;
+  margin-top: 0;
+  padding-top: 0;
+  min-height: unset;
+  .md-input {
+    width: 3em;
+    text-align: center;
+  }
+}
 body {
   margin: 0;
   @include wnh(100vw, 100vh);
   user-select: none;
-  background: #373737;
+  background: #212121;
   font-family: "Roboto Mono", sans-serif;
   color: #bbbbbb;
   font-weight: lighter;
@@ -73,8 +81,7 @@ body {
     & > .frame {
       @include wnh(100%, 32px);
       position: relative;
-      display: flex; // background: rgba(0, 0, 0, 0.25);
-      // background: #515151;
+      display: flex; // background: rgba(0, 0, 0, 0.25); // background: #515151;
       z-index: 999;
       // .left {
       // @include wnh(24px, 24px);
@@ -100,16 +107,7 @@ body {
           align-items: center;
           cursor: pointer;
           i {
-            color: #515151;
-            // transition: 0.5s;
-            // &:hover {
-            //   &.exit {
-            //     color: #b71c1c;
-            //   }
-            //   &.min {
-            //     color: #f57f17;
-            //   }
-            // }
+            color: #515151; // transition: 0.5s; // &:hover { // &.exit { // color: #b71c1c; // } // &.min { // color: #f57f17; // } // }
           }
         }
       }
@@ -124,7 +122,7 @@ body {
       @include wnh(100%, calc(100% - 32px));
       position: relative;
       z-index: 99;
-      background: #414141;
+      background: #252525;
       border-radius: 10px 10px 0 0;
       overflow: hidden;
       box-shadow: 0 -1px 20px -3px rgba(0, 0, 0, 0.5);

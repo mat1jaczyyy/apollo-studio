@@ -2,7 +2,7 @@
 main
   .x
     h4 x translation
-    dial(:value.sync="x" :size="50" :width="5" :min="min" :max="max" :holdfor="15" :overflow="true")
+    dial(:value.sync="x" :size="50" :width="7" :min="min" :max="max" :holdfor="15" :overflow="true")
     .values
       a(@click="x += -1") -
       md-field
@@ -10,7 +10,7 @@ main
       a(@click="x += 1") +
   .y
     h4 y translation
-    dial(:value.sync="y" :size="50" :width="5" :min="min" :max="max" :holdfor="15" :overflow="true")
+    dial(:value.sync="y" :size="50" :width="7" :min="min" :max="max" :holdfor="15" :overflow="true")
     .values
       a(@click="y += -1") -
       md-field
@@ -45,14 +45,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    .md-field {
-      margin: 0;
-      margin-top: -24px;
-      .md-input {
-        width: 3em;
-        text-align: center;
-      }
-    }
     a {
       cursor: pointer;
       color: rgba(255, 255, 255, 0.25);

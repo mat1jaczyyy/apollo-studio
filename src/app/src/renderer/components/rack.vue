@@ -43,6 +43,7 @@ const applyDrag = (arr, dragResult) => {
 
 export default {
   components: { dial, launchpad, translation, blank, delay },
+  name: "rack",
   data: () => ({
     devices: [
       {
@@ -84,20 +85,21 @@ export default {
     display: flex;
     .rackItem {
       height: calc(100% - 8px);
-      width: 225px;
+      // width: 225px;
       box-shadow: none;
       // transition: box-shadow .3s;
       .inner {
         overflow: hidden;
         border-radius: 5px 5px 0 0;
         height: 100%;
-        background: #3a3a3a;
+        background: #2a2a2a;
         box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
         margin: 4px 0;
         margin-left: 4px;
         transition: box-shadow 0.3s;
         position: relative;
         .content {
+          padding: 0 15px;
           position: relative;
           display: flex;
           justify-content: center;
@@ -108,8 +110,9 @@ export default {
           display: flex;
           height: 20px;
           padding: 0 4px;
-          background: #515151;
+          background: #2b2b2b;
           position: relative;
+          box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
           h6 {
             font-size: 12px;
             line-height: 20px;

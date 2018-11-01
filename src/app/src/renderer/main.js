@@ -2,6 +2,7 @@ import Vue from "vue"
 
 import app from "./app"
 import router from "./router"
+import store from "./store"
 
 if (!process.env.IS_WEB) Vue.use(require("vue-electron"))
 Vue.config.productionTip = false
@@ -13,5 +14,6 @@ import "vue-material/dist/vue-material.min.css"
 new Vue({
   components: { app },
   router,
+  store,
   template: "<app/>",
 }).$mount("#app")

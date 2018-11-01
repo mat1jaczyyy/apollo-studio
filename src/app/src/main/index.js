@@ -23,9 +23,9 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     height: 292,
     width: 750,
-    backgroundColor: "#414141",
+    backgroundColor: "#212121",
     frame: false,
-    show: false,
+    // show: false,
     center: true,
     minHeight: 292,
     minWidth: 750,
@@ -35,9 +35,9 @@ function createWindow() {
 
   mainWindow.loadURL(winURL)
 
-  mainWindow.on("closed", () => {
-    mainWindow = null
-  })
+  // mainWindow.on("closed", () => {
+  //   mainWindow = null
+  // })
 
   mainWindow.once("ready-to-show", () => {
     mainWindow.show()
