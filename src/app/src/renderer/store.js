@@ -9,9 +9,13 @@ export default new Vuex.Store({
     settings: ls("settings") || {
       dialPointerLock: true,
     },
+    strings: {
+      dialPointerLock: "Lock pointer while adjusting dials",
+    },
   },
   mutations: {
     setting(state, { k, v }) {
+      // console.log({ k, v })
       state.settings[k] = v
       ls("settings", state.settings)
     },

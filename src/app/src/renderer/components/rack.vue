@@ -1,11 +1,11 @@
 <template lang="pug">
 .rack
-  .rackWrap(@drop="onDrop" orientation="horizontal" lock-axis="x" :animation-duration="500" drag-class="sh" drag-handle-selector=".drag")
-    .rackItem(v-for="device in devices" :key="device.id")
+  .rackWrap
+    .rackItem(v-for="(device, key) in devices" :key="key")
       .inner
         .frame
           h6.title {{device.name}}
-          a(@click="remove(device.id)")
+          .remove(@click="remove(key)")
             i.material-icons close
         .content
           component(:is="device.component")
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-// import { Container, Draggable } from "vue-smooth-dnd"
 import { remote } from "electron"
 import dial from "../ui/dial"
 import launchpad from "../ui/launchpad"
@@ -23,23 +22,23 @@ import blank from "../ui/blank"
 import translation from "../devices/translation"
 import delay from "../devices/delay"
 
-const applyDrag = (arr, dragResult) => {
-  const { removedIndex, addedIndex, payload } = dragResult
-  if (removedIndex === null && addedIndex === null) return arr
+// const applyDrag = (arr, dragResult) => {
+//   const { removedIndex, addedIndex, payload } = dragResult
+//   if (removedIndex === null && addedIndex === null) return arr
 
-  const result = [...arr]
-  let itemToAdd = payload
+//   const result = [...arr]
+//   let itemToAdd = payload
 
-  if (removedIndex !== null) {
-    itemToAdd = result.splice(removedIndex, 1)[0]
-  }
+//   if (removedIndex !== null) {
+//     itemToAdd = result.splice(removedIndex, 1)[0]
+//   }
 
-  if (addedIndex !== null) {
-    result.splice(addedIndex, 0, itemToAdd)
-  }
+//   if (addedIndex !== null) {
+//     result.splice(addedIndex, 0, itemToAdd)
+//   }
 
-  return result
-}
+//   return result
+// }
 
 export default {
   components: { dial, launchpad, translation, blank, delay },
@@ -49,17 +48,14 @@ export default {
       {
         component: "launchpad",
         name: "launchpad",
-        id: 0,
       },
       {
         component: "translation",
         name: "translation",
-        id: 1,
       },
       {
         component: "delay",
         name: "delay",
-        id: 2,
       },
     ],
     window: remote.getCurrentWindow(),
@@ -117,7 +113,7 @@ export default {
             font-size: 12px;
             line-height: 20px;
           }
-          a {
+          > div {
             position: absolute;
             height: 20px;
             right: 4px;
@@ -130,10 +126,10 @@ export default {
             }
             i {
               font-size: 20px;
-              // transition: 0.5s;
-              // &:hover {
-              //   color: #d03333;
-              // }
+              transition: 0.5s;
+              &:hover {
+                color: #d03333;
+              }
             }
           }
         }
