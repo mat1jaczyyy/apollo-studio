@@ -4,11 +4,10 @@ import { app, BrowserWindow } from "electron"
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
-if (process.env.NODE_ENV !== "development") {
+if (process.env.NODE_ENV !== "development")
   global.__static = require("path")
     .join(__dirname, "/static")
     .replace(/\\/g, "\\\\")
-}
 
 let mainWindow
 const winURL =
@@ -21,16 +20,19 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 292,
     width: 750,
+    // x: 0,
+    // y: 0,
+    // minWidth: 685,
+    height: 292,
+    width: 685,
     backgroundColor: "#212121",
     frame: false,
     // show: false,
     center: true,
     minHeight: 292,
-    minWidth: 750,
     maxHeight: 292,
-    alwaysOnTop: true
+    // alwaysOnTop: true
   })
 
   mainWindow.loadURL(winURL)
@@ -47,15 +49,11 @@ function createWindow() {
 app.on("ready", createWindow)
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit()
-  }
+  if (process.platform !== "darwin") app.quit()
 })
 
 app.on("activate", () => {
-  if (mainWindow === null) {
-    createWindow()
-  }
+  if (mainWindow === null) createWindow()
 })
 
 /**

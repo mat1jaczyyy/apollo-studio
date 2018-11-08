@@ -25,9 +25,7 @@ main.delay
 </template>
 
 <script>
-import dial from "../ui/dial"
 export default {
-  components: { dial },
   data: () => ({
     delay: 0,
     step: 7,

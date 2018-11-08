@@ -9,9 +9,6 @@
             i.material-icons close
         .content
           component(:is="device.component")
-  //- dial(:value="dial1" @update:value="dial1 += $event" size="80px")
-  //- dial(:value="dial2" @update:value="dial2 += $event" color="#FFB532")
-  //- dial(:value="dial3" @update:value="dial3 += $event" color="#FFF" size="50px")
 </template>
 
 <script>
@@ -21,24 +18,6 @@ import launchpad from "../ui/launchpad"
 import blank from "../ui/blank"
 import translation from "../devices/translation"
 import delay from "../devices/delay"
-
-// const applyDrag = (arr, dragResult) => {
-//   const { removedIndex, addedIndex, payload } = dragResult
-//   if (removedIndex === null && addedIndex === null) return arr
-
-//   const result = [...arr]
-//   let itemToAdd = payload
-
-//   if (removedIndex !== null) {
-//     itemToAdd = result.splice(removedIndex, 1)[0]
-//   }
-
-//   if (addedIndex !== null) {
-//     result.splice(addedIndex, 0, itemToAdd)
-//   }
-
-//   return result
-// }
 
 export default {
   components: { dial, launchpad, translation, blank, delay },
@@ -81,9 +60,7 @@ export default {
     display: flex;
     .rackItem {
       height: calc(100% - 8px);
-      // width: 225px;
       box-shadow: none;
-      // transition: box-shadow .3s;
       .inner {
         overflow: hidden;
         border-radius: 5px 5px 0 0;

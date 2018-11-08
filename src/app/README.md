@@ -5,9 +5,9 @@
 
 ## devices
 
-* - [ ] Delay: Very similar to the Max for Live version of Delay (from the Outbreak set).
-  * Duration dial with Sync or Free toggle option. Free specifies milliseconds from 0 to 60000, Sync specifies time value ranging in: 1/128, 1/64, 1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4
-  * Gate dial. Specifies percentage ranging from 0% to 400%.
+* - [x] ~~Delay: Very similar to the Max for Live version of Delay (from the Outbreak set).~~
+  * ~~Duration dial with Sync or Free toggle option. Free specifies milliseconds from 0 to 60000, Sync specifies time value ranging in: 1/128, 1/64, 1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4~~
+  * ~~Gate dial. Specifies percentage ranging from 0% to 400%.~~
 
 * - [ ] Duplication: Very similar to the Ableton Chord.
   * List of elements (2 dials) that effectively act as a Translation. X translation dial and Y translation dial per list element.
@@ -44,9 +44,9 @@
 
 * - [ ] Preview: displays the signals that pass through it and doesn't process them at all.
   * Reuse the Launchpad grid you have (add the mode/side LED). The buttons react, with each of them showing the colors they receive from the signals.
-  * Clicking a button will tell the backend to send a signal from that device into the chain directly after it (so it can be used as a cheap input device). 
+  * Clicking a button will tell the backend to send a signal from that device into the chain directly after it (so it can be used as a cheap input device).
 
-* - [ ] Translation: Similar to Ableton's Pitch, moves a signal around the grid.
-  * X translation dial and Y translation dial.
+* - [x] ~~Translation: Similar to Ableton's Pitch, moves a signal around the grid.~~
+  * ~~X translation dial and Y translation dial.~~
 
-For now, ignore any interactions with the backend, especially those where devices themselves listen to feedback from their backend counterparts (like Preview). Implement the prototype UIs first, and then we will 
+For now, ignore any interactions with the backend, especially those where devices themselves listen to feedback from their backend counterparts (like Preview). Implement the prototype UIs first, and then we will

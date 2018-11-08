@@ -15,7 +15,6 @@ export default new Vuex.Store({
   },
   mutations: {
     setting(state, { k, v }) {
-      // console.log({ k, v })
       state.settings[k] = v
       ls("settings", state.settings)
     },

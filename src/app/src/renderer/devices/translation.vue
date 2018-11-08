@@ -19,9 +19,7 @@ main
 </template>
 
 <script>
-import dial from "../ui/dial"
 export default {
-  components: { dial },
   data: () => ({
     x: 0,
     y: 0,
