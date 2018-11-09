@@ -80,6 +80,9 @@ namespace api {
             //Set.Open("/Users/mat1jaczyyy/Code/GoHigher.aps");
 
             Communication.Server.Start();
+
+            Communication.Frontend.Test();
+
             Log("ready");
 
             close.WaitOne();
