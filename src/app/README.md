@@ -46,7 +46,8 @@
   * Reuse the Launchpad grid you have (add the mode/side LED). The buttons react, with each of them showing the colors they receive from the signals.
   * Clicking a button will tell the backend to send a signal from that device into the chain directly after it (so it can be used as a cheap input device).
 
-* - [x] ~~Translation: Similar to Ableton's Pitch, moves a signal around the grid.~~
+* - [x] Translation: Similar to Ableton's Pitch, moves a signal around the grid.
   * ~~X translation dial and Y translation dial.~~
+  * Gate scaling
 
 For now, ignore any interactions with the backend, especially those where devices themselves listen to feedback from their backend counterparts (like Preview). Implement the prototype UIs first, and then we will

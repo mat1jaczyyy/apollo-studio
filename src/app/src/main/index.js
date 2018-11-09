@@ -1,4 +1,14 @@
 import { app, BrowserWindow } from "electron"
+import express from "express"
+
+const server = express()
+const cors = require("cors")
+
+server.use(cors())
+server.get("/", function(req, res) {
+  res.send("Hello World")
+})
+server.listen(1549)
 
 /**
  * Set `__static` path to static files in production
@@ -41,9 +51,9 @@ function createWindow() {
   //   mainWindow = null
   // })
 
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show()
-  })
+  // mainWindow.once("ready-to-show", () => {
+  //   mainWindow.show()
+  // })
 }
 
 app.on("ready", createWindow)

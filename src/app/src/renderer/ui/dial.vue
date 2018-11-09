@@ -160,7 +160,8 @@ export default {
     > path {
       transition: 0.3s;
       &.locked {
-        transition: 0.1s;
+        // transition: 0.1s;
+        transition: none;
       }
     }
   }

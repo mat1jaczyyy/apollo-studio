@@ -3,7 +3,7 @@ div#app(:class="{showsettings}")
   .frame
     .left
       .settings(@click="showsettings = !showsettings")
-        i.set.material-icons(:class="{rotate: showsettings}") settings
+        i.set.material-icons(:class="{showsettings}") settings
     .drag
     .right
       .minimize(@click="frame('minimize')")
@@ -123,7 +123,7 @@ body {
               transition: 0.5s;
             }
             &:hover.set,
-            &.rotate {
+            &.showsettings {
               color: rgb(175, 175, 175);
               transform: rotate(0);
               font-size: 24px;
