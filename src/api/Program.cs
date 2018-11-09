@@ -4,6 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+
 using RtMidi.Core;
 using RtMidi.Core.Devices;
 using RtMidi.Core.Enums;
@@ -75,7 +79,9 @@ namespace api {
             Set.Save("/Users/mat1jaczyyy/Code/GoHigher.aps");
             //Set.Open("/Users/mat1jaczyyy/Code/GoHigher.aps");
 
+            Communication.Server.Start();
             Log("ready");
+
             close.WaitOne();
         }
     }
