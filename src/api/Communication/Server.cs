@@ -7,26 +7,32 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace api.Communication {
     public static class Server {
+        private static readonly string ip = "localhost";
+        private static readonly ushort port = 1548;
+
         private static IWebHost host = new WebHostBuilder()
             .UseKestrel()
             .UseStartup<Startup>()
-            .UseUrls("http://localhost:1548/") // API = 1548, APP = 1549
+            .UseUrls($"http://{ip}:{port}/")
             .Build();
 
         private class Startup {
             public Startup(IHostingEnvironment env) {}
 
-            // This method gets called by the runtime. Use this method to add services to the container.
             public void ConfigureServices(IServiceCollection services) {
-                // Add framework services.
+                services.AddCors(options => {
+                    options.AddPolicy("AllowAllOrigins", builder => { // Required for Frontend to be able to properly access API.
+                        builder.AllowAnyOrigin();
+                    });
+                });
+
                 services.AddMvc().AddJsonOptions(options => {
-                    //return json format with Camel Case
                     options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
                 });
             }
 
-            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             public void Configure(IApplicationBuilder app) {
+                app.UseCors("AllowAllOrigins");
                 app.UseMvc();
             }
         }
