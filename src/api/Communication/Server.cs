@@ -10,6 +10,7 @@ namespace api.Communication {
         private static IWebHost host = new WebHostBuilder()
             .UseKestrel()
             .UseStartup<Startup>()
+            .UseUrls("http://localhost:1548/") // API = 1548, APP = 1549
             .Build();
 
         private class Startup {
