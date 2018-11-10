@@ -27,6 +27,10 @@ const describeArc = (x, y, radius, startAngle, endAngle) => {
   return d
 }
 
+const scale = (v, min, max, e) => {
+  return Math.pow((v - min) / (max - min), 1 / e)
+}
+
 export default {
   props: {
     min: {
@@ -46,6 +50,7 @@ export default {
     value: { type: Number, default: 0 },
     holdfor: { type: Number, default: 5 },
     overflow: { type: Boolean, default: false },
+    exponent: { type: Number, default: 1 },
   },
   data() {
     return {
@@ -143,10 +148,13 @@ export default {
       return (1 - 0.7 / 3.6) * (2 * Math.PI * this.radius)
     },
     offset() {
-      return this.circumference * (1 - this.value / this.max)
+      return this.circumference * (1 - this.scaling)
     },
     d() {
       return describeArc(this.size / 2, this.size / 2, this.radius, -145, 145)
+    },
+    scaling() {
+      return scale(this.value, this.min, this.max, this.exponent)
     },
   },
 }

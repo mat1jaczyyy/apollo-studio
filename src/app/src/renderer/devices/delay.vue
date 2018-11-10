@@ -16,7 +16,7 @@ main.delay
       a(@click="step += 1") +
   .gate
     h4 gate
-    dial(:value.sync="gate" :size="50" :width="7" :min="0" :max="400" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(:value.sync="gate" :exponent="2" :size="50" :width="7" :min="0" :max="400" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
       a(@click="gate += -10") -
       md-field
