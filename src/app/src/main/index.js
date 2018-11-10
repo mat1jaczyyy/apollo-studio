@@ -6,7 +6,7 @@ const cors = require("cors")
 
 server.use(cors())
 server.get("/", function(req, res) {
-  res.send("Hello World")
+  if (finishload) mainWindow.webContents.send("request", req)
 })
 server.listen(1549)
 
@@ -19,7 +19,8 @@ if (process.env.NODE_ENV !== "development")
     .join(__dirname, "/static")
     .replace(/\\/g, "\\\\")
 
-let mainWindow
+let mainWindow,
+  finishload = false
 const winURL =
   process.env.NODE_ENV === "development"
     ? `http://localhost:9080`
@@ -42,11 +43,15 @@ function createWindow() {
     center: true,
     minHeight: 292,
     maxHeight: 292,
-    // alwaysOnTop: true
+    alwaysOnTop: true,
+    webPreferences: {
+      // nodeIntegration: false, // TODO: fix this security thing
+    },
   })
 
   mainWindow.loadURL(winURL)
 
+  mainWindow.webContents.on("did-finish-load", () => (finishload = true))
   // mainWindow.on("closed", () => {
   //   mainWindow = null
   // })
@@ -78,10 +83,10 @@ app.on("activate", () => {
 import { autoUpdater } from 'electron-updater'
 
 autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
+autoUpdater.quitAndInstall()
 })
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
- */
+*/

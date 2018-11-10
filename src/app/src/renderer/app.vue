@@ -24,9 +24,18 @@ div#app(:class="{showsettings}")
 // TODO: macos frames, drag padding
 import { remote } from "electron"
 import ls from "local-storage"
+import axios from "axios"
+
+const { ipcRenderer } = require("electron")
+ipcRenderer.on("request", (event, arg) => {
+  console.log("from main", arg) // prints "pong"
+})
+// ipcRenderer.send('asynchronous-message', 'ping')
+
+// axios.get("http://localhost:1548/api/contacts").then(e => console.log(e))
 
 export default {
-  name: "orion-studio",
+  name: "apollo-studio",
   data: () => ({
     window: remote.getCurrentWindow(),
     showsettings: false,
@@ -194,5 +203,8 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+i.material-icons {
+  cursor: pointer;
 }
 </style>

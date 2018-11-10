@@ -1,7 +1,9 @@
 <template lang="pug">
 .rack
   .rackWrap
-    .rackItem(v-for="(device, key) in devices" :key="key")
+    .additem
+      i.material-icons add
+    .rackItem(v-for="(device, key) in devices" :key="key" :class="{hov: hov === key}")
       .inner
         .frame
           h6.title {{device.name}}
@@ -9,6 +11,8 @@
             i.material-icons close
         .content
           component(:is="device.component")
+      .additem(@mouseenter="hover(true, key)" @mouseleave="hover(false, key)")
+        i.material-icons add
 </template>
 
 <script>
@@ -23,6 +27,7 @@ export default {
   components: { dial, launchpad, translation, blank, delay },
   name: "rack",
   data: () => ({
+    hov: false,
     devices: [
       {
         component: "launchpad",
@@ -40,6 +45,10 @@ export default {
     window: remote.getCurrentWindow(),
   }),
   methods: {
+    hover(n, i) {
+      if (n) this.hov = i
+      else this.hov = false
+    },
     onDrop: function(dropResult) {
       this.devices = applyDrag(this.devices, dropResult)
     },
@@ -55,23 +64,58 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  .rackWrap {
+  > .rackWrap {
     height: 100%;
     display: flex;
-    .rackItem {
+    .additem {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      i {
+        transition: 0.3s;
+        color: rgba(255, 255, 255, 0.125);
+        &:hover {
+          color: rgba(255, 255, 255, 0.25);
+        }
+      }
+    }
+    > .rackItem {
       height: calc(100% - 8px);
       box-shadow: none;
-      .inner {
+      margin: 0 4px;
+      position: relative;
+      transition: margin 0.3s;
+      .additem {
+        position: absolute;
+        left: 100%;
+        top: 0;
+        height: 100%;
+        width: 8px;
+        transition: 0.3s;
+        i {
+          color: transparent;
+        }
+      }
+      &.hov {
+        margin-right: 20px;
+        > .additem {
+          width: 24px;
+          > i {
+            color: rgba(255, 255, 255, 0.25);
+          }
+        }
+      }
+      > .inner {
         overflow: hidden;
         border-radius: 5px 5px 0 0;
         height: 100%;
         background: #2a2a2a;
         box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
         margin: 4px 0;
-        margin-left: 4px;
         transition: box-shadow 0.3s;
         position: relative;
-        .content {
+        > .content {
           padding: 0 15px;
           position: relative;
           display: flex;
@@ -79,14 +123,14 @@ export default {
           align-items: center;
           height: calc(100% - 20px);
         }
-        .frame {
+        > .frame {
           display: flex;
           height: 20px;
           padding: 0 4px;
           background: #2b2b2b;
           position: relative;
           box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
-          h6 {
+          > h6 {
             font-size: 12px;
             line-height: 20px;
           }
