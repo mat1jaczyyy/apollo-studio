@@ -15,6 +15,7 @@ namespace api.Communication {
             .UseKestrel()
             .UseStartup<Startup>()
             .UseUrls($"http://{ip}:{port}/")
+            .SuppressStatusMessages(true)
             .Build();
 
         private class Startup {
