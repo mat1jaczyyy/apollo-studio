@@ -2,7 +2,10 @@
 
 ## api
 
-* Calls hosted on the api server will be documented here.
+* /add_device:
+    * Adds new instance of device at position in the chain.
+    * request: json {track: int, index: int, device: string}
+    * response: json device data
 
 ## app
 

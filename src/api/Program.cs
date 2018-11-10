@@ -42,7 +42,6 @@ namespace api {
             Set.New();
 
             Communication.Server.Start();
-            Communication.UI.Test();
 
             Log("ready");
 

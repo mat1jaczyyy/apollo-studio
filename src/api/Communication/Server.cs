@@ -15,7 +15,7 @@ namespace api.Communication {
             .UseKestrel()
             .UseStartup<Startup>()
             .UseUrls($"http://{ip}:{port}/")
-            .SuppressStatusMessages(true)
+            .SuppressStatusMessages(!api.Program.log)
             .Build();
 
         private class Startup {
@@ -24,13 +24,11 @@ namespace api.Communication {
             public void ConfigureServices(IServiceCollection services) {
                 services.AddCors(options => {
                     options.AddPolicy("AllowAllOrigins", builder => { // Required for Frontend to be able to properly access API.
-                        builder.AllowAnyOrigin();
+                        builder.AllowAnyOrigin().AllowAnyMethod();
                     });
                 });
 
-                services.AddMvc().AddJsonOptions(options => {
-                    options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-                });
+                services.AddMvc();
             }
 
             public void Configure(IApplicationBuilder app) {
