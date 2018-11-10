@@ -4,7 +4,7 @@
     .additem
       i.material-icons add
     .rackItem(v-for="(device, key) in devices" :key="key" :class="{hov: hov === key}")
-      .inner
+      .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
         .frame
           h6.title {{device.name}}
           .remove(@click="remove(key)")
@@ -28,10 +28,10 @@ export default {
   data: () => ({
     hov: false,
     devices: [
-      {
-        component: "launchpad",
-        name: "launchpad",
-      },
+      // {
+      //   component: "launchpad",
+      //   name: "launchpad",
+      // },
       {
         component: "translation",
         name: "translation",
@@ -138,7 +138,7 @@ export default {
           display: flex;
           height: 20px;
           padding: 0 4px;
-          background: #2b2b2b;
+          background: rgba(0, 0, 0, 0.125);
           position: relative;
           box-shadow: 1px 1px 15px -4px rgba(0, 0, 0, 0.25);
           > h6 {

@@ -1,6 +1,6 @@
 <template lang="pug">
 div#app(:class="{showsettings}")
-  .frame
+  .frame(v-if="platform !== 'darwin'")
     .left
       .settings(@click="showsettings = !showsettings")
         i.set.material-icons(:class="{showsettings}") settings
@@ -10,13 +10,27 @@ div#app(:class="{showsettings}")
         i.min.material-icons keyboard_arrow_down
       .close(@click="frame('close')")
         i.exit.material-icons close
+  .frame.mac(v-else)
+    .right
+      .close(@click="frame('close')")
+        i.exit.material-icons fiber_manual_record
+      .minimize(@click="frame('minimize')")
+        i.min.material-icons fiber_manual_record
+    .drag
   .settings
     .inner
       .setting(v-for="(setting, k) in $store.state.settings")
         h4 {{$store.state.strings[k] || k}}: <b>{{setting}}</b>
         md-switch(v-if="typeof setting === 'boolean'" :value="!setting"
         @change="$store.commit('setting', {k, v: !setting})")
-  .content
+        md-menu(v-else-if="k === 'theme'")
+          md-button(md-menu-trigger) change
+          md-menu-content
+            md-menu-item(v-for="(theme, key) in $store.state.themes" :key="key"
+            @click="$store.commit('setting', {k: 'theme', v: key})") {{key}}
+
+
+  .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
     router-view.router
 </template>
 
@@ -39,7 +53,14 @@ export default {
   data: () => ({
     window: remote.getCurrentWindow(),
     showsettings: false,
+    platform: process.platform,
   }),
+  watch: {
+    "$store.state.settings.theme": "theme",
+  },
+  mounted() {
+    this.theme()
+  },
   methods: {
     frame(icon) {
       switch (icon) {
@@ -51,8 +72,28 @@ export default {
           break
       }
     },
-    changesetting(e) {
-      console.log(e, arguments)
+    changetheme(v) {
+      if (v) this.$store.commit("setting", { k: "theme", v })
+    },
+    theme() {
+      let st = this.$store.state.themes[this.$store.state.settings.theme]
+      let c
+
+      if (!document.querySelector(".theme")) c = document.createElement("style")
+      else c = document.querySelector(".theme")
+
+      c.innerHTML = `
+      body, .md-list {
+        background: ${st.background1} !important;
+      }
+      body, .md-button-content, .md-list-item-content, .md-field input {
+        color: ${st.text} !important;
+      }`.replace(/\s\s/g, "")
+
+      if (!document.querySelector(".theme")) {
+        document.body.appendChild(c)
+        c.classList.add("theme")
+      }
     },
   },
 }
@@ -95,6 +136,19 @@ export default {
     text-align: center;
   }
 }
+.md-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+}
+.md-switch {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.md-field.md-theme-default.md-focused .md-input,
+.md-field.md-theme-default.md-focused .md-textarea,
+.md-field.md-theme-default.md-has-value .md-input,
+.md-field.md-theme-default.md-has-value .md-textarea {
+  -webkit-text-fill-color: unset;
+}
 body {
   margin: 0;
   @include wnh(100vw, 100vh);
@@ -103,6 +157,7 @@ body {
   font-family: "Roboto Mono", sans-serif;
   color: #bbbbbb;
   font-weight: lighter;
+  transition: .3s background;
   #app {
     @include wnh;
     position: absolute;
@@ -155,6 +210,19 @@ body {
         width: 100%;
         z-index: 9999;
       }
+      &.mac {
+        > .right > div > i,
+        > .left > div > i {
+          &:hover {
+            &.exit {
+              color: #f86360;
+            }
+            &.min {
+              color: #f7be4d;
+            }
+          }
+        }
+      }
     }
     > .content {
       @include wnh(100%, calc(100% - 32px));
@@ -178,8 +246,10 @@ body {
         padding: 15px 25px;
         > .setting {
           display: flex;
-          justify-content: space-around;
+          justify-content: space-between;
           align-items: center;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+          padding: 10px 0;
           > h4 {
             font-weight: 300;
           }

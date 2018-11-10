@@ -18,7 +18,7 @@ requireComponent.keys().forEach(fileName => {
 if (!process.env.IS_WEB) Vue.use(require("vue-electron"))
 Vue.config.productionTip = false
 
-const imp = ["Field", "Switch"].forEach(e =>
+const imp = ["Field", "Switch", "Menu", "List", "Button"].forEach(e =>
   Vue.use(require("vue-material/dist/components")["Md" + e]),
 )
 import "vue-material/dist/vue-material.min.css"

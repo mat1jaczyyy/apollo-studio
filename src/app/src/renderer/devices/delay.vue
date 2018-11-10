@@ -2,8 +2,8 @@
 main.delay
   .duration
     h4 duration
-    dial(v-if="!sync" :value.sync="delay" :size="50" :width="7" :min="0" :max="60" @rclick="toggle")
-    dial(v-else :holdfor="50" color="#FFB532" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
+    dial(v-if="!sync" :value.sync="delay" :size="50" :width="7" :min="0" :max="60" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(v-else :holdfor="50" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
       a(@click="delay += -1") -
       md-field
@@ -16,7 +16,7 @@ main.delay
       a(@click="step += 1") +
   .gate
     h4 gate
-    dial(:value.sync="gate" :size="50" :width="7" :min="0" :max="400")
+    dial(:value.sync="gate" :size="50" :width="7" :min="0" :max="400" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
       a(@click="gate += -10") -
       md-field
