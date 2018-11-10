@@ -81,7 +81,7 @@ namespace api {
 
             Communication.Server.Start();
 
-            Communication.Frontend.Test();
+            Communication.UI.Test();
 
             Log("ready");
 
