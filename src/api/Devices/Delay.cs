@@ -30,7 +30,7 @@ namespace api.Devices {
                 return _gate;
             }
             set {
-                if (0 <= value && value <= 2)
+                if (0 <= value && value <= 4)
                     _gate = value;
             }
         }
