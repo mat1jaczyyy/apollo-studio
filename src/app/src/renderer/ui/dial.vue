@@ -31,6 +31,10 @@ const scale = (v, min, max, e) => {
   return Math.pow((v - min) / (max - min), 1 / e)
 }
 
+const scale_back = (v, min, max, e) => {
+  return Number((Math.pow(v, e) * (max - min) + min).toFixed(1))
+}
+
 export default {
   props: {
     min: {
@@ -58,14 +62,20 @@ export default {
       locked: false,
       focus: false,
       initial: this.value,
+      scaled: 0,
       // offset: 0,
     }
   },
   watch: {
     value(n) {
-      if (!this.overflow)
-        if (n > this.max) this.$emit("update:value", this.max)
-        else if (n < this.min) this.$emit("update:value", this.min)
+      if (!this.overflow && n > this.max) {
+        this.$emit("update:value", this.max)
+      } else if (!this.overflow && n < this.min) {
+        this.$emit("update:value", this.min)
+      } else {
+        this.scaled = scale(n, this.min, this.max, this.exponent)
+      }
+      // TODO: fix dial not updating on load and fix steps
     },
     focus(n, o) {
       let self = this
@@ -131,12 +141,12 @@ export default {
     },
     mmve(e) {
       let self = this
-      if (self.hold < self.holdfor && self.hold > self.holdfor / -1) self.hold += e.movementY / -2
-      else {
-        if (self.hold > 0 && self.value + 1 <= self.max) self.$emit("update:value", self.value + 1)
-        else if (self.hold < 0 && self.value - 1 >= self.min)
-          self.$emit("update:value", self.value + -1)
-        self.hold = 0
+      if (e.movementY < 0) {
+        self.scaled = Math.min(1, self.scaled + 0.01)
+        self.$emit("update:value", scale_back(self.scaled, self.min, self.max, self.exponent))
+      } else if (e.movementY > 0) {
+        self.scaled = Math.max(0, self.scaled - 0.01)
+        self.$emit("update:value", scale_back(self.scaled, self.min, self.max, self.exponent))
       }
     },
   },
@@ -148,13 +158,10 @@ export default {
       return (1 - 0.7 / 3.6) * (2 * Math.PI * this.radius)
     },
     offset() {
-      return this.circumference * (1 - this.scaling)
+      return this.circumference * (1 - this.scaled)
     },
     d() {
       return describeArc(this.size / 2, this.size / 2, this.radius, -145, 145)
-    },
-    scaling() {
-      return scale(this.value, this.min, this.max, this.exponent)
     },
   },
 }

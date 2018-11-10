@@ -2,13 +2,13 @@
 main.delay
   .duration
     h4 duration
-    dial(v-if="!sync" :value.sync="delay" :size="50" :width="7" :min="0" :max="60000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(v-if="!sync" :value.sync="delay" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
     dial(v-else :holdfor="50" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
-      a(@click="delay += -1") -
+      a(@click="delay += -100") -
       md-field
         md-input(@input.native="delay = Number($event.target.value) || 0" :value="delay")
-      a(@click="delay += 1") +
+      a(@click="delay += 100") +
     .durationvalues.values(v-else).sync
       a(@click="step += -1") -
       md-field
@@ -18,10 +18,10 @@ main.delay
     h4 gate
     dial(:value.sync="gate" :exponent="2" :size="50" :width="7" :min="0" :max="400" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
-      a(@click="gate += -10") -
+      a(@click="gate += -12.5") -
       md-field
         md-input(@input.native="gate = Number($event.target.value) || 0" :value="gate")
-      a(@click="gate += 10") +
+      a(@click="gate += 12.5") +
 </template>
 
 <script>
