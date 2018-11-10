@@ -1,11 +1,12 @@
 import { app, BrowserWindow } from "electron"
 import express from "express"
+import bp from "body-parser"
 
 const server = express()
-const cors = require("cors")
 
-server.use(cors())
-server.get("/", function(req, res) {
+server.use(bp.json())
+
+server.use((req, res) => {
   if (finishload) mainWindow.webContents.send("request", req)
 })
 server.listen(1549)
@@ -44,10 +45,9 @@ function createWindow() {
     minHeight: 292,
     maxHeight: 292,
     alwaysOnTop: true,
-    webPreferences: {
-      // nodeIntegration: false, // TODO: fix this security thing
-    },
+    webPreferences: { webSecurity: false },
   })
+  // nodeIntegration: false, // TODO: fix this security thing
 
   mainWindow.loadURL(winURL)
 

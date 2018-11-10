@@ -12,19 +12,18 @@
         .content
           component(:is="device.component")
       .additem(@mouseenter="hover(true, key)" @mouseleave="hover(false, key)")
-        i.material-icons add
+        i.material-icons(@click="") add
 </template>
 
 <script>
 import { remote } from "electron"
-import dial from "../ui/dial"
 import launchpad from "../ui/launchpad"
 import blank from "../ui/blank"
 import translation from "../devices/translation"
 import delay from "../devices/delay"
 
 export default {
-  components: { dial, launchpad, translation, blank, delay },
+  components: { launchpad, translation, blank, delay },
   name: "rack",
   data: () => ({
     hov: false,
@@ -72,11 +71,20 @@ export default {
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      width: 4px;
+      transition: 0.3s;
       i {
         transition: 0.3s;
-        color: rgba(255, 255, 255, 0.125);
-        &:hover {
+        color: transparent;
+      }
+
+      &:hover {
+        width: 20px;
+        i {
           color: rgba(255, 255, 255, 0.25);
+          &:hover {
+            color: rgba(255, 255, 255, 0.5);
+          }
         }
       }
     }
@@ -103,6 +111,9 @@ export default {
           width: 24px;
           > i {
             color: rgba(255, 255, 255, 0.25);
+            &:hover {
+              color: rgba(255, 255, 255, 0.5);
+            }
           }
         }
       }
