@@ -2,7 +2,7 @@
 main.delay
   .duration
     h4 duration
-    dial(v-if="!sync" :value.sync="delay" :size="50" :width="7" :min="0" :max="60" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(v-if="!sync" :value.sync="delay" :size="50" :width="7" :min="0" :max="60000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
     dial(v-else :holdfor="50" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
       a(@click="delay += -1") -
@@ -26,6 +26,16 @@ main.delay
 
 <script>
 export default {
+  props: {
+    data: {
+      type: Object,
+      required: true,
+    },
+  },
+  created() {
+    this.delay = this.data.length
+    this.gate = this.data.gate * 100
+  },
   data: () => ({
     delay: 0,
     step: 7,

@@ -38,7 +38,6 @@ div#app(:class="{showsettings}")
 // TODO: macos frames, drag padding
 import { remote } from "electron"
 import ls from "local-storage"
-import axios from "axios"
 
 const { ipcRenderer } = require("electron")
 ipcRenderer.on("request", (event, arg) => {
@@ -143,6 +142,15 @@ export default {
   margin-top: 0;
   margin-bottom: 0;
 }
+.md-menu-content {
+  z-index: 99;
+}
+.md-list-item-content {
+  padding: 0 8px;
+}
+.md-list {
+  padding: 0;
+}
 .md-field.md-theme-default.md-focused .md-input,
 .md-field.md-theme-default.md-focused .md-textarea,
 .md-field.md-theme-default.md-has-value .md-input,
@@ -157,7 +165,7 @@ body {
   font-family: "Roboto Mono", sans-serif;
   color: #bbbbbb;
   font-weight: lighter;
-  transition: .3s background;
+  transition: 0.3s background;
   #app {
     @include wnh;
     position: absolute;

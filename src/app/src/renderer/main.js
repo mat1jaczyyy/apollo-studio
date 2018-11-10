@@ -6,6 +6,11 @@ import store from "./store"
 
 import upperFirst from "lodash/upperFirst"
 import camelCase from "lodash/camelCase"
+import axios from "axios"
+
+Array.prototype.last = function() {
+  return this[this.length - 1]
+}
 
 const requireComponent = require.context("./ui", false, /\w+\.(vue|js)$/)
 
@@ -23,6 +28,8 @@ const imp = ["Field", "Switch", "Menu", "List", "Button"].forEach(e =>
 )
 import "vue-material/dist/vue-material.min.css"
 
+Vue.axios = Vue.prototype.axios = axios
+Vue.api = Vue.prototype.api = "http://localhost:1548"
 /* eslint-disable no-new */
 new Vue({
   components: { app },

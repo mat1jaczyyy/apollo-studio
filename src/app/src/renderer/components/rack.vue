@@ -2,17 +2,29 @@
 .rack
   .rackWrap
     .additem
-      i.material-icons add
+      //- i.material-icons(@click="newDevice") add
+      md-menu(md-size="auto")
+        md-button.md-icon-button(md-menu-trigger :md-ripple="false")
+          md-icon(:class="{lonely: devices.length <= 0}") add
+        md-menu-content
+          md-menu-item(v-for="device in av_devices" :key="device"
+          @click="newDevice(device, 0)") {{device}}
     .rackItem(v-for="(device, key) in devices" :key="key" :class="{hov: hov === key}")
       .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
         .frame
-          h6.title {{device.name}}
+          h6.title {{device.component}}
           .remove(@click="remove(key)")
             i.material-icons close
         .content
-          component(:is="device.component")
+          component(:is="device.component" :data="device.data")
       .additem(@mouseenter="hover(true, key)" @mouseleave="hover(false, key)")
-        i.material-icons(@click="") add
+        //- i.material-icons(@click="newDevice") add
+        md-menu(md-size="auto")
+          md-button.md-icon-button(md-menu-trigger :md-ripple="false")
+            md-icon add
+          md-menu-content
+            md-menu-item(v-for="adddevice in av_devices" :key="adddevice"
+            @click="newDevice(adddevice, key + 1)") {{adddevice}}
 </template>
 
 <script>
@@ -22,25 +34,18 @@ import blank from "../ui/blank"
 import translation from "../devices/translation"
 import delay from "../devices/delay"
 
+const av_devices = {
+  translation,
+  delay,
+}
+
 export default {
-  components: { launchpad, translation, blank, delay },
+  components: Object.assign({}, av_devices, { launchpad, blank }),
   name: "rack",
   data: () => ({
     hov: false,
-    devices: [
-      // {
-      //   component: "launchpad",
-      //   name: "launchpad",
-      // },
-      {
-        component: "translation",
-        name: "translation",
-      },
-      {
-        component: "delay",
-        name: "delay",
-      },
-    ],
+    av_devices: Object.keys(av_devices),
+    devices: [],
     window: remote.getCurrentWindow(),
   }),
   methods: {
@@ -53,6 +58,23 @@ export default {
     },
     remove: function(id) {
       this.devices.splice(id, 1)
+    },
+    newDevice(device, index) {
+      let self = this
+      // console.log(device, index)
+      this.axios
+        .post(`${this.api}/add_device`, {
+          track: 0,
+          index: 0,
+          device,
+        })
+        .then(e => {
+          console.log(e.data)
+          self.devices.push({
+            component: e.data.device,
+            data: e.data.data,
+          })
+        })
     },
   },
 }
@@ -70,14 +92,19 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      // overflow: hidden;
       width: 4px;
       transition: 0.3s;
+      button:before {
+        display: none;
+      }
       i {
         transition: 0.3s;
         color: transparent;
+        &.lonely {
+          color: rgba(255, 255, 255, 0.25);
+        }
       }
-
       &:hover {
         width: 20px;
         i {
@@ -109,7 +136,7 @@ export default {
         margin-right: 20px;
         > .additem {
           width: 24px;
-          > i {
+          i {
             color: rgba(255, 255, 255, 0.25);
             &:hover {
               color: rgba(255, 255, 255, 0.5);
