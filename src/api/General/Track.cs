@@ -9,8 +9,21 @@ using Newtonsoft.Json;
 namespace api {
     public class Track {
         public Chain Chain;
-        public Launchpad Launchpad;
+        private Launchpad _launchpad;
         private Pixel[] screen = new Pixel[128];
+
+        public Launchpad Launchpad {
+            get {
+                return _launchpad;
+            }
+            set {
+                if (_launchpad != null)
+                    Launchpad.Receive -= MIDIEnter;
+
+                _launchpad = value;
+                _launchpad.Receive += MIDIEnter;
+            }
+        }
 
         public Track() {
             Chain = new Chain(ChainExit);

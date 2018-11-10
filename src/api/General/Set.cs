@@ -10,7 +10,7 @@ using api.Devices;
 namespace api {
     public static class Set {
         public static List<Track> Tracks = new List<Track>();
-        public static Decimal BPM = 120;
+        public static Decimal BPM = 150;
 
         public static void Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
@@ -37,6 +37,7 @@ namespace api {
         public static void New() {
             Close();
             Tracks.Add(new Track());
+            Set.Tracks[0].Launchpad = MIDI.Devices[0];
         }
 
         public static void Open(string path) {
