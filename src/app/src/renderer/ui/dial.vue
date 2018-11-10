@@ -31,8 +31,8 @@ const scale = (v, min, max, e) => {
   return Math.pow((v - min) / (max - min), 1 / e)
 }
 
-const scale_back = (v, min, max, e) => {
-  return Number((Math.pow(v, e) * (max - min) + min).toFixed(1))
+const scale_back = (v, min, max, e, decimals) => {
+  return Number((Math.pow(v, e) * (max - min) + min).toFixed(decimals))
 }
 
 export default {
@@ -55,6 +55,7 @@ export default {
     holdfor: { type: Number, default: 5 },
     overflow: { type: Boolean, default: false },
     exponent: { type: Number, default: 1 },
+    decimals: { type: Number, default: 0 }
   },
   data() {
     return {
@@ -75,7 +76,7 @@ export default {
       } else {
         this.scaled = scale(n, this.min, this.max, this.exponent)
       }
-      // TODO: fix dial not updating on load and fix steps
+      // TODO: fix dial not updating on load, make steps lock (feel steppy)
     },
     focus(n, o) {
       let self = this
@@ -140,13 +141,12 @@ export default {
         }
     },
     mmve(e) {
-      let self = this
       if (e.movementY < 0) {
-        self.scaled = Math.min(1, self.scaled + 0.01)
-        self.$emit("update:value", scale_back(self.scaled, self.min, self.max, self.exponent))
+        this.scaled = Math.min(1, this.scaled + 0.01)
+        this.$emit("update:value", scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals))
       } else if (e.movementY > 0) {
-        self.scaled = Math.max(0, self.scaled - 0.01)
-        self.$emit("update:value", scale_back(self.scaled, self.min, self.max, self.exponent))
+        this.scaled = Math.max(0, this.scaled - 0.01)
+        this.$emit("update:value", scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals))
       }
     },
   },
