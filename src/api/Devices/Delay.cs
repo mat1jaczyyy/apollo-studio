@@ -11,6 +11,7 @@ using api;
 namespace api.Devices {
     public class Delay: Device {
         private int _length = 200; // milliseconds
+        private Decimal _gate = 1;
         private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
@@ -24,17 +25,28 @@ namespace api.Devices {
             }
         }
 
+        public Decimal Gate {
+            get {
+                return _gate;
+            }
+            set {
+                if (0 <= value && value <= 2)
+                    _gate = value;
+            }
+        }
+
         public override Device Clone() {
-            return new Delay(_length);
+            return new Delay(_length, _gate);
         }
 
         public Delay() {
             _timerexit = new TimerCallback(Tick);
         }
 
-        public Delay(int length) {
+        public Delay(int length, Decimal gate) {
             _timerexit = new TimerCallback(Tick);
             Length = length;
+            Gate = gate;
         }
 
         public Delay(Action<Signal> exit) {
@@ -42,9 +54,10 @@ namespace api.Devices {
             MIDIExit = exit;
         }
 
-        public Delay(int length, Action<Signal> exit) {
+        public Delay(int length, Decimal gate, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
             Length = length;
+            Gate = gate;
             MIDIExit = exit;
         }
 
@@ -66,7 +79,7 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             try {
-                _timers.Enqueue(new Timer(_timerexit, n.Clone(), _length, System.Threading.Timeout.Infinite));
+                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32(_length * _gate), System.Threading.Timeout.Infinite));
             } catch {
                 if (api.Program.log)
                     Console.WriteLine($"ERR ** Delay Enqueue skipped");
@@ -79,7 +92,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
-            return new Delay(int.Parse(data["time"].ToString()));
+            return new Delay(int.Parse(data["length"].ToString()), int.Parse(data["gate"].ToString()));
         }
 
         public override string EncodeSpecific() {
@@ -94,8 +107,11 @@ namespace api.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
-                        writer.WritePropertyName("time");
+                        writer.WritePropertyName("length");
                         writer.WriteValue(_length);
+
+                        writer.WritePropertyName("gate");
+                        writer.WriteValue(_gate);
 
                     writer.WriteEndObject();
 
