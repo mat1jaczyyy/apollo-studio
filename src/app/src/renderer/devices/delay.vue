@@ -3,7 +3,7 @@ main.delay
   .duration
     h4 duration
     dial(v-if="!sync" :value.sync="delay" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
-    dial(v-else :holdfor="50" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
+    dial(v-else :steps="steps.length" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
       a(@click="delay += -100") -
       md-field

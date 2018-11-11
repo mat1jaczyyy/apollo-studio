@@ -2,7 +2,7 @@
 main
   .x
     h4 x translation
-    dial(:value.sync="x" :size="50" :width="7" :min="min" :max="max" :holdfor="15" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(:value.sync="x" :size="50" :width="7" :min="min" :max="max" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
       a(@click="x += -1") -
       md-field
@@ -10,7 +10,7 @@ main
       a(@click="x += 1") +
   .y
     h4 y translation
-    dial(:value.sync="y" :size="50" :width="7" :min="min" :max="max" :holdfor="15" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(:value.sync="y" :size="50" :width="7" :min="min" :max="max" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
       a(@click="y += -1") -
       md-field

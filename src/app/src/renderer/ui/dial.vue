@@ -6,7 +6,7 @@
            :stroke-dasharray="circumference" :stroke-dashoffset="offset" :class="{locked}")
     path(:d="d" fill="none" stroke="rgba(0,0,0,.125)" :stroke-width="width").bg
     path(:d="d" fill="none" :stroke="color" :stroke-width="width"
-      :stroke-dasharray="circumference" :stroke-dashoffset="offset / -1" :class="{locked}")
+      :stroke-dasharray="circumference" :stroke-dashoffset="offset / -1" :class="{locked, steps: typeof steps === 'number'}")
 </template>
 
 <script>
@@ -52,10 +52,10 @@ export default {
     width: { type: Number, default: 7 },
     size: { type: Number, default: 50 },
     value: { type: Number, default: 0 },
-    holdfor: { type: Number, default: 5 },
     overflow: { type: Boolean, default: false },
     exponent: { type: Number, default: 1 },
-    decimals: { type: Number, default: 0 }
+    decimals: { type: Number, default: 0 },
+    steps: { type: [Number, Boolean], default: false },
   },
   data() {
     return {
@@ -67,6 +67,9 @@ export default {
       // offset: 0,
     }
   },
+  created() {
+    this.scaled = scale(this.value, this.min, this.max, this.exponent)
+  },
   watch: {
     value(n) {
       if (!this.overflow && n > this.max) {
@@ -76,7 +79,7 @@ export default {
       } else {
         this.scaled = scale(n, this.min, this.max, this.exponent)
       }
-      // TODO: fix dial not updating on load, make steps lock (feel steppy)
+      // TODO: make steps lock (feel steppy)
     },
     focus(n, o) {
       let self = this
@@ -143,10 +146,16 @@ export default {
     mmve(e) {
       if (e.movementY < 0) {
         this.scaled = Math.min(1, this.scaled + 0.01)
-        this.$emit("update:value", scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals))
+        this.$emit(
+          "update:value",
+          scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals),
+        )
       } else if (e.movementY > 0) {
         this.scaled = Math.max(0, this.scaled - 0.01)
-        this.$emit("update:value", scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals))
+        this.$emit(
+          "update:value",
+          scale_back(this.scaled, this.min, this.max, this.exponent, this.decimals),
+        )
       }
     },
   },
@@ -158,7 +167,8 @@ export default {
       return (1 - 0.7 / 3.6) * (2 * Math.PI * this.radius)
     },
     offset() {
-      return this.circumference * (1 - this.scaled)
+      if (typeof this.steps === "number") return this.circumference * (1 - this.value / this.max)
+      else return this.circumference * (1 - this.scaled)
     },
     d() {
       return describeArc(this.size / 2, this.size / 2, this.radius, -145, 145)
@@ -175,8 +185,10 @@ export default {
     > path {
       transition: 0.3s;
       &.locked {
-        // transition: 0.1s;
         transition: none;
+      }
+      &.steps {
+        transition: 0.1s;
       }
     }
   }
