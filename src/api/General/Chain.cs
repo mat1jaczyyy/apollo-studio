@@ -137,18 +137,13 @@ namespace api {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
-                        writer.WritePropertyName("devices");
-                        writer.WriteStartObject();
+                        writer.WritePropertyName("count");
+                        writer.WriteValue(_devices.Count);
 
-                            writer.WritePropertyName("count");
-                            writer.WriteValue(_devices.Count);
-
-                            for (int i = 0; i < _devices.Count; i++) {
-                                writer.WritePropertyName(i.ToString());
-                                writer.WriteRawValue(_devices[i].Encode());
-                            }
-                        
-                        writer.WriteEndObject();
+                        for (int i = 0; i < _devices.Count; i++) {
+                            writer.WritePropertyName(i.ToString());
+                            writer.WriteRawValue(_devices[i].Encode());
+                        }
 
                     writer.WriteEndObject();
 
