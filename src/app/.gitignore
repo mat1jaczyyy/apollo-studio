@@ -10,7 +10,6 @@ npm-debug.log.*
 thumbs.db
 !.gitkeep
 yarn.lock
-package.json
 package-lock.json
 librtmidi.dylib
 rtmidi.dll
