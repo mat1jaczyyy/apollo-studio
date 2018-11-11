@@ -33,4 +33,14 @@ namespace api.Communication.Calls {
             return Ok(Set.Tracks[Convert.ToInt32(json["track"])].Chain[Convert.ToInt32(json["index"])].EncodeSpecific());
         }
     }
+
+    [Route("[controller]")] public class Delete_DeviceController: Controller {
+        [HttpPost] public IActionResult Post() {
+            var json = Parser.ParseRequest(this.Request);
+
+            Set.Tracks[Convert.ToInt32(json["track"])].Chain.Remove(Convert.ToInt32(json["index"]));
+
+            return Ok();
+        }
+    }
 }
