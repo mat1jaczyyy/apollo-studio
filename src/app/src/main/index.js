@@ -8,6 +8,7 @@ server.use(bp.json())
 
 server.use((req, res) => {
   if (finishload) mainWindow.webContents.send("request", req)
+  res.send(200)
 })
 server.listen(1549)
 
