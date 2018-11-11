@@ -57,6 +57,12 @@ export default {
       this.devices = applyDrag(this.devices, dropResult)
     },
     remove: function(id) {
+      this.axios
+        .post(`${this.api}/delete_device`, {
+          track: 0,
+          index: id,
+        })
+        .catch(e => console.error(e))
       this.devices.splice(id, 1)
     },
     newDevice(device, index) {
