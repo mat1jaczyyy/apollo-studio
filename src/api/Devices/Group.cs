@@ -102,7 +102,7 @@ namespace api.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             List<Chain> init = new List<Chain>();
-            for (int i = 0; i < int.Parse(data["count"].ToString()); i++) {
+            for (int i = 0; i < Convert.ToInt32(data["count"]); i++) {
                 init.Add(Chain.Decode(data[i.ToString()].ToString()));
             }
             return new Group(init);

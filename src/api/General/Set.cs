@@ -22,7 +22,7 @@ namespace api {
             Close();
 
             BPM = Decimal.Parse(data["bpm"].ToString());
-            for (int i = 0; i < int.Parse(tracks["count"].ToString()); i++) {
+            for (int i = 0; i < Convert.ToInt32(tracks["count"]); i++) {
                 Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
             }
         }

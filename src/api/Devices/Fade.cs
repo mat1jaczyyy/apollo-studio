@@ -124,17 +124,17 @@ namespace api.Devices {
             
             List<Color> initC = new List<Color>();
             Dictionary<string, object> colors = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["colors"].ToString());
-            for (int i = 0; i < int.Parse(colors["count"].ToString()); i++) {
+            for (int i = 0; i < Convert.ToInt32(colors["count"]); i++) {
                 initC.Add(Color.Decode(colors[i.ToString()].ToString()));
             }
 
             List<Decimal> initP = new List<Decimal>();
             Dictionary<string, object> positions = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["positions"].ToString());
-            for (int i = 0; i < int.Parse(positions["count"].ToString()); i++) {
+            for (int i = 0; i < Convert.ToInt32(positions["count"]); i++) {
                 initP.Add(Decimal.Parse(positions[i.ToString()].ToString()));
             }
 
-            return new Fade(int.Parse(data["time"].ToString()), initC, initP);
+            return new Fade(Convert.ToInt32(data["time"]), initC, initP);
         }
 
         public override string EncodeSpecific() {

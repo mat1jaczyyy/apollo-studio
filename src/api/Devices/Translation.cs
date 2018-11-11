@@ -59,7 +59,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Translation(int.Parse(data["offset"].ToString()));
+            return new Translation(Convert.ToInt32(data["offset"]));
         }
 
         public override string EncodeSpecific() {

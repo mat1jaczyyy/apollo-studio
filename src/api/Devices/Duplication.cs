@@ -92,8 +92,8 @@ namespace api.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             List<int> offsets = new List<int>();
-            for (int i = 0; i < int.Parse(data["count"].ToString()); i++) {
-                offsets.Add(int.Parse(data[i.ToString()].ToString()));
+            for (int i = 0; i < Convert.ToInt32(data["count"]); i++) {
+                offsets.Add(Convert.ToInt32(data[i.ToString()]));
             }
             return new Duplication(offsets);
         }

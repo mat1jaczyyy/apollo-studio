@@ -74,7 +74,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Hold(int.Parse(data["time"].ToString()));
+            return new Hold(Convert.ToInt32(data["time"]));
         }
 
         public override string EncodeSpecific() {

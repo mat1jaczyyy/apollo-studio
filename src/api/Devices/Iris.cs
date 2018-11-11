@@ -140,11 +140,11 @@ namespace api.Devices {
             
             List<Color> init = new List<Color>();
             Dictionary<string, object> colors = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["colors"].ToString());
-            for (int i = 0; i < int.Parse(colors["count"].ToString()); i++) {
+            for (int i = 0; i < Convert.ToInt32(colors["count"]); i++) {
                 init.Add(Color.Decode(colors[i.ToString()].ToString()));
             }
 
-            return new Iris(int.Parse(data["rate"].ToString()), init);
+            return new Iris(Convert.ToInt32(data["rate"]), init);
         }
 
         public override string EncodeSpecific() {

@@ -92,7 +92,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
-            return new Delay(int.Parse(data["length"].ToString()), int.Parse(data["gate"].ToString()));
+            return new Delay(Convert.ToInt32(data["length"]), Convert.ToInt32(data["gate"]));
         }
 
         public override string EncodeSpecific() {
