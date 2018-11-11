@@ -30,9 +30,13 @@ namespace api {
         static void Main(string[] args) {
             logTimer.Start();
 
-            foreach (string arg in args)
-                if (arg.Equals("--log"))
+            foreach (string arg in args) {
+                /*if (arg.Equals("--log")) {
                     log = true;
+                }*/
+            }
+
+            log = true; // Always log during alpha/beta
             
             if (log)
                 foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
