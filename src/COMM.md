@@ -4,6 +4,8 @@
 
 All requests towards the api should target `localhost:1548/api`.
 
+### Messages
+
 Generally, a message should be formatted as follows:
 
 ```js
@@ -35,11 +37,24 @@ If the message contains another message that should be forwarded to one of the r
     }
 ```
 
-The top-most recipient will ALWAYS be the currently loaded Set. You can nest multiple forward messages into each other.
+ALL objects, upon attempting to resolve the request, will forward the inner message to the desired member object. You can nest multiple forward messages into each other to access a deep object. The top-most recipient will ALWAYS be the master Set object. 
 
-### `set` object
+### Objects
 
-The Set object contains the List of Tracks. It also does file management and stores the BPM value. It is the top-most object in the Apollo hierarchy.
+#### `set` object
+
+The Set object contains the List of Tracks. It also does file management and stores the BPM value. It is the top-most object in the Apollo hierarchy, and can only have one instance loaded at a time (it is static).
+
+```js
+    {
+        "object": "set", 
+        "bpm": int, 
+        "tracks": {
+            "count": int,
+            "i": track // i = 0 to (this."count" - 1)
+        }
+    }
+```
 
 * `new`:
     * Closes the current Apollo Set and creates a new one.
@@ -73,9 +88,50 @@ The Set object contains the List of Tracks. It also does file management and sto
     ```
     * response: identical to the request to app's `/init`.
 
-### `chain` object
+#### `track` object
 
-The Chain object contains a List of Devices. It is usually found inside a Track or Group object.
+The Track object contains the top-most Chain of the Track and the currently selected Launchpad used as the Track's input and output. It is found inside of a Set.
+
+```js
+{
+    "object": "track",
+    "data": {
+        "chain": chain,
+        "launchpad": launchpad
+    }
+}
+```
+
+The Track object currently handles no requests.
+
+#### `launchpad` object
+
+The Launchpad object represents a physical Launchpad device. It contains the MIDI port names associated with the device's input and output. It is found inside of a Track.
+
+```js
+{
+    "object": "launchpad",
+    "data": {
+        "port": string
+    }
+}
+```
+
+The Launchpad object currently handles no requests.
+
+#### `chain` object
+
+The Chain object contains a List of Devices. It is found inside of a Track or Group. Signal data travels through the contained Devices in ascending order (left-to-right), and then exits into the parent object.
+
+```js
+{
+    "object": "chain",
+    "data": {
+        "count": int,
+        "i": device // i = 0 to (this."count" - 1)
+    }
+}
+```
 
 * `add`:
     * Adds new instance of device at position in the chain.
@@ -96,6 +152,7 @@ The Chain object contains a List of Devices. It is usually found inside a Track 
             }
         }
     ```
+
 * `remove`:
     * Removes device at position in the chain.
     * request: 
@@ -109,6 +166,24 @@ The Chain object contains a List of Devices. It is usually found inside a Track 
     ```js
         null
     ```
+ 
+#### `device` object
+
+The Device object is a generic object that holds a device identifier and the parameters said device holds. It is found inside a Chain.
+
+```js
+{
+    "object": "device",
+    "data": {
+        "device:" string, // device identifier
+        "data": {
+            // device-specific data
+        }
+    }
+}
+```
+
+The Device object currently handles no requests.
 
 ## app (Electron)
 
@@ -116,43 +191,8 @@ All requests towards the app should target `localhost:1549`. The request URI is 
 
 * `/init`:
     * .NET Core Host has initialized for the first time and reports Apollo Set information.
-    * request:
-    ```js
-        {
-            "object": "set", 
-            "bpm": int, 
-            "tracks": {
-                "count": int,
-                "i": { // i = 0 to (this.count - 1)
-                    "object": "track",
-                    "data": {
-                        "chain": {
-                            "object": "chain",
-                            "data": {
-                                "count": int,
-                                "j": { // j = 0 to (this.count - 1)
-                                    "object": "device",
-                                    "data": {
-                                        "device:" string,
-                                        "data": {
-                                            // device-specific data
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "launchpad": {
-                            "object": "launchpad",
-                            "data": {
-                                "port": string
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    ```
-* response: 
+    * request: A JSON-encoded api.Set object.
+    * response: 
     ```js
         null
     ```
