@@ -2,6 +2,8 @@
 
 ## api (.NET Core)
 
+All requests towards the api should target `localhost:1548/api`.
+
 Generally, a message should be formatted as follows:
 
 ```js
@@ -71,6 +73,8 @@ The top-most recipient will ALWAYS be the currently loaded Set. You can nest mul
     ```
 
 ## app (Electron)
+
+All requests towards the app should target `localhost:1549`. The request URI is different for each kind of request.
 
 * `/init`:
     * .NET Core Host has initialized and returns Apollo Set information.
