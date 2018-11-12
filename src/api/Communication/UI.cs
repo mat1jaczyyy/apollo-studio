@@ -9,7 +9,7 @@ namespace api.Communication {
 
         public static async void Init() {
             using (HttpClient client = new HttpClient())
-                using (HttpResponseMessage res = await client.PostAsync($"http://{ip}:{port}/init", new StringContent(Set.Encode(), Encoding.UTF8, "application/json")));
+                await client.PostAsync($"http://{ip}:{port}/init", new StringContent(Set.Encode(), Encoding.UTF8, "application/json"));
         }
     }
 }
