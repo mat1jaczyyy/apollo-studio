@@ -197,8 +197,8 @@ The Delay device delays an incoming signal by `duration * gate` milliseconds.
 {
     "device:" "delay",
     "data": {
-        "length": int, // base duration in ms, 10 <= x <= 30000
-        "gate": Decimal // gate multiplier in %, 0 <= x <= 4
+        "length": int, // base duration in ms, [10, 30000]
+        "gate": Decimal // gate multiplier in %, [0, 4]
     }
 }
 ```
