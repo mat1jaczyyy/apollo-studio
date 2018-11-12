@@ -10,37 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace api.Communication.Calls {
-    class Parser {
-        public static Dictionary<string, object> ParseRequest(HttpRequest request) {
-            byte[] buffer = new byte[Convert.ToInt32(request.ContentLength)];
-            request.Body.Read(buffer, 0, Convert.ToInt32(request.ContentLength));
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(Encoding.UTF8.GetString(buffer));
-        }
-    }
-    
-
-    [Route("[controller]")] public class Add_DeviceController: Controller {
+    [Route("[controller]")] public class ApiController: Controller {
         [HttpPost] public IActionResult Post() {
-            var json = Parser.ParseRequest(this.Request);
-
-            foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
-                if (device.Name.ToLower().Equals(json["device"])) {
-                    Set.Tracks[Convert.ToInt32(json["track"])].Chain.Insert(Convert.ToInt32(json["index"]), (Devices.Device)Activator.CreateInstance(device));
-                    break;
-                }
-            }
-
-            return Ok(Set.Tracks[Convert.ToInt32(json["track"])].Chain[Convert.ToInt32(json["index"])].EncodeSpecific());
-        }
-    }
-
-    [Route("[controller]")] public class Delete_DeviceController: Controller {
-        [HttpPost] public IActionResult Post() {
-            var json = Parser.ParseRequest(this.Request);
-
-            Set.Tracks[Convert.ToInt32(json["track"])].Chain.Remove(Convert.ToInt32(json["index"]));
-
-            return Ok();
+            byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
+            this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
+            return Set.Request(Encoding.UTF8.GetString(buffer));
         }
     }
 }

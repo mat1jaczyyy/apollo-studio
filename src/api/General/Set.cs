@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using api.Devices;
@@ -11,21 +13,6 @@ namespace api {
     public static class Set {
         public static List<Track> Tracks = new List<Track>();
         public static Decimal BPM = 150;
-
-        public static void Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "set") return;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
-
-            Close();
-
-            BPM = Decimal.Parse(data["bpm"].ToString());
-            for (int i = 0; i < Convert.ToInt32(tracks["count"]); i++) {
-                Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
-            }
-        }
 
         private static void Close() {
             foreach (Track track in Tracks)
@@ -55,6 +42,21 @@ namespace api {
                 }
 
                 File.WriteAllText(path, Encode());
+            }
+        }
+
+        public static void Decode(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "set") return;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
+
+            Close();
+
+            BPM = Decimal.Parse(data["bpm"].ToString());
+            for (int i = 0; i < Convert.ToInt32(tracks["count"]); i++) {
+                Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
             }
         }
 
@@ -95,6 +97,28 @@ namespace api {
             }
             
             return json.ToString();
+        }
+
+        public static ObjectResult Request(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "set") return new BadRequestObjectResult("Incorrect recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    switch (data["forward"].ToString()) {
+                        case "track":
+                            return Tracks[Convert.ToInt32(data["index"])].Request(data["message"].ToString());
+                        
+                        default:
+                            return new BadRequestObjectResult("Incorrectly formatted message.");
+                    }
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }

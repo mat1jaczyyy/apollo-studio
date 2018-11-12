@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
-using api.Devices;
+
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+
+using api.Devices;
 
 namespace api {
     public class Chain {
@@ -151,6 +154,27 @@ namespace api {
             }
             
             return json.ToString();
+        }
+
+        public ObjectResult Request(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "chain") return new BadRequestObjectResult("Incorrect recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    switch (data["forward"].ToString()) {
+                        // TODO: Device-specific updates and calls
+                        
+                        default:
+                            return new BadRequestObjectResult("Incorrectly formatted message.");
+                    }
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }
