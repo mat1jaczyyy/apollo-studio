@@ -10,6 +10,7 @@ using api;
 
 namespace api.Devices {
     public class Delay: Device {
+        // TODO: Step-based delays (musical notation)
         private int _length = 500; // milliseconds
         private Decimal _gate = 1;
         private Queue<Timer> _timers = new Queue<Timer>();
