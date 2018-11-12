@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 using Microsoft.AspNetCore.Mvc;
@@ -171,6 +172,19 @@ namespace api {
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");
                     }
+                
+                case "add":
+                    foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
+                        if (device.Name.ToLower().Equals(json["device"])) {
+                            Insert(Convert.ToInt32(json["index"]), (Devices.Device)Activator.CreateInstance(device));
+                            return new OkObjectResult(_devices[Convert.ToInt32(json["index"])].Encode());
+                        }
+                    }
+                    return new BadRequestObjectResult("Incorrectly formatted message.");
+
+                case "remove":
+                    Remove(Convert.ToInt32(json["index"]));
+                    return new OkObjectResult(null);
                 
                 default:
                     return new BadRequestObjectResult("Unknown message type.");
