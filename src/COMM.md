@@ -37,7 +37,45 @@ If the message contains another message that should be forwarded to one of the r
 
 The top-most recipient will ALWAYS be the currently loaded Set. You can nest multiple forward messages into each other.
 
+### `set` object
+
+The Set object contains the List of Tracks. It also does file management and stores the BPM value. It is the top-most object in the Apollo hierarchy.
+
+* `new`:
+    * Closes the current Apollo Set and creates a new one.
+    * request:
+    ```js
+    {
+        "type": "new"
+    }
+    ```
+    * response: identical to the request to app's `/init`.
+
+* `open`:
+    * Closes the current Apollo Set and opens an existing one from file.
+    * request:
+    ```js
+    {
+        "type": "open",
+        "path": string
+    }
+    ```
+    * response: identical to the request to app's `/init`.
+
+* `save`:
+    * Saves the current Apollo set to a file. If the file exists, it will be overwritten.
+    * request:
+    ```js
+    {
+        "type": "save",
+        "path": string
+    }
+    ```
+    * response: identical to the request to app's `/init`.
+
 ### `chain` object
+
+The Chain object contains a List of Devices. It is usually found inside a Track or Group object.
 
 * `add`:
     * Adds new instance of device at position in the chain.
@@ -77,7 +115,7 @@ The top-most recipient will ALWAYS be the currently loaded Set. You can nest mul
 All requests towards the app should target `localhost:1549`. The request URI is different for each kind of request.
 
 * `/init`:
-    * .NET Core Host has initialized and returns Apollo Set information.
+    * .NET Core Host has initialized for the first time and reports Apollo Set information.
     * request:
     ```js
         {

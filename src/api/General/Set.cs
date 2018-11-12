@@ -27,27 +27,24 @@ namespace api {
             Set.Tracks[0].Launchpad = MIDI.Devices[0];
         }
 
-        public static void Open(string path) {
+        public static bool Open(string path) {
             if (File.Exists(path)) {
-                Decode(File.ReadAllText(path));
+                return Decode(File.ReadAllText(path));
             }
+            return false;
         }
 
         public static void Save(string path) {
             string[] file = path.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                if (File.Exists(path)) {
-                    // TODO: Ask for overwrite
-                }
-
                 File.WriteAllText(path, Encode());
             }
         }
 
-        public static void Decode(string jsonString) {
+        public static bool Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "set") return;
+            if (json["object"].ToString() != "set") return false;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
@@ -58,6 +55,8 @@ namespace api {
             for (int i = 0; i < Convert.ToInt32(tracks["count"]); i++) {
                 Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
             }
+
+            return true;
         }
 
         public static string Encode() {
@@ -116,6 +115,20 @@ namespace api {
                             return new BadRequestObjectResult("Incorrectly formatted message.");
                     }
                 
+                case "new":
+                    New();
+                    return new OkObjectResult(Set.Encode());
+
+                case "open":
+                    if (Open(data["path"].ToString())) {
+                        return new OkObjectResult(Set.Encode());
+                    }
+                    return new BadRequestObjectResult("Bad Set file content or path to Set file.");
+
+                case "save":
+                    Save(data["path"].ToString());
+                    return new OkObjectResult(null);
+
                 default:
                     return new BadRequestObjectResult("Unknown message type.");
             }
