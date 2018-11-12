@@ -1,7 +1,7 @@
 # apollo-studio UI todo
 ## general
 
-- [ ] At any point in the chain between two adjacent devices, have a + icon pop up in the middle of the separator. Clicking it brings up a context menu with a list of devices that the user can add into that position in the chain by clicking on them.
+- [x] ~~At any point in the chain between two adjacent devices, have a + icon pop up in the middle of the separator. Clicking it brings up a context menu with a list of devices that the user can add into that position in the chain by clicking on them.~~
 
 ## devices
 
