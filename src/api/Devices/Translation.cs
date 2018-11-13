@@ -4,6 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading;
+
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using api;
@@ -83,6 +85,10 @@ namespace api.Devices {
             }
             
             return json.ToString();
+        }
+
+        public override ObjectResult RequestSpecific(string jsonString) {
+            throw new NotImplementedException();
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading;
+
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using api;
@@ -120,6 +122,31 @@ namespace api.Devices {
             }
             
             return json.ToString();
+        }
+
+        public override ObjectResult RequestSpecific(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != "delay") return new BadRequestObjectResult("Incorrect device recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    return new BadRequestObjectResult("The Delay object has no members to forward to.");
+                
+                case "length":
+                    Length = Convert.ToInt32(data["value"]);
+                    return new OkObjectResult(null);
+
+                case "gate":
+                    Gate = Convert.ToDecimal(data["value"]);
+                    return new OkObjectResult(null);
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }

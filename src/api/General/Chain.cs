@@ -167,7 +167,8 @@ namespace api {
             switch (data["type"].ToString()) {
                 case "forward":
                     switch (data["forward"].ToString()) {
-                        // TODO: Device-specific updates and calls
+                        case "device":
+                            return _devices[Convert.ToInt32(data["index"])].RequestSpecific(data["message"].ToString());
                         
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");
