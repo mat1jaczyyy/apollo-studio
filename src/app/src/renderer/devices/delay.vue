@@ -1,7 +1,7 @@
 <template lang="pug">
 main.delay
   .duration
-    h4 duration
+    h4 Duration
     dial(v-if="!sync" :value.sync="delay" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
     dial(v-else :steps="steps.length" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
@@ -15,7 +15,7 @@ main.delay
         md-input(@input.native="step = Number($event.target.value) || 0" :value="steps[step]" disabled)
       a(@click="step += 1") +
   .gate
-    h4 gate
+    h4 Gate
     dial(:value.sync="gate" :exponent="2" :size="50" :width="7" :min="0" :max="400" :decimals="1" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
       a(@click="gate += -12.5") -
@@ -26,6 +26,7 @@ main.delay
 
 <script>
 export default {
+  name: "Delay",
   props: {
     data: {
       type: Object,

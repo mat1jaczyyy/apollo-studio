@@ -20,6 +20,7 @@ main
 
 <script>
 export default {
+  name: "Translation",
   data: () => ({
     x: 0,
     y: 0,

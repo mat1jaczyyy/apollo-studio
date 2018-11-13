@@ -29,7 +29,13 @@ const imp = ["Field", "Switch", "Menu", "List", "Button"].forEach(e =>
 import "vue-material/dist/vue-material.min.css"
 
 Vue.axios = Vue.prototype.axios = axios
-Vue.api = Vue.prototype.api = "http://localhost:1548"
+Vue.api = Vue.prototype.api = o =>
+  new Promise((res, rej) =>
+    axios
+      .post(`http://localhost:1548/api`, o)
+      .then(res)
+      .catch(rej),
+  )
 /* eslint-disable no-new */
 new Vue({
   components: { app },

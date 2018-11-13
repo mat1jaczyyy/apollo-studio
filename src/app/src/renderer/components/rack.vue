@@ -12,7 +12,7 @@
     .rackItem(v-for="(device, key) in devices" :key="key" :class="{hov: hov === key}")
       .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
         .frame
-          h6.title {{device.component}}
+          h6.title {{device.component.name}}
           .remove(@click="remove(key)")
             i.material-icons close
         .content
@@ -56,31 +56,39 @@ export default {
     onDrop: function(dropResult) {
       this.devices = applyDrag(this.devices, dropResult)
     },
-    remove: function(id) {
-      this.axios
-        .post(`${this.api}/delete_device`, {
-          track: 0,
-          index: id,
-        })
-        .catch(e => console.error(e))
-      this.devices.splice(id, 1)
+    remove: function(index) {
+      this.api({
+        object: "message",
+        recipent: "chain",
+        data: {
+          type: "remove",
+          index,
+        },
+      }).catch(e => console.error(e))
+      this.devices.splice(index, 1)
     },
     newDevice(device, index) {
       let self = this
-      // console.log(device, index)
-      this.axios
-        .post(`${this.api}/add_device`, {
-          track: 0,
+      this.api({
+        object: "message",
+        recipent: "chain",
+        data: {
+          type: "add",
           index: 0,
           device,
+        },
+      }).then(e => {
+        console.log(e.data)
+        self.devices.push({
+          component: e.data.device,
+          data: e.data.data,
+          // component: delay,
+          // data: {
+          //   delay: 0,
+          //   gate: 0,
+          // },
         })
-        .then(e => {
-          console.log(e.data)
-          self.devices.push({
-            component: e.data.device,
-            data: e.data.data,
-          })
-        })
+      })
     },
   },
 }
@@ -112,7 +120,7 @@ export default {
         }
       }
       &:hover {
-        width: 20px;
+        width: 24px;
         i {
           color: rgba(255, 255, 255, 0.25);
           &:hover {

@@ -2,8 +2,16 @@
 div#app(:class="{showsettings}")
   .frame(v-if="platform !== 'darwin'")
     .left
-      .settings(@click="showsettings = !showsettings")
-        i.set.material-icons(:class="{showsettings}") settings
+      md-menu(md-size='medium' md-align-trigger='')
+        .save(md-menu-trigger)
+          i.material-icons save
+        md-menu-content
+          md-menu-item(@click="save('new')") new
+          md-menu-item(@click="save('open')") open
+          md-menu-item(@click="save('save')") save
+      div
+        .settings(@click="showsettings = !showsettings")
+          i.set.material-icons(:class="{showsettings}") settings
     .drag
     .right
       .minimize(@click="frame('minimize')")
@@ -94,6 +102,49 @@ export default {
         c.classList.add("theme")
       }
     },
+    save(o) {
+      let self = this
+      const dialog_options = {
+        title: "open apollo-studio save",
+        buttonLabel: ":)",
+        filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }],
+      }
+      if (o === "new")
+        self.api({
+          object: "message",
+          recipent: "set",
+          data: {
+            type: "new",
+          },
+        })
+      else if (o === "open") {
+        remote.dialog.showOpenDialog(
+          Object.assign({}, dialog_options, {
+            properties: ["openFile"],
+          }),
+          path =>
+            self.api({
+              object: "message",
+              recipent: "set",
+              data: {
+                type: "open",
+                path: path[0],
+              },
+            }),
+        )
+      } else if (o === "save") {
+        remote.dialog.showSaveDialog(Object.assign({}, dialog_options), path =>
+          self.api({
+            object: "message",
+            recipent: "set",
+            data: {
+              type: "open",
+              path,
+            },
+          }),
+        )
+      }
+    },
   },
 }
 </script>
@@ -151,6 +202,9 @@ export default {
 .md-list {
   padding: 0;
 }
+.md-menu-content {
+  max-height: 50vh;
+}
 .md-field.md-theme-default.md-focused .md-input,
 .md-field.md-theme-default.md-focused .md-textarea,
 .md-field.md-theme-default.md-has-value .md-input,
@@ -181,7 +235,7 @@ body {
         justify-content: center;
         align-items: center;
         margin: 0 4px;
-        > div {
+        div {
           display: flex;
           justify-content: center;
           align-items: center;
@@ -189,9 +243,9 @@ body {
           > i {
             color: #515151;
             transition: 0.3s;
-            &.set {
+            font-size: 22px;
+            > &.set {
               transform: rotate(-90deg);
-              font-size: 22px;
               transition: 0.5s;
             }
             &:hover.set,
