@@ -6,12 +6,13 @@ All requests towards the api should target `localhost:1548/api`.
 
 ### Messages
 
-Generally, a message should be formatted as follows:
+Generally, a message should be formatted as follows. If the message recipient is a `device`, the device recipient type should also be explicitly stated.
 
 ```js
 {
     "object": "message",
     "recipient": string, // Recipient object identifier
+    "device": string, // If the recipient is a device, include device identifier as well
     "data": {
         "type": string, // Recipient-specific message type
         // Additional data (recipient-specific)
@@ -28,7 +29,6 @@ If the message contains another message that should be forwarded to one of the r
     "data": {
         "type": "forward", // Special forward message type
         "forward": string, // Forwardee object identifier
-        "forward-device": string, // If applicable, forwardee device identifier, if the object is a device
         "index": int, // If applicable, include an index for array-based members
         "message": {
             "object": "message",
