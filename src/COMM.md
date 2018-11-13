@@ -176,7 +176,7 @@ The Device object is a generic object that holds a device identifier and the par
 {
     "object": "device",
     "data": {
-        "device:" string, // device identifier
+        "device": string, // device identifier
         "data": {
             // device-specific data
         }
@@ -190,13 +190,29 @@ The Device object currently handles no requests.
 
 Devices are a subset of the Device object and the most important unit of the Apollo hierarchy. Their job is to process and shape incoming signals to produce proper light effects.
 
+#### `group` device
+
+The Group device contains multiple `chain` objects. Any incoming signal is transmitted to every Chain without any kind of filtering. Any outgoing signal coming from the Chains is transmitted outside into the next device.
+
+```js
+{
+    "device": "group",
+    "data": {
+        "count": int, // number of chains
+        "i": api.chain // i = 0 to (this."count" - 1)
+    }
+}
+```
+
+The Group object currently handles no requests.
+
 #### `delay` device
 
 The Delay device delays an incoming signal by `length * gate` milliseconds.
 
 ```js
 {
-    "device:" "delay",
+    "device": "delay",
     "data": {
         "length": int, // base duration in ms, [10, 30000]
         "gate": Decimal // gate multiplier in %, [0, 4]
