@@ -192,7 +192,7 @@ Devices are a subset of the Device object and the most important unit of the Apo
 
 #### `delay` device
 
-The Delay device delays an incoming signal by `duration * gate` milliseconds.
+The Delay device delays an incoming signal by `length * gate` milliseconds.
 
 ```js
 {
@@ -204,7 +204,33 @@ The Delay device delays an incoming signal by `duration * gate` milliseconds.
 }
 ```
 
-The Delay device currently handles no requests.
+* `length`:
+    * Updates length parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "length",
+        "value": int // [10, 30000]
+    }
+    ```
+    * response: 
+    ```js
+    null
+    ```
+
+* `gate`:
+    * Updates gate parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "gate",
+        "value": int // [0, 4]
+    }
+    ```
+    * response: 
+    ```js
+    null
+    ```
 
 ## app (Electron)
 
