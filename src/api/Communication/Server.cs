@@ -13,14 +13,6 @@ namespace api.Communication {
         private static readonly string ip = "localhost";
         private static readonly ushort port = 1548;
 
-        [Route("[controller]")] public class ApiController: Controller {
-            [HttpPost] public IActionResult Post() {
-                byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
-                this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
-                return Set.Request(Encoding.UTF8.GetString(buffer));
-            }
-        }
-
         private static IWebHost host = new WebHostBuilder()
             .UseKestrel()
             .UseStartup<Startup>()
@@ -51,6 +43,14 @@ namespace api.Communication {
             await Task.Run(() => {
                 host.Run();
             });
+        }
+    }
+
+    [Route("[controller]")] public class ApiController: Controller {
+        [HttpPost] public IActionResult Post() {
+            byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
+            this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
+            return Set.Request(Encoding.UTF8.GetString(buffer));
         }
     }
 }
