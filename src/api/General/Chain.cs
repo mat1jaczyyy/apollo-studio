@@ -175,15 +175,15 @@ namespace api {
                 
                 case "add":
                     foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
-                        if (device.Name.ToLower().Equals(json["device"])) {
-                            Insert(Convert.ToInt32(json["index"]), (Devices.Device)Activator.CreateInstance(device));
-                            return new OkObjectResult(_devices[Convert.ToInt32(json["index"])].Encode());
+                        if (device.Name.ToLower().Equals(data["device"])) {
+                            Insert(Convert.ToInt32(data["index"]), (Devices.Device)Activator.CreateInstance(device));
+                            return new OkObjectResult(_devices[Convert.ToInt32(data["index"])].Encode());
                         }
                     }
                     return new BadRequestObjectResult("Incorrectly formatted message.");
 
                 case "remove":
-                    Remove(Convert.ToInt32(json["index"]));
+                    Remove(Convert.ToInt32(data["index"]));
                     return new OkObjectResult(null);
                 
                 default:
