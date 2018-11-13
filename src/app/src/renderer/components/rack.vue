@@ -59,10 +59,27 @@ export default {
     remove: function(index) {
       this.api({
         object: "message",
-        recipent: "chain",
+        recipient: "set",
         data: {
-          type: "remove",
-          index,
+          type: "forward",
+          forward: "track",
+          index: 0,
+          message: {
+            object: "message",
+            recipient: "track",
+            data: {
+              type: "forward",
+              forward: "chain",
+              message: {
+                object: "message",
+                recipient: "chain",
+                data: {
+                  type: "remove",
+                  index,
+                },
+              },
+            },
+          },
         },
       }).catch(e => console.error(e))
       this.devices.splice(index, 1)
@@ -71,11 +88,28 @@ export default {
       let self = this
       this.api({
         object: "message",
-        recipent: "chain",
+        recipient: "set",
         data: {
-          type: "add",
+          type: "forward",
+          forward: "track",
           index: 0,
-          device,
+          message: {
+            object: "message",
+            recipient: "track",
+            data: {
+              type: "forward",
+              forward: "chain",
+              message: {
+                object: "message",
+                recipient: "chain",
+                data: {
+                  type: "add",
+                  index,
+                  device,
+                },
+              },
+            },
+          },
         },
       }).then(e => {
         console.log(e.data)
