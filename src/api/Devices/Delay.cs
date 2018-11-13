@@ -138,11 +138,11 @@ namespace api.Devices {
                 
                 case "length":
                     Length = Convert.ToInt32(data["value"]);
-                    return new OkObjectResult(null);
+                    return new OkObjectResult(EncodeSpecific());
 
                 case "gate":
                     Gate = Convert.ToDecimal(data["value"]);
-                    return new OkObjectResult(null);
+                    return new OkObjectResult(EncodeSpecific());
                 
                 default:
                     return new BadRequestObjectResult("Unknown message type.");

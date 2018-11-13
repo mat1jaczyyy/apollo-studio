@@ -229,10 +229,7 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
         "value": int // [10, 30000]
     }
     ```
-    * response: 
-    ```js
-    null
-    ```
+    * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
 
 * `gate`:
     * Updates gate parameter to given value.
@@ -243,10 +240,7 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
         "value": int // [0, 4]
     }
     ```
-    * response: 
-    ```js
-    null
-    ```
+    * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
 
 ## app (Electron)
 
