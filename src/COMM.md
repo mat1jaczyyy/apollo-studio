@@ -28,6 +28,7 @@ If the message contains another message that should be forwarded to one of the r
     "data": {
         "type": "forward", // Special forward message type
         "forward": string, // Forwardee object identifier
+        "forward-device": string, // If applicable, forwardee device identifier, if the object is a device
         "index": int, // If applicable, include an index for array-based members
         "message": {
             "object": "message",
