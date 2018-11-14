@@ -50,7 +50,14 @@ namespace api.Communication {
         [HttpPost] public IActionResult Post() {
             byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
             this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
-            return Set.Request(Encoding.UTF8.GetString(buffer));
+
+            string request = Encoding.UTF8.GetString(buffer);
+            api.Program.Log(request);
+
+            ObjectResult response = Set.Request(request);
+            api.Program.Log(response.Value.ToString()); 
+
+            return response;
         }
     }
 }
