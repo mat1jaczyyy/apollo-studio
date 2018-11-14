@@ -165,17 +165,13 @@ namespace api.Devices {
                         writer.WriteValue(_rate);
 
                         writer.WritePropertyName("colors");
-                        writer.WriteStartObject();
-
-                            writer.WritePropertyName("count");
-                            writer.WriteValue(Colors.Count);
+                        writer.WriteStartArray();
 
                             for (int i = 0; i < Colors.Count; i++) {
-                                writer.WritePropertyName(i.ToString());
                                 writer.WriteRawValue(Colors[i].Encode());
                             }
 
-                        writer.WriteEndObject();
+                        writer.WriteEndArray();
 
                     writer.WriteEndObject();
 

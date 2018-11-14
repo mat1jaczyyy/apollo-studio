@@ -110,17 +110,13 @@ namespace api.Devices {
                     writer.WriteValue("duplication");
 
                     writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("count");
-                        writer.WriteValue(_offsets.Count);
+                    writer.WriteStartArray();
 
                         for (int i = 0; i < _offsets.Count; i++) {
-                            writer.WritePropertyName(i.ToString());
                             writer.WriteValue(_offsets[i]);
                         }
 
-                    writer.WriteEndObject();
+                    writer.WriteEndArray();
 
                 writer.WriteEndObject();
             }

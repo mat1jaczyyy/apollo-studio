@@ -139,17 +139,13 @@ namespace api {
                     writer.WriteValue("chain");
 
                     writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("count");
-                        writer.WriteValue(_devices.Count);
+                    writer.WriteStartArray();
 
                         for (int i = 0; i < _devices.Count; i++) {
-                            writer.WritePropertyName(i.ToString());
                             writer.WriteRawValue(_devices[i].Encode());
                         }
 
-                    writer.WriteEndObject();
+                    writer.WriteEndArray();
 
                 writer.WriteEndObject();
             }

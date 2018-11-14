@@ -91,17 +91,13 @@ namespace api {
                         writer.WriteValue(FilePath);
 
                         writer.WritePropertyName("tracks");
-                        writer.WriteStartObject();
-
-                            writer.WritePropertyName("count");
-                            writer.WriteValue(Tracks.Count);
+                        writer.WriteStartArray();
 
                             for (int i = 0; i < Tracks.Count; i++) {
-                                writer.WritePropertyName(i.ToString());
                                 writer.WriteRawValue(Tracks[i].Encode());
                             }
                         
-                        writer.WriteEndObject();
+                        writer.WriteEndArray();
 
                     writer.WriteEndObject();
 

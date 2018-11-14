@@ -120,17 +120,13 @@ namespace api.Devices {
                     writer.WriteValue("group");
 
                     writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("count");
-                        writer.WriteValue(_chains.Count);
+                    writer.WriteStartArray();
 
                         for (int i = 0; i < _chains.Count; i++) {
-                            writer.WritePropertyName(i.ToString());
                             writer.WriteRawValue(_chains[i].Encode());
                         }
 
-                    writer.WriteEndObject();
+                    writer.WriteEndArray();
 
                 writer.WriteEndObject();
             }

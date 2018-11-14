@@ -155,30 +155,23 @@ namespace api.Devices {
                         writer.WriteValue(_time);
 
                         writer.WritePropertyName("colors");
-                        writer.WriteStartObject();
 
-                            writer.WritePropertyName("count");
-                            writer.WriteValue(_colors.Count);
+                        writer.WriteStartArray();
 
                             for (int i = 0; i < _colors.Count; i++) {
-                                writer.WritePropertyName(i.ToString());
                                 writer.WriteRawValue(_colors[i].Encode());
                             }
 
-                        writer.WriteEndObject();
+                        writer.WriteEndArray();
 
                         writer.WritePropertyName("positions");
-                        writer.WriteStartObject();
-
-                            writer.WritePropertyName("count");
-                            writer.WriteValue(_positions.Count);
+                        writer.WriteStartArray();
 
                             for (int i = 0; i < _positions.Count; i++) {
-                                writer.WritePropertyName(i.ToString());
                                 writer.WriteValue(_positions[i]);
                             }
 
-                        writer.WriteEndObject();
+                        writer.WriteEndArray();
 
                     writer.WriteEndObject();
 

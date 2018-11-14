@@ -71,14 +71,13 @@ namespace api.Devices {
                     writer.WriteValue("filter");
 
                     writer.WritePropertyName("data");
-                    writer.WriteStartObject();
+                    writer.WriteStartArray();
 
                         for (int i = 0; i < 128; i++) {
-                            writer.WritePropertyName(i.ToString());
                             writer.WriteValue(_filter[i]);
                         }
 
-                    writer.WriteEndObject();
+                    writer.WriteEndArray();
 
                 writer.WriteEndObject();
             }
