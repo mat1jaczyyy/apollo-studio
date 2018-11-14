@@ -211,7 +211,7 @@ The Group device contains multiple `chain` objects. Any incoming signal is trans
     * response: A JSON-encoded [Chain object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#chain-object)
 
 * `remove`:
-    * Removes device at position in the chain.
+    * Removes existing Chain at position in the List of Chain.
     * request: 
     ```js
     {
