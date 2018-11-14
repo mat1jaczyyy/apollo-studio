@@ -50,10 +50,7 @@ The Set object contains the List of Tracks. It also does file management and sto
 {
     "object": "set", 
     "bpm": int, 
-    "tracks": {
-        "count": int,
-        "i": api.track // i = 0 to (this."count" - 1)
-    }
+    "tracks": array(api.track)
 }
 ```
 
@@ -140,10 +137,7 @@ The Chain object contains a List of Devices. It is found inside of a Track or Gr
 ```js
 {
     "object": "chain",
-    "data": {
-        "count": int,
-        "i": api.device // i = 0 to (this."count" - 1)
-    }
+    "data": array(api.device)
 }
 ```
 
@@ -202,10 +196,7 @@ The Group device contains multiple `chain` objects. Any incoming signal is trans
 ```js
 {
     "device": "group",
-    "data": {
-        "count": int, // number of chains
-        "i": api.chain // i = 0 to (this."count" - 1)
-    }
+    "data": array(api.chain)
 }
 ```
 
