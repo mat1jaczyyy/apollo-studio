@@ -7,8 +7,8 @@ export default new Router({
   routes: [
     {
       path: "/",
-      name: "rack",
-      component: require("@/components/rack").default,
+      name: "apollo-track",
+      component: require("@/components/apollo-track").default,
     },
     {
       path: "*",

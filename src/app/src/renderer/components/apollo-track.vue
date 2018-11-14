@@ -1,6 +1,7 @@
 <template lang="pug">
-.rack
-  .rackWrap
+.track(v-if="track")
+  chain(:chain="track.data.chain")
+  //- .rackWrap
     .additem
       //- i.material-icons(@click="newDevice") add
       md-menu(md-size="auto")
@@ -12,7 +13,7 @@
     .rackItem(v-for="(device, key) in devices" :key="key" :class="{hov: hov === key}")
       .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
         .frame
-          h6.title {{device.component.name}}
+          h6.title {{device.component}}
           .remove(@click="remove(key)")
             i.material-icons close
         .content
@@ -25,102 +26,49 @@
           md-menu-content
             md-menu-item(v-for="adddevice in av_devices" :key="adddevice"
             @click="newDevice(adddevice, key + 1)") {{adddevice}}
+
 </template>
 
 <script>
 import { remote } from "electron"
-import launchpad from "../ui/launchpad"
-import blank from "../ui/blank"
-import translation from "../devices/translation"
-import delay from "../devices/delay"
-
-const av_devices = {
-  translation,
-  delay,
-}
-
 export default {
-  components: Object.assign({}, av_devices, { launchpad, blank }),
-  name: "rack",
-  data: () => ({
-    hov: false,
-    av_devices: Object.keys(av_devices),
-    devices: [],
-    window: remote.getCurrentWindow(),
-  }),
+  inheritAttrs: false,
+  props: {
+    track: {
+      type: [Object, Boolean],
+      required: true,
+    },
+  },
+  name: "apollo-track",
+  data() {
+    return {
+      hov: false,
+      av_devices: ["translation", "delay"],
+      window: this.$electron.remote.getCurrentWindow(),
+    }
+  },
   methods: {
     hover(n, i) {
       if (n) this.hov = i
       else this.hov = false
     },
-    onDrop: function(dropResult) {
-      this.devices = applyDrag(this.devices, dropResult)
-    },
     remove: function(index) {
-      this.api({
-        object: "message",
-        recipient: "set",
-        data: {
-          type: "forward",
-          forward: "track",
-          index: 0,
-          message: {
-            object: "message",
-            recipient: "track",
-            data: {
-              type: "forward",
-              forward: "chain",
-              message: {
-                object: "message",
-                recipient: "chain",
-                data: {
-                  type: "remove",
-                  index,
-                },
-              },
-            },
-          },
-        },
+      this.api("set/track:0/chain:0", {
+        type: "remove",
+        index,
       }).catch(e => console.error(e))
       this.devices.splice(index, 1)
     },
     newDevice(device, index) {
       let self = this
-      this.api({
-        object: "message",
-        recipient: "set",
-        data: {
-          type: "forward",
-          forward: "track",
-          index: 0,
-          message: {
-            object: "message",
-            recipient: "track",
-            data: {
-              type: "forward",
-              forward: "chain",
-              message: {
-                object: "message",
-                recipient: "chain",
-                data: {
-                  type: "add",
-                  index,
-                  device,
-                },
-              },
-            },
-          },
-        },
+      this.api("set/track:0/chain:0", {
+        type: "add",
+        index,
+        device,
       }).then(e => {
-        console.log(e.data)
         self.devices.push({
-          component: e.data.device,
-          data: e.data.data,
-          // component: delay,
-          // data: {
-          //   delay: 0,
-          //   gate: 0,
-          // },
+          component: e.data.data.device,
+          data: e.data.data.data,
         })
       })
     },

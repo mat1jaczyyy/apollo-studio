@@ -39,7 +39,7 @@ div#app(:class="{showsettings}")
 
 
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
-    router-view.router
+    router-view(:track="track").router
 </template>
 
 <script>
@@ -49,7 +49,7 @@ import ls from "local-storage"
 
 const { ipcRenderer } = require("electron")
 ipcRenderer.on("request", (event, arg) => {
-  console.log("from main", arg) // prints "pong"
+  console.log(`req@${arg.url}`, arg) // prints "pong"
 })
 // ipcRenderer.send('asynchronous-message', 'ping')
 
@@ -61,11 +61,13 @@ export default {
     window: remote.getCurrentWindow(),
     showsettings: false,
     platform: process.platform,
+    track: false,
   }),
   watch: {
     "$store.state.settings.theme": "theme",
   },
   mounted() {
+    window.vue = this
     this.theme()
   },
   methods: {
@@ -110,38 +112,32 @@ export default {
         filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }],
       }
       if (o === "new")
-        self.api({
-          object: "message",
-          recipent: "set",
-          data: {
+        self
+          .api("set", {
             type: "new",
-          },
-        })
+          })
+          .then(e => console.log(e))
       else if (o === "open") {
         remote.dialog.showOpenDialog(
           Object.assign({}, dialog_options, {
             properties: ["openFile"],
           }),
           path =>
-            self.api({
-              object: "message",
-              recipent: "set",
-              data: {
+            self
+              .api("set", {
                 type: "open",
                 path: path[0],
-              },
-            }),
+              })
+              .then(e => (self.track = e.data.data.tracks[0])),
         )
       } else if (o === "save") {
         remote.dialog.showSaveDialog(Object.assign({}, dialog_options), path =>
-          self.api({
-            object: "message",
-            recipent: "set",
-            data: {
+          self
+            .api("set", {
               type: "open",
               path,
-            },
-          }),
+            })
+            .then(e => console.log(e)),
         )
       }
     },
@@ -235,7 +231,7 @@ body {
         justify-content: center;
         align-items: center;
         margin: 0 4px;
-        div {
+        div > div {
           display: flex;
           justify-content: center;
           align-items: center;
@@ -244,11 +240,11 @@ body {
             color: #515151;
             transition: 0.3s;
             font-size: 22px;
-            > &.set {
+            &.set {
               transform: rotate(-90deg);
               transition: 0.5s;
             }
-            &:hover.set,
+            &:hover,
             &.showsettings {
               color: rgb(175, 175, 175);
               transform: rotate(0);
