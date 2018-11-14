@@ -175,7 +175,7 @@ namespace api.Devices {
 
                             for (int i = 0; i < _positions.Count; i++) {
                                 writer.WritePropertyName(i.ToString());
-                                writer.WriteRawValue(_positions[i].ToString());
+                                writer.WriteValue(_positions[i]);
                             }
 
                         writer.WriteEndObject();
