@@ -87,7 +87,10 @@ The Set object contains the List of Tracks. It also does file management and sto
         "path": string
     }
     ```
-    * response: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
+    * response:
+    ```js
+    null
+    ```
 
 #### `track` object
 
