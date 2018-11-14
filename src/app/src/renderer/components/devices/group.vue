@@ -4,7 +4,7 @@
     div(v-for="(member, key) in data" :key="`group>${data[show].object}:${key}`"
     :class="{selected: key === show}" @click="show = key") chain {{key}}
   //- chain(v-for="(member, key) in data" :key="`group>${member.object}:${key}`" :chain="member")
-  chain(:chain="data[show]" @addDevice="addDevice")
+  chain(:chain="data[show]" @addDevice="addDevice" :index="show")
 </template>
 
 <script>
@@ -20,10 +20,10 @@ export default {
     show: 0,
   }),
   methods: {
-    addDevice() {
-
-    }
-  }
+    addDevice({ path, device, index }) {
+      this.$emit("addDevice", { path: `/chain:${this.show}${path}`, device, index })
+    },
+  },
 }
 </script>
 

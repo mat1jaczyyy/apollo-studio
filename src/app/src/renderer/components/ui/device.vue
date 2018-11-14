@@ -3,7 +3,7 @@
   .frame
     h5 {{data.data.device}}
   .inner
-    component(:is="data.data.device" :data="data.data.data")
+    component(:is="data.data.device" :data="data.data.data" @addDevice="addDevice")
 </template>
 
 <script>
@@ -13,6 +13,19 @@ export default {
     data: {
       type: Object,
       required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
+  },
+  methods: {
+    addDevice({ path, device, index }) {
+      this.$emit("addDevice", {
+        path: `/device:${this.index}:${this.data.data.device}${path}`,
+        device,
+        index,
+      })
     },
   },
 }
