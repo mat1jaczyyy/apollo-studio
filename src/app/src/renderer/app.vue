@@ -26,6 +26,18 @@ div#app(:class="{showsettings}")
       .minimize(@click="frame('minimize')")
         i.min.material-icons fiber_manual_record
     .drag
+    .left
+      md-menu(md-size='medium' md-align-trigger='')
+        .save(md-menu-trigger)
+          i.material-icons save
+        md-menu-content
+          md-menu-item(@click="save('new')") new
+          md-menu-item(@click="save('open')") open
+          md-menu-item(@click="save('save')") save
+          md-menu-item(@click="save('save_as')") save as
+      div
+        .settings(@click="showsettings = !showsettings")
+          i.set.material-icons(:class="{showsettings}") settings
   .settings
     .inner
       .setting(v-for="(setting, k) in $store.state.settings")
@@ -242,7 +254,7 @@ body {
         justify-content: center;
         align-items: center;
         margin: 0 4px;
-        div > div {
+        div {
           display: flex;
           justify-content: center;
           align-items: center;
