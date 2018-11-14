@@ -7,7 +7,7 @@ const path = require("path")
 const proc = require("child_process").spawn
 let apipath = path.join(__dirname, "..\\..\\..\\api\\bin\\dist\\win\\api.exe")
 console.log(apipath)
-if (os.platform() === "darwin") apipath = path.join(__dirname, "..//api//bin//dist//osx//Api")
+if (os.platform() === "darwin") apipath = path.join(__dirname, "..//..//..//api//bin//dist//osx//api")
 
 server.use(bp.json())
 
