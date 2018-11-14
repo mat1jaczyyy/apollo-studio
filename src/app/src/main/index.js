@@ -1,13 +1,19 @@
-import { app, BrowserWindow } from "electron"
-import express from "express"
-import bp from "body-parser"
-
+const { app, BrowserWindow } = require("electron")
+const express = require("express")
+const bp = require("body-parser")
+const os = require("os")
 const server = express()
+const path = require("path")
+const proc = require("child_process").spawn
+let apipath = path.join(__dirname, "..\\..\\..\\api\\bin\\dist\\win\\api.exe")
+console.log(apipath)
+if (os.platform() === "darwin") apipath = path.join(__dirname, "..//api//bin//dist//osx//Api")
 
 server.use(bp.json())
 
 server.use((req, res) => {
   if (finishload) mainWindow.webContents.send("request", req)
+  if (req.url === "/init") mainWindow.show()
   res.send(200)
 })
 server.listen(1549)
@@ -41,7 +47,7 @@ function createWindow() {
     width: 685,
     backgroundColor: "#212121",
     frame: false,
-    // show: false,
+    show: false,
     center: true,
     minHeight: 292,
     maxHeight: 292,
@@ -62,7 +68,8 @@ function createWindow() {
   // })
 }
 
-app.on("ready", createWindow)
+// app.on("ready", createWindow)
+app.on("ready", startApi)
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit()
@@ -72,6 +79,21 @@ app.on("activate", () => {
   if (mainWindow === null) createWindow()
 })
 
+function startApi() {
+  const apiProcess = proc(apipath)
+  createWindow()
+  apiProcess.stdout.on("data", data => {
+    writeLog(`api: ${data}`)
+  })
+}
+process.on("exit", () => {
+  writeLog("exit")
+  apiProcess.kill()
+})
+
+function writeLog(msg) {
+  console.log(msg)
+}
 /**
  * Auto Updater
  *
