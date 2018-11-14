@@ -57,13 +57,13 @@ namespace api {
             if (json["object"].ToString() != "set") return false;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            Dictionary<string, object> tracks = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["tracks"].ToString());
+            List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
             Close();
 
             BPM = Decimal.Parse(data["bpm"].ToString());
-            for (int i = 0; i < Convert.ToInt32(tracks["count"]); i++) {
-                Tracks.Add(Track.Decode(tracks[i.ToString()].ToString()));
+            foreach (object track in tracks) {
+                Tracks.Add(Track.Decode(track.ToString()));
             }
 
             return true;

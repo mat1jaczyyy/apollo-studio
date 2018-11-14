@@ -124,16 +124,16 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
+            List<object> colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
             List<Color> initC = new List<Color>();
-            Dictionary<string, object> colors = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["colors"].ToString());
-            for (int i = 0; i < Convert.ToInt32(colors["count"]); i++) {
-                initC.Add(Color.Decode(colors[i.ToString()].ToString()));
+            foreach (object color in colors) {
+                initC.Add(Color.Decode(color.ToString()));
             }
 
+            List<object> positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
             List<Decimal> initP = new List<Decimal>();
-            Dictionary<string, object> positions = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["positions"].ToString());
-            for (int i = 0; i < Convert.ToInt32(positions["count"]); i++) {
-                initP.Add(Decimal.Parse(positions[i.ToString()].ToString()));
+            foreach (object position in positions) {
+                initP.Add(Decimal.Parse(position.ToString()));
             }
 
             return new Fade(Convert.ToInt32(data["time"]), initC, initP);

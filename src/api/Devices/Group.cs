@@ -101,11 +101,11 @@ namespace api.Devices {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != "group") return null;
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<Chain> init = new List<Chain>();
-            for (int i = 0; i < Convert.ToInt32(data["count"]); i++) {
-                init.Add(Chain.Decode(data[i.ToString()].ToString()));
+            foreach (object chain in data) {
+                init.Add(Chain.Decode(chain.ToString()));
             }
             return new Group(init);
         }

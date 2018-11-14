@@ -91,11 +91,11 @@ namespace api.Devices {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != "duplication") return null;
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<int> offsets = new List<int>();
-            for (int i = 0; i < Convert.ToInt32(data["count"]); i++) {
-                offsets.Add(Convert.ToInt32(data[i.ToString()]));
+            foreach (object offset in offsets) {
+                offsets.Add(Convert.ToInt32(offset));
             }
             return new Duplication(offsets);
         }

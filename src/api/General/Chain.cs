@@ -119,12 +119,11 @@ namespace api {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "chain") return null;
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<Device> init = new List<Device>();
-            Dictionary<string, object> devices = JsonConvert.DeserializeObject<Dictionary<string, object>>(data["devices"].ToString());
-            for (int i = 0; i < Convert.ToInt32(devices["count"]); i++) {
-                init.Add(Device.Decode(devices[i.ToString()].ToString()));
+            foreach (object device in data) {
+                init.Add(Device.Decode(device.ToString()));
             }
             return new Chain(init);
         }

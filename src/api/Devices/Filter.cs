@@ -51,11 +51,11 @@ namespace api.Devices {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != "filter") return null;
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             bool[] filter = new bool[128];
             for (int i = 0; i < 128; i++) {
-                filter[i] = bool.Parse(data[i.ToString()].ToString());
+                filter[i] = Convert.ToBoolean(data[i].ToString());
             }
 
             return new Filter(filter);
