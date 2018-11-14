@@ -20,6 +20,7 @@ export default {
   },
   methods: {
     addDevice({ path, device, index }) {
+      // console.log(`set/track:0/chain${path}`)
       this.api(`set/track:0/chain${path}`, {
         type: "add",
         device,

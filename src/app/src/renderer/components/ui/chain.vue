@@ -29,7 +29,7 @@ export default {
     },
     addDevice({ path, device, index }) {
       if (typeof this.index === "boolean" && !this.index)
-        this.$emit("addDevice", { path: `/chain${path}`, device, index })
+        this.$emit("addDevice", { path, device, index })
       else this.$emit("addDevice", { path: `/chain:${this.index}${path}`, device, index })
     },
   },
