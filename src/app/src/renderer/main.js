@@ -15,17 +15,20 @@ Array.prototype.last = function() {
 const resolveUrl = (url, payload) => {
   const path = url.indexOf("/") > 0 ? url.split("/") : [url]
   const msg = data => {
-    const d = data.shift()
-    return {
+    const d = data.shift(),
+      split = d.split(":")
+    const ret = {
       type: "forward",
-      forward: d.split(":")[0],
-      index: Number(d.split(":")[1]),
+      forward: split[0],
       message: {
         object: "message",
-        recipient: d.split(":")[0],
+        recipient: split[0],
         data: data.length ? msg(data) : payload,
       },
     }
+    if (!isNaN(Number(split[1]))) ret.index = Number(split[1])
+    if (ret.forward === "device") ret.message.device = split[2]
+    return ret
   }
   return {
     object: "message",

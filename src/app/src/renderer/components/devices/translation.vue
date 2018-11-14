@@ -1,41 +1,28 @@
 <template lang="pug">
 main
-  .x
-    h4 x translation
-    dial(:value.sync="x" :size="50" :width="7" :min="min" :max="max" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
+  .offset
+    h4 offset translation
+    dial(:value.sync="offset" :size="50" :width="7" :min="min" :max="max" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
-      a(@click="x += -1") -
+      a(@click="offset += -1") -
       md-field
-        md-input(@input.native="x = Number($event.target.value) || 0" :value="x")
-      a(@click="x += 1") +
-  .y
-    h4 y translation
-    dial(:value.sync="y" :size="50" :width="7" :min="min" :max="max" :overflow="true" :color="$store.state.themes[$store.state.settings.theme].dial1")
-    .values
-      a(@click="y += -1") -
-      md-field
-        md-input(@input.native="y = Number($event.target.value) || 0" :value="y")
-      a(@click="y += 1") +
+        md-input(@input.native="offset = Number($event.target.value) || 0" :value="offset")
+      a(@click="offset += 1") +
 </template>
 
 <script>
 export default {
   name: "Translation",
   data: () => ({
-    x: 0,
-    y: 0,
-    min: -9,
-    max: 9,
+    offset: 0,
+    min: -99,
+    max: 99,
   }),
 }
 </script>
 
 <style lang="scss">
-.x {
-  margin-bottom: 10px;
-}
-.x,
-.y {
+.offset {
   display: flex;
   justify-content: center;
   align-items: center;

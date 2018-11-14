@@ -9,6 +9,7 @@ div#app(:class="{showsettings}")
           md-menu-item(@click="save('new')") new
           md-menu-item(@click="save('open')") open
           md-menu-item(@click="save('save')") save
+          md-menu-item(@click="save('save_as')") save as
       div
         .settings(@click="showsettings = !showsettings")
           i.set.material-icons(:class="{showsettings}") settings
@@ -116,7 +117,8 @@ export default {
           .api("set", {
             type: "new",
           })
-          .then(e => console.log(e))
+          .then(e => (self.track = e.data.data.tracks[0]))
+          .catch(e => console.log(e))
       else if (o === "open") {
         remote.dialog.showOpenDialog(
           Object.assign({}, dialog_options, {
@@ -128,16 +130,25 @@ export default {
                 type: "open",
                 path: path[0],
               })
-              .then(e => (self.track = e.data.data.tracks[0])),
+              .then(e => (self.track = e.data.data.tracks[0]))
+              .catch(e => console.log(e)),
         )
       } else if (o === "save") {
+        self
+          .api("set", {
+            type: "save",
+          })
+          .then(e => console.log(e))
+          .catch(e => console.log(e))
+      } else if (o === "save_as") {
         remote.dialog.showSaveDialog(Object.assign({}, dialog_options), path =>
           self
             .api("set", {
-              type: "open",
+              type: "save_as",
               path,
             })
-            .then(e => console.log(e)),
+            .then(e => console.log(e))
+            .catch(e => console.log(e)),
         )
       }
     },
@@ -199,7 +210,7 @@ export default {
   padding: 0;
 }
 .md-menu-content {
-  max-height: 50vh;
+  max-height: 75vh;
 }
 .md-field.md-theme-default.md-focused .md-input,
 .md-field.md-theme-default.md-focused .md-textarea,
