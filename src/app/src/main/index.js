@@ -5,9 +5,9 @@ const os = require("os")
 const server = express()
 const path = require("path")
 const proc = require("child_process").spawn
-let apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "api\\bin\\dist\\win\\api.exe" : "..\\..\\api\\bin\\dist\\win\\api.exe")
+let apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "..\\..\\..\\api\\bin\\dist\\win\\api.exe" : "..\\..\\api\\bin\\dist\\win\\api.exe")
 console.log(apipath)
-if (os.platform() === "darwin") apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "api//bin//dist//osx//api" : "..//..//api//bin//dist//osx//api")
+if (os.platform() === "darwin") apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "..//..//..//api//bin//dist//osx//api" : "..//..//api//bin//dist//osx//api")
 
 server.use(bp.json())
 
