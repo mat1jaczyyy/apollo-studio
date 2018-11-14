@@ -139,7 +139,34 @@ namespace api.Devices {
         }
 
         public override ObjectResult RequestSpecific(string jsonString) {
-            throw new NotImplementedException();
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != "group") return new BadRequestObjectResult("Incorrect device recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    switch (data["forward"].ToString()) {
+                        case "chain":
+                            return _chains[Convert.ToInt32(data["index"])].Request(data["message"].ToString());
+                        
+                        default:
+                            return new BadRequestObjectResult("Incorrectly formatted message.");
+                    }
+                
+                case "add":
+                    Insert(Convert.ToInt32(data["index"]));
+                    return new OkObjectResult(_chains[Convert.ToInt32(data["index"])].Encode());
+
+                case "remove":
+                    Remove(Convert.ToInt32(data["index"]));
+                    return new OkObjectResult(null);
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }

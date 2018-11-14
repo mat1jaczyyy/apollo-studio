@@ -143,19 +143,11 @@ The Chain object contains a List of Devices. It is found inside of a Track or Gr
     ```js
     {
         "type": "add",
-        "index": int,
-        "device": string // Device object identifier
+        "device": string, // Device object identifier
+        "index": int
     }
     ```
-    * response: 
-    ```js
-    {
-        "device": string,
-        "data": {
-            // device-specific data
-        }
-    }
-    ```
+    * response: A JSON-encoded [Device object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#device-object)
 
 * `remove`:
     * Removes device at position in the chain.
@@ -207,7 +199,30 @@ The Group device contains multiple `chain` objects. Any incoming signal is trans
 }
 ```
 
-The Group object currently handles no requests.
+* `add`:
+    * Adds new Chain at position in the List of Chain.
+    * request: 
+    ```js
+    {
+        "type": "add",
+        "index": int
+    }
+    ```
+    * response: A JSON-encoded [Chain object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#chain-object)
+
+* `remove`:
+    * Removes device at position in the chain.
+    * request: 
+    ```js
+    {
+        "type": "remove",
+        "index": int
+    }
+    ```
+    * response: 
+    ```js
+    null
+    ```
 
 #### `delay` device
 
