@@ -77,7 +77,8 @@ namespace api {
         }
 
         private void MIDIEnter(Signal n) {
-            Chain.MIDIEnter(n);
+            if (Chain != null)
+                Chain.MIDIEnter(n);
         }
 
         public void Dispose() {
