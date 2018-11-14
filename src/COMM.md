@@ -79,18 +79,28 @@ The Set object contains the List of Tracks. It also does file management and sto
     * response: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
 
 * `save`:
-    * Saves the current Apollo set to a file. If the file exists, it will be overwritten.
+    * Saves the current Apollo set. If the file exists, it will be overwritten. If the internal path is empty, the response will be a 400.
     * request:
     ```js
     {
         "type": "save",
-        "path": string
     }
     ```
     * response:
     ```js
     null
     ```
+
+* `save_as`:
+    * Saves the current Apollo set to a different file. If the file exists, it will be overwritten.
+    * request:
+    ```js
+    {
+        "type": "save_as",
+        "path": string
+    }
+    ```
+    * response: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
 
 #### `track` object
 

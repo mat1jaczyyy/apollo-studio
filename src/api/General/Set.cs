@@ -14,6 +14,13 @@ namespace api {
         public static List<Track> Tracks = new List<Track>();
         public static Decimal BPM = 150;
 
+        private static string _path = "";
+        public static string FilePath {
+            get {
+                return _path;
+            }
+        }
+
         private static void Close() {
             foreach (Track track in Tracks)
                 track.Dispose();
@@ -25,6 +32,7 @@ namespace api {
             Close();
             Tracks.Add(new Track());
             Set.Tracks[0].Launchpad = MIDI.Devices[0];
+            _path = "";
         }
 
         public static bool Open(string path) {
@@ -40,6 +48,8 @@ namespace api {
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
                 File.WriteAllText(path, Encode());
             }
+
+            _path = path;
         }
 
         public static bool Decode(string jsonString) {
@@ -76,6 +86,9 @@ namespace api {
 
                         writer.WritePropertyName("bpm");
                         writer.WriteValue(BPM);
+                        
+                        writer.WritePropertyName("path");
+                        writer.WriteValue(FilePath);
 
                         writer.WritePropertyName("tracks");
                         writer.WriteStartObject();
@@ -121,13 +134,21 @@ namespace api {
 
                 case "open":
                     if (Open(data["path"].ToString())) {
+                        _path = data["path"].ToString();
                         return new OkObjectResult(Set.Encode());
                     }
                     return new BadRequestObjectResult("Bad Set file content or path to Set file.");
 
                 case "save":
-                    Save(data["path"].ToString());
+                    if (_path == "")
+                        return new BadRequestObjectResult("No path to save to");
+
+                    Save(_path);
                     return new OkObjectResult(null);
+                
+                case "save_as":
+                    Save(data["path"].ToString());
+                    return new OkObjectResult(Set.Encode());
 
                 default:
                     return new BadRequestObjectResult("Unknown message type.");
