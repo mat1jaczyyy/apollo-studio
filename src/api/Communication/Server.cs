@@ -52,10 +52,10 @@ namespace api.Communication {
             this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
 
             string request = Encoding.UTF8.GetString(buffer);
-            api.Program.Log(request);
+            api.Program.Log($"REQ -> {request}");
 
             ObjectResult response = Set.Request(request);
-            api.Program.Log(response.Value.ToString()); 
+            api.Program.Log($"RSP <- {response.Value.ToString()}"); 
 
             return response;
         }
