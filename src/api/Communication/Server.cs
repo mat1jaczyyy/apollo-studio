@@ -46,8 +46,8 @@ namespace api.Communication {
         }
     }
 
-    [Route("[controller]")] public class ApiController: Controller {
-        [HttpPost] public IActionResult Post() {
+    [Route("/[controller]")] public class ApiController: Controller {
+        [HttpPost()] public IActionResult Post() {
             byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
             this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
 

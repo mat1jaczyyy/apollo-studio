@@ -26,7 +26,7 @@
       "output": "build"
     },
     "extraResources": {
-      "from": "../api/bin/dist/",
+      "from": "api/bin/dist/",
       "to": "api/bin/dist/",
       "filter": [
         "**/*"
