@@ -20,14 +20,30 @@ export default {
   },
   methods: {
     addDevice({ path, device, index }) {
+      let self = this
       // console.log(`set/track:0/chain${path}`)
-      this.api(`set/track:0/chain${path}`, {
-        type: "add",
-        device,
-        index,
-      })
-        .then(e => console.log(e))
-        .catch(e => console.error(e))
+      const insertDevice = (path, data) => {
+        // const p = path.shift()
+        let fullPath = self.track.data
+        path.forEach(e => {
+          // console.log(e)
+          if (e.indexOf(":") > 0) console.log(fullPath[e.split(":")[1]].data)
+          else console.log(fullPath[e].data)
+          // if (e.indexOf(":") > 0) fullPath = fullPath[e.split(":")[1]].data
+          // else fullPath = fullPath[e].data
+        })
+      }
+      const p = `set/track:0/chain${path}`.split("/")
+      p.shift()
+      p.shift()
+      insertDevice(p, device)
+      // this.api(`set/track:0/chain${path}`, {
+      //   type: "add",
+      //   device,
+      //   index,
+      // })
+      //   .then(e => console.log(e))
+      //   .catch(e => console.error(e))
     },
     remove: function(index) {
       this.api("set/track:0/chain:0", {

@@ -61,8 +61,16 @@ import { remote } from "electron"
 import ls from "local-storage"
 
 const { ipcRenderer } = require("electron")
-ipcRenderer.on("request", (event, arg) => {
-  console.log(`req@${arg.url}`, arg) // prints "pong"
+let vue = false
+ipcRenderer.on("request", (event, req) => {
+  switch (req.url) {
+    case "/init":
+      if (vue) vue.track = req.body.data.tracks[0]
+      break
+    default:
+      console.log(`req@${req.url}`, req)
+      break
+  }
 })
 // ipcRenderer.send('asynchronous-message', 'ping')
 
@@ -79,8 +87,10 @@ export default {
   watch: {
     "$store.state.settings.theme": "theme",
   },
+  created() {
+    vue = this
+  },
   mounted() {
-    window.vue = this
     this.theme()
   },
   methods: {

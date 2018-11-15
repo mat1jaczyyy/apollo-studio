@@ -5,14 +5,28 @@ const os = require("os")
 const server = express()
 const path = require("path")
 const proc = require("child_process").spawn
-let apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "..\\..\\..\\api\\bin\\dist\\win\\api.exe" : "..\\..\\api\\bin\\dist\\win\\api.exe")
+let apipath = path.join(
+  __dirname,
+  process.env.NODE_ENV !== "development"
+    ? "..\\..\\..\\api\\bin\\dist\\win\\api.exe"
+    : "..\\..\\api\\bin\\dist\\win\\api.exe",
+)
 console.log(apipath)
-if (os.platform() === "darwin") apipath = path.join(__dirname, process.env.NODE_ENV !== "development"? "..//..//..//api//bin//dist//osx//api" : "..//..//api//bin//dist//osx//api")
+if (os.platform() === "darwin")
+  apipath = path.join(
+    __dirname,
+    process.env.NODE_ENV !== "development"
+      ? "..//..//..//api//bin//dist//osx//api"
+      : "..//..//api//bin//dist//osx//api",
+  )
 
 server.use(bp.json())
 
+const missedRequests = []
+let finishload = false
 server.use((req, res) => {
   if (finishload) mainWindow.webContents.send("request", req)
+  else missedRequests.push(req)
   if (req.url === "/init") mainWindow.show()
   res.send(200)
 })
@@ -27,8 +41,7 @@ if (process.env.NODE_ENV !== "development")
     .join(__dirname, "/static")
     .replace(/\\/g, "\\\\")
 
-let mainWindow,
-  finishload = false
+let mainWindow
 const winURL =
   process.env.NODE_ENV === "development"
     ? `http://localhost:9080`
@@ -58,7 +71,10 @@ function createWindow() {
 
   mainWindow.loadURL(winURL)
 
-  mainWindow.webContents.on("did-finish-load", () => (finishload = true))
+  mainWindow.webContents.on("did-finish-load", () => {
+    finishload = true
+    missedRequests.forEach(req => mainWindow.webContents.send("request", req))
+  })
   // mainWindow.on("closed", () => {
   //   mainWindow = null
   // })
