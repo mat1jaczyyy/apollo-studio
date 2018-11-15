@@ -6,8 +6,8 @@
   "license": "null",
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build": "dotnet publish ../api/api.csproj -r win10-x64 --output ../app/api/bin/dist/win && node .electron-vue/build.js && electron-builder",
-    "build:mac": "dotnet publish ../api/api.csproj -r osx.10.11-x64 --output ../app/api/bin/dist/osx && node .electron-vue/build.js && electron-builder",
+    "build": "dotnet publish ../api/api.csproj -r win10-x64 --output ../app/api/bin/dist/win && yarn && node .electron-vue/build.js && electron-builder",
+    "build:mac": "dotnet publish ../api/api.csproj -r osx.10.11-x64 --output ../app/api/bin/dist/osx && yarn && node .electron-vue/build.js && electron-builder",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
