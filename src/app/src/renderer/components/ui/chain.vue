@@ -7,7 +7,7 @@
       md-menu-content
         md-menu-item(v-for="item in $store.state.av_devices" :key="item" @click="init_addDevice(item, 0)") {{item}}
   template(v-for="(device, key) in chain.data")
-    device(:data="device" @addDevice="addDevice" :index="key" :key="`device>${device.data.device}:${key}`")
+    device(:data="device" @addDevice="addDevice" @update="update" :index="key" :key="`device>${device.data.device}:${key}`")
     .add
       md-menu
         md-button(md-menu-trigger).md-icon-button.md-super-dense
@@ -35,6 +35,14 @@ export default {
     },
     addDevice({ path, device, index }) {
       this.$emit("addDevice", { path, device, index })
+    },
+    update({ path, type, value }) {
+      this.$emit("update", {
+      // console.log("update", {
+        path,
+        type,
+        value,
+      })
     },
   },
 }

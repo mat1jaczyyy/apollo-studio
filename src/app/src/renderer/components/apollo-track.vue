@@ -1,6 +1,6 @@
 <template lang="pug">
 .track(v-if="track")
-  chain(:chain="track.data.chain" @addDevice="addDevice" :index="false")
+  chain(:chain="track.data.chain" @update="update" @addDevice="addDevice" :index="false")
 </template>
 
 <script>
@@ -69,6 +69,16 @@ export default {
           data: e.data.data.data,
         })
       })
+    },
+    update({ path, type, value }) {
+      // this.$emit("update", {
+      // console.log("update", {
+      this.api(`set/track:0/chain${path}`, {
+        type,
+        value,
+      })
+        .then(e => console.log(e))
+        .catch(e => console.error(e))
     },
   },
 }

@@ -49,6 +49,10 @@ div#app(:class="{showsettings}")
           md-menu-content
             md-menu-item(v-for="(theme, key) in $store.state.themes" :key="key"
             @click="$store.commit('setting', {k: 'theme', v: key})") {{key}}
+      .setting
+        h4 Open DevTools
+        md-button(v-if="!devOpen" @click="toggleDevTools") open
+        md-button(v-else @click="toggleDevTools") close
 
 
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
@@ -83,6 +87,7 @@ export default {
     showsettings: false,
     platform: process.platform,
     track: false,
+    devOpen: false,
   }),
   watch: {
     "$store.state.settings.theme": "theme",
@@ -94,6 +99,15 @@ export default {
     this.theme()
   },
   methods: {
+    toggleDevTools() {
+      if (!this.window.isDevToolsOpened()) {
+        this.window.openDevTools()
+        this.devOpen = true
+      } else {
+        this.window.closeDevTools()
+        this.devOpen = false
+      }
+    },
     frame(icon) {
       switch (icon) {
         case "minimize":
@@ -348,6 +362,9 @@ body {
           padding: 10px 0;
           > h4 {
             font-weight: 300;
+          }
+          > button {
+            margin: 0;
           }
         }
       }

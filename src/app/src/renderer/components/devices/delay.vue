@@ -55,12 +55,23 @@ export default {
         if (self.duration > self.max) self.duration = self.max
         else if (self.duration < self.min) self.duration = self.min
       }
+      self.update("length", self.duration)
     },
+    gate(n) {
+      this.update("gate", this.gate / 100)
+    }
   },
   methods: {
     toggle() {
       this.sync = !this.sync
     },
+    update: throttle(function(type, value) {
+      this.$emit("update", {
+        path: "",
+        type,
+        value,
+      })
+    }, 100),
   },
 }
 </script>

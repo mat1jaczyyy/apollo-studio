@@ -16,7 +16,7 @@ export default new Vuex.Store({
       dialPointerLock: "Lock pointer while adjusting dials",
       theme: "Theme",
     },
-    av_devices: ["delay", "translation", "group", "fade"],
+    av_devices: ["delay", "group"],
     themes: {
       "pretty dark": {
         background1: "#212121",
