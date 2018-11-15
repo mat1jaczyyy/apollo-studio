@@ -7,10 +7,16 @@ import store from "./store"
 import upperFirst from "lodash/upperFirst"
 import camelCase from "lodash/camelCase"
 import axios from "axios"
+import Raven from "raven-js"
+import RavenVue from "raven-js/plugins/vue"
 
 Array.prototype.last = function() {
   return this[this.length - 1]
 }
+
+Raven.config("https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916")
+  .addPlugin(RavenVue, Vue)
+  .install()
 
 const resolveUrl = (url, payload) => {
   const path = url.indexOf("/") > 0 ? url.split("/") : [url]

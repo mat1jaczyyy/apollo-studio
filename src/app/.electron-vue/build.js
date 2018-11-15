@@ -123,8 +123,7 @@ function greeting() {
   const cols = process.stdout.columns
   let text = ""
 
-  if (cols > 115) text = "lets-build"
-  else if (cols > 60) text = "lets-|build"
+  if (cols > 115) text = "alpha|software"
   else text = false
 
   if (text && !isCI) {

@@ -20,6 +20,9 @@ if (os.platform() === "darwin")
       : "..//..//api//bin//dist//osx//api",
   )
 
+const Sentry = require("@sentry/node")
+Sentry.init({ dsn: "https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916" })
+
 server.use(bp.json())
 
 const missedRequests = []
