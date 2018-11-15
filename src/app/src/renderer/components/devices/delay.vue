@@ -2,13 +2,13 @@
 main.delay
   .duration
     h4 Duration
-    dial(v-if="!sync" :value.sync="delay" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
+    dial(v-if="!sync" :value.sync="duration" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
     dial(v-else :steps="steps.length" :color="$store.state.themes[$store.state.settings.theme].dial2" :value.sync="step" :size="50" :width="7" :min="0" :max="steps.length - 1" @rclick="toggle")
     .values(v-if="!sync")
-      a(@click="delay += -100") -
+      a(@click="duration += -100") -
       md-field
-        md-input(@input.native="delay = Number($event.target.value) || 0" :value="delay")
-      a(@click="delay += 100") +
+        md-input(@input.native="duration = Number($event.target.value) || 0" :value="duration")
+      a(@click="duration += 100") +
     .durationvalues.values(v-else).sync
       a(@click="step += -1") -
       md-field
@@ -25,6 +25,7 @@ main.delay
 </template>
 
 <script>
+import throttle from "lodash/throttle"
 export default {
   name: "Delay",
   props: {
@@ -34,25 +35,25 @@ export default {
     },
   },
   created() {
-    this.delay = this.data.length
-    this.gate = this.data.gate * 100
+    this.duration = this.data.data.length
+    this.gate = this.data.data.gate * 100
   },
   data: () => ({
-    delay: 0,
+    duration: 0,
     step: 7,
     gate: 0,
     sync: false,
     steps: ["1/128", "1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1", "2", "4"],
   }),
   watch: {
-    delay(n) {
+    duration(n) {
       let self = this
       if (self.sync) {
-        if (self.delay > self.steps.length - 1) self.delay = self.steps.length - 1
-        else if (self.delay < 0) self.delay = 0
+        if (self.duration > self.steps.length - 1) self.duration = self.steps.length - 1
+        else if (self.duration < 0) self.duration = 0
       } else {
-        if (self.delay > self.max) self.delay = self.max
-        else if (self.delay < self.min) self.delay = self.min
+        if (self.duration > self.max) self.duration = self.max
+        else if (self.duration < self.min) self.duration = self.min
       }
     },
   },

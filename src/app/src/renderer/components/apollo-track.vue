@@ -21,29 +21,34 @@ export default {
   methods: {
     addDevice({ path, device, index }) {
       let self = this
-      // console.log(`set/track:0/chain${path}`)
-      const insertDevice = (path, data) => {
+      console.log(`set/track:0/chain${path}`)
+      const resolveUrl = path => {
         // const p = path.shift()
         let fullPath = self.track.data
         path.forEach(e => {
-          // console.log(e)
-          if (e.indexOf(":") > 0) console.log(fullPath[e.split(":")[1]].data)
-          else console.log(fullPath[e].data)
-          // if (e.indexOf(":") > 0) fullPath = fullPath[e.split(":")[1]].data
-          // else fullPath = fullPath[e].data
+          if (e.indexOf(":") > 0) {
+            let s = e.split(":")
+            if (s.length > 2 && s[2] === "group") fullPath = fullPath[s[1]].data.data
+            else fullPath = fullPath[s[1]].data
+          } else fullPath = fullPath[e].data || fullPath[e]
         })
+        return fullPath
       }
       const p = `set/track:0/chain${path}`.split("/")
       p.shift()
       p.shift()
-      insertDevice(p, device)
-      // this.api(`set/track:0/chain${path}`, {
-      //   type: "add",
-      //   device,
-      //   index,
-      // })
-      //   .then(e => console.log(e))
-      //   .catch(e => console.error(e))
+      console.log(index, device, resolveUrl(p))
+
+      this.api(`set/track:0/chain${path}`, {
+        type: "add",
+        device,
+        index,
+      })
+        .then(e => {
+          console.log(e)
+          resolveUrl(p).splice(index, 0, e.data)
+        })
+        .catch(e => console.error(e))
     },
     remove: function(index) {
       this.api("set/track:0/chain:0", {

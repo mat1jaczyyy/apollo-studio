@@ -68,7 +68,7 @@ ipcRenderer.on("request", (event, req) => {
       if (vue) vue.track = req.body.data.tracks[0]
       break
     default:
-      console.log(`req@${req.url}`, req)
+      console.log(`sad req@${req.url}`, req)
       break
   }
 })
@@ -239,6 +239,11 @@ export default {
 .md-field.md-theme-default.md-has-value .md-input,
 .md-field.md-theme-default.md-has-value .md-textarea {
   -webkit-text-fill-color: unset;
+}
+.md-icon-button.md-super-dense {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
 }
 body {
   margin: 0;

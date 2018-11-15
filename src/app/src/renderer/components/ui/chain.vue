@@ -1,13 +1,19 @@
 <template lang="pug">
 .chain
-  .add
+  .add(:class="{lonely: !chain.data.length}")
     md-menu
-      md-button(md-menu-trigger).md-icon-button.md-dense
+      md-button(md-menu-trigger).md-icon-button.md-super-dense
         md-icon add
       md-menu-content
         md-menu-item(v-for="item in $store.state.av_devices" :key="item" @click="init_addDevice(item, 0)") {{item}}
-  device(v-for="(device, key) in chain.data" :data="device"
-  :key="`device>${device.data.device}:${key}`" @addDevice="addDevice" :index="key")
+  template(v-for="(device, key) in chain.data")
+    device(:data="device" @addDevice="addDevice" :index="key" :key="`device>${device.data.device}:${key}`")
+    .add
+      md-menu
+        md-button(md-menu-trigger).md-icon-button.md-super-dense
+          md-icon add
+        md-menu-content
+          md-menu-item(v-for="item in $store.state.av_devices" :key="item" @click="init_addDevice(item, key + 1)") {{item}}
 </template>
 
 <script>
@@ -25,12 +31,10 @@ export default {
   },
   methods: {
     init_addDevice(device, index) {
-      this.$emit("addDevice", { path: "", device, index })
+      this.$emit("addDevice", { path: ``, device, index })
     },
     addDevice({ path, device, index }) {
-      if (typeof this.index === "boolean" && !this.index)
-        this.$emit("addDevice", { path, device, index })
-      else this.$emit("addDevice", { path: `/chain:${this.index}${path}`, device, index })
+      this.$emit("addDevice", { path, device, index })
     },
   },
 }
@@ -44,5 +48,25 @@ export default {
   justify-content: center;
   align-items: center;
   margin: 0 2.5px;
+  > .add {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5px;
+    transition: 0.3s;
+    transition-delay: 0.1s;
+    overflow: hidden;
+    opacity: 0;
+    &.lonely {
+      width: 28px;
+      opacity: 0.5;
+      height: unset;
+    }
+    &:hover {
+      opacity: 1;
+      width: 28px;
+    }
+  }
 }
 </style>

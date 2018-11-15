@@ -35,7 +35,7 @@ export default new Vuex.Store({
         dial2: "#9a6b6b",
       },
       "my eyes hurt": {
-        background1: "#ffb200",
+        background1: "#edff00",
         background2: "#004aff",
         text: "#25ff00",
         device: "#e402b2",
