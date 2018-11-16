@@ -2,7 +2,7 @@
 
 ## api (.NET Core)
 
-All requests towards the api should target `localhost:1548/api`.
+All requests towards the api should target `localhost:1548/api`. Sending an empty request will return a 200 OK, and should be used as an initial "handshake".
 
 ### Messages
 

@@ -54,7 +54,7 @@ namespace api.Communication {
             string request = Encoding.UTF8.GetString(buffer);
             api.Program.Log($"REQ -> {request}");
 
-            ObjectResult response = Set.Request(request);
+            ObjectResult response = (request == "")? new OkObjectResult(null) : Set.Request(request);
             api.Program.Log($"RSP <- {response.Value.ToString()}"); 
 
             return response;
