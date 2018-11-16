@@ -12,22 +12,16 @@ using api;
 
 namespace api.Devices {
     public class Paint: Device {
-        private Color _high = new Color(63), _low = new Color(0);
+        private Color _color = new Color(63);
 
         public override Device Clone() {
-            return new Paint(_high, _low);
+            return new Paint(_color);
         }
 
         public Paint() {}
 
         public Paint(Color color) {
-            _high = color.Clone();
-            _low = color.Clone();
-        }
-
-        public Paint(Color high, Color low) {
-            _high = high.Clone();
-            _low = low.Clone();
+            _color = color.Clone();
         }
         
         public Paint(Action<Signal> exit) {
@@ -35,14 +29,7 @@ namespace api.Devices {
         }
 
         public Paint(Color color, Action<Signal> exit) {
-            _high = color.Clone();
-            _low = color.Clone();
-            MIDIExit = exit;
-        }
-
-        public Paint(Color high, Color low, Action<Signal> exit) {
-            _high = high.Clone();
-            _low = low.Clone();
+            _color = color.Clone();
             MIDIExit = exit;
         }
 
@@ -54,11 +41,7 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Color.Lit) {
-                n.Color.Red = Scale(n.Color.Red, _high.Red, _low.Red);
-                n.Color.Green = Scale(n.Color.Green, _high.Green, _high.Green);
-                n.Color.Blue = Scale(n.Color.Blue, _high.Blue, _high.Blue);
-            }
+            n.Color = _color.Clone();
 
             if (MIDIExit != null)
                 MIDIExit(n);
@@ -70,7 +53,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Paint(Color.Decode(data["high"].ToString()), Color.Decode(data["low"].ToString()));
+            return new Paint(Color.Decode(data["color"].ToString()));
         }
 
         public override string EncodeSpecific() {
@@ -85,11 +68,8 @@ namespace api.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
-                        writer.WritePropertyName("high");
-                        writer.WriteRawValue(_high.Encode());
-
-                        writer.WritePropertyName("low");
-                        writer.WriteRawValue(_low.Encode());
+                        writer.WritePropertyName("color");
+                        writer.WriteRawValue(_color.Encode());
 
                     writer.WriteEndObject();
 
