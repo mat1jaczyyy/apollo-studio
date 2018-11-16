@@ -10,6 +10,9 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
 
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+
 namespace api {
     public static class MIDI {
         public static List<Launchpad> Devices = new List<Launchpad>();
