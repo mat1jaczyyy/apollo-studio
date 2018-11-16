@@ -33,15 +33,9 @@ namespace api.Devices {
             MIDIExit = exit;
         }
 
-        private byte Scale(byte value, byte high, byte low) {
-            if (value == 0)
-                return 0;
-            
-            return (byte)(((high - low) * value) / 63 + low);
-        }
-
         public override void MIDIEnter(Signal n) {
-            n.Color = _color.Clone();
+            if (n.Color.Lit)
+                n.Color = _color.Clone();
 
             if (MIDIExit != null)
                 MIDIExit(n);
