@@ -21,7 +21,7 @@ namespace api {
             }
             set {
                 if (_launchpad != null)
-                    Launchpad.Receive -= MIDIEnter;
+                    _launchpad.Receive -= MIDIEnter;
 
                 _launchpad = value;
                 _launchpad.Receive += MIDIEnter;
@@ -143,6 +143,10 @@ namespace api {
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");
                     }
+                
+                case "port":
+                    Launchpad = MIDI.Devices[Convert.ToInt32(data["index"])];
+                    return new OkObjectResult(Launchpad.Encode());
                 
                 default:
                     return new BadRequestObjectResult("Unknown message type.");

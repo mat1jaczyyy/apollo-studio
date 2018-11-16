@@ -120,6 +120,9 @@ namespace api {
                         case "track":
                             return Tracks[Convert.ToInt32(data["index"])].Request(data["message"].ToString());
                         
+                        case "midi":
+                            return MIDI.Request(data["message"].ToString());
+
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");
                     }

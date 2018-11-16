@@ -66,5 +66,49 @@ namespace api {
                 }
             }
         }
+
+        public static string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("midi");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartArray();
+
+                        for (int i = 0; i < Devices.Count; i++) {
+                            writer.WriteRawValue(Devices[i].Encode());
+                        }
+                    
+                    writer.WriteEndArray();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
+        }
+
+        public static ObjectResult Request(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "midi") return new BadRequestObjectResult("Incorrect recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    return new BadRequestObjectResult("The MIDI object has no members to forward to.");
+                
+                case "rescan":
+                    Rescan();
+                    return new OkObjectResult(Encode());
+
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
+        }
     }
 }

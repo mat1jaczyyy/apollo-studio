@@ -99,21 +99,26 @@ The Set object contains the List of Tracks. It also does file management and sto
     ```
     * response: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
 
-#### `track` object
+#### `midi` object
 
-The Track object contains the top-most Chain of the Track and the currently selected Launchpad used as the Track's input and output. It is found inside of a Set.
+The MIDI object contains a list of available Launchpads. It can be forwarded to from a Set.
 
 ```js
 {
-    "object": "track",
-    "data": {
-        "chain": api.chain,
-        "launchpad": api.launchpad
-    }
+    "object": "midi",
+    "data": array(api.launchpad)
 }
 ```
 
-The Track object currently handles no requests.
+* `rescan`:
+    * Rescans for new MIDI devices and returns the list.
+    * request:
+    ```js
+    {
+        "type": "rescan"
+    }
+    ```
+    * response: A JSON-encoded [MIDI object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#midi-object)
 
 #### `launchpad` object
 
@@ -129,6 +134,31 @@ The Launchpad object represents a physical Launchpad device. It contains the MID
 ```
 
 The Launchpad object currently handles no requests.
+
+#### `track` object
+
+The Track object contains the top-most Chain of the Track and the currently selected Launchpad used as the Track's input and output. It is found inside of a Set.
+
+```js
+{
+    "object": "track",
+    "data": {
+        "chain": api.chain,
+        "launchpad": api.launchpad
+    }
+}
+```
+
+* `port`:
+    * Changes port of Track to given index, corresponding to the index found in MIDI.
+    * request:
+    ```js
+    {
+        "type": "port",
+        "index": int
+    }
+    ```
+    * response: A JSON-encoded [Launchpad object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#launchpad-object)
 
 #### `chain` object
 
