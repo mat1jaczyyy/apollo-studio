@@ -3,4 +3,4 @@
 
 Apollo Studio is an extremely work-in-progress MIDI processing DAW for the lightshow aspect of the Novation Launchpads. The core workflow borrows a lot from Ableton Live's concepts and improves upon them. It supports all 3 major OSes (Windows, macOS and Linux).
 
-For any end-user, this is currently highly unusable, mostly due to the lack of any proper user interface. The only way to use it is to directly load files with Set data or define the Set in `api.Program.Main`. Proper builds and public beta testing for the project will be open as soon as an end-user interface is implemented.
+The api is mostly finished, but the app (UI) lacks most features. We have begun alpha testing while we work on bringing features and fixing bugs. This is currently usable by an end-user, but not recommended for any long-term work due to the possibility of massive changes happening at any point in time.
