@@ -14,9 +14,10 @@ Array.prototype.last = function() {
   return this[this.length - 1]
 }
 
-Raven.config("https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916")
-  .addPlugin(RavenVue, Vue)
-  .install()
+if (process.env.NODE_ENV !== "development")
+  Raven.config("https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916")
+    .addPlugin(RavenVue, Vue)
+    .install()
 
 const resolveUrl = (url, payload) => {
   const path = url.indexOf("/") > 0 ? url.split("/") : [url]

@@ -4,6 +4,19 @@
 </template>
 
 <script>
+const resolveUrl = (path, fullPath) => {
+  path = path.split("/")
+  path.shift()
+  path.shift()
+  path.forEach(e => {
+    if (e.indexOf(":") > 0) {
+      let s = e.split(":")
+      if (s.length > 2 && s[2] === "group") fullPath = fullPath[s[1]].data.data
+      else fullPath = fullPath[s[1]].data
+    } else fullPath = fullPath[e].data || fullPath[e]
+  })
+  return fullPath
+}
 export default {
   inheritAttrs: false,
   props: {
@@ -21,23 +34,7 @@ export default {
   methods: {
     addDevice({ path, device, index }) {
       let self = this
-      console.log(`set/track:0/chain${path}`)
-      const resolveUrl = path => {
-        // const p = path.shift()
-        let fullPath = self.track.data
-        path.forEach(e => {
-          if (e.indexOf(":") > 0) {
-            let s = e.split(":")
-            if (s.length > 2 && s[2] === "group") fullPath = fullPath[s[1]].data.data
-            else fullPath = fullPath[s[1]].data
-          } else fullPath = fullPath[e].data || fullPath[e]
-        })
-        return fullPath
-      }
-      const p = `set/track:0/chain${path}`.split("/")
-      p.shift()
-      p.shift()
-      console.log(index, device, resolveUrl(p))
+      // console.log(`set/track:0/chain${path}`)
 
       this.api(`set/track:0/chain${path}`, {
         type: "add",
@@ -45,8 +42,7 @@ export default {
         index,
       })
         .then(e => {
-          console.log(e)
-          resolveUrl(p).splice(index, 0, e.data)
+          resolveUrl(`set/track:0/chain${path}`, self.track.data).splice(index, 0, e.data)
         })
         .catch(e => console.error(e))
     },
@@ -73,12 +69,13 @@ export default {
     update({ path, type, value }) {
       // this.$emit("update", {
       // console.log("update", {
+      const device = resolveUrl(`set/track:0/chain${path}`, this.track.data)
       this.api(`set/track:0/chain${path}`, {
         type,
         value,
       })
-        .then(e => console.log(e))
         .catch(e => console.error(e))
+        .then(e => (device.data = e.data.data))
     },
   },
 }

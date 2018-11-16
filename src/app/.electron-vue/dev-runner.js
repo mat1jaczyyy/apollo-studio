@@ -157,8 +157,8 @@ function greeting() {
   const cols = process.stdout.columns
   let text = ""
 
-  if (cols > 104) text = "apollo-studio"
-  else if (cols > 76) text = "apollo-|studio"
+  if (cols > 114) text = "apollo-studio"
+  else if (cols > 63) text = "apollo-|studio"
   else text = false
 
   if (text) {

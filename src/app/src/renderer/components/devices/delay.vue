@@ -35,6 +35,7 @@ export default {
     },
   },
   created() {
+    console.log(this.data.data.length, this.data.data.gate * 100)
     this.duration = this.data.data.length
     this.gate = this.data.data.gate * 100
   },
@@ -59,7 +60,7 @@ export default {
     },
     gate(n) {
       this.update("gate", this.gate / 100)
-    }
+    },
   },
   methods: {
     toggle() {

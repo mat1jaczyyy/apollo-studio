@@ -3,7 +3,7 @@
   .chains(v-if="data.data.length > 0")
     div(v-for="(member, key) in data.data" :key="`group>${data.data[show].object}:${key}`"
     :class="{selected: key === show}" @click="show = key") chain {{key}}
-    md-button(@click="init_addDevice('chain', 0)").md-icon-button.md-dense
+    md-button(@click="init_addDevice('chain', data.data.length)").md-icon-button.md-dense
       md-icon add
   chain(v-if="data.data.length > 0" @update="update" :key="`group>chain:${show}`" :chain="data.data[show]" @addDevice="addDevice" :index="show")
   .addgoup(v-else).lonely
@@ -25,6 +25,7 @@ export default {
   }),
   methods: {
     init_addDevice(device, index) {
+      console.log("addDevice", { path: "", device, index })
       this.$emit("addDevice", { path: "", device, index })
     },
     addDevice({ path, device, index }) {
@@ -67,7 +68,7 @@ export default {
     }
   }
   > .chains {
-    padding: 10px 0;
+    padding: 10px;
     > div {
       // color: rgba(255, 255, 255, 0.25);
       opacity: 0.25;
