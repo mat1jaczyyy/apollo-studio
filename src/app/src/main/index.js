@@ -10,7 +10,7 @@ const axios = require("axios")
 let apipath = path.join(
   __dirname,
   process.env.NODE_ENV !== "development"
-    ? "api\\bin\\dist\\win\\api.exe"
+    ? "..\\..\\..\\api\\bin\\dist\\win\\api.exe"
     : "..\\..\\api\\bin\\dist\\win\\api.exe",
 )
 console.log(apipath)
@@ -18,7 +18,7 @@ if (os.platform() === "darwin")
   apipath = path.join(
     __dirname,
     process.env.NODE_ENV !== "development"
-      ? "api//bin//dist//osx//api"
+      ? "..//..//..//api//bin//dist//osx//api"
       : "..//..//api//bin//dist//osx//api",
   )
 
