@@ -69,7 +69,10 @@ let vue = false
 ipcRenderer.on("request", (event, req) => {
   switch (req.url) {
     case "/init":
-      if (vue) vue.track = req.body.data.tracks[0]
+      if (vue) {
+        vue.track = req.body.data.tracks[0]
+        vue.axios.post("http://localhost:1548/api").catch(e => {})
+      }
       break
     default:
       console.log(`sad req@${req.url}`, req)
