@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices;
@@ -18,7 +20,7 @@ namespace api {
         public static List<Launchpad> Devices = new List<Launchpad>();
 
         public static void Rescan() {
-            /* 
+            /*
               The idea here is that we update Devices as MIDI devices are plugged in or out.
             RtMidi doesn't provide any kind of callback function for reporting changes,
             so we must scan manually every x milliseconds and check for changes ourselves.
@@ -26,7 +28,7 @@ namespace api {
             same data instead of updated devices. The second attempt used an async Task that
             would have its thread sleep, but this caused segfaults when the app is idling.
             So, for the time being, this function will have to be called manually.
-            
+
               https://github.com/micdah/RtMidi.Core/issues/18
             */
 
@@ -85,12 +87,12 @@ namespace api {
                         for (int i = 0; i < Devices.Count; i++) {
                             writer.WriteRawValue(Devices[i].Encode());
                         }
-                    
+
                     writer.WriteEndArray();
 
                 writer.WriteEndObject();
             }
-            
+
             return json.ToString();
         }
 
@@ -104,7 +106,7 @@ namespace api {
             switch (data["type"].ToString()) {
                 case "forward":
                     return new BadRequestObjectResult("The MIDI object has no members to forward to.");
-                
+
                 case "rescan":
                     Rescan();
                     return new OkObjectResult(Encode());

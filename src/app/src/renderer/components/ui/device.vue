@@ -1,5 +1,5 @@
 <template lang="pug">
-.device
+.device(:class="{isgroup: data.data.device === 'group'}")
   .frame
     h5 {{data.data.device}}
   .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
@@ -29,7 +29,7 @@ export default {
     },
     update({ path, type, value }) {
       this.$emit("update", {
-      // console.log("update", {
+        // console.log("update", {
         path: `/device:${this.index}:${this.data.data.device}${path}`,
         type,
         value,
@@ -42,7 +42,7 @@ export default {
 <style lang="scss">
 .device {
   height: calc(100% - 5px);
-  min-width: 100px;
+  // min-width: 100px;
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
   margin: 2.5px 0;
@@ -63,6 +63,17 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  &.isgroup {
+    height: 100%;
+    margin: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.125);
+    > .frame {
+      display: none;
+    }
+    > .inner {
+      height: 100%;
+    }
   }
 }
 </style>

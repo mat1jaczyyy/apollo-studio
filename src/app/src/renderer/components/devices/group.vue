@@ -6,8 +6,8 @@
     md-button(@click="init_addDevice('chain', 0)").md-icon-button.md-dense
       md-icon add
   chain(v-if="data.data.length > 0" @update="update" :key="`group>chain:${show}`" :chain="data.data[show]" @addDevice="addDevice" :index="show")
-  .add(v-else).lonely
-    md-button(@click="init_addDevice('chain', 0)").md-icon-button.md-super-dense
+  .addgoup(v-else).lonely
+    md-button(@click="init_addDevice('chain', 0)").md-icon-button.md-dense
       md-icon add
 </template>
 
@@ -46,7 +46,7 @@ export default {
 .group {
   display: flex;
   height: 100%;
-  > .add {
+  > .addgoup {
     height: 100%;
     display: flex;
     justify-content: center;
@@ -57,17 +57,17 @@ export default {
     overflow: hidden;
     opacity: 0;
     &.lonely {
-      width: 28px;
+      width: 32px;
       opacity: 0.5;
       height: unset;
     }
     &:hover {
       opacity: 1;
-      width: 28px;
+      width: 40px;
     }
   }
   > .chains {
-    padding: 10px;
+    padding: 10px 0;
     > div {
       // color: rgba(255, 255, 255, 0.25);
       opacity: 0.25;
