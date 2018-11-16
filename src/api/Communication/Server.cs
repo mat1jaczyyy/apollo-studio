@@ -33,9 +33,15 @@ namespace api.Communication {
                 services.AddMvc();
             }
 
-            public void Configure(IApplicationBuilder app) {
+            public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime) {
                 app.UseCors("AllowAllOrigins");
                 app.UseMvc();
+
+                applicationLifetime.ApplicationStarted.Register(InitializeApplication);
+            }
+
+            public void InitializeApplication() { 
+                Communication.UI.Init();
             }
         }
 
