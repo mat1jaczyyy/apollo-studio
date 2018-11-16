@@ -57,15 +57,27 @@ div#app(:class="{showsettings}")
 
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
     router-view(:track="track").router
+  transition(name="opacity")
+    .overlay(v-if="colorSelector")
+      chrome(v-model="colorSelector" @click="colorResolve(colorSelector.rgba); colorSelector = false")
 </template>
 
 <script>
 // TODO: macos frames, drag padding
 import { remote } from "electron"
 import ls from "local-storage"
+let vue = false
+
+const getColor = org =>
+  new Promise((res, rej) => {
+    if (vue && org) {
+      vue.colorSelector = org
+      vue.colorResolve = res
+    } else rej("no vue")
+  })
+window.getColor = getColor
 
 const { ipcRenderer } = require("electron")
-let vue = false
 ipcRenderer.on("request", (event, req) => {
   switch (req.url) {
     case "/init":
@@ -91,6 +103,8 @@ export default {
     platform: process.platform,
     track: false,
     devOpen: false,
+    colorSelector: false,
+    colorResolve: false,
   }),
   watch: {
     "$store.state.settings.theme": "theme",
@@ -375,6 +389,34 @@ body {
     &.showsettings {
       > .settings {
         @include wnh(100%, calc(100% - 32px));
+      }
+    }
+    > .overlay {
+      position: absolute;
+      z-index: 995;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      > .vc-chrome {
+        transform: none;
+      }
+      &.opacity-enter-active,
+      &.opacity-leave-active,
+      > .vc-chrome {
+        transition: 0.3s;
+      }
+      &.opacity-enter,
+      &.opacity-leave-to {
+        opacity: 0;
+        > .vc-chrome {
+          transform: translateY(32px);
+        }
       }
     }
   }

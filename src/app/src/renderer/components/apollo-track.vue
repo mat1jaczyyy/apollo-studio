@@ -34,7 +34,7 @@ export default {
   methods: {
     addDevice({ path, device, index }) {
       let self = this
-      // console.log(`set/track:0/chain${path}`)
+      console.log(`set/track:0/chain${path} wants ${device}`)
 
       this.api(`set/track:0/chain${path}`, {
         type: "add",

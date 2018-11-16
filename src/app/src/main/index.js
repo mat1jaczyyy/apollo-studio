@@ -5,6 +5,8 @@ const os = require("os")
 const server = express()
 const path = require("path")
 const proc = require("child_process").spawn
+const axios = require("axios")
+
 let apipath = path.join(
   __dirname,
   process.env.NODE_ENV !== "development"
@@ -30,7 +32,13 @@ let finishload = false
 server.use((req, res) => {
   if (finishload) mainWindow.webContents.send("request", req)
   else missedRequests.push(req)
-  if (req.url === "/init") mainWindow.show()
+  if (req.url === "/init")
+    axios
+      .post(`http://localhost:1548/api`)
+      .then(e => {
+        mainWindow.show()
+      })
+      .catch(e => console.error(e))
   res.send(200)
 })
 server.listen(1549)
@@ -99,8 +107,8 @@ app.on("activate", () => {
 })
 
 function startApi() {
-  const apiProcess = proc(apipath)
   createWindow()
+  const apiProcess = proc(apipath)
   apiProcess.stdout.on("data", data => {
     writeLog(`api: ${data}`)
   })

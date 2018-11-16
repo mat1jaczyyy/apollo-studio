@@ -1,5 +1,5 @@
 <template lang="pug">
-svg(xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewbox='0 0 200 200' width="200" height="200")
+svg(xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewbox='0 0 200 200' width="200" height="200").launchpad
   g(data-name='Group 5' style="transform: scale(.22)")
     rect(data-name='Rectangle 2' width='909' height='909' rx='20' fill="#242424")
     g(data-name='Group 3' transform='translate(-62 -29)')

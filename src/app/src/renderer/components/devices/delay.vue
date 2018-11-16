@@ -1,5 +1,5 @@
 <template lang="pug">
-main.delay
+.delay
   .duration
     h4 Duration
     dial(v-if="!sync" :value.sync="duration" :exponent="5.9068906" :size="50" :width="7" :min="10" :max="30000" @rclick="toggle" :color="$store.state.themes[$store.state.settings.theme].dial1")
@@ -35,7 +35,6 @@ export default {
     },
   },
   created() {
-    console.log(this.data.data.length, this.data.data.gate * 100)
     this.duration = this.data.data.length
     this.gate = this.data.data.gate * 100
   },
@@ -56,10 +55,10 @@ export default {
         if (self.duration > self.max) self.duration = self.max
         else if (self.duration < self.min) self.duration = self.min
       }
-      self.update("length", self.duration)
+      if (self.duration !== self.data.data.length) self.update("length", self.duration)
     },
     gate(n) {
-      this.update("gate", this.gate / 100)
+      if (this.gate / 100 !== this.data.data.gate) this.update("gate", this.gate / 100)
     },
   },
   methods: {
@@ -67,6 +66,7 @@ export default {
       this.sync = !this.sync
     },
     update: throttle(function(type, value) {
+      console.log("update")
       this.$emit("update", {
         path: "",
         type,
@@ -79,10 +79,8 @@ export default {
 
 <style lang="scss">
 main.delay {
-  display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   .duration {
     margin-bottom: 10px;
   }

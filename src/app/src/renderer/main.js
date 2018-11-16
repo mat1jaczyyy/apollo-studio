@@ -10,6 +10,9 @@ import axios from "axios"
 import Raven from "raven-js"
 import RavenVue from "raven-js/plugins/vue"
 
+// import { Chrome } from "vue-color"
+// Vue.component("colorselector", Chrome)
+
 Array.prototype.last = function() {
   return this[this.length - 1]
 }

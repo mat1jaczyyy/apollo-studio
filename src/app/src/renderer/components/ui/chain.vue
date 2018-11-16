@@ -5,7 +5,7 @@
       md-button(md-menu-trigger).md-icon-button.md-super-dense
         md-icon add
       md-menu-content
-        md-menu-item(v-for="item in $store.state.av_devices" :key="item" @click="init_addDevice(item, 0)") {{item}}
+        md-menu-item(v-for="(item, keyy) in $store.state.av_devices" :key="item" @click="init_addDevice(keyy, 0)") {{keyy}}
   template(v-for="(device, key) in chain.data")
     device(:data="device" @addDevice="addDevice" @update="update" :index="key" :key="`device>${device.data.device}:${key}`")
     .add
@@ -13,7 +13,7 @@
         md-button(md-menu-trigger).md-icon-button.md-super-dense
           md-icon add
         md-menu-content
-          md-menu-item(v-for="item in $store.state.av_devices" :key="item" @click="init_addDevice(item, key + 1)") {{item}}
+          md-menu-item(v-for="(item, keyy) in $store.state.av_devices" :key="item" @click="init_addDevice(keyy, key + 1)") {{keyy}}
 </template>
 
 <script>
@@ -38,7 +38,7 @@ export default {
     },
     update({ path, type, value }) {
       this.$emit("update", {
-      // console.log("update", {
+        // console.log("update", {
         path,
         type,
         value,

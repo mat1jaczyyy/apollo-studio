@@ -3,7 +3,7 @@
   .frame
     h5 {{data.data.device}}
   .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
-    component(:is="data.data.device" :data="data.data" @addDevice="addDevice" @update="update")
+    component(:is="$store.state.av_devices[data.data.device]" :data="data.data" @addDevice="addDevice" @update="update")
 </template>
 
 <script>
@@ -63,6 +63,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    > div {
+      display: flex;
+      flex-direction: column;
+    }
   }
   &.isgroup {
     height: 100%;
