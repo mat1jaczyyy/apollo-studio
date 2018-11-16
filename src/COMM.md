@@ -215,6 +215,23 @@ The Device object is a generic object that holds a device identifier and the par
 
 The Device object currently handles no requests.
 
+#### `color` object
+
+The Color object holds a definition for a color suitable for showing on the Launchpad. It has 3 6-bit color channels. It is usually found inside devices that modify the color of an incoming signal (such as Paint).
+
+```js
+{
+    "object": "color",
+    "data": {
+        "red": int, // [0, 63]
+        "green": int, // [0, 63]
+        "blue": int // [0, 63]
+    }
+}
+```
+
+The Color object currently handles no requests.
+
 ### Devices
 
 Devices are a subset of the Device object and the most important unit of the Apollo hierarchy. Their job is to process and shape incoming signals to produce proper light effects.
@@ -290,6 +307,32 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     }
     ```
     * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+
+#### `paint` device
+
+The Paint device applies a specific color to incoming signals if they are lit.
+
+```js
+{
+    "device": "paint",
+    "data": {
+        "color": api.color
+    }
+}
+```
+
+* `color`:
+    * Updates color to given value.
+    * request: 
+    ```js
+    {
+        "type": "color",
+        "red": int, // [0, 63]
+        "green": int, // [0, 63]
+        "blue": int // [0, 63]
+    }
+    ```
+    * response: A JSON-encoded [Paint device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#paint-device)
 
 ## app (Electron)
 
