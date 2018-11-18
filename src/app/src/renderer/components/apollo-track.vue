@@ -66,14 +66,12 @@ export default {
         })
       })
     },
-    update({ path, type, value }) {
+    update({ path, data }) {
       // this.$emit("update", {
       // console.log("update", {
+      console.log(data)
       const device = resolveUrl(`set/track:0/chain${path}`, this.track.data)
-      this.api(`set/track:0/chain${path}`, {
-        type,
-        value,
-      })
+      this.api(`set/track:0/chain${path}`, data)
         .catch(e => console.error(e))
         .then(e => (device.data = e.data.data))
     },

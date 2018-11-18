@@ -66,11 +66,13 @@ export default {
       this.sync = !this.sync
     },
     update: throttle(function(type, value) {
-      console.log("update")
+      // console.log("update", {
       this.$emit("update", {
         path: "",
-        type,
-        value,
+        data: {
+          type,
+          value,
+        },
       })
     }, 100),
   },

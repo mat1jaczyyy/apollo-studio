@@ -16,6 +16,7 @@ export default new Vuex.Store({
     strings: {
       dialPointerLock: "Lock pointer while adjusting dials",
       theme: "Theme",
+      alwaysOnTop: "Always on top",
     },
     av_devices: {
       delay: "delay",

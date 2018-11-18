@@ -31,12 +31,11 @@ export default {
     addDevice({ path, device, index }) {
       this.$emit("addDevice", { path: `/chain:${this.show}${path}`, device, index })
     },
-    update({ path, type, value }) {
+    update({ path, data }) {
       this.$emit("update", {
-      // console.log("update", {
+        // console.log("update", {
         path: `/chain:${this.show}${path}`,
-        type,
-        value,
+        data,
       })
     },
   },

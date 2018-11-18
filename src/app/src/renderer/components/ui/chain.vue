@@ -36,12 +36,11 @@ export default {
     addDevice({ path, device, index }) {
       this.$emit("addDevice", { path, device, index })
     },
-    update({ path, type, value }) {
+    update({ path, data }) {
       this.$emit("update", {
         // console.log("update", {
         path,
-        type,
-        value,
+        data,
       })
     },
   },

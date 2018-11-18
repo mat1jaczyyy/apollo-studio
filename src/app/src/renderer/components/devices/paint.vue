@@ -29,7 +29,17 @@ export default {
   }),
   watch: {
     high() {
-      this.hexToRgb(this.high)
+      const rgb = this.hexToRgb(this.high),
+        factor = 63 / 255
+      this.$emit("update", {
+        path: "",
+        data: {
+          type: "color",
+          red: Math.round(rgb[0] * factor),
+          green: Math.round(rgb[1] * factor),
+          blue: Math.round(rgb[2] * factor),
+        },
+      })
     },
   },
   methods: {

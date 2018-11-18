@@ -108,6 +108,13 @@ export default {
   }),
   watch: {
     "$store.state.settings.theme": "theme",
+    "$store.state.settings.alwaysOnTop"(n) {
+      if (n) {
+        this.window.setAlwaysOnTop(true)
+      } else {
+        this.window.setAlwaysOnTop(false)
+      }
+    },
   },
   created() {
     vue = this

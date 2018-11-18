@@ -27,12 +27,11 @@ export default {
         index,
       })
     },
-    update({ path, type, value }) {
+    update({ path, data }) {
       this.$emit("update", {
         // console.log("update", {
         path: `/device:${this.index}:${this.data.data.device}${path}`,
-        type,
-        value,
+        data,
       })
     },
   },
