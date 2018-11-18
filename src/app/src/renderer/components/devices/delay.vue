@@ -78,7 +78,7 @@ export default {
 </script>
 
 <style lang="scss">
-main.delay {
+.delay {
   justify-content: center;
   align-items: center;
   .duration {
