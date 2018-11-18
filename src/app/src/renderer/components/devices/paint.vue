@@ -3,7 +3,7 @@
   .high
     h4 color
     .color
-      .inner(:style="{background: `rgb(${high.r}, ${high.g}, ${high.b})`}" @click="color")
+      .inner(:style="{background: high}" @click="color")
   //- .low
   //-   h4 low
   //-   .color
@@ -20,21 +20,22 @@ export default {
   },
   name: "apollo-paint",
   data: () => ({
-    high: {
-      r: 255,
-      g: 255,
-      b: 255,
-    },
-    low: {
-      r: 255,
-      g: 255,
-      b: 255,
-    },
+    high: "#fff",
+    // low: {
+    //   r: 255,
+    //   g: 255,
+    //   b: 255,
+    // },
   }),
+  watch: {
+    high() {
+      this.hexToRgb(this.high)
+    },
+  },
   methods: {
     color() {
       let self = this
-      getColor(this.high).then(e => (self.high = e))
+      getColor(this.high).then(e => (self.high = e.hex || e))
     },
   },
 }
@@ -42,7 +43,9 @@ export default {
 
 <style lang="scss">
 .paint {
-  display: none;
+  // display: none;
+  display: flex;
+  flex-direction: column;
   > .high {
     display: flex;
     justify-content: center;

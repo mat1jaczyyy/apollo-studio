@@ -59,7 +59,7 @@ div#app(:class="{showsettings}")
     router-view(:track="track").router
   transition(name="opacity")
     .overlay(v-if="colorSelector")
-      chrome(v-model="colorSelector" @click="colorResolve(colorSelector.rgba); colorSelector = false")
+      chrome(v-model="colorSelector" @click="colorResolve(colorSelector); colorSelector = false")
 </template>
 
 <script>
@@ -250,8 +250,8 @@ export default {
   width: 0 !important;
 }
 .md-switch {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 .md-menu-content {
   z-index: 99;

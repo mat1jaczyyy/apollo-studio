@@ -7,6 +7,7 @@ Vue.use(Vuex)
 const default_settings = {
   dialPointerLock: true,
   theme: "pretty dark",
+  alwaysOnTop: true,
 }
 
 export default new Vuex.Store({
@@ -19,7 +20,7 @@ export default new Vuex.Store({
     av_devices: {
       delay: "delay",
       group: "group",
-      // paint: "paint",
+      paint: "paint",
     },
     themes: {
       "pretty dark": {
