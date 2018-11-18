@@ -58,8 +58,8 @@ div#app(:class="{showsettings}")
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
     router-view(:track="track").router
   transition(name="opacity")
-    .overlay(v-if="colorSelector")
-      chrome(v-model="colorSelector" @click="colorResolve(colorSelector); colorSelector = false")
+    .overlay(v-if="colorSelector" @click="closeColorSelector")
+      chrome(v-model="colorSelector" @click="colorPromise.res(colorSelector); colorSelector = false")
 </template>
 
 <script>
@@ -72,7 +72,7 @@ const getColor = org =>
   new Promise((res, rej) => {
     if (vue && org) {
       vue.colorSelector = org
-      vue.colorResolve = res
+      vue.colorPromise = { res, rej }
     } else rej("no vue")
   })
 window.getColor = getColor
@@ -104,7 +104,7 @@ export default {
     track: false,
     devOpen: false,
     colorSelector: false,
-    colorResolve: false,
+    colorPromise: false,
   }),
   watch: {
     "$store.state.settings.theme": "theme",
@@ -123,6 +123,12 @@ export default {
     this.theme()
   },
   methods: {
+    closeColorSelector(e) {
+      if (!e.target.closest(".vc-chrome")) {
+        this.colorSelector = false
+        this.colorPromise.rej("nope")
+      }
+    },
     toggleDevTools() {
       if (!this.window.isDevToolsOpened()) {
         this.window.openDevTools()

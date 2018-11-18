@@ -34,6 +34,15 @@ export default {
         data,
       })
     },
+    delete() {
+      this.$emit("update", {
+        path: "",
+        data: {
+          type: "remove",
+          index: this.index,
+        },
+      })
+    },
   },
 }
 </script>

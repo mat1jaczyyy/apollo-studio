@@ -45,7 +45,9 @@ export default {
   methods: {
     color() {
       let self = this
-      getColor(this.high).then(e => (self.high = e.hex || e))
+      getColor(this.high)
+        .then(e => (self.high = e.hex || e))
+        .catch(e => {})
     },
   },
 }
