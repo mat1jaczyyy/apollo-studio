@@ -66,7 +66,7 @@ function createWindow() {
     width: 750,
     // x: 0,
     // y: 0,
-    // minWidth: 685,
+    minWidth: 500,
     height: 292,
     width: 685,
     backgroundColor: "#212121",

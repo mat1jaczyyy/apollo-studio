@@ -8,6 +8,7 @@ const default_settings = {
   dialPointerLock: true,
   theme: "pretty dark",
   alwaysOnTop: true,
+  chainAlignLeft: false,
 }
 
 export default new Vuex.Store({
@@ -17,6 +18,7 @@ export default new Vuex.Store({
       dialPointerLock: "Lock pointer while adjusting dials",
       theme: "Theme",
       alwaysOnTop: "Always on top",
+      chainAlignLeft: "Align track to the left of the window",
     },
     av_devices: {
       delay: "delay",

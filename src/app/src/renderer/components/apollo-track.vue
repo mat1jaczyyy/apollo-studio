@@ -1,6 +1,7 @@
 <template lang="pug">
 .track(v-if="track")
-  chain(:chain="track.data.chain" @update="update" @addDevice="addDevice" :index="false").og
+  chain(:chain="track.data.chain" @update="update" @addDevice="addDevice" :index="false"
+    :class="{left: $store.state.settings.chainAlignLeft}").og
 </template>
 
 <script>
@@ -85,6 +86,9 @@ export default {
   > .chain.og {
     height: calc(100% - 5px * 2);
     margin: 5px 0;
+    &.left {
+      justify-content: flex-start;
+    }
   }
 }
 </style>

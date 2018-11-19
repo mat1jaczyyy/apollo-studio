@@ -378,9 +378,23 @@ body {
     > .settings {
       transition: 1s var(--ease);
       @include wnh(100%, 0);
+      opacity: 0;
       > .inner {
         @include wnh;
-        padding: 15px 25px;
+        padding: 0 25px;
+        transition: 1s var(--ease);
+        overflow-y: overlay;
+        &::-webkit-scrollbar-track {
+          background-color: transparent;
+        }
+        &::-webkit-scrollbar {
+          width: 5px;
+          background-color: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color: #fff;
+          border-radius: 5px;
+        }
         > .setting {
           display: flex;
           justify-content: space-between;
@@ -399,6 +413,10 @@ body {
     &.showsettings {
       > .settings {
         @include wnh(100%, calc(100% - 32px));
+        opacity: 1;
+        > .inner {
+          padding: 15px 25px;
+        }
       }
     }
     > .overlay {
