@@ -123,15 +123,18 @@ function greeting() {
   const cols = process.stdout.columns
   let text = ""
 
-  if (cols > 115) text = "alpha|software"
+  if (cols > 75) text = "manem|jeff :)"
+  else if (cols > 56) text = "name|jeff"
   else text = false
 
   if (text && !isCI) {
     say(text, {
-      colors: ["yellow"],
-      font: "simple3d",
+      background: "yellow",
+      colors: ["blueBright", "red"],
+      align: "center",
+      font: "huge",
       space: false,
     })
-  } else console.log(chalk.yellow.bold("\n  lets-build"))
+  } else console.log(chalk.yellow.bold("\n  name is jeff"))
   console.log()
 }

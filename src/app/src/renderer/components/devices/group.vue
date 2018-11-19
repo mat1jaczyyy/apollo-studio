@@ -5,7 +5,9 @@
     :class="{selected: key === show}" @click="show = key") chain {{key}}
     md-button(@click="init_addDevice('chain', data.data.length)").md-icon-button.md-dense
       md-icon add
-  chain(v-if="data.data.length > 0" @update="update" :key="`group>chain:${show}`" :chain="data.data[show]" @addDevice="addDevice" :index="show")
+  template(v-if="data.data.length > 0")
+    transition(name="device")
+      chain(@update="update" :key="`group>chain:${show}`" :chain="data.data[show]" @addDevice="addDevice" :index="show")
   .addgoup(v-else).lonely
     md-button(@click="init_addDevice('chain', 0)").md-icon-button.md-dense
       md-icon add
@@ -46,6 +48,25 @@ export default {
 .group {
   display: flex;
   height: 100%;
+  > .chain {
+    &.device-enter-active,
+    &.device-leave-active {
+      transition: 0.3s var(--ease);
+      > .device {
+        transition: 0.3s var(--ease);
+      }
+    }
+    &.device-enter,
+    &.device-leave-to {
+      margin: 0;
+      > .device,
+      > .add {
+        opacity: 0;
+        width: 0;
+        box-shadow: none;
+      }
+    }
+  }
   > .addgoup {
     height: 100%;
     display: flex;

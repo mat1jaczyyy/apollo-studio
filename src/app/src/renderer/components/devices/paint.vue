@@ -18,6 +18,16 @@ export default {
       required: true,
     },
   },
+  created() {
+    const self = this,
+      color = self.data.data.color.data,
+      hex = self.rgbToHex({
+        red: Math.round(color.red / self.factor),
+        green: Math.round(color.green / self.factor),
+        blue: Math.round(color.blue / self.factor),
+      })
+    self.high = hex
+  },
   name: "apollo-paint",
   data: () => ({
     high: "#fff",
@@ -26,28 +36,32 @@ export default {
     //   g: 255,
     //   b: 255,
     // },
+    factor: 63 / 255,
   }),
   watch: {
-    high() {
-      const rgb = this.hexToRgb(this.high),
-        factor = 63 / 255
-      this.$emit("update", {
+    high(n) {
+      if (!n) return
+      const self = this
+      const rgb = self.hexToRgb(n)
+      self.$emit("update", {
         path: "",
         data: {
           type: "color",
-          red: Math.round(rgb[0] * factor),
-          green: Math.round(rgb[1] * factor),
-          blue: Math.round(rgb[2] * factor),
+          red: Math.round(rgb[0] * self.factor),
+          green: Math.round(rgb[1] * self.factor),
+          blue: Math.round(rgb[2] * self.factor),
         },
       })
     },
   },
   methods: {
     color() {
-      let self = this
-      getColor(this.high)
-        .then(e => (self.high = e.hex || e))
-        .catch(e => {})
+      const self = this
+      const org = self.high
+      const call = e => {
+        if (e) self.high = e.hex
+      }
+      getColor({ org, call })
     },
   },
 }

@@ -58,8 +58,8 @@ div#app(:class="{showsettings}")
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
     router-view(:track="track").router
   transition(name="opacity")
-    .overlay(v-if="colorSelector" @click="closeColorSelector")
-      chrome(v-model="colorSelector" @click="colorPromise.res(colorSelector); colorSelector = false")
+    .overlay(v-if="colorSelector" @mousedown="closeColorSelector")
+      chrome(v-model="colorSelector" @click="colorPromise.call(colorSelector); colorSelector = false; colorPromise = false")
 </template>
 
 <script>
@@ -68,13 +68,12 @@ import { remote } from "electron"
 import ls from "local-storage"
 let vue = false
 
-const getColor = org =>
-  new Promise((res, rej) => {
-    if (vue && org) {
-      vue.colorSelector = org
-      vue.colorPromise = { res, rej }
-    } else rej("no vue")
-  })
+const getColor = ({ org, call }) => {
+  if (vue && org) {
+    vue.colorSelector = org
+    vue.colorPromise = { call, unwatch: vue.$watch("colorSelector", n => call(n)) }
+  }
+}
 window.getColor = getColor
 
 const { ipcRenderer } = require("electron")
@@ -109,11 +108,8 @@ export default {
   watch: {
     "$store.state.settings.theme": "theme",
     "$store.state.settings.alwaysOnTop"(n) {
-      if (n) {
-        this.window.setAlwaysOnTop(true)
-      } else {
-        this.window.setAlwaysOnTop(false)
-      }
+      if (n) this.window.setAlwaysOnTop(true)
+      else this.window.setAlwaysOnTop(false)
     },
   },
   created() {
@@ -126,7 +122,8 @@ export default {
     closeColorSelector(e) {
       if (!e.target.closest(".vc-chrome")) {
         this.colorSelector = false
-        this.colorPromise.rej("nope")
+        this.colorPromise.unwatch()
+        this.colorPromise = false
       }
     },
     toggleDevTools() {
