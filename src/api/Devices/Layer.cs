@@ -73,7 +73,24 @@ namespace api.Devices {
         }
 
         public override ObjectResult RequestSpecific(string jsonString) {
-            throw new NotImplementedException();
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != "layer") return new BadRequestObjectResult("Incorrect device recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    return new BadRequestObjectResult("The Layer object has no members to forward to.");
+                
+                case "target":
+                    Target = Convert.ToInt32(data["value"]);
+                    return new OkObjectResult(EncodeSpecific());
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }

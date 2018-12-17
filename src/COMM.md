@@ -308,6 +308,30 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     ```
     * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
 
+#### `layer` device
+
+The Layer device applies a target layer index to incoming signals.
+
+```js
+{
+    "device": "layer",
+    "data": {
+        "target": int // [-∞, +∞]
+    }
+}
+```
+
+* `target`:
+    * Updates target to given value.
+    * request: 
+    ```js
+    {
+        "type": "target",
+        "value": int // [-∞, +∞]
+    }
+    ```
+    * response: A JSON-encoded [Layer device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#layer-device)
+
 #### `paint` device
 
 The Paint device applies a specific color to incoming signals if they are lit.
