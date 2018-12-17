@@ -13,7 +13,9 @@ const default_settings = {
 
 export default new Vuex.Store({
   state: {
-    settings: ls("settings") ? Object.assign(default_settings, ls("settings")) : default_settings,
+    settings: ls("settings")
+      ? Object.assign(default_settings, ls("settings"))
+      : default_settings,
     strings: {
       dialPointerLock: "Lock pointer while adjusting dials",
       theme: "Theme",
@@ -24,6 +26,8 @@ export default new Vuex.Store({
       delay: "delay",
       group: "group",
       paint: "paint",
+      translation: "translation",
+      layer: "layer",
     },
     themes: {
       "pretty dark": {
@@ -43,10 +47,13 @@ export default new Vuex.Store({
         dial2: "#9a6b6b",
       },
       "my eyes hurt": {
-        background1: "#edff00",
-        background2: "#004aff",
+        background1:
+          "radial-gradient(ellipse at center, #e9ff02 1%,#00bbff 49%,#ff0000 100%)",
+        background2:
+          "linear-gradient(to bottom, #e9ff02 1%,#00bbff 49%,#ff0000 100%)",
         text: "#25ff00",
-        device: "#e402b2",
+        device:
+          "radial-gradient(ellipse at center, #e402b2 0%,#00ff11 49%,#ff0000 100%)",
         dial1: "#00ff34",
         dial2: "#ff4400",
       },

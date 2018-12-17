@@ -1,19 +1,19 @@
 <template lang="pug">
-.translation
-  .offset
-    h4 offset
-    dial(:value.sync="offset" :exponent="1" :size="50" :width="7" :min="-99" :max="99" :decimals="1" :color="$store.state.themes[$store.state.settings.theme].dial1")
+.layer
+  .target
+    h4 target
+    dial(:value.sync="target" :exponent="1" :size="50" :width="7" :min="-69" :max="69" :decimals="1" :color="$store.state.themes[$store.state.settings.theme].dial1")
     .values
-      a(@click="offset += -1") -
+      a(@click="target += -1") -
       md-field
-        md-input(@input.native="offset = Number($event.target.value) || 0" :value="offset")
-      a(@click="offset += 1") +
+        md-input(@input.native="target = Number($event.target.value) || 0" :value="target")
+      a(@click="target += 1") +
 </template>
 
 <script>
 import throttle from "lodash/throttle"
 export default {
-  name: "translation",
+  name: "layer",
   props: {
     data: {
       type: Object,
@@ -22,16 +22,16 @@ export default {
   },
   created() {
     console.log(this.data)
-    this.offset = this.data.data.offset
+    this.target = this.data.data.target
   },
   data: () => ({
     step: 7,
-    offset: 0
+    target: 0
   }),
   watch: {
-    offset(n) {
-      if (this.offset !== this.data.data.offset)
-        this.update("offset", this.offset)
+    target(n) {
+      if (this.target !== this.data.data.target)
+        this.update("target", this.target)
     }
   },
   methods: {
@@ -50,10 +50,10 @@ export default {
 </script>
 
 <style lang="scss">
-.translation {
+.layer {
   justify-content: center;
   align-items: center;
-  > .offset {
+  > .target {
     display: flex;
     align-items: center;
     flex-direction: column;
