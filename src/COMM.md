@@ -334,6 +334,30 @@ The Paint device applies a specific color to incoming signals if they are lit.
     ```
     * response: A JSON-encoded [Paint device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#paint-device)
 
+#### `translation` device
+
+The Translation device applies an index offset to incoming signals.
+
+```js
+{
+    "device": "translation",
+    "data": {
+        "offset": int // [-99, 99]
+    }
+}
+```
+
+* `offset`:
+    * Updates offset to given value.
+    * request: 
+    ```js
+    {
+        "type": "offset",
+        "value": int // [-99, 99]
+    }
+    ```
+    * response: A JSON-encoded [Translation device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#translation-device)
+
 ## app (Electron)
 
 All requests towards the app should target `localhost:1549`. The request URI is different for each kind of request.

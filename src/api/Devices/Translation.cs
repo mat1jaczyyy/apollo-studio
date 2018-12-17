@@ -19,7 +19,7 @@ namespace api.Devices {
                 return _offset;
             }
             set {
-                if (-127 <= value && value <= 127)
+                if (-99 <= value && value <= 99)
                     _offset = value;
             }
         }
@@ -47,7 +47,7 @@ namespace api.Devices {
             int result = n.Index + _offset;
 
             if (result < 0) result = 0;
-            if (result > 127) result = 127;
+            if (result > 99) result = 99;
 
             n.Index = (byte)result;
 
@@ -88,7 +88,24 @@ namespace api.Devices {
         }
 
         public override ObjectResult RequestSpecific(string jsonString) {
-            throw new NotImplementedException();
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
+            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != "translation") return new BadRequestObjectResult("Incorrect device recipient for message.");
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+
+            switch (data["type"].ToString()) {
+                case "forward":
+                    return new BadRequestObjectResult("The Translation object has no members to forward to.");
+                
+                case "offset":
+                    Offset = Convert.ToInt32(data["value"]);
+                    return new OkObjectResult(EncodeSpecific());
+                
+                default:
+                    return new BadRequestObjectResult("Unknown message type.");
+            }
         }
     }
 }
