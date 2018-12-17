@@ -70,7 +70,7 @@ export default {
     update({ path, data }) {
       // this.$emit("update", {
       // console.log("update", {
-      console.log(data)
+      // console.log(data)
       const device = resolveUrl(`set/track:0/chain${path}`, this.track.data)
       this.api(`set/track:0/chain${path}`, data)
         .catch(e => console.error(e))

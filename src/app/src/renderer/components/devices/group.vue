@@ -89,6 +89,7 @@ export default {
   }
   > .chains {
     padding: 10px;
+    width: 80px;
     > div {
       // color: rgba(255, 255, 255, 0.25);
       opacity: 0.25;

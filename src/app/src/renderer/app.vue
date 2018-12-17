@@ -59,7 +59,7 @@ div#app(:class="{showsettings}")
     router-view(:track="track").router
   transition(name="opacity")
     .overlay(v-if="colorSelector" @mousedown="closeColorSelector")
-      chrome(v-model="colorSelector" @click="colorPromise.call(colorSelector); colorSelector = false; colorPromise = false")
+      chrome(v-model="colorSelector" @matgay="closeColorSelector" @click="colorPromise.call(colorSelector); colorSelector = false; colorPromise = false")
 </template>
 
 <script>
@@ -71,7 +71,13 @@ let vue = false
 const getColor = ({ org, call }) => {
   if (vue && org) {
     vue.colorSelector = org
-    vue.colorPromise = { call, unwatch: vue.$watch("colorSelector", n => call(n)) }
+    if (vue.colorPromise && vue.colorPromise.unwatch) {
+      vue.colorPromise.unwatch()
+    }
+    vue.colorPromise = {
+      call,
+      unwatch: vue.$watch("colorSelector", n => call(n))
+    }
   }
 }
 window.getColor = getColor
@@ -103,14 +109,14 @@ export default {
     track: false,
     devOpen: false,
     colorSelector: false,
-    colorPromise: false,
+    colorPromise: false
   }),
   watch: {
     "$store.state.settings.theme": "theme",
     "$store.state.settings.alwaysOnTop"(n) {
       if (n) this.window.setAlwaysOnTop(true)
       else this.window.setAlwaysOnTop(false)
-    },
+    }
   },
   created() {
     vue = this
@@ -120,7 +126,7 @@ export default {
   },
   methods: {
     closeColorSelector(e) {
-      if (!e.target.closest(".vc-chrome")) {
+      if ((typeof e === "boolean" && e) || !e.target.closest(".vc-chrome")) {
         this.colorSelector = false
         this.colorPromise.unwatch()
         this.colorPromise = false
@@ -173,33 +179,33 @@ export default {
       const dialog_options = {
         title: "open apollo-studio save",
         buttonLabel: ":)",
-        filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }],
+        filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }]
       }
       if (o === "new")
         self
           .api("set", {
-            type: "new",
+            type: "new"
           })
           .then(e => (self.track = e.data.data.tracks[0]))
           .catch(e => console.log(e))
       else if (o === "open") {
         remote.dialog.showOpenDialog(
           Object.assign({}, dialog_options, {
-            properties: ["openFile"],
+            properties: ["openFile"]
           }),
           path =>
             self
               .api("set", {
                 type: "open",
-                path: path[0],
+                path: path[0]
               })
               .then(e => (self.track = e.data.data.tracks[0]))
-              .catch(e => console.log(e)),
+              .catch(e => console.log(e))
         )
       } else if (o === "save") {
         self
           .api("set", {
-            type: "save",
+            type: "save"
           })
           .then(e => console.log(e))
           .catch(e => console.log(e))
@@ -208,14 +214,14 @@ export default {
           self
             .api("set", {
               type: "save_as",
-              path,
+              path
             })
             .then(e => console.log(e))
-            .catch(e => console.log(e)),
+            .catch(e => console.log(e))
         )
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -228,7 +234,7 @@ export default {
   (
     primary: #bbbbbb,
     accent: #0288d1,
-    theme: dark,
+    theme: dark
   )
 );
 // quart cubic beziers, very nice.
