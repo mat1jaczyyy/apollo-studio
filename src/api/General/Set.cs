@@ -31,7 +31,9 @@ namespace api {
         public static void New() {
             Close();
             Tracks.Add(new Track());
-            Set.Tracks[0].Launchpad = MIDI.Devices[0];
+            
+            Set.Tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
+
             _path = "";
         }
 
