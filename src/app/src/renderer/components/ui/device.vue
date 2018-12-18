@@ -2,7 +2,10 @@
 transition(name="device")
   .device(:class="{isgroup: data.data.device === 'group'}")
     .frame
-      h5 {{data.data.device}}
+      .title
+        h5 {{data.data.device}}
+      .close(@click="deletedevice")
+        i.material-icons close
     .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
       component(:is="$store.state.av_devices[data.data.device]" :data="data.data" @addDevice="addDevice" @update="update")
 </template>
@@ -35,7 +38,7 @@ export default {
         data,
       })
     },
-    delete() {
+    deletedevice() {
       this.$emit("update", {
         path: "",
         data: {
@@ -74,6 +77,51 @@ export default {
     justify-content: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.125);
+    > .title,
+    > .close {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 0.3s;
+      transition-delay: 0;
+    }
+    > .title {
+      width: 100%;
+      > h5 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    > .close {
+      width: 0%;
+      opacity: 0;
+      > i {
+        font-size: 0;
+        transition: 0.3s;
+      }
+    }
+    &:hover {
+      > .title,
+      > .close {
+        transition-delay: 0.25s;
+      }
+      > .title {
+        width: 85%;
+        > h5 {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      > .close {
+        width: 25%;
+        opacity: 1;
+        > i {
+          font-size: 1em;
+        }
+      }
+    }
   }
   > .inner {
     height: calc(100% - 1.25em);

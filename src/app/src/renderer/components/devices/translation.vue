@@ -21,7 +21,6 @@ export default {
     }
   },
   created() {
-    console.log(this.data)
     this.offset = this.data.data.offset
   },
   data: () => ({

@@ -35,7 +35,7 @@ export default {
   methods: {
     addDevice({ path, device, index }) {
       let self = this
-      console.log(`set/track:0/chain${path} wants ${device}`)
+      // console.log(`set/track:0/chain${path} wants ${device}`)
 
       this.api(`set/track:0/chain${path}`, {
         type: "add",
@@ -43,7 +43,11 @@ export default {
         index,
       })
         .then(e => {
-          resolveUrl(`set/track:0/chain${path}`, self.track.data).splice(index, 0, e.data)
+          resolveUrl(`set/track:0/chain${path}`, self.track.data).splice(
+            index,
+            0,
+            e.data
+          )
         })
         .catch(e => console.error(e))
     },
@@ -74,7 +78,10 @@ export default {
       const device = resolveUrl(`set/track:0/chain${path}`, this.track.data)
       this.api(`set/track:0/chain${path}`, data)
         .catch(e => console.error(e))
-        .then(e => (device.data = e.data.data))
+        .then(e => {
+          if (data.type === "remove") device.splice(data.index, 1)
+          device.data = e.data.data
+        })
     },
   },
 }
