@@ -1,3 +1,7 @@
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 using api;
 
 namespace api {
@@ -73,6 +77,32 @@ namespace api {
             Index = (byte)index;
             Color = color;
             Layer = layer;
+        }
+
+        public string Encode() {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("signal");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+                    
+                        writer.WritePropertyName("index");
+                        writer.WriteValue(_p);
+                        
+                        writer.WritePropertyName("color");
+                        writer.WriteValue(Color.Encode());
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            return json.ToString();
         }
 
         public override string ToString() {

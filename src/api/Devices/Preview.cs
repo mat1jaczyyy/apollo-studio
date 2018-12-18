@@ -23,7 +23,8 @@ namespace api.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            MIDIExit(n);
+            if (MIDIExit != null)
+                MIDIExit(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {
@@ -66,6 +67,11 @@ namespace api.Devices {
                 case "forward":
                     return new BadRequestObjectResult("The Preview object has no members to forward to.");
                 
+                case "signal":
+                    Signal n = new Signal(Convert.ToByte(data["index"]), new Color(63));
+                    MIDIEnter(n.Clone());
+                    return new OkObjectResult(n.Encode());
+
                 default:
                     return new BadRequestObjectResult("Unknown message type.");
             }
