@@ -32,6 +32,8 @@ namespace api.Devices {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != "infinity") return null;
             
+            // Infinity device has no data to parse
+
             return new Infinity();
         }
 
