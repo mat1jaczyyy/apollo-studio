@@ -53,6 +53,17 @@ div#app(:class="{showsettings}")
         h4 Open DevTools
         md-button(v-if="!devOpen" @click="toggleDevTools") open
         md-button(v-else @click="toggleDevTools") close
+      .setting(v-if="ports")
+        h4 Change Port
+        md-menu(md-size="medium" md-align-trigger)
+          md-button(md-menu-trigger) {{port}}
+          md-menu-content
+            md-menu-item(v-for="(port, key) in ports.data" :key="port.data.port" @click="setport(key)") {{port.data.port}}
+          //- md-field
+          //-   md-input(:value="track.data.launchpad.data.port" @input.native="port = $event.target.value" placeholder="port")
+          //- md-button(@click="setport") set
+
+
 
 
   .content(:style="{background: $store.state.themes[$store.state.settings.theme].background2}")
@@ -76,7 +87,7 @@ const getColor = ({ org, call }) => {
     }
     vue.colorPromise = {
       call,
-      unwatch: vue.$watch("colorSelector", n => call(n))
+      unwatch: vue.$watch("colorSelector", n => call(n)),
     }
   }
 }
@@ -88,6 +99,7 @@ ipcRenderer.on("request", (event, req) => {
     case "/init":
       if (vue) {
         vue.track = req.body.data.tracks[0]
+        vue.port = vue.track.data.launchpad.data.port
         vue.axios.post("http://localhost:1548/api").catch(e => {})
       }
       break
@@ -109,17 +121,23 @@ export default {
     track: false,
     devOpen: false,
     colorSelector: false,
-    colorPromise: false
+    colorPromise: false,
+    port: "",
+    ports: false,
   }),
   watch: {
     "$store.state.settings.theme": "theme",
     "$store.state.settings.alwaysOnTop"(n) {
       if (n) this.window.setAlwaysOnTop(true)
       else this.window.setAlwaysOnTop(false)
-    }
+    },
   },
   created() {
     vue = this
+    const self = this
+    this.api("set/midi", {
+      type: "rescan",
+    }).then(e => (self.ports = e.data))
   },
   mounted() {
     this.theme()
@@ -179,33 +197,39 @@ export default {
       const dialog_options = {
         title: "open apollo-studio save",
         buttonLabel: ":)",
-        filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }]
+        filters: [{ name: "apollo-studio savefiles", extensions: ["aps"] }],
       }
       if (o === "new")
         self
           .api("set", {
-            type: "new"
+            type: "new",
           })
-          .then(e => (self.track = e.data.data.tracks[0]))
+          .then(e => {
+            self.track = e.data.data.tracks[0]
+            vue.port = self.track.data.launchpad.data.port
+          })
           .catch(e => console.log(e))
       else if (o === "open") {
         remote.dialog.showOpenDialog(
           Object.assign({}, dialog_options, {
-            properties: ["openFile"]
+            properties: ["openFile"],
           }),
           path =>
             self
               .api("set", {
                 type: "open",
-                path: path[0]
+                path: path[0],
               })
-              .then(e => (self.track = e.data.data.tracks[0]))
+              .then(e => {
+                self.track = e.data.data.tracks[0]
+                vue.port = self.track.data.launchpad.data.port
+              })
               .catch(e => console.log(e))
         )
       } else if (o === "save") {
         self
           .api("set", {
-            type: "save"
+            type: "save",
           })
           .then(e => console.log(e))
           .catch(e => console.log(e))
@@ -214,14 +238,26 @@ export default {
           self
             .api("set", {
               type: "save_as",
-              path
+              path,
             })
             .then(e => console.log(e))
             .catch(e => console.log(e))
         )
       }
-    }
-  }
+    },
+    setport(index) {
+      const self = this
+      self
+        .api(`set/track:0`, {
+          type: "port",
+          index,
+        })
+        .then(data => {
+          self.port = data.data.data.port
+        })
+        .catch(e => console.error(e))
+    },
+  },
 }
 </script>
 
@@ -234,7 +270,7 @@ export default {
   (
     primary: #bbbbbb,
     accent: #0288d1,
-    theme: dark
+    theme: dark,
   )
 );
 // quart cubic beziers, very nice.
@@ -412,6 +448,12 @@ body {
           }
           > button {
             margin: 0;
+          }
+          > .text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
           }
         }
       }
