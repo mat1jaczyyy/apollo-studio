@@ -294,18 +294,42 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
 {
     "device": "delay",
     "data": {
-        "length": int, // base duration in ms, [10, 30000]
-        "gate": Decimal // gate multiplier in %, [0, 4]
+        "mode": bool, // false if using time, true if using length
+        "length": int, // base length index, [0, 9]
+        "time": int, // base duration in ms, [10, 30000]
+        "gate": Decimal // gate multiplier, [0, 4]
     }
 }
 ```
+
+* `mode`:
+    * Updates mode parameter (use length or time) to given value.
+    * request: 
+    ```js
+    {
+        "type": "time",
+        "value": int // [0, 9]
+    }
+    ```
+    * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
 
 * `length`:
     * Updates length parameter to given value.
     * request: 
     ```js
     {
-        "type": "length",
+        "type": "time",
+        "value": int // [0, 9]
+    }
+    ```
+    * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+
+* `time`:
+    * Updates time parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "time",
         "value": int // [10, 30000]
     }
     ```
@@ -317,7 +341,7 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     ```js
     {
         "type": "gate",
-        "value": int // [0, 4]
+        "value": Decimal // [0, 4]
     }
     ```
     * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)

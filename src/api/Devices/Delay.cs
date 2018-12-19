@@ -149,7 +149,7 @@ namespace api.Devices {
                         writer.WriteValue(Mode);
 
                         writer.WritePropertyName("length");
-                        writer.WriteValue(Length.Value);
+                        writer.WriteValue(Convert.ToInt32(Math.Log(Length.Value, 2)) + 7);
 
                         writer.WritePropertyName("time");
                         writer.WriteValue(_time);
@@ -182,7 +182,7 @@ namespace api.Devices {
                     return new OkObjectResult(EncodeSpecific());
 
                 case "length":
-                    Length = new Length(Convert.ToInt32(data["value"]) + 7);
+                    Length = new Length(Convert.ToInt32(data["value"]) - 7);
                     return new OkObjectResult(EncodeSpecific());
 
                 case "time":
