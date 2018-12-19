@@ -215,9 +215,23 @@ The Device object is a generic object that holds a device identifier and the par
 
 The Device object currently handles no requests.
 
+#### `signal` object
+
+The Signal object travels through the chain from device to device. It is created from an incoming note from the Launchpad, and is converted into SysEx before outputting back to the Launchpad. It contains a button index and the corresponding color object.
+
+```js
+{
+    "object": "signal",
+    "data": {
+        "index": int, // [0, 99]
+        "color": api.color
+    }
+}
+```
+
 #### `color` object
 
-The Color object holds a definition for a color suitable for showing on the Launchpad. It has 3 6-bit color channels. It is usually found inside devices that modify the color of an incoming signal (such as Paint).
+The Color object holds a definition for a color suitable for showing on the Launchpad. It has 3 6-bit color channels. It is usually found inside devices that modify the color of an incoming Signal (such as Paint).
 
 ```js
 {
@@ -357,6 +371,28 @@ The Paint device applies a specific color to incoming signals if they are lit.
     }
     ```
     * response: A JSON-encoded [Paint device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#paint-device)
+
+#### `preview` device
+
+The Preview device uses a grid to display incoming signals and can be used to generate signals manually inside a Chain.
+
+```js
+{
+    "device": "preview",
+    "data": {}
+}
+```
+
+* `signal`:
+    * Generates a Signal and outputs it to the right. Requested upon clicking a button on the grid.
+    * request: 
+    ```js
+    {
+        "type": "signal",
+        "index": int // [0, 99]
+    }
+    ```
+    * response: A JSON-encoded [Signal object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#signal-object)
 
 #### `translation` device
 
