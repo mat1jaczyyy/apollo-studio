@@ -17,8 +17,8 @@ export default {
     min: Number,
     arrowOffset: {
       type: Number,
-      default: 1
-    }
+      default: 1,
+    },
   },
   computed: {
     val: {
@@ -32,7 +32,7 @@ export default {
         } else {
           return v
         }
-      }
+      },
     },
     labelId() {
       return `input__label__${this.label}__${Math.random()
@@ -41,7 +41,7 @@ export default {
     },
     labelSpanText() {
       return this.labelText || this.label
-    }
+    },
   },
   methods: {
     update(e) {
@@ -81,7 +81,7 @@ export default {
           e.preventDefault()
         }
       }
-    }
+    },
     // **** unused
     // handleDrag (e) {
     //   console.log(e)
@@ -89,7 +89,7 @@ export default {
     // handleMouseDown (e) {
     //   console.log(e)
     // }
-  }
+  },
 }
 </script>
 

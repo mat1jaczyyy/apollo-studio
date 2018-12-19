@@ -106,6 +106,18 @@ export default {
   }
   > .chains {
     padding: 10px;
+    overflow-y: auto;
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    &::-webkit-scrollbar {
+      width: 5px;
+      background-color: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #fff;
+      border-radius: 5px;
+    }
     // width: 7em;
     > div {
       // color: rgba(255, 255, 255, 0.25);

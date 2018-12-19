@@ -15,7 +15,7 @@ div(role='application' aria-label='Chrome color picker' :class="['vc-chrome', di
     .vc-chrome-fields-wrap(v-if='!disableFields')
       .vc-chrome-fields(v-show='fieldsIndex === 0')
         .vc-chrome-field
-          ed-in(label='select' :value='colors.hex' @change='inputChange' @matgay="e => $emit('matgay', e)")
+          ed-in(label='hex' :value='colors.hex' @change='inputChange' @matgay="e => $emit('matgay', e)")
 
 </template>
 
@@ -33,24 +33,24 @@ export default {
   props: {
     disableAlpha: {
       type: Boolean,
-      default: false
+      default: false,
     },
     disableFields: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   components: {
     saturation,
     hue,
     alpha,
     "ed-in": editableInput,
-    checkboard
+    checkboard,
   },
   data() {
     return {
       fieldsIndex: 0,
-      highlight: false
+      highlight: false,
     }
   },
   computed: {
@@ -59,7 +59,7 @@ export default {
       return {
         h: h.toFixed(),
         s: `${(s * 100).toFixed()}%`,
-        l: `${(l * 100).toFixed()}%`
+        l: `${(l * 100).toFixed()}%`,
       }
     },
     activeColor() {
@@ -68,13 +68,14 @@ export default {
     },
     hasAlpha() {
       return this.colors.a < 1
-    }
+    },
   },
   methods: {
     childChange(data) {
       this.colorChange(data)
     },
     inputChange(data) {
+      console.log(data)
       if (!data) {
         return
       }
@@ -82,7 +83,7 @@ export default {
         this.isValidHex(data.hex) &&
           this.colorChange({
             hex: data.hex,
-            source: "hex"
+            source: "hex",
           })
       } else if (data.r || data.g || data.b || data.a) {
         this.colorChange({
@@ -90,7 +91,7 @@ export default {
           g: data.g || this.colors.rgba.g,
           b: data.b || this.colors.rgba.b,
           a: data.a || this.colors.rgba.a,
-          source: "rgba"
+          source: "rgba",
         })
       } else if (data.h || data.s || data.l) {
         const s = data.s ? data.s.replace("%", "") / 100 : this.colors.hsl.s
@@ -100,7 +101,7 @@ export default {
           h: data.h || this.colors.hsl.h,
           s,
           l,
-          source: "hsl"
+          source: "hsl",
         })
       }
     },
@@ -116,8 +117,8 @@ export default {
     },
     hideHighlight() {
       this.highlight = false
-    }
-  }
+    },
+  },
 }
 </script>
 
