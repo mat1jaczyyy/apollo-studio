@@ -12,19 +12,22 @@ using api;
 
 namespace api.Devices {
     public class Delay: Device {
-        // TODO: Step-based delays (musical notation)
-        private int _length = 500; // milliseconds
+        public bool Mode = false; // true uses Length
+        public Length Length = new Length();
+
+        private int _time = 500;
         private Decimal _gate = 1;
+
         private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
-        public int Length {
+        public int Time {
             get {
-                return _length;
+                return _time;
             }
             set {
                 if (10 <= value && value <= 30000)
-                    _length = value;
+                    _time = value;
             }
         }
 
@@ -39,15 +42,30 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Delay(_length, _gate);
+            return new Delay(Mode, Length, _time, _gate);
         }
 
         public Delay() {
             _timerexit = new TimerCallback(Tick);
         }
 
-        public Delay(int length, Decimal gate) {
+        public Delay(int time, Decimal gate) {
             _timerexit = new TimerCallback(Tick);
+            Time = time;
+            Gate = gate;
+        }
+
+        public Delay(Length length, Decimal gate) {
+            _timerexit = new TimerCallback(Tick);
+            Mode = true;
+            Length = length;
+            Gate = gate;
+        }
+
+        public Delay(bool mode, Length length, int time, Decimal gate) {
+            _timerexit = new TimerCallback(Tick);
+            Mode = mode;
+            Time = time;
             Length = length;
             Gate = gate;
         }
@@ -57,8 +75,25 @@ namespace api.Devices {
             MIDIExit = exit;
         }
 
-        public Delay(int length, Decimal gate, Action<Signal> exit) {
+        public Delay(int time, Decimal gate, Action<Signal> exit) {
             _timerexit = new TimerCallback(Tick);
+            Time = time;
+            Gate = gate;
+            MIDIExit = exit;
+        }
+
+        public Delay(Length length, Decimal gate, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
+            Mode = true;
+            Length = length;
+            Gate = gate;
+            MIDIExit = exit;
+        }
+
+        public Delay(bool mode, Length length, int time, Decimal gate, Action<Signal> exit) {
+            _timerexit = new TimerCallback(Tick);
+            Mode = mode;
+            Time = time;
             Length = length;
             Gate = gate;
             MIDIExit = exit;
@@ -82,7 +117,7 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             try {
-                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32(_length * _gate), System.Threading.Timeout.Infinite));
+                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), System.Threading.Timeout.Infinite));
             } catch {
                 if (api.Program.log)
                     Console.WriteLine($"ERR ** Delay Enqueue skipped");
@@ -95,7 +130,7 @@ namespace api.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
-            return new Delay(Convert.ToInt32(data["length"]), Convert.ToInt32(data["gate"]));
+            return new Delay(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]));
         }
 
         public override string EncodeSpecific() {
@@ -110,8 +145,14 @@ namespace api.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(Mode);
+
                         writer.WritePropertyName("length");
-                        writer.WriteValue(_length);
+                        writer.WriteValue(Length.Value);
+
+                        writer.WritePropertyName("time");
+                        writer.WriteValue(_time);
 
                         writer.WritePropertyName("gate");
                         writer.WriteValue(_gate);
@@ -136,8 +177,16 @@ namespace api.Devices {
                 case "forward":
                     return new BadRequestObjectResult("The Delay object has no members to forward to.");
                 
+                case "mode":
+                    Mode = Convert.ToBoolean(data["value"]);
+                    return new OkObjectResult(EncodeSpecific());
+
                 case "length":
-                    Length = Convert.ToInt32(data["value"]);
+                    Length = new Length(Convert.ToInt32(data["value"]) + 7);
+                    return new OkObjectResult(EncodeSpecific());
+
+                case "time":
+                    Time = Convert.ToInt32(data["value"]);
                     return new OkObjectResult(EncodeSpecific());
 
                 case "gate":

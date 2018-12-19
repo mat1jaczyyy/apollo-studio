@@ -6,7 +6,19 @@ using api;
 
 namespace api {
     public class Length {
-        public Decimal Value = 1 / 4;
+        private Decimal _value = (Decimal)0.25;
+        
+        public Decimal Value {
+            get {
+                return _value;
+            }
+            set {
+                if ((Decimal)0.0078125 <= value && value <= (Decimal)4)
+                    _value = value;
+            }
+        }
+
+        public Length() {}
 
         public Length(int exponent) {
             Value = Convert.ToDecimal(Math.Pow(2, exponent));
