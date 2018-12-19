@@ -149,7 +149,7 @@ namespace api.Devices {
                         writer.WriteValue(Mode);
 
                         writer.WritePropertyName("length");
-                        writer.WriteValue(Convert.ToInt32(Math.Log(Length.Value, 2)) + 7);
+                        writer.WriteValue(Convert.ToInt32(Math.Log(Convert.ToDouble(Length.Value), 2)) + 7);
 
                         writer.WritePropertyName("time");
                         writer.WriteValue(_time);
