@@ -12,19 +12,35 @@ using api;
 
 namespace api.Devices {
     public class Preview: Device {
+        private Pixel[] screen = new Pixel[128];
+
         public override Device Clone() {
             return new Preview();
         }
 
-        public Preview() {}
+        public Preview() {
+            for (int i = 0; i < 128; i++)
+                screen[i] = new Pixel(PreviewExit);
+        }
 
         public Preview(Action<Signal> exit) {
+            for (int i = 0; i < 128; i++)
+                screen[i] = new Pixel(PreviewExit);
+            
             MIDIExit = exit;
         }
 
+        public void PreviewExit(Signal n) {
+            // TODO: Request app drawing
+        }
+
         public override void MIDIEnter(Signal n) {
+            Signal m = n.Clone();
+
             if (MIDIExit != null)
                 MIDIExit(n);
+            
+            screen[m.Index].MIDIEnter(m);
         }
 
         public static Device DecodeSpecific(string jsonString) {

@@ -31,26 +31,23 @@ namespace api {
         public Track() {
             Chain = new Chain(ChainExit);
 
-            for (int i = 0; i < 128; i++) {
+            for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel(MIDIExit);
-            }
         }
 
         public Track(Chain init) {
             Chain = init;
             Chain.MIDIExit = ChainExit;
             
-            for (int i = 0; i < 128; i++) {
+            for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel(MIDIExit);
-            }
         }
 
         public Track(Launchpad launchpad) {
             Chain = new Chain(ChainExit);
 
-            for (int i = 0; i < 128; i++) {
+            for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel(MIDIExit);
-            }
 
             Launchpad = launchpad;
             Launchpad.Receive += MIDIEnter;
