@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using api.Devices;
 
 namespace api {
-    public class Track {
+    public class Track: Container {
         public Chain Chain;
         private Launchpad _launchpad;
         private Pixel[] screen = new Pixel[128];
@@ -29,7 +29,7 @@ namespace api {
         }
 
         public Track() {
-            Chain = new Chain() {MIDIExit = ChainExit};
+            Chain = new Chain() {Parent = this, MIDIExit = ChainExit};
 
             for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
@@ -37,6 +37,7 @@ namespace api {
 
         public Track(Chain init) {
             Chain = init;
+            Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
             
             for (int i = 0; i < 128; i++)
@@ -44,7 +45,7 @@ namespace api {
         }
 
         public Track(Launchpad launchpad) {
-            Chain = new Chain() {MIDIExit = ChainExit};
+            Chain = new Chain() {Parent = this, MIDIExit = ChainExit};
 
             for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
@@ -55,6 +56,7 @@ namespace api {
 
         public Track(Chain init, Launchpad launchpad) {
             Chain = init;
+            Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
             
             for (int i = 0; i < 128; i++)

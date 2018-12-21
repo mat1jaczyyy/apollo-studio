@@ -15,8 +15,12 @@ namespace api {
         private List<Device> _devices = new List<Device>();
         private Action<Signal> _chainenter = null;
         private Action<Signal> _midiexit = null;
+        public Container Parent = null;
 
         private void Reroute() {
+            for (int i = 0; i < _devices.Count; i++)
+                _devices[i].Parent = this;
+            
             if (_devices.Count == 0)
                 _chainenter = _midiexit;
 
@@ -29,9 +33,6 @@ namespace api {
                 
                 _devices[_devices.Count - 1].MIDIExit = _midiexit;
             }
-
-            for (int i = 0; i < _devices.Count; i++)
-                _devices[i].Parent = this;
         }
 
         public Device this[int index] {

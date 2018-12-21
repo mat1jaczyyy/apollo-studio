@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using api;
 
 namespace api.Devices {
-    public class Group: Device {
+    public class Group: Device, Container {
         private List<Chain> _chains = new List<Chain>();
 
         public Chain this[int index] {
@@ -20,6 +20,7 @@ namespace api.Devices {
             }
             set {
                 _chains[index] = value;
+                _chains[index].Parent = this;
                 _chains[index].MIDIExit = ChainExit;
             }
         }
@@ -31,29 +32,32 @@ namespace api.Devices {
         }
 
         public override Device Clone() {
-            return new Group((from chain in _chains select chain.Clone()).ToList());
+            return new Group((from i in _chains select i.Clone()).ToList());
         }
 
         public void Insert(int index) {
-            _chains.Insert(index, new Chain() {MIDIExit = ChainExit});
+            _chains.Insert(index, new Chain() {Parent = this, MIDIExit = ChainExit});
         }
 
         public void Insert(int index, Chain chain) {
+            chain.Parent = this;
             chain.MIDIExit = ChainExit;
             _chains.Insert(index, chain);
         }
 
         public void Add() {
-            _chains.Add(new Chain() {MIDIExit = ChainExit});
+            _chains.Add(new Chain() {Parent = this, MIDIExit = ChainExit});
         }
 
         public void Add(Chain chain) {
+            chain.Parent = this;
             chain.MIDIExit = ChainExit;
             _chains.Add(chain);  
         }
 
         public void Add(Chain[] chains) {
             foreach (Chain chain in chains) {
+                chain.Parent = this;
                 chain.MIDIExit = ChainExit;
                 _chains.Add(chain);
             }     
