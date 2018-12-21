@@ -63,7 +63,7 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public override ObjectResult RequestSpecific(string jsonString) {
+        public override ObjectResult RespondSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
             if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");

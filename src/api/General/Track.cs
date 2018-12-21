@@ -125,7 +125,7 @@ namespace api {
             return json.ToString();
         }
 
-        public ObjectResult Request(string jsonString) {
+        public ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
             if (json["recipient"].ToString() != "track") return new BadRequestObjectResult("Incorrect recipient for message.");
@@ -136,7 +136,7 @@ namespace api {
                 case "forward":
                     switch (data["forward"].ToString()) {
                         case "chain":
-                            return Chain.Request(data["message"].ToString());
+                            return Chain.Respond(data["message"].ToString());
                         
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");

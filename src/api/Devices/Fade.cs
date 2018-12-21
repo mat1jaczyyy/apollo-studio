@@ -173,7 +173,7 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public override ObjectResult RequestSpecific(string jsonString) {
+        public override ObjectResult RespondSpecific(string jsonString) {
             throw new NotImplementedException();
         }
     }

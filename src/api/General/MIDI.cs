@@ -96,7 +96,7 @@ namespace api {
             return json.ToString();
         }
 
-        public static ObjectResult Request(string jsonString) {
+        public static ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
             if (json["recipient"].ToString() != "midi") return new BadRequestObjectResult("Incorrect recipient for message.");

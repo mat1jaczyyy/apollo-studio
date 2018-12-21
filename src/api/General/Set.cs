@@ -109,7 +109,7 @@ namespace api {
             return json.ToString();
         }
 
-        public static ObjectResult Request(string jsonString) {
+        public static ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
             if (json["recipient"].ToString() != "set") return new BadRequestObjectResult("Incorrect recipient for message.");
@@ -120,10 +120,10 @@ namespace api {
                 case "forward":
                     switch (data["forward"].ToString()) {
                         case "track":
-                            return Tracks[Convert.ToInt32(data["index"])].Request(data["message"].ToString());
+                            return Tracks[Convert.ToInt32(data["index"])].Respond(data["message"].ToString());
                         
                         case "midi":
-                            return MIDI.Request(data["message"].ToString());
+                            return MIDI.Respond(data["message"].ToString());
 
                         default:
                             return new BadRequestObjectResult("Incorrectly formatted message.");

@@ -60,7 +60,7 @@ namespace api.Communication {
             string request = Encoding.UTF8.GetString(buffer);
             api.Program.Log($"REQ -> {request}");
 
-            ObjectResult response = (this.Request.ContentLength == 0)? new OkObjectResult(null) : Set.Request(request);
+            ObjectResult response = (this.Request.ContentLength == 0)? new OkObjectResult(null) : Set.Respond(request);
             if (response.Value != null) api.Program.Log($"RSP <- {response.Value.ToString()}"); 
 
             return response;

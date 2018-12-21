@@ -50,6 +50,6 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public abstract ObjectResult RequestSpecific(string jsonString);
+        public abstract ObjectResult RespondSpecific(string jsonString);
     }
 }
