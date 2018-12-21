@@ -307,8 +307,8 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     * request: 
     ```js
     {
-        "type": "time",
-        "value": int // [0, 9]
+        "type": "mode",
+        "value": bool // false if using time, true if using length
     }
     ```
     * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
