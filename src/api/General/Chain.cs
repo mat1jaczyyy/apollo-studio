@@ -17,14 +17,21 @@ namespace api {
         private Action<Signal> _midiexit = null;
 
         private void Reroute() {
-            if (_devices.Count == 0) {
+            if (_devices.Count == 0)
                 _chainenter = _midiexit;
-            } else {
+
+            else {
                 _chainenter = _devices[0].MIDIEnter;
-                for (int i = 1; i < _devices.Count; i++)
+                
+                for (int i = 1; i < _devices.Count; i++) {
                     _devices[i - 1].MIDIExit = _devices[i].MIDIEnter;
+                }
+                
                 _devices[_devices.Count - 1].MIDIExit = _midiexit;
             }
+
+            for (int i = 0; i < _devices.Count; i++)
+                _devices[i].Parent = this;
         }
 
         public Device this[int index] {
@@ -54,10 +61,7 @@ namespace api {
         }
 
         public Chain Clone() {
-            Chain ret = new Chain();
-            foreach (Device device in _devices)
-                ret.Add(device.Clone());
-            return ret;
+            return new Chain((from i in _devices select i.Clone()).ToList());
         }
 
         public void Insert(int index, Device device) {

@@ -16,6 +16,7 @@ namespace api.Devices {
         public abstract void MIDIEnter(Signal n);
         public abstract Device Clone();
         public Action<Signal> MIDIExit = null;
+        public Chain Parent = null;
         
         public static Device Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
