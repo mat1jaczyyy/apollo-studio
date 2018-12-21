@@ -29,10 +29,10 @@ namespace api {
         }
 
         public Track() {
-            Chain = new Chain(ChainExit);
+            Chain = new Chain() {MIDIExit = ChainExit};
 
             for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel(MIDIExit);
+                screen[i] = new Pixel() {MIDIExit = MIDIExit};
         }
 
         public Track(Chain init) {
@@ -40,14 +40,14 @@ namespace api {
             Chain.MIDIExit = ChainExit;
             
             for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel(MIDIExit);
+                screen[i] = new Pixel() {MIDIExit = MIDIExit};
         }
 
         public Track(Launchpad launchpad) {
-            Chain = new Chain(ChainExit);
+            Chain = new Chain() {MIDIExit = ChainExit};
 
             for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel(MIDIExit);
+                screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
             Launchpad.Receive += MIDIEnter;
@@ -57,9 +57,8 @@ namespace api {
             Chain = init;
             Chain.MIDIExit = ChainExit;
             
-            for (int i = 0; i < 128; i++) {
-                screen[i] = new Pixel(MIDIExit);
-            }
+            for (int i = 0; i < 128; i++)
+                screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
             Launchpad.Receive += MIDIEnter;

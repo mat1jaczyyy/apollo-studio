@@ -35,7 +35,7 @@ namespace api.Devices {
         }
 
         public void Insert(int index) {
-            _chains.Insert(index, new Chain(ChainExit));
+            _chains.Insert(index, new Chain() {MIDIExit = ChainExit});
         }
 
         public void Insert(int index, Chain chain) {
@@ -44,7 +44,7 @@ namespace api.Devices {
         }
 
         public void Add() {
-            _chains.Add(new Chain(ChainExit));
+            _chains.Add(new Chain() {MIDIExit = ChainExit});
         }
 
         public void Add(Chain chain) {

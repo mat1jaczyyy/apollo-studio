@@ -11,10 +11,6 @@ namespace api {
 
         public Pixel() {}
 
-        public Pixel(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
         public void MIDIEnter(Signal n) {
             lock (locker) {
                 int layer = -n.Layer;

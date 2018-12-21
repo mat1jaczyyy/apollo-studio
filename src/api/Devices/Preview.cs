@@ -20,7 +20,7 @@ namespace api.Devices {
 
         public Preview() {
             for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel(PreviewExit);
+                screen[i] = new Pixel() {MIDIExit = PreviewExit};
         }
 
         public void PreviewExit(Signal n) {

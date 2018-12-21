@@ -97,23 +97,6 @@ namespace api {
             Reroute();
         }
 
-        public Chain(Action<Signal> exit) {
-            _midiexit = exit;
-            Reroute();
-        }
-
-        public Chain(Device[] init, Action<Signal> exit) {
-            _devices = init.ToList();
-            _midiexit = exit;
-            Reroute();
-        }
-
-        public Chain(List<Device> init, Action<Signal> exit) {
-            _devices = init;
-            _midiexit = exit;
-            Reroute();
-        }
-
         public void MIDIEnter(Signal n) {
             if (_chainenter != null)
                 _chainenter(n);
