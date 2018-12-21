@@ -24,15 +24,6 @@ namespace api.Devices {
             Target = target;
         }
 
-        public Layer(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Layer(int target, Action<Signal> exit) {
-            Target = target;
-            MIDIExit = exit;
-        }
-
         public override void MIDIEnter(Signal n) {
             n.Layer = Target;
             

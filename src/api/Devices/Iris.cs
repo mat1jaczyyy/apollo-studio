@@ -62,43 +62,6 @@ namespace api.Devices {
             Colors = colors;
         }
 
-        public Iris(Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            MIDIExit = exit;
-        }
-
-        public Iris(int rate, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Rate = rate;
-            MIDIExit = exit;
-        }
-
-        public Iris(Color[] colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Colors = colors.ToList();
-            MIDIExit = exit;
-        }
-
-        public Iris(List<Color> colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Colors = colors;
-            MIDIExit = exit;
-        }
-
-        public Iris(int rate, Color[] colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Rate = rate;
-            Colors = colors.ToList();
-            MIDIExit = exit;
-        }
-
-        public Iris(int rate, List<Color> colors, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Rate = rate;
-            Colors = colors;
-            MIDIExit = exit;
-        }
-
         private void Tick(object info) {
             if (info.GetType() == typeof((byte, int))) {
                 (byte index, int i) = ((byte, int))info;

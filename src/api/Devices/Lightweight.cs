@@ -227,17 +227,6 @@ namespace api.Devices {
             Path = path;
         }
 
-        public Lightweight(Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            MIDIExit = exit;
-        }
-
-        public Lightweight(string path, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Path = path;
-            MIDIExit = exit;
-        }
-
         private void Tick(object info) {
             if (info.GetType() == typeof(int)) {
                 Signal n = _signals[(int)info].Clone();

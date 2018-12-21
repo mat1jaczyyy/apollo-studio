@@ -18,10 +18,6 @@ namespace api.Devices {
 
         public Infinity() {}
 
-        public Infinity(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)
                 if (MIDIExit != null)

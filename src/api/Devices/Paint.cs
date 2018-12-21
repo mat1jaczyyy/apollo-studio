@@ -23,15 +23,6 @@ namespace api.Devices {
         public Paint(Color color) {
             _color = color.Clone();
         }
-        
-        public Paint(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Paint(Color color, Action<Signal> exit) {
-            _color = color.Clone();
-            MIDIExit = exit;
-        }
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)

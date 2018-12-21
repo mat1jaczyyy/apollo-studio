@@ -34,15 +34,6 @@ namespace api.Devices {
             Offset = offset;
         }
 
-        public Translation(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Translation(int offset, Action<Signal> exit) {
-            Offset = offset;
-            MIDIExit = exit;
-        }
-
         public override void MIDIEnter(Signal n) {
             int result = n.Index + _offset;
 

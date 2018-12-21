@@ -54,20 +54,6 @@ namespace api.Devices {
             Offsets = offsets;
         }
 
-        public Duplication(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Duplication(int[] offsets, Action<Signal> exit) {
-            Offsets = offsets.ToList();
-            MIDIExit = exit;
-        }
-
-        public Duplication(List<int> offsets, Action<Signal> exit) {
-            Offsets = offsets;
-            MIDIExit = exit;
-        }
-
         public override void MIDIEnter(Signal n) {
             if (MIDIExit != null)
                 MIDIExit(n);

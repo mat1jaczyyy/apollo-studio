@@ -70,35 +70,6 @@ namespace api.Devices {
             Gate = gate;
         }
 
-        public Delay(Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            MIDIExit = exit;
-        }
-
-        public Delay(int time, Decimal gate, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            Gate = gate;
-            MIDIExit = exit;
-        }
-
-        public Delay(Length length, Decimal gate, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Mode = true;
-            Length = length;
-            Gate = gate;
-            MIDIExit = exit;
-        }
-
-        public Delay(bool mode, Length length, int time, Decimal gate, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Mode = mode;
-            Time = time;
-            Length = length;
-            Gate = gate;
-            MIDIExit = exit;
-        }
-
         private void Tick(object info) {
             if (info.GetType() == typeof(Signal)) {
                 Signal n = (Signal)info;

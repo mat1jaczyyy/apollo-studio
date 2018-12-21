@@ -30,17 +30,6 @@ namespace api.Devices {
                 _filter = init;
         }
 
-        public Filter(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Filter(bool[] init, Action<Signal> exit) {
-            if (init.Length == 128)
-                _filter = init;
-            
-            MIDIExit = exit;
-        }
-
         public override void MIDIEnter(Signal n) {
             if (_filter[n.Index])
                 if (MIDIExit != null)

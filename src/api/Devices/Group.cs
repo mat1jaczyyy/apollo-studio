@@ -73,20 +73,6 @@ namespace api.Devices {
             Add(init.ToArray());
         }
 
-        public Group(Action<Signal> exit) {
-            MIDIExit = exit;
-        }
-
-        public Group(Chain[] init, Action<Signal> exit) {
-            Add(init);
-            MIDIExit = exit;
-        }
-
-        public Group(List<Chain> init, Action<Signal> exit) {
-            Add(init.ToArray());
-            MIDIExit = exit;
-        }
-
         private void ChainExit(Signal n) {
             if (MIDIExit != null)
                 MIDIExit(n);

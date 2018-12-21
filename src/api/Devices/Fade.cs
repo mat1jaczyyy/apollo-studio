@@ -80,14 +80,6 @@ namespace api.Devices {
             Generate();
         }
 
-        public Fade(int time, List<Color> colors, List<Decimal> positions, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            _colors = colors;
-            MIDIExit = exit;
-            Generate();
-        }
-
         private void Tick(object info) {
             if (info.GetType() == typeof((byte, int, int))) {
                 (byte index, int i, int j) = ((byte, int, int))info;

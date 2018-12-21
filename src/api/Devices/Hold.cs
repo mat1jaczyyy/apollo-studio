@@ -39,17 +39,6 @@ namespace api.Devices {
             Length = length;
         }
 
-        public Hold(Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            MIDIExit = exit;
-        }
-
-        public Hold(int length, Action<Signal> exit) {
-            _timerexit = new TimerCallback(Tick);
-            Length = length;
-            MIDIExit = exit;
-        }
-
         private void Tick(object info) {
             if (info.GetType() == typeof(byte)) {
                 Signal n = new Signal((byte)info, new Color(0));

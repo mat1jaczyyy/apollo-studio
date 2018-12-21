@@ -23,13 +23,6 @@ namespace api.Devices {
                 screen[i] = new Pixel(PreviewExit);
         }
 
-        public Preview(Action<Signal> exit) {
-            for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel(PreviewExit);
-            
-            MIDIExit = exit;
-        }
-
         public void PreviewExit(Signal n) {
             // TODO: Request app drawing
         }
