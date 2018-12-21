@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using api.Devices;
 
 namespace api {
-    public class Track: Container {
+    public class Track: IChainParent {
         public Chain Chain;
         private Launchpad _launchpad;
         private Pixel[] screen = new Pixel[128];

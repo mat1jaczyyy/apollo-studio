@@ -11,11 +11,11 @@ using Newtonsoft.Json;
 using api.Devices;
 
 namespace api {
-    public class Chain {
+    public class Chain: IDeviceParent {
         private List<Device> _devices = new List<Device>();
         private Action<Signal> _chainenter = null;
         private Action<Signal> _midiexit = null;
-        public Container Parent = null;
+        public IChainParent Parent = null;
 
         private void Reroute() {
             for (int i = 0; i < _devices.Count; i++)

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using api;
 
 namespace api.Devices {
-    public class Group: Device, Container {
+    public class Group: Device, IChainParent {
         private List<Chain> _chains = new List<Chain>();
 
         public Chain this[int index] {
