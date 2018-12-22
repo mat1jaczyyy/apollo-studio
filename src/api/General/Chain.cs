@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -12,14 +13,29 @@ using api.Devices;
 
 namespace api {
     public class Chain: IDeviceParent {
+        public static readonly string Identifier = "chain";
+
+        public IChainParent Parent = null;
+        public int? ParentIndex;
+        private Action<Signal> _midiexit = null;
+        public Action<Signal> MIDIExit {
+            get {
+                return _midiexit;
+            }
+            set {
+                _midiexit = value;
+                Reroute();
+            }
+        }
+
         private List<Device> _devices = new List<Device>();
         private Action<Signal> _chainenter = null;
-        private Action<Signal> _midiexit = null;
-        public IChainParent Parent = null;
 
         private void Reroute() {
-            for (int i = 0; i < _devices.Count; i++)
+            for (int i = 0; i < _devices.Count; i++) {
                 _devices[i].Parent = this;
+                _devices[i].ParentIndex = i;
+            }
             
             if (_devices.Count == 0)
                 _chainenter = _midiexit;
@@ -51,16 +67,6 @@ namespace api {
             }
         }
 
-        public Action<Signal> MIDIExit {
-            get {
-                return _midiexit;
-            }
-            set {
-                _midiexit = value;
-                Reroute();
-            }
-        }
-
         public Chain Clone() {
             return new Chain((from i in _devices select i.Clone()).ToList());
         }
@@ -86,14 +92,8 @@ namespace api {
             Reroute();
         }
 
-        public Chain() {}
-
-        public Chain(Device[] init) {
-            _devices = init.ToList();
-            Reroute();
-        }
-
-        public Chain(List<Device> init) {
+        public Chain(List<Device> init = null) {
+            if (init == null) init = new List<Device>();
             _devices = init;
             Reroute();
         }
@@ -105,7 +105,7 @@ namespace api {
 
         public static Chain Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "chain") return null;
+            if (json["object"].ToString() != Identifier) return null;
 
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
@@ -123,7 +123,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("chain");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
@@ -140,10 +140,22 @@ namespace api {
             return json.ToString();
         }
 
+        public string Request(string type, Dictionary<string, object> content) {
+            Dictionary<string, object> newContent = new Dictionary<string, object>() {
+                ["forward"] = Identifier,
+                ["message"] = Communication.UI.EncodeMessage(Identifier, type, content)
+            };
+
+            if (ParentIndex != null)
+                newContent["index"] = ParentIndex;
+
+            return Parent.Request("forward", newContent);
+        }
+
         public ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "chain") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
@@ -160,7 +172,7 @@ namespace api {
                 case "add":
                     foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
                         if (device.Name.ToLower().Equals(data["device"])) {
-                            Insert(Convert.ToInt32(data["index"]), (Devices.Device)Activator.CreateInstance(device));
+                            Insert(Convert.ToInt32(data["index"]), (Devices.Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
                             return new OkObjectResult(_devices[Convert.ToInt32(data["index"])].Encode());
                         }
                     }

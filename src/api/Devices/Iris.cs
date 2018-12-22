@@ -12,8 +12,11 @@ using api;
 
 namespace api.Devices {
     public class Iris: Device {
-        private int _rate = 200; // milliseconds
+        public static readonly new string DeviceIdentifier = "iris";
+
+        private int _rate; // milliseconds
         public List<Color> Colors = new List<Color>();
+        
         private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
@@ -31,33 +34,11 @@ namespace api.Devices {
             return new Iris(_rate, Colors);
         }
 
-        public Iris() {
+        public Iris(int rate = 200, List<Color> colors = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
-        }
 
-        public Iris(int rate) {
-            _timerexit = new TimerCallback(Tick);
-            Rate = rate;
-        }
+            if (colors == null) colors = new List<Color>() {new Color(63), new Color(31), new Color(15), new Color(0)};
 
-        public Iris(Color[] colors) {
-            _timerexit = new TimerCallback(Tick);
-            Colors = colors.ToList();
-        }
-
-        public Iris(List<Color> colors) {
-            _timerexit = new TimerCallback(Tick);
-            Colors = colors;
-        }
-
-        public Iris(int rate, Color[] colors) {
-            _timerexit = new TimerCallback(Tick);
-            Rate = rate;
-            Colors = colors.ToList();
-        }
-
-        public Iris(int rate, List<Color> colors) {
-            _timerexit = new TimerCallback(Tick);
             Rate = rate;
             Colors = colors;
         }
@@ -99,7 +80,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "iris") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -119,7 +100,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("iris");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

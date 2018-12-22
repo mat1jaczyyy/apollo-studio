@@ -11,6 +11,10 @@ using api.Devices;
 
 namespace api {
     public class Track: IChainParent {
+        public static readonly string Identifier = "track";
+        
+        public int? ParentIndex;
+
         public Chain Chain;
         private Launchpad _launchpad;
         private Pixel[] screen = new Pixel[128];
@@ -24,37 +28,14 @@ namespace api {
                     _launchpad.Receive -= MIDIEnter;
 
                 _launchpad = value;
-                _launchpad.Receive += MIDIEnter;
+
+                if (_launchpad != null)
+                    _launchpad.Receive += MIDIEnter;
             }
         }
 
-        public Track() {
-            Chain = new Chain() {Parent = this, MIDIExit = ChainExit};
-
-            for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel() {MIDIExit = MIDIExit};
-        }
-
-        public Track(Chain init) {
-            Chain = init;
-            Chain.Parent = this;
-            Chain.MIDIExit = ChainExit;
-            
-            for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel() {MIDIExit = MIDIExit};
-        }
-
-        public Track(Launchpad launchpad) {
-            Chain = new Chain() {Parent = this, MIDIExit = ChainExit};
-
-            for (int i = 0; i < 128; i++)
-                screen[i] = new Pixel() {MIDIExit = MIDIExit};
-
-            Launchpad = launchpad;
-            Launchpad.Receive += MIDIEnter;
-        }
-
-        public Track(Chain init, Launchpad launchpad) {
+        public Track(Chain init = null, Launchpad launchpad = null) {
+            if (init == null) init = new Chain();
             Chain = init;
             Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
@@ -63,7 +44,6 @@ namespace api {
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
-            Launchpad.Receive += MIDIEnter;
         }
 
         private void ChainExit(Signal n) {
@@ -92,7 +72,7 @@ namespace api {
         
         public static Track Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "track") return null;
+            if (json["object"].ToString() != Identifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -106,7 +86,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("track");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -125,10 +105,16 @@ namespace api {
             return json.ToString();
         }
 
+        public string Request(string type, Dictionary<string, object> content) => Set.Request("forward", new Dictionary<string, object>() {
+            ["forward"] = Identifier,
+            ["index"] = ParentIndex,
+            ["message"] = Communication.UI.EncodeMessage(Identifier, type, content)
+        });
+
         public ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "track") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

@@ -6,7 +6,7 @@ using api;
 
 namespace api {
     public class Length {
-        private Decimal _value = (Decimal)0.25;
+        private Decimal _value;
         
         public Decimal Value {
             get {
@@ -18,9 +18,8 @@ namespace api {
             }
         }
 
-        public Length() {}
-
-        public Length(int exponent) {
+        public Length(int exponent = -2) {
+            _value = (Decimal)0.25;
             Value = Convert.ToDecimal(Math.Pow(2, exponent));
         }
 

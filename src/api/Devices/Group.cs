@@ -12,16 +12,20 @@ using api;
 
 namespace api.Devices {
     public class Group: Device, IChainParent {
+        public static readonly new string DeviceIdentifier = "group";
+
         private List<Chain> _chains = new List<Chain>();
+
+        private void Reroute() {
+            for (int i = 0; i < _chains.Count; i++) {
+                _chains[i].Parent = this;
+                _chains[i].ParentIndex = i;
+            }
+        }
 
         public Chain this[int index] {
             get {
                 return _chains[index];
-            }
-            set {
-                _chains[index] = value;
-                _chains[index].Parent = this;
-                _chains[index].MIDIExit = ChainExit;
             }
         }
 
@@ -36,28 +40,33 @@ namespace api.Devices {
         }
 
         public void Insert(int index) {
-            _chains.Insert(index, new Chain() {Parent = this, MIDIExit = ChainExit});
+            _chains.Insert(index, new Chain() {MIDIExit = ChainExit});
+            
+            Reroute();
         }
 
         public void Insert(int index, Chain chain) {
-            chain.Parent = this;
             chain.MIDIExit = ChainExit;
             _chains.Insert(index, chain);
+            
+            Reroute();
         }
 
         public void Add() {
-            _chains.Add(new Chain() {Parent = this, MIDIExit = ChainExit});
+            _chains.Add(new Chain() {Parent = this, ParentIndex = _chains.Count, MIDIExit = ChainExit});
         }
 
         public void Add(Chain chain) {
             chain.Parent = this;
+            chain.ParentIndex = _chains.Count;
             chain.MIDIExit = ChainExit;
-            _chains.Add(chain);  
+            _chains.Add(chain);
         }
 
-        public void Add(Chain[] chains) {
+        public void Add(List<Chain> chains) {
             foreach (Chain chain in chains) {
                 chain.Parent = this;
+                chain.ParentIndex = _chains.Count;
                 chain.MIDIExit = ChainExit;
                 _chains.Add(chain);
             }     
@@ -65,16 +74,13 @@ namespace api.Devices {
 
         public void Remove(int index) {
             _chains.RemoveAt(index);
+
+            Reroute();
         }
 
-        public Group() {}
-
-        public Group(Chain[] init) {
+        public Group(List<Chain> init = null): base(DeviceIdentifier) {
+            if (init == null) init = new List<Chain>();
             Add(init);
-        }
-
-        public Group(List<Chain> init) {
-            Add(init.ToArray());
         }
 
         private void ChainExit(Signal n) {
@@ -89,7 +95,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "group") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
@@ -107,7 +113,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("group");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
@@ -127,8 +133,8 @@ namespace api.Devices {
         public override ObjectResult RespondSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != "group") return new BadRequestObjectResult("Incorrect device recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

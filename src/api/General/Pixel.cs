@@ -4,9 +4,10 @@ using System.Linq;
 
 namespace api {
     public class Pixel {
+        public Action<Signal> MIDIExit = null;
+        
         private SortedList<int, Signal> _signals = new SortedList<int, Signal>();
         private int? _highest = null;
-        public Action<Signal> MIDIExit = null;
         private object locker = new object();
 
         public Pixel() {}

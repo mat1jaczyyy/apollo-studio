@@ -12,12 +12,15 @@ using api;
 
 namespace api.Devices {
     public class Fade: Device {
-        private int _time = 1000; // milliseconds
+        public static readonly new string DeviceIdentifier = "fade";
+
+        private int _time; // milliseconds
         private List<Color> _colors = new List<Color>();
         private List<Decimal> _positions = new List<Decimal>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
+        
         private Timer[] _timers = new Timer[128];
         private TimerCallback _timerexit;
 
@@ -72,11 +75,16 @@ namespace api.Devices {
             return new Fade(_time, _colors, _positions);
         }
 
-        public Fade(int time, List<Color> colors, List<Decimal> positions) {
+        public Fade(int time = 1000, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
+
+            if (colors == null) colors = new List<Color>() {new Color(63), new Color(0)};
+            if (positions == null) positions = new List<Decimal>() {0, 1};
+            
             Time = time;
             _colors = colors;
             _positions = positions;
+
             Generate();
         }
 
@@ -112,7 +120,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "fade") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -138,7 +146,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("fade");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

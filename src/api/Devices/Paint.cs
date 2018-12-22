@@ -12,16 +12,16 @@ using api;
 
 namespace api.Devices {
     public class Paint: Device {
-        private Color _color = new Color(63);
+        public static readonly new string DeviceIdentifier = "paint";
+
+        private Color _color;
 
         public override Device Clone() {
             return new Paint(_color);
         }
 
-        public Paint() {}
-
-        public Paint(Color color) {
-            _color = color.Clone();
+        public Paint(Color color = null): base(DeviceIdentifier) {
+            _color = (color == null)? new Color(63) : color.Clone();
         }
 
         public override void MIDIEnter(Signal n) {
@@ -34,7 +34,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "paint") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -48,7 +48,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("paint");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -67,8 +67,8 @@ namespace api.Devices {
         public override ObjectResult RespondSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != "paint") return new BadRequestObjectResult("Incorrect device recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

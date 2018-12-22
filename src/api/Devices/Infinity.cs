@@ -12,11 +12,13 @@ using api;
 
 namespace api.Devices {
     public class Infinity: Device {
+        public static readonly new string DeviceIdentifier = "infinity";
+
         public override Device Clone() {
             return new Infinity();
         }
 
-        public Infinity() {}
+        public Infinity(): base(DeviceIdentifier) {}
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)
@@ -26,7 +28,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "infinity") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
             
             // Infinity device has no data to parse
 
@@ -40,7 +42,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("infinity");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

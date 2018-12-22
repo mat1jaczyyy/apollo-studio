@@ -12,8 +12,11 @@ using api;
 
 namespace api.Devices {
     public class Lightweight: Device {
+        public static readonly new string DeviceIdentifier = "lightweight";
+
         private string _path = null;
         private BinaryReader _read;
+        
         private List<Timer> _timers = new List<Timer>();
         private List<int> _timecodes = new List<int>();
         private List<Signal> _signals = new List<Signal>();
@@ -102,7 +105,7 @@ namespace api.Devices {
                 
                 _read = new BinaryReader(File.Open(value, FileMode.Open));
 
-                if (!_read.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'h', 'd'})) // Header identifier
+                if (!_read.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'h', 'd'})) // Header Identifier
                     return;
                 
                 if (!_read.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x06})) // Header size
@@ -218,13 +221,11 @@ namespace api.Devices {
             return new Lightweight(_path);
         }
 
-        public Lightweight() {
+        public Lightweight(string path = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
-        }
 
-        public Lightweight(string path) {
-            _timerexit = new TimerCallback(Tick);
-            Path = path;
+            if (path != null)
+                Path = path;
         }
 
         private void Tick(object info) {
@@ -246,7 +247,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "lightweight") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -260,7 +261,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("lightweight");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

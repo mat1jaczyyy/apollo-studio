@@ -12,6 +12,8 @@ using RtMidi.Core.Messages;
 
 namespace api {
     public class Launchpad {
+        public static readonly string Identifier = "launchpad";
+
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
         private string _name;
@@ -160,21 +162,22 @@ namespace api {
                 if (api.Program.log)
                     api.Program.Log($"IN  -> {n.ToString()}");
 
-                Receive.Invoke(n);
+                if (Receive != null)
+                    Receive.Invoke(n);
             }
         }
 
         private void NoteOn(object sender, in NoteOnMessage e) {
-            HandleMessage(new Signal(e.Key, new Color((byte)(e.Velocity >> 1))));
+            HandleMessage(new Signal((byte)e.Key, new Color((byte)(e.Velocity >> 1))));
         }
 
         private void NoteOff(object sender, in NoteOffMessage e) {
-            HandleMessage(new Signal(e.Key, new Color(0)));
+            HandleMessage(new Signal((byte)e.Key, new Color(0)));
         }
 
         public static Launchpad Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "launchpad") return null;
+            if (json["object"].ToString() != Identifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
@@ -196,7 +199,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("launchpad");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

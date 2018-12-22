@@ -17,6 +17,8 @@ using Newtonsoft.Json;
 
 namespace api {
     public static class MIDI {
+        public static readonly string Identifier = "midi";
+
         public static List<Launchpad> Devices = new List<Launchpad>();
 
         public static void Rescan() {
@@ -79,7 +81,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("midi");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
@@ -99,7 +101,7 @@ namespace api {
         public static ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "midi") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

@@ -12,7 +12,9 @@ using api;
 
 namespace api.Devices {
     public class Filter: Device {
-        private bool[] _filter = new bool[128];
+        public static readonly new string DeviceIdentifier = "filter";
+
+        private bool[] _filter;
 
         public override Device Clone() {
             return new Filter(_filter);
@@ -23,11 +25,9 @@ namespace api.Devices {
                 _filter[index] = value;
         }
 
-        public Filter() {}
-
-        public Filter(bool[] init) {
-            if (init.Length == 128)
-                _filter = init;
+        public Filter(bool[] init = null): base(DeviceIdentifier) {
+            if (init == null || init.Length != 128) init = new bool[128];
+            _filter = init;
         }
 
         public override void MIDIEnter(Signal n) {
@@ -38,7 +38,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "filter") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
@@ -57,7 +57,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("filter");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();

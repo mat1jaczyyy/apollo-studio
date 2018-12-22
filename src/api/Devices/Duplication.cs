@@ -12,7 +12,9 @@ using api;
 
 namespace api.Devices {
     public class Duplication: Device {
-        private List<int> _offsets = new List<int>();
+        public static readonly new string DeviceIdentifier = "duplication";
+
+        private List<int> _offsets;
 
         public List<int> Offsets {
             get {
@@ -44,13 +46,8 @@ namespace api.Devices {
             _offsets.RemoveAt(index);
         }
 
-        public Duplication() {}
-
-        public Duplication(int[] offsets) {
-            Offsets = offsets.ToList();
-        }
-
-        public Duplication(List<int> offsets) {
+        public Duplication(List<int> offsets = null): base(DeviceIdentifier) {
+            if (offsets == null) offsets = new List<int>();
             Offsets = offsets;
         }
 
@@ -75,7 +72,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "duplication") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
@@ -93,7 +90,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("duplication");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();

@@ -12,7 +12,10 @@ using api;
 
 namespace api.Devices {
     public class Hold: Device {
-        private int _length = 200; // milliseconds
+        public static readonly new string DeviceIdentifier = "hold";
+
+        private int _length; // milliseconds
+        
         private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
@@ -30,13 +33,10 @@ namespace api.Devices {
             return new Hold(_length);
         }
 
-        public Hold() {
-            _timerexit = new TimerCallback(Tick);
-        }
-
-        public Hold(int length) {
-            _timerexit = new TimerCallback(Tick);
+        public Hold(int length = 200): base(DeviceIdentifier) {
             Length = length;
+
+            _timerexit = new TimerCallback(Tick);
         }
 
         private void Tick(object info) {
@@ -61,7 +61,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "hold") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -75,7 +75,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("hold");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

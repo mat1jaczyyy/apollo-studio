@@ -6,7 +6,9 @@ using Newtonsoft.Json;
 
 namespace api {
     public class Color {
-        private byte _r = 63, _g = 63, _b = 63;
+        public static readonly string Identifier = "color";
+
+        private byte _r, _g, _b;
 
         private bool IsValid(byte value) {
             return (0 <= value && value <= 63);
@@ -17,7 +19,7 @@ namespace api {
                 return _r;
             }
             set {
-                if (0 <= value && value <= 63) _r = value;
+                if (IsValid(value)) _r = value;
             }
         }
 
@@ -26,7 +28,7 @@ namespace api {
                 return _g;
             }
             set {
-                if (0 <= value && value <= 63) _g = value;
+                if (IsValid(value)) _g = value;
             }
         }
 
@@ -35,7 +37,7 @@ namespace api {
                 return _b;
             }
             set {
-                if (0 <= value && value <= 63) _b = value;
+                if (IsValid(value)) _b = value;
             }
         }
 
@@ -49,14 +51,13 @@ namespace api {
             return new Color(_r, _g, _b);
         }
 
-        public Color() {}
-
-        public Color(byte bright) {
+        public Color(byte bright = 63) {
             if (IsValid(bright))
                 _r = _g = _b = bright;
         }
 
         public Color(byte red, byte green, byte blue) {
+            _r = _g = _b = 63;
             Red = red;
             Green = green;
             Blue = blue;
@@ -64,7 +65,7 @@ namespace api {
 
         public static Color Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "color") return null;
+            if (json["object"].ToString() != Identifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -78,7 +79,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("color");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();

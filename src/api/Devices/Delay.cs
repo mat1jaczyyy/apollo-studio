@@ -12,11 +12,12 @@ using api;
 
 namespace api.Devices {
     public class Delay: Device {
-        public bool Mode = false; // true uses Length
-        public Length Length = new Length();
+        public static readonly new string DeviceIdentifier = "delay";
 
-        private int _time = 500;
-        private Decimal _gate = 1;
+        public bool Mode; // true uses Length
+        public Length Length;
+        private int _time;
+        private Decimal _gate;
 
         private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
@@ -45,25 +46,11 @@ namespace api.Devices {
             return new Delay(Mode, Length, _time, _gate);
         }
 
-        public Delay() {
+        public Delay(bool mode = false, Length length = null, int time = 500, Decimal gate = 1): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
-        }
 
-        public Delay(int time, Decimal gate) {
-            _timerexit = new TimerCallback(Tick);
-            Time = time;
-            Gate = gate;
-        }
+            if (length == null) length = new Length();
 
-        public Delay(Length length, Decimal gate) {
-            _timerexit = new TimerCallback(Tick);
-            Mode = true;
-            Length = length;
-            Gate = gate;
-        }
-
-        public Delay(bool mode, Length length, int time, Decimal gate) {
-            _timerexit = new TimerCallback(Tick);
             Mode = mode;
             Time = time;
             Length = length;
@@ -97,7 +84,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "delay") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
@@ -111,7 +98,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("delay");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -139,8 +126,8 @@ namespace api.Devices {
         public override ObjectResult RespondSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != "delay") return new BadRequestObjectResult("Incorrect device recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

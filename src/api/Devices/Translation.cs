@@ -12,7 +12,9 @@ using api;
 
 namespace api.Devices {
     public class Translation: Device {
-        private int _offset = 0;
+        public static readonly new string DeviceIdentifier = "translation";
+
+        private int _offset;
 
         public int Offset {
             get {
@@ -28,9 +30,7 @@ namespace api.Devices {
             return new Translation(_offset);
         }
 
-        public Translation() {}
-
-        public Translation(int offset) {
+        public Translation(int offset = 0): base(DeviceIdentifier) {
             Offset = offset;
         }
 
@@ -48,7 +48,7 @@ namespace api.Devices {
 
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != "translation") return null;
+            if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
@@ -62,7 +62,7 @@ namespace api.Devices {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("device");
-                    writer.WriteValue("translation");
+                    writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -81,8 +81,8 @@ namespace api.Devices {
         public override ObjectResult RespondSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "device") return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != "translation") return new BadRequestObjectResult("Incorrect device recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 

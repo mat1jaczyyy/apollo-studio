@@ -11,6 +11,8 @@ using api.Devices;
 
 namespace api {
     public static class Set {
+        public static readonly string Identifier = "set";
+
         public static List<Track> Tracks = new List<Track>();
         public static Decimal BPM = 150;
 
@@ -30,7 +32,7 @@ namespace api {
 
         public static void New() {
             Close();
-            Tracks.Add(new Track());
+            Tracks.Add(new Track() {ParentIndex = Tracks.Count});
             
             Set.Tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
 
@@ -56,7 +58,7 @@ namespace api {
 
         public static bool Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "set") return false;
+            if (json["object"].ToString() != Identifier) return false;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
@@ -65,7 +67,9 @@ namespace api {
 
             BPM = Decimal.Parse(data["bpm"].ToString());
             foreach (object track in tracks) {
-                Tracks.Add(Track.Decode(track.ToString()));
+                Track _track = Track.Decode(track.ToString());
+                _track.ParentIndex = Tracks.Count;
+                Tracks.Add(_track);
             }
 
             return true;
@@ -78,7 +82,7 @@ namespace api {
                 writer.WriteStartObject();
 
                     writer.WritePropertyName("object");
-                    writer.WriteValue("set");
+                    writer.WriteValue(Identifier);
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
@@ -109,10 +113,12 @@ namespace api {
             return json.ToString();
         }
 
+        public static string Request(string type, Dictionary<string, object> content) => Communication.UI.EncodeMessage(Identifier, type, content);
+
         public static ObjectResult Respond(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != "set") return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
