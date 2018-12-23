@@ -2,7 +2,37 @@
 
 ## api (.NET Core)
 
-All requests towards the api should target `localhost:1548/api`. Sending an empty request will return a 200 OK, and should be used as an initial "handshake".
+All requests towards the api should target `localhost:1548`. 
+
+### Entry-points
+
+* `/api`:
+    * Main entry point for communicating with Apollo objects in the current Set. Sending an empty request will return a 200 OK, and should be used as an initial "handshake". (TODO: Change to init for consistency?)
+    * request: A JSON-encoded [Message](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#messages)
+    * response: The equivalent response to the requested message.
+
+## app (Electron)
+
+All requests towards the app should target `localhost:1549`.
+
+### Entry-points
+
+* `/app`:
+    * Main entry point for communicating with Apollo objects in the current Set.
+    * request: A JSON-encoded [Message](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#messages)
+    * response: The equivalent response to the requested message.
+
+* `/init`:
+    * The .NET Core Host has initialized for the first time and reports Apollo Set information.
+    * request: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
+    * response: 
+    ```js
+    null
+    ```
+
+## Contents
+
+The two main concepts are messages and objects. Objects are elements that are interconnected and reside inside the Apollo Set, while messages are a way to communicate and do actions with them. Only the api should ever encode the objects to their JSON counterparts.
 
 ### Messages
 
@@ -54,6 +84,8 @@ The Set object contains the List of Tracks. It also does file management and sto
 }
 ```
 
+##### api messages
+
 * `new`:
     * Closes the current Apollo Set and creates a new one.
     * request:
@@ -99,6 +131,10 @@ The Set object contains the List of Tracks. It also does file management and sto
     ```
     * response: A JSON-encoded [Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
 
+##### app messages
+
+The Set object currently handles no app messages.
+
 #### `midi` object
 
 The MIDI object contains a list of available Launchpads. It can be forwarded to from a Set.
@@ -110,6 +146,8 @@ The MIDI object contains a list of available Launchpads. It can be forwarded to 
 }
 ```
 
+##### api messages
+
 * `rescan`:
     * Rescans for new MIDI devices and returns the list.
     * request:
@@ -119,6 +157,10 @@ The MIDI object contains a list of available Launchpads. It can be forwarded to 
     }
     ```
     * response: A JSON-encoded [MIDI object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#midi-object)
+
+##### app messages
+
+The MIDI object currently handles no app messages.
 
 #### `launchpad` object
 
@@ -133,7 +175,7 @@ The Launchpad object represents a physical Launchpad device. It contains the MID
 }
 ```
 
-The Launchpad object currently handles no requests.
+The Launchpad object currently handles no messages.
 
 #### `track` object
 
@@ -149,6 +191,8 @@ The Track object contains the top-most Chain of the Track and the currently sele
 }
 ```
 
+##### api messages
+
 * `port`:
     * Changes port of Track to given index, corresponding to the index found in MIDI.
     * request:
@@ -160,6 +204,10 @@ The Track object contains the top-most Chain of the Track and the currently sele
     ```
     * response: A JSON-encoded [Launchpad object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#launchpad-object)
 
+##### app messages
+
+The Track object currently handles no app messages.
+
 #### `chain` object
 
 The Chain object contains a List of Devices. It is found inside of a Track or Group. Signal data travels through the contained Devices in ascending order (left-to-right), and then exits into the parent object.
@@ -170,6 +218,8 @@ The Chain object contains a List of Devices. It is found inside of a Track or Gr
     "data": array(api.device)
 }
 ```
+
+##### api messages
 
 * `add`:
     * Adds new instance of device at position in the chain.
@@ -196,6 +246,10 @@ The Chain object contains a List of Devices. It is found inside of a Track or Gr
     ```js
     null
     ```
+
+##### app messages
+
+The Chain object currently handles no app messages.
  
 #### `device` object
 
@@ -213,7 +267,7 @@ The Device object is a generic object that holds a device identifier and the par
 }
 ```
 
-The Device object currently handles no requests.
+The Device object currently handles no messages.
 
 #### `signal` object
 
@@ -228,6 +282,8 @@ The Signal object travels through the chain from device to device. It is created
     }
 }
 ```
+
+The Signal object currently handles no messages.
 
 #### `color` object
 
@@ -244,7 +300,7 @@ The Color object holds a definition for a color suitable for showing on the Laun
 }
 ```
 
-The Color object currently handles no requests.
+The Color object currently handles no messages.
 
 ### Devices
 
@@ -260,6 +316,8 @@ The Group device contains multiple `chain` objects. Any incoming signal is trans
     "data": array(api.chain)
 }
 ```
+
+##### api messages
 
 * `add`:
     * Adds new Chain at position in the List of Chain.
@@ -286,6 +344,10 @@ The Group device contains multiple `chain` objects. Any incoming signal is trans
     null
     ```
 
+##### app messages
+
+The Group device currently handles no app messages.
+
 #### `delay` device
 
 The Delay device delays an incoming signal by `length * gate` milliseconds.
@@ -301,6 +363,8 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     }
 }
 ```
+
+##### api messages
 
 * `mode`:
     * Updates mode parameter (use length or time) to given value.
@@ -346,6 +410,10 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
     ```
     * response: A JSON-encoded [Delay device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
 
+##### app messages
+
+The Delay device currently handles no app messages.
+
 #### `layer` device
 
 The Layer device applies a target layer index to incoming signals.
@@ -359,6 +427,8 @@ The Layer device applies a target layer index to incoming signals.
 }
 ```
 
+##### api messages
+
 * `target`:
     * Updates target to given value.
     * request: 
@@ -369,6 +439,10 @@ The Layer device applies a target layer index to incoming signals.
     }
     ```
     * response: A JSON-encoded [Layer device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#layer-device)
+
+##### app messages
+
+The Layer device currently handles no app messages.
 
 #### `paint` device
 
@@ -383,6 +457,8 @@ The Paint device applies a specific color to incoming signals if they are lit.
 }
 ```
 
+##### api messages
+
 * `color`:
     * Updates color to given value.
     * request: 
@@ -396,6 +472,10 @@ The Paint device applies a specific color to incoming signals if they are lit.
     ```
     * response: A JSON-encoded [Paint device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#paint-device)
 
+##### app messages
+
+The Paint device currently handles no app messages.
+
 #### `preview` device
 
 The Preview device uses a grid to display incoming signals and can be used to generate signals manually inside a Chain.
@@ -407,6 +487,8 @@ The Preview device uses a grid to display incoming signals and can be used to ge
 }
 ```
 
+##### api messages
+
 * `signal`:
     * Generates a Signal and outputs it to the right. Requested upon clicking a button on the grid.
     * request: 
@@ -417,6 +499,21 @@ The Preview device uses a grid to display incoming signals and can be used to ge
     }
     ```
     * response: A JSON-encoded [Signal object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#signal-object)
+
+##### app messages
+
+* `signal`:
+    * Reports a Signal that has been inputted from the left. Response is rendering the Signal on the grid.
+    * request: 
+    ```js
+    {
+        "signal": api.signal
+    }
+    ```
+    * response: 
+    ```js
+    null
+    ```
 
 #### `translation` device
 
@@ -431,6 +528,8 @@ The Translation device applies an index offset to incoming signals.
 }
 ```
 
+##### api messages
+
 * `offset`:
     * Updates offset to given value.
     * request: 
@@ -442,14 +541,6 @@ The Translation device applies an index offset to incoming signals.
     ```
     * response: A JSON-encoded [Translation device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#translation-device)
 
-## app (Electron)
+##### app messages
 
-All requests towards the app should target `localhost:1549`. The request URI is different for each kind of request.
-
-* `/init`:
-    * .NET Core Host has initialized for the first time and reports Apollo Set information.
-    * request: A JSON-encoded [api.Set object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#set-object)
-    * response: 
-    ```js
-    null
-    ```
+The Delay device currently handles no app messages.
