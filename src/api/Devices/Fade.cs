@@ -96,7 +96,7 @@ namespace api.Devices {
                     i++;
                 
                 if (i < _colors.Count - 1)
-                    _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), System.Threading.Timeout.Infinite);
+                    _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), Timeout.Infinite);
 
                 if (MIDIExit != null)
                     MIDIExit(new Signal(index, _steps[j].Clone()));
@@ -109,7 +109,7 @@ namespace api.Devices {
                     if (_timers[n.Index] != null)
                         _timers[n.Index].Dispose();
 
-                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0, 0), (int)((_positions[1] - _positions[0]) * _time / _counts[0]), System.Threading.Timeout.Infinite);
+                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0, 0), (int)((_positions[1] - _positions[0]) * _time / _counts[0]), Timeout.Infinite);
 
                     n.Color = _steps[0].Clone();
 

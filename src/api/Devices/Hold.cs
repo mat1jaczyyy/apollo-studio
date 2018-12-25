@@ -52,7 +52,7 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                _timers.Enqueue(new Timer(_timerexit, n.Index, _length, System.Threading.Timeout.Infinite));
+                _timers.Enqueue(new Timer(_timerexit, n.Index, _length, Timeout.Infinite));
                 
                 if (MIDIExit != null)
                     MIDIExit(n);

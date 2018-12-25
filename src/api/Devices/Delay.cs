@@ -75,7 +75,7 @@ namespace api.Devices {
 
         public override void MIDIEnter(Signal n) {
             try {
-                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), System.Threading.Timeout.Infinite));
+                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
             } catch {
                 if (api.Program.log)
                     Console.WriteLine($"ERR ** Delay Enqueue skipped");
