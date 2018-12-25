@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -17,7 +18,7 @@ namespace api.Devices {
         private int _rate; // milliseconds
         public List<Color> Colors = new List<Color>();
         
-        private Timer[] _timers = new Timer[128];
+        private List<Timer>[] _timers = new List<Timer>[128];
         private TimerCallback _timerexit;
 
         public int Rate {
@@ -44,38 +45,29 @@ namespace api.Devices {
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof((byte, int))) {
-                (byte index, int i) = ((byte, int))info;
-                if (++i < Colors.Count) {
-                    _timers[index] = new Timer(_timerexit, (index, i), _rate, System.Threading.Timeout.Infinite);
-                    
-                    Signal n = new Signal(index, Colors[i].Clone());
-
-                    if (MIDIExit != null)
-                        MIDIExit(n);
-                
-                } else {
-                    Signal n = new Signal(index, new Color(0));
-
-                    if (MIDIExit != null)
-                        MIDIExit(n);
-                }
+            if (info.GetType() == typeof(Signal)) {
+                if (MIDIExit != null)
+                    MIDIExit((Signal)info);
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            if (Colors.Count > 0)
-                if (n.Color.Lit) {
-                    if (_timers[n.Index] != null)
-                        _timers[n.Index].Dispose();
+            if (Colors.Count > 0 && n.Color.Lit) {
+                if (_timers[n.Index] != null) 
+                    for (int i = 0; i < _timers[n.Index].Count; i++) 
+                        _timers[n.Index][i].Dispose();
+                
+                _timers[n.Index] = new List<Timer>();
 
-                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0), _rate, System.Threading.Timeout.Infinite);
+                n.Color = Colors[0].Clone();
 
-                    n.Color = Colors[0].Clone();
-
-                    if (MIDIExit != null)
-                        MIDIExit(n);
+                if (MIDIExit != null)
+                    MIDIExit(n);
+                
+                for (int i = 1; i < Colors.Count; i++) {
+                    _timers[n.Index].Add(new Timer(_timerexit, new Signal(n.Index, Colors[i].Clone(), n.Layer), _rate * i, Timeout.Infinite));
                 }
+            }
         }
 
         public static Device DecodeSpecific(string jsonString) {
