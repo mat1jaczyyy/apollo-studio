@@ -18,6 +18,9 @@ namespace api.Devices {
         private int _rate; // milliseconds
         public List<Color> Colors = new List<Color>();
         
+        private int[] _indexes = new int[128];
+        private object[] locker = new object[128];
+
         private List<Timer>[] _timers = new List<Timer>[128];
         private TimerCallback _timerexit;
 
@@ -38,16 +41,30 @@ namespace api.Devices {
         public Iris(int rate = 200, List<Color> colors = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
 
-            if (colors == null) colors = new List<Color>() {new Color(63), new Color(31), new Color(15), new Color(0)};
+            if (colors == null) colors = new List<Color>() {new Color(63), new Color(31), new Color(15)};
 
             Rate = rate;
             Colors = colors;
+
+            for (int i = 0; i < 128; i++)
+                locker[i] = new object();
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof(Signal)) {
-                if (MIDIExit != null)
-                    MIDIExit((Signal)info);
+            if (info.GetType() == typeof((byte, int))) {
+                (byte index, int layer) = ((byte, int))info;
+
+                lock (locker[index]) {
+                    int color = ++_indexes[index];
+
+                    if (color < Colors.Count) {
+                        if (MIDIExit != null)
+                            MIDIExit(new Signal(index, Colors[color].Clone(), layer));
+                    } else { // TODO: Only if last color is not 0?
+                        if (MIDIExit != null)
+                            MIDIExit(new Signal(index, new Color(0), layer));
+                    }
+                }
             }
         }
 
@@ -58,14 +75,15 @@ namespace api.Devices {
                         _timers[n.Index][i].Dispose();
                 
                 _timers[n.Index] = new List<Timer>();
+                _indexes[n.Index] = 0;
 
                 n.Color = Colors[0].Clone();
 
                 if (MIDIExit != null)
                     MIDIExit(n);
                 
-                for (int i = 1; i < Colors.Count; i++) {
-                    _timers[n.Index].Add(new Timer(_timerexit, new Signal(n.Index, Colors[i].Clone(), n.Layer), _rate * i, Timeout.Infinite));
+                for (int i = 1; i <= Colors.Count; i++) {
+                    _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), _rate * i, Timeout.Infinite));
                 }
             }
         }
