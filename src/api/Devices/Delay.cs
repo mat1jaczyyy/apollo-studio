@@ -19,6 +19,8 @@ namespace api.Devices {
         private int _time;
         private Decimal _gate;
 
+        private object locker = new object();
+
         private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
@@ -60,26 +62,18 @@ namespace api.Devices {
         private void Tick(object info) {
             if (info.GetType() == typeof(Signal)) {
                 Signal n = (Signal)info;
-      
-                if (MIDIExit != null)
-                    MIDIExit(n);
-                
-                try {
-                    _timers.Dequeue();
-                } catch {
-                    if (api.Program.log)
-                        Console.WriteLine($"ERR ** Delay Dequeue skipped");
-                } 
+
+                lock (locker) {
+                    if (MIDIExit != null)
+                        MIDIExit(n);
+                    
+                    _timers.Dequeue().Dispose();
+                }
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            try {
-                _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
-            } catch {
-                if (api.Program.log)
-                    Console.WriteLine($"ERR ** Delay Enqueue skipped");
-            } 
+            _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
         }
 
         public static Device DecodeSpecific(string jsonString) {
