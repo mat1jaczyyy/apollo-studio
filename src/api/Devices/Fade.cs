@@ -102,9 +102,6 @@ namespace api.Devices {
                     if (color < _steps.Count) {
                         if (MIDIExit != null)
                             MIDIExit(new Signal(index, _steps[color].Clone(), layer));
-                    } else {
-                        if (MIDIExit != null)
-                            MIDIExit(new Signal(index, new Color(0), layer));
                     }
                 }
             }
