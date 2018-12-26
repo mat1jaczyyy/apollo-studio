@@ -21,7 +21,7 @@ namespace api.Devices {
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
         
-        private Timer[] _timers = new Timer[128];
+        private List<Timer>[] _timers = new List<Timer>[128];
         private TimerCallback _timerexit;
 
         public int Time {
@@ -37,7 +37,7 @@ namespace api.Devices {
         private void Generate() {
             _steps = new List<Color>();
             _counts = new List<int>();
-            _cutoffs = new List<int>();
+            _cutoffs = new List<int>() {0};
 
             for (int i = 0; i < _colors.Count - 1; i++) {
                 _counts.Add(new int[] {
@@ -67,8 +67,6 @@ namespace api.Devices {
                 _steps.Add(new Color(0));
                 _cutoffs[_cutoffs.Count - 1]++;
             }
-
-            //_counts.Add(_counts.Last());
         }
 
         public override Device Clone() {
@@ -89,33 +87,42 @@ namespace api.Devices {
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof((byte, int, int))) {
-                (byte index, int i, int j) = ((byte, int, int))info;
-                
-                if (_cutoffs[i] == ++j)
-                    i++;
-                
-                if (i < _colors.Count - 1)
-                    _timers[index] = new Timer(_timerexit, (index, i, j), (int)((_positions[i + 1] - _positions[i]) * _time / _counts[i]), Timeout.Infinite);
-
+            if (info.GetType() == typeof(Signal)) {
                 if (MIDIExit != null)
-                    MIDIExit(new Signal(index, _steps[j].Clone()));
+                    MIDIExit((Signal)info);
             }
         }
 
         public override void MIDIEnter(Signal n) {
-            if (_colors.Count > 0)
-                if (n.Color.Lit) {
-                    if (_timers[n.Index] != null)
-                        _timers[n.Index].Dispose();
+            if (_colors.Count > 0 && n.Color.Lit) {
+                if (_timers[n.Index] != null) 
+                    for (int i = 0; i < _timers[n.Index].Count; i++) 
+                        _timers[n.Index][i].Dispose();
 
-                    _timers[n.Index] = new Timer(_timerexit, (n.Index, 0, 0), (int)((_positions[1] - _positions[0]) * _time / _counts[0]), Timeout.Infinite);
+                _timers[n.Index] = new List<Timer>();
 
-                    n.Color = _steps[0].Clone();
+                n.Color = _steps[0].Clone();
 
-                    if (MIDIExit != null)
-                        MIDIExit(n);
+                if (MIDIExit != null)
+                    MIDIExit(n);
+
+                List<int> gay = new List<int>();
+
+                int j = 0;
+                for (int i = 1; i < _steps.Count; i++) {
+                    if (_cutoffs[j + 1] == i) j++;
+                    if (j < _colors.Count - 1) {
+                        _timers[n.Index].Add(new Timer(
+                            _timerexit,
+                            new Signal(n.Index, _steps[i].Clone(), n.Layer),
+                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
+                            Timeout.Infinite
+                        ));
+                    }
                 }
+
+                _timers[n.Index].Add(new Timer(_timerexit, new Signal(n.Index, new Color(0), n.Layer), _time, Timeout.Infinite));
+            }
         }
 
         public static Device DecodeSpecific(string jsonString) {
