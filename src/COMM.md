@@ -414,6 +414,72 @@ The Delay device delays an incoming signal by `length * gate` milliseconds.
 
 The Delay device currently handles no app messages.
 
+#### `hold` device
+
+The Hold device holds an incoming lit signal by `length * gate` milliseconds before sending an off signal.
+
+```js
+{
+    "device": "hold",
+    "data": {
+        "mode": bool, // false if using time, true if using length
+        "length": int, // base length index, [0, 9]
+        "time": int, // base duration in ms, [10, 30000]
+        "gate": Decimal // gate multiplier, [0, 4]
+    }
+}
+```
+
+##### api messages
+
+* `mode`:
+    * Updates mode parameter (use length or time) to given value.
+    * request: 
+    ```js
+    {
+        "type": "mode",
+        "value": bool // false if using time, true if using length
+    }
+    ```
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+
+* `length`:
+    * Updates length parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "time",
+        "value": int // [0, 9]
+    }
+    ```
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+
+* `time`:
+    * Updates time parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "time",
+        "value": int // [10, 30000]
+    }
+    ```
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+
+* `gate`:
+    * Updates gate parameter to given value.
+    * request: 
+    ```js
+    {
+        "type": "gate",
+        "value": Decimal // [0, 4]
+    }
+    ```
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#hold-device)
+
+##### app messages
+
+The Hold device currently handles no app messages.
+
 #### `layer` device
 
 The Layer device applies a target layer index to incoming signals.
