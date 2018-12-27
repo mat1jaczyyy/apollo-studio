@@ -441,7 +441,7 @@ The Hold device holds an incoming lit signal by `length * gate` milliseconds bef
         "value": bool // false if using time, true if using length
     }
     ```
-    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#hold-device)
 
 * `length`:
     * Updates length parameter to given value.
@@ -452,7 +452,7 @@ The Hold device holds an incoming lit signal by `length * gate` milliseconds bef
         "value": int // [0, 9]
     }
     ```
-    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#hold-device)
 
 * `time`:
     * Updates time parameter to given value.
@@ -463,7 +463,7 @@ The Hold device holds an incoming lit signal by `length * gate` milliseconds bef
         "value": int // [10, 30000]
     }
     ```
-    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#delay-device)
+    * response: A JSON-encoded [Hold device](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#hold-device)
 
 * `gate`:
     * Updates gate parameter to given value.
