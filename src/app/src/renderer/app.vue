@@ -94,20 +94,41 @@ const getColor = ({ org, call }) => {
 window.getColor = getColor
 
 const { ipcRenderer } = require("electron")
-ipcRenderer.on("request", (event, req) => {
-  switch (req.url) {
+ipcRenderer.on("request", (event, request) => {
+  switch (request.url) {
     case "/init":
       if (vue) {
-        vue.track = req.body.data.tracks[0]
+        vue.track = request.body.data.tracks[0]
         vue.port = vue.track.data.launchpad.data.port
         vue.axios.post("http://localhost:1548/api").catch(e => {})
       }
       break
+    case "/app":
+      if (vue) {
+        const { req, device } = resolveObj(request.body, [vue.track])
+        device.data = req.data
+      }
+      break
     default:
-      console.log(`sad req@${req.url}`, req)
+      console.log(`sad req@${request.url}`, request)
       break
   }
 })
+
+const resolveObj = (req, device) => {
+  if (req.data && req.data.forward && req.data.message)
+    return resolveObj(
+      req.data.message,
+      device[
+        req.data.hasOwnProperty("index") ? req.data.index : req.data.forward
+      ].data
+    )
+  else
+    return {
+      req,
+      device,
+    }
+}
 // ipcRenderer.send('asynchronous-message', 'ping')
 
 // axios.get("http://localhost:1548/api/contacts").then(e => console.log(e))

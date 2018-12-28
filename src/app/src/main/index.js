@@ -11,7 +11,7 @@ let apipath = path.join(
   __dirname,
   process.env.NODE_ENV !== "development"
     ? "..\\..\\..\\api\\bin\\dist\\win\\api.exe"
-    : "..\\..\\api\\bin\\dist\\win\\api.exe",
+    : "..\\..\\api\\bin\\dist\\win\\api.exe"
 )
 console.log(apipath)
 if (os.platform() === "darwin")
@@ -19,11 +19,13 @@ if (os.platform() === "darwin")
     __dirname,
     process.env.NODE_ENV !== "development"
       ? "..//..//..//api//bin//dist//osx//api"
-      : "..//..//api//bin//dist//osx//api",
+      : "..//..//api//bin//dist//osx//api"
   )
 
 const Sentry = require("@sentry/node")
-Sentry.init({ dsn: "https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916" })
+Sentry.init({
+  dsn: "https://dc7c9a8085d64d6d9181158bc19e3236@sentry.io/1323916",
+})
 
 server.use(bp.json())
 

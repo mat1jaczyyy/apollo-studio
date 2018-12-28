@@ -7,7 +7,7 @@ transition(name="device")
       .close(@click="deletedevice")
         i.material-icons close
     .inner(:style="{background: $store.state.themes[$store.state.settings.theme].device}")
-      component(:is="$store.state.av_devices[data.data.device]" :data="data.data" @addDevice="addDevice" @update="update")
+      component(:is="$store.state.av_devices[data.data.device]" :data="data.data" @addDevice="addDevice" @update="update").component
 </template>
 
 <script>
@@ -54,7 +54,7 @@ export default {
 <style lang="scss">
 .device {
   height: calc(100% - 5px);
-  width: 100px;
+  // width: 100px;
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
   margin: 2.5px 0;
