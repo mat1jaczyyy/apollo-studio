@@ -116,7 +116,7 @@ namespace api {
         }
 
         public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
 
             if (path.Count() > 1) {
                 if (path[1] == "chain")

@@ -72,7 +72,7 @@ namespace api.Devices {
 
         public abstract ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data);
         public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
             return RespondSpecific(obj, path, data);
         }
     }
