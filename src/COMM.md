@@ -562,6 +562,7 @@ The Preview device uses a grid to display incoming signals and can be used to ge
     {
         "type": "signal",
         "index": int // [0, 99]
+        "press": bool // true if pressed, false if released
     }
     ```
     * response: A JSON-encoded [Signal object](https://github.com/mat1jaczyyy/apollo-studio/blob/master/src/COMM.md#signal-object)
