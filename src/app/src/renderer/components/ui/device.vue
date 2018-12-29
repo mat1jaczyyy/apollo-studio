@@ -26,15 +26,14 @@ export default {
   methods: {
     addDevice({ path, device, index }) {
       this.$emit("addDevice", {
-        path: `/device:${this.index}:${this.data.data.device}${path}`,
+        path: `/device:${this.index}${path}`,
         device,
         index,
       })
     },
     update({ path, data }) {
       this.$emit("update", {
-        // console.log("update", {
-        path: `/device:${this.index}:${this.data.data.device}${path}`,
+        path: `/device:${this.index}${path}`,
         data,
       })
     },

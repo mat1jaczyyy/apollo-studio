@@ -20,7 +20,8 @@
     "test": "npm run unit",
     "unit": "karma start test/unit/karma.conf.js",
     "postinstall": "",
-    "kill": "taskkill -f -t -im electron.exe"
+    "kill": "taskkill -f -t -im electron.exe",
+    "ded": "taskkill -f -t -im electron.exe"
   },
   "build": {
     "productName": "Apollo Studio",
