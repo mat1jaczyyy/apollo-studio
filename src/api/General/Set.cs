@@ -115,26 +115,20 @@ namespace api {
 
         public static string Request(string type, Dictionary<string, object> content) => Communication.UI.EncodeMessage(Identifier, type, content);
 
-        public static ObjectResult Respond(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+        public static ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
+            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (path.Count() > 1) {
+                if (path[1].StartsWith("track:"))
+                    return Tracks[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
+
+                else if (path[1] == "midi")
+                    return MIDI.Respond(obj, path.Skip(1).ToArray(), data);
+                
+                else return new BadRequestObjectResult("Incorrectly formatted message.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    switch (data["forward"].ToString()) {
-                        case "track":
-                            return Tracks[Convert.ToInt32(data["index"])].Respond(data["message"].ToString());
-                        
-                        case "midi":
-                            return MIDI.Respond(data["message"].ToString());
-
-                        default:
-                            return new BadRequestObjectResult("Incorrectly formatted message.");
-                    }
-                
                 case "new":
                     New();
                     return new OkObjectResult(Set.Encode());

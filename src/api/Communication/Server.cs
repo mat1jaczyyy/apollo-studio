@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace api.Communication {
     public static class Server {
@@ -53,6 +55,19 @@ namespace api.Communication {
     }
 
     [Route("/[controller]")] public class ApiController: Controller {
+        private ObjectResult Respond(string jsonString) {
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+
+            string obj = json["object"].ToString();
+            if (obj != "message") return new BadRequestObjectResult("Not a message.");
+            
+            return Set.Respond(
+                obj,
+                json["path"].ToString().Split('/'),
+                JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString())
+            );
+        }
+
         [HttpPost()] public IActionResult Post() {
             byte[] buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
             this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
@@ -60,7 +75,7 @@ namespace api.Communication {
             string request = Encoding.UTF8.GetString(buffer);
             api.Program.Log($"REQ -> {request}");
 
-            ObjectResult response = (this.Request.ContentLength == 0)? new OkObjectResult(null) : Set.Respond(request);
+            ObjectResult response = (this.Request.ContentLength == 0)? new OkObjectResult(null) : Respond(request);
             if (response.Value != null) api.Program.Log($"RSP <- {response.Value.ToString()}"); 
 
             return response;

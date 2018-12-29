@@ -130,24 +130,15 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public override ObjectResult RespondSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
+        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
+            if (path.Count() > 1) {
+                if (path[1].StartsWith("chain:"))
+                    return _chains[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+                else return new BadRequestObjectResult("Incorrectly formatted message.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    switch (data["forward"].ToString()) {
-                        case "chain":
-                            return _chains[Convert.ToInt32(data["index"])].Respond(data["message"].ToString());
-                        
-                        default:
-                            return new BadRequestObjectResult("Incorrectly formatted message.");
-                    }
-                
                 case "add":
                     Insert(Convert.ToInt32(data["index"]));
                     return new OkObjectResult(_chains[Convert.ToInt32(data["index"])].Encode());

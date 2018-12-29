@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using api;
 
 namespace api.Devices {
-    public abstract class Device: IRequest {
+    public abstract class Device: IRequest, IResponse {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
 
@@ -66,6 +66,10 @@ namespace api.Devices {
             ["message"] = Communication.UI.EncodeMessage(Identifier, type, content, DeviceIdentifier)
         });
 
-        public abstract ObjectResult RespondSpecific(string jsonString);
+        public abstract ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data);
+        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
+            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+            return RespondSpecific(obj, path, data);
+        }
     }
 }

@@ -277,7 +277,7 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public override ObjectResult RespondSpecific(string jsonString) {
+        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
             throw new NotImplementedException();
         }
     }

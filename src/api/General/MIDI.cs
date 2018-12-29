@@ -98,17 +98,14 @@ namespace api {
             return json.ToString();
         }
 
-        public static ObjectResult Respond(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+        public static ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
+            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (path.Count() > 1) {
+                return new BadRequestObjectResult("The MIDI object has no members to forward to.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    return new BadRequestObjectResult("The MIDI object has no members to forward to.");
-
                 case "rescan":
                     Rescan();
                     return new OkObjectResult(Encode());

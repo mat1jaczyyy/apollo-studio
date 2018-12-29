@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using api.Devices;
 
 namespace api {
-    public class Track: IChainParent {
+    public class Track: IChainParent, IResponse {
         public static readonly string Identifier = "track";
         
         public int? ParentIndex;
@@ -111,23 +111,17 @@ namespace api {
             ["message"] = Communication.UI.EncodeMessage(Identifier, type, content)
         });
 
-        public ObjectResult Respond(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
+            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (path.Count() > 1) {
+                if (path[1] == "chain")
+                    return Chain.Respond(obj, path.Skip(1).ToArray(), data);
+
+                else return new BadRequestObjectResult("Incorrectly formatted message.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    switch (data["forward"].ToString()) {
-                        case "chain":
-                            return Chain.Respond(data["message"].ToString());
-                        
-                        default:
-                            return new BadRequestObjectResult("Incorrectly formatted message.");
-                    }
-                
                 case "port":
                     Launchpad = MIDI.Devices[Convert.ToInt32(data["index"])];
                     return new OkObjectResult(Launchpad.Encode());

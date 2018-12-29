@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using api.Devices;
 
 namespace api {
-    public class Chain: IDeviceParent {
+    public class Chain: IDeviceParent, IResponse {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
@@ -152,23 +152,17 @@ namespace api {
             return Parent.Request("forward", newContent);
         }
 
-        public ObjectResult Respond(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
+        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
+            if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (path.Count() > 1) {
+                if (path[1].StartsWith("device:"))
+                    return _devices[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
+
+                else return new BadRequestObjectResult("Incorrectly formatted message.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    switch (data["forward"].ToString()) {
-                        case "device":
-                            return _devices[Convert.ToInt32(data["index"])].RespondSpecific(data["message"].ToString());
-                        
-                        default:
-                            return new BadRequestObjectResult("Incorrectly formatted message.");
-                    }
-                
                 case "add":
                     foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
                         if (device.Name.ToLower().Equals(data["device"])) {

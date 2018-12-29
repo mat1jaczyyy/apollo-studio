@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 
 namespace api {
     class Program {
-        public static bool log = false;
+        public static bool log = true;
         public static ManualResetEvent close = new ManualResetEvent(false);
 
         public static Stopwatch logTimer = new Stopwatch();
@@ -36,8 +36,6 @@ namespace api {
                     log = true;
                 }*/
             }
-
-            //log = true; // Always log during alpha/beta
             
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Log($"MIDI API: {api}");

@@ -117,18 +117,12 @@ namespace api.Devices {
             return json.ToString();
         }
 
-        public override ObjectResult RespondSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "message") return new BadRequestObjectResult("Not a message.");
-            if (json["recipient"].ToString() != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");
-            if (json["device"].ToString() != DeviceIdentifier) return new BadRequestObjectResult("Incorrect device recipient for message.");
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
+            if (path.Count() > 1) {
+                return new BadRequestObjectResult("The Delay object has no members to forward to.");
+            }
 
             switch (data["type"].ToString()) {
-                case "forward":
-                    return new BadRequestObjectResult("The Delay object has no members to forward to.");
-                
                 case "mode":
                     Mode = Convert.ToBoolean(data["value"]);
                     return new OkObjectResult(EncodeSpecific());
