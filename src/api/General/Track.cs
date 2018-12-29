@@ -105,11 +105,15 @@ namespace api {
             return json.ToString();
         }
 
-        public string Request(string type, Dictionary<string, object> content) => Set.Request("forward", new Dictionary<string, object>() {
-            ["forward"] = Identifier,
-            ["index"] = ParentIndex,
-            ["message"] = Communication.UI.EncodeMessage(Identifier, type, content)
-        });
+        public string Request(Dictionary<string, object> data, List<string> path = null) {
+            if (path == null) path = new List<string>();
+            path.Insert(0, Identifier);
+
+            if (ParentIndex != null)
+                path[0] += $":{ParentIndex}";
+
+            return Set.Request(data, path);
+        }
 
         public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
             if (path[0] != Identifier) return new BadRequestObjectResult("Incorrect recipient for message.");

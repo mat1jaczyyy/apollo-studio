@@ -60,11 +60,15 @@ namespace api.Devices {
             return json.ToString();
         }
         
-        public string Request(string type, Dictionary<string, object> content) => Parent.Request("forward", new Dictionary<string, object>() {
-            ["forward"] = Identifier,
-            ["index"] = ParentIndex,
-            ["message"] = Communication.UI.EncodeMessage(Identifier, type, content, DeviceIdentifier)
-        });
+        public string Request(Dictionary<string, object> data, List<string> path = null) {
+            if (path == null) path = new List<string>();
+            path.Insert(0, Identifier);
+
+            if (ParentIndex != null)
+                path[0] += $":{ParentIndex}";
+
+            return Parent.Request(data, path);
+        }
 
         public abstract ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data);
         public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {

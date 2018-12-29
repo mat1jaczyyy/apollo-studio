@@ -26,7 +26,8 @@ namespace api.Devices {
         }
 
         public void PreviewExit(Signal n) {
-            Communication.UI.App(Request("signal", new Dictionary<string, object>() {
+            Communication.UI.App(Request(new Dictionary<string, object>() {
+                ["type"] = "signal",
                 ["signal"] = n.Encode()
             }));
         }

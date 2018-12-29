@@ -7,7 +7,7 @@ namespace api {
     public interface IChainParent: IRequest {}
 
     public interface IRequest {
-        string Request(string type, Dictionary<string, object> content);
+        string Request(Dictionary<string, object> data, List<string> path = null);
     }
 
     public interface IResponse {
