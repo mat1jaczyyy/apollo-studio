@@ -97,8 +97,7 @@ namespace api {
                     throw new ArgumentException("Launchpad not recognized");
             }
 
-            if (api.Program.log)
-                api.Program.Log($"OUT <- {n.ToString()}");
+            api.Program.Log($"OUT <- {n.ToString()}");
 
             SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, rgb_byte, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue});
             Output.Send(in msg);
@@ -159,8 +158,7 @@ namespace api {
                 if (InputFormat == InputType.DrumRack)
                     n.Index = Conversion.DRtoXY[n.Index];
                 
-                if (api.Program.log)
-                    api.Program.Log($"IN  -> {n.ToString()}");
+                api.Program.Log($"IN  -> {n.ToString()}");
 
                 if (Receive != null)
                     Receive.Invoke(n);

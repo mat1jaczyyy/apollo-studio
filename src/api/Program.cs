@@ -24,7 +24,8 @@ namespace api {
         public static Stopwatch logTimer = new Stopwatch();
 
         public static void Log(string text) {
-            Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
+            if (log)
+                Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
         }
 
         static void Main(string[] args) {
@@ -36,11 +37,10 @@ namespace api {
                 }*/
             }
 
-            log = true; // Always log during alpha/beta
+            //log = true; // Always log during alpha/beta
             
-            if (log)
-                foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                    Log($"MIDI API: {api}");
+            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
+                Log($"MIDI API: {api}");
 
             MIDI.Rescan();
             Set.New();
