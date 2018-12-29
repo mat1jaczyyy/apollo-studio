@@ -41,8 +41,7 @@ Generally, a message should be formatted as follows. If the message recipient is
 ```js
 {
     "object": "message",
-    "recipient": string, // Recipient object identifier
-    "device": string, // If the recipient is a device, include device identifier as well
+    "path": string, // String formatted as a path to the object
     "data": {
         "type": string, // Recipient-specific message type
         // Additional data (recipient-specific)
@@ -50,23 +49,11 @@ Generally, a message should be formatted as follows. If the message recipient is
 }
 ```
 
-If the message contains another message that should be forwarded to one of the recipient's members, the message should look like this:
+The path string is formatted as object identifiers separated with a slash `/`, with an optionally appended device identifier `(string)` for device objects and appended index `:int` for accessing objects in an array. 
 
-```js
-{
-    "object": "message",
-    "recipient": string, // Recipient object identifier
-    "data": {
-        "type": "forward", // Special forward message type
-        "forward": string, // Forwardee object identifier
-        "index": int, // If applicable, include an index for array-based members
-        "message": {
-            "object": "message",
-            // ...
-        }
-    }
-}
-```
+Example: `set/track:index/chain/device(specific):index`
+
+Example in case of a Group: `set/track:index/chain/device(group):index/chain:index/device(specific):index`
 
 ALL objects, upon attempting to resolve the request, will forward the inner message to the desired member object. You can nest multiple forward messages into each other to access a deep object. The top-most recipient will ALWAYS be the master Set object. 
 
