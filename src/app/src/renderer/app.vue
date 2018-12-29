@@ -101,6 +101,9 @@ ipcRenderer.on("request", (event, request) => {
         vue.track = request.body.data.tracks[0]
         vue.port = vue.track.data.launchpad.data.port
         vue.axios.post("http://localhost:1548/api").catch(e => {})
+        vue.api("set/midi", {
+          type: "rescan",
+        }).then(e => (vue.ports = e.data))
       }
       break
     case "/app":
@@ -156,9 +159,6 @@ export default {
   created() {
     vue = this
     const self = this
-    this.api("set/midi", {
-      type: "rescan",
-    }).then(e => (self.ports = e.data))
   },
   mounted() {
     this.theme()

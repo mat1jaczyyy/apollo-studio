@@ -13,7 +13,6 @@ let apipath = path.join(
     ? "..\\..\\..\\api\\bin\\dist\\win\\api.exe"
     : "..\\..\\api\\bin\\dist\\win\\api.exe"
 )
-console.log(apipath)
 if (os.platform() === "darwin")
   apipath = path.join(
     __dirname,
@@ -21,6 +20,7 @@ if (os.platform() === "darwin")
       ? "..//..//..//api//bin//dist//osx//api"
       : "..//..//api//bin//dist//osx//api"
   )
+console.log(apipath)
 
 const Sentry = require("@sentry/node")
 Sentry.init({
