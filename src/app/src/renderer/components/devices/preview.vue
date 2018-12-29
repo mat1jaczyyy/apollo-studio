@@ -8,7 +8,9 @@
         g(transform="scale(0.25)")
           rect(x="242" y="487" width="16" height="10.5" transform="matrix(1,0,0,1,0,0)" fill="rgb(235,235,235)" button="99")
           path(d="M 12.5 2.5 L 487.5 2.5 C 493.019 2.5 497.5 6.981 497.5 12.5 L 497.5 487.5 C 497.5 493.019 493.019 497.5 487.5 497.5 L 12.5 497.5 C 6.981 497.5 2.5 493.019 2.5 487.5 L 2.5 12.5 C 2.5 6.981 6.981 2.5 12.5 2.5 Z" fill="rgb(33,33,33)")
-          path(v-for="(button, index) in buttons" :d="button" :button="index" fill="rgb(235,235,235)" @mousedown="mdown(index)" @mouseup="mup(index)")
+          path(v-for="(button, index) in buttons" :d="button" :button="index" fill="rgb(235,235,235)"
+            @pointerdown="mdown(index)" @pointerup="mup(index)"
+            @pointerover="pointerover(index)" @pointerout="pointerout(index)")
 </template>
 
 <script>
@@ -23,6 +25,7 @@ export default {
   data: () => ({
     unwatch: false,
     factor: 63 / 255,
+    pointerdown: false,
     buttons: {
       "81":
         "M 72 69 L 106 69 C 107.656 69 109 70.344 109 72 L 109 106 C 109 107.656 107.656 109 106 109 L 72 109 C 70.344 109 69 107.656 69 106 L 69 72 C 69 70.344 70.344 69 72 69 Z",
@@ -239,6 +242,7 @@ export default {
   },
   methods: {
     mdown(index) {
+      this.pointerdown = true
       this.update({
         type: "signal",
         press: !0,
@@ -246,6 +250,7 @@ export default {
       })
     },
     mup(index) {
+      this.pointerdown = false
       this.update({
         type: "signal",
         press: !1,
@@ -257,6 +262,25 @@ export default {
         path: "",
         data,
       })
+    },
+    mmove() {},
+    pointerover(index) {
+      if (this.pointerdown) {
+        this.update({
+          type: "signal",
+          press: !0,
+          index,
+        })
+      }
+    },
+    pointerout(index) {
+      if (this.pointerdown) {
+        this.update({
+          type: "signal",
+          press: !1,
+          index,
+        })
+      }
     },
   },
 }
