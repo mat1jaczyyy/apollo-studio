@@ -101,15 +101,18 @@ ipcRenderer.on("request", (event, request) => {
         vue.track = request.body.data.tracks[0]
         vue.port = vue.track.data.launchpad.data.port
         vue.axios.post("http://localhost:1548/api").catch(e => {})
-        vue.api("set/midi", {
-          type: "rescan",
-        }).then(e => (vue.ports = e.data))
+        vue
+          .api("set/midi", {
+            type: "rescan",
+          })
+          .then(e => (vue.ports = e.data))
       }
       break
     case "/app":
       if (vue) {
-        const { req, device } = resolveObj(request.body, [vue.track])
-        device.data = req.data
+        console.log(resolveUrl(request.body.path, vue.track.data))
+        // const { req, device } = resolveObj(request.body, [vue.track])
+        // device.data = req.data
       }
       break
     default:
@@ -131,6 +134,20 @@ const resolveObj = (req, device) => {
       req,
       device,
     }
+}
+const resolveUrl = (path, fullPath) => {
+  path = path.split("/")
+  path.shift()
+  path.shift()
+  console.log(path, fullPath)
+  path.forEach(e => {
+    if (e.indexOf(":") > 0) {
+      const s = e.split(":")
+      fullPath = fullPath[s[1]].data
+      if (fullPath.data) fullPath = fullPath.data
+    } else fullPath = fullPath[e].data
+  })
+  return fullPath
 }
 // ipcRenderer.send('asynchronous-message', 'ping')
 

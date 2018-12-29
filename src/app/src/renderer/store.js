@@ -28,7 +28,7 @@ export default new Vuex.Store({
       paint: "paint",
       translation: "translation",
       layer: "layer",
-      preview: "preview",
+      // preview: "preview",
     },
     themes: {
       "pretty dark": {
