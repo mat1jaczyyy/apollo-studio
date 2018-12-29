@@ -6,6 +6,7 @@
       preserveAspectRatio="xMidYMid meet"
       width="100%" height="100%" ref="svg")
         g(transform="scale(0.25)")
+          rect#b99(x="243.5" y="489" width="13" height="25" transform="matrix(1,0,0,1,0,0)" fill="rgb(235,235,235)")
           path(d="M 12.5 2.5 L 487.5 2.5 C 493.019 2.5 497.5 6.981 497.5 12.5 L 497.5 487.5 C 497.5 493.019 493.019 497.5 487.5 497.5 L 12.5 497.5 C 6.981 497.5 2.5 493.019 2.5 487.5 L 2.5 12.5 C 2.5 6.981 6.981 2.5 12.5 2.5 Z" fill="rgb(33,33,33)")
           g#middle
             g#row
@@ -138,9 +139,9 @@ export default {
     self.unwatch = self.$watch(
       "data",
       n => {
-        console.log(n.data.signal.data.index)
         let { red, green, blue } = n.data.signal.data.color.data
         const el = self.$refs.svg.querySelector(`#b${n.data.signal.data.index}`)
+        // TODO: make colors nicer :)
         if (red === 0 && green === 0 && blue === 0) red = green = blue = 235
         if (el)
           el.style.fill = `rgb(${red / self.factor}, ${green /
