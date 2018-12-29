@@ -81,7 +81,7 @@ namespace api.Devices {
                     return new BadRequestObjectResult("The Preview object has no members to forward to.");
                 
                 case "signal":
-                    Signal n = new Signal(Convert.ToByte(data["index"]), new Color(63));
+                    Signal n = new Signal(Convert.ToByte(data["index"]), new Color((Convert.ToBoolean(data["press"]))? (byte)63: (byte)0));
                     MIDIEnter(n.Clone());
                     return new OkObjectResult(n.Encode());
 
