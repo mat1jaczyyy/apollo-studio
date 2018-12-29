@@ -11,11 +11,12 @@ const resolveUrl = (path, fullPath) => {
   path.shift()
   path.forEach(e => {
     if (e.indexOf(":") > 0) {
-      let s = e.split(":")
-      if (s.length > 2 && s[2] === "group") fullPath = fullPath[s[1]].data.data
-      else fullPath = fullPath[s[1]].data
-    } else fullPath = fullPath[e].data || fullPath[e]
+      const s = e.split(":")
+      fullPath = fullPath[s[1]].data
+      if (fullPath.data) fullPath = fullPath.data
+    } else fullPath = fullPath[e].data
   })
+  console.log(path, fullPath)
   return fullPath
 }
 export default {
@@ -43,11 +44,11 @@ export default {
         index,
       })
         .then(e => {
-          resolveUrl(`set/track:0/chain${path}`, self.track.data).splice(
-            index,
-            0,
-            e.data
+          const resolved = resolveUrl(
+            `set/track:0/chain${path}`,
+            self.track.data
           )
+          resolved.splice(index, 0, e.data)
         })
         .catch(e => console.error(e))
     },
@@ -57,19 +58,6 @@ export default {
         index,
       }).catch(e => console.error(e))
       this.devices.splice(index, 1)
-    },
-    newDevice(device, index) {
-      let self = this
-      this.api("set/track:0/chain:0", {
-        type: "add",
-        index,
-        device,
-      }).then(e => {
-        self.devices.push({
-          component: e.data.data.device,
-          data: e.data.data.data,
-        })
-      })
     },
     update({ path, data }) {
       // this.$emit("update", {
