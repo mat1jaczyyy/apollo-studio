@@ -43,7 +43,7 @@ namespace api {
             MIDI.Rescan();
             Set.New();
 
-            Communication.Server.Start();
+            //Communication.Server.Start();
 
             Log("ready");
 
