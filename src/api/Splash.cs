@@ -18,6 +18,7 @@ namespace api {
             #endif
 
             this.Get<Image>("img").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("api.Resources.SplashImage.png"));
+            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("api.Resources.WindowIcon.png"));
         }
     }
 }

@@ -6,16 +6,18 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64</RuntimeIdentifiers>
     <LangVersion>7.2</LangVersion>
-    <ApplicationIcon />
+    <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="App.xaml" />
+    <None Remove="Resources\WindowIcon.png" />
     <None Remove="Splash.xaml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\WindowIcon.png" />
     <EmbeddedResource Include="Splash.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
