@@ -19,6 +19,8 @@ namespace api {
     class Program {
         public static bool log = true;
 
+        public static ManualResetEvent close = new ManualResetEvent(false);
+
         public static Stopwatch logTimer = new Stopwatch();
 
         public static void Log(string text) {
@@ -44,13 +46,12 @@ namespace api {
                 Log($"MIDI API: {api}");
 
             MIDI.Rescan();
-            Set.New();
-
-            //Communication.Server.Start();
 
             Log("ready");
 
             BuildAvaloniaApp().Start<Splash>();
+
+            close.WaitOne();
         }
     }
 }
