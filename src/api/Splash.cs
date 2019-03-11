@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 
 using Avalonia;
@@ -10,9 +9,7 @@ using Avalonia.Media.Imaging;
 
 namespace api {
     public class Splash: Window {
-        private void InitializeComponent() {
-            AvaloniaXamlLoader.Load(this);
-        }
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public Splash() {
             InitializeComponent();
@@ -26,7 +23,9 @@ namespace api {
 
         public void buttonNew_Click(object sender, RoutedEventArgs e) {
             Set.New();
-            Close();
+
+            foreach (Track track in Set.Tracks)
+                track.Show();
         }
 
         public async void buttonOpen_Click(object sender, RoutedEventArgs e) {

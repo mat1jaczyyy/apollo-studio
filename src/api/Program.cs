@@ -51,6 +51,8 @@ namespace api {
 
             BuildAvaloniaApp().Start<Splash>();
 
+            Log("loaded");
+
             close.WaitOne();
         }
     }

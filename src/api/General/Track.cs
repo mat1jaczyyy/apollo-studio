@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -7,11 +7,15 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Devices;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace api {
-    public class Track: IChainParent, IResponse {
+    public class Track: Window, IChainParent, IResponse {
         public static readonly string Identifier = "track";
+        
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         public int? ParentIndex;
 
@@ -35,6 +39,11 @@ namespace api {
         }
 
         public Track(Chain init = null, Launchpad launchpad = null) {
+            InitializeComponent();
+            #if DEBUG
+                this.AttachDevTools();
+            #endif
+
             if (init == null) init = new Chain();
             Chain = init;
             Chain.Parent = this;

@@ -24,6 +24,9 @@
     <EmbeddedResource Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="General\Track.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>
@@ -38,5 +41,11 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Resources/SplashImage.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="General\Track.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 </Project>
