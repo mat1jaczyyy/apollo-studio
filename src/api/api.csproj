@@ -12,21 +12,13 @@
 
   <ItemGroup>
     <None Remove="App.xaml" />
+    <None Remove="General\Track.xaml" />
     <None Remove="Resources\WindowIcon.png" />
     <None Remove="Splash.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\WindowIcon.png" />
-    <EmbeddedResource Include="Splash.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Include="General\Track.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>
@@ -44,8 +36,22 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="General\Track.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="**\*.xaml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="General\Track.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Splash.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  
 </Project>

@@ -25,7 +25,7 @@ namespace api {
             Set.New();
 
             foreach (Track track in Set.Tracks)
-                track.Show();
+            track.Show();
         }
 
         public async void buttonOpen_Click(object sender, RoutedEventArgs e) {
