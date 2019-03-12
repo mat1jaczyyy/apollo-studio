@@ -20,9 +20,8 @@ namespace Apollo.Components {
                         _signals[layer] = n.Clone();
                         
                         if (layer == _highest)
-                            if (MIDIExit != null)
-                                MIDIExit(n.Clone());
-                    
+                            MIDIExit?.Invoke(n.Clone());
+
                     } else {
                         _signals.Remove(layer);
 
@@ -30,14 +29,12 @@ namespace Apollo.Components {
                             if (_signals.Count == 0) {
                                 _highest = null;
 
-                                if (MIDIExit != null)
-                                    MIDIExit(n.Clone());
-                            
+                                MIDIExit?.Invoke(n.Clone());
+
                             } else {
                                 _highest = _signals.Keys[0];
 
-                                if (MIDIExit != null)
-                                    MIDIExit(_signals[(int)_highest].Clone());
+                                MIDIExit?.Invoke(_signals[(int)_highest].Clone());
                             }
                         }
                     }
@@ -49,8 +46,7 @@ namespace Apollo.Components {
                         if (!_highest.HasValue || layer < _highest) {
                             _highest = layer;
 
-                            if (MIDIExit != null)
-                                MIDIExit(n.Clone());
+                            MIDIExit?.Invoke(n.Clone());
                         }
                     }
                 }

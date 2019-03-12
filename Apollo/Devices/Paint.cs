@@ -28,8 +28,7 @@ namespace Apollo.Devices {
             if (n.Color.Lit)
                 n.Color = _color.Clone();
 
-            if (MIDIExit != null)
-                MIDIExit(n);
+            MIDIExit?.Invoke(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {

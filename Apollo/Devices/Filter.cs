@@ -31,8 +31,7 @@ namespace Apollo.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (_filter[n.Index])
-                if (MIDIExit != null)
-                    MIDIExit(n);
+                MIDIExit?.Invoke(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {

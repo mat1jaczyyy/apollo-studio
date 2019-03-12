@@ -100,8 +100,7 @@ namespace Apollo.Elements {
         }
 
         public void MIDIEnter(Signal n) {
-            if (_chainenter != null)
-                _chainenter(n);
+            _chainenter?.Invoke(n);
         }
 
         public static Chain Decode(string jsonString) {

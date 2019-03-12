@@ -65,9 +65,8 @@ namespace Apollo.Devices {
                 Signal n = (Signal)info;
 
                 lock (locker) {
-                    if (MIDIExit != null)
-                        MIDIExit(n);
-                    
+                    MIDIExit?.Invoke(n);
+
                     _timers.Dequeue().Dispose();
                 }
             }

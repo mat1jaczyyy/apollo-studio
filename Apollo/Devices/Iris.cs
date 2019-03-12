@@ -57,11 +57,9 @@ namespace Apollo.Devices {
                     int color = ++_indexes[index];
 
                     if (color < Colors.Count) {
-                        if (MIDIExit != null)
-                            MIDIExit(new Signal(index, Colors[color].Clone(), layer));
+                        MIDIExit?.Invoke(new Signal(index, Colors[color].Clone(), layer));
                     } else { // TODO: Only if last color is not 0?
-                        if (MIDIExit != null)
-                            MIDIExit(new Signal(index, new Color(0), layer));
+                        MIDIExit?.Invoke(new Signal(index, new Color(0), layer));
                     }
                 }
             }
@@ -78,9 +76,8 @@ namespace Apollo.Devices {
 
                 n.Color = Colors[0].Clone();
 
-                if (MIDIExit != null)
-                    MIDIExit(n);
-                
+                MIDIExit?.Invoke(n);
+
                 for (int i = 1; i <= Colors.Count; i++) {
                     _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), _rate * i, Timeout.Infinite));
                 }

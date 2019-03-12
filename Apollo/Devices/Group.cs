@@ -85,8 +85,7 @@ namespace Apollo.Devices {
         }
 
         private void ChainExit(Signal n) {
-            if (MIDIExit != null)
-                MIDIExit(n);
+            MIDIExit?.Invoke(n);
         }
 
         public override void MIDIEnter(Signal n) {

@@ -101,8 +101,7 @@ namespace Apollo.Devices {
                     int color = ++_indexes[index];
 
                     if (color < _steps.Count) {
-                        if (MIDIExit != null)
-                            MIDIExit(new Signal(index, _steps[color].Clone(), layer));
+                        MIDIExit?.Invoke(new Signal(index, _steps[color].Clone(), layer));
                     }
                 }
             }
@@ -119,9 +118,8 @@ namespace Apollo.Devices {
 
                 n.Color = _steps[0].Clone();
 
-                if (MIDIExit != null)
-                    MIDIExit(n);
-                
+                MIDIExit?.Invoke(n);
+
                 int j = 0;
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;

@@ -19,18 +19,18 @@ namespace Apollo.Core {
                 this.AttachDevTools();
             #endif
 
-            this.Get<Image>("img").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
+            this.Get<Image>("Logo").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
         }
 
-        public void buttonNew_Click(object sender, RoutedEventArgs e) {
+        public void New_Click(object sender, RoutedEventArgs e) {
             Set.New();
 
             foreach (Track track in Set.Tracks)
             track.Show();
         }
 
-        public async void buttonOpen_Click(object sender, RoutedEventArgs e) {
+        public async void Open_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {

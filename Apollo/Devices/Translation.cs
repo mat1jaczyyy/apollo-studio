@@ -42,8 +42,7 @@ namespace Apollo.Devices {
 
             n.Index = (byte)result;
 
-            if (MIDIExit != null)
-                MIDIExit(n);
+            MIDIExit?.Invoke(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {

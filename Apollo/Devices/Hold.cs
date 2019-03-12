@@ -65,9 +65,8 @@ namespace Apollo.Devices {
                 Signal n = new Signal((byte)info, new Color(0));
 
                 lock (locker) {
-                    if (MIDIExit != null)
-                        MIDIExit(n);
-                    
+                    MIDIExit?.Invoke(n);
+
                     _timers.Dequeue();
                 }
             }
@@ -76,9 +75,8 @@ namespace Apollo.Devices {
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
                 _timers.Enqueue(new Timer(_timerexit, n.Index, Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
-                
-                if (MIDIExit != null)
-                    MIDIExit(n);
+
+                MIDIExit?.Invoke(n);
             }
         }
 

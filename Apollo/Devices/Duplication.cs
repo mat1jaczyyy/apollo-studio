@@ -51,9 +51,8 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (MIDIExit != null)
-                MIDIExit(n);
-            
+            MIDIExit?.Invoke(n);
+
             foreach (int offset in _offsets) {
                 Signal m = n.Clone();
 
@@ -64,8 +63,7 @@ namespace Apollo.Devices {
 
                 m.Index = (byte)result;
 
-                if (MIDIExit != null)
-                    MIDIExit(m);
+                MIDIExit?.Invoke(m);
             }
         }
 

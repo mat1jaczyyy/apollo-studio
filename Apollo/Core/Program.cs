@@ -7,6 +7,9 @@ using Avalonia.Logging.Serilog;
 
 using RtMidi.Core;
 
+// Suppresses readonly suggestion
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier")]
+
 namespace Apollo.Core {
     class Program {
         public static bool log = true;

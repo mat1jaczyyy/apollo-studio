@@ -236,8 +236,7 @@ namespace Apollo.Devices {
                 
                 n.Index = Conversion.DRtoXY[n.Index];
 
-                if (MIDIExit != null)
-                    MIDIExit(n);
+                MIDIExit?.Invoke(n);
             }
         }
 
