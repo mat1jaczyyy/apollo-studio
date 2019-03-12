@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RtMidi.Core;
 
-using api.Elements;
+using Apollo.Elements;
 
-namespace api.Core {
+namespace Apollo.Core {
     public static class MIDI {
         public static readonly string Identifier = "midi";
 

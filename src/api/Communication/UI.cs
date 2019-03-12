@@ -5,10 +5,10 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using api.Core;
-using api.Elements;
+using Apollo.Core;
+using Apollo.Elements;
 
-namespace api.Communication {
+namespace Apollo.Communication {
     public class UI {
         private static readonly string ip = "localhost";
         private static readonly ushort port = 1549;

@@ -8,10 +8,10 @@ using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
-using api.Core;
-using api.Components;
+using Apollo.Core;
+using Apollo.Components;
 
-namespace api.Elements {
+namespace Apollo.Elements {
     public class Launchpad {
         public static readonly string Identifier = "launchpad";
 

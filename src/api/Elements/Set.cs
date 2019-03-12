@@ -7,9 +7,9 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Core;
+using Apollo.Core;
 
-namespace api.Elements {
+namespace Apollo.Elements {
     public static class Set {
         public static readonly string Identifier = "set";
 

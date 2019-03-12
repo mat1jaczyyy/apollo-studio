@@ -7,10 +7,10 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Components;
-using api.Elements;
+using Apollo.Components;
+using Apollo.Elements;
 
-namespace api.Devices {
+namespace Apollo.Devices {
     public class Layer: Device {
         public static readonly new string DeviceIdentifier = "layer";
 

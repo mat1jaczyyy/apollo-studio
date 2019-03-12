@@ -8,10 +8,10 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Components;
-using api.Core;
+using Apollo.Components;
+using Apollo.Core;
 
-namespace api.Elements {
+namespace Apollo.Elements {
     public abstract class Device: IRequest, IResponse {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
@@ -34,7 +34,7 @@ namespace api.Elements {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
+            foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("Apollo.Devices") && !type.Namespace.StartsWith("Apollo.Devices.Device")) select type)) {
                 var parsed = device.GetMethod("DecodeSpecific").Invoke(null, new object[] {json["data"].ToString()});
                 if (parsed != null) return (Device)parsed;
             }

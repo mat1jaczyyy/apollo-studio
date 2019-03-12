@@ -7,9 +7,9 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 
-using api.Elements;
+using Apollo.Elements;
 
-namespace api.Core {
+namespace Apollo.Core {
     public class Splash: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
@@ -19,8 +19,8 @@ namespace api.Core {
                 this.AttachDevTools();
             #endif
 
-            this.Get<Image>("img").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("api.Resources.SplashImage.png"));
-            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("api.Resources.WindowIcon.png"));
+            this.Get<Image>("img").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
+            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
         }
 
         public void buttonNew_Click(object sender, RoutedEventArgs e) {

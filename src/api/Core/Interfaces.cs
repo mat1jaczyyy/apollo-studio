@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace api.Core {
+namespace Apollo.Core {
     public interface IDeviceParent: IRequest {}
     public interface IChainParent: IRequest {}
 

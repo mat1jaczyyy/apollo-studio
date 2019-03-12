@@ -11,10 +11,10 @@ using Avalonia.Markup.Xaml;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Core;
-using api.Components;
+using Apollo.Core;
+using Apollo.Components;
 
-namespace api.Elements {
+namespace Apollo.Elements {
     public class Track: Window, IChainParent, IResponse {
         public static readonly string Identifier = "track";
         

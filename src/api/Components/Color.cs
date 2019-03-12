@@ -4,7 +4,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace api.Components {
+namespace Apollo.Components {
     public class Color {
         public static readonly string Identifier = "color";
 

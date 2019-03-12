@@ -7,7 +7,7 @@
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64</RuntimeIdentifiers>
     <LangVersion>7.2</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <StartupObject>api.Core.Program</StartupObject>
+    <StartupObject>Apollo.Core.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

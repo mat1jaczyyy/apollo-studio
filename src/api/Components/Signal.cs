@@ -3,7 +3,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace api.Components {
+namespace Apollo.Components {
     public class Signal {
         public static readonly string Identifier = "signal";
 

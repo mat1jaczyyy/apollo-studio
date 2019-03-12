@@ -7,7 +7,7 @@ using Avalonia.Logging.Serilog;
 
 using RtMidi.Core;
 
-namespace api.Core {
+namespace Apollo.Core {
     class Program {
         public static bool log = true;
 

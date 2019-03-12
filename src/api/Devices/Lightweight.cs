@@ -8,11 +8,11 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Components;
-using api.Core;
-using api.Elements;
+using Apollo.Components;
+using Apollo.Core;
+using Apollo.Elements;
 
-namespace api.Devices {
+namespace Apollo.Devices {
     public class Lightweight: Device {
         public static readonly new string DeviceIdentifier = "lightweight";
 

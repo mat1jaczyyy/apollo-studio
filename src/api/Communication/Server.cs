@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
-using api.Core;
-using api.Elements;
+using Apollo.Core;
+using Apollo.Elements;
 
-namespace api.Communication {
+namespace Apollo.Communication {
     public static class Server {
         private static readonly string ip = "localhost";
         private static readonly ushort port = 1548;
