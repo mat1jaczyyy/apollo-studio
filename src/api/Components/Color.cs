@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Text;
+
 using Newtonsoft.Json;
 
-namespace api {
+namespace api.Components {
     public class Color {
         public static readonly string Identifier = "color";
 

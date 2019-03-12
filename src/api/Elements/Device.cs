@@ -4,14 +4,14 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api;
+using api.Components;
+using api.Core;
 
-namespace api.Devices {
+namespace api.Elements {
     public abstract class Device: IRequest, IResponse {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;

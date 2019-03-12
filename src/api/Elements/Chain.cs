@@ -9,9 +9,10 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Devices;
+using api.Components;
+using api.Core;
 
-namespace api {
+namespace api.Elements {
     public class Chain: IDeviceParent, IResponse {
         public static readonly string Identifier = "chain";
 
@@ -164,7 +165,7 @@ namespace api {
                 case "add":
                     foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("api.Devices") && !type.Namespace.StartsWith("api.Devices.Device")) select type)) {
                         if (device.Name.ToLower().Equals(data["device"])) {
-                            Insert(Convert.ToInt32(data["index"]), (Devices.Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
+                            Insert(Convert.ToInt32(data["index"]), (Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
                             return new OkObjectResult(_devices[Convert.ToInt32(data["index"])].Encode());
                         }
                     }

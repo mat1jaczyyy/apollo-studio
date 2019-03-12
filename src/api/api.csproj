@@ -7,12 +7,11 @@
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64</RuntimeIdentifiers>
     <LangVersion>7.2</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <StartupObject />
+    <StartupObject>api.Core.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="App.xaml" />
-    <None Remove="General\Track.xaml" />
     <None Remove="Resources\WindowIcon.png" />
     <None Remove="Splash.xaml" />
   </ItemGroup>
@@ -46,12 +45,24 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Update="General\Track.xaml">
+    <EmbeddedResource Update="Elements\Track.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Splash.xaml">
+    <EmbeddedResource Update="Core\Splash.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="Core\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Core\Splash.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Elements\Track.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
   
 </Project>

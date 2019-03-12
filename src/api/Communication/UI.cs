@@ -1,10 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 
 using Newtonsoft.Json;
+
+using api.Core;
+using api.Elements;
 
 namespace api.Communication {
     public class UI {
@@ -58,7 +60,7 @@ namespace api.Communication {
         }
 
         public static async void App(string json) {
-            api.Program.Log($"UI  ** {json}");
+            Program.Log($"UI  ** {json}");
             using (HttpClient client = new HttpClient())
                 await client.PostAsync($"http://{ip}:{port}/app", new StringContent(json, Encoding.UTF8, "application/json"));
         }

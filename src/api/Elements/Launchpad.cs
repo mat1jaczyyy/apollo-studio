@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
 
-using RtMidi.Core;
+using Newtonsoft.Json;
 using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
-using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
 
-namespace api {
+using api.Core;
+using api.Components;
+
+namespace api.Elements {
     public class Launchpad {
         public static readonly string Identifier = "launchpad";
 
@@ -97,7 +98,7 @@ namespace api {
                     throw new ArgumentException("Launchpad not recognized");
             }
 
-            api.Program.Log($"OUT <- {n.ToString()}");
+            Program.Log($"OUT <- {n.ToString()}");
 
             SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, rgb_byte, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue});
             Output.Send(in msg);
@@ -158,7 +159,7 @@ namespace api {
                 if (InputFormat == InputType.DrumRack)
                     n.Index = Conversion.DRtoXY[n.Index];
                 
-                api.Program.Log($"IN  -> {n.ToString()}");
+                Program.Log($"IN  -> {n.ToString()}");
 
                 if (Receive != null)
                     Receive.Invoke(n);

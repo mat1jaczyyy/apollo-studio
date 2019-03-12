@@ -1,10 +1,9 @@
 using System.IO;
 using System.Text;
+
 using Newtonsoft.Json;
 
-using api;
-
-namespace api {
+namespace api.Components {
     public class Signal {
         public static readonly string Identifier = "signal";
 

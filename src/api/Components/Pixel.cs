@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace api {
+namespace api.Components {
     public class Pixel {
         public Action<Signal> MIDIExit = null;
         

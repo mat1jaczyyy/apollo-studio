@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using api;
+using api.Elements;
 
-namespace api {
+namespace api.Components {
     public class Length {
         private Decimal _value;
         

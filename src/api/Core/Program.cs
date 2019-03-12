@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
-
-using RtMidi.Core;
-using RtMidi.Core.Devices;
-using RtMidi.Core.Enums;
-using RtMidi.Core.Messages;
-
-using api.Devices;
-using Newtonsoft.Json;
 
 using Avalonia;
 using Avalonia.Logging.Serilog;
 
-namespace api {
+using RtMidi.Core;
+
+namespace api.Core {
     class Program {
         public static bool log = true;
 

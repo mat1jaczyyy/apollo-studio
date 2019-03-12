@@ -7,9 +7,9 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api.Devices;
+using api.Core;
 
-namespace api {
+namespace api.Elements {
     public static class Set {
         public static readonly string Identifier = "set";
 

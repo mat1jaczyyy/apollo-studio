@@ -7,7 +7,9 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 
-namespace api {
+using api.Elements;
+
+namespace api.Core {
     public class Splash: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 

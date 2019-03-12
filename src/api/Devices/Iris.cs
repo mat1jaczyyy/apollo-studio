@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -9,7 +7,8 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using api;
+using api.Components;
+using api.Elements;
 
 namespace api.Devices {
     public class Iris: Device {

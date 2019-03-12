@@ -1,21 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-using RtMidi.Core;
-using RtMidi.Core.Devices;
-using RtMidi.Core.Devices.Infos;
-using RtMidi.Core.Enums;
-using RtMidi.Core.Messages;
 
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using RtMidi.Core;
 
-namespace api {
+using api.Elements;
+
+namespace api.Core {
     public static class MIDI {
         public static readonly string Identifier = "midi";
 

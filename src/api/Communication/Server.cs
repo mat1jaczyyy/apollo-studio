@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+
+using api.Core;
+using api.Elements;
 
 namespace api.Communication {
     public static class Server {
@@ -19,7 +21,7 @@ namespace api.Communication {
             .UseKestrel()
             .UseStartup<Startup>()
             .UseUrls($"http://{ip}:{port}/")
-            .SuppressStatusMessages(!api.Program.log)
+            .SuppressStatusMessages(!Program.log)
             .Build();
 
         private class Startup {
@@ -73,10 +75,10 @@ namespace api.Communication {
             this.Request.Body.Read(buffer, 0, Convert.ToInt32(this.Request.ContentLength));
 
             string request = Encoding.UTF8.GetString(buffer);
-            api.Program.Log($"REQ -> {request}");
+            Program.Log($"REQ -> {request}");
 
             ObjectResult response = (this.Request.ContentLength == 0)? new OkObjectResult(null) : Respond(request);
-            if (response.Value != null) api.Program.Log($"RSP <- {response.Value.ToString()}"); 
+            if (response.Value != null) Program.Log($"RSP <- {response.Value.ToString()}"); 
 
             return response;
         }

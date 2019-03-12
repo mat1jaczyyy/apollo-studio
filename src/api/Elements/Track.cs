@@ -4,14 +4,17 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace api {
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+
+using api.Core;
+using api.Components;
+
+namespace api.Elements {
     public class Track: Window, IChainParent, IResponse {
         public static readonly string Identifier = "track";
         
