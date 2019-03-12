@@ -36,8 +36,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Update="**\*.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
+    <Compile Update="**\*.cs">
+      <DependentUpon>%(Filename).xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="**\*.xaml">
       <SubType>Designer</SubType>
