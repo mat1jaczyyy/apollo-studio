@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 using Avalonia;
@@ -46,6 +47,8 @@ namespace Apollo.Elements {
             #if DEBUG
                 this.AttachDevTools();
             #endif
+            
+            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
 
             if (init == null) init = new Chain();
             Chain = init;

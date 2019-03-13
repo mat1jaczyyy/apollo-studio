@@ -46,7 +46,8 @@ namespace Apollo.Core {
 
             string[] result = await ofd.ShowAsync();
             if (result.Length > 0 && Set.Open(result[0])) {
-                Close();
+                foreach (Track track in Set.Tracks)
+                    track.Show();
             }
         }
     }
