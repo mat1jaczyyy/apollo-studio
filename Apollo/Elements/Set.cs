@@ -40,10 +40,10 @@ namespace Apollo.Elements {
         }
 
         public static bool Open(string path) {
-            if (File.Exists(path)) {
-                return Decode(File.ReadAllText(path));
-            }
-            return false;
+            bool result = File.Exists(path) && Decode(File.ReadAllText(path));
+            if (result) _path = path;
+
+            return result;
         }
 
         public static void Save(string path) {
