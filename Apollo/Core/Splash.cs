@@ -44,7 +44,7 @@ namespace Apollo.Core {
                 Title = "Open Project"
             };
 
-            string[] result = await ofd.ShowAsync();
+            string[] result = await ofd.ShowAsync(this);
             if (result.Length > 0 && Set.Open(result[0])) {
                 foreach (Track track in Set.Tracks)
                     track.Show();
