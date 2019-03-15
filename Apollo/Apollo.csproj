@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Remove="App.xaml" />
+    <None Remove="Components\Dial.xaml" />
     <None Remove="Resources\WindowIcon.png" />
     <None Remove="Splash.xaml" />
   </ItemGroup>
@@ -46,6 +47,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <EmbeddedResource Update="Components\Dial.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Elements\Track.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
