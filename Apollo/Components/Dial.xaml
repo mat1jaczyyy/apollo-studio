@@ -8,11 +8,11 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <TextBlock Grid.Row="0" Text="Dial" />
+    <TextBlock Grid.Row="0" x:Name="Title" />
 
     <Canvas Grid.Row="1" Width="50">
-      <Path Stroke="#0A0A0A" StrokeThickness="7"  
-        Data="M 10.75,40.12 A 18,18 300 1 1 32.25,40.12" />
+      <Path Stroke="#0A0A0A" x:Name="ArcBase" />
+      <Path Stroke="#0288D1" x:Name="Arc" />
     </Canvas>
 
     <NumericUpDown Grid.Row="2" />
