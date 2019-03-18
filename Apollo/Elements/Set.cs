@@ -111,41 +111,5 @@ namespace Apollo.Elements {
             
             return json.ToString();
         }
-
-        public static string Request(Dictionary<string, object> data, List<string> path = null) {
-            if (path == null) path = new List<string>();
-            path.Insert(0, Identifier);
-
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue("message");
-
-                    writer.WritePropertyName("path");
-                    writer.WriteValue(string.Join('/', path));
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        foreach (KeyValuePair<string, object> entry in data) {
-                            writer.WritePropertyName(entry.Key);
-                            string value = entry.Value.ToString();
-
-                            if (value[0].Equals('{') || value[0].Equals('['))
-                                writer.WriteRawValue(value);
-                            else
-                                writer.WriteValue(value);
-                        }
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-
-            return json.ToString();
-        }
     }
 }

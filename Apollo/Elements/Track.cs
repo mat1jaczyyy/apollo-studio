@@ -118,15 +118,5 @@ namespace Apollo.Elements {
             
             return json.ToString();
         }
-
-        public string Request(Dictionary<string, object> data, List<string> path = null) {
-            if (path == null) path = new List<string>();
-            path.Insert(0, Identifier);
-
-            if (ParentIndex != null)
-                path[0] += $":{ParentIndex}";
-
-            return Set.Request(data, path);
-        }
     }
 }
