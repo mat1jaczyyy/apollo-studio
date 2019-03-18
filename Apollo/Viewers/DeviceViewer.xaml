@@ -1,6 +1,5 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Devices="clr-namespace:Apollo.Devices">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   
   <Grid>
     <Grid.RowDefinitions>
@@ -8,11 +7,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     
-    <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Top Placeholder" />
-    
-    <Grid Grid.Row="1">
-      <TextBlock Text="Test" />
-    </Grid>
-      
+    <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Device" />
+    <Grid Grid.Row="1" x:Name="Contents" />
   </Grid>
 </UserControl>
