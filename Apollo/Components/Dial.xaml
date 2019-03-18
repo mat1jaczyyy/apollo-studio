@@ -8,14 +8,14 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <TextBlock Grid.Row="0" x:Name="Title" />
+    <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
 
-    <Canvas Grid.Row="1" Width="43" Background="Transparent" x:Name="ArcCanvas"
+    <Canvas Grid.Row="1" HorizontalAlignment="Center" Width="43" Background="Transparent" x:Name="ArcCanvas"
             PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
       <Path Stroke="#0A0A0A" x:Name="ArcBase" />
       <Path Stroke="#0288D1" x:Name="Arc" />
     </Canvas>
 
-    <TextBlock Grid.Row="2" x:Name="Display" />
+    <TextBlock Grid.Row="2" HorizontalAlignment="Center" x:Name="Display" />
   </Grid>
 </UserControl>
