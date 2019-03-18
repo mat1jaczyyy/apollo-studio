@@ -33,10 +33,13 @@ namespace Apollo.Elements {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("Apollo.Devices") && !type.Namespace.StartsWith("Apollo.Devices.Device")) select type)) {
-                var parsed = device.GetMethod("DecodeSpecific").Invoke(null, new object[] {json["data"].ToString()});
-                if (parsed != null) return (Device)parsed;
+            foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.Devices") select type)) {
+                object parsed = device.GetMethod("DecodeSpecific").Invoke(null, new object[] {json["data"].ToString()});
+
+                if (parsed != null)
+                    return (Device)parsed;
             }
+
             return null;
         }
 
