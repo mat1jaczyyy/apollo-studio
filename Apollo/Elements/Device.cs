@@ -5,14 +5,13 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
 using Apollo.Core;
 
 namespace Apollo.Elements {
-    public abstract class Device: IRequest, IResponse {
+    public abstract class Device {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
 
@@ -58,22 +57,6 @@ namespace Apollo.Elements {
             }
             
             return json.ToString();
-        }
-        
-        public string Request(Dictionary<string, object> data, List<string> path = null) {
-            if (path == null) path = new List<string>();
-            path.Insert(0, Identifier);
-
-            if (ParentIndex != null)
-                path[0] += $":{ParentIndex}";
-
-            return Parent.Request(data, path);
-        }
-
-        public abstract ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data);
-        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
-            return RespondSpecific(obj, path, data);
         }
     }
 }

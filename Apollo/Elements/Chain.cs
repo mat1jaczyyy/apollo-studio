@@ -6,14 +6,13 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
 using Apollo.Core;
 
 namespace Apollo.Elements {
-    public class Chain: IDeviceParent, IResponse {
+    public class Chain: IDeviceParent {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
@@ -138,45 +137,6 @@ namespace Apollo.Elements {
             }
             
             return json.ToString();
-        }
-
-        public string Request(Dictionary<string, object> data, List<string> path = null) {
-            if (path == null) path = new List<string>();
-            path.Insert(0, Identifier);
-
-            if (ParentIndex != null)
-                path[0] += $":{ParentIndex}";
-
-            return Parent.Request(data, path);
-        }
-
-        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
-
-            if (path.Count() > 1) {
-                if (path[1].StartsWith("device:"))
-                    return _devices[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
-
-                else return new BadRequestObjectResult("Incorrectly formatted message.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "add":
-                    foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where (type.Namespace.StartsWith("Apollo.Devices") && !type.Namespace.StartsWith("Apollo.Devices.Device")) select type)) {
-                        if (device.Name.ToLower().Equals(data["device"])) {
-                            Insert(Convert.ToInt32(data["index"]), (Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
-                            return new OkObjectResult(_devices[Convert.ToInt32(data["index"])].Encode());
-                        }
-                    }
-                    return new BadRequestObjectResult("Incorrectly formatted message.");
-
-                case "remove":
-                    Remove(Convert.ToInt32(data["index"]));
-                    return new OkObjectResult(null);
-                
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

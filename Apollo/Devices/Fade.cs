@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
@@ -198,10 +197,6 @@ namespace Apollo.Devices {
             }
             
             return json.ToString();
-        }
-
-        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
-            throw new NotImplementedException();
         }
     }
 }

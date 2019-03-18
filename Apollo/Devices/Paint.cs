@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
@@ -61,24 +60,6 @@ namespace Apollo.Devices {
             }
             
             return json.ToString();
-        }
-
-        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
-            if (path.Count() > 1) {
-                return new BadRequestObjectResult("The Paint object has no members to forward to.");
-            }
-
-            switch (data["type"].ToString()) {
-                
-                case "color":
-                    _color.Red = Convert.ToByte(data["red"]);
-                    _color.Green = Convert.ToByte(data["green"]);
-                    _color.Blue = Convert.ToByte(data["blue"]);
-                    return new OkObjectResult(EncodeSpecific());
-                
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

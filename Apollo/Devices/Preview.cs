@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
@@ -26,10 +25,7 @@ namespace Apollo.Devices {
         }
 
         public void PreviewExit(Signal n) {
-            Communication.UI.App(Request(new Dictionary<string, object>() {
-                ["type"] = "signal",
-                ["signal"] = n.Encode()
-            }));
+            throw new NotImplementedException();
         }
 
         public override void MIDIEnter(Signal n) {
@@ -66,22 +62,6 @@ namespace Apollo.Devices {
             }
             
             return json.ToString();
-        }
-
-        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
-            if (path.Count() > 1) {
-                return new BadRequestObjectResult("The Preview object has no members to forward to.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "signal":
-                    Signal n = new Signal(Convert.ToByte(data["index"]), new Color((Convert.ToBoolean(data["press"]))? (byte)63: (byte)0));
-                    MIDIEnter(n.Clone());
-                    return new OkObjectResult(n.Encode());
-
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

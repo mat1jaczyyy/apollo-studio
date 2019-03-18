@@ -9,14 +9,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Components;
 
 namespace Apollo.Elements {
-    public class Track: Window, IChainParent, IResponse {
+    public class Track: Window, IChainParent {
         public static readonly string Identifier = "track";
         
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -128,26 +127,6 @@ namespace Apollo.Elements {
                 path[0] += $":{ParentIndex}";
 
             return Set.Request(data, path);
-        }
-
-        public ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
-
-            if (path.Count() > 1) {
-                if (path[1] == "chain")
-                    return Chain.Respond(obj, path.Skip(1).ToArray(), data);
-
-                else return new BadRequestObjectResult("Incorrectly formatted message.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "port":
-                    Launchpad = MIDI.Devices[Convert.ToInt32(data["index"])];
-                    return new OkObjectResult(Launchpad.Encode());
-                
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

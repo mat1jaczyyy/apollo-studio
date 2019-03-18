@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Core;
@@ -147,47 +146,6 @@ namespace Apollo.Elements {
             }
 
             return json.ToString();
-        }
-
-        public static ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
-
-            if (path.Count() > 1) {
-                if (path[1].StartsWith("track:"))
-                    return Tracks[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
-
-                else if (path[1] == "midi")
-                    return MIDI.Respond(obj, path.Skip(1).ToArray(), data);
-                
-                else return new BadRequestObjectResult("Incorrectly formatted message.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "new":
-                    New();
-                    return new OkObjectResult(Set.Encode());
-
-                case "open":
-                    if (Open(data["path"].ToString())) {
-                        _path = data["path"].ToString();
-                        return new OkObjectResult(Set.Encode());
-                    }
-                    return new BadRequestObjectResult("Bad Set file content or path to Set file.");
-
-                case "save":
-                    if (_path == "")
-                        return new BadRequestObjectResult("No path to save to");
-
-                    Save(_path);
-                    return new OkObjectResult(null);
-                
-                case "save_as":
-                    Save(data["path"].ToString());
-                    return new OkObjectResult(Set.Encode());
-
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

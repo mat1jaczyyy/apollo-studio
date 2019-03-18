@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
@@ -115,33 +114,6 @@ namespace Apollo.Devices {
             }
             
             return json.ToString();
-        }
-
-        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
-            if (path.Count() > 1) {
-                return new BadRequestObjectResult("The Delay object has no members to forward to.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "mode":
-                    Mode = Convert.ToBoolean(data["value"]);
-                    return new OkObjectResult(EncodeSpecific());
-
-                case "length":
-                    Length = new Length(Convert.ToInt32(data["value"]) - 7);
-                    return new OkObjectResult(EncodeSpecific());
-
-                case "time":
-                    Time = Convert.ToInt32(data["value"]);
-                    return new OkObjectResult(EncodeSpecific());
-
-                case "gate":
-                    Gate = Convert.ToDecimal(data["value"]);
-                    return new OkObjectResult(EncodeSpecific());
-                
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

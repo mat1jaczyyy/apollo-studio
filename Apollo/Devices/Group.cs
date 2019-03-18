@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 using Apollo.Components;
@@ -128,28 +127,6 @@ namespace Apollo.Devices {
             }
             
             return json.ToString();
-        }
-
-        public override ObjectResult RespondSpecific(string obj, string[] path, Dictionary<string, object> data) {
-            if (path.Count() > 1) {
-                if (path[1].StartsWith("chain:"))
-                    return _chains[Convert.ToInt32(path[1].Split(':')[1])].Respond(obj, path.Skip(1).ToArray(), data);
-
-                else return new BadRequestObjectResult("Incorrectly formatted message.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "add":
-                    Insert(Convert.ToInt32(data["index"]));
-                    return new OkObjectResult(_chains[Convert.ToInt32(data["index"])].Encode());
-
-                case "remove":
-                    Remove(Convert.ToInt32(data["index"]));
-                    return new OkObjectResult(null);
-                
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }

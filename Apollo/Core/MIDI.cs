@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RtMidi.Core;
 
@@ -90,23 +89,6 @@ namespace Apollo.Core {
             }
 
             return json.ToString();
-        }
-
-        public static ObjectResult Respond(string obj, string[] path, Dictionary<string, object> data) {
-            if (!path[0].StartsWith(Identifier)) return new BadRequestObjectResult("Incorrect recipient for message.");
-
-            if (path.Count() > 1) {
-                return new BadRequestObjectResult("The MIDI object has no members to forward to.");
-            }
-
-            switch (data["type"].ToString()) {
-                case "rescan":
-                    Rescan();
-                    return new OkObjectResult(Encode());
-
-                default:
-                    return new BadRequestObjectResult("Unknown message type.");
-            }
         }
     }
 }
