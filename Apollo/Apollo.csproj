@@ -10,17 +10,6 @@
     <StartupObject>Apollo.Core.Program</StartupObject>
     <Version>0.1.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="App.xaml" />
-    <None Remove="Components\Dial.xaml" />
-    <None Remove="Resources\WindowIcon.png" />
-    <None Remove="Splash.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\WindowIcon.png" />
-  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.7.1-cibuild0001679-beta" />
@@ -30,41 +19,12 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Resources/SplashImage.png" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="**\*.cs">
+    <Compile Update="**/*.cs">
       <DependentUpon>%(Filename).xaml</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="**\*.xaml">
+    <EmbeddedResource Include="**/*.xaml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\*" />
+    <EmbeddedResource Include="Resources/*" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Update="Components\Dial.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Elements\Track.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Core\Splash.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </EmbeddedResource>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="Core\App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-    <None Update="Core\Splash.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-    <None Update="Elements\Track.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-  </ItemGroup>
-  
 </Project>
