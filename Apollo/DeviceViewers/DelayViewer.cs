@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -16,6 +18,14 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _device = device;
+        }
+
+        private void Duration_Changed(double value) {
+            _device.Time = (int)value;
+        }
+
+        private void Gate_Changed(double value) {
+            _device.Gate = (decimal)(value / 100);
         }
     }
 }
