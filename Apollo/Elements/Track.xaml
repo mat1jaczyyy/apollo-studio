@@ -1,6 +1,5 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:Apollo.Components"
         Title="Track" WindowStartupLocation="CenterScreen" Width="580" Height="290" MinHeight="290" MaxHeight="290">
   
   <Grid>
@@ -10,19 +9,6 @@
     </Grid.RowDefinitions>
     
     <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Top Placeholder" />
-    
-    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch">
-        <StackPanel.Styles>
-          <Style Selector="local|Dial">
-            <Setter Property="Margin" Value="20" />
-          </Style>
-        </StackPanel.Styles>
-
-        <local:Dial Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Value="0.5" Unit="ms" />
-        <local:Dial Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Value="0.5" Unit="%" />
-        
-      </StackPanel>
-    </ScrollViewer>
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
   </Grid>
 </Window>

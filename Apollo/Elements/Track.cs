@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Components;
+using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public class Track: Window, IChainParent {
@@ -58,6 +59,8 @@ namespace Apollo.Elements {
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
+
+            this.Get<ScrollViewer>("Contents").Content = new ChainViewer(Chain);
         }
 
         private void ChainExit(Signal n) {
