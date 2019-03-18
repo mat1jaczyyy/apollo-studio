@@ -17,13 +17,16 @@ namespace Apollo.Components {
         private const double angle_start = 4 * Math.PI / 3;
         private const double angle_end = -1 * Math.PI / 3;
 
+        private double ToValue(double rawValue) => Math.Pow((rawValue - _min) / (_max - _min), 1 / _exp);
+        private double ToRawValue(double value) => _min + (_max - _min) * Math.Pow(value, _exp);
+
         private double _min = 0;
         public double Minimum {
             get => _min;
             set {
                 if (_min != value) {
                     _min = value;
-                    RawValue = _min + (_max - _min) * _value;
+                    RawValue = ToRawValue(_value);
                 }
             }
         }
@@ -34,7 +37,7 @@ namespace Apollo.Components {
             set {
                 if (_max != value) {
                     _max = value;
-                    RawValue = _min + (_max - _min) * _value;
+                    RawValue = ToRawValue(_value);
                 }
             }
         }
@@ -45,7 +48,18 @@ namespace Apollo.Components {
             set {
                 if (_round != value) {
                     _round = value;
-                    RawValue = _min + (_max - _min) * _value;
+                    RawValue = ToRawValue(_value);
+                }
+            }
+        }
+
+        private double _exp = 100;
+        public double Exponent {
+            get => _exp;
+            set {
+                if (_exp != value) {
+                    _exp = value;
+                    RawValue = ToRawValue(_value);
                 }
             }
         }
@@ -57,7 +71,7 @@ namespace Apollo.Components {
                 value = Math.Max(0, Math.Min(1, value));
                 if (value != _value) {
                     _value = value;
-                    RawValue = _min + (_max - _min) * _value;
+                    RawValue = ToRawValue(_value);
                     DrawArc(this.Get<Path>("Arc"), _value);
                 }
             }
@@ -70,7 +84,7 @@ namespace Apollo.Components {
                 value = Math.Round(Math.Max(_min, Math.Min(_max, value)) * Math.Pow(10, _round), 0) / Math.Pow(10, _round);
                 if (_raw != value) {
                     _raw = value;
-                    Value = (_raw - _min) / (_max - _min);
+                    Value = ToValue(_raw);
                     this.Get<TextBlock>("Display").Text = ValueString;
                 }
             }

@@ -19,7 +19,8 @@
           </Style>
         </StackPanel.Styles>
 
-        <local:Dial Title="Duration" Minimum="0" Maximum="60000" Round="0" Value="0.4" Unit="ms" />
+        <local:Dial Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Value="0.5" Unit="ms" />
+        <local:Dial Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Value="0.5" Unit="%" />
         
       </StackPanel>
     </ScrollViewer>
