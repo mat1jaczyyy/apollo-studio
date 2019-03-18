@@ -17,26 +17,83 @@ namespace Apollo.Components {
         private const double angle_start = 4 * Math.PI / 3;
         private const double angle_end = -1 * Math.PI / 3;
 
+        private double _min = 0;
+        public double Minimum {
+            get => _min;
+            set {
+                if (_min != value) {
+                    _min = value;
+                    RawValue = _min + (_max - _min) * _value;
+                }
+            }
+        }
+
+        private double _max = 100;
+        public double Maximum {
+            get => _max;
+            set {
+                if (_max != value) {
+                    _max = value;
+                    RawValue = _min + (_max - _min) * _value;
+                }
+            }
+        }
+
+        private int _round = 0;
+        public int Round {
+            get => _round;
+            set {
+                if (_round != value) {
+                    _round = value;
+                    RawValue = _min + (_max - _min) * _value;
+                }
+            }
+        }
+
         private double _value = 0.5;
         public double Value {
-            get {
-                return _value;
-            }
+            get => _value;
             set {
-                _value = Math.Max(0, Math.Min(1, value));
-                DrawArc(this.Get<Path>("Arc"), _value);
+                value = Math.Max(0, Math.Min(1, value));
+                if (value != _value) {
+                    _value = value;
+                    RawValue = _min + (_max - _min) * _value;
+                    DrawArc(this.Get<Path>("Arc"), _value);
+                }
+            }
+        }
+
+        private double _raw = 50;
+        public double RawValue {
+            get => _raw;
+            set {
+                value = Math.Round(Math.Max(_min, Math.Min(_max, value)) * Math.Pow(10, _round), 0) / Math.Pow(10, _round);
+                if (_raw != value) {
+                    _raw = value;
+                    Value = (_raw - _min) / (_max - _min);
+                    this.Get<TextBlock>("Display").Text = ValueString;
+                }
             }
         }
 
         private string _title = "Dial";
         public string Title {
-            get {
-                return _title;
-            }
+            get => _title;
             set {
                 this.Get<TextBlock>("Title").Text = _title = value;
             }
         }
+
+        private string _unit = "%";
+        public string Unit {
+            get => _unit;
+            set {
+                _unit = value;
+                this.Get<TextBlock>("Display").Text = ValueString;
+            }
+        }
+
+        private string ValueString => $"{RawValue}{Unit}";
 
         private void DrawArc(Path Arc, double value) {
             double x_start = radius * (Math.Cos(angle_start) + 1) + strokeHalf;
@@ -58,26 +115,27 @@ namespace Apollo.Components {
         public Dial() {
             InitializeComponent();
 
-            this.Get<TextBlock>("Title").Text = _title;
-
             DrawArc(this.Get<Path>("ArcBase"), 1);
-            DrawArc(this.Get<Path>("Arc"), _value);
         }
 
         private bool mouseHeld = false;
         private double lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
-            mouseHeld = true;
-            Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                mouseHeld = true;
+                Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
 
-            lastY = e.GetPosition(ArcCanvas).Y;
-            ArcCanvas.Cursor = new Cursor(StandardCursorType.No);
+                lastY = e.GetPosition(ArcCanvas).Y;
+                ArcCanvas.Cursor = new Cursor(StandardCursorType.No);
+            }
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
-            mouseHeld = false;
-            this.Get<Canvas>("ArcCanvas").Cursor = new Cursor(StandardCursorType.Arrow);
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                mouseHeld = false;
+                this.Get<Canvas>("ArcCanvas").Cursor = new Cursor(StandardCursorType.Arrow);
+            }
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {

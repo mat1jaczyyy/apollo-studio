@@ -19,17 +19,7 @@
           </Style>
         </StackPanel.Styles>
 
-        <local:Dial Title="0/10" Value="0" />
-        <local:Dial Title="1/10" Value="0.1" />
-        <local:Dial Title="2/10" Value="0.2" />
-        <local:Dial Title="3/10" Value="0.3" />
-        <local:Dial Title="4/10" Value="0.4" />
-        <local:Dial Title="5/10" Value="0.5" />
-        <local:Dial Title="6/10" Value="0.6" />
-        <local:Dial Title="7/10" Value="0.7" />
-        <local:Dial Title="8/10" Value="0.8" />
-        <local:Dial Title="9/10" Value="0.9" />
-        <local:Dial Title="10/10" Value="1" />
+        <local:Dial Title="Duration" Minimum="0" Maximum="60000" Round="0" Value="0.4" Unit="ms" />
         
       </StackPanel>
     </ScrollViewer>

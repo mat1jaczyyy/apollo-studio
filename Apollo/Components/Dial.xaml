@@ -16,6 +16,6 @@
       <Path Stroke="#0288D1" x:Name="Arc" />
     </Canvas>
 
-    <NumericUpDown Grid.Row="2" />
+    <TextBlock Grid.Row="2" x:Name="Display" />
   </Grid>
 </UserControl>
