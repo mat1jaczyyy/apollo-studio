@@ -10,7 +10,10 @@ using Avalonia.Media;
 namespace Apollo.Components {
     public class Dial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-        
+
+        public delegate void DialChangedEventHandler(double NewValue);
+        public event DialChangedEventHandler Changed;
+
         private const double radius = 18, stroke = 7;
         private const double strokeHalf = stroke / 2;
 
@@ -86,6 +89,7 @@ namespace Apollo.Components {
                     _raw = value;
                     Value = ToValue(_raw);
                     this.Get<TextBlock>("Display").Text = ValueString;
+                    Changed?.Invoke(_raw);
                 }
             }
         }
