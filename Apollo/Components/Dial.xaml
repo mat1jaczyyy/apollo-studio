@@ -10,7 +10,8 @@
 
     <TextBlock Grid.Row="0" x:Name="Title" />
 
-    <Canvas Grid.Row="1" Width="50">
+    <Canvas Grid.Row="1" Width="43" Background="Transparent" x:Name="ArcCanvas"
+            PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
       <Path Stroke="#0A0A0A" x:Name="ArcBase" />
       <Path Stroke="#0288D1" x:Name="Arc" />
     </Canvas>

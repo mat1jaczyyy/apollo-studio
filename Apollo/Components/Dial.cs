@@ -3,6 +3,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -22,7 +23,7 @@ namespace Apollo.Components {
                 return _value;
             }
             set {
-                _value = value;
+                _value = Math.Max(0, Math.Min(1, value));
                 DrawArc(this.Get<Path>("Arc"), _value);
             }
         }
@@ -61,6 +62,31 @@ namespace Apollo.Components {
 
             DrawArc(this.Get<Path>("ArcBase"), 1);
             DrawArc(this.Get<Path>("Arc"), _value);
+        }
+
+        private bool mouseHeld = false;
+        private double lastY;
+
+        private void MouseDown(object sender, PointerPressedEventArgs e) {
+            mouseHeld = true;
+            Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
+
+            lastY = e.GetPosition(ArcCanvas).Y;
+            ArcCanvas.Cursor = new Cursor(StandardCursorType.No);
+        }
+
+        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+            mouseHeld = false;
+            this.Get<Canvas>("ArcCanvas").Cursor = new Cursor(StandardCursorType.Arrow);
+        }
+
+        private void MouseMove(object sender, PointerEventArgs e) {
+            if (mouseHeld) {
+                Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
+                double Y = e.GetPosition(ArcCanvas).Y;
+                Value += (lastY - Y) / 200;
+                lastY = Y;
+            }
         }
     }
 }
