@@ -1,0 +1,14 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Components="clr-namespace:Apollo.Components">
+  
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Components:Dial Grid.Row="0" Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Value="0.5" Unit="ms" />
+    <Components:Dial Grid.Row="1" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Value="0.5" Unit="%" />
+  </Grid>
+</UserControl>
