@@ -8,7 +8,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <Components:Dial Grid.Row="0" Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Value="0.5" Unit="ms" Changed="Duration_Changed" />
-    <Components:Dial Grid.Row="1" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Value="0.5" Unit="%" Changed="Gate_Changed" />
+    <Components:Dial Grid.Row="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Unit="ms" Changed="Duration_Changed" />
+    <Components:Dial Grid.Row="1" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Changed="Gate_Changed" />
   </Grid>
 </UserControl>
