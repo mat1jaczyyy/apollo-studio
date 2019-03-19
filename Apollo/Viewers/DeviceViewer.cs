@@ -30,6 +30,8 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
+            this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
+
             _device = device;
             _viewer = GetSpecificViewer(_device);
 

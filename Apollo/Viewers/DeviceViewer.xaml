@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
         
         <Border BorderBrush="#151515" Background="#161616" BorderThickness="0 0 0 1">
-          <TextBlock Grid.Row="0" Margin="10 4" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="Device" />
+          <TextBlock Grid.Row="0" Margin="10 4" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />
         </Border>
 
         <Grid Grid.Row="1" x:Name="Contents" Margin="10 5" />
