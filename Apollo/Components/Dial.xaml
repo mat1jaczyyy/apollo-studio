@@ -1,18 +1,18 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Grid>
+  <Grid VerticalAlignment="Center">
     <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="2*" />
-      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
     <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
 
-    <Canvas Grid.Row="1" HorizontalAlignment="Center" Width="43" Background="Transparent" x:Name="ArcCanvas"
+    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="43" Height="39" Background="Transparent" x:Name="ArcCanvas"
             PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
-      <Path Stroke="#0A0A0A" x:Name="ArcBase" />
+      <Path Stroke="#161616" x:Name="ArcBase" />
       <Path Stroke="#0288D1" x:Name="Arc" />
     </Canvas>
 

@@ -7,7 +7,7 @@
     <StyleInclude Source="resm:Avalonia.Themes.Default.Accents.BaseLight.xaml?assembly=Avalonia.Themes.Default" />
 
     <Style Selector="Window">
-      <Setter Property="Background" Value="#101010" />
+      <Setter Property="Background" Value="#1A1A1A" />
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
     

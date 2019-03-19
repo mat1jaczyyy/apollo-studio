@@ -3,15 +3,20 @@
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      
-      <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Device" />
-      <Grid Grid.Row="1" x:Name="Contents" />
-    </Grid>
+    <Border BorderBrush="#121212" Background="#202020" BorderThickness="1" CornerRadius="5">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Border BorderBrush="#151515" Background="#161616" BorderThickness="0 0 0 1">
+          <TextBlock Grid.Row="0" Margin="10 4" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="Device" />
+        </Border>
+
+        <Grid Grid.Row="1" x:Name="Contents" Margin="10 5" />
+      </Grid>
+    </Border>
 
     <Components:Add DeviceAdded="Device_Add" />
   </StackPanel>
