@@ -4,6 +4,12 @@
 
   <Grid>
     <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="AddCanvas">
+      <Canvas.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Delay" />
+        </ContextMenu>
+      </Canvas.ContextMenu>
+
       <Path Stroke="#DCDCDC" StrokeThickness="2"
             Data="M 0,8 L 16,8 M 8,0 L 8,16" />
     </Canvas>
