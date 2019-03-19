@@ -1,13 +1,18 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    
-    <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Device" />
-    <Grid Grid.Row="1" x:Name="Contents" />
-  </Grid>
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      
+      <TextBlock Grid.Row="0" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Device" />
+      <Grid Grid.Row="1" x:Name="Contents" />
+    </Grid>
+
+    <Components:Add />
+  </StackPanel>
 </UserControl>
