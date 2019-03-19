@@ -16,6 +16,12 @@ namespace Apollo.Viewers {
         private Chain _chain;
         private Controls Contents;
 
+        private void Contents_Insert(int index, Device device) {
+            DeviceViewer viewer = new DeviceViewer(device);
+            viewer.DeviceAdded += Device_Insert;
+            Contents.Insert(index + 1, viewer);
+        }
+
         public ChainViewer(Chain chain) {
             InitializeComponent();
 
@@ -24,12 +30,16 @@ namespace Apollo.Viewers {
             Contents = this.Get<StackPanel>("Contents").Children;
 
             for (int i = 0; i < _chain.Count; i++)
-                Contents.Add(new DeviceViewer(_chain[i]));
+                Contents_Insert(i, _chain[i]);
         }
 
-        private void Device_Add(Type device) {
-            _chain.Insert(0, (Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
-            Contents.Insert(1, new DeviceViewer(_chain[0]));
+        private void Device_Insert(int index, Type device) {
+            _chain.Insert(index, (Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
+            Contents_Insert(index, _chain[index]);
+        }
+
+        private void Device_InsertStart(Type device) {
+            Device_Insert(0, device);
         }
     }
 }

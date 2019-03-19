@@ -11,6 +11,9 @@ using Apollo.Elements;
 namespace Apollo.Viewers {
     public class DeviceViewer: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+        public delegate void DeviceAddedEventHandler(int index, Type device);
+        public event DeviceAddedEventHandler DeviceAdded;
         
         IControl GetSpecificViewer(Device device) {
             foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type)) {       
@@ -32,6 +35,10 @@ namespace Apollo.Viewers {
 
             if (_viewer != null)
                 this.Get<Grid>("Contents").Children.Add(_viewer);
+        }
+
+        private void Device_Add(Type device) {
+            DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
         }
     }
 }

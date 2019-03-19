@@ -13,6 +13,6 @@
       <Grid Grid.Row="1" x:Name="Contents" />
     </Grid>
 
-    <Components:Add />
+    <Components:Add DeviceAdded="Device_Add" />
   </StackPanel>
 </UserControl>
