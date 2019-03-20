@@ -2,7 +2,7 @@ using System;
 
 using Apollo.Elements;
 
-namespace Apollo.Components {
+namespace Apollo.Structures {
     public class Length {
         private Decimal _value;
         

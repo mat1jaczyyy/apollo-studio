@@ -7,8 +7,8 @@ using System.Threading;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Fade: Device {

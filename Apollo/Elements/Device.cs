@@ -7,8 +7,8 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Core;
+using Apollo.Structures;
 
 namespace Apollo.Elements {
     public abstract class Device {

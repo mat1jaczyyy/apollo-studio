@@ -5,8 +5,8 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Infinity: Device {

@@ -27,7 +27,7 @@ namespace Apollo.Core {
             Set.New();
 
             foreach (Track track in Set.Tracks)
-            track.Show();
+                track.Show();
         }
 
         public async void Open_Click(object sender, RoutedEventArgs e) {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Apollo.Components {
+namespace Apollo.Structures {
     public class Pixel {
         public Action<Signal> MIDIExit = null;
         

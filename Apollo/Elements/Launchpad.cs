@@ -9,7 +9,7 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
 using Apollo.Core;
-using Apollo.Components;
+using Apollo.Structures;
 
 namespace Apollo.Elements {
     public class Launchpad {

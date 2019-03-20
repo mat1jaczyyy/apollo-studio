@@ -8,8 +8,8 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Core;
+using Apollo.Structures;
 
 namespace Apollo.Elements {
     public class Chain: IDeviceParent {

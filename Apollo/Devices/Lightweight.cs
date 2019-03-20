@@ -7,9 +7,9 @@ using System.Threading;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Lightweight: Device {

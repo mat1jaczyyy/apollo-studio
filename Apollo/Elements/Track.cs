@@ -12,7 +12,7 @@ using Avalonia.Markup.Xaml;
 using Newtonsoft.Json;
 
 using Apollo.Core;
-using Apollo.Components;
+using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {

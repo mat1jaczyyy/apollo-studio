@@ -6,9 +6,9 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent {
