@@ -9,16 +9,21 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     
-    <Grid Grid.Row="0">
+    <Grid Grid.Row="0" Background="#121212">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
 
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <Components:SetButton />
+        <Components:PreferencesButton />
+      </StackPanel>
+
       <TextBlock Grid.Column="1" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
     </Grid>
 
-    <ScrollViewer Grid.Row="1" Padding="0 0 0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
+    <ScrollViewer Grid.Row="1" Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
   </Grid>
 </Window>

@@ -20,8 +20,7 @@ namespace Apollo.Components {
         public Add() {
             InitializeComponent();
 
-            Canvas AddCanvas = this.Get<Canvas>("AddCanvas");
-            AddCanvas.ContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            this.Get<Canvas>("Icon").ContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
         }
 
         private void ContextMenu_Click(object _, EventArgs e) {
