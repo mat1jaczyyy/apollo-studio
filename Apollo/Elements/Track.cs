@@ -21,7 +21,14 @@ namespace Apollo.Elements {
         
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        public int? ParentIndex;
+        private int? _ParentIndex;
+        public int? ParentIndex {
+            get => _ParentIndex;
+            set {
+                _ParentIndex = value;
+                this.Get<TextBlock>("Title").Text = $"Track {ParentIndex + 1} - {Set.FilePath}";
+            }
+        }
 
         public Chain Chain;
         private Launchpad _launchpad;
