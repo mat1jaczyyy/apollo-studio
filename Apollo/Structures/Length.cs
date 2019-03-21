@@ -1,6 +1,6 @@
 using System;
 
-using Apollo.Elements;
+using Apollo.Core;
 
 namespace Apollo.Structures {
     public class Length {
@@ -25,6 +25,6 @@ namespace Apollo.Structures {
             Value = value;
         }
 
-        public static implicit operator Decimal(Length x) => x.Value * 240000 / Project.BPM;
+        public static implicit operator Decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
     }
 }

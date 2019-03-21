@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 using Avalonia;
@@ -24,9 +25,10 @@ namespace Apollo.Core {
         }
 
         public void New_Click(object sender, RoutedEventArgs e) {
-            Project.New();
-
-            foreach (Track track in Project.Tracks)
+            Program.Project?.Dispose();
+            Program.Project = new Project();
+            
+            foreach (Track track in Program.Project.Tracks)
                 track.Show();
         }
 
@@ -45,9 +47,15 @@ namespace Apollo.Core {
             };
 
             string[] result = await ofd.ShowAsync(this);
-            if (result.Length > 0 && Project.Open(result[0])) {
-                foreach (Track track in Project.Tracks)
-                    track.Show();
+            if (result.Length > 0) {
+                Project loaded = Project.Decode(File.ReadAllText(result[0]), result[0]);
+
+                if (loaded != null) {
+                    Program.Project = loaded;
+
+                    foreach (Track track in Program.Project.Tracks)
+                        track.Show();
+                }
             }
         }
     }

@@ -242,7 +242,7 @@ namespace Apollo.Devices {
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)
                 for (int i = 0; i < _timers.Count; i++)
-                _timers[i].Change(Decimal.ToInt32(_timecodes[i] * 2500 / Project.BPM), Timeout.Infinite);
+                _timers[i].Change(Decimal.ToInt32(_timecodes[i] * 2500 / Program.Project.BPM), Timeout.Infinite);
         }
 
         public static Device DecodeSpecific(string jsonString) {

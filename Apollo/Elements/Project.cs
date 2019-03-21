@@ -9,72 +9,48 @@ using Newtonsoft.Json;
 using Apollo.Core;
 
 namespace Apollo.Elements {
-    public static class Project {
+    public class Project {
         public static readonly string Identifier = "project";
 
-        public static List<Track> Tracks = new List<Track>();
-        public static Decimal BPM = 150;
+        public List<Track> Tracks;
+        public Decimal BPM;
 
-        private static string _path = "";
-        public static string FilePath {
-            get {
-                return _path;
-            }
+        private string _path;
+        public string FilePath {
+            get => _path;
         }
 
-        private static void Close() {
-            foreach (Track track in Tracks)
-                track.Dispose();
-
-            Tracks = new List<Track>();
-        }
-
-        public static void New() {
-            Close();
-            Tracks.Add(new Track() {ParentIndex = Tracks.Count});
-            
-            Tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
-
-            _path = "";
-        }
-
-        public static bool Open(string path) {
-            bool result = File.Exists(path) && Decode(File.ReadAllText(path));
-            if (result) _path = path;
-
-            return result;
-        }
-
-        public static void Save(string path) {
-            string[] file = path.Split(Path.DirectorySeparatorChar);
-
-            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                File.WriteAllText(path, Encode());
+        public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
+            if (tracks == null) {
+                tracks = new List<Track>() {new Track()};
+                tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
             }
 
+            for (int i = 0; i < tracks.Count; i++)
+                tracks[i].ParentIndex = i;
+
+            BPM = bpm;
+            Tracks = tracks;
             _path = path;
         }
 
-        public static bool Decode(string jsonString) {
+        public void Dispose() {
+            foreach (Track track in Tracks)
+                track.Dispose();
+        }
+
+        public static Project Decode(string jsonString, string path) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return false;
+            if (json["object"].ToString() != Identifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
-            Close();
-
-            BPM = Decimal.Parse(data["bpm"].ToString());
-            foreach (object track in tracks) {
-                Track _track = Track.Decode(track.ToString());
-                _track.ParentIndex = Tracks.Count;
-                Tracks.Add(_track);
-            }
-
-            return true;
+            //return new Project;
+            return new Project(Decimal.Parse(data["bpm"].ToString()), (from i in tracks select Track.Decode(i.ToString())).ToList(), path);
         }
 
-        public static string Encode() {
+        public string Encode() {
             StringBuilder json = new StringBuilder();
 
             using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
@@ -91,9 +67,6 @@ namespace Apollo.Elements {
 
                         writer.WritePropertyName("bpm");
                         writer.WriteValue(BPM);
-                        
-                        writer.WritePropertyName("path");
-                        writer.WriteValue(FilePath);
 
                         writer.WritePropertyName("tracks");
                         writer.WriteStartArray();
