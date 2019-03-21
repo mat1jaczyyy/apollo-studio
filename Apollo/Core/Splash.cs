@@ -24,9 +24,9 @@ namespace Apollo.Core {
         }
 
         public void New_Click(object sender, RoutedEventArgs e) {
-            Set.New();
+            Project.New();
 
-            foreach (Track track in Set.Tracks)
+            foreach (Track track in Project.Tracks)
                 track.Show();
         }
 
@@ -45,8 +45,8 @@ namespace Apollo.Core {
             };
 
             string[] result = await ofd.ShowAsync(this);
-            if (result.Length > 0 && Set.Open(result[0])) {
-                foreach (Track track in Set.Tracks)
+            if (result.Length > 0 && Project.Open(result[0])) {
+                foreach (Track track in Project.Tracks)
                     track.Show();
             }
         }

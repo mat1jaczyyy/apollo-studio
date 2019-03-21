@@ -25,6 +25,6 @@ namespace Apollo.Structures {
             Value = value;
         }
 
-        public static implicit operator Decimal(Length x) => x.Value * 240000 / Set.BPM;
+        public static implicit operator Decimal(Length x) => x.Value * 240000 / Project.BPM;
     }
 }

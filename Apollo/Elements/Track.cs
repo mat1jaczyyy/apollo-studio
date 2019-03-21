@@ -26,7 +26,7 @@ namespace Apollo.Elements {
             get => _ParentIndex;
             set {
                 _ParentIndex = value;
-                this.Get<TextBlock>("Title").Text = $"Track {ParentIndex + 1} - {Set.FilePath}";
+                this.Get<TextBlock>("Title").Text = $"Track {ParentIndex + 1} - {Project.FilePath}";
             }
         }
 

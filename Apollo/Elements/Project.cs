@@ -9,8 +9,8 @@ using Newtonsoft.Json;
 using Apollo.Core;
 
 namespace Apollo.Elements {
-    public static class Set {
-        public static readonly string Identifier = "set";
+    public static class Project {
+        public static readonly string Identifier = "project";
 
         public static List<Track> Tracks = new List<Track>();
         public static Decimal BPM = 150;
@@ -33,7 +33,7 @@ namespace Apollo.Elements {
             Close();
             Tracks.Add(new Track() {ParentIndex = Tracks.Count});
             
-            Set.Tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
+            Tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
 
             _path = "";
         }
