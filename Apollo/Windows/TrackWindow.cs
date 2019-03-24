@@ -37,12 +37,17 @@ namespace Apollo.Windows {
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
 
             _track = track;
+            _track.Window = this;
 
             this.Get<ScrollViewer>("Contents").Content = new ChainViewer(_track.Chain);
         }
 
         private void Loaded(object sender, EventArgs e) {
             Title_Update();
+        }
+
+        private void Unloaded(object sender, EventArgs e) {
+            _track.Window = null;
         }
     }
 }

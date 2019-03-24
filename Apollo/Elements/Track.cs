@@ -4,6 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
+using Avalonia.Controls;
+
 using Newtonsoft.Json;
 
 using Apollo.Core;
@@ -13,6 +15,8 @@ using Apollo.Viewers;
 namespace Apollo.Elements {
     public class Track: IChainParent {
         public static readonly string Identifier = "track";
+
+        public Window Window;
 
         private int? _ParentIndex;
         public int? ParentIndex {

@@ -25,7 +25,11 @@ namespace Apollo.Viewers {
         }
         
         private void Clicked(object sender, EventArgs e) {
-            new TrackWindow(_track).Show();
+            if (_track.Window == null) {
+                new TrackWindow(_track).Show();
+            } else {
+                _track.Window.Activate();
+            }
         }
     }
 }
