@@ -27,10 +27,16 @@ namespace Apollo.Windows {
             
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
 
+            Program.Project.Window = this;
+
             Controls Contents = this.Get<StackPanel>("Contents").Children;
             
             foreach (Track track in Program.Project.Tracks)
                 Contents.Add(new TrackViewer(track));
+        }
+
+        private void Unloaded(object sender, EventArgs e) {
+            Program.Project.Window = null;
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
+using Avalonia.Controls;
+
 using Newtonsoft.Json;
 
 using Apollo.Core;
@@ -12,6 +14,8 @@ using Apollo.Viewers;
 namespace Apollo.Elements {
     public class Project {
         public static readonly string Identifier = "project";
+
+        public Window Window;
 
         public List<Track> Tracks;
         public Decimal BPM;

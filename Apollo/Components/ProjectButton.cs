@@ -19,7 +19,11 @@ namespace Apollo.Components {
         }
 
         private void Clicked(object sender, EventArgs e) {
-            new ProjectWindow().Show();
+            if (Program.Project.Window == null) {
+                new ProjectWindow().Show();
+            } else {
+                Program.Project.Window.Activate();
+            }
         }
     }
 }

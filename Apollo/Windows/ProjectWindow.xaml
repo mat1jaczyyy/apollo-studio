@@ -1,6 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Project" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinWidth="548" MinHeight="274">
+        Title="Project" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinWidth="548" MinHeight="274"
+        Closed="Unloaded">
   
   <Grid>
     <Grid.RowDefinitions>
