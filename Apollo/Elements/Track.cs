@@ -21,16 +21,19 @@ namespace Apollo.Elements {
         
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
+        private void Title_Update() {
+            this.Get<TextBlock>("Title").Text = (Program.Project.FilePath == "")
+                ? $"Track {ParentIndex + 1} - Untitled"
+                : $"Track {ParentIndex + 1} - {Program.Project.FilePath}";
+        }
+
         private int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
             set {
                 _ParentIndex = value;
-                if (Program.Project != null) {
-                    this.Get<TextBlock>("Title").Text = (Program.Project.FilePath == "")
-                        ? $"Track {ParentIndex + 1} - Untitled"
-                        : $"Track {ParentIndex + 1} - {Program.Project.FilePath}";
-                }
+                if (Program.Project != null)
+                    Title_Update();
             }
         }
 
@@ -72,6 +75,10 @@ namespace Apollo.Elements {
             Launchpad = launchpad;
 
             this.Get<ScrollViewer>("Contents").Content = new ChainViewer(Chain);
+        }
+
+        private void Loaded(object sender, EventArgs e) {
+            Title_Update();
         }
 
         private void ChainExit(Signal n) {

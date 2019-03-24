@@ -1,7 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Track" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinHeight="274" MaxHeight="274">
+        Title="Track" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinHeight="274" MaxHeight="274" Opened="Loaded">
   
   <Grid>
     <Grid.RowDefinitions>
