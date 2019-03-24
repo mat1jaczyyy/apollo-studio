@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Reflection;
 using System.Text;
-
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
 using Newtonsoft.Json;
 
@@ -16,24 +11,14 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public class Track: Window, IChainParent {
+    public class Track: IChainParent {
         public static readonly string Identifier = "track";
-        
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-        
-        private void Title_Update() {
-            this.Get<TextBlock>("Title").Text = (Program.Project.FilePath == "")
-                ? $"Track {ParentIndex + 1} - Untitled"
-                : $"Track {ParentIndex + 1} - {Program.Project.FilePath}";
-        }
 
         private int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
             set {
                 _ParentIndex = value;
-                if (Program.Project != null)
-                    Title_Update();
             }
         }
 
@@ -57,13 +42,6 @@ namespace Apollo.Elements {
         }
 
         public Track(Chain init = null, Launchpad launchpad = null) {
-            InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
-            
-            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
-
             if (init == null) init = new Chain();
             Chain = init;
             Chain.Parent = this;
@@ -73,12 +51,6 @@ namespace Apollo.Elements {
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
-
-            this.Get<ScrollViewer>("Contents").Content = new ChainViewer(Chain);
-        }
-
-        private void Loaded(object sender, EventArgs e) {
-            Title_Update();
         }
 
         private void ChainExit(Signal n) {

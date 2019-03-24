@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Elements;
+using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class TrackViewer: UserControl {
@@ -24,7 +25,7 @@ namespace Apollo.Viewers {
         }
         
         private void Clicked(object sender, EventArgs e) {
-            _track.Show();
+            new TrackWindow(_track).Show();
         }
     }
 }
