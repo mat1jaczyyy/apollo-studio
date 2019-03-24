@@ -27,9 +27,7 @@ namespace Apollo.Core {
         public void New_Click(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
-            
-            foreach (Track track in Program.Project.Tracks)
-                track.Show();
+            Program.Project.Show();
         }
 
         public async void Open_Click(object sender, RoutedEventArgs e) {
@@ -51,10 +49,9 @@ namespace Apollo.Core {
                 Project loaded = Project.Decode(File.ReadAllText(result[0]), result[0]);
 
                 if (loaded != null) {
+                    Program.Project?.Dispose();
                     Program.Project = loaded;
-
-                    foreach (Track track in Program.Project.Tracks)
-                        track.Show();
+                    Program.Project.Show();
                 }
             }
         }
