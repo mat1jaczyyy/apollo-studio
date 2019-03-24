@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 
 using Apollo.Elements;
+using Apollo.Windows;
 
 namespace Apollo.Core {
     public class Splash: Window {
@@ -27,7 +28,7 @@ namespace Apollo.Core {
         public void New_Click(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
-            Program.Project.Show();
+            new ProjectWindow().Show();
         }
 
         public async void Open_Click(object sender, RoutedEventArgs e) {
@@ -51,7 +52,7 @@ namespace Apollo.Core {
                 if (loaded != null) {
                     Program.Project?.Dispose();
                     Program.Project = loaded;
-                    Program.Project.Show();
+                    new ProjectWindow().Show();
                 }
             }
         }

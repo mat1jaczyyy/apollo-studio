@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
+using Apollo.Windows;
 
 namespace Apollo.Components {
     public class ProjectButton: UserControl {
@@ -18,7 +19,7 @@ namespace Apollo.Components {
         }
 
         private void Clicked(object sender, EventArgs e) {
-            Program.Project.Show();
+            new ProjectWindow().Show();
         }
     }
 }

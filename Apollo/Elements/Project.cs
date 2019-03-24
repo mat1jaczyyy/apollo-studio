@@ -2,12 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Reflection;
 using System.Text;
-
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
 using Newtonsoft.Json;
 
@@ -15,11 +10,9 @@ using Apollo.Core;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public class Project: Window {
+    public class Project {
         public static readonly string Identifier = "project";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-        
         public List<Track> Tracks;
         public Decimal BPM;
 
@@ -29,13 +22,6 @@ namespace Apollo.Elements {
         }
 
         public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
-            InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
-            
-            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
-
             if (tracks == null) {
                 tracks = new List<Track>() {new Track()};
                 tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
@@ -47,11 +33,6 @@ namespace Apollo.Elements {
             BPM = bpm;
             Tracks = tracks;
             _path = path;
-            
-            Controls Contents = this.Get<StackPanel>("Contents").Children;
-            
-            foreach (Track track in Tracks)
-                Contents.Add(new TrackViewer(track));
         }
 
         public void Dispose() {
@@ -66,7 +47,6 @@ namespace Apollo.Elements {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
-            //return new Project;
             return new Project(Decimal.Parse(data["bpm"].ToString()), (from i in tracks select Track.Decode(i.ToString())).ToList(), path);
         }
 
