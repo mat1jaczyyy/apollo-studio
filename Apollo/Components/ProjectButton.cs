@@ -11,10 +11,10 @@ using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Components {
-    public class SetButton: UserControl {
+    public class ProjectButton: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public SetButton() {
+        public ProjectButton() {
             InitializeComponent();
         }
 

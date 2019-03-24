@@ -17,7 +17,7 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:SetButton />
+        <Components:ProjectButton />
         <Components:PreferencesButton />
       </StackPanel>
 
