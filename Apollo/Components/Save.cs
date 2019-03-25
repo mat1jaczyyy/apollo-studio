@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -19,7 +20,7 @@ namespace Apollo.Components {
         }
 
         private void Clicked(object sender, EventArgs e) {
-            Program.Project.Save();
+            Program.Project.Save((Window)this.GetVisualRoot());
         }
     }
 }

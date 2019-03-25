@@ -25,7 +25,26 @@ namespace Apollo.Elements {
             get => _path;
         }
 
-        public void Save() {
+        public async void Save(Window sender) {
+            if (_path == "") {
+                SaveFileDialog sfd = new SaveFileDialog() {
+                    Filters = new List<FileDialogFilter>() {
+                        new FileDialogFilter() {
+                            Extensions = new List<string>() {
+                                "approj"
+                            },
+                            Name = "Apollo Project"
+                        }
+                    },
+                    Title = "Save Project"
+                };
+
+                string result = await sfd.ShowAsync(sender);
+                if (result != null) {
+                    _path = result;
+                }
+            }
+
             string[] file = _path.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
