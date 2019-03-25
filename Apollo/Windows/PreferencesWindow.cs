@@ -30,10 +30,13 @@ namespace Apollo.Windows {
             
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
 
-            Program.PreferencesWindow = this;
+            Preferences.Window = this;
 
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
+            AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
+
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
+            CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
@@ -41,11 +44,11 @@ namespace Apollo.Windows {
         }
 
         private void AlwaysOnTop_Changed(object sender, EventArgs e) {
-            
+            Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
         }
 
         private void CenterTrackContents_Changed(object sender, EventArgs e) {
-            
+            Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
         }
     }
 }

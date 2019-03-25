@@ -28,7 +28,6 @@ namespace Apollo.Core {
                 Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
         }
 
-        public static PreferencesWindow PreferencesWindow;
         public static Project Project;
 
         static ManualResetEvent close = new ManualResetEvent(false);

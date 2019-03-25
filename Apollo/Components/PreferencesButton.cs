@@ -21,11 +21,11 @@ namespace Apollo.Components {
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left)
-                if (Program.PreferencesWindow == null) {
+                if (Preferences.Window == null) {
                     new PreferencesWindow().Show();
                 } else {
-                    Program.PreferencesWindow.WindowState = WindowState.Normal;
-                    Program.PreferencesWindow.Activate();
+                    Preferences.Window.WindowState = WindowState.Normal;
+                    Preferences.Window.Activate();
                 }
         }
     }
