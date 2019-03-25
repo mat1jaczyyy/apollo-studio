@@ -29,6 +29,7 @@ namespace Apollo.Core {
             Program.Project?.Dispose();
             Program.Project = new Project();
             new ProjectWindow().Show();
+            Close();
         }
 
         public async void Open_Click(object sender, RoutedEventArgs e) {
@@ -53,6 +54,7 @@ namespace Apollo.Core {
                     Program.Project?.Dispose();
                     Program.Project = loaded;
                     new ProjectWindow().Show();
+                    Close();
                 }
             }
         }
