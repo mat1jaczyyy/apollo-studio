@@ -4,7 +4,7 @@ using Apollo.Core;
 
 namespace Apollo.Structures {
     public class Length {
-        private Decimal _value;
+        private Decimal _value = 0.25M;
         
         public Decimal Value {
             get {
@@ -17,7 +17,6 @@ namespace Apollo.Structures {
         }
 
         public Length(int exponent = -2) {
-            _value = (Decimal)0.25;
             Value = Convert.ToDecimal(Math.Pow(2, exponent));
         }
 
