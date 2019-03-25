@@ -5,6 +5,7 @@ using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Elements;
@@ -24,12 +25,13 @@ namespace Apollo.Viewers {
             this.Get<TextBlock>("Name").Text = $"Track {_track.ParentIndex + 1}";
         }
         
-        private void Clicked(object sender, EventArgs e) {
-            if (_track.Window == null) {
-                new TrackWindow(_track).Show();
-            } else {
-                _track.Window.Activate();
-            }
+        private void Clicked(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left)
+                if (_track.Window == null) {
+                    new TrackWindow(_track).Show();
+                } else {
+                    _track.Window.Activate();
+                }
         }
     }
 }

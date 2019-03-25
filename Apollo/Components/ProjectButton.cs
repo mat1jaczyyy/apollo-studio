@@ -4,7 +4,7 @@ using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
@@ -18,12 +18,13 @@ namespace Apollo.Components {
             InitializeComponent();
         }
 
-        private void Clicked(object sender, EventArgs e) {
-            if (Program.Project.Window == null) {
-                new ProjectWindow().Show();
-            } else {
-                Program.Project.Window.Activate();
-            }
+        private void Clicked(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left)
+                if (Program.Project.Window == null) {
+                    new ProjectWindow().Show();
+                } else {
+                    Program.Project.Window.Activate();
+                }
         }
     }
 }
