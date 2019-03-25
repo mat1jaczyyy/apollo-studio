@@ -8,7 +8,6 @@ using Avalonia.Controls;
 
 using Newtonsoft.Json;
 
-using Apollo.Core;
 using Apollo.Windows;
 
 namespace Apollo.Elements {

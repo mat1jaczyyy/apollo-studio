@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-
-using Apollo.Devices;
-using Apollo.Elements;
 
 namespace Apollo.Components {
     public class Add: UserControl {

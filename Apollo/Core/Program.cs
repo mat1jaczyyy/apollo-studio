@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -32,7 +31,7 @@ namespace Apollo.Core {
         public static Project Project;
 
         public static void WindowClose(Window sender) {
-            if (Program.Project == null || Program.Project.Window != null) return;
+            if (Project == null || Project.Window != null) return;
             
             foreach (Track track in Program.Project.Tracks) {
                 if (track.Window != null) return;
@@ -41,8 +40,8 @@ namespace Apollo.Core {
             Type type = sender.GetType();
 
             if (type == typeof(ProjectWindow)) {
-                Program.Project.Dispose();
-                Program.Project = null;
+                Project.Dispose();
+                Project = null;
                 new SplashWindow().Show();
 
             } else if (type == typeof(TrackWindow)) {

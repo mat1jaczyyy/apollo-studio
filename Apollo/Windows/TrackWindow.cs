@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Reflection;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -11,11 +7,8 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 
-using Newtonsoft.Json;
-
 using Apollo.Core;
 using Apollo.Elements;
-using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {

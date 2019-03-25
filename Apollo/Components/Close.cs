@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-
-using Apollo.Core;
-using Apollo.Windows;
 
 namespace Apollo.Components {
     public class Close: UserControl {
