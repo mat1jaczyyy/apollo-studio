@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -15,14 +16,26 @@ namespace Apollo.Core {
     public class Splash: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+        private void UpdateTopmost(bool value) {
+            Topmost = value;
+        }
+
         public Splash() {
             InitializeComponent();
             #if DEBUG
                 this.AttachDevTools();
             #endif
 
-            this.Get<Image>("Logo").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
+            
+            UpdateTopmost(Preferences.AlwaysOnTop);
+            Preferences.AlwaysOnTopChanged += UpdateTopmost;
+
+            this.Get<Image>("Logo").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
+        }
+        
+        private void Unloaded(object sender, EventArgs e) {
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
 
         public void New_Click(object sender, RoutedEventArgs e) {

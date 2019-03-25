@@ -24,6 +24,10 @@ namespace Apollo.Windows {
             this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
         }
 
+        private void UpdateTopmost(bool value) {
+            Topmost = value;
+        }
+
         public ProjectWindow() {
             InitializeComponent();
             #if DEBUG
@@ -31,6 +35,9 @@ namespace Apollo.Windows {
             #endif
             
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
+            
+            UpdateTopmost(Preferences.AlwaysOnTop);
+            Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             Program.Project.Window = this;
 
@@ -49,6 +56,7 @@ namespace Apollo.Windows {
             Program.Project.Window = null;
 
             Program.Project.PathChanged -= UpdateTitle;
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {

@@ -1,6 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Apollo Studio" WindowStartupLocation="CenterScreen" Width="320" Height="320">
+        Title="Apollo Studio" WindowStartupLocation="CenterScreen" Width="320" Height="320"
+        Closed="Unloaded">
 
   <Border BorderBrush="#121212" BorderThickness="1" Padding="10">
     <StackPanel>

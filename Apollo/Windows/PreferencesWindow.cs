@@ -22,6 +22,10 @@ namespace Apollo.Windows {
 
         private CheckBox AlwaysOnTop, CenterTrackContents;
 
+        private void UpdateTopmost(bool value) {
+            Topmost = value;
+        }
+
         public PreferencesWindow() {
             InitializeComponent();
             #if DEBUG
@@ -29,6 +33,9 @@ namespace Apollo.Windows {
             #endif
             
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
+            
+            UpdateTopmost(Preferences.AlwaysOnTop);
+            Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             Preferences.Window = this;
 
@@ -37,6 +44,12 @@ namespace Apollo.Windows {
 
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
+        }
+
+        private void Unloaded(object sender, EventArgs e) {
+            Preferences.Window = null;
+
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {

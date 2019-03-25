@@ -18,20 +18,28 @@ namespace Apollo.Core {
 
         private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";
 
+        public delegate void AlwaysOnTopChangedEventHandler(bool NewValue);
+        public static event AlwaysOnTopChangedEventHandler AlwaysOnTopChanged;
+
         private static bool _AlwaysOnTop = true;
         public static bool AlwaysOnTop {
             get => _AlwaysOnTop;
             set {
                 _AlwaysOnTop = value;
+                AlwaysOnTopChanged?.Invoke(_AlwaysOnTop);
                 Save();
             }
         }
+
+        public delegate void CenterTrackContentsChangedEventHandler(bool NewValue);
+        public static event CenterTrackContentsChangedEventHandler CenterTrackContentsChanged;
 
         private static bool _CenterTrackContents = true;
         public static bool CenterTrackContents {
             get => _CenterTrackContents;
             set {
                 _CenterTrackContents = value;
+                CenterTrackContentsChanged?.Invoke(_CenterTrackContents);
                 Save();
             }
         }

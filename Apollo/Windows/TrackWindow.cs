@@ -8,6 +8,7 @@ using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 
 using Newtonsoft.Json;
@@ -22,11 +23,21 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         Track _track;
+
+        private HorizontalAlignment ContentAlignment;
         
         private void UpdateTitle(string path) {
             this.Get<TextBlock>("Title").Text = (path == "")
                 ? $"Track {_track.ParentIndex + 1}"
                 : $"Track {_track.ParentIndex + 1} - {path}";
+        }
+
+        private void UpdateTopmost(bool value) {
+            Topmost = value;
+        }
+
+        private void UpdateContentAlignment(bool value) {
+            ContentAlignment = value? HorizontalAlignment.Center : HorizontalAlignment.Left;
         }
 
         public TrackWindow(Track track) {
@@ -37,10 +48,19 @@ namespace Apollo.Windows {
             
             Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
 
+            UpdateTopmost(Preferences.AlwaysOnTop);
+            Preferences.AlwaysOnTopChanged += UpdateTopmost;
+
             _track = track;
             _track.Window = this;
 
-            this.Get<ScrollViewer>("Contents").Content = new ChainViewer(_track.Chain);
+            ChainViewer chainViewer = new ChainViewer(_track.Chain);
+
+            ContentAlignment = chainViewer.Get<StackPanel>("Contents").HorizontalAlignment;
+            UpdateContentAlignment(Preferences.CenterTrackContents);
+            Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
+
+            this.Get<ScrollViewer>("Contents").Content = chainViewer;
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -50,8 +70,10 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             _track.Window = null;
-
+            
             Program.Project.PathChanged -= UpdateTitle;
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+            Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
