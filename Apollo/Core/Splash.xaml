@@ -6,6 +6,13 @@
     <StackPanel>
       <Image x:Name="Logo" Height="260" />
       <Grid ColumnDefinitions="*,*" Margin="0 10 0 0">
+        <Grid.Styles>
+          <Style Selector="Button">
+            <Setter Property="BorderBrush" Value="#121212" />
+            <Setter Property="Background" Value="#202020" />
+          </Style>
+        </Grid.Styles>
+
         <Button Grid.Column="0" Margin="0 0 5 0" Content="New Project" Click="New_Click" />
         <Button Grid.Column="1" Margin="5 0 0 0" Content="Open Project" Click="Open_Click" />
       </Grid>
