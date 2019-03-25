@@ -26,10 +26,8 @@ namespace Apollo.Elements {
         }
 
         public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
-            if (tracks == null) {
-                tracks = new List<Track>() {new Track()};
-                tracks[0].Launchpad = (MIDI.Devices.Count > 0)? MIDI.Devices[0] : new Launchpad("null placeholder");
-            }
+            if (tracks == null)
+                tracks = (from i in Core.MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
             for (int i = 0; i < tracks.Count; i++)
                 tracks[i].ParentIndex = i;
