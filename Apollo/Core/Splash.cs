@@ -5,6 +5,7 @@ using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -40,14 +41,14 @@ namespace Apollo.Core {
             Program.WindowClose(this);
         }
 
-        public void New_Click(object sender, RoutedEventArgs e) {
+        public void New(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
             ProjectWindow.Create();
             Close();
         }
 
-        public async void Open_Click(object sender, RoutedEventArgs e) {
+        public async void Open(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {
@@ -72,6 +73,10 @@ namespace Apollo.Core {
                     Close();
                 }
             }
+        }
+
+        private void MoveWindow(object sender, PointerPressedEventArgs e) {
+            BeginMoveDrag();
         }
     }
 }
