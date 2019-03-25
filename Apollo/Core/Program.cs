@@ -8,6 +8,7 @@ using Avalonia.Logging.Serilog;
 using RtMidi.Core;
 
 using Apollo.Elements;
+using Apollo.Windows;
 
 // Suppresses readonly suggestion
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier")]
@@ -27,6 +28,7 @@ namespace Apollo.Core {
                 Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
         }
 
+        public static PreferencesWindow PreferencesWindow;
         public static Project Project;
 
         static ManualResetEvent close = new ManualResetEvent(false);
