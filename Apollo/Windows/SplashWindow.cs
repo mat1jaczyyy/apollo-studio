@@ -10,18 +10,18 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 
+using Apollo.Core;
 using Apollo.Elements;
-using Apollo.Windows;
 
-namespace Apollo.Core {
-    public class Splash: Window {
+namespace Apollo.Windows {
+    public class SplashWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         private void UpdateTopmost(bool value) {
             Topmost = value;
         }
 
-        public Splash() {
+        public SplashWindow() {
             InitializeComponent();
             #if DEBUG
                 this.AttachDevTools();

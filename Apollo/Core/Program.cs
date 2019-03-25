@@ -43,8 +43,8 @@ namespace Apollo.Core {
             if (type == typeof(ProjectWindow)) {
                 Program.Project.Dispose();
                 Program.Project = null;
-                new Splash().Show();
-                
+                new SplashWindow().Show();
+
             } else if (type == typeof(TrackWindow)) {
                 ProjectWindow.Create();
             }
@@ -66,7 +66,7 @@ namespace Apollo.Core {
 
             Log("ready");
 
-            BuildAvaloniaApp().Start<Splash>();
+            BuildAvaloniaApp().Start<SplashWindow>();
         }
     }
 }
