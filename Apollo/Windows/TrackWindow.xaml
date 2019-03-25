@@ -18,13 +18,18 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:ProjectButton />
         <Components:PreferencesButton />
+        <Components:ProjectButton />
       </StackPanel>
 
       <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
         <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
       </Grid>
+
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <Components:Minimize Click="Minimize" />
+        <Components:Close Click="Close" />
+      </StackPanel>
     </Grid>
 
     <ScrollViewer Grid.Row="1" Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />

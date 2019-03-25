@@ -43,5 +43,9 @@ namespace Apollo.Windows {
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
             BeginMoveDrag();
         }
+        
+        private void Minimize() {
+            WindowState = WindowState.Minimized;
+        }
     }
 }
