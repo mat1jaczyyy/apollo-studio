@@ -10,7 +10,7 @@
       </Grid.ColumnDefinitions>
 
       <TextBlock Grid.Column="0" x:Name="Name" PointerReleased="Clicked" />
-      <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="Port Selector" />
+      <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="[Port Selector Placeholder]" />
     </Grid>
   </Border>
 </UserControl>

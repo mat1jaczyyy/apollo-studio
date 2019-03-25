@@ -34,7 +34,7 @@
     
     <Border Grid.Row="1" BorderBrush="#121212" BorderThickness="1 0 1 1">
       <ScrollViewer Padding="5 5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-        <StackPanel x:Name="Contents" />
+        <StackPanel Spacing="5" x:Name="Contents" />
       </ScrollViewer>
     </Border>
   </Grid>
