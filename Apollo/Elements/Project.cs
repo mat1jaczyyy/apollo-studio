@@ -20,13 +20,20 @@ namespace Apollo.Elements {
         public List<Track> Tracks;
         public Decimal BPM;
 
+        public delegate void PathChangedEventHandler(string path);
+        public event PathChangedEventHandler PathChanged;
+
         private string _path;
         public string FilePath {
             get => _path;
+            private set {
+                _path = value;
+                PathChanged?.Invoke(_path);
+            }
         }
 
         public async void Save(Window sender) {
-            if (_path == "") {
+            if (FilePath == "") {
                 SaveFileDialog sfd = new SaveFileDialog() {
                     Filters = new List<FileDialogFilter>() {
                         new FileDialogFilter() {
@@ -41,14 +48,14 @@ namespace Apollo.Elements {
 
                 string result = await sfd.ShowAsync(sender);
                 if (result != null) {
-                    _path = result;
+                    FilePath = result;
                 }
             }
 
-            string[] file = _path.Split(Path.DirectorySeparatorChar);
+            string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                File.WriteAllText(_path, Encode());
+                File.WriteAllText(FilePath, Encode());
             }
         }
 
@@ -61,7 +68,7 @@ namespace Apollo.Elements {
 
             BPM = bpm;
             Tracks = tracks;
-            _path = path;
+            FilePath = path;
         }
 
         public void Dispose() {

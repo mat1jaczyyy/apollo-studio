@@ -20,6 +20,10 @@ namespace Apollo.Windows {
     public class ProjectWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+        private void UpdateTitle(string path) {
+            this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
+        }
+
         public ProjectWindow() {
             InitializeComponent();
             #if DEBUG
@@ -35,9 +39,16 @@ namespace Apollo.Windows {
             foreach (Track track in Program.Project.Tracks)
                 Contents.Add(new TrackViewer(track));
         }
+        
+        private void Loaded(object sender, EventArgs e) {
+            Program.Project.PathChanged += UpdateTitle;
+            UpdateTitle(Program.Project.FilePath);
+        }
 
         private void Unloaded(object sender, EventArgs e) {
             Program.Project.Window = null;
+
+            Program.Project.PathChanged -= UpdateTitle;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {

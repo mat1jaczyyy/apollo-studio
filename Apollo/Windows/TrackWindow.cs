@@ -23,10 +23,10 @@ namespace Apollo.Windows {
 
         Track _track;
         
-        private void Title_Update() {
-            this.Get<TextBlock>("Title").Text = (Program.Project.FilePath == "")
-                ? $"Track {_track.ParentIndex + 1} - Untitled"
-                : $"Track {_track.ParentIndex + 1} - {Program.Project.FilePath}";
+        private void UpdateTitle(string path) {
+            this.Get<TextBlock>("Title").Text = (path == "")
+                ? $"Track {_track.ParentIndex + 1}"
+                : $"Track {_track.ParentIndex + 1} - {path}";
         }
 
         public TrackWindow(Track track) {
@@ -44,11 +44,14 @@ namespace Apollo.Windows {
         }
 
         private void Loaded(object sender, EventArgs e) {
-            Title_Update();
+            Program.Project.PathChanged += UpdateTitle;
+            UpdateTitle(Program.Project.FilePath);
         }
 
         private void Unloaded(object sender, EventArgs e) {
             _track.Window = null;
+
+            Program.Project.PathChanged -= UpdateTitle;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
