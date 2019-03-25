@@ -19,13 +19,7 @@ namespace Apollo.Components {
         }
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left)
-                if (Program.Project.Window == null) {
-                    new ProjectWindow().Show();
-                } else {
-                    Program.Project.Window.WindowState = WindowState.Normal;
-                    Program.Project.Window.Activate();
-                }
+            if (e.MouseButton == MouseButton.Left) ProjectWindow.Create();
         }
     }
 }

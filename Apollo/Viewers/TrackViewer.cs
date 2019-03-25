@@ -26,13 +26,7 @@ namespace Apollo.Viewers {
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left)
-                if (_track.Window == null) {
-                    new TrackWindow(_track).Show();
-                } else {
-                    _track.Window.WindowState = WindowState.Normal;
-                    _track.Window.Activate();
-                }
+            if (e.MouseButton == MouseButton.Left) TrackWindow.Create(_track);
         }
     }
 }

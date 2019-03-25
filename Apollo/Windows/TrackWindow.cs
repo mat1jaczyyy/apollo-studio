@@ -52,7 +52,6 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             _track = track;
-            _track.Window = this;
 
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
 
@@ -74,6 +73,8 @@ namespace Apollo.Windows {
             Program.Project.PathChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
+
+            Program.WindowClose(this);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
@@ -82,6 +83,16 @@ namespace Apollo.Windows {
 
         private void Minimize() {
             WindowState = WindowState.Minimized;
+        }
+
+        public static void Create(Track track) {
+            if (track.Window == null) {
+                track.Window = new TrackWindow(track);
+                track.Window.Show();
+            } else {
+                track.Window.WindowState = WindowState.Normal;
+                track.Window.Activate();
+            }
         }
     }
 }

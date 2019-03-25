@@ -20,13 +20,7 @@ namespace Apollo.Components {
         }
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left)
-                if (Preferences.Window == null) {
-                    new PreferencesWindow().Show();
-                } else {
-                    Preferences.Window.WindowState = WindowState.Normal;
-                    Preferences.Window.Activate();
-                }
+            if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create();
         }
     }
 }

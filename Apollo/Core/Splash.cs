@@ -36,12 +36,14 @@ namespace Apollo.Core {
         
         private void Unloaded(object sender, EventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            Program.WindowClose(this);
         }
 
         public void New_Click(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
-            new ProjectWindow().Show();
+            ProjectWindow.Create();
             Close();
         }
 
@@ -66,7 +68,7 @@ namespace Apollo.Core {
                 if (loaded != null) {
                     Program.Project?.Dispose();
                     Program.Project = loaded;
-                    new ProjectWindow().Show();
+                    ProjectWindow.Create();
                     Close();
                 }
             }

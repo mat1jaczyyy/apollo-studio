@@ -63,5 +63,15 @@ namespace Apollo.Windows {
         private void CenterTrackContents_Changed(object sender, EventArgs e) {
             Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
         }
+
+        public static void Create() {
+            if (Preferences.Window == null) {
+                Preferences.Window = new PreferencesWindow();
+                Preferences.Window.Show();
+            } else {
+                Preferences.Window.WindowState = WindowState.Normal;
+                Preferences.Window.Activate();
+            }
+        }
     }
 }

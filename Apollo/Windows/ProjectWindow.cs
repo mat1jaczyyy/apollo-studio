@@ -39,8 +39,6 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
-            Program.Project.Window = this;
-
             Controls Contents = this.Get<StackPanel>("Contents").Children;
             
             foreach (Track track in Program.Project.Tracks)
@@ -57,6 +55,8 @@ namespace Apollo.Windows {
 
             Program.Project.PathChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            Program.WindowClose(this);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
@@ -65,6 +65,16 @@ namespace Apollo.Windows {
         
         private void Minimize() {
             WindowState = WindowState.Minimized;
+        }
+
+        public static void Create() {
+            if (Program.Project.Window == null) {
+                Program.Project.Window = new ProjectWindow();
+                Program.Project.Window.Show();
+            } else {
+                Program.Project.Window.WindowState = WindowState.Normal;
+                Program.Project.Window.Activate();
+            }
         }
     }
 }
