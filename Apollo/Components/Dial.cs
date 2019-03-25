@@ -145,7 +145,7 @@ namespace Apollo.Components {
                 Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
 
                 lastY = e.GetPosition(ArcCanvas).Y;
-                ArcCanvas.Cursor = new Cursor(StandardCursorType.No);
+                ArcCanvas.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
             }
         }
 
