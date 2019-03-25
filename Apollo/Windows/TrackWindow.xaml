@@ -4,19 +4,8 @@
         Title="Track" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded">
   
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    
-    <Grid Grid.Row="0" Background="#121212">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="#121212">
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
         <Components:PreferencesButton />
         <Components:ProjectButton />

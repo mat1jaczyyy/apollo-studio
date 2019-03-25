@@ -5,24 +5,10 @@
         Closing="Unloaded">
 
   <Border BorderBrush="#0C0C0C" BorderThickness="1">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
-      
-      <Grid Grid.Row="0">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
         <Components:PreferencesButton Grid.Column="0" Margin="5 5" />
-
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow" />
-
         <Components:Close Grid.Column="2" Margin="5 5" Click="Close" />
       </Grid>
 
