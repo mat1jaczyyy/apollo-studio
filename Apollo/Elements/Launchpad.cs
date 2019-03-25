@@ -17,22 +17,11 @@ namespace Apollo.Elements {
 
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
-        private string _name;
         private LaunchpadType Type = LaunchpadType.Unknown;
-        private bool _available;
         public InputType InputFormat = InputType.XY;
 
-        public string Name {
-            get {
-                return _name;
-            }
-        }
-
-        public bool Available {
-            get {
-                return _available;
-            }
-        }
+        public string Name { get; private set; }
+        public bool Available { get; private set; }
 
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
@@ -108,20 +97,20 @@ namespace Apollo.Elements {
             Input = input.CreateDevice();
             Output = output.CreateDevice();
 
-            _name = input.Name;
+            Name = input.Name;
 
             Input.Open();
             Output.Open();
 
-            _available = true;
+            Available = true;
 
             Input.SysEx += WaitForIdentification;            
             Output.Send(in Inquiry);
         }
 
         public Launchpad(string name) {
-            _name = name;
-            _available = false;
+            Name = name;
+            Available = false;
         }
 
         public void Connect(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
@@ -131,7 +120,7 @@ namespace Apollo.Elements {
             Input.Open();
             Output.Open();
 
-            _available = true;
+            Available = true;
 
             if (Type == LaunchpadType.Unknown) {
                 Input.SysEx += WaitForIdentification;
@@ -151,11 +140,11 @@ namespace Apollo.Elements {
                 Output.Close();
             Output.Dispose();
 
-            _available = false;
+            Available = false;
         }
 
         private void HandleMessage(Signal n) {
-            if (_available) {
+            if (Available) {
                 if (InputFormat == InputType.DrumRack)
                     n.Index = Conversion.DRtoXY[n.Index];
                 
@@ -204,7 +193,7 @@ namespace Apollo.Elements {
                     writer.WriteStartObject();
 
                         writer.WritePropertyName("port");
-                        writer.WriteValue(_name);
+                        writer.WriteValue(Name);
 
                     writer.WriteEndObject();
 
