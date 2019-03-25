@@ -32,6 +32,8 @@
       </StackPanel>
     </Grid>
 
-    <ScrollViewer Grid.Row="1" Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
+    <Border Grid.Row="1" BorderBrush="#121212" BorderThickness="1 0 1 1">
+      <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
+    </Border>
   </Grid>
 </Window>
