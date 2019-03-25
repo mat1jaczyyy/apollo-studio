@@ -19,6 +19,7 @@
 
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
         <Components:PreferencesButton />
+        <Components:Save />
       </StackPanel>
 
       <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">

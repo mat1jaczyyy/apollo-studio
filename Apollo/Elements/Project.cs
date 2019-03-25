@@ -25,6 +25,14 @@ namespace Apollo.Elements {
             get => _path;
         }
 
+        public void Save() {
+            string[] file = _path.Split(Path.DirectorySeparatorChar);
+
+            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+                File.WriteAllText(_path, Encode());
+            }
+        }
+
         public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
             if (tracks == null)
                 tracks = (from i in Core.MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
