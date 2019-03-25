@@ -7,6 +7,7 @@ using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Newtonsoft.Json;
@@ -37,6 +38,10 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             Program.Project.Window = null;
+        }
+
+        private void MoveWindow(object sender, PointerPressedEventArgs e) {
+            BeginMoveDrag();
         }
     }
 }

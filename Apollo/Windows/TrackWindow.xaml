@@ -22,7 +22,9 @@
         <Components:PreferencesButton />
       </StackPanel>
 
-      <TextBlock Grid.Column="1" Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
+        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+      </Grid>
     </Grid>
 
     <ScrollViewer Grid.Row="1" Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
