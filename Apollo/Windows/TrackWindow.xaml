@@ -1,0 +1,28 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Components="clr-namespace:Apollo.Components"
+        Title="Track" WindowStartupLocation="CenterScreen" Width="548" Height="274" MinHeight="274" MaxHeight="274"
+        Opened="Loaded" Closing="Unloaded">
+  
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="#121212">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <Components:PreferencesButton />
+        <Components:ProjectButton />
+      </StackPanel>
+
+      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
+        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+      </Grid>
+
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <Components:Minimize Click="Minimize" />
+        <Components:Close Click="Close" />
+      </StackPanel>
+    </Grid>
+
+    <Border Grid.Row="1" BorderBrush="#121212" BorderThickness="1 0 1 1">
+      <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
+    </Border>
+  </Grid>
+</Window>

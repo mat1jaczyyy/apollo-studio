@@ -1,0 +1,25 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Components="clr-namespace:Apollo.Components"
+        Title="Project" WindowStartupLocation="CenterScreen" Width="274" Height="411"
+        Closing="Unloaded">
+  
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#121212">
+      <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow">
+        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Preferences" />
+      </Grid>
+
+      <Components:Close Grid.Column="1" Margin="5 5" Click="Close" />
+    </Grid>
+    
+    <Border Grid.Row="1" BorderBrush="#121212" BorderThickness="1 0 1 1">
+      <ScrollViewer Padding="10 5" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="5">
+          <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
+          <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</Window>

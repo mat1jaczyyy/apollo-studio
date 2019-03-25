@@ -1,0 +1,24 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Clicked">
+    <Path Fill="#404040"
+          Data="M 4.75,2.4 L 11.25,2.4 14.4,8 11.25,13.6 4.75,13.6 1.6,8 Z" />
+    <Ellipse Fill="#121212"
+          Canvas.Left="5" Canvas.Top="5" Width="6" Height="6" />
+
+    <Path Fill="#404040"
+          Data="M 12.6,5.5 L 16,6 16,10 12.6,10.5 Z" />
+    <Path Fill="#404040"
+          Data="M 12.5,10.75 L 13.7,13.95 10.3,15.9 8.15,13.3 Z" />
+    <Path Fill="#404040"
+          Data="M 7.85,13.3 L 5.7,15.9 2.3,13.95 3.5,10.75 Z" />
+    <Path Fill="#404040"
+          Data="M 3.4,5.5 L 0,6 0,10 3.4,10.5 Z" />
+    <Path Fill="#404040"
+          Data="M 3.5,5.25 L 2.3,2.05 5.7,0.1 7.85,2.7 Z" />
+    <Path Fill="#404040"
+          Data="M 8.5,2.7 L 10.3,0.1 13.7,2.05 12.5,5.25 Z" />
+  
+  </Canvas>
+</UserControl>
