@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Structures;
-using Apollo.Viewers;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Track: IChainParent {
         public static readonly string Identifier = "track";
 
-        public Window Window;
+        public TrackWindow Window;
 
         private int? _ParentIndex;
         public int? ParentIndex {
