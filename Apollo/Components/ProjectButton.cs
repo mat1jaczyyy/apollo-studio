@@ -23,6 +23,7 @@ namespace Apollo.Components {
                 if (Program.Project.Window == null) {
                     new ProjectWindow().Show();
                 } else {
+                    Program.Project.Window.WindowState = WindowState.Normal;
                     Program.Project.Window.Activate();
                 }
         }

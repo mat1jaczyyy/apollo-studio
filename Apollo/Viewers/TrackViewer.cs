@@ -30,6 +30,7 @@ namespace Apollo.Viewers {
                 if (_track.Window == null) {
                     new TrackWindow(_track).Show();
                 } else {
+                    _track.Window.WindowState = WindowState.Normal;
                     _track.Window.Activate();
                 }
         }
