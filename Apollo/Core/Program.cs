@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Logging.Serilog;
 
 using RtMidi.Core;
@@ -30,7 +31,22 @@ namespace Apollo.Core {
 
         public static Project Project;
 
-        static ManualResetEvent close = new ManualResetEvent(false);
+        public static void WindowClose(Window sender) {
+            if (Program.Project != null && Program.Project.Window != null) return;
+            
+            foreach (Track track in Program.Project.Tracks) {
+                if (track.Window != null) return;
+            }
+
+            Type type = sender.GetType();
+
+            if (type == typeof(ProjectWindow)) {
+                Program.Project.Dispose();
+                new Splash().Show();
+            } else if (type == typeof(TrackWindow)) {
+                ProjectWindow.Create();
+            }
+        }
 
         static void Main(string[] args) {
             logTimer.Start();
@@ -49,10 +65,6 @@ namespace Apollo.Core {
             Log("ready");
 
             BuildAvaloniaApp().Start<Splash>();
-
-            Log("loaded");
-
-            close.WaitOne();
         }
     }
 }
