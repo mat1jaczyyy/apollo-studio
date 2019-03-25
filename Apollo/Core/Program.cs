@@ -32,7 +32,7 @@ namespace Apollo.Core {
         public static Project Project;
 
         public static void WindowClose(Window sender) {
-            if (Program.Project != null && Program.Project.Window != null) return;
+            if (Program.Project == null || Program.Project.Window != null) return;
             
             foreach (Track track in Program.Project.Tracks) {
                 if (track.Window != null) return;
@@ -42,7 +42,9 @@ namespace Apollo.Core {
 
             if (type == typeof(ProjectWindow)) {
                 Program.Project.Dispose();
+                Program.Project = null;
                 new Splash().Show();
+                
             } else if (type == typeof(TrackWindow)) {
                 ProjectWindow.Create();
             }
