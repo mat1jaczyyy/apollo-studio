@@ -18,9 +18,6 @@ namespace Apollo.Devices {
         private int _time;
         private Decimal _gate;
 
-        private object locker = new object();
-
-        private Queue<Timer> _timers = new Queue<Timer>();
         private TimerCallback _timerexit;
 
         public int Time {
@@ -59,19 +56,11 @@ namespace Apollo.Devices {
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof(Signal)) {
-                Signal n = (Signal)info;
-
-                lock (locker) {
-                    MIDIExit?.Invoke(n);
-
-                    _timers.Dequeue().Dispose();
-                }
-            }
+            MIDIExit?.Invoke((Signal)info);
         }
 
         public override void MIDIEnter(Signal n) {
-            _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
+            new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite);
         }
 
         public static Device DecodeSpecific(string jsonString) {
