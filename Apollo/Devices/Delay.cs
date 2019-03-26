@@ -44,7 +44,7 @@ namespace Apollo.Devices {
             return new Delay(Mode, Length, _time, _gate);
         }
 
-        public Delay(bool mode = false, Length length = null, int time = 500, Decimal gate = 1): base(DeviceIdentifier) {
+        public Delay(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
 
             if (length == null) length = new Length();
