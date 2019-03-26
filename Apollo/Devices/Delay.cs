@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 using Newtonsoft.Json;
 
@@ -17,8 +16,6 @@ namespace Apollo.Devices {
         public Length Length;
         private int _time;
         private Decimal _gate;
-
-        private TimerCallback _timerexit;
 
         public int Time {
             get {
@@ -45,8 +42,6 @@ namespace Apollo.Devices {
         }
 
         public Delay(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1): base(DeviceIdentifier) {
-            _timerexit = new TimerCallback(Tick);
-
             if (length == null) length = new Length();
 
             Mode = mode;
@@ -55,12 +50,21 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        private void Tick(object info) {
-            MIDIExit?.Invoke((Signal)info);
+        private void Tick(object sender, EventArgs e) {
+            Courier courier = (Courier)sender;
+            courier.Elapsed -= Tick;
+            
+            MIDIExit?.Invoke((Signal)courier.Info);
         }
 
         public override void MIDIEnter(Signal n) {
-            new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite);
+            Courier courier = new Courier() {
+                Info = n.Clone(),
+                AutoReset = false,
+                Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
         }
 
         public static Device DecodeSpecific(string jsonString) {
