@@ -5,6 +5,7 @@
     <Canvas.ContextMenu>
       <ContextMenu>
         <MenuItem Header="Delay" />
+        <MenuItem Header="Hold" />
         <MenuItem Header="Translation" />
       </ContextMenu>
     </Canvas.ContextMenu>
