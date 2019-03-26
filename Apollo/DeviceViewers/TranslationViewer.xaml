@@ -2,6 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Components:Dial x:Name="Offset" Title="Offset" Minimum="-99" Maximum="99" Exponent="1" Round="0" Unit=""
+  <Components:Dial x:Name="Offset" Title="Offset" Minimum="-99" Maximum="99" Exponent="1" Round="0" Unit="" Centered="true"
                    Changed="Offset_Changed" />
 </UserControl>

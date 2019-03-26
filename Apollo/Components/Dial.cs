@@ -19,6 +19,7 @@ namespace Apollo.Components {
 
         private const double angle_start = 4 * Math.PI / 3;
         private const double angle_end = -1 * Math.PI / 3;
+        private const double angle_center = Math.PI / 2;
 
         private double ToValue(double rawValue) => Math.Pow((rawValue - _min) / (_max - _min), 1 / _exp);
         private double ToRawValue(double value) => _min + (_max - _min) * Math.Pow(value, _exp);
@@ -111,28 +112,39 @@ namespace Apollo.Components {
             }
         }
 
+        private bool _centered = false;
+        public bool Centered {
+            get => _centered;
+            set {
+                _centered = value;
+                DrawArc(this.Get<Path>("Arc"), _value);
+            }
+        }
+
         private string ValueString => $"{RawValue}{Unit}";
 
         private void DrawArc(Path Arc, double value) {
-            double x_start = radius * (Math.Cos(angle_start) + 1) + strokeHalf;
-            double y_start = radius * (-Math.Sin(angle_start) + 1) + strokeHalf;
+            double x_start = radius * (Math.Cos(_centered? angle_center: angle_start) + 1) + strokeHalf;
+            double y_start = radius * (-Math.Sin(_centered? angle_center: angle_start) + 1) + strokeHalf;
             
             double angle_point = angle_start - Math.Abs(angle_end - angle_start) * value;
 
             double x_end = radius * (Math.Cos(angle_point) + 1) + strokeHalf;
             double y_end = radius * (-Math.Sin(angle_point) + 1) + strokeHalf;
 
-            double angle = (angle_start - angle_point) / Math.PI * 180;
+            double angle = ((_centered? angle_center: angle_start) - angle_point) / Math.PI * 180;
 
             int large = Convert.ToInt32(angle > 180);
+            int direction = Convert.ToInt32(angle > 0);
 
             Arc.StrokeThickness = stroke;
-            Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} 1 {5},{6}",
+            Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
                 x_start.ToString(CultureInfo.InvariantCulture),
                 y_start.ToString(CultureInfo.InvariantCulture),
                 radius.ToString(CultureInfo.InvariantCulture),
                 angle.ToString(CultureInfo.InvariantCulture),
-                large.ToString(CultureInfo.InvariantCulture),
+                large,
+                direction,
                 x_end.ToString(CultureInfo.InvariantCulture),
                 y_end.ToString(CultureInfo.InvariantCulture)
             ));
