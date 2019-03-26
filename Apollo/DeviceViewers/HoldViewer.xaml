@@ -2,13 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid RowDefinitions="*,*">
+  <Grid RowDefinitions="*,*,Auto">
     <Border Grid.Row="0" BorderBrush="#151515" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms"
+      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.7"
                        Changed="Duration_Changed" />
     </Border>
     
-    <Components:Dial Grid.Row="1" Margin="0 5 0 0" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
-                     Changed="Gate_Changed" />
+    <Border Grid.Row="1" BorderBrush="#151515" BorderThickness="0 0 0 1">
+      <Components:Dial Margin="0 5 0 5" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Scale="0.7"
+                       Changed="Gate_Changed" />
+    </Border>
+
+    <CheckBox Grid.Row="2" Margin="0 5 0 0" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
   </Grid>
 </UserControl>
