@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -126,7 +127,15 @@ namespace Apollo.Components {
             int large = Convert.ToInt32(angle > 180);
 
             Arc.StrokeThickness = stroke;
-            Arc.Data = Geometry.Parse($"M {x_start},{y_start} A {radius},{radius} {angle} {large} 1 {x_end},{y_end}");
+            Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} 1 {5},{6}",
+                x_start.ToString(CultureInfo.InvariantCulture),
+                y_start.ToString(CultureInfo.InvariantCulture),
+                radius.ToString(CultureInfo.InvariantCulture),
+                angle.ToString(CultureInfo.InvariantCulture),
+                large.ToString(CultureInfo.InvariantCulture),
+                x_end.ToString(CultureInfo.InvariantCulture),
+                y_end.ToString(CultureInfo.InvariantCulture)
+            ));
         }
 
         public Dial() {
