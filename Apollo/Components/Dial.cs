@@ -121,7 +121,7 @@ namespace Apollo.Components {
             }
         }
 
-        private string ValueString => $"{RawValue}{Unit}";
+        private string ValueString => $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         private void DrawArc(Path Arc, double value) {
             double x_start = radius * (Math.Cos(_centered? angle_center: angle_start) + 1) + strokeHalf;
