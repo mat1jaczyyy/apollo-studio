@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Elements;
@@ -40,6 +41,13 @@ namespace Apollo.Viewers {
 
         private void Device_Add(Type device) {
             DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
+        }
+
+        private void Device_Remove(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left) {
+                ((Panel)Parent).Children.RemoveAt(_device.ParentIndex.Value + 1);
+                _device.Parent.Remove(_device.ParentIndex.Value);
+            }
         }
     }
 }

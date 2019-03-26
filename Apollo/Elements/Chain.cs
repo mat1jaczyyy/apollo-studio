@@ -10,7 +10,7 @@ using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Elements {
-    public class Chain: IDeviceParent {
+    public class Chain {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
