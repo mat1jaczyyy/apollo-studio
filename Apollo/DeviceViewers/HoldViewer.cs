@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using System;
+
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -26,6 +28,10 @@ namespace Apollo.DeviceViewers {
 
         private void Gate_Changed(double value) {
             _hold.Gate = (decimal)(value / 100);
+        }
+
+        private void Infinite_Changed(object sender, EventArgs e) {
+            _hold.Infinite = this.Get<CheckBox>("Infinite").IsChecked.Value;
         }
     }
 }

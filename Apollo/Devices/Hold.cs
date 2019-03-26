@@ -16,6 +16,7 @@ namespace Apollo.Devices {
         public Length Length;
         private int _time;
         private Decimal _gate;
+        public bool Infinite;
 
         public int Time {
             get {
@@ -38,16 +39,17 @@ namespace Apollo.Devices {
         }
 
         public override Device Clone() {
-            return new Hold(Mode, Length, _time, _gate);
+            return new Hold(Mode, Length, _time, _gate, Infinite);
         }
 
-        public Hold(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1): base(DeviceIdentifier) {
+        public Hold(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
             if (length == null) length = new Length();
 
             Mode = mode;
             Time = time;
             Length = length;
             Gate = gate;
+            Infinite = infinite;
         }
 
         private void Tick(object sender, EventArgs e) {
@@ -59,13 +61,15 @@ namespace Apollo.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                Courier courier = new Courier() {
-                    Info = new Signal(n.Index, new Color(0), n.Layer),
-                    AutoReset = false,
-                    Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
-                };
-                courier.Elapsed += Tick;
-                courier.Start();
+                if (!Infinite) {
+                    Courier courier = new Courier() {
+                        Info = new Signal(n.Index, new Color(0), n.Layer),
+                        AutoReset = false,
+                        Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
+                    };
+                    courier.Elapsed += Tick;
+                    courier.Start();
+                }
 
                 MIDIExit?.Invoke(n);
             }
@@ -77,7 +81,7 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Hold(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]));
+            return new Hold(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]), Convert.ToBoolean(data["infinite"]));
         }
 
         public override string EncodeSpecific() {
@@ -103,6 +107,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("gate");
                         writer.WriteValue(_gate);
+
+                        writer.WritePropertyName("infinite");
+                        writer.WriteValue(Infinite);
 
                     writer.WriteEndObject();
 
