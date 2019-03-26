@@ -14,6 +14,10 @@ namespace Apollo.Components {
         public delegate void DialChangedEventHandler(double NewValue);
         public event DialChangedEventHandler Changed;
 
+        Canvas ArcCanvas;
+        Path ArcBase, Arc;
+
+        private const double width = 43, height = 39;
         private const double radius = 18, stroke = 7;
         private const double strokeHalf = stroke / 2;
 
@@ -76,7 +80,7 @@ namespace Apollo.Components {
                 if (value != _value) {
                     _value = value;
                     RawValue = ToRawValue(_value);
-                    DrawArc(this.Get<Path>("Arc"), _value);
+                    DrawArc(Arc, _value);
                 }
             }
         }
@@ -117,31 +121,48 @@ namespace Apollo.Components {
             get => _centered;
             set {
                 _centered = value;
-                DrawArc(this.Get<Path>("Arc"), _value);
+                DrawArc(Arc, _value);
+            }
+        }
+
+        private double _scale = 1;
+        public double Scale {
+            get => _scale;
+            set {
+                value = Math.Max(0, Math.Min(1, value));
+                if (value != _value) {
+                    _scale = value;
+
+                    ArcCanvas.Width = width * _scale;
+                    ArcCanvas.Height = height * _scale;
+
+                    DrawArc(ArcBase, 1, true);
+                    DrawArc(Arc, _value);
+                }
             }
         }
 
         private string ValueString => $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
-        private void DrawArc(Path Arc, double value) {
-            double x_start = radius * (Math.Cos(_centered? angle_center: angle_start) + 1) + strokeHalf;
-            double y_start = radius * (-Math.Sin(_centered? angle_center: angle_start) + 1) + strokeHalf;
+        private void DrawArc(Path Arc, double value, bool overrideBase = false) {
+            double x_start = (radius * (Math.Cos((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
+            double y_start = (radius * (-Math.Sin((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
             
             double angle_point = angle_start - Math.Abs(angle_end - angle_start) * value;
 
-            double x_end = radius * (Math.Cos(angle_point) + 1) + strokeHalf;
-            double y_end = radius * (-Math.Sin(angle_point) + 1) + strokeHalf;
+            double x_end = (radius * (Math.Cos(angle_point) + 1) + strokeHalf) * _scale;
+            double y_end = (radius * (-Math.Sin(angle_point) + 1) + strokeHalf) * _scale;
 
-            double angle = ((_centered? angle_center: angle_start) - angle_point) / Math.PI * 180;
+            double angle = (((_centered && !overrideBase)? angle_center: angle_start) - angle_point) / Math.PI * 180;
 
             int large = Convert.ToInt32(angle > 180);
             int direction = Convert.ToInt32(angle > 0);
 
-            Arc.StrokeThickness = stroke;
+            Arc.StrokeThickness = stroke * _scale;
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
                 x_start.ToString(CultureInfo.InvariantCulture),
                 y_start.ToString(CultureInfo.InvariantCulture),
-                radius.ToString(CultureInfo.InvariantCulture),
+                (radius * _scale).ToString(CultureInfo.InvariantCulture),
                 angle.ToString(CultureInfo.InvariantCulture),
                 large,
                 direction,
@@ -153,7 +174,11 @@ namespace Apollo.Components {
         public Dial() {
             InitializeComponent();
 
-            DrawArc(this.Get<Path>("ArcBase"), 1);
+            ArcCanvas = this.Get<Canvas>("ArcCanvas");
+            ArcBase = this.Get<Path>("ArcBase");
+            Arc = this.Get<Path>("Arc");
+
+            DrawArc(ArcBase, 1, true);
         }
 
         private bool mouseHeld = false;
@@ -162,7 +187,6 @@ namespace Apollo.Components {
         private void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = true;
-                Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
 
                 lastY = e.GetPosition(ArcCanvas).Y;
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
@@ -172,13 +196,12 @@ namespace Apollo.Components {
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
-                this.Get<Canvas>("ArcCanvas").Cursor = new Cursor(StandardCursorType.Arrow);
+                ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
             }
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
-                Canvas ArcCanvas = this.Get<Canvas>("ArcCanvas");
                 double Y = e.GetPosition(ArcCanvas).Y;
                 Value += (lastY - Y) / 200;
                 lastY = Y;
