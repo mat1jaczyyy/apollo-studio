@@ -12,8 +12,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.7.1-cibuild0001679-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.7.1-cibuild0001679-beta" />
+    <PackageReference Include="Avalonia" Version="0.7.1-cibuild0001731-beta" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.7.1-cibuild0001731-beta" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="RtMidi.Core" Version="1.0.49" />
   </ItemGroup>
