@@ -125,6 +125,15 @@ namespace Apollo.Components {
             }
         }
 
+        private bool _enabled = true;
+        public bool Enabled {
+            get => _enabled;
+            set {
+                _enabled = value;
+                DrawArc(Arc, _value);
+            }
+        }
+
         private double _scale = 1;
         public double Scale {
             get => _scale;
@@ -159,6 +168,8 @@ namespace Apollo.Components {
             int direction = Convert.ToInt32(angle > 0);
 
             Arc.StrokeThickness = stroke * _scale;
+            if (!overrideBase) Arc.Stroke = (SolidColorBrush)(new BrushConverter().ConvertFrom(Enabled? "#0288D1" : "#404040"));
+
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
                 x_start.ToString(CultureInfo.InvariantCulture),
                 y_start.ToString(CultureInfo.InvariantCulture),
@@ -185,7 +196,7 @@ namespace Apollo.Components {
         private double lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
                 mouseHeld = true;
 
                 lastY = e.GetPosition(ArcCanvas).Y;
@@ -194,14 +205,14 @@ namespace Apollo.Components {
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
-                mouseHeld = false;
+            if (e.MouseButton.HasFlag(MouseButton.Left))
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
-            }
+            
+            mouseHeld = false;
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
-            if (mouseHeld) {
+            if (mouseHeld && Enabled) {
                 double Y = e.GetPosition(ArcCanvas).Y;
                 Value += (lastY - Y) / 200;
                 lastY = Y;
