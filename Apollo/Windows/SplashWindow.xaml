@@ -1,10 +1,10 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Apollo Studio" Background="#121212" WindowStartupLocation="CenterScreen" Width="320" Height="320"
+        Title="Apollo Studio" Background="{DynamicResource ThemeBorderMidBrush}" WindowStartupLocation="CenterScreen" Width="320" Height="320"
         Closing="Unloaded">
 
-  <Border BorderBrush="#0C0C0C" BorderThickness="1">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
     <Grid RowDefinitions="Auto,*,Auto">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
         <Components:PreferencesButton Grid.Column="0" Margin="5 5" />
@@ -17,8 +17,8 @@
       <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
         <Grid.Styles>
           <Style Selector="Button">
-            <Setter Property="BorderBrush" Value="#121212" />
-            <Setter Property="Background" Value="#202020" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />
           </Style>
         </Grid.Styles>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -168,8 +169,8 @@ namespace Apollo.Components {
             int direction = Convert.ToInt32(angle > 0);
 
             Arc.StrokeThickness = stroke * _scale;
-            if (!overrideBase) Arc.Stroke = (SolidColorBrush)(new BrushConverter().ConvertFrom(Enabled? "#0288D1" : "#404040"));
-
+            if (!overrideBase) Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+            
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
                 x_start.ToString(CultureInfo.InvariantCulture),
                 y_start.ToString(CultureInfo.InvariantCulture),

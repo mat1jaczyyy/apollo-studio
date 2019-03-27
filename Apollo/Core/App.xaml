@@ -6,12 +6,7 @@
     <StyleInclude Source="resm:Apollo.Core.Theme.xaml" />
 
     <Style Selector="Window">
-      <Setter Property="Background" Value="#1A1A1A" />
       <Setter Property="HasSystemDecorations" Value="false" />
-    </Style>
-    
-    <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="Gainsboro" />
     </Style>
   </Application.Styles>
 </Application>

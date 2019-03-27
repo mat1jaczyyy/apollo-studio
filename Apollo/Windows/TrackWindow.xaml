@@ -5,7 +5,7 @@
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="#121212">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
         <Components:PreferencesButton />
         <Components:ProjectButton />
@@ -21,7 +21,7 @@
       </StackPanel>
     </Grid>
 
-    <Border Grid.Row="1" BorderBrush="#121212" BorderThickness="1 0 1 1">
+    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
     </Border>
   </Grid>
