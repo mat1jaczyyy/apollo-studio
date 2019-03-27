@@ -28,6 +28,8 @@ namespace Apollo.DeviceViewers {
             Gate.RawValue = (double)_hold.Gate * 100;
 
             Infinite = this.Get<CheckBox>("Infinite");
+            Infinite.IsChecked = _hold.Infinite;
+            Infinite_Changed(null, EventArgs.Empty);
         }
 
         private void Duration_Changed(double value) {
