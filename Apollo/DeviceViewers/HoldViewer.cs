@@ -13,13 +13,21 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Hold _hold;
+        Dial Duration, Gate;
+        CheckBox Infinite;
 
         public HoldViewer(Hold hold) {
             InitializeComponent();
 
             _hold = hold;
-            this.Get<Dial>("Duration").RawValue = _hold.Time;
-            this.Get<Dial>("Gate").RawValue = (double)_hold.Gate * 100;
+
+            Duration = this.Get<Dial>("Duration");
+            Duration.RawValue = _hold.Time;
+
+            Gate = this.Get<Dial>("Gate");
+            Gate.RawValue = (double)_hold.Gate * 100;
+
+            Infinite = this.Get<CheckBox>("Infinite");
         }
 
         private void Duration_Changed(double value) {
@@ -31,7 +39,8 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Infinite_Changed(object sender, EventArgs e) {
-            _hold.Infinite = this.Get<CheckBox>("Infinite").IsChecked.Value;
+            _hold.Infinite = Infinite.IsChecked.Value;
+            Duration.Enabled = Gate.Enabled = !Infinite.IsChecked.Value;
         }
     }
 }
