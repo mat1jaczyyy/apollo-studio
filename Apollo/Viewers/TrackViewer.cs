@@ -13,13 +13,18 @@ namespace Apollo.Viewers {
         public event TrackAddedEventHandler TrackAdded;
         
         Track _track;
+
+        public void UpdateText(int index) {
+            this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
+        }
         
         public TrackViewer(Track track) {
             InitializeComponent();
             
             _track = track;
             
-            this.Get<TextBlock>("Name").Text = $"Track {_track.ParentIndex + 1}";
+            UpdateText(_track.ParentIndex.Value);
+            _track.ParentIndexChanged += UpdateText;
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {

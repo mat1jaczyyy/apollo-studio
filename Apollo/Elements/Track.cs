@@ -14,11 +14,17 @@ namespace Apollo.Elements {
 
         public TrackWindow Window;
 
+        public delegate void ParentIndexChangedEventHandler(int index);
+        public event ParentIndexChangedEventHandler ParentIndexChanged;
+
         private int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
             set {
-                _ParentIndex = value;
+                if (_ParentIndex != value) {
+                    _ParentIndex = value;
+                    ParentIndexChanged?.Invoke(_ParentIndex.Value);
+                }
             }
         }
 

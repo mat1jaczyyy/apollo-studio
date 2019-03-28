@@ -19,11 +19,15 @@ namespace Apollo.Windows {
 
         private HorizontalAlignment ContentAlignment;
         
-        private void UpdateTitle(string path) {
+        private void UpdateTitle(string path, int index) {
             this.Get<TextBlock>("Title").Text = (path == "")
-                ? $"Track {_track.ParentIndex + 1}"
-                : $"Track {_track.ParentIndex + 1} - {path}";
+                ? $"Track {index + 1}"
+                : $"Track {index + 1} - {path}";
         }
+
+        private void UpdateTitle(string path) => UpdateTitle(path, _track.ParentIndex.Value);
+        private void UpdateTitle(int index) => UpdateTitle(Program.Project.FilePath, index);
+        private void UpdateTitle() => UpdateTitle(Program.Project.FilePath, _track.ParentIndex.Value);
 
         private void UpdateTopmost(bool value) {
             Topmost = value;
@@ -57,13 +61,15 @@ namespace Apollo.Windows {
 
         private void Loaded(object sender, EventArgs e) {
             Program.Project.PathChanged += UpdateTitle;
-            UpdateTitle(Program.Project.FilePath);
+            _track.ParentIndexChanged += UpdateTitle;
+            UpdateTitle();
         }
 
         private void Unloaded(object sender, EventArgs e) {
             _track.Window = null;
             
             Program.Project.PathChanged -= UpdateTitle;
+            _track.ParentIndexChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
 

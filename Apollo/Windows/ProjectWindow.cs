@@ -44,7 +44,7 @@ namespace Apollo.Windows {
             Contents = this.Get<StackPanel>("Contents").Children;
             
             for (int i = 0; i < Program.Project.Count; i++)
-                Contents.Add(new TrackViewer(Program.Project[i]));
+                Contents_Insert(i, Program.Project[i]);
         }
         
         private void Loaded(object sender, EventArgs e) {
