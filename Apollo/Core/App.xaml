@@ -6,6 +6,7 @@
     <StyleInclude Source="resm:Apollo.Core.Theme.xaml" />
 
     <Style Selector="Window">
+      <Setter Property="CanResize" Value="false" />
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
 

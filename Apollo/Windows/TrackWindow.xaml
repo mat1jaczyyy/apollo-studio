@@ -4,25 +4,31 @@
         Title="Track" WindowStartupLocation="CenterOwner" Width="548" Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded">
   
-  <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:PreferencesButton />
-        <Components:ProjectButton />
-      </StackPanel>
+  <Grid>
+    <Grid RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:PreferencesButton />
+          <Components:ProjectButton />
+        </StackPanel>
 
-      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
-        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+        <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
+        </Grid>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:Minimize Clicked="Minimize" />
+          <Components:Close Clicked="Close" />
+        </StackPanel>
       </Grid>
 
-      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:Minimize Clicked="Minimize" />
-        <Components:Close Clicked="Close" />
-      </StackPanel>
+      <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
+        <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
+      </Border>
     </Grid>
 
-    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Contents" />
-    </Border>
+    <Grid ColumnDefinitions="Auto,*,Auto">
+      <Canvas Grid.Column="0" Background="Red" VerticalAlignment="Stretch" Width="4" PointerPressed="ResizeWest" />
+      <Canvas Grid.Column="2" Background="Red" VerticalAlignment="Stretch" Width="4" PointerPressed="ResizeEast" />
+    </Grid>
   </Grid>
 </Window>
