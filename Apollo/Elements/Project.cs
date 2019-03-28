@@ -12,15 +12,29 @@ using Newtonsoft.Json;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Project: IEnumerable {
+    public class Project: IEnumerator, IEnumerable {
         public static readonly string Identifier = "project";
 
         public ProjectWindow Window;
 
         private List<Track> _tracks;
-        public Decimal BPM;
+        int _position = 0;
+        public IEnumerator GetEnumerator() => (IEnumerator)this;
 
-        public IEnumerator GetEnumerator() => (IEnumerator<Track>)_tracks;
+        public bool MoveNext() {
+            _position++;
+            return (_position < _tracks.Count);
+        }
+
+        public void Reset() {
+            _position = 0;
+        }
+
+        public object Current {
+            get => _tracks[_position];
+        }
+
+        public Decimal BPM;
 
         public delegate void PathChangedEventHandler(string path);
         public event PathChangedEventHandler PathChanged;

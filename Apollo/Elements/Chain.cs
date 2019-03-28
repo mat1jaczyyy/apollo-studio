@@ -11,7 +11,7 @@ using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Elements {
-    public class Chain: IEnumerable {
+    public class Chain: IEnumerator, IEnumerable {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
@@ -27,10 +27,24 @@ namespace Apollo.Elements {
             }
         }
 
-        private List<Device> _devices = new List<Device>();
-        private Action<Signal> _chainenter = null;
+        private List<Device> _devices = new List<Device>();        
+        int _position = 0;
+        public IEnumerator GetEnumerator() => (IEnumerator)this;
 
-        public IEnumerator GetEnumerator() => (IEnumerator<Device>)_devices;
+        public bool MoveNext() {
+            _position++;
+            return (_position < _devices.Count);
+        }
+
+        public void Reset() {
+            _position = 0;
+        }
+
+        public object Current {
+            get => _devices[_position];
+        }
+        
+        private Action<Signal> _chainenter = null;
 
         private void Reroute() {
             for (int i = 0; i < _devices.Count; i++) {
