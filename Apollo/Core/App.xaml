@@ -8,5 +8,17 @@
     <Style Selector="Window">
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
+
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+
+    <Style Selector="Button:pressed  /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+
+    <Style Selector="CheckBox:pointerover /template/ Border#border">
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
   </Application.Styles>
 </Application>
