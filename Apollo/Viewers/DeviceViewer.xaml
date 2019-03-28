@@ -20,6 +20,6 @@
       </Grid>
     </Border>
 
-    <Components:Add DeviceAdded="Device_Add" />
+    <Components:DeviceAddButton DeviceAdded="Device_Add" />
   </StackPanel>
 </UserControl>

@@ -7,7 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
-    public class Add: UserControl {
+    public class DeviceAddButton: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void DeviceAddedEventHandler(Type device);
@@ -15,7 +15,7 @@ namespace Apollo.Components {
 
         Canvas Icon;
 
-        public Add() {
+        public DeviceAddButton() {
             InitializeComponent();
 
             Icon = this.Get<Canvas>("Icon");

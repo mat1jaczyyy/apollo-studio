@@ -22,6 +22,14 @@ namespace Apollo.Windows {
             Topmost = value;
         }
 
+        private Controls Contents;
+
+        private void Contents_Insert(int index, Track track) {
+            TrackViewer viewer = new TrackViewer(track);
+            viewer.TrackAdded += Track_Insert;
+            Contents.Insert(index + 1, viewer);
+        }
+
         public ProjectWindow() {
             InitializeComponent();
             #if DEBUG
@@ -33,10 +41,10 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
-            Controls Contents = this.Get<StackPanel>("Contents").Children;
+            Contents = this.Get<StackPanel>("Contents").Children;
             
-            foreach (Track track in Program.Project.Tracks)
-                Contents.Add(new TrackViewer(track));
+            for (int i = 0; i < Program.Project.Count; i++)
+                Contents.Add(new TrackViewer(Program.Project[i]));
         }
         
         private void Loaded(object sender, EventArgs e) {
@@ -51,6 +59,15 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Program.WindowClose(this);
+        }
+
+        private void Track_Insert(int index) {
+            Program.Project.Insert(index, new Track());
+            Contents_Insert(index, Program.Project[index]);
+        }
+
+        private void Track_InsertStart() {
+            Track_Insert(0);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) {

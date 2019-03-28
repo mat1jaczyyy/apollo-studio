@@ -16,7 +16,7 @@ namespace Apollo.Elements {
 
         public ProjectWindow Window;
 
-        public List<Track> Tracks;
+        private List<Track> _tracks;
         public Decimal BPM;
 
         public delegate void PathChangedEventHandler(string path);
@@ -58,20 +58,47 @@ namespace Apollo.Elements {
             }
         }
 
+        private void Reroute() {
+            for (int i = 0; i < _tracks.Count; i++)
+                _tracks[i].ParentIndex = i;
+        }
+
+        public Track this[int index] {
+            get => _tracks[index];
+        }
+
+        public int Count {
+            get => _tracks.Count;
+        }
+
+        public void Insert(int index, Track track) {
+            _tracks.Insert(index, track);
+            Reroute();
+        }
+
+        public void Add(Track track) {
+            _tracks.Add(track);
+            Reroute();
+        }
+
+        public void Remove(int index) {
+            _tracks.RemoveAt(index);
+            Reroute();
+        }
+
         public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
             if (tracks == null)
                 tracks = (from i in Core.MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
-            for (int i = 0; i < tracks.Count; i++)
-                tracks[i].ParentIndex = i;
-
             BPM = bpm;
-            Tracks = tracks;
+            _tracks = tracks;
             FilePath = path;
+
+            Reroute();
         }
 
         public void Dispose() {
-            foreach (Track track in Tracks)
+            foreach (Track track in _tracks)
                 track.Dispose();
         }
 
@@ -106,8 +133,8 @@ namespace Apollo.Elements {
                         writer.WritePropertyName("tracks");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < Tracks.Count; i++) {
-                                writer.WriteRawValue(Tracks[i].Encode());
+                            for (int i = 0; i < _tracks.Count; i++) {
+                                writer.WriteRawValue(_tracks[i].Encode());
                             }
                         
                         writer.WriteEndArray();

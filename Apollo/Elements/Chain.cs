@@ -50,19 +50,11 @@ namespace Apollo.Elements {
         }
 
         public Device this[int index] {
-            get {
-                return _devices[index];
-            }
-            set {
-                _devices[index] = value;
-                Reroute();
-            }
+            get => _devices[index];
         }
 
         public int Count {
-            get {
-                return _devices.Count;
-            }
+            get => _devices.Count;
         }
 
         public Chain Clone() {
@@ -76,12 +68,6 @@ namespace Apollo.Elements {
 
         public void Add(Device device) {
             _devices.Add(device);
-            Reroute();
-        }
-
-        public void Add(Device[] devices) {
-            foreach (Device device in devices)
-                _devices.Add(device);
             Reroute();
         }
 

@@ -33,9 +33,8 @@ namespace Apollo.Core {
         public static void WindowClose(Window sender) {
             if (Project == null || Project.Window != null) return;
             
-            foreach (Track track in Program.Project.Tracks) {
-                if (track.Window != null) return;
-            }
+            for (int i = 0; i < Program.Project.Count; i++)
+                if (Program.Project[i].Window != null) return;
 
             Type type = sender.GetType();
 
