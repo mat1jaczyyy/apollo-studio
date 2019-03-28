@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 using Newtonsoft.Json;
 
@@ -17,11 +16,7 @@ namespace Apollo.Devices {
         public Length Length;
         private int _time;
         private Decimal _gate;
-
-        private object locker = new object();
-
-        private Queue<Timer> _timers = new Queue<Timer>();
-        private TimerCallback _timerexit;
+        public bool Infinite;
 
         public int Time {
             get {
@@ -44,35 +39,37 @@ namespace Apollo.Devices {
         }
 
         public override Device Clone() {
-            return new Hold(Mode, Length, _time, _gate);
+            return new Hold(Mode, Length, _time, _gate, Infinite);
         }
 
-        public Hold(bool mode = false, Length length = null, int time = 500, Decimal gate = 1): base(DeviceIdentifier) {
-            _timerexit = new TimerCallback(Tick);
-
+        public Hold(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
             if (length == null) length = new Length();
 
             Mode = mode;
             Time = time;
             Length = length;
             Gate = gate;
+            Infinite = infinite;
         }
 
-        private void Tick(object info) {
-            if (info.GetType() == typeof(byte)) {
-                Signal n = new Signal((byte)info, new Color(0));
-
-                lock (locker) {
-                    MIDIExit?.Invoke(n);
-
-                    _timers.Dequeue();
-                }
-            }
+        private void Tick(object sender, EventArgs e) {
+            Courier courier = (Courier)sender;
+            courier.Elapsed -= Tick;
+            
+            MIDIExit?.Invoke((Signal)courier.Info);
         }
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                _timers.Enqueue(new Timer(_timerexit, n.Index, Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
+                if (!Infinite) {
+                    Courier courier = new Courier() {
+                        Info = new Signal(n.Index, new Color(0), n.Layer),
+                        AutoReset = false,
+                        Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
+                    };
+                    courier.Elapsed += Tick;
+                    courier.Start();
+                }
 
                 MIDIExit?.Invoke(n);
             }
@@ -84,7 +81,7 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Hold(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]));
+            return new Hold(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]), Convert.ToBoolean(data["infinite"]));
         }
 
         public override string EncodeSpecific() {
@@ -110,6 +107,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("gate");
                         writer.WriteValue(_gate);
+
+                        writer.WritePropertyName("infinite");
+                        writer.WriteValue(Infinite);
 
                     writer.WriteEndObject();
 

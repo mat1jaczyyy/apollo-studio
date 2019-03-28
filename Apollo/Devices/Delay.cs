@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 using Newtonsoft.Json;
 
@@ -17,11 +16,6 @@ namespace Apollo.Devices {
         public Length Length;
         private int _time;
         private Decimal _gate;
-
-        private object locker = new object();
-
-        private Queue<Timer> _timers = new Queue<Timer>();
-        private TimerCallback _timerexit;
 
         public int Time {
             get {
@@ -47,9 +41,7 @@ namespace Apollo.Devices {
             return new Delay(Mode, Length, _time, _gate);
         }
 
-        public Delay(bool mode = false, Length length = null, int time = 500, Decimal gate = 1): base(DeviceIdentifier) {
-            _timerexit = new TimerCallback(Tick);
-
+        public Delay(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1): base(DeviceIdentifier) {
             if (length == null) length = new Length();
 
             Mode = mode;
@@ -58,20 +50,21 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        private void Tick(object info) {
-            if (info.GetType() == typeof(Signal)) {
-                Signal n = (Signal)info;
-
-                lock (locker) {
-                    MIDIExit?.Invoke(n);
-
-                    _timers.Dequeue().Dispose();
-                }
-            }
+        private void Tick(object sender, EventArgs e) {
+            Courier courier = (Courier)sender;
+            courier.Elapsed -= Tick;
+            
+            MIDIExit?.Invoke((Signal)courier.Info);
         }
 
         public override void MIDIEnter(Signal n) {
-            _timers.Enqueue(new Timer(_timerexit, n.Clone(), Convert.ToInt32((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
+            Courier courier = new Courier() {
+                Info = n.Clone(),
+                AutoReset = false,
+                Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
         }
 
         public static Device DecodeSpecific(string jsonString) {

@@ -2,14 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-
-    <Border Grid.Row="0" BorderBrush="#151515" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="5.93555596275" Round="0" Unit="ms"
+  <Grid RowDefinitions="*,*">
+    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms"
                        Changed="Duration_Changed" />
     </Border>
     

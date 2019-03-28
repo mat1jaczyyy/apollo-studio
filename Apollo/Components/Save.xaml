@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Clicked">
-    <Path Fill="#404040"
+    <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
           Data="M 0,0 L 0,16 16,16 16,4 12,0 Z" />
-    <Path Fill="#121212"
+    <Path Fill="{DynamicResource ThemeBorderMidBrush}"
           Data="M 1,1 L 1,4 11,4 11,1 Z" />
-    <Ellipse Fill="#121212"
+    <Ellipse Fill="{DynamicResource ThemeBorderMidBrush}"
           Canvas.Left="5" Canvas.Top="8" Width="6" Height="6" />
   </Canvas>
 </UserControl>

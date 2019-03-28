@@ -15,7 +15,7 @@ namespace Apollo.Elements {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
 
-        public IDeviceParent Parent = null;
+        public Chain Parent = null;
         public int? ParentIndex;
         public Action<Signal> MIDIExit = null;
 

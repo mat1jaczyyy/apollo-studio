@@ -3,15 +3,22 @@
 
   <Application.Styles>
     <StyleInclude Source="resm:Avalonia.Themes.Default.DefaultTheme.xaml?assembly=Avalonia.Themes.Default" />
-    <StyleInclude Source="resm:Avalonia.Themes.Default.Accents.BaseLight.xaml?assembly=Avalonia.Themes.Default" />
+    <StyleInclude Source="resm:Apollo.Core.Theme.xaml" />
 
     <Style Selector="Window">
-      <Setter Property="Background" Value="#1A1A1A" />
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
-    
-    <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="Gainsboro" />
+
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+
+    <Style Selector="Button:pressed  /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+
+    <Style Selector="CheckBox:pointerover /template/ Border#border">
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
     </Style>
   </Application.Styles>
 </Application>

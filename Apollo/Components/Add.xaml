@@ -5,10 +5,12 @@
     <Canvas.ContextMenu>
       <ContextMenu>
         <MenuItem Header="Delay" />
+        <MenuItem Header="Hold" />
+        <MenuItem Header="Translation" />
       </ContextMenu>
     </Canvas.ContextMenu>
 
-    <Path Stroke="#DCDCDC" StrokeThickness="2"
+    <Path Stroke="{DynamicResource ThemeForegroundBrush}" StrokeThickness="2"
           Data="M 0,8 L 16,8 M 8,0 L 8,16" />
   </Canvas>
 </UserControl>
