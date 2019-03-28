@@ -4,9 +4,10 @@
   
   <StackPanel VerticalAlignment="Stretch">
     <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="5">
-      <Grid ColumnDefinitions="Auto,*" Margin="5 5">
-        <TextBlock Grid.Column="0" x:Name="Name" PointerReleased="Clicked" />
-        <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="[Port Selector Placeholder]" />
+      <Grid ColumnDefinitions="Auto,Auto,*" Margin="5 5">
+        <Components:RemoveButton Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" Removed="Track_Remove" />
+        <TextBlock Grid.Column="1" x:Name="Name" PointerReleased="Clicked" />
+        <TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="[Port Selector Placeholder]" />
       </Grid>
     </Border>
 

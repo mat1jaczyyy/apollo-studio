@@ -2,6 +2,7 @@
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Windows;
 
@@ -33,6 +34,11 @@ namespace Apollo.Viewers {
 
         private void Track_Add() {
             TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
+        }
+
+        private void Track_Remove() {
+            ((Panel)Parent).Children.RemoveAt(_track.ParentIndex.Value + 1);
+            Program.Project.Remove(_track.ParentIndex.Value);
         }
     }
 }

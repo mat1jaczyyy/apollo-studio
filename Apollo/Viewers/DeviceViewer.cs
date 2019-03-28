@@ -43,11 +43,9 @@ namespace Apollo.Viewers {
             DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
         }
 
-        private void Device_Remove(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) {
-                ((Panel)Parent).Children.RemoveAt(_device.ParentIndex.Value + 1);
-                _device.Parent.Remove(_device.ParentIndex.Value);
-            }
+        private void Device_Remove() {
+            ((Panel)Parent).Children.RemoveAt(_device.ParentIndex.Value + 1);
+            _device.Parent.Remove(_device.ParentIndex.Value);
         }
     }
 }

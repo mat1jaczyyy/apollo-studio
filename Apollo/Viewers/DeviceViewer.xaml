@@ -9,10 +9,7 @@
           <Grid ColumnDefinitions="*,Auto" Margin="5 4">
             <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />
 
-            <Canvas Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Center" Width="8" Height="8" Background="Transparent" PointerReleased="Device_Remove">
-              <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
-                    Data="M 1,1 L 7,7 M 7,1 L 1,7" />
-            </Canvas>
+            <Components:RemoveButton Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Center" Removed="Device_Remove" />
           </Grid>
         </Border>
 
