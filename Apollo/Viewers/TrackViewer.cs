@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -29,7 +30,7 @@ namespace Apollo.Viewers {
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) TrackWindow.Create(_track);
+            if (e.MouseButton == MouseButton.Left) TrackWindow.Create(_track, (Window)this.GetVisualRoot());
         }
 
         private void Track_Add() {

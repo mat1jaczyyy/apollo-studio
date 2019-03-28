@@ -84,10 +84,11 @@ namespace Apollo.Windows {
             WindowState = WindowState.Minimized;
         }
 
-        public static void Create(Track track) {
+        public static void Create(Track track, Window owner) {
             if (track.Window == null) {
-                track.Window = new TrackWindow(track);
+                track.Window = new TrackWindow(track) {Owner = owner};
                 track.Window.Show();
+                track.Window.Owner = null;
             } else {
                 track.Window.WindowState = WindowState.Normal;
                 track.Window.Activate();

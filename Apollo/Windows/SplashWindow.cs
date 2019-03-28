@@ -44,7 +44,7 @@ namespace Apollo.Windows {
         public void New(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
-            ProjectWindow.Create();
+            ProjectWindow.Create(this);
             Close();
         }
 
@@ -69,7 +69,7 @@ namespace Apollo.Windows {
                 if (loaded != null) {
                     Program.Project?.Dispose();
                     Program.Project = loaded;
-                    ProjectWindow.Create();
+                    ProjectWindow.Create(this);
                     Close();
                 }
             }

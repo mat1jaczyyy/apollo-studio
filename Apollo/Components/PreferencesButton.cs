@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 using Apollo.Windows;
 
@@ -13,7 +14,7 @@ namespace Apollo.Components {
         }
 
         private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create();
+            if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create((Window)this.GetVisualRoot());
         }
     }
 }

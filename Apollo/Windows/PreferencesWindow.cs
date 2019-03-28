@@ -56,10 +56,11 @@ namespace Apollo.Windows {
             Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
         }
 
-        public static void Create() {
+        public static void Create(Window owner) {
             if (Preferences.Window == null) {
-                Preferences.Window = new PreferencesWindow();
+                Preferences.Window = new PreferencesWindow() {Owner = owner};
                 Preferences.Window.Show();
+                Preferences.Window.Owner = null;
             } else {
                 Preferences.Window.WindowState = WindowState.Normal;
                 Preferences.Window.Activate();

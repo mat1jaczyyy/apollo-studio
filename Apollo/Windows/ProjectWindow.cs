@@ -78,10 +78,11 @@ namespace Apollo.Windows {
             WindowState = WindowState.Minimized;
         }
 
-        public static void Create() {
+        public static void Create(Window owner) {
             if (Program.Project.Window == null) {
-                Program.Project.Window = new ProjectWindow();
+                Program.Project.Window = new ProjectWindow() {Owner = owner};
                 Program.Project.Window.Show();
+                Program.Project.Window.Owner = null;
             } else {
                 Program.Project.Window.WindowState = WindowState.Normal;
                 Program.Project.Window.Activate();

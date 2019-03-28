@@ -1,7 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Project" WindowStartupLocation="CenterScreen" Width="274" Height="411"
+        Title="Project" WindowStartupLocation="CenterOwner" Width="274" Height="411"
         Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
