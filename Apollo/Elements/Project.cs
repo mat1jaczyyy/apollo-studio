@@ -12,27 +12,12 @@ using Newtonsoft.Json;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Project: IEnumerator, IEnumerable {
+    public class Project {
         public static readonly string Identifier = "project";
 
         public ProjectWindow Window;
 
-        private List<Track> _tracks;
-        int _position = 0;
-        public IEnumerator GetEnumerator() => (IEnumerator)this;
-
-        public bool MoveNext() {
-            _position++;
-            return (_position < _tracks.Count);
-        }
-
-        public void Reset() {
-            _position = 0;
-        }
-
-        public object Current {
-            get => _tracks[_position];
-        }
+        public List<Track> Tracks;
 
         public Decimal BPM;
 
@@ -76,30 +61,30 @@ namespace Apollo.Elements {
         }
 
         private void Reroute() {
-            for (int i = 0; i < _tracks.Count; i++)
-                _tracks[i].ParentIndex = i;
+            for (int i = 0; i < Tracks.Count; i++)
+                Tracks[i].ParentIndex = i;
         }
 
         public Track this[int index] {
-            get => _tracks[index];
+            get => Tracks[index];
         }
 
         public int Count {
-            get => _tracks.Count;
+            get => Tracks.Count;
         }
 
         public void Insert(int index, Track track) {
-            _tracks.Insert(index, track);
+            Tracks.Insert(index, track);
             Reroute();
         }
 
         public void Add(Track track) {
-            _tracks.Add(track);
+            Tracks.Add(track);
             Reroute();
         }
 
         public void Remove(int index) {
-            _tracks.RemoveAt(index);
+            Tracks.RemoveAt(index);
             Reroute();
         }
 
@@ -108,14 +93,14 @@ namespace Apollo.Elements {
                 tracks = (from i in Core.MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
             BPM = bpm;
-            _tracks = tracks;
+            Tracks = tracks;
             FilePath = path;
 
             Reroute();
         }
 
         public void Dispose() {
-            foreach (Track track in _tracks)
+            foreach (Track track in Tracks)
                 track.Dispose();
         }
 
@@ -150,8 +135,8 @@ namespace Apollo.Elements {
                         writer.WritePropertyName("tracks");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < _tracks.Count; i++) {
-                                writer.WriteRawValue(_tracks[i].Encode());
+                            for (int i = 0; i < Tracks.Count; i++) {
+                                writer.WriteRawValue(Tracks[i].Encode());
                             }
                         
                         writer.WriteEndArray();

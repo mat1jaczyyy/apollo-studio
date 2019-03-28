@@ -11,7 +11,7 @@ using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Elements {
-    public class Chain: IEnumerator, IEnumerable {
+    public class Chain {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
@@ -27,75 +27,59 @@ namespace Apollo.Elements {
             }
         }
 
-        private List<Device> _devices = new List<Device>();        
-        int _position = 0;
-        public IEnumerator GetEnumerator() => (IEnumerator)this;
-
-        public bool MoveNext() {
-            _position++;
-            return (_position < _devices.Count);
-        }
-
-        public void Reset() {
-            _position = 0;
-        }
-
-        public object Current {
-            get => _devices[_position];
-        }
-        
+        public List<Device> Devices = new List<Device>();
         private Action<Signal> _chainenter = null;
 
         private void Reroute() {
-            for (int i = 0; i < _devices.Count; i++) {
-                _devices[i].Parent = this;
-                _devices[i].ParentIndex = i;
+            for (int i = 0; i < Devices.Count; i++) {
+                Devices[i].Parent = this;
+                Devices[i].ParentIndex = i;
             }
             
-            if (_devices.Count == 0)
+            if (Devices.Count == 0)
                 _chainenter = _midiexit;
 
             else {
-                _chainenter = _devices[0].MIDIEnter;
+                _chainenter = Devices[0].MIDIEnter;
                 
-                for (int i = 1; i < _devices.Count; i++) {
-                    _devices[i - 1].MIDIExit = _devices[i].MIDIEnter;
+                for (int i = 1; i < Devices.Count; i++) {
+                    Devices[i - 1].MIDIExit = Devices[i].MIDIEnter;
                 }
                 
-                _devices[_devices.Count - 1].MIDIExit = _midiexit;
+                Devices[Devices.Count - 1].MIDIExit = _midiexit;
             }
         }
 
         public Device this[int index] {
-            get => _devices[index];
+            get => Devices[index];
         }
 
         public int Count {
-            get => _devices.Count;
+            get => Devices.Count;
         }
 
         public Chain Clone() {
-            return new Chain((from i in _devices select i.Clone()).ToList());
+            return new Chain((from i in Devices select i.Clone()).ToList());
         }
 
         public void Insert(int index, Device device) {
-            _devices.Insert(index, device);
+            Devices.Insert(index, device);
             Reroute();
         }
 
         public void Add(Device device) {
-            _devices.Add(device);
+            Devices.Add(device);
             Reroute();
         }
 
         public void Remove(int index) {
-            _devices.RemoveAt(index);
+            Devices.RemoveAt(index);
             Reroute();
         }
 
         public Chain(List<Device> init = null) {
             if (init == null) init = new List<Device>();
-            _devices = init;
+            Devices = init;
             Reroute();
         }
 
@@ -128,8 +112,8 @@ namespace Apollo.Elements {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < _devices.Count; i++) {
-                            writer.WriteRawValue(_devices[i].Encode());
+                        for (int i = 0; i < Devices.Count; i++) {
+                            writer.WriteRawValue(Devices[i].Encode());
                         }
 
                     writer.WriteEndArray();
