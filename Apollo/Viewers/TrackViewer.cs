@@ -39,7 +39,7 @@ namespace Apollo.Viewers {
         private void Track_Remove() {
             ((Panel)Parent).Children.RemoveAt(_track.ParentIndex.Value + 1);
             Program.Project.Remove(_track.ParentIndex.Value);
-            _track.Window.Close();
+            _track.Window?.Close();
         }
     }
 }
