@@ -8,7 +8,7 @@
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
       <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
         <Components:PreferencesButton />
-        <Components:Save />
+        <Components:SaveButton />
       </StackPanel>
 
       <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
@@ -24,7 +24,7 @@
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <ScrollViewer Padding="5 5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
         <StackPanel x:Name="Contents">
-          <Components:TrackAddButton TrackAdded="Track_InsertStart" />
+          <Components:TrackAdd TrackAdded="Track_InsertStart" />
         </StackPanel>
       </ScrollViewer>
     </Border>

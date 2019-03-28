@@ -3,6 +3,6 @@
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">
-    <Components:DeviceAddButton DeviceAdded="Device_InsertStart" />
+    <Components:DeviceAdd DeviceAdded="Device_InsertStart" />
   </StackPanel>
 </UserControl>

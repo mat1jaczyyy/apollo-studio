@@ -9,7 +9,7 @@
           <Grid ColumnDefinitions="*,Auto" Margin="5 4">
             <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />
 
-            <Components:RemoveButton Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Center" Removed="Device_Remove" />
+            <Components:Remove Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Center" Removed="Device_Remove" />
           </Grid>
         </Border>
 
@@ -17,6 +17,6 @@
       </Grid>
     </Border>
 
-    <Components:DeviceAddButton DeviceAdded="Device_Add" />
+    <Components:DeviceAdd DeviceAdded="Device_Add" />
   </StackPanel>
 </UserControl>

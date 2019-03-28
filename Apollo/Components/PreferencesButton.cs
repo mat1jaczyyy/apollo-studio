@@ -12,7 +12,7 @@ namespace Apollo.Components {
             InitializeComponent();
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
+        private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create();
         }
     }

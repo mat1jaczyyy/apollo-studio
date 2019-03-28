@@ -7,19 +7,18 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
-    public class RemoveButton: UserControl {
+    public class TrackAdd: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void RemovedEventHandler();
-        public event RemovedEventHandler Removed;
+        public delegate void TrackAddedEventHandler();
+        public event TrackAddedEventHandler TrackAdded;
         
-        public RemoveButton() {
+        public TrackAdd() {
             InitializeComponent();
         }
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left)
-                Removed?.Invoke();
+            if (e.MouseButton == MouseButton.Left) TrackAdded?.Invoke();
         }
     }
 }

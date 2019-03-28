@@ -1,7 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Clicked">
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
     <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
           Data="M 0,0 L 0,16 16,16 16,4 12,0 Z" />
     <Path Fill="{DynamicResource ThemeBorderMidBrush}"

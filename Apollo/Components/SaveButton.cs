@@ -1,21 +1,22 @@
 ﻿using System;
 
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 
 using Apollo.Core;
 
 namespace Apollo.Components {
-    public class Save: UserControl {
+    public class SaveButton: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public Save() {
+        public SaveButton() {
             InitializeComponent();
         }
 
-        private void Clicked(object sender, EventArgs e) {
-            Program.Project.Save((Window)this.GetVisualRoot());
+        private void Click(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left) Program.Project.Save((Window)this.GetVisualRoot());
         }
     }
 }

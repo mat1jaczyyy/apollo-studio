@@ -1,7 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Canvas Width="8" Height="8" Background="Transparent" x:Name="Icon" PointerReleased="Clicked">
+  <Canvas Width="8" Height="8" Background="Transparent" x:Name="Icon" PointerReleased="Click">
     <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
           Data="M 1,1 L 7,7 M 7,1 L 1,7" />
   </Canvas>

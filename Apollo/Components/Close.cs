@@ -6,16 +6,16 @@ namespace Apollo.Components {
     public class Close: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void ClickEventHandler();
-        public event ClickEventHandler Click;
+        public delegate void ClickedEventHandler();
+        public event ClickedEventHandler Clicked;
 
         public Close() {
             InitializeComponent();
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
+        private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left)
-                Click?.Invoke();
+                Clicked?.Invoke();
         }
     }
 }

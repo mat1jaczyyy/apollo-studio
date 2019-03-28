@@ -7,7 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
-    public class DeviceAddButton: UserControl {
+    public class DeviceAdd: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void DeviceAddedEventHandler(Type device);
@@ -15,7 +15,7 @@ namespace Apollo.Components {
 
         Canvas Icon;
 
-        public DeviceAddButton() {
+        public DeviceAdd() {
             InitializeComponent();
 
             Icon = this.Get<Canvas>("Icon");
@@ -32,10 +32,8 @@ namespace Apollo.Components {
             }
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left)
-                Icon.ContextMenu.Open(Icon);
-
+        private void Click(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left) Icon.ContextMenu.Open(Icon);
             e.Handled = true;
         }
     }
