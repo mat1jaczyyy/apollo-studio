@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -10,7 +11,7 @@ using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Elements {
-    public class Chain {
+    public class Chain: IEnumerable {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
@@ -28,6 +29,8 @@ namespace Apollo.Elements {
 
         private List<Device> _devices = new List<Device>();
         private Action<Signal> _chainenter = null;
+
+        public IEnumerator GetEnumerator() => (IEnumerator<Device>)_devices;
 
         private void Reroute() {
             for (int i = 0; i < _devices.Count; i++) {

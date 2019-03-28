@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -11,13 +12,15 @@ using Newtonsoft.Json;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Project {
+    public class Project: IEnumerable {
         public static readonly string Identifier = "project";
 
         public ProjectWindow Window;
 
         private List<Track> _tracks;
         public Decimal BPM;
+
+        public IEnumerator GetEnumerator() => (IEnumerator<Track>)_tracks;
 
         public delegate void PathChangedEventHandler(string path);
         public event PathChangedEventHandler PathChanged;
