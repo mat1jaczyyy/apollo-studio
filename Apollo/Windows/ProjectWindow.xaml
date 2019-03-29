@@ -1,32 +1,41 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Project" WindowStartupLocation="CenterOwner" Width="300" MinWidth="300" Height="200" MinHeight="200"
+        Title="Project" WindowStartupLocation="CenterOwner"
+        Width="350" MinWidth="350" MaxWidth="350"
+        Height="200" MinHeight="120"
         Opened="Loaded" Closing="Unloaded">
   
-  <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:PreferencesButton />
-        <Components:SaveButton />
-      </StackPanel>
-
-      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
-        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
-      </Grid>
-
-      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:Minimize Clicked="Minimize" />
-        <Components:Close Clicked="Close" />
-      </StackPanel>
-    </Grid>
-    
-    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <ScrollViewer Padding="5 5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-        <StackPanel x:Name="Contents">
-          <Components:TrackAdd TrackAdded="Track_InsertStart" />
+  <Grid>
+    <Grid RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:PreferencesButton />
+          <Components:SaveButton />
         </StackPanel>
-      </ScrollViewer>
-    </Border>
+
+        <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
+          <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+        </Grid>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:Minimize Clicked="Minimize" />
+          <Components:Close Clicked="Close" />
+        </StackPanel>
+      </Grid>
+      
+      <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
+        <ScrollViewer Padding="5 5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+          <StackPanel x:Name="Contents">
+            <Components:TrackAdd TrackAdded="Track_InsertStart" />
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Canvas Grid.Row="0" Background="Red" HorizontalAlignment="Stretch" Height="4" PointerPressed="ResizeNorth" />
+      <Canvas Grid.Row="2" Background="Red" HorizontalAlignment="Stretch" Height="4" PointerPressed="ResizeSouth" />
+    </Grid>
   </Grid>
 </Window>

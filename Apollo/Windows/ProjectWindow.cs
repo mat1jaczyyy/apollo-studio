@@ -78,6 +78,14 @@ namespace Apollo.Windows {
             WindowState = WindowState.Minimized;
         }
 
+        private void ResizeNorth(object sender, PointerPressedEventArgs e) {
+            BeginResizeDrag(WindowEdge.North);
+        }
+
+        private void ResizeSouth(object sender, PointerPressedEventArgs e) {
+            BeginResizeDrag(WindowEdge.South);
+        }
+
         public static void Create(Window owner) {
             if (Program.Project.Window == null) {
                 Program.Project.Window = new ProjectWindow() {Owner = owner};

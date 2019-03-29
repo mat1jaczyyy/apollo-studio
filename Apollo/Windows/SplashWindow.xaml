@@ -1,7 +1,9 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Apollo Studio" Background="{DynamicResource ThemeBorderMidBrush}" WindowStartupLocation="CenterScreen" Width="320" Height="320"
+        Title="Apollo Studio" Background="{DynamicResource ThemeBorderMidBrush}" WindowStartupLocation="CenterScreen"
+        Width="320" MinWidth="320" MaxWidth="320"
+        Height="320" MinHeight="320" MaxHeight="320"
         Closing="Unloaded">
 
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
