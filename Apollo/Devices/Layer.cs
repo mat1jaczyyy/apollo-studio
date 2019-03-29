@@ -30,7 +30,9 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Layer(Convert.ToInt32(data["target"]));
+            return new Layer(
+                Convert.ToInt32(data["target"])
+            );
         }
 
         public override string EncodeSpecific() {

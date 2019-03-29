@@ -108,7 +108,11 @@ namespace Apollo.Elements {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
-            return new Project(Decimal.Parse(data["bpm"].ToString()), (from i in tracks select Track.Decode(i.ToString())).ToList(), path);
+            return new Project(
+                Decimal.Parse(data["bpm"].ToString()),
+                (from i in tracks select Track.Decode(i.ToString())).ToList(),
+                path
+            );
         }
 
         public string Encode() {

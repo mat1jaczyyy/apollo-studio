@@ -75,7 +75,12 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Hold(Convert.ToBoolean(data["mode"]), new Length(Convert.ToDecimal(data["length"])), Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]), Convert.ToBoolean(data["infinite"]));
+            return new Hold(
+                Convert.ToBoolean(data["mode"]),
+                new Length(Convert.ToDecimal(data["length"])),
+                Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]),
+                Convert.ToBoolean(data["infinite"])
+            );
         }
 
         public override string EncodeSpecific() {

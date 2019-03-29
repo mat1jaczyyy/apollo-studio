@@ -57,7 +57,11 @@ namespace Apollo.Structures {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Color(byte.Parse(data["red"].ToString()), byte.Parse(data["green"].ToString()), byte.Parse(data["blue"].ToString()));
+            return new Color(
+                byte.Parse(data["red"].ToString()),
+                byte.Parse(data["green"].ToString()),
+                byte.Parse(data["blue"].ToString())
+            );
         }
 
         public string Encode() {

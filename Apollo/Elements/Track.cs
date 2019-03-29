@@ -74,7 +74,10 @@ namespace Apollo.Elements {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Track(Chain.Decode(data["chain"].ToString()), Launchpad.Decode(data["launchpad"].ToString()));
+            return new Track(
+                Chain.Decode(data["chain"].ToString()),
+                Launchpad.Decode(data["launchpad"].ToString())
+            );
         }
 
         public string Encode() {

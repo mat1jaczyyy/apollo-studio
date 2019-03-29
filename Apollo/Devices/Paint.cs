@@ -30,7 +30,9 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Paint(Color.Decode(data["color"].ToString()));
+            return new Paint(
+                Color.Decode(data["color"].ToString())
+            );
         }
 
         public override string EncodeSpecific() {

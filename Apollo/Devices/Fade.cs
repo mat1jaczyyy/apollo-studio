@@ -148,7 +148,11 @@ namespace Apollo.Devices {
             foreach (object position in positions)
                 initP.Add(Decimal.Parse(position.ToString()));
 
-            return new Fade(Convert.ToInt32(data["time"]), initC, initP);
+            return new Fade(
+                Convert.ToInt32(data["time"]),
+                initC,
+                initP
+            );
         }
 
         public override string EncodeSpecific() {

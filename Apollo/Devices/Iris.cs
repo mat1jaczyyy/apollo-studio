@@ -91,7 +91,10 @@ namespace Apollo.Devices {
             foreach (object color in colors)
                 init.Add(Color.Decode(color.ToString()));
 
-            return new Iris(Convert.ToInt32(data["rate"]), init);
+            return new Iris(
+                Convert.ToInt32(data["rate"]),
+                init
+            );
         }
 
         public override string EncodeSpecific() {

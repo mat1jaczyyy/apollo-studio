@@ -240,7 +240,9 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Lightweight(data["path"].ToString());
+            return new Lightweight(
+                data["path"].ToString()
+            );
         }
 
         public override string EncodeSpecific() {
