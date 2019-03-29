@@ -55,7 +55,7 @@ namespace Apollo.Core {
                 ProjectWindow.Create(sender);
             
             } else if (type == typeof(SplashWindow)) {
-                Preferences.Window.Close();
+                Preferences.Window?.Close();
             }
         }
 
