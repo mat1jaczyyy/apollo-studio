@@ -9,8 +9,8 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Translation: Device {
-        public static readonly new string DeviceIdentifier = "translation";
+    public class Move: Device {
+        public static readonly new string DeviceIdentifier = "move";
 
         private int _offset;
 
@@ -22,9 +22,9 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Translation(_offset);
+        public override Device Clone() => new Move(_offset);
 
-        public Translation(int offset = 0): base(DeviceIdentifier) => Offset = offset;
+        public Move(int offset = 0): base(DeviceIdentifier) => Offset = offset;
 
         public override void MIDIEnter(Signal n) {
             int result = n.Index + _offset;
@@ -43,7 +43,7 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Translation(
+            return new Move(
                 Convert.ToInt32(data["offset"])
             );
         }
