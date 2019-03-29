@@ -14,9 +14,7 @@ namespace Apollo.Windows {
 
         private CheckBox AlwaysOnTop, CenterTrackContents;
 
-        private void UpdateTopmost(bool value) {
-            Topmost = value;
-        }
+        private void UpdateTopmost(bool value) => Topmost = value;
 
         public PreferencesWindow() {
             InitializeComponent();
@@ -44,17 +42,14 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
-            BeginMoveDrag();
-        }
+        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
 
         private void AlwaysOnTop_Changed(object sender, EventArgs e) {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
+            Activate();
         }
 
-        private void CenterTrackContents_Changed(object sender, EventArgs e) {
-            Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
-        }
+        private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

@@ -49,10 +49,7 @@ namespace Apollo.Elements {
                         return LaunchpadType.MK2;
                     
                     case 0x51: // Launchpad Pro
-                        if (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w')
-                            return LaunchpadType.CFW;
-                        else
-                            return LaunchpadType.PRO;
+                        return (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w')? LaunchpadType.CFW : LaunchpadType.PRO;
                 }
             }
 
@@ -132,12 +129,10 @@ namespace Apollo.Elements {
         }
 
         public void Disconnect() {
-            if (Input.IsOpen)
-                Input.Close();
+            if (Input.IsOpen) Input.Close();
             Input.Dispose();
 
-            if (Output.IsOpen)
-                Output.Close();
+            if (Output.IsOpen) Output.Close();
             Output.Dispose();
 
             Available = false;
@@ -150,18 +145,13 @@ namespace Apollo.Elements {
                 
                 Program.Log($"IN  -> {n.ToString()}");
 
-                if (Receive != null)
-                    Receive.Invoke(n);
+                Receive?.Invoke(n);
             }
         }
 
-        private void NoteOn(object sender, in NoteOnMessage e) {
-            HandleMessage(new Signal((byte)e.Key, new Color((byte)(e.Velocity >> 1))));
-        }
+        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal((byte)e.Key, new Color((byte)(e.Velocity >> 1))));
 
-        private void NoteOff(object sender, in NoteOffMessage e) {
-            HandleMessage(new Signal((byte)e.Key, new Color(0)));
-        }
+        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal((byte)e.Key, new Color(0)));
 
         public static Launchpad Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
@@ -169,14 +159,13 @@ namespace Apollo.Elements {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
 
-            foreach (Launchpad launchpad in MIDI.Devices) {
-                if (launchpad.Name == data["port"].ToString()) {
+            foreach (Launchpad launchpad in MIDI.Devices)
+                if (launchpad.Name == data["port"].ToString())
                     return launchpad;
-                }
-            }
             
             Launchpad lp = new Launchpad(data["port"].ToString());
             MIDI.Devices.Add(lp);
+            
             return lp;
         }
 

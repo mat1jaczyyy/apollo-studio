@@ -13,13 +13,9 @@ namespace Apollo.Devices {
 
         private Color _color;
 
-        public override Device Clone() {
-            return new Paint(_color);
-        }
+        public override Device Clone() => new Paint(_color);
 
-        public Paint(Color color = null): base(DeviceIdentifier) {
-            _color = (color == null)? new Color(63) : color.Clone();
-        }
+        public Paint(Color color = null): base(DeviceIdentifier) => _color = (color == null)? new Color(63) : color.Clone();
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)

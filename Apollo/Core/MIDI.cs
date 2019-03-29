@@ -33,17 +33,14 @@ namespace Apollo.Core {
 
                         foreach (Launchpad device in Devices) {
                             if (device.Name == output.Name) {
-                                if (!device.Available) {
-                                    device.Connect(input, output);
-                                }
+                                if (!device.Available) device.Connect(input, output);
+                                
                                 justConnected = false;
                                 break;
                             }
                         }
 
-                        if (justConnected) {
-                            Devices.Add(new Launchpad(input, output));
-                        }
+                        if (justConnected) Devices.Add(new Launchpad(input, output));
                     }
                 }
             }
@@ -59,9 +56,7 @@ namespace Apollo.Core {
                         }
                     }
 
-                    if (justDisconnected) {
-                        device.Disconnect();
-                    }
+                    if (justDisconnected) device.Disconnect();
                 }
             }
         }
@@ -78,9 +73,8 @@ namespace Apollo.Core {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < Devices.Count; i++) {
+                        for (int i = 0; i < Devices.Count; i++)
                             writer.WriteRawValue(Devices[i].Encode());
-                        }
 
                     writer.WriteEndArray();
 

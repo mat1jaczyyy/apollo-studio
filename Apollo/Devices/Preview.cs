@@ -14,18 +14,14 @@ namespace Apollo.Devices {
 
         private Pixel[] screen = new Pixel[128];
 
-        public override Device Clone() {
-            return new Preview();
-        }
+        public override Device Clone() => new Preview();
 
         public Preview(): base(DeviceIdentifier) {
             for (int i = 0; i < 128; i++)
                 screen[i] = new Pixel() {MIDIExit = PreviewExit};
         }
 
-        public void PreviewExit(Signal n) {
-            throw new NotImplementedException();
-        }
+        public void PreviewExit(Signal n) => throw new NotImplementedException();
 
         public override void MIDIEnter(Signal n) {
             Signal m = n.Clone();

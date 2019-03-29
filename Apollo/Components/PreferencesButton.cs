@@ -9,9 +9,7 @@ namespace Apollo.Components {
     public class PreferencesButton: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public PreferencesButton() {
-            InitializeComponent();
-        }
+        public PreferencesButton() => InitializeComponent();
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create((Window)this.GetVisualRoot());

@@ -20,12 +20,8 @@ namespace Apollo.DeviceViewers {
             this.Get<Dial>("Gate").RawValue = (double)_delay.Gate * 100;
         }
 
-        private void Duration_Changed(double value) {
-            _delay.Time = (int)value;
-        }
+        private void Duration_Changed(double value) => _delay.Time = (int)value;
 
-        private void Gate_Changed(double value) {
-            _delay.Gate = (decimal)(value / 100);
-        }
+        private void Gate_Changed(double value) => _delay.Gate = (decimal)(value / 100);
     }
 }

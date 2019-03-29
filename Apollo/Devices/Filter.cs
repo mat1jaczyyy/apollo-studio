@@ -14,9 +14,7 @@ namespace Apollo.Devices {
 
         private bool[] _filter;
 
-        public override Device Clone() {
-            return new Filter(_filter);
-        }
+        public override Device Clone() => new Filter(_filter);
 
         public void Set(byte index, bool value) {
             if (0 <= index && index <= 127)
@@ -40,9 +38,9 @@ namespace Apollo.Devices {
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             bool[] filter = new bool[128];
-            for (int i = 0; i < 128; i++) {
+
+            for (int i = 0; i < 128; i++)
                 filter[i] = Convert.ToBoolean(data[i].ToString());
-            }
 
             return new Filter(filter);
         }
@@ -59,9 +57,8 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < 128; i++) {
+                        for (int i = 0; i < 128; i++)
                             writer.WriteValue(_filter[i]);
-                        }
 
                     writer.WriteEndArray();
 

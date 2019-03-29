@@ -14,13 +14,9 @@ namespace Apollo.Devices {
 
         public int Target;
 
-        public override Device Clone() {
-            return new Layer(Target);
-        }
+        public override Device Clone() => new Layer(Target);
 
-        public Layer(int target = 0): base(DeviceIdentifier) {
-            Target = target;
-        }
+        public Layer(int target = 0): base(DeviceIdentifier) => Target = target;
 
         public override void MIDIEnter(Signal n) {
             n.Layer = Target;

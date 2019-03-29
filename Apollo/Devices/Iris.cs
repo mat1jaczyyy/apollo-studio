@@ -23,23 +23,20 @@ namespace Apollo.Devices {
         private TimerCallback _timerexit;
 
         public int Rate {
-            get {
-                return _rate;
-            }
+            get => _rate;
             set {
                 if (0 <= value)
                     _rate = value;
             }
         }
 
-        public override Device Clone() {
-            return new Iris(_rate, Colors);
-        }
+        public override Device Clone() => new Iris(_rate, Colors);
 
         public Iris(int rate = 200, List<Color> colors = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
 
-            if (colors == null) colors = new List<Color>() {new Color(63), new Color(31), new Color(15)};
+            if (colors == null)
+                colors = new List<Color>() {new Color(63), new Color(31), new Color(15)};
 
             Rate = rate;
             Colors = colors;
@@ -77,9 +74,8 @@ namespace Apollo.Devices {
 
                 MIDIExit?.Invoke(n);
 
-                for (int i = 1; i <= Colors.Count; i++) {
+                for (int i = 1; i <= Colors.Count; i++)
                     _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), _rate * i, Timeout.Infinite));
-                }
             }
         }
 
@@ -91,9 +87,9 @@ namespace Apollo.Devices {
             
             List<object> colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
             List<Color> init = new List<Color>();
-            foreach (object color in colors) {
+
+            foreach (object color in colors)
                 init.Add(Color.Decode(color.ToString()));
-            }
 
             return new Iris(Convert.ToInt32(data["rate"]), init);
         }
@@ -116,9 +112,8 @@ namespace Apollo.Devices {
                         writer.WritePropertyName("colors");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < Colors.Count; i++) {
+                            for (int i = 0; i < Colors.Count; i++)
                                 writer.WriteRawValue(Colors[i].Encode());
-                            }
 
                         writer.WriteEndArray();
 

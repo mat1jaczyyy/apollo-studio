@@ -13,9 +13,7 @@ namespace Apollo.Components {
         public delegate void RemovedEventHandler();
         public event RemovedEventHandler Removed;
         
-        public Remove() {
-            InitializeComponent();
-        }
+        public Remove() => InitializeComponent();
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Removed?.Invoke();

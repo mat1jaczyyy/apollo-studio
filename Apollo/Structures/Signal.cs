@@ -12,18 +12,14 @@ namespace Apollo.Structures {
         public int Layer;
 
         public byte Index {
-            get {
-                return _p;
-            }
+            get => _p;
             set {
                 if (0 <= value && value <= 127)
                     _p = value;
             }
         }
 
-        public Signal Clone() {
-            return new Signal(_p, Color.Clone(), Layer);
-        }
+        public Signal Clone() => new Signal(_p, Color.Clone(), Layer);
 
         public Signal(byte index = 11, Color color = null, int layer = 0) {
             if (color == null) color = new Color(63);
@@ -60,8 +56,6 @@ namespace Apollo.Structures {
             return json.ToString();
         }
 
-        public override string ToString() {
-            return $"{Index} @ {Layer} / {Color.Red}, {Color.Green}, {Color.Blue}";
-        }
+        public override string ToString() => $"{Index} @ {Layer} / {Color.Red}, {Color.Green}, {Color.Blue}";
     }
 }

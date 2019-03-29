@@ -15,22 +15,16 @@ namespace Apollo.Devices {
         private int _offset;
 
         public int Offset {
-            get {
-                return _offset;
-            }
+            get => _offset;
             set {
                 if (-99 <= value && value <= 99)
                     _offset = value;
             }
         }
 
-        public override Device Clone() {
-            return new Translation(_offset);
-        }
+        public override Device Clone() => new Translation(_offset);
 
-        public Translation(int offset = 0): base(DeviceIdentifier) {
-            Offset = offset;
-        }
+        public Translation(int offset = 0): base(DeviceIdentifier) => Offset = offset;
 
         public override void MIDIEnter(Signal n) {
             int result = n.Index + _offset;

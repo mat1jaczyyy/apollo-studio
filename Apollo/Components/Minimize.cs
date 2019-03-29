@@ -9,9 +9,7 @@ namespace Apollo.Components {
         public delegate void ClickedEventHandler();
         public event ClickedEventHandler Clicked;
 
-        public Minimize() {
-            InitializeComponent();
-        }
+        public Minimize() => InitializeComponent();
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Clicked?.Invoke();

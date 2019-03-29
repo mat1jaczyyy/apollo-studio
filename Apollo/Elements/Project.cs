@@ -48,16 +48,13 @@ namespace Apollo.Elements {
                 };
 
                 string result = await sfd.ShowAsync(sender);
-                if (result != null) {
-                    FilePath = result;
-                }
+                if (result != null) FilePath = result;
             }
 
             string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
-            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
                 File.WriteAllText(FilePath, Encode());
-            }
         }
 
         private void Reroute() {
@@ -135,9 +132,8 @@ namespace Apollo.Elements {
                         writer.WritePropertyName("tracks");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < Tracks.Count; i++) {
+                            for (int i = 0; i < Tracks.Count; i++)
                                 writer.WriteRawValue(Tracks[i].Encode());
-                            }
                         
                         writer.WriteEndArray();
 

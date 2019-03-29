@@ -41,16 +41,11 @@ namespace Apollo.Core {
             }
         }
 
-        public static void Save() {
-            File.WriteAllText(FilePath, Encode());
-        }
+        public static void Save() => File.WriteAllText(FilePath, Encode());
 
         static Preferences() {
-            if (File.Exists(FilePath)) {
-                Decode(File.ReadAllText(FilePath));
-            } else {
-                Save();
-            }
+            if (File.Exists(FilePath)) Decode(File.ReadAllText(FilePath));
+            else Save();
         }
         
         private static void Decode(string jsonString) {

@@ -15,20 +15,16 @@ namespace Apollo.Devices {
         private List<int> _offsets;
 
         public List<int> Offsets {
-            get {
-                return _offsets;
-            }
+            get => _offsets; // TODO: indexer exploitable? just make it public
             set {
-                foreach (int offset in value) {
+                foreach (int offset in value)
                     if (offset <= -127 || 127 <= offset) return;
-                }
+                
                 _offsets = value;
             }
         }
 
-        public override Device Clone() {
-            return new Duplication(_offsets);
-        }
+        public override Device Clone() => new Duplication(_offsets);
 
         public void Insert(int index, int offset) {
             if (offset <= -127 || 127 <= offset)
@@ -73,9 +69,10 @@ namespace Apollo.Devices {
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<int> offsets = new List<int>();
-            foreach (object offset in offsets) {
+            
+            foreach (object offset in offsets)
                 offsets.Add(Convert.ToInt32(offset));
-            }
+            
             return new Duplication(offsets);
         }
 
@@ -91,9 +88,8 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < _offsets.Count; i++) {
+                        for (int i = 0; i < _offsets.Count; i++)
                             writer.WriteValue(_offsets[i]);
-                        }
 
                     writer.WriteEndArray();
 

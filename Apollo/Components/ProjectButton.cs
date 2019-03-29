@@ -9,9 +9,7 @@ namespace Apollo.Components {
     public class ProjectButton: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public ProjectButton() {
-            InitializeComponent();
-        }
+        public ProjectButton() => InitializeComponent();
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) ProjectWindow.Create((Window)this.GetVisualRoot());

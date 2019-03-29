@@ -33,17 +33,13 @@ namespace Apollo.Elements {
         private Pixel[] screen = new Pixel[128];
 
         public Launchpad Launchpad {
-            get {
-                return _launchpad;
-            }
+            get => _launchpad;
             set {
-                if (_launchpad != null)
-                    _launchpad.Receive -= MIDIEnter;
+                if (_launchpad != null) _launchpad.Receive -= MIDIEnter;
 
                 _launchpad = value;
 
-                if (_launchpad != null)
-                    _launchpad.Receive += MIDIEnter;
+                if (_launchpad != null) _launchpad.Receive += MIDIEnter;
             }
         }
 
@@ -59,28 +55,17 @@ namespace Apollo.Elements {
             Launchpad = launchpad;
         }
 
-        private void ChainExit(Signal n) {
-            screen[n.Index].MIDIEnter(n);
-        }
+        private void ChainExit(Signal n) => screen[n.Index].MIDIEnter(n);
 
-        private void MIDIExit(Signal n) {
-            Launchpad.Send(n);
-        }
+        private void MIDIExit(Signal n) => Launchpad.Send(n);
 
-        private void MIDIEnter(Signal n) {
-            if (Chain != null)
-                Chain.MIDIEnter(n);
-        }
+        private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
 
         public void Dispose() {
             if (Launchpad != null)
                 Launchpad.Receive -= MIDIEnter;
             
             Chain = null;
-        }
-
-        public override string ToString() {
-            return Launchpad.Name;
         }
         
         public static Track Decode(string jsonString) {

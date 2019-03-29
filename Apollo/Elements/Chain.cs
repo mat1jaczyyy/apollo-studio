@@ -18,9 +18,7 @@ namespace Apollo.Elements {
         public int? ParentIndex;
         private Action<Signal> _midiexit = null;
         public Action<Signal> MIDIExit {
-            get {
-                return _midiexit;
-            }
+            get => _midiexit;
             set {
                 _midiexit = value;
                 Reroute();
@@ -42,9 +40,8 @@ namespace Apollo.Elements {
             else {
                 _chainenter = Devices[0].MIDIEnter;
                 
-                for (int i = 1; i < Devices.Count; i++) {
+                for (int i = 1; i < Devices.Count; i++)
                     Devices[i - 1].MIDIExit = Devices[i].MIDIEnter;
-                }
                 
                 Devices[Devices.Count - 1].MIDIExit = _midiexit;
             }
@@ -58,9 +55,7 @@ namespace Apollo.Elements {
             get => Devices.Count;
         }
 
-        public Chain Clone() {
-            return new Chain((from i in Devices select i.Clone()).ToList());
-        }
+        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList());
 
         public void Insert(int index, Device device) {
             Devices.Insert(index, device);
@@ -83,9 +78,7 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public void MIDIEnter(Signal n) {
-            _chainenter?.Invoke(n);
-        }
+        public void MIDIEnter(Signal n) => _chainenter?.Invoke(n);
 
         public static Chain Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
@@ -94,9 +87,10 @@ namespace Apollo.Elements {
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<Device> init = new List<Device>();
-            foreach (object device in data) {
+
+            foreach (object device in data)
                 init.Add(Device.Decode(device.ToString()));
-            }
+            
             return new Chain(init);
         }
 
@@ -112,9 +106,8 @@ namespace Apollo.Elements {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < Devices.Count; i++) {
+                        for (int i = 0; i < Devices.Count; i++)
                             writer.WriteRawValue(Devices[i].Encode());
-                        }
 
                     writer.WriteEndArray();
 

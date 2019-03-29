@@ -19,23 +19,17 @@ namespace Apollo.Windows {
 
         private HorizontalAlignment ContentAlignment;
         
-        private void UpdateTitle(string path, int index) {
-            this.Get<TextBlock>("Title").Text = (path == "")
-                ? $"Track {index + 1}"
-                : $"Track {index + 1} - {path}";
-        }
+        private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
+            ? $"Track {index + 1}"
+            : $"Track {index + 1} - {path}";
 
         private void UpdateTitle(string path) => UpdateTitle(path, _track.ParentIndex.Value);
         private void UpdateTitle(int index) => UpdateTitle(Program.Project.FilePath, index);
         private void UpdateTitle() => UpdateTitle(Program.Project.FilePath, _track.ParentIndex.Value);
 
-        private void UpdateTopmost(bool value) {
-            Topmost = value;
-        }
+        private void UpdateTopmost(bool value) => Topmost = value;
 
-        private void UpdateContentAlignment(bool value) {
-            ContentAlignment = value? HorizontalAlignment.Center : HorizontalAlignment.Left;
-        }
+        private void UpdateContentAlignment(bool value) => ContentAlignment = value? HorizontalAlignment.Center : HorizontalAlignment.Left;
 
         public TrackWindow(Track track) {
             InitializeComponent();
@@ -76,21 +70,13 @@ namespace Apollo.Windows {
             Program.WindowClose(this);
         }
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
-            BeginMoveDrag();
-        }
+        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        
+        private void Minimize() => WindowState = WindowState.Minimized;
 
-        private void Minimize() {
-            WindowState = WindowState.Minimized;
-        }
+        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
 
-        private void ResizeWest(object sender, PointerPressedEventArgs e) {
-            BeginResizeDrag(WindowEdge.West);
-        }
-
-        private void ResizeEast(object sender, PointerPressedEventArgs e) {
-            BeginResizeDrag(WindowEdge.East);
-        }
+        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
 
         public static void Create(Track track, Window owner) {
             if (track.Window == null) {

@@ -16,9 +16,7 @@ namespace Apollo.Viewers {
         
         Track _track;
 
-        public void UpdateText(int index) {
-            this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
-        }
+        public void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
         
         public TrackViewer(Track track) {
             InitializeComponent();
@@ -33,9 +31,7 @@ namespace Apollo.Viewers {
             if (e.MouseButton == MouseButton.Left) TrackWindow.Create(_track, (Window)this.GetVisualRoot());
         }
 
-        private void Track_Add() {
-            TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
-        }
+        private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
 
         private void Track_Remove() {
             ((Panel)Parent).Children.RemoveAt(_track.ParentIndex.Value + 1);

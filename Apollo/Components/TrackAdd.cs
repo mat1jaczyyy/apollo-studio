@@ -13,9 +13,7 @@ namespace Apollo.Components {
         public delegate void TrackAddedEventHandler();
         public event TrackAddedEventHandler TrackAdded;
         
-        public TrackAdd() {
-            InitializeComponent();
-        }
+        public TrackAdd() => InitializeComponent();
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) TrackAdded?.Invoke();

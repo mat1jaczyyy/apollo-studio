@@ -19,8 +19,6 @@ namespace Apollo.DeviceViewers {
             this.Get<Dial>("Offset").RawValue = _translation.Offset;
         }
 
-        private void Offset_Changed(double value) {
-            _translation.Offset = (int)value;
-        }
+        private void Offset_Changed(double value) => _translation.Offset = (int)value;
     }
 }

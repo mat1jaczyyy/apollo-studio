@@ -39,9 +39,7 @@ namespace Apollo.Viewers {
                 this.Get<Grid>("Contents").Children.Add(_viewer);
         }
 
-        private void Device_Add(Type device) {
-            DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
-        }
+        private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
         private void Device_Remove() {
             ((Panel)Parent).Children.RemoveAt(_device.ParentIndex.Value + 1);

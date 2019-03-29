@@ -28,12 +28,9 @@ namespace Apollo.Devices {
         private TimerCallback _timerexit;
 
         public int Time {
-            get {
-                return _time;
-            }
+            get => _time;
             set {
-                if (0 <= value)
-                    _time = value;
+                if (0 <= value) _time = value;
             }
         }
 
@@ -72,9 +69,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() {
-            return new Fade(_time, _colors, _positions);
-        }
+        public override Device Clone() => new Fade(_time, _colors, _positions);
 
         public Fade(int time = 1000, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
@@ -99,9 +94,8 @@ namespace Apollo.Devices {
                 lock (locker[index]) {
                     int color = ++_indexes[index];
 
-                    if (color < _steps.Count) {
+                    if (color < _steps.Count)
                         MIDIExit?.Invoke(new Signal(index, _steps[color].Clone(), layer));
-                    }
                 }
             }
         }
@@ -122,14 +116,14 @@ namespace Apollo.Devices {
                 int j = 0;
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;
-                    if (j < _colors.Count - 1) {
+
+                    if (j < _colors.Count - 1)
                         _timers[n.Index].Add(new Timer(
                             _timerexit,
                             (n.Index, n.Layer),
                             (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
                             Timeout.Infinite
                         ));
-                    }
                 }
 
                 _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), _time, Timeout.Infinite));
@@ -144,15 +138,15 @@ namespace Apollo.Devices {
             
             List<object> colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
             List<Color> initC = new List<Color>();
-            foreach (object color in colors) {
+
+            foreach (object color in colors)
                 initC.Add(Color.Decode(color.ToString()));
-            }
 
             List<object> positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
             List<Decimal> initP = new List<Decimal>();
-            foreach (object position in positions) {
+
+            foreach (object position in positions)
                 initP.Add(Decimal.Parse(position.ToString()));
-            }
 
             return new Fade(Convert.ToInt32(data["time"]), initC, initP);
         }
@@ -176,18 +170,16 @@ namespace Apollo.Devices {
 
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < _colors.Count; i++) {
+                            for (int i = 0; i < _colors.Count; i++)
                                 writer.WriteRawValue(_colors[i].Encode());
-                            }
 
                         writer.WriteEndArray();
 
                         writer.WritePropertyName("positions");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < _positions.Count; i++) {
+                            for (int i = 0; i < _positions.Count; i++)
                                 writer.WriteValue(_positions[i]);
-                            }
 
                         writer.WriteEndArray();
 

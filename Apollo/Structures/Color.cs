@@ -10,50 +10,38 @@ namespace Apollo.Structures {
 
         private byte _r, _g, _b;
 
-        private bool IsValid(byte value) {
-            return (0 <= value && value <= 63);
-        }
+        private bool IsValid(byte value) => 0 <= value && value <= 63;
 
         public byte Red {
-            get {
-                return _r;
-            }
+            get => _r;
             set {
                 if (IsValid(value)) _r = value;
             }
         }
 
         public byte Green {
-            get {
-                return _g;
-            }
+            get => _g;
             set {
                 if (IsValid(value)) _g = value;
             }
         }
 
         public byte Blue {
-            get {
-                return _b;
-            }
+            get => _b;
             set {
                 if (IsValid(value)) _b = value;
             }
         }
 
         public bool Lit {
-            get {
-                return _r != 0 || _g != 0 || _b != 0;
-            }
+            get => _r != 0 || _g != 0 || _b != 0;
         }
 
-        public Color Clone() {
-            return new Color(_r, _g, _b);
-        }
+        public Color Clone() => new Color(_r, _g, _b);
 
         public Color(byte bright = 63) {
-            if (IsValid(bright))
-                _r = _g = _b = bright;
+            if (!IsValid(bright)) bright = 63;
+            _r = _g = _b = bright;
         }
 
         public Color(byte red, byte green, byte blue) {

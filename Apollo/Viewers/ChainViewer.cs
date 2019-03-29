@@ -36,8 +36,6 @@ namespace Apollo.Viewers {
             Contents_Insert(index, _chain[index]);
         }
 
-        private void Device_InsertStart(Type device) {
-            Device_Insert(0, device);
-        }
+        private void Device_InsertStart(Type device) => Device_Insert(0, device);
     }
 }

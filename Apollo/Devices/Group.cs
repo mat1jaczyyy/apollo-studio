@@ -23,20 +23,14 @@ namespace Apollo.Devices {
         }
 
         public Chain this[int index] {
-            get {
-                return _chains[index];
-            }
+            get => _chains[index];
         }
 
         public int Count {
-            get {
-                return _chains.Count;
-            }
+            get => _chains.Count;
         }
 
-        public override Device Clone() {
-            return new Group((from i in _chains select i.Clone()).ToList());
-        }
+        public override Device Clone() => new Group((from i in _chains select i.Clone()).ToList());
 
         public void Insert(int index) {
             _chains.Insert(index, new Chain() {MIDIExit = ChainExit});
@@ -51,9 +45,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public void Add() {
-            _chains.Add(new Chain() {Parent = this, ParentIndex = _chains.Count, MIDIExit = ChainExit});
-        }
+        public void Add() => _chains.Add(new Chain());
 
         public void Add(Chain chain) {
             chain.Parent = this;
@@ -63,12 +55,7 @@ namespace Apollo.Devices {
         }
 
         public void Add(List<Chain> chains) {
-            foreach (Chain chain in chains) {
-                chain.Parent = this;
-                chain.ParentIndex = _chains.Count;
-                chain.MIDIExit = ChainExit;
-                _chains.Add(chain);
-            }     
+            foreach (Chain chain in chains) _chains.Add(chain);
         }
 
         public void Remove(int index) {
@@ -82,9 +69,7 @@ namespace Apollo.Devices {
             Add(init);
         }
 
-        private void ChainExit(Signal n) {
-            MIDIExit?.Invoke(n);
-        }
+        private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
             foreach (Chain chain in _chains)
@@ -98,9 +83,10 @@ namespace Apollo.Devices {
             List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
             
             List<Chain> init = new List<Chain>();
-            foreach (object chain in data) {
+
+            foreach (object chain in data)
                 init.Add(Chain.Decode(chain.ToString()));
-            }
+            
             return new Group(init);
         }
 
@@ -116,9 +102,8 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartArray();
 
-                        for (int i = 0; i < _chains.Count; i++) {
+                        for (int i = 0; i < _chains.Count; i++)
                             writer.WriteRawValue(_chains[i].Encode());
-                        }
 
                     writer.WriteEndArray();
 

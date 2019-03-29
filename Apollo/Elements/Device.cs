@@ -21,9 +21,7 @@ namespace Apollo.Elements {
 
         public abstract Device Clone();
         
-        protected Device(string device) {
-            DeviceIdentifier = device;
-        }
+        protected Device(string device) => DeviceIdentifier = device;
 
         public abstract void MIDIEnter(Signal n);
 
@@ -31,13 +29,11 @@ namespace Apollo.Elements {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != Identifier) return null;
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            object[] specific = new object[] {json["data"].ToString()};
             
             foreach (Type device in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.Devices") select type)) {
-                object parsed = device.GetMethod("DecodeSpecific").Invoke(null, new object[] {json["data"].ToString()});
-
-                if (parsed != null)
-                    return (Device)parsed;
+                object parsed = device.GetMethod("DecodeSpecific").Invoke(null, specific);
+                if (parsed != null) return (Device)parsed;
             }
 
             return null;

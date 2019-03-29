@@ -18,9 +18,7 @@ namespace Apollo.Devices {
         private Decimal _gate;
 
         public int Time {
-            get {
-                return _time;
-            }
+            get => _time;
             set {
                 if (10 <= value && value <= 30000)
                     _time = value;
@@ -28,18 +26,14 @@ namespace Apollo.Devices {
         }
 
         public Decimal Gate {
-            get {
-                return _gate;
-            }
+            get => _gate;
             set {
                 if (0 <= value && value <= 4)
                     _gate = value;
             }
         }
 
-        public override Device Clone() {
-            return new Delay(Mode, Length, _time, _gate);
-        }
+        public override Device Clone() => new Delay(Mode, Length, _time, _gate);
 
         public Delay(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1): base(DeviceIdentifier) {
             if (length == null) length = new Length();

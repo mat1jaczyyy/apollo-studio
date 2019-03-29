@@ -14,13 +14,9 @@ namespace Apollo.Windows {
     public class ProjectWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void UpdateTitle(string path) {
-            this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
-        }
+        private void UpdateTitle(string path) => this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
 
-        private void UpdateTopmost(bool value) {
-            Topmost = value;
-        }
+        private void UpdateTopmost(bool value) => Topmost = value;
 
         private Controls Contents;
 
@@ -66,25 +62,15 @@ namespace Apollo.Windows {
             Contents_Insert(index, Program.Project[index]);
         }
 
-        private void Track_InsertStart() {
-            Track_Insert(0);
-        }
+        private void Track_InsertStart() => Track_Insert(0);
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
-            BeginMoveDrag();
-        }
+        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         
-        private void Minimize() {
-            WindowState = WindowState.Minimized;
-        }
+        private void Minimize() => WindowState = WindowState.Minimized;
 
-        private void ResizeNorth(object sender, PointerPressedEventArgs e) {
-            BeginResizeDrag(WindowEdge.North);
-        }
+        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
 
-        private void ResizeSouth(object sender, PointerPressedEventArgs e) {
-            BeginResizeDrag(WindowEdge.South);
-        }
+        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
 
         public static void Create(Window owner) {
             if (Program.Project.Window == null) {

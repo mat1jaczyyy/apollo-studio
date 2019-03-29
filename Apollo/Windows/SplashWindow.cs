@@ -17,9 +17,7 @@ namespace Apollo.Windows {
     public class SplashWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void UpdateTopmost(bool value) {
-            Topmost = value;
-        }
+        private void UpdateTopmost(bool value) => Topmost = value;
 
         public SplashWindow() {
             InitializeComponent();
@@ -75,8 +73,6 @@ namespace Apollo.Windows {
             }
         }
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
-            BeginMoveDrag();
-        }
+        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
     }
 }
