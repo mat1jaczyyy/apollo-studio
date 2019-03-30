@@ -47,8 +47,6 @@ namespace Apollo.Viewers {
             _track.Dispose();
         }
 
-        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
-            _track.Launchpad = (Launchpad)PortSelector.SelectedItem;
-        }
+        private void Port_Changed(object sender, SelectionChangedEventArgs e) => _track.Launchpad = (Launchpad)PortSelector.SelectedItem;
     }
 }

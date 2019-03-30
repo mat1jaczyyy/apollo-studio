@@ -71,9 +71,9 @@ namespace Apollo.Core {
             foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
                 Log($"MIDI API: {api}");
 
-            MIDI.Rescan();
+            MIDI.Start();
 
-            Log("ready");
+            Log("MIDI Ready");
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }

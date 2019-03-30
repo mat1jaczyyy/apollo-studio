@@ -99,6 +99,8 @@ namespace Apollo.Elements {
             Input.Open();
             Output.Open();
 
+            Program.Log($"MIDI Created {Name}");
+
             Available = true;
 
             Input.SysEx += WaitForIdentification;            
@@ -117,6 +119,8 @@ namespace Apollo.Elements {
             Input.Open();
             Output.Open();
 
+            Program.Log($"MIDI Connected {Name}");
+
             Available = true;
 
             if (Type == LaunchpadType.Unknown) {
@@ -134,6 +138,8 @@ namespace Apollo.Elements {
 
             if (Output.IsOpen) Output.Close();
             Output.Dispose();
+
+            Program.Log($"MIDI Disconnected {Name}");
 
             Available = false;
         }

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Timers;
 
 using Newtonsoft.Json;
 using RtMidi.Core;
@@ -12,52 +15,56 @@ namespace Apollo.Core {
         public static readonly string Identifier = "midi";
 
         public static List<Launchpad> Devices = new List<Launchpad>();
+        private static Timer timer = new Timer() { Interval = 100 };
+        private static bool started = false;
 
-        public static void Rescan() {
-            /*
-              The idea here is that we update Devices as MIDI devices are plugged in or out.
-            RtMidi doesn't provide any kind of callback function for reporting changes,
-            so we must scan manually every x milliseconds and check for changes ourselves.
-            The first attempt was using an async Threading.Timer, which always returned the
-            same data instead of updated devices. The second attempt used an async Task that
-            would have its thread sleep, but this caused segfaults when the app is idling.
-            So, for the time being, this function will have to be called manually.
+        public static void Start() {
+            if (started) new InvalidOperationException("MIDI Rescan Timer is already running");
 
-              https://github.com/micdah/RtMidi.Core/issues/18
-            */
+            timer.Elapsed += Rescan;
+            timer.Start();
+            started = true;
+        }
 
-            foreach (var input in MidiDeviceManager.Default.InputDevices) {
-                foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                    if (input.Name == output.Name) {
-                        bool justConnected = true;
+        private static object locker = new object();
 
-                        foreach (Launchpad device in Devices) {
+        public static void Rescan(object sender, EventArgs e) {
+            lock(locker) {
+                foreach (var input in MidiDeviceManager.Default.InputDevices) {
+                    foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                        if (input.Name == output.Name) {
+                            bool justConnected = true;
+
+                            foreach (Launchpad device in Devices) {
+                                if (device.Name == output.Name) {
+                                    if (!device.Available) device.Connect(input, output);
+                                    
+                                    justConnected = false;
+                                    break;
+                                }
+                            }
+
+                            if (justConnected) Devices.Add(new Launchpad(input, output));
+                        }
+                    }
+                }
+
+                foreach (Launchpad device in Devices) {
+                    if (device.Available) {
+                        bool justDisconnected = true;
+
+                        foreach (var output in MidiDeviceManager.Default.OutputDevices) {
                             if (device.Name == output.Name) {
-                                if (!device.Available) device.Connect(input, output);
-                                
-                                justConnected = false;
+                                justDisconnected = false;
                                 break;
                             }
                         }
 
-                        if (justConnected) Devices.Add(new Launchpad(input, output));
+                        if (justDisconnected) device.Disconnect();
                     }
                 }
-            }
 
-            foreach (Launchpad device in Devices) {
-                if (device.Available) {
-                    bool justDisconnected = true;
-
-                    foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                        if (device.Name == output.Name) {
-                            justDisconnected = false;
-                            break;
-                        }
-                    }
-
-                    if (justDisconnected) device.Disconnect();
-                }
+                Program.Log($"Rescan");
             }
         }
 
