@@ -1,0 +1,10 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Grid RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+    <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Color" Margin="0 0 0 5"/>
+    <Canvas Grid.Row="1" Margin="0 0 0 30" Width="43" Height="43">
+      <Ellipse Width="43" Height="43" x:Name="Color" />
+    </Canvas>
+  </Grid>
+</UserControl>

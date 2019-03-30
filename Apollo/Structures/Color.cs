@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Avalonia.Media;
+
 using Newtonsoft.Json;
 
 namespace Apollo.Structures {
@@ -50,6 +52,13 @@ namespace Apollo.Structures {
             Green = green;
             Blue = blue;
         }
+
+        public IBrush ToBrush() => new SolidColorBrush(new Avalonia.Media.Color(
+            255,
+            (byte)(_r * (255.0 / 63)),
+            (byte)(_g * (255.0 / 63)),
+            (byte)(_b * (255.0 / 63))
+        ));
 
         public static Color Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);

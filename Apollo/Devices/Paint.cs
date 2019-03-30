@@ -11,15 +11,15 @@ namespace Apollo.Devices {
     public class Paint: Device {
         public static readonly new string DeviceIdentifier = "paint";
 
-        private Color _color;
+        public Color Color;
 
-        public override Device Clone() => new Paint(_color);
+        public override Device Clone() => new Paint(Color);
 
-        public Paint(Color color = null): base(DeviceIdentifier) => _color = (color == null)? new Color(63) : color.Clone();
+        public Paint(Color color = null): base(DeviceIdentifier) => Color = (color == null)? new Color(63) : color.Clone();
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit)
-                n.Color = _color.Clone();
+                n.Color = Color.Clone();
 
             MIDIExit?.Invoke(n);
         }
@@ -48,7 +48,7 @@ namespace Apollo.Devices {
                     writer.WriteStartObject();
 
                         writer.WritePropertyName("color");
-                        writer.WriteRawValue(_color.Encode());
+                        writer.WriteRawValue(Color.Encode());
 
                     writer.WriteEndObject();
 

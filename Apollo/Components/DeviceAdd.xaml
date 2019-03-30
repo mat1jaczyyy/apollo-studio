@@ -7,6 +7,7 @@
         <MenuItem Header="Delay" />
         <MenuItem Header="Move" />
         <MenuItem Header="Hold" />
+        <MenuItem Header="Paint" />
       </ContextMenu>
     </Canvas.ContextMenu>
 
