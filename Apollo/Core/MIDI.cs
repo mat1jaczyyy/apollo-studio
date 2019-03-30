@@ -14,6 +14,9 @@ namespace Apollo.Core {
     public static class MIDI {
         public static readonly string Identifier = "midi";
 
+        public delegate void DevicesUpdatedEventHandler();
+        public static event DevicesUpdatedEventHandler DevicesUpdated;
+
         public static List<Launchpad> Devices = new List<Launchpad>();
         private static Timer timer = new Timer() { Interval = 100 };
         private static bool started = false;
@@ -30,6 +33,8 @@ namespace Apollo.Core {
 
         public static void Rescan(object sender, EventArgs e) {
             lock(locker) {
+                bool updated = false;
+
                 foreach (var input in MidiDeviceManager.Default.InputDevices) {
                     foreach (var output in MidiDeviceManager.Default.OutputDevices) {
                         if (input.Name == output.Name) {
@@ -37,14 +42,20 @@ namespace Apollo.Core {
 
                             foreach (Launchpad device in Devices) {
                                 if (device.Name == output.Name) {
-                                    if (!device.Available) device.Connect(input, output);
+                                    if (!device.Available) {
+                                        device.Connect(input, output);
+                                        updated = true;
+                                    }
                                     
                                     justConnected = false;
                                     break;
                                 }
                             }
 
-                            if (justConnected) Devices.Add(new Launchpad(input, output));
+                            if (justConnected) {
+                                Devices.Add(new Launchpad(input, output));
+                                updated = true;
+                            }
                         }
                     }
                 }
@@ -60,11 +71,16 @@ namespace Apollo.Core {
                             }
                         }
 
-                        if (justDisconnected) device.Disconnect();
+                        if (justDisconnected) {
+                            device.Disconnect();
+                            updated = true;
+                        }
                     }
                 }
 
                 Program.Log($"Rescan");
+
+                if (updated) DevicesUpdated?.Invoke();
             }
         }
 

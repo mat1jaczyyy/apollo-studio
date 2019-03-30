@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 using Apollo.Core;
@@ -19,7 +22,18 @@ namespace Apollo.Viewers {
         Track _track;
         DropDown PortSelector;
 
-        public void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
+        private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
+
+        private void UpdatePorts() {
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available select i).ToList();
+            if (_track.Launchpad != null && !_track.Launchpad.Available) ports.Add(_track.Launchpad);
+
+            PortSelector.Items = ports;
+            PortSelector.SelectedIndex = -1;
+            PortSelector.SelectedItem = _track.Launchpad;
+        }
+
+        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
         public TrackViewer(Track track) {
             InitializeComponent();
@@ -30,8 +44,8 @@ namespace Apollo.Viewers {
             _track.ParentIndexChanged += UpdateText;
 
             PortSelector = this.Get<DropDown>("PortSelector");
-            PortSelector.Items = from i in MIDI.Devices where i.Available select i;
-            PortSelector.SelectedItem = _track.Launchpad;
+            UpdatePorts();
+            MIDI.DevicesUpdated += HandlePorts;
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {
@@ -47,6 +61,13 @@ namespace Apollo.Viewers {
             _track.Dispose();
         }
 
-        private void Port_Changed(object sender, SelectionChangedEventArgs e) => _track.Launchpad = (Launchpad)PortSelector.SelectedItem;
+        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
+            Launchpad selected = (Launchpad)PortSelector.SelectedItem;
+
+            if (selected != null && _track.Launchpad != selected) {
+                _track.Launchpad = selected;
+                UpdatePorts();
+            }
+        }
     }
 }
