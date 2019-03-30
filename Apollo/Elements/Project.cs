@@ -9,6 +9,7 @@ using Avalonia.Controls;
 
 using Newtonsoft.Json;
 
+using Apollo.Core;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -87,7 +88,7 @@ namespace Apollo.Elements {
 
         public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
             if (tracks == null)
-                tracks = (from i in Core.MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
+                tracks = (from i in MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
             BPM = bpm;
             Tracks = tracks;

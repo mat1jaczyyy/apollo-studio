@@ -153,6 +153,8 @@ namespace Apollo.Elements {
 
         private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal((byte)e.Key, new Color(0)));
 
+        public override string ToString() => Name;
+
         public static Launchpad Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != Identifier) return null;

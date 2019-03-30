@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using System.Linq;
+
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
@@ -15,6 +17,7 @@ namespace Apollo.Viewers {
         public event TrackAddedEventHandler TrackAdded;
         
         Track _track;
+        DropDown PortSelector;
 
         public void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
         
@@ -25,6 +28,10 @@ namespace Apollo.Viewers {
             
             UpdateText(_track.ParentIndex.Value);
             _track.ParentIndexChanged += UpdateText;
+
+            PortSelector = this.Get<DropDown>("PortSelector");
+            PortSelector.Items = from i in MIDI.Devices where i.Available select i;
+            PortSelector.SelectedItem = _track.Launchpad;
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {
@@ -38,6 +45,10 @@ namespace Apollo.Viewers {
             Program.Project.Remove(_track.ParentIndex.Value);
             _track.Window?.Close();
             _track.Dispose();
+        }
+
+        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
+            _track.Launchpad = (Launchpad)PortSelector.SelectedItem;
         }
     }
 }
