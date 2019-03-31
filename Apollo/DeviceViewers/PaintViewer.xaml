@@ -1,10 +1,49 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Grid RowDefinitions="Auto,Auto" VerticalAlignment="Center">
-    <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Color" Margin="0 0 0 5"/>
-    <Canvas Grid.Row="1" Margin="0 0 0 30" Width="43" Height="43">
-      <Ellipse Width="43" Height="43" x:Name="Color" />
-    </Canvas>
+  <Grid RowDefinitions="*,Auto" Width="160">
+    <Border Grid.Row="0" Margin="0 0 0 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1">
+      <Grid>
+        <Grid>
+          <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+              <GradientStop Offset="0" Color="#FFFFFFFF" />
+              <GradientStop Offset="1" Color="#FFFF0000" />
+            </LinearGradientBrush>
+          </Grid.Background>
+        </Grid>
+
+        <Grid>
+          <Grid.Background>
+            <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+              <GradientStop Offset="0" Color="#00000000" />
+              <GradientStop Offset="1" Color="#FF000000" />
+            </LinearGradientBrush>
+          </Grid.Background>
+        </Grid>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+      <Canvas Grid.Column="0" Margin="0 0 5 0" Width="15" Height="15" >
+        <Ellipse Width="15" Height="15" x:Name="Color" />
+      </Canvas>
+      
+      <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1">
+        <Grid>
+          <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+              <GradientStop Offset="0"              Color="#FFFF0000" />
+              <GradientStop Offset="0.166666666667" Color="#FFFFFF00" />
+              <GradientStop Offset="0.333333333333" Color="#FF00FF00" />
+              <GradientStop Offset="0.5"            Color="#FF00FFFF" />
+              <GradientStop Offset="0.666666666667" Color="#FF0000FF" />
+              <GradientStop Offset="0.833333333333" Color="#FFFF00FF" />
+              <GradientStop Offset="1"              Color="#FFFF0000" />
+            </LinearGradientBrush>
+          </Grid.Background>
+        </Grid>
+      </Border>
+    </Grid>
   </Grid>
 </UserControl>
