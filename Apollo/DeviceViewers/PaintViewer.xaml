@@ -20,6 +20,19 @@
               <GradientStop Offset="1" Color="#FF000000" />
             </LinearGradientBrush>
           </Grid.Background>
+
+          <Canvas Background="Transparent" ClipToBounds="true">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5.5 -5.5 0 0" Width="11" Height="11" DragDelta="ThumbMove">
+              <Thumb.Template>
+                <ControlTemplate>
+                  <Canvas Background="Transparent">
+                    <Ellipse Width="11" Height="11" Stroke="#FFFFFFFF" StrokeThickness="1" />
+                    <Ellipse Canvas.Top="1" Canvas.Left="1" Width="9" Height="9" Stroke="#FF000000" StrokeThickness="1" />
+                  </Canvas>
+                </ControlTemplate>
+              </Thumb.Template>
+            </Thumb>
+          </Canvas>
         </Grid>
       </Grid>
     </Border>

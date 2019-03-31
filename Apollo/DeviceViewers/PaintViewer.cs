@@ -1,5 +1,7 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -21,6 +23,17 @@ namespace Apollo.DeviceViewers {
             
             color = this.Get<Ellipse>("Color");
             color.Fill = _paint.Color.ToBrush();
+        }
+
+        private void ThumbMove(object sender, VectorEventArgs e) {
+            Thumb thumb = (Thumb)e.Source;
+            Canvas Area = (Canvas)thumb.Parent;
+
+            double x = Canvas.GetLeft(thumb) + e.Vector.X;
+            double y = Canvas.GetTop(thumb) + e.Vector.Y;
+
+            if (0 <= x && x <= Area.Bounds.Width) Canvas.SetLeft(thumb, x);
+            if (0 <= y && y <= Area.Bounds.Height) Canvas.SetTop(thumb, y);
         }
     }
 }
