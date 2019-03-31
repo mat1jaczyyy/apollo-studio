@@ -25,7 +25,7 @@ namespace Apollo.DeviceViewers {
             color.Fill = _paint.Color.ToBrush();
         }
 
-        private void ThumbMove(object sender, VectorEventArgs e) {
+        private void MainThumbMove(object sender, VectorEventArgs e) {
             Thumb thumb = (Thumb)e.Source;
             Canvas Area = (Canvas)thumb.Parent;
 
@@ -34,6 +34,14 @@ namespace Apollo.DeviceViewers {
 
             if (0 <= x && x <= Area.Bounds.Width) Canvas.SetLeft(thumb, x);
             if (0 <= y && y <= Area.Bounds.Height) Canvas.SetTop(thumb, y);
+        }
+
+        private void HueThumbMove(object sender, VectorEventArgs e) {
+            Thumb thumb = (Thumb)e.Source;
+            Canvas Area = (Canvas)thumb.Parent;
+
+            double x = Canvas.GetLeft(thumb) + e.Vector.X;
+            if (0 <= x && x <= Area.Bounds.Width) Canvas.SetLeft(thumb, x);
         }
     }
 }

@@ -22,12 +22,12 @@
           </Grid.Background>
 
           <Canvas Background="Transparent" ClipToBounds="true">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5.5 -5.5 0 0" Width="11" Height="11" DragDelta="ThumbMove">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" DragDelta="MainThumbMove">
               <Thumb.Template>
                 <ControlTemplate>
                   <Canvas Background="Transparent">
-                    <Ellipse Width="11" Height="11" Stroke="#FFFFFFFF" StrokeThickness="1" />
-                    <Ellipse Canvas.Top="1" Canvas.Left="1" Width="9" Height="9" Stroke="#FF000000" StrokeThickness="1" />
+                    <Ellipse Width="10" Height="10" Stroke="#FFFFFFFF" StrokeThickness="1" />
+                    <Ellipse Canvas.Top="1" Canvas.Left="1" Width="8" Height="8" Stroke="#FF000000" StrokeThickness="1" />
                   </Canvas>
                 </ControlTemplate>
               </Thumb.Template>
@@ -55,6 +55,21 @@
               <GradientStop Offset="1"              Color="#FFFF0000" />
             </LinearGradientBrush>
           </Grid.Background>
+
+          <Canvas Background="Transparent" ClipToBounds="true">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-4 0" Width="10" Height="13" DragDelta="HueThumbMove">
+              <Thumb.Template>
+                <ControlTemplate>
+                  <Canvas Background="Transparent">
+                    <Path Fill="#FF000000"
+                          Data="M 0,0 L 4,4 8,0 Z" />
+                    <Path Fill="#FF000000"
+                          Data="M 0,13 L 4,9 8,13 Z" />
+                  </Canvas>
+                </ControlTemplate>
+              </Thumb.Template>
+            </Thumb>
+          </Canvas>
         </Grid>
       </Border>
     </Grid>
