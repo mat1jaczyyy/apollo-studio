@@ -159,6 +159,20 @@ namespace Apollo.Elements {
 
         private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal((byte)e.Key, new Color(0)));
 
+        private void ControlChange(object sender, in ControlChangeMessage e) {
+            switch (Type) {
+                case LaunchpadType.MK2:
+                    if (104 <= e.Control && e.Control <= 111)
+                        HandleMessage(new Signal((byte)(e.Control - 13), new Color((byte)(e.Value >> 1))));
+                    break;
+
+                case LaunchpadType.PRO:
+                case LaunchpadType.CFW:
+                    HandleMessage(new Signal((byte)e.Control, new Color((byte)(e.Value >> 1))));
+                    break;
+            }
+        }
+
         public override string ToString() => (Available? "" : "(unavailable) ") + Name;
 
         public static Launchpad Decode(string jsonString) {
