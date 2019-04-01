@@ -199,6 +199,7 @@ namespace Apollo.Components {
         private void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
                 mouseHeld = true;
+                e.Device.Capture(ArcCanvas);
 
                 lastY = e.GetPosition(ArcCanvas).Y;
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
@@ -206,10 +207,12 @@ namespace Apollo.Components {
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left))
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                mouseHeld = false;
+                e.Device.Capture(null);
+
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
-            
-            mouseHeld = false;
+            }
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
