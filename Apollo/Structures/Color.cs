@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 
 using Avalonia.Media;
+using AvaloniaColor = Avalonia.Media.Color;
 
 using Newtonsoft.Json;
 
@@ -53,7 +54,7 @@ namespace Apollo.Structures {
             Blue = blue;
         }
 
-        public IBrush ToBrush() => new SolidColorBrush(new Avalonia.Media.Color(
+        public IBrush ToBrush() => new SolidColorBrush(new AvaloniaColor(
             255,
             (byte)(_r * (255.0 / 63)),
             (byte)(_g * (255.0 / 63)),
