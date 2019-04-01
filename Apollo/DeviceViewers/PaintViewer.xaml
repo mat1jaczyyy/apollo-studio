@@ -22,7 +22,7 @@
           </Grid.Background>
 
           <Canvas Background="Transparent" ClipToBounds="true">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" DragDelta="MainThumbMove">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" x:Name="MainThumb" DragDelta="MainThumbMove">
               <Thumb.Template>
                 <ControlTemplate>
                   <Canvas Background="Transparent">
@@ -57,7 +57,7 @@
           </Grid.Background>
 
           <Canvas Background="Transparent" ClipToBounds="true">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-4 0" Width="10" Height="13" DragDelta="HueThumbMove">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-4 0" Width="10" Height="13" x:Name="HueThumb" DragDelta="HueThumbMove">
               <Thumb.Template>
                 <ControlTemplate>
                   <Canvas Background="Transparent">
