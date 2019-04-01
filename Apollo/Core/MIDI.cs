@@ -37,11 +37,11 @@ namespace Apollo.Core {
 
                 foreach (var input in MidiDeviceManager.Default.InputDevices) {
                     foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                        if (input.Name == output.Name) {
+                        if (input.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) {
                             bool justConnected = true;
 
                             foreach (Launchpad device in Devices) {
-                                if (device.Name == output.Name) {
+                                if (device.Name == input.Name) {
                                     if (!device.Available) {
                                         device.Connect(input, output);
                                         updated = true;
@@ -65,7 +65,7 @@ namespace Apollo.Core {
                         bool justDisconnected = true;
 
                         foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                            if (device.Name == output.Name) {
+                            if (device.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) {
                                 justDisconnected = false;
                                 break;
                             }
