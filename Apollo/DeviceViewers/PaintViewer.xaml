@@ -21,7 +21,7 @@
             </LinearGradientBrush>
           </Grid.Background>
 
-          <Canvas Background="Transparent" ClipToBounds="true">
+          <Canvas Background="Transparent" ClipToBounds="true" LayoutUpdated="InitCanvas">
             <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" x:Name="MainThumb" DragDelta="MainThumbMove">
               <Thumb.Template>
                 <ControlTemplate>
