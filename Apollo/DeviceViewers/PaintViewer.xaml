@@ -21,8 +21,9 @@
             </LinearGradientBrush>
           </Grid.Background>
 
-          <Canvas Background="Transparent" ClipToBounds="true" LayoutUpdated="InitCanvas">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" x:Name="MainThumb" DragDelta="MainThumbMove">
+          <Canvas Background="Transparent" ClipToBounds="true" x:Name="MainCanvas"
+                  LayoutUpdated="InitCanvas" PointerPressed="MainCanvas_MouseDown" PointerReleased="MainCanvas_MouseUp" PointerMoved="MainCanvas_MouseMove">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" x:Name="MainThumb" DragDelta="MainThumb_Move">
               <Thumb.Template>
                 <ControlTemplate>
                   <Canvas Background="Transparent">
@@ -56,8 +57,9 @@
             </LinearGradientBrush>
           </Grid.Background>
 
-          <Canvas Background="Transparent" ClipToBounds="true">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-4 0" Width="10" Height="13" x:Name="HueThumb" DragDelta="HueThumbMove">
+          <Canvas Background="Transparent" ClipToBounds="true" x:Name="HueCanvas"
+                  PointerPressed="HueCanvas_MouseDown" PointerReleased="HueCanvas_MouseUp" PointerMoved="HueCanvas_MouseMove">
+            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-4 0" Width="10" Height="13" x:Name="HueThumb" DragDelta="HueThumb_Move">
               <Thumb.Template>
                 <ControlTemplate>
                   <Canvas Background="Transparent">

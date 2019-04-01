@@ -26,8 +26,11 @@ namespace Apollo.DeviceViewers {
         Paint _paint;
         
         Ellipse color;
-        GradientStop mainColor;
+        Canvas mainCanvas, hueCanvas;
         Thumb mainThumb, hueThumb;
+        GradientStop mainColor;
+
+        bool main_mouseHeld, hue_mouseHeld;
 
         public PaintViewer(Paint paint) {
             InitializeComponent();
@@ -36,6 +39,9 @@ namespace Apollo.DeviceViewers {
             
             color = this.Get<Ellipse>("Color");
             color.Fill = _paint.Color.ToBrush();
+
+            mainCanvas = this.Get<Canvas>("MainCanvas");
+            hueCanvas = this.Get<Canvas>("HueCanvas");
 
             mainThumb = this.Get<Thumb>("MainThumb");
             hueThumb = this.Get<Thumb>("HueThumb");
@@ -126,28 +132,89 @@ namespace Apollo.DeviceViewers {
             else              mainColor.Color = new AvaloniaColor(255, v, p, q);
         }
 
-        private void MainThumbMove(object sender, VectorEventArgs e) {
-            Thumb thumb = (Thumb)e.Source;
-            Canvas Area = (Canvas)thumb.Parent;
+        private void MainThumb_Move(object sender, VectorEventArgs e) {
+            double x = Canvas.GetLeft(mainThumb) + e.Vector.X;
+            x = x < 0? 0 : x;
+            x = x > mainCanvas.Bounds.Width? mainCanvas.Bounds.Width : x;
 
-            double x = Canvas.GetLeft(thumb) + e.Vector.X;
-            double y = Canvas.GetTop(thumb) + e.Vector.Y;
+            double y = Canvas.GetTop(mainThumb) + e.Vector.Y;
+            y = y < 0? 0 : y;
+            y = y > mainCanvas.Bounds.Height? mainCanvas.Bounds.Height : y;
 
-            if (0 <= x && x <= Area.Bounds.Width) Canvas.SetLeft(thumb, x);
-            if (0 <= y && y <= Area.Bounds.Height) Canvas.SetTop(thumb, y);
+            Canvas.SetLeft(mainThumb, x);
+            Canvas.SetTop(mainThumb, y);
 
             UpdateColor();
         }
 
-        private void HueThumbMove(object sender, VectorEventArgs e) {
-            Thumb thumb = (Thumb)e.Source;
-            Canvas Area = (Canvas)thumb.Parent;
+        private void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                main_mouseHeld = true;
+                e.Device.Capture(mainCanvas);
 
-            double x = Canvas.GetLeft(thumb) + e.Vector.X;
-            if (0 <= x && x <= Area.Bounds.Width) Canvas.SetLeft(thumb, x);
+                Vector position = e.GetPosition(mainThumb);
+                position = position.WithX(position.X - mainThumb.Bounds.Width / 2)
+                                   .WithY(position.Y - mainThumb.Bounds.Height / 2);
+
+                MainThumb_Move(null, new VectorEventArgs() { Vector = position });
+            }
+        }
+
+        private void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                main_mouseHeld = false;
+                e.Device.Capture(null);
+            }
+        }
+
+        private void MainCanvas_MouseMove(object sender, PointerEventArgs e) {
+            if (main_mouseHeld) {
+                Vector position = e.GetPosition(mainThumb);
+                position = position.WithX(position.X - mainThumb.Bounds.Width / 2)
+                                   .WithY(position.Y - mainThumb.Bounds.Height / 2);
+
+                MainThumb_Move(null, new VectorEventArgs() { Vector = position });
+            }
+        }
+
+        private void HueThumb_Move(object sender, VectorEventArgs e) {
+            double x = Canvas.GetLeft(hueThumb) + e.Vector.X;
+            x = x < 0? 0 : x;
+            x = x > hueCanvas.Bounds.Width? hueCanvas.Bounds.Width : x;
+
+            Canvas.SetLeft(hueThumb, x);
 
             UpdateColor();
             UpdateCanvas();
+        }
+
+        private void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                hue_mouseHeld = true;
+                e.Device.Capture(hueCanvas);
+
+                Vector position = e.GetPosition(hueThumb);
+                position = position.WithX(position.X - hueThumb.Bounds.Width / 2)
+                                   .WithY(position.Y - hueThumb.Bounds.Height / 2);
+
+                HueThumb_Move(null, new VectorEventArgs() { Vector = position });
+            }
+        }
+
+        private void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                hue_mouseHeld = false;
+                e.Device.Capture(null);
+            }
+        }
+
+        private void HueCanvas_MouseMove(object sender, PointerEventArgs e) {
+            if (hue_mouseHeld) {
+                Vector position = e.GetPosition(hueThumb);
+                position = position.WithX(position.X - hueThumb.Bounds.Width / 2);
+
+                HueThumb_Move(null, new VectorEventArgs() { Vector = position });
+            }
         }
     }
 }
