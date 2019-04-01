@@ -62,6 +62,7 @@ namespace Apollo.Elements {
                 Input.SysEx -= WaitForIdentification;
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
+                Input.ControlChange += ControlChange;
             }
         }
 
@@ -129,6 +130,7 @@ namespace Apollo.Elements {
             } else {
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
+                Input.ControlChange += ControlChange;
             }
         }
 
