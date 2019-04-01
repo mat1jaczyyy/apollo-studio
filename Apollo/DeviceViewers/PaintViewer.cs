@@ -79,12 +79,7 @@ namespace Apollo.DeviceViewers {
             Canvas.SetLeft(mainThumb, saturation * ((Canvas)mainThumb.Parent).Bounds.Width);
             Canvas.SetTop(mainThumb, (1 - max) * ((Canvas)mainThumb.Parent).Bounds.Height);
 
-            mainColor.Color = new AvaloniaColor(
-                255,
-                (byte)(r * 255),
-                (byte)(g * 255),
-                (byte)(b * 255)
-            );
+            UpdateCanvas();
 
             ((Canvas)sender).LayoutUpdated -= InitCanvas;
         }
