@@ -3,7 +3,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Project" WindowStartupLocation="CenterOwner"
         Width="350" MinWidth="350" MaxWidth="350"
-        Height="200" MinHeight="120"
+        Height="320" MinHeight="180"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid>
