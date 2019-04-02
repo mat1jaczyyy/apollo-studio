@@ -21,7 +21,7 @@ namespace Apollo.Windows {
         private Controls Contents;
 
         private void Contents_Insert(int index, Track track) {
-            TrackViewer viewer = new TrackViewer(track);
+            TrackInfo viewer = new TrackInfo(track);
             viewer.TrackAdded += Track_Insert;
             Contents.Insert(index + 1, viewer);
         }

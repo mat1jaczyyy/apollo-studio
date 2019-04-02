@@ -13,7 +13,7 @@ using Apollo.Elements;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
-    public class TrackViewer: UserControl {
+    public class TrackInfo: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void TrackAddedEventHandler(int index);
@@ -35,7 +35,7 @@ namespace Apollo.Viewers {
 
         private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
-        public TrackViewer(Track track) {
+        public TrackInfo(Track track) {
             InitializeComponent();
             
             _track = track;
