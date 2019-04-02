@@ -1,5 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 using Apollo.Devices;
 using Apollo.Elements;
@@ -12,26 +14,58 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Group _group;
-        StackPanel _root;
-
+        DeviceViewer _parent;
+        Controls _root;
         Controls Contents;
+
+        int? current;
 
         private void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);
             viewer.ChainAdded += Chain_Insert;
+            viewer.ChainRemoved += Chain_Remove;
+            viewer.ChainExpanded += Expand;
             Contents.Insert(index + 1, viewer);
         }
 
-        public GroupViewer(Group group, StackPanel root) {
+        public GroupViewer(Group group, DeviceViewer parent) {
             InitializeComponent();
 
             _group = group;
-            _root = root;
+            _parent = parent;
+            _root = _parent.Get<StackPanel>("Root").Children;
 
             Contents = this.Get<StackPanel>("Contents").Children;
             
             for (int i = 0; i < _group.Count; i++)
                 Contents_Insert(i, _group[i]);
+            
+            _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
+            parent.Get<Grid>("Contents").Margin = new Thickness(0);
+        }
+
+        private void Expand(int? index) {
+            if (current != null) {
+                _root.RemoveAt(1);
+
+                // TODO: Avalonia should fix setting CornerRadius.
+                //_parent.Get<Border>("Border").CornerRadius = new CornerRadius(5);
+
+                ((ChainInfo)Contents[current.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
+
+                if (index == current) {
+                    current = null;
+                    return;
+                }
+            }
+
+            if (index != null) {
+                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush") });
+                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
+                ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
+            }
+            
+            current = index;
         }
 
         private void Chain_Insert(int index) {
@@ -40,5 +74,15 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Chain_InsertStart() => Chain_Insert(0);
+
+        private void Chain_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            _group.Remove(index);
+
+            if (current != null) {
+                if (index < current) current--;
+                else if (index == current) Expand(null);
+            }
+        }
     }
 }

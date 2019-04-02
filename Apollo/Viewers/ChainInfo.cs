@@ -17,9 +17,13 @@ namespace Apollo.Viewers {
     public class ChainInfo: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void ChainAddedEventHandler(int index);
-        public event ChainAddedEventHandler ChainAdded;
-        
+        public delegate void ChainInfoEventHandler(int index);
+        public event ChainInfoEventHandler ChainAdded;
+        public event ChainInfoEventHandler ChainRemoved;
+
+        public delegate void ChainExpandedEventHandler(int? index);
+        public event ChainExpandedEventHandler ChainExpanded;
+
         Chain _chain;
 
         private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Chain {index + 1}";
@@ -34,15 +38,10 @@ namespace Apollo.Viewers {
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) {}
+            if (e.MouseButton == MouseButton.Left) ChainExpanded?.Invoke(_chain.ParentIndex.Value);
         }
 
         private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
-
-        private void Chain_Remove() {
-            ((Panel)Parent).Children.RemoveAt(_chain.ParentIndex.Value + 1);
-            ((Group)_chain.Parent).Remove(_chain.ParentIndex.Value);
-            _chain = null;
-        }
+        private void Chain_Remove() => ChainRemoved?.Invoke(_chain.ParentIndex.Value);
     }
 }

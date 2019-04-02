@@ -16,12 +16,9 @@ namespace Apollo.Viewers {
         public static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
             foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
-                    if (device.DeviceIdentifier == "group") {
-                        sender.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
-                        sender.Get<Grid>("Contents").Margin = new Thickness(0);
-                        return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender.Get<StackPanel>("Root")});
-                    }
-
+                    if (device.DeviceIdentifier == "group")
+                        return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
+                    
                     return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device});
                 }
 
