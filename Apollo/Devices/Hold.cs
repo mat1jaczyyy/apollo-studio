@@ -78,7 +78,7 @@ namespace Apollo.Devices {
             return new Hold(
                 Convert.ToBoolean(data["mode"]),
                 new Length(Convert.ToDecimal(data["length"])),
-                Convert.ToInt32(data["time"]), Convert.ToInt32(data["gate"]),
+                Convert.ToInt32(data["time"]), Convert.ToDecimal(data["gate"]),
                 Convert.ToBoolean(data["infinite"])
             );
         }
