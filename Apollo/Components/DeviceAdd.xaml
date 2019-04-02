@@ -4,6 +4,7 @@
   <Canvas Margin="5 0" HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
     <Canvas.ContextMenu>
       <ContextMenu>
+        <MenuItem Header="Group" />
         <MenuItem Header="Delay" />
         <MenuItem Header="Move" />
         <MenuItem Header="Hold" />
