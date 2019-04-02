@@ -30,18 +30,27 @@ namespace Apollo.Devices {
             }
         }
 
+        public bool Loop;
+
         public override Device Clone() => new Move(_x, _y);
 
-        public Move(int x = 0, int y = 0): base(DeviceIdentifier) {
+        public Move(int x = 0, int y = 0, bool loop = false): base(DeviceIdentifier) {
             X = x;
             Y = y;
+            Loop = loop;
         }
 
         public override void MIDIEnter(Signal n) {
             int x = n.Index % 10 + X;
             int y = n.Index / 10 + Y;
-            int result = y * 10 + x;
 
+            if (Loop) {
+                x = (x + 10) % 10;
+                y = (y + 10) % 10;
+            }
+
+            int result = y * 10 + x;
+                
             if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
                 n.Index = (byte)result;
                 MIDIExit?.Invoke(n);
@@ -56,7 +65,8 @@ namespace Apollo.Devices {
             
             return new Move(
                 Convert.ToInt32(data["x"]),
-                Convert.ToInt32(data["y"])
+                Convert.ToInt32(data["y"]),
+                Convert.ToBoolean(data["loop"])
             );
         }
 
@@ -77,6 +87,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("y");
                         writer.WriteValue(_y);
+
+                        writer.WritePropertyName("loop");
+                        writer.WriteValue(Loop);
 
                     writer.WriteEndObject();
 
