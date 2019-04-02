@@ -15,7 +15,21 @@ namespace Apollo.Elements {
         public static readonly string Identifier = "chain";
 
         public IChainParent Parent = null;
-        public int? ParentIndex;
+
+        public delegate void ParentIndexChangedEventHandler(int index);
+        public event ParentIndexChangedEventHandler ParentIndexChanged;
+
+        private int? _ParentIndex;
+        public int? ParentIndex {
+            get => _ParentIndex;
+            set {
+                if (_ParentIndex != value) {
+                    _ParentIndex = value;
+                    ParentIndexChanged?.Invoke(_ParentIndex.Value);
+                }
+            }
+        }
+
         private Action<Signal> _midiexit = null;
         public Action<Signal> MIDIExit {
             get => _midiexit;
