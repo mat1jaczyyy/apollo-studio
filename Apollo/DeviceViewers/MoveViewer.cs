@@ -23,6 +23,7 @@ namespace Apollo.DeviceViewers {
             MoveDial moveDial = this.Get<MoveDial>("Offset");
             moveDial.X = _move.X;
             moveDial.Y = _move.Y;
+            moveDial.Changed += Offset_Changed;
 
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _move.Loop;

@@ -3,8 +3,7 @@
              xmlns:Components="clr-namespace:Apollo.Components">
 
   <Grid RowDefinitions="*,Auto">
-    <Components:MoveDial Grid.Row="0" x:Name="Offset" Title="Offset"
-                         Changed="Offset_Changed" />
+    <Components:MoveDial Grid.Row="0" x:Name="Offset" Title="Offset" />
 
     <CheckBox Grid.Row="1" Margin="0 5 0 0" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
   </Grid>
