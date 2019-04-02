@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Viewers;
@@ -46,6 +47,7 @@ namespace Apollo.DeviceViewers {
 
         private void Expand(int? index) {
             if (current != null) {
+                _root.RemoveAt(2);
                 _root.RemoveAt(1);
 
                 // TODO: Avalonia should fix setting CornerRadius.
@@ -60,7 +62,8 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush") });
+                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = new SolidColorBrush(new Color(16, 0, 0, 0)) });
+                _root.Insert(2, new GroupTail());
                 _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
                 ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
             }
@@ -71,6 +74,8 @@ namespace Apollo.DeviceViewers {
         private void Chain_Insert(int index) {
             _group.Insert(index, new Chain());
             Contents_Insert(index, _group[index]);
+
+            if (current != null && index <= current) current++;
         }
 
         private void Chain_InsertStart() => Chain_Insert(0);
