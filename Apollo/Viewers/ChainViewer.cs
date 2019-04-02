@@ -11,8 +11,8 @@ namespace Apollo.Viewers {
     public class ChainViewer: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        private Chain _chain;
-        private Controls Contents;
+        Chain _chain;
+        Controls Contents;
 
         private void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);

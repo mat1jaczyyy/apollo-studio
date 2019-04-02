@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
         Group _group;
         StackPanel _root;
 
-        private Controls Contents;
+        Controls Contents;
 
         private void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);

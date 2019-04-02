@@ -12,7 +12,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private CheckBox AlwaysOnTop, CenterTrackContents;
+        CheckBox AlwaysOnTop, CenterTrackContents;
 
         private void UpdateTopmost(bool value) => Topmost = value;
 

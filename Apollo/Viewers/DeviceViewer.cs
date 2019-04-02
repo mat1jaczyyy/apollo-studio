@@ -31,8 +31,7 @@ namespace Apollo.Viewers {
         public delegate void DeviceAddedEventHandler(int index, Type device);
         public event DeviceAddedEventHandler DeviceAdded;
         
-        private Device _device;
-        private IControl _viewer;
+        Device _device;
 
         public DeviceViewer(Device device) {
             InitializeComponent();
@@ -40,7 +39,8 @@ namespace Apollo.Viewers {
             this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
-            _viewer = GetSpecificViewer(this, _device);
+            
+            IControl _viewer = GetSpecificViewer(this, _device);
 
             if (_viewer != null)
                 this.Get<Grid>("Contents").Children.Add(_viewer);

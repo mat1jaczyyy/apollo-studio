@@ -17,7 +17,7 @@ namespace Apollo.Windows {
 
         Track _track;
 
-        private HorizontalAlignment ContentAlignment;
+        HorizontalAlignment ContentAlignment;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Track {index + 1}"

@@ -18,7 +18,7 @@ namespace Apollo.Windows {
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
-        private Controls Contents;
+        Controls Contents;
 
         private void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
