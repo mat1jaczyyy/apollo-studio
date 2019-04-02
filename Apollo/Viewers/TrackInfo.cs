@@ -20,7 +20,7 @@ namespace Apollo.Viewers {
         public event TrackAddedEventHandler TrackAdded;
         
         Track _track;
-        DropDown PortSelector;
+        ComboBox PortSelector;
 
         private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
 
@@ -43,7 +43,7 @@ namespace Apollo.Viewers {
             UpdateText(_track.ParentIndex.Value);
             _track.ParentIndexChanged += UpdateText;
 
-            PortSelector = this.Get<DropDown>("PortSelector");
+            PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
         }
