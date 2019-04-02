@@ -12,29 +12,40 @@ namespace Apollo.Devices {
     public class Move: Device {
         public static readonly new string DeviceIdentifier = "move";
 
-        private int _offset;
-
-        public int Offset {
-            get => _offset;
+        private int _x;
+        public int X {
+            get => _x;
             set {
-                if (-99 <= value && value <= 99)
-                    _offset = value;
+                if (-9 <= value && value <= 9)
+                    _x = value;
             }
         }
 
-        public override Device Clone() => new Move(_offset);
+        private int _y;
+        public int Y {
+            get => _y;
+            set {
+                if (-9 <= value && value <= 9)
+                    _y = value;
+            }
+        }
 
-        public Move(int offset = 0): base(DeviceIdentifier) => Offset = offset;
+        public override Device Clone() => new Move(_x, _y);
+
+        public Move(int x = 0, int y = 0): base(DeviceIdentifier) {
+            X = x;
+            Y = y;
+        }
 
         public override void MIDIEnter(Signal n) {
-            int result = n.Index + _offset;
+            int x = n.Index % 10 + X;
+            int y = n.Index / 10 + Y;
+            int result = y * 10 + x;
 
-            if (result < 0) result = 0;
-            if (result > 99) result = 99;
-
-            n.Index = (byte)result;
-
-            MIDIExit?.Invoke(n);
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
+                n.Index = (byte)result;
+                MIDIExit?.Invoke(n);
+            }
         }
 
         public static Device DecodeSpecific(string jsonString) {
@@ -44,7 +55,8 @@ namespace Apollo.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             return new Move(
-                Convert.ToInt32(data["offset"])
+                Convert.ToInt32(data["x"]),
+                Convert.ToInt32(data["y"])
             );
         }
 
@@ -60,8 +72,11 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
-                        writer.WritePropertyName("offset");
-                        writer.WriteValue(_offset);
+                        writer.WritePropertyName("x");
+                        writer.WriteValue(_x);
+
+                        writer.WritePropertyName("y");
+                        writer.WriteValue(_y);
 
                     writer.WriteEndObject();
 

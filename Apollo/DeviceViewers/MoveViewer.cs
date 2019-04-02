@@ -16,9 +16,15 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _move = move;
-            this.Get<Dial>("Offset").RawValue = _move.Offset;
+
+            MoveDial moveDial = this.Get<MoveDial>("Offset");
+            moveDial.X = _move.X;
+            moveDial.Y = _move.Y;
         }
 
-        private void Offset_Changed(double value) => _move.Offset = (int)value;
+        private void Offset_Changed(int x, int y) {
+            _move.X = x;
+            _move.Y = y;
+        } 
     }
 }

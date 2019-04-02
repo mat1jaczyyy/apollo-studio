@@ -1,0 +1,24 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center">
+    <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
+
+    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" Height="40" Background="Transparent" x:Name="PlaneCanvas"
+            PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
+      <Path Fill="{DynamicResource ThemeControlLowBrush}" 
+            Data="M 0,18 L 38,18 38,20 0,20 Z" />
+      <Path Fill="{DynamicResource ThemeControlLowBrush}" 
+            Data="M 18,0 L 18,38 20,38 20,0 Z" />
+
+      <Rectangle Fill="{DynamicResource ThemeAccentBrush}" x:Name="XRect" 
+                 Canvas.Top="18" Height="2" />
+      <Rectangle Fill="{DynamicResource ThemeAccentBrush}" x:Name="YRect" 
+                 Canvas.Left="18" Width="2" />
+      <Rectangle Fill="{DynamicResource ThemeAccentBrush}" x:Name="Point"
+                 Canvas.Top="18" Canvas.Left="18" Width="2" Height="2" />
+    </Canvas>
+
+    <TextBlock Grid.Row="2" HorizontalAlignment="Center" x:Name="Display" />
+  </Grid>
+</UserControl>
