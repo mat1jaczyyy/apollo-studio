@@ -55,7 +55,7 @@ namespace Apollo.Devices {
         }
 
         public void Add(List<Chain> chains) {
-            foreach (Chain chain in chains) _chains.Add(chain);
+            foreach (Chain chain in chains) Add(chain);
         }
 
         public void Remove(int index) {
