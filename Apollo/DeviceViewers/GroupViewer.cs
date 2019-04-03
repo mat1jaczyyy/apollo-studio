@@ -79,7 +79,7 @@ namespace Apollo.DeviceViewers {
             _group.Insert(index, chain);
             Contents_Insert(index, _group[index]);
 
-            if (current != null && index <= current) current++;
+            Expand(index);
 
             this.Get<ChainAdd>("ChainAdd").AlwaysShowing = false;
         }
