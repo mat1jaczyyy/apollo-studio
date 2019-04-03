@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Viewers;
@@ -72,7 +73,10 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Chain_Insert(int index) {
-            _group.Insert(index, new Chain());
+            Chain chain = new Chain();
+            if (Preferences.AutoCreateFilter) chain.Add(new Filter());
+
+            _group.Insert(index, chain);
             Contents_Insert(index, _group[index]);
 
             if (current != null && index <= current) current++;

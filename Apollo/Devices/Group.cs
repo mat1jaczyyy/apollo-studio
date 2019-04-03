@@ -45,8 +45,6 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public void Add() => _chains.Add(new Chain());
-
         public void Add(Chain chain) {
             chain.Parent = this;
             chain.ParentIndex = _chains.Count;

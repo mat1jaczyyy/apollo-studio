@@ -20,6 +20,7 @@
         <StackPanel Spacing="5">
           <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
           <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
+          <CheckBox Click="AutoCreateFilter_Changed" x:Name="AutoCreateFilter">Auto create Filter in new Group Chain</CheckBox>
         </StackPanel>
       </ScrollViewer>
     </Border>

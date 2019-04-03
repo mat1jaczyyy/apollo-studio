@@ -15,9 +15,9 @@ namespace Apollo.Core {
 
         private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";
 
-        public delegate void AlwaysOnTopChangedEventHandler(bool NewValue);
-        public static event AlwaysOnTopChangedEventHandler AlwaysOnTopChanged;
+        public delegate void CheckBoxChanged(bool NewValue);
 
+        public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;
         public static bool AlwaysOnTop {
             get => _AlwaysOnTop;
@@ -28,15 +28,22 @@ namespace Apollo.Core {
             }
         }
 
-        public delegate void CenterTrackContentsChangedEventHandler(bool NewValue);
-        public static event CenterTrackContentsChangedEventHandler CenterTrackContentsChanged;
-
+        public static event CheckBoxChanged CenterTrackContentsChanged;
         private static bool _CenterTrackContents = true;
         public static bool CenterTrackContents {
             get => _CenterTrackContents;
             set {
                 _CenterTrackContents = value;
                 CenterTrackContentsChanged?.Invoke(_CenterTrackContents);
+                Save();
+            }
+        }
+
+        private static bool _AutoCreateFilter = true;
+        public static bool AutoCreateFilter {
+            get => _AutoCreateFilter;
+            set {
+                _AutoCreateFilter = value;
                 Save();
             }
         }
