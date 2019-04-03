@@ -28,7 +28,8 @@ namespace Apollo.Viewers {
             _chain = chain;
 
             Contents = this.Get<StackPanel>("Contents").Children;
-            this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = true;
+
+            if (_chain.Count == 0) this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = true;
 
             for (int i = 0; i < _chain.Count; i++)
                 Contents_Insert(i, _chain[i]);
