@@ -14,7 +14,7 @@ namespace Apollo.Structures {
         public byte Index {
             get => _p;
             set {
-                if (0 <= value && value <= 127)
+                if (1 <= value && value <= 99)
                     _p = value;
             }
         }
