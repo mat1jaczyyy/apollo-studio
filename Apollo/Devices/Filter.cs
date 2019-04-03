@@ -23,7 +23,7 @@ namespace Apollo.Devices {
                     _filter[index] = value;
             }
         }
-        
+
         public Filter(bool[] init = null): base(DeviceIdentifier) {
             if (init == null || init.Length != 100) init = new bool[100];
             _filter = init;
@@ -43,7 +43,7 @@ namespace Apollo.Devices {
             bool[] filter = new bool[100];
 
             for (int i = 1; i <= 99; i++)
-                filter[i] = Convert.ToBoolean(data[i].ToString());
+                filter[i] = Convert.ToBoolean(data[i - 1].ToString());
 
             return new Filter(filter);
         }
