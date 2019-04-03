@@ -13,6 +13,17 @@ namespace Apollo.Components {
         public delegate void ChainAddedEventHandler();
         public event ChainAddedEventHandler ChainAdded;
         
+        private bool _always;
+        public bool AlwaysShowing {
+            get => _always;
+            set {
+                if (value != _always) {
+                    _always = value;
+                    this.Get<Grid>("Root").MinHeight = _always? 22 : 0;
+                }
+            }
+        }
+        
         public ChainAdd() => InitializeComponent();
 
         private void Clicked(object sender, PointerReleasedEventArgs e) {
