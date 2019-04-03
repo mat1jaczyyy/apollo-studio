@@ -85,13 +85,13 @@ namespace Apollo.DeviceViewers {
         private void Chain_InsertStart() => Chain_Insert(0);
 
         private void Chain_Remove(int index) {
-            Contents.RemoveAt(index + 1);
-            _group.Remove(index);
-
             if (current != null) {
                 if (index < current) current--;
                 else if (index == current) Expand(null);
             }
+
+            Contents.RemoveAt(index + 1);
+            _group.Remove(index);
 
             if (_group.Count == 0) this.Get<ChainAdd>("ChainAdd").AlwaysShowing = true;
         }
