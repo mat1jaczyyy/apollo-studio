@@ -15,6 +15,17 @@ namespace Apollo.Components {
 
         Canvas Icon;
 
+        private bool _always;
+        public bool AlwaysShowing {
+            get => _always;
+            set {
+                if (value != _always) {
+                    _always = value;
+                    this.Get<Grid>("Root").MinWidth = _always? 26 : 0;
+                }
+            }
+        }
+
         public DeviceAdd() {
             InitializeComponent();
 

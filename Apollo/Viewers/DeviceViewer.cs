@@ -27,6 +27,9 @@ namespace Apollo.Viewers {
 
         public delegate void DeviceAddedEventHandler(int index, Type device);
         public event DeviceAddedEventHandler DeviceAdded;
+
+        public delegate void DeviceRemovedEventHandler(int index);
+        public event DeviceRemovedEventHandler DeviceRemoved;
         
         Device _device;
 
@@ -45,9 +48,6 @@ namespace Apollo.Viewers {
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
-        private void Device_Remove() {
-            ((Panel)Parent).Children.RemoveAt(_device.ParentIndex.Value + 1);
-            _device.Parent.Remove(_device.ParentIndex.Value);
-        }
+        private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
     }
 }
