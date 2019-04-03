@@ -16,11 +16,14 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Filter(_filter);
 
-        public void Set(byte index, bool value) {
-            if (1 <= index && index <= 99)
-                _filter[index] = value;
+        public bool this[int index] {
+            get => _filter[index];
+            set {
+                if (1 <= index && index <= 99)
+                    _filter[index] = value;
+            }
         }
-
+        
         public Filter(bool[] init = null): base(DeviceIdentifier) {
             if (init == null || init.Length != 100) init = new bool[100];
             _filter = init;

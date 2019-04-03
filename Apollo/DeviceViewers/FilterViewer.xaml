@@ -10,7 +10,7 @@
       </Style>
     </StackPanel.Styles>
 
-    <UniformGrid Rows="10" Columns="10">
+    <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
       <UniformGrid.Styles>
         <Style Selector="Rectangle, Path">
           <Setter Property="Width" Value="15" />
