@@ -18,7 +18,7 @@ using Apollo.Structures;
 using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
-    public class PaintViewer: UserControl {
+    public class PaintViewer: UserControl, IObserver<Rect> {
         public static readonly string DeviceIdentifier = "paint";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -43,13 +43,22 @@ namespace Apollo.DeviceViewers {
             mainCanvas = this.Get<Canvas>("MainCanvas");
             hueCanvas = this.Get<Canvas>("HueCanvas");
 
+            mainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(this);
+            hueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(this);
+
             mainThumb = this.Get<Thumb>("MainThumb");
             hueThumb = this.Get<Thumb>("HueThumb");
 
             mainColor = this.Get<GradientStop>("MainColor");
         }
 
-        private void InitCanvas(object sender, EventArgs e) {
+        public void OnCompleted() {}
+        public void OnError(Exception e) {}
+        public void OnNext(Rect bounds) {
+            if (!bounds.IsEmpty) InitCanvas();
+        }
+
+        private void InitCanvas() {
             double hueWidth = ((Canvas)hueThumb.Parent).Bounds.Width;
             double mainWidth = ((Canvas)mainThumb.Parent).Bounds.Width;
             double mainHeight = ((Canvas)mainThumb.Parent).Bounds.Height;
@@ -86,8 +95,6 @@ namespace Apollo.DeviceViewers {
             Canvas.SetTop(mainThumb, (1 - max) * ((Canvas)mainThumb.Parent).Bounds.Height);
 
             UpdateCanvas();
-
-            ((Canvas)sender).LayoutUpdated -= InitCanvas;
         }
 
         private void UpdateColor() {
