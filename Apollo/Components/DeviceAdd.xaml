@@ -21,6 +21,7 @@
         <ContextMenu>
           <MenuItem Header="Group" />
           <MenuItem Header="Delay" />
+          <MenuItem Header="Filter" />
           <MenuItem Header="Move" />
           <MenuItem Header="Hold" />
           <MenuItem Header="Paint" />
