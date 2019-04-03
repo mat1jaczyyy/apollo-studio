@@ -51,18 +51,24 @@ namespace Apollo.Core {
         public static void Save() => File.WriteAllText(FilePath, Encode());
 
         static Preferences() {
-            if (File.Exists(FilePath)) Decode(File.ReadAllText(FilePath));
-            else Save();
+            if (!(File.Exists(FilePath) && Decode(File.ReadAllText(FilePath)))) Save();
         }
         
-        private static void Decode(string jsonString) {
+        private static bool Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return;
+            if (json["object"].ToString() != Identifier) return false;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            AlwaysOnTop = Convert.ToBoolean(data["alwaysontop"]);
-            CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
+            try {
+                AlwaysOnTop = Convert.ToBoolean(data["alwaysontop"]);
+                CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
+                AutoCreateFilter = Convert.ToBoolean(data["autocreatefilter"]);
+            } catch {
+                return false;
+            }
+
+            return true;
         }
 
         private static string Encode() {
@@ -82,6 +88,9 @@ namespace Apollo.Core {
 
                         writer.WritePropertyName("centertrackcontents");
                         writer.WriteValue(CenterTrackContents);
+
+                        writer.WritePropertyName("autocreatefilter");
+                        writer.WriteValue(AutoCreateFilter);
 
                     writer.WriteEndObject();
 
