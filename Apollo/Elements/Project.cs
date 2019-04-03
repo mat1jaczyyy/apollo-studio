@@ -82,6 +82,7 @@ namespace Apollo.Elements {
         }
 
         public void Remove(int index) {
+            Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
         }
