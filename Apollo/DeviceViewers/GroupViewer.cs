@@ -43,7 +43,6 @@ namespace Apollo.DeviceViewers {
             for (int i = 0; i < _group.Count; i++)
                 Contents_Insert(i, _group[i]);
             
-            _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
             parent.Get<Grid>("Contents").Margin = new Thickness(0);
         }
 
@@ -52,9 +51,7 @@ namespace Apollo.DeviceViewers {
                 _root.RemoveAt(2);
                 _root.RemoveAt(1);
 
-                // TODO: Avalonia should fix setting CornerRadius.
-                //_parent.Get<Border>("Border").CornerRadius = new CornerRadius(5);
-
+                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5);
                 ((ChainInfo)Contents[current.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
 
                 if (index == current) {
@@ -66,6 +63,7 @@ namespace Apollo.DeviceViewers {
             if (index != null) {
                 _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = new SolidColorBrush(new Color(16, 0, 0, 0)) });
                 _root.Insert(2, new GroupTail());
+
                 _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
                 ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
             }
