@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Viewers;
@@ -23,6 +24,7 @@ namespace Apollo.Windows {
         private void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
             viewer.TrackAdded += Track_Insert;
+            viewer.TrackRemoved += Track_Remove;
             Contents.Insert(index + 1, viewer);
         }
 
@@ -38,6 +40,8 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             Contents = this.Get<StackPanel>("Contents").Children;
+            
+            if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
             
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
@@ -60,9 +64,18 @@ namespace Apollo.Windows {
         private void Track_Insert(int index) {
             Program.Project.Insert(index, new Track());
             Contents_Insert(index, Program.Project[index]);
+            this.Get<TrackAdd>("TrackAdd").AlwaysShowing = false;
         }
 
         private void Track_InsertStart() => Track_Insert(0);
+
+        private void Track_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            Program.Project[index].Window?.Close();
+            Program.Project.Remove(index);
+
+            if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
+        }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         

@@ -16,8 +16,9 @@ namespace Apollo.Viewers {
     public class TrackInfo: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void TrackAddedEventHandler(int index);
-        public event TrackAddedEventHandler TrackAdded;
+        public delegate void TrackInfoEventHandler(int index);
+        public event TrackInfoEventHandler TrackAdded;
+        public event TrackInfoEventHandler TrackRemoved;
         
         Track _track;
         ComboBox PortSelector;
@@ -54,12 +55,7 @@ namespace Apollo.Viewers {
 
         private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
 
-        private void Track_Remove() {
-            ((Panel)Parent).Children.RemoveAt(_track.ParentIndex.Value + 1);
-            Program.Project.Remove(_track.ParentIndex.Value);
-            _track.Window?.Close();
-            _track.Dispose();
-        }
+        private void Track_Remove() => TrackRemoved?.Invoke(_track.ParentIndex.Value);
 
         private void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
