@@ -16,13 +16,20 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <ScrollViewer Padding="10 5" VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="5">
-          <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
-          <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-          <CheckBox Click="AutoCreateFilter_Changed" x:Name="AutoCreateFilter">Auto create Filter in new Group Chain</CheckBox>
+      <Grid RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0" Padding="10 5" VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="5">
+            <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
+            <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
+            <CheckBox Click="AutoCreateFilter_Changed" x:Name="AutoCreateFilter">Auto create Filter in new Group Chain</CheckBox>
+          </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Margin="15" HorizontalAlignment="Center">
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 5" />
+          <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
-      </ScrollViewer>
+      </Grid>
     </Border>
   </Grid>
 </Window>
