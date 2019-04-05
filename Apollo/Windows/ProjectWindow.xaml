@@ -36,7 +36,7 @@
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10 5">
             <TextBlock VerticalAlignment="Center" Text="BPM: " />
-            <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="30" />
+            <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="30" x:Name="BPM" />
           </StackPanel>
         </Grid>
       </Border>

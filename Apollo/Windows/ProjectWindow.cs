@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reflection;
 
 using Avalonia;
@@ -12,7 +13,7 @@ using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
-    public class ProjectWindow: Window {
+    public class ProjectWindow: Window, IObserver<string> {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         private void UpdateTitle(string path) => this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
@@ -20,6 +21,7 @@ namespace Apollo.Windows {
         private void UpdateTopmost(bool value) => Topmost = value;
 
         Controls Contents;
+        TextBox BPM;
 
         private void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
@@ -45,6 +47,17 @@ namespace Apollo.Windows {
             
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
+            
+            BPM = this.Get<TextBox>("BPM");
+            BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
+
+            BPM.GetObservable(TextBox.TextProperty).Subscribe(this);
+        }
+
+        public void OnCompleted() {}
+        public void OnError(Exception e) {}
+        public void OnNext(string text) {
+            if (text != null) BPM_Changed(text);
         }
         
         private void Loaded(object sender, EventArgs e) {
@@ -75,6 +88,10 @@ namespace Apollo.Windows {
             Program.Project.Remove(index);
 
             if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
+        }
+
+        private void BPM_Changed(string text) {
+            
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
