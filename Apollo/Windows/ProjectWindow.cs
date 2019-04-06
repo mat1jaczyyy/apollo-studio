@@ -91,7 +91,8 @@ namespace Apollo.Windows {
         }
 
         private void BPM_Changed(string text) {
-            
+            if (Decimal.TryParse(text, out Decimal value)) Program.Project.BPM = value;
+            else BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
