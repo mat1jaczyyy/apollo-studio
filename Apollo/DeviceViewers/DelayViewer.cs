@@ -16,11 +16,16 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _delay = delay;
-            this.Get<Dial>("Duration").RawValue = _delay.Time;
+            Dial Duration = this.Get<Dial>("Duration");
+            Duration.RawValue = _delay.Time;
+            Duration.Length = _delay.Length;
+
             this.Get<Dial>("Gate").RawValue = (double)_delay.Gate * 100;
         }
 
         private void Duration_Changed(double value) => _delay.Time = (int)value;
+
+        private void Duration_ModeChanged(bool value) => _delay.Mode = value;
 
         private void Gate_Changed(double value) => _delay.Gate = (decimal)(value / 100);
     }
