@@ -171,7 +171,7 @@ namespace Apollo.Components {
         public bool UsingSteps {
             get => _usingSteps;
             set {
-                if (AllowSteps) {
+                if (AllowSteps && Enabled) {
                     _usingSteps = value;
                     DrawArcAuto();
                     ModeChanged?.Invoke(UsingSteps);
