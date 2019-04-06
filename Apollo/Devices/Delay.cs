@@ -69,7 +69,7 @@ namespace Apollo.Devices {
 
             return new Delay(
                 Convert.ToBoolean(data["mode"]),
-                new Length(Convert.ToInt32(data["length"])),
+                Length.Decode(data["length"].ToString()),
                 Convert.ToInt32(data["time"]),
                 Convert.ToDecimal(data["gate"])
             );
@@ -91,7 +91,7 @@ namespace Apollo.Devices {
                         writer.WriteValue(Mode);
 
                         writer.WritePropertyName("length");
-                        writer.WriteValue(Convert.ToInt32(Math.Log(Convert.ToDouble(Length.Value), 2)) + 7);
+                        writer.WriteValue(Length.Encode());
 
                         writer.WritePropertyName("time");
                         writer.WriteValue(_time);
