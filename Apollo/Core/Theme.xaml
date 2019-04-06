@@ -4,7 +4,7 @@
   
   <Style.Resources>
     <Color x:Key="ThemeAccentColor">#FF0288D1</Color>
-    <Color x:Key="ThemeAccentColor2">#99119EDA</Color>
+    <Color x:Key="ThemeAccentColor2">#FFD04A02</Color>
     <Color x:Key="ThemeAccentColor3">#66119EDA</Color>
     <Color x:Key="ThemeAccentColor4">#33119EDA</Color>
 

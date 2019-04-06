@@ -8,6 +8,8 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Apollo.Structures;
+
 namespace Apollo.Components {
     public class Dial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -17,6 +19,7 @@ namespace Apollo.Components {
 
         Canvas ArcCanvas;
         Path ArcBase, Arc;
+        TextBlock Display;
 
         private const double width = 43, height = 39;
         private const double radius = 18, stroke = 7;
@@ -81,7 +84,7 @@ namespace Apollo.Components {
                 if (value != _value) {
                     _value = value;
                     RawValue = ToRawValue(_value);
-                    DrawArc(Arc, _value);
+                    DrawArcValue();
                 }
             }
         }
@@ -94,7 +97,7 @@ namespace Apollo.Components {
                 if (_raw != value) {
                     _raw = value;
                     Value = ToValue(_raw);
-                    this.Get<TextBlock>("Display").Text = ValueString;
+                    Display.Text = ValueString;
                     Changed?.Invoke(_raw);
                 }
             }
@@ -104,7 +107,7 @@ namespace Apollo.Components {
         public string Title {
             get => _title;
             set {
-                this.Get<TextBlock>("Title").Text = _title = value;
+                Display.Text = _title = value;
             }
         }
 
@@ -113,7 +116,7 @@ namespace Apollo.Components {
             get => _unit;
             set {
                 _unit = value;
-                this.Get<TextBlock>("Display").Text = ValueString;
+                DrawArcAuto();
             }
         }
 
@@ -122,7 +125,7 @@ namespace Apollo.Components {
             get => _centered;
             set {
                 _centered = value;
-                DrawArc(Arc, _value);
+                DrawArcAuto();
             }
         }
 
@@ -131,7 +134,7 @@ namespace Apollo.Components {
             get => _enabled;
             set {
                 _enabled = value;
-                DrawArc(Arc, _value);
+                DrawArcAuto();
             }
         }
 
@@ -146,15 +149,33 @@ namespace Apollo.Components {
                     ArcCanvas.Width = width * _scale;
                     ArcCanvas.Height = height * _scale;
 
-                    DrawArc(ArcBase, 1, true);
-                    DrawArc(Arc, _value);
+                    DrawArcBase();
+                    DrawArcAuto();
                 }
             }
         }
 
-        private string ValueString => $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+        private bool _steps = false;
+        public bool AllowSteps {
+            get => _steps;
+            set {
+                _steps = value;
+                DrawArcAuto();
+            }
+        }
 
-        private void DrawArc(Path Arc, double value, bool overrideBase = false) {
+        private Length _length = new Length();
+        public Length Length {
+            get => _length;
+            set {
+                _length = value;
+                DrawArcSteps();
+            }
+        }
+
+        private string ValueString => AllowSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+
+        private void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             double x_start = (radius * (Math.Cos((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
             double y_start = (radius * (-Math.Sin((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
             
@@ -169,7 +190,10 @@ namespace Apollo.Components {
             int direction = Convert.ToInt32(angle > 0);
 
             Arc.StrokeThickness = stroke * _scale;
-            if (!overrideBase) Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+            if (!overrideBase) {
+                Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
+                Display.Text = ValueString;
+            }
             
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
                 x_start.ToString(CultureInfo.InvariantCulture),
@@ -183,6 +207,21 @@ namespace Apollo.Components {
             ));
         }
 
+        private void DrawArcBase() => DrawArc(ArcBase, 1, true);
+
+        private void DrawArcValue() {
+            if (!AllowSteps) DrawArc(Arc, _value, false);
+        }
+
+        private void DrawArcSteps() {
+            if (AllowSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeAccentBrush2");
+        }
+
+        private void DrawArcAuto() {
+            if (AllowSteps) DrawArcSteps();
+            else DrawArcValue();
+        }
+
         public Dial() {
             InitializeComponent();
 
@@ -190,10 +229,12 @@ namespace Apollo.Components {
             ArcBase = this.Get<Path>("ArcBase");
             Arc = this.Get<Path>("Arc");
 
-            DrawArc(ArcBase, 1, true);
+            Display = this.Get<TextBlock>("Display");
+
+            DrawArcBase();
         }
 
-        private void LayoutChanged(object sender, EventArgs e) => DrawArc(Arc, _value);
+        private void LayoutChanged(object sender, EventArgs e) => DrawArcValue();
 
         private bool mouseHeld = false;
         private double lastY;
@@ -214,7 +255,8 @@ namespace Apollo.Components {
                 e.Device.Capture(null);
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
-            }
+
+            } else if (e.MouseButton.HasFlag(MouseButton.Right)) AllowSteps = !AllowSteps;
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
