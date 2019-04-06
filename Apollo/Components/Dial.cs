@@ -14,8 +14,11 @@ namespace Apollo.Components {
     public class Dial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void DialChangedEventHandler(double NewValue);
-        public event DialChangedEventHandler Changed;
+        public delegate void DialValueChangedEventHandler(double NewValue);
+        public event DialValueChangedEventHandler ValueChanged;
+
+        public delegate void DialModeChangedEventHandler(bool NewValue);
+        public event DialModeChangedEventHandler ModeChanged;
 
         Canvas ArcCanvas;
         Path ArcBase, Arc;
@@ -98,7 +101,7 @@ namespace Apollo.Components {
                     _raw = value;
                     Value = ToValue(_raw);
                     Display.Text = ValueString;
-                    Changed?.Invoke(_raw);
+                    ValueChanged?.Invoke(_raw);
                 }
             }
         }
@@ -155,12 +158,24 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _steps = false;
+        private bool _allowSteps = false;
         public bool AllowSteps {
-            get => _steps;
+            get => _allowSteps;
             set {
-                _steps = value;
-                DrawArcAuto();
+                _allowSteps = value;
+                if (!_allowSteps) UsingSteps = false;
+            }
+        }
+
+        private bool _usingSteps = false;
+        public bool UsingSteps {
+            get => _usingSteps;
+            set {
+                if (AllowSteps) {
+                    _usingSteps = value;
+                    DrawArcAuto();
+                    ModeChanged?.Invoke(UsingSteps);
+                }
             }
         }
 
@@ -173,7 +188,7 @@ namespace Apollo.Components {
             }
         }
 
-        private string ValueString => AllowSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+        private string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         private void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             double x_start = (radius * (Math.Cos((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
@@ -210,15 +225,15 @@ namespace Apollo.Components {
         private void DrawArcBase() => DrawArc(ArcBase, 1, true);
 
         private void DrawArcValue() {
-            if (!AllowSteps) DrawArc(Arc, _value, false);
+            if (!UsingSteps) DrawArc(Arc, _value, false);
         }
 
         private void DrawArcSteps() {
-            if (AllowSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeAccentBrush2");
+            if (UsingSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeAccentBrush2");
         }
 
         private void DrawArcAuto() {
-            if (AllowSteps) DrawArcSteps();
+            if (UsingSteps) DrawArcSteps();
             else DrawArcValue();
         }
 
@@ -257,14 +272,14 @@ namespace Apollo.Components {
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
 
-            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) AllowSteps = !AllowSteps;
+            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) UsingSteps = !UsingSteps;
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld && Enabled) {
                 double Y = e.GetPosition(ArcCanvas).Y;
 
-                if (AllowSteps) {
+                if (UsingSteps) {
                     if (Math.Abs(Y - lastY) >= 8) {
                         _length.Step -= (int)((Y - lastY) / 8);
                         DrawArcSteps();
