@@ -250,7 +250,7 @@ namespace Apollo.Components {
             DrawArcBase();
         }
 
-        private void LayoutChanged(object sender, EventArgs e) => DrawArcValue();
+        private void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
 
         private bool mouseHeld = false;
         private double lastY;

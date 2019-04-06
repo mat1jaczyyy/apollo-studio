@@ -17,8 +17,9 @@ namespace Apollo.DeviceViewers {
 
             _delay = delay;
             Dial Duration = this.Get<Dial>("Duration");
-            Duration.RawValue = _delay.Time;
+            Duration.UsingSteps = _delay.Mode;
             Duration.Length = _delay.Length;
+            Duration.RawValue = _delay.Time;
 
             this.Get<Dial>("Gate").RawValue = (double)_delay.Gate * 100;
         }
