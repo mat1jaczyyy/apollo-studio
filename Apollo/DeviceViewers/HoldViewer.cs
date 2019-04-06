@@ -24,6 +24,7 @@ namespace Apollo.DeviceViewers {
 
             Duration = this.Get<Dial>("Duration");
             Duration.RawValue = _hold.Time;
+            Duration.Length = _hold.Length;
 
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_hold.Gate * 100;
@@ -34,6 +35,8 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Duration_Changed(double value) => _hold.Time = (int)value;
+
+        private void Duration_ModeChanged(bool value) => _hold.Mode = value;
 
         private void Gate_Changed(double value) => _hold.Gate = (decimal)(value / 100);
 
