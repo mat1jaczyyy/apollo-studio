@@ -19,7 +19,7 @@ namespace Apollo.Components {
 
         Canvas ArcCanvas;
         Path ArcBase, Arc;
-        TextBlock Display;
+        TextBlock TitleText, Display;
 
         private const double width = 43, height = 39;
         private const double radius = 18, stroke = 7;
@@ -107,7 +107,7 @@ namespace Apollo.Components {
         public string Title {
             get => _title;
             set {
-                Display.Text = _title = value;
+                TitleText.Text = _title = value;
             }
         }
 
@@ -230,6 +230,7 @@ namespace Apollo.Components {
             Arc = this.Get<Path>("Arc");
 
             Display = this.Get<TextBlock>("Display");
+            TitleText = this.Get<TextBlock>("Title");
 
             DrawArcBase();
         }
@@ -256,14 +257,23 @@ namespace Apollo.Components {
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
 
-            } else if (e.MouseButton.HasFlag(MouseButton.Right)) AllowSteps = !AllowSteps;
+            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) AllowSteps = !AllowSteps;
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld && Enabled) {
                 double Y = e.GetPosition(ArcCanvas).Y;
-                Value += (lastY - Y) / 200;
-                lastY = Y;
+
+                if (AllowSteps) {
+                    if (Math.Abs(Y - lastY) >= 8) {
+                        _length.Step -= (int)((Y - lastY) / 8);
+                        DrawArcSteps();
+                        lastY = Y;
+                    }
+                } else {
+                    Value += (lastY - Y) / 200;
+                    lastY = Y;
+                }
             }
         }
     }
