@@ -4,9 +4,9 @@
   
   <Style.Resources>
     <Color x:Key="ThemeAccentColor">#FF0288D1</Color>
-    <Color x:Key="ThemeAccentColor2">#FFD04A02</Color>
-    <Color x:Key="ThemeAccentColor3">#66119EDA</Color>
-    <Color x:Key="ThemeAccentColor4">#33119EDA</Color>
+    <Color x:Key="ThemeAccentColor2">#990288D1</Color>
+    <Color x:Key="ThemeAccentColor3">#660288D1</Color>
+    <Color x:Key="ThemeAccentColor4">#330288D1</Color>
 
     <Color x:Key="ThemeBackgroundColor">#FF171717</Color>
     <Color x:Key="ThemeBorderLowColor">#FF070707</Color>
@@ -20,6 +20,7 @@
     <Color x:Key="ThemeControlHighlightHighColor">#FF505050</Color>
     <Color x:Key="ThemeForegroundColor">#FFDCDCDC</Color>
     <Color x:Key="ThemeForegroundLowColor">#FF404040</Color>
+    <Color x:Key="ThemeExtraColor">#FFD04A02</Color>
 
     <Color x:Key="HighlightColor">#FF119EDA</Color>
     <Color x:Key="ErrorColor">#FFFF0000</Color>
@@ -43,6 +44,7 @@
     <SolidColorBrush x:Key="ThemeAccentBrush2" Color="{DynamicResource ThemeAccentColor2}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeAccentBrush3" Color="{DynamicResource ThemeAccentColor3}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeAccentBrush4" Color="{DynamicResource ThemeAccentColor4}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemeExtraBrush" Color="{DynamicResource ThemeExtraColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource ErrorColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ErrorLowBrush" Color="{DynamicResource ErrorLowColor}"></SolidColorBrush>
 

@@ -229,7 +229,7 @@ namespace Apollo.Components {
         }
 
         private void DrawArcSteps() {
-            if (UsingSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeAccentBrush2");
+            if (UsingSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeExtraBrush");
         }
 
         private void DrawArcAuto() {
