@@ -26,7 +26,10 @@ namespace Apollo.Devices {
         }
 
         public PageFilter(bool[] init = null): base(DeviceIdentifier) {
-            if (init == null || init.Length != 100) init = new bool[100];
+            if (init == null || init.Length != 100) {
+                init = new bool[100];
+                init[Program.Project.Page - 1] = true;
+            }
             _filter = init;
         }
 
