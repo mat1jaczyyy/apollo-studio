@@ -9,12 +9,12 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Filter: Device {
-        public static readonly new string DeviceIdentifier = "filter";
+    public class KeyFilter: Device {
+        public static readonly new string DeviceIdentifier = "keyfilter";
 
         private bool[] _filter;
 
-        public override Device Clone() => new Filter(_filter);
+        public override Device Clone() => new KeyFilter(_filter);
 
         public bool this[int index] {
             get => _filter[index];
@@ -24,7 +24,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public Filter(bool[] init = null): base(DeviceIdentifier) {
+        public KeyFilter(bool[] init = null): base(DeviceIdentifier) {
             if (init == null || init.Length != 100) init = new bool[100];
             _filter = init;
         }
@@ -45,7 +45,7 @@ namespace Apollo.Devices {
             for (int i = 1; i <= 99; i++)
                 filter[i] = Convert.ToBoolean(data[i - 1].ToString());
 
-            return new Filter(filter);
+            return new KeyFilter(filter);
         }
 
         public override string EncodeSpecific() {

@@ -12,19 +12,19 @@ using Apollo.Components;
 using Apollo.Devices;
 
 namespace Apollo.DeviceViewers {
-    public class FilterViewer: UserControl {
-        public static readonly string DeviceIdentifier = "filter";
+    public class KeyFilterViewer: UserControl {
+        public static readonly string DeviceIdentifier = "keyfilter";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        Filter _filter;
+        KeyFilter _filter;
         UniformGrid LaunchpadGrid;
 
         private int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
 
         private void Set(Shape shape, bool value) => shape.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
 
-        public FilterViewer(Filter filter) {
+        public KeyFilterViewer(KeyFilter filter) {
             InitializeComponent();
 
             _filter = filter;

@@ -21,9 +21,9 @@
         <ContextMenu>
           <MenuItem Header="Group" />
           <MenuItem Header="Delay" />
-          <MenuItem Header="Filter" />
-          <MenuItem Header="Move" />
+          <MenuItem Header="KeyFilter" />
           <MenuItem Header="Hold" />
+          <MenuItem Header="Move" />
           <MenuItem Header="Paint" />
         </ContextMenu>
       </Canvas.ContextMenu>

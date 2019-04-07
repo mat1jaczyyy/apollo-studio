@@ -74,7 +74,7 @@ namespace Apollo.DeviceViewers {
 
         private void Chain_Insert(int index) {
             Chain chain = new Chain();
-            if (Preferences.AutoCreateFilter) chain.Add(new Filter());
+            if (Preferences.AutoCreateFilter) chain.Add(new KeyFilter());
 
             _group.Insert(index, chain);
             Contents_Insert(index, _group[index]);
