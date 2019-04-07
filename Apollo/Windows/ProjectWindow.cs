@@ -52,6 +52,8 @@ namespace Apollo.Windows {
             BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
 
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
+
+            this.Get<HorizontalDial>("Page").RawValue = Program.Project.Page;
         }
         
         private void Loaded(object sender, EventArgs e) {
