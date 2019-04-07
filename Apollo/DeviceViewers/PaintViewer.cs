@@ -18,7 +18,7 @@ using Apollo.Structures;
 using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
-    public class PaintViewer: UserControl, IObserver<Rect> {
+    public class PaintViewer: UserControl {
         public static readonly string DeviceIdentifier = "paint";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -43,8 +43,8 @@ namespace Apollo.DeviceViewers {
             mainCanvas = this.Get<Canvas>("MainCanvas");
             hueCanvas = this.Get<Canvas>("HueCanvas");
 
-            mainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(this);
-            hueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(this);
+            mainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            hueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
 
             mainThumb = this.Get<Thumb>("MainThumb");
             hueThumb = this.Get<Thumb>("HueThumb");
@@ -52,9 +52,7 @@ namespace Apollo.DeviceViewers {
             mainColor = this.Get<GradientStop>("MainColor");
         }
 
-        public void OnCompleted() {}
-        public void OnError(Exception e) {}
-        public void OnNext(Rect bounds) {
+        public void Bounds_Updated(Rect bounds) {
             if (!bounds.IsEmpty) InitCanvas();
         }
 
