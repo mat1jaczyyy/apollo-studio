@@ -68,12 +68,13 @@ namespace Apollo.Elements {
 
         public void Send(Signal n) {
             byte rgb_byte;
+            byte index = n.Index;
 
             switch (Type) {
                 case LaunchpadType.MK2:
                     rgb_byte = 0x18;
-                    if (91 <= n.Index && n.Index <= 98)
-                        n.Index += 13;
+                    if (91 <= index && index <= 98)
+                        index += 13;
                     break;
                 
                 case LaunchpadType.PRO:
@@ -87,7 +88,7 @@ namespace Apollo.Elements {
 
             Program.Log($"OUT <- {n.ToString()}");
 
-            SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, rgb_byte, 0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue});
+            SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, rgb_byte, 0x0B, index, n.Color.Red, n.Color.Green, n.Color.Blue});
             Output.Send(in msg);
         }
 
