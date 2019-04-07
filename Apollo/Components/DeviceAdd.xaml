@@ -25,6 +25,7 @@
           <MenuItem Header="Hold" />
           <MenuItem Header="Move" />
           <MenuItem Header="PageFilter" />
+          <MenuItem Header="PageSwitch" />
           <MenuItem Header="Paint" />
         </ContextMenu>
       </Canvas.ContextMenu>
