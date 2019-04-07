@@ -35,12 +35,12 @@
           </Border>
 
           <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="10 5">
-            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Exponent="1" Round="0" Unit="" Scale="0.4" />
+         
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock VerticalAlignment="Center" Text="BPM: " />
               <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="30" x:Name="BPM" />
             </StackPanel>
-
-            <Components:HorizontalDial Grid.Column="1" HorizontalAlignment="Right" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Exponent="1" Round="0" Unit="" Scale="0.4" />
           </Grid>
         </Grid>
       </Border>
