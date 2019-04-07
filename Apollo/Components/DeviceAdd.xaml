@@ -23,6 +23,7 @@
           <MenuItem Header="Delay" />
           <MenuItem Header="KeyFilter" />
           <MenuItem Header="Hold" />
+          <MenuItem Header="Layer" />
           <MenuItem Header="Move" />
           <MenuItem Header="PageFilter" />
           <MenuItem Header="PageSwitch" />
