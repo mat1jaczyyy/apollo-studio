@@ -48,6 +48,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _AutoCreatePageFilter = false;
+        public static bool AutoCreatePageFilter {
+            get => _AutoCreatePageFilter;
+            set {
+                _AutoCreatePageFilter = value;
+                Save();
+            }
+        }
+
         public static void Save() => File.WriteAllText(FilePath, Encode());
 
         static Preferences() {
@@ -64,6 +73,7 @@ namespace Apollo.Core {
                 AlwaysOnTop = Convert.ToBoolean(data["alwaysontop"]);
                 CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
                 AutoCreateKeyFilter = Convert.ToBoolean(data["autocreatekeyfilter"]);
+                AutoCreatePageFilter = Convert.ToBoolean(data["autocreatepagefilter"]);
             } catch {
                 return false;
             }
@@ -91,6 +101,9 @@ namespace Apollo.Core {
 
                         writer.WritePropertyName("autocreatekeyfilter");
                         writer.WriteValue(AutoCreateKeyFilter);
+
+                        writer.WritePropertyName("autocreatepagefilter");
+                        writer.WriteValue(AutoCreatePageFilter);
 
                     writer.WriteEndObject();
 
