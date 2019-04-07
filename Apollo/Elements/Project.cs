@@ -34,12 +34,17 @@ namespace Apollo.Elements {
             }
         }
 
+        public delegate void PageChangedEventHandler();
+        public event PageChangedEventHandler PageChanged;
+
         private int _page;
         public int Page {
             get => _page;
             set {
-                if (1 <= value && value <= 100)
+                if (1 <= value && value <= 100) {
                     _page = value;
+                    PageChanged?.Invoke();
+                }
             }
         }
 

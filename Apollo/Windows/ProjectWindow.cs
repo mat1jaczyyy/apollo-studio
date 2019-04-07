@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -18,10 +19,14 @@ namespace Apollo.Windows {
 
         private void UpdateTitle(string path) => this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
 
+        private void UpdatePage() => Page.RawValue = Program.Project.Page;
+        private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
+
         private void UpdateTopmost(bool value) => Topmost = value;
 
         Controls Contents;
         TextBox BPM;
+        HorizontalDial Page;
 
         private void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
@@ -53,12 +58,16 @@ namespace Apollo.Windows {
 
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
-            this.Get<HorizontalDial>("Page").RawValue = Program.Project.Page;
+            Page = this.Get<HorizontalDial>("Page");
+            Page.RawValue = Program.Project.Page;
         }
         
         private void Loaded(object sender, EventArgs e) {
             Program.Project.PathChanged += UpdateTitle;
             UpdateTitle(Program.Project.FilePath);
+
+            Program.Project.PageChanged += HandlePage;
+            UpdatePage();
         }
 
         private void Unloaded(object sender, EventArgs e) {
