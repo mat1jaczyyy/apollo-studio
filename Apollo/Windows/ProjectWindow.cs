@@ -13,7 +13,7 @@ using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
-    public class ProjectWindow: Window, IObserver<string> {
+    public class ProjectWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         private void UpdateTitle(string path) => this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
@@ -51,13 +51,7 @@ namespace Apollo.Windows {
             BPM = this.Get<TextBox>("BPM");
             BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
 
-            BPM.GetObservable(TextBox.TextProperty).Subscribe(this);
-        }
-
-        public void OnCompleted() {}
-        public void OnError(Exception e) {}
-        public void OnNext(string text) {
-            if (text != null) BPM_Changed(text);
+            BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
         }
         
         private void Loaded(object sender, EventArgs e) {
@@ -93,6 +87,8 @@ namespace Apollo.Windows {
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
 
         private void BPM_Changed(string text) {
+            if (text == null) return;
+
             if (Decimal.TryParse(text, out Decimal value)) Program.Project.BPM = value;
             else BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
         }
