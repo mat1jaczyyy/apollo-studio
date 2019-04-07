@@ -12,7 +12,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateFilter;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter;
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -35,8 +35,8 @@ namespace Apollo.Windows {
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
 
-            AutoCreateFilter = this.Get<CheckBox>("AutoCreateFilter");
-            AutoCreateFilter.IsChecked = Preferences.AutoCreateFilter;
+            AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
+            AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
         }
 
         private void Unloaded(object sender, EventArgs e) {
@@ -54,7 +54,7 @@ namespace Apollo.Windows {
 
         private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        private void AutoCreateFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateFilter = AutoCreateFilter.IsChecked.Value;
+        private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

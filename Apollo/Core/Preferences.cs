@@ -39,11 +39,11 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _AutoCreateFilter = true;
-        public static bool AutoCreateFilter {
-            get => _AutoCreateFilter;
+        private static bool _AutoCreateKeyFilter = true;
+        public static bool AutoCreateKeyFilter {
+            get => _AutoCreateKeyFilter;
             set {
-                _AutoCreateFilter = value;
+                _AutoCreateKeyFilter = value;
                 Save();
             }
         }
@@ -63,7 +63,7 @@ namespace Apollo.Core {
             try {
                 AlwaysOnTop = Convert.ToBoolean(data["alwaysontop"]);
                 CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
-                AutoCreateFilter = Convert.ToBoolean(data["autocreatefilter"]);
+                AutoCreateKeyFilter = Convert.ToBoolean(data["autocreatekeyfilter"]);
             } catch {
                 return false;
             }
@@ -89,8 +89,8 @@ namespace Apollo.Core {
                         writer.WritePropertyName("centertrackcontents");
                         writer.WriteValue(CenterTrackContents);
 
-                        writer.WritePropertyName("autocreatefilter");
-                        writer.WriteValue(AutoCreateFilter);
+                        writer.WritePropertyName("autocreatekeyfilter");
+                        writer.WriteValue(AutoCreateKeyFilter);
 
                     writer.WriteEndObject();
 
