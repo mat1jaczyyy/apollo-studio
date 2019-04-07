@@ -1,0 +1,125 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Components="clr-namespace:Apollo.Components">
+
+  <UniformGrid Rows="10" Columns="10" VerticalAlignment="Center" x:Name="PagesGrid">
+    <UniformGrid.Styles>
+      <Style Selector="Rectangle">
+        <Setter Property="Fill" Value="{DynamicResource ThemeForegroundLowBrush}" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="Width" Value="15" />
+        <Setter Property="Height" Value="15" />
+      </Style>
+    </UniformGrid.Styles>
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+    <Rectangle PointerReleased="Clicked" />
+  </UniformGrid>
+</UserControl>

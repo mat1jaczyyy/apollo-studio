@@ -24,6 +24,7 @@
           <MenuItem Header="KeyFilter" />
           <MenuItem Header="Hold" />
           <MenuItem Header="Move" />
+          <MenuItem Header="PageFilter" />
           <MenuItem Header="Paint" />
         </ContextMenu>
       </Canvas.ContextMenu>
