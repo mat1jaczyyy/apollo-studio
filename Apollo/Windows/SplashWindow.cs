@@ -24,13 +24,9 @@ namespace Apollo.Windows {
             #if DEBUG
                 this.AttachDevTools();
             #endif
-
-            Icon = new WindowIcon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.WindowIcon.png"));
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
-
-            this.Get<Image>("Logo").Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("Apollo.Resources.SplashImage.png"));
         }
         
         private void Unloaded(object sender, EventArgs e) {

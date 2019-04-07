@@ -12,8 +12,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.7.1-cibuild0001772-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.7.1-cibuild0001772-beta" />
+    <PackageReference Include="Avalonia" Version="0.8.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="RtMidi.Core" Version="1.0.50" />
   </ItemGroup>
@@ -22,9 +22,9 @@
     <Compile Update="**/*.cs">
       <DependentUpon>%(Filename).xaml</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="**/*.xaml">
+    <AvaloniaResource Include="**/*.xaml">
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources/*" />
+    </AvaloniaResource>
+    <AvaloniaResource Include="Resources/*" />
   </ItemGroup>
 </Project>

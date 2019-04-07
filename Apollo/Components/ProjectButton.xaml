@@ -1,5 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.ProjectButton">
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
     <Path Fill="{DynamicResource ThemeForegroundLowBrush}"

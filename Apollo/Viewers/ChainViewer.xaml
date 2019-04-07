@@ -1,5 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Viewers.ChainViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">

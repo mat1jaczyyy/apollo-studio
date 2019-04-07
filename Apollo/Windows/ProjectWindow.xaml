@@ -1,7 +1,9 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Apollo.Windows.ProjectWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Project" WindowStartupLocation="CenterOwner"
+        Icon="/Resources/WindowIcon.png"
         Width="350" MinWidth="350" MaxWidth="350"
         Height="320" MinHeight="180"
         Opened="Loaded" Closing="Unloaded">

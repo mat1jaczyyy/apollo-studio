@@ -1,5 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.LayerViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="-100" Maximum="100" Exponent="1" Round="0" Unit="" Centered="true"

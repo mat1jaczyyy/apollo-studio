@@ -1,7 +1,9 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Apollo.Windows.TrackWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Track" WindowStartupLocation="CenterOwner"
+        Icon="/Resources/WindowIcon.png"
         Width="600" MinWidth="180"
         Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded">

@@ -1,7 +1,9 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Apollo.Windows.SplashWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Apollo Studio" Background="{DynamicResource ThemeBorderMidBrush}" WindowStartupLocation="CenterScreen"
+        Icon="/Resources/WindowIcon.png"
         Width="320" MinWidth="320" MaxWidth="320"
         Height="320" MinHeight="320" MaxHeight="320"
         Closing="Unloaded">
@@ -14,7 +16,7 @@
         <Components:Close Grid.Column="2" Margin="5 5" Clicked="Close" />
       </Grid>
 
-      <Image Grid.Row="1" x:Name="Logo" />
+      <Image Grid.Row="1" Source="/Resources/SplashImage.png" />
 
       <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
         <Grid.Styles>
