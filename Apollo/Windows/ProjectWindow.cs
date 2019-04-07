@@ -90,6 +90,8 @@ namespace Apollo.Windows {
             if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
         }
 
+        private void Page_Changed(double value) => Program.Project.Page = (int)value;
+
         private void BPM_Changed(string text) {
             if (Decimal.TryParse(text, out Decimal value)) Program.Project.BPM = value;
             else BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
