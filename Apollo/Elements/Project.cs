@@ -34,6 +34,15 @@ namespace Apollo.Elements {
             }
         }
 
+        private int _page;
+        public int Page {
+            get => _page;
+            set {
+                if (1 <= value && value <= 100)
+                    _page = value;
+            }
+        }
+
         public async void Save(Window sender) {
             if (FilePath == "") {
                 SaveFileDialog sfd = new SaveFileDialog() {
@@ -87,11 +96,12 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Project(Decimal bpm = 150, List<Track> tracks = null, string path = "") {
+        public Project(Decimal bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
             if (tracks == null)
                 tracks = (from i in MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
             BPM = bpm;
+            Page = page;
             Tracks = tracks;
             FilePath = path;
 
@@ -111,7 +121,8 @@ namespace Apollo.Elements {
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
             return new Project(
-                Decimal.Parse(data["bpm"].ToString()),
+                Convert.ToDecimal(data["bpm"]),
+                Convert.ToInt32(data["page"]),
                 (from i in tracks select Track.Decode(i.ToString())).ToList(),
                 path
             );
@@ -134,6 +145,9 @@ namespace Apollo.Elements {
 
                         writer.WritePropertyName("bpm");
                         writer.WriteValue(BPM);
+
+                        writer.WritePropertyName("page");
+                        writer.WriteValue(Page);
 
                         writer.WritePropertyName("tracks");
                         writer.WriteStartArray();
