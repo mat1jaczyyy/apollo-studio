@@ -3,5 +3,5 @@
              x:Class="Apollo.DeviceViewers.PreviewViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
 
-  <Components:LaunchpadGrid x:Name="Grid" PadClicked="PadClicked" />
+  <Components:LaunchpadGrid x:Name="Grid" PadPressed="PadPressed" PadReleased="PadReleased" />
 </UserControl>

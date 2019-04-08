@@ -33,7 +33,7 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(_filter[i]));
         }
 
-        private void PadClicked(int index) {
+        private void PadPressed(int index) {
             int signalIndex = LaunchpadGrid.GridToSignal(index);
             Grid.SetColor(index, GetColor(_filter[signalIndex] = !_filter[signalIndex]));
         }

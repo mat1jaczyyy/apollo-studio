@@ -15,8 +15,9 @@ namespace Apollo.Components {
         UniformGrid Grid;
         Shape ModeLight;
 
-        public delegate void PadClickedEventHandler(int index);
-        public event PadClickedEventHandler PadClicked;
+        public delegate void PadChangedEventHandler(int index);
+        public event PadChangedEventHandler PadPressed;
+        public event PadChangedEventHandler PadReleased;
 
         public static int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
         public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
@@ -35,6 +36,28 @@ namespace Apollo.Components {
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) => PadClicked?.Invoke(Grid.Children.IndexOf((IControl)sender));
+        bool mouseHeld = false;
+
+        private void MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                mouseHeld = true;
+                MouseEnter(sender, new PointerEventArgs());
+            }
+        }
+
+        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                MouseLeave(sender, new PointerEventArgs());
+                mouseHeld = false;
+            }
+        }
+
+        private void MouseEnter(object sender, PointerEventArgs e) {
+            if (mouseHeld) PadPressed?.Invoke(Grid.Children.IndexOf((IControl)sender));
+        }
+
+        private void MouseLeave(object sender, PointerEventArgs e) {
+            if (mouseHeld) PadReleased?.Invoke(Grid.Children.IndexOf((IControl)sender));
+        }
     }
 }
