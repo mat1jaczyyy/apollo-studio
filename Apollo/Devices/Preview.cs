@@ -21,7 +21,10 @@ namespace Apollo.Devices {
                 screen[i] = new Pixel() {MIDIExit = PreviewExit};
         }
 
-        public void PreviewExit(Signal n) => throw new NotImplementedException();
+        public delegate void SignalExitedEventHandler(Signal n);
+        public event SignalExitedEventHandler SignalExited;
+
+        public void PreviewExit(Signal n) => SignalExited?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
             Signal m = n.Clone();
