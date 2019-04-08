@@ -2,8 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Remove">
 
-  <Canvas Width="8" Height="8" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
-          Data="M 1,1 L 7,7 M 7,1 L 1,7" />
-  </Canvas>
+  <UserControl.Styles>
+    <Style Selector="Grid.collapsible">
+      <Setter Property="Width" Value="2" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.1" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Grid.collapsible:pointerover">
+      <Setter Property="Width" Value="12" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="3,Auto,3" Background="Transparent" Classes="collapsible">
+    <Canvas Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Height="8" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
+      <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
+            Data="M 1,1 L 7,7 M 7,1 L 1,7" />
+    </Canvas>
+  </Grid>
 </UserControl>
