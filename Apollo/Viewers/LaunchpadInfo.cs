@@ -30,8 +30,6 @@ namespace Apollo.Viewers {
             InputFormatSelector.SelectedIndex = (int)_launchpad.InputFormat;
         }
 
-        private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) {
-
-        }
+        private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (Launchpad.InputType)InputFormatSelector.SelectedIndex;
     }
 }
