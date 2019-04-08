@@ -3,6 +3,9 @@ using System.Text;
 
 using Newtonsoft.Json;
 
+using Apollo.Core;
+using Apollo.Elements;
+
 namespace Apollo.Structures {
     public class Signal {
         public static readonly string Identifier = "signal";
@@ -21,7 +24,10 @@ namespace Apollo.Structures {
 
         public Signal Clone() => new Signal(_p, Color.Clone(), Layer);
 
-        public Signal(byte index = 11, Color color = null, int layer = 0) {
+        public Signal(byte index = 11, Color color = null, int layer = 0, Launchpad.InputType format = Launchpad.InputType.XY) {
+            if (format == Launchpad.InputType.DrumRack)
+                index = Conversion.DRtoXY[index];
+
             if (color == null) color = new Color(63);
             _p = 11;
 
