@@ -1,20 +1,34 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 using Apollo.Core;
+using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter;
+        Controls Contents;
 
         private void UpdateTopmost(bool value) => Topmost = value;
+
+        private void UpdatePorts() {
+            Contents.Clear();
+            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available select new LaunchpadInfo(i))) {
+                Contents.Add(control);
+            }
+        }
+
+        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public PreferencesWindow() {
             InitializeComponent();
@@ -38,6 +52,10 @@ namespace Apollo.Windows {
 
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
+
+            Contents = this.Get<StackPanel>("Contents").Children;
+            UpdatePorts();
+            MIDI.DevicesUpdated += HandlePorts;
         }
 
         private void Unloaded(object sender, EventArgs e) {
