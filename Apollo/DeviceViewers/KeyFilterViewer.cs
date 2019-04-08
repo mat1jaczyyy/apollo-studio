@@ -18,28 +18,24 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         KeyFilter _filter;
-        UniformGrid LaunchpadGrid;
+        LaunchpadGrid Grid;
 
-        private int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
-
-        private void Set(Shape shape, bool value) => shape.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+        private SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
 
         public KeyFilterViewer(KeyFilter filter) {
             InitializeComponent();
 
             _filter = filter;
 
-            LaunchpadGrid = this.Get<UniformGrid>("LaunchpadGrid");
+            Grid = this.Get<LaunchpadGrid>("Grid");
 
-            for (int i = 0; i < LaunchpadGrid.Children.Count; i++) {
-                int index = GridToSignal(i);
-                if (index != 0 && index != 9 && index != 90 && index != 99) Set((Shape)LaunchpadGrid.Children[i], _filter[index]);
-            }
+            for (int i = 0; i < 100; i++)
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(_filter[i]));
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
-            int index = GridToSignal(LaunchpadGrid.Children.IndexOf((IControl)sender));
-            Set((Shape)sender, _filter[index] = !_filter[index]);
+        private void PadClicked(int index) {
+            int signalIndex = LaunchpadGrid.GridToSignal(index);
+            Grid.SetColor(index, GetColor(_filter[signalIndex] = !_filter[signalIndex]));
         }
     }
 }

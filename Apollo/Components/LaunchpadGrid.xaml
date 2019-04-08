@@ -1,0 +1,143 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.LaunchpadGrid">
+
+  <StackPanel VerticalAlignment="Center">
+    <StackPanel.Styles>
+      <Style Selector="Rectangle, Path, Ellipse">
+        <Setter Property="Fill" Value="{DynamicResource ThemeForegroundLowBrush}" />
+        <Setter Property="Margin" Value="1" />
+      </Style>
+    </StackPanel.Styles>
+
+    <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
+      <UniformGrid.Styles>
+        <Style Selector="Rectangle, Path">
+          <Setter Property="Width" Value="15" />
+          <Setter Property="Height" Value="15" />
+        </Style>
+
+        <Style Selector="Rectangle.empty">
+          <Setter Property="Fill" Value="#00000000" />
+        </Style>
+
+        <Style Selector="Ellipse">
+          <Setter Property="Width" Value="11" />
+          <Setter Property="Height" Value="11" />
+        </Style>
+      </UniformGrid.Styles>
+
+      <Rectangle Classes="empty" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle Classes="empty" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Path Data="M 0,0 L 0,15 12,15 15,12 15,0 Z" PointerReleased="Clicked" />
+      <Path Data="M 0,0 L 0,12 3,15 15,15 15,0 Z" PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Path Data="M 0,0 L 0,15 15,15 15,3 12,0 Z" PointerReleased="Clicked" />
+      <Path Data="M 0,3 L 0,15 15,15 15,0 3,0 Z" PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Rectangle PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+
+      <Rectangle Classes="empty" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Ellipse PointerReleased="Clicked" />
+      <Rectangle Classes="empty" />
+    </UniformGrid>
+
+    <Rectangle Margin="0 5 0 0" HorizontalAlignment="Center" Width="4" Height="2" x:Name="ModeLight" PointerReleased="Clicked" />
+  </StackPanel>
+</UserControl>
