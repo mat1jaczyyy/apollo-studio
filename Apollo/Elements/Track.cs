@@ -57,7 +57,7 @@ namespace Apollo.Elements {
 
         private void ChainExit(Signal n) => screen[n.Index].MIDIEnter(n);
 
-        private void MIDIExit(Signal n) => Launchpad.Send(n);
+        private void MIDIExit(Signal n) => Launchpad?.Send(n);
 
         private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
 

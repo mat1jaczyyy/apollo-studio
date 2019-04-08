@@ -67,6 +67,8 @@ namespace Apollo.Elements {
         }
 
         public void Send(Signal n) {
+            if (!Available || Type == LaunchpadType.Unknown) return;
+
             byte rgb_byte;
             byte index = n.Index;
 
@@ -162,12 +164,12 @@ namespace Apollo.Elements {
             switch (Type) {
                 case LaunchpadType.MK2:
                     if (104 <= e.Control && e.Control <= 111)
-                        HandleMessage(new Signal((byte)(e.Control - 13), new Color((byte)(e.Value >> 1)), 0));
+                        HandleMessage(new Signal((byte)(e.Control - 13), new Color((byte)(e.Value >> 1))));
                     break;
 
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
-                    HandleMessage(new Signal((byte)e.Control, new Color((byte)(e.Value >> 1)), 0));
+                    HandleMessage(new Signal((byte)e.Control, new Color((byte)(e.Value >> 1))));
                     break;
             }
         }

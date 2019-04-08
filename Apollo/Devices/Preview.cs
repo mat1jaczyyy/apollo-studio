@@ -23,14 +23,12 @@ namespace Apollo.Devices {
 
         public delegate void SignalExitedEventHandler(Signal n);
         public event SignalExitedEventHandler SignalExited;
-
+        
         public void PreviewExit(Signal n) => SignalExited?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
             Signal m = n.Clone();
-
             MIDIExit?.Invoke(n);
-
             screen[m.Index].MIDIEnter(m);
         }
 

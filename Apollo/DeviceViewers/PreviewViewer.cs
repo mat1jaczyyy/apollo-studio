@@ -5,8 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using AvaloniaColor = Avalonia.Media.Color;
+using SolidColorBrush = Avalonia.Media.SolidColorBrush;
 using Avalonia.Input;
 using Avalonia.Threading;
 
@@ -37,9 +37,7 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new SolidColorBrush(new AvaloniaColor(255, 0, 0, 0)));
         }
 
-        private void PadClicked(int index) {
-            
-        }
+        private void PadClicked(int index) => _preview.MIDIEnter(new Signal((byte)LaunchpadGrid.GridToSignal(index), new Color()));
 
         private void SignalRender(Signal n) => Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), (SolidColorBrush)n.Color.ToBrush());
 
