@@ -30,7 +30,7 @@ namespace Apollo.Elements {
 
         public Chain Chain;
         private Launchpad _launchpad;
-        private Pixel[] screen = new Pixel[128];
+        private Pixel[] screen = new Pixel[100];
 
         public Launchpad Launchpad {
             get => _launchpad;
@@ -49,7 +49,7 @@ namespace Apollo.Elements {
             Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
             
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 100; i++)
                 screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
