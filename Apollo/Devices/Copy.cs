@@ -152,7 +152,7 @@ namespace Apollo.Devices {
                         writer.WriteStartArray();
 
                             for (int i = 0; i < Offsets.Count; i++)
-                                writer.WriteValue(Offsets[i]);
+                                writer.WriteRawValue(Offsets[i].Encode());
 
                         writer.WriteEndArray();
 
