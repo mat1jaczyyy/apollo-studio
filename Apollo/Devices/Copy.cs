@@ -23,7 +23,7 @@ namespace Apollo.Devices {
         public int Rate {
             get => _rate;
             set {
-                if (10 <= value && value <= 30000)
+                if (10 <= value && value <= 5000)
                     _rate = value;
             }
         }
@@ -38,7 +38,7 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Copy(Mode, Length, _rate, _gate, Animate, Loop, Offsets);
 
-        public Copy(bool mode = false, Length length = null, int rate = 1000, Decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public Copy(bool mode = false, Length length = null, int rate = 500, Decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             if (length == null) length = new Length();
             if (offsets == null) offsets = new List<Offset>();
 
