@@ -4,13 +4,13 @@
 
   <UserControl.Styles>
     <Style Selector="Grid.collapsible">
-      <Setter Property="Height" Value="2" />
+      <Setter Property="Height" Value="3" />
     </Style>
     <Style Selector="Grid.collapsible[IsPointerOver=false]">
       <Style.Animations>
         <Animation Duration="0:0:0.1" FillMode="Forward">
           <KeyFrame Cue="100%">
-            <Setter Property="Height" Value="2" />
+            <Setter Property="Height" Value="3" />
           </KeyFrame>
         </Animation>
       </Style.Animations>
@@ -19,7 +19,7 @@
       <Style.Animations>
         <Animation Duration="0:0:0.3" FillMode="Forward">
           <KeyFrame Cue="66%">
-            <Setter Property="Height" Value="2" />
+            <Setter Property="Height" Value="3" />
           </KeyFrame>
           <KeyFrame Cue="100%">
             <Setter Property="Height" Value="26" />
