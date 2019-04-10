@@ -1,0 +1,10 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.CopyOffset"
+             xmlns:Components="clr-namespace:Apollo.Components">
+  
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root" MaxHeight="223">
+    <Components:MoveDial x:Name="Offset" Title="Offset" />
+    <Components:OffsetAdd OffsetAdded="Offset_Add" />
+  </StackPanel>
+</UserControl>

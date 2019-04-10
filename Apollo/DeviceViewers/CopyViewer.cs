@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
 using Apollo.Devices;
+using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
     public class CopyViewer: UserControl {
@@ -16,6 +17,15 @@ namespace Apollo.DeviceViewers {
 
         Dial Rate, Gate;
         CheckBox Loop, Animate;
+
+        Controls Contents;
+
+        private void Contents_Insert(int index, Offset offset) {
+            CopyOffset viewer = new CopyOffset(offset, _copy);
+            viewer.OffsetAdded += Offset_Insert;
+            viewer.OffsetRemoved += Offset_Remove;
+            Contents.Insert(index + 1, viewer);
+        }
 
         public CopyViewer(Copy copy) {
             InitializeComponent();
@@ -37,6 +47,13 @@ namespace Apollo.DeviceViewers {
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _copy.Loop;
             Loop_Changed(null, EventArgs.Empty);
+
+            Contents = this.Get<StackPanel>("Contents").Children;
+
+            if (_copy.Offsets.Count == 0) this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = true;
+
+            for (int i = 0; i < _copy.Offsets.Count; i++)
+                Contents_Insert(i, _copy.Offsets[i]);
         }
 
         private void Rate_Changed(double value) => _copy.Rate = (int)value;
@@ -51,5 +68,20 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Loop_Changed(object sender, EventArgs e) => _copy.Loop = Loop.IsChecked.Value;
+
+        private void Offset_Insert(int index) {
+            _copy.Offsets.Insert(index, new Offset());
+            Contents_Insert(index, _copy.Offsets[index]);
+            this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = false;
+        }
+
+        private void Offset_InsertStart() => Offset_Insert(0);
+
+        private void Offset_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            _copy.Offsets.RemoveAt(index);
+
+            if (_copy.Offsets.Count == 0) this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = true;
+        }
     }
 }

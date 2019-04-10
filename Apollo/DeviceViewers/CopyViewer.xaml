@@ -3,19 +3,27 @@
              x:Class="Apollo.DeviceViewers.CopyViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid RowDefinitions="*,*,Auto,Auto">
-    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Rate" Title="Rate" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.4" AllowSteps="true"
-                       ValueChanged="Rate_Changed" ModeChanged="Rate_ModeChanged" />
-    </Border>
-    
-    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 5 0 5" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Scale="0.4"
-                       ValueChanged="Gate_Changed" />
+  <Grid ColumnDefinitions="Auto,Auto">
+    <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+      <Grid RowDefinitions="*,*,Auto,Auto" Margin="0 0 5 0">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+          <Components:Dial Margin="0 0 0 5" x:Name="Rate" Title="Rate" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.4" AllowSteps="true"
+                          ValueChanged="Rate_Changed" ModeChanged="Rate_ModeChanged" />
+        </Border>
+        
+        <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+          <Components:Dial Margin="0 5 0 5" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Scale="0.4"
+                          ValueChanged="Gate_Changed" />
+        </Border>
+
+        <CheckBox Grid.Row="2" Margin="0 5 0 0" x:Name="Animate" Click="Animate_Changed">Animate</CheckBox>
+
+        <CheckBox Grid.Row="3" Margin="0 5 0 0" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+      </Grid>
     </Border>
 
-    <CheckBox Grid.Row="2" Margin="0 5 0 0" x:Name="Animate" Click="Animate_Changed">Animate</CheckBox>
-
-    <CheckBox Grid.Row="3" Margin="0 5 0 0" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+    <StackPanel Grid.Column="1" Margin="5 0 0 0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">
+      <Components:OffsetAdd OffsetAdded="Offset_InsertStart" x:Name="OffsetAdd" />
+    </StackPanel>
   </Grid>
 </UserControl>
