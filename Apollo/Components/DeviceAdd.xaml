@@ -34,6 +34,7 @@
       <Canvas.ContextMenu>
         <ContextMenu>
           <MenuItem Header="Group" />
+          <MenuItem Header="Copy" />
           <MenuItem Header="Delay" />
           <MenuItem Header="KeyFilter" />
           <MenuItem Header="Hold" />
