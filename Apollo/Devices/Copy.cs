@@ -134,7 +134,7 @@ namespace Apollo.Devices {
                         writer.WriteValue(Mode);
 
                         writer.WritePropertyName("length");
-                        writer.WriteValue(Length.Encode());
+                        writer.WriteRawValue(Length.Encode());
 
                         writer.WritePropertyName("rate");
                         writer.WriteValue(_rate);
