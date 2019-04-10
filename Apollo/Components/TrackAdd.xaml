@@ -30,7 +30,7 @@
   </UserControl.Styles>
 
   <Grid RowDefinitions="5,Auto,5" Background="Transparent" x:Name="Root" Classes="collapsible">
-    <Canvas Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Clicked">
+    <Canvas Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
       <Path Stroke="{DynamicResource ThemeForegroundBrush}" StrokeThickness="2"
             Data="M 0,8 L 16,8 M 8,0 L 8,16" />
     </Canvas>
