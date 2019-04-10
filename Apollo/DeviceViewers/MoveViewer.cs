@@ -21,8 +21,8 @@ namespace Apollo.DeviceViewers {
             _move = move;
 
             MoveDial moveDial = this.Get<MoveDial>("Offset");
-            moveDial.X = _move.X;
-            moveDial.Y = _move.Y;
+            moveDial.X = _move.Offset.X;
+            moveDial.Y = _move.Offset.Y;
             moveDial.Changed += Offset_Changed;
 
             Loop = this.Get<CheckBox>("Loop");
@@ -31,8 +31,8 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Offset_Changed(int x, int y) {
-            _move.X = x;
-            _move.Y = y;
+            _move.Offset.X = x;
+            _move.Offset.Y = y;
         }
 
         private void Loop_Changed(object sender, EventArgs e) => _move.Loop = Loop.IsChecked.Value;

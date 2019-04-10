@@ -12,37 +12,21 @@ namespace Apollo.Devices {
     public class Move: Device {
         public static readonly new string DeviceIdentifier = "move";
 
-        private int _x;
-        public int X {
-            get => _x;
-            set {
-                if (-9 <= value && value <= 9)
-                    _x = value;
-            }
-        }
-
-        private int _y;
-        public int Y {
-            get => _y;
-            set {
-                if (-9 <= value && value <= 9)
-                    _y = value;
-            }
-        }
-
+        public TranslationPoint Offset;
         public bool Loop;
 
-        public override Device Clone() => new Move(_x, _y);
+        public override Device Clone() => new Move(Offset);
 
-        public Move(int x = 0, int y = 0, bool loop = false): base(DeviceIdentifier) {
-            X = x;
-            Y = y;
+        public Move(TranslationPoint offset = null, bool loop = false): base(DeviceIdentifier) {
+            if (offset == null) offset = new TranslationPoint();
+            
+            Offset = offset;
             Loop = loop;
         }
 
         public override void MIDIEnter(Signal n) {
-            int x = n.Index % 10 + X;
-            int y = n.Index / 10 + Y;
+            int x = n.Index % 10 + Offset.X;
+            int y = n.Index / 10 + Offset.Y;
 
             if (Loop) {
                 x = (x + 10) % 10;
@@ -64,8 +48,7 @@ namespace Apollo.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             return new Move(
-                Convert.ToInt32(data["x"]),
-                Convert.ToInt32(data["y"]),
+                TranslationPoint.Decode(data["offset"].ToString()),
                 Convert.ToBoolean(data["loop"])
             );
         }
@@ -82,11 +65,8 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
-                        writer.WritePropertyName("x");
-                        writer.WriteValue(_x);
-
-                        writer.WritePropertyName("y");
-                        writer.WriteValue(_y);
+                        writer.WritePropertyName("offset");
+                        writer.WriteRawValue(Offset.Encode());
 
                         writer.WritePropertyName("loop");
                         writer.WriteValue(Loop);
