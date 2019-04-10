@@ -81,7 +81,7 @@ namespace Apollo.DeviceViewers {
             Contents.RemoveAt(index + 1);
             _copy.Offsets.RemoveAt(index);
 
-            if (_copy.Offsets.Count == 0) this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = true;
+            if (_copy.Offsets.Count == 0) this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = true;
         }
     }
 }

@@ -4,7 +4,11 @@
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root" MaxHeight="223">
-    <Components:MoveDial x:Name="Offset" Title="Offset" />
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="3 0 0 0">
+      <Components:MoveDial x:Name="Offset" Title="Offset" />
+      <Components:Remove VerticalAlignment="Top" Margin="0 5 0 0" Removed="Offset_Remove" />
+    </StackPanel>
+
     <Components:OffsetAdd OffsetAdded="Offset_Add" />
   </StackPanel>
 </UserControl>
