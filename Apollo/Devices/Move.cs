@@ -12,13 +12,13 @@ namespace Apollo.Devices {
     public class Move: Device {
         public static readonly new string DeviceIdentifier = "move";
 
-        public TranslationPoint Offset;
+        public Offset Offset;
         public bool Loop;
 
         public override Device Clone() => new Move(Offset);
 
-        public Move(TranslationPoint offset = null, bool loop = false): base(DeviceIdentifier) {
-            if (offset == null) offset = new TranslationPoint();
+        public Move(Offset offset = null, bool loop = false): base(DeviceIdentifier) {
+            if (offset == null) offset = new Offset();
             
             Offset = offset;
             Loop = loop;
@@ -48,7 +48,7 @@ namespace Apollo.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             return new Move(
-                TranslationPoint.Decode(data["offset"].ToString()),
+                Offset.Decode(data["offset"].ToString()),
                 Convert.ToBoolean(data["loop"])
             );
         }

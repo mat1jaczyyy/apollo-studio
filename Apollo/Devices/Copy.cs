@@ -18,7 +18,7 @@ namespace Apollo.Devices {
         private Decimal _gate;
         public bool Animate;
         public bool Loop;
-        public List<TranslationPoint> Offsets;
+        public List<Offset> Offsets;
 
         public int Rate {
             get => _rate;
@@ -38,14 +38,9 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Copy(Mode, Length, _rate, _gate, Animate, Loop, Offsets);
 
-        public Copy(bool mode = false, Length length = null, int rate = 1000, Decimal gate = 1, bool animate = false, bool loop = false, List<TranslationPoint> offsets = null): base(DeviceIdentifier) {
+        public Copy(bool mode = false, Length length = null, int rate = 1000, Decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             if (length == null) length = new Length();
-            if (offsets == null) offsets = new List<TranslationPoint>() {
-                new TranslationPoint(1, 0),
-                new TranslationPoint(2, 0),
-                new TranslationPoint(3, 0),
-                new TranslationPoint(4, 0),  
-            };
+            if (offsets == null) offsets = new List<Offset>();
 
             Mode = mode;
             Rate = rate;
@@ -107,10 +102,10 @@ namespace Apollo.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             List<object> offsets = JsonConvert.DeserializeObject<List<object>>(data["offsets"].ToString());
-            List<TranslationPoint> initO = new List<TranslationPoint>();
+            List<Offset> initO = new List<Offset>();
 
             foreach (object offset in offsets)
-                initO.Add(TranslationPoint.Decode(offset.ToString()));
+                initO.Add(Offset.Decode(offset.ToString()));
 
             return new Copy(
                 Convert.ToBoolean(data["mode"]),

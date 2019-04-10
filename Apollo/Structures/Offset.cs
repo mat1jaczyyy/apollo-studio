@@ -5,8 +5,8 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace Apollo.Structures {
-    public class TranslationPoint {
-        public static readonly string Identifier = "translationpoint";
+    public class Offset {
+        public static readonly string Identifier = "offset";
 
         private int _x = 0;
         public int X {
@@ -26,18 +26,18 @@ namespace Apollo.Structures {
             }
         }
 
-        public TranslationPoint(int x = 0, int y = 0) {
+        public Offset(int x = 0, int y = 0) {
             X = x;
             Y = y;
         }
 
-        public static TranslationPoint Decode(string jsonString) {
+        public static Offset Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["object"].ToString() != Identifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new TranslationPoint(
+            return new Offset(
                 int.Parse(data["x"].ToString()),
                 int.Parse(data["y"].ToString())
             );
