@@ -33,7 +33,7 @@ namespace Apollo.DeviceViewers {
         GradientStop mainColor;
         TextBox Hex;
 
-        bool main_mouseHeld, hue_mouseHeld;
+        bool main_mouseHeld, hue_mouseHeld, hexValidation;
 
         public PaintViewer(Paint paint) {
             InitializeComponent();
@@ -54,6 +54,7 @@ namespace Apollo.DeviceViewers {
 
             mainColor = this.Get<GradientStop>("MainColor");
 
+            hexValidation = true;
             Hex = this.Get<TextBox>("Hex");
             Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
@@ -99,6 +100,8 @@ namespace Apollo.DeviceViewers {
             Canvas.SetTop(mainThumb, (1 - max) * mainHeight);
 
             UpdateCanvas();
+
+            Hex.Text = _paint.Color.ToHex();
         }
 
         private void UpdateColor() {
@@ -122,6 +125,10 @@ namespace Apollo.DeviceViewers {
             else              _paint.Color = new Color(v, p, q);
 
             color.Fill = _paint.Color.ToBrush();
+
+            hexValidation = false;
+            Hex.Text = _paint.Color.ToHex();
+            hexValidation = true;
         }
 
         private void UpdateCanvas() {
@@ -255,12 +262,12 @@ namespace Apollo.DeviceViewers {
 
                 color.Fill = _paint.Color.ToBrush();
                 InitCanvas();
-
-                Hex.Text = _paint.Color.ToHex();
             });
         }
 
         private void Hex_Changed(string text) {
+            if (!hexValidation) return;
+            
             if (text == null) return;
             if (text == "") text = "#";
 
