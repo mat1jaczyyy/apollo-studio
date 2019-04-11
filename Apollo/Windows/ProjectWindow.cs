@@ -102,7 +102,7 @@ namespace Apollo.Windows {
 
             Action update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
 
-            if (Decimal.TryParse(text, out Decimal value))
+            if (int.TryParse(text, out int value))
                 if (20 <= value && value <= 999) {
                     Program.Project.BPM = value;
                     update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };

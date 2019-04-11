@@ -20,7 +20,7 @@ namespace Apollo.Elements {
 
         public List<Track> Tracks;
 
-        public Decimal BPM;
+        public int BPM;
 
         public delegate void PathChangedEventHandler(string path);
         public event PathChangedEventHandler PathChanged;
@@ -101,7 +101,7 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Project(Decimal bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
+        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
             if (tracks == null)
                 tracks = (from i in MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
 
@@ -126,7 +126,7 @@ namespace Apollo.Elements {
             List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
 
             return new Project(
-                Convert.ToDecimal(data["bpm"]),
+                Convert.ToInt32(data["bpm"]),
                 Convert.ToInt32(data["page"]),
                 (from i in tracks select Track.Decode(i.ToString())).ToList(),
                 path
