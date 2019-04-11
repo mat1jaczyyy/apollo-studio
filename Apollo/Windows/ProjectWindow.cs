@@ -102,17 +102,23 @@ namespace Apollo.Windows {
 
             Action update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
 
-            if (int.TryParse(text, out int value))
+            if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {
                     Program.Project.BPM = value;
                     update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    update = () => {
-                        if (value <= 0) BPM.Text = "0";
-                        if (value > 999) BPM.Text = "999";
-                        BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
-                    };
+                    update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
                 }
+
+                update += () => { 
+                    if (value <= 0) text = "0";
+                    else text = text.TrimStart('0');
+
+                    if (value > 999) text = "999";
+                    
+                    BPM.Text = text;
+                };
+            }
 
             Dispatcher.UIThread.InvokeAsync(update);
         }
