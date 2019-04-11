@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using GradientStop = Avalonia.Media.GradientStop;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 using Apollo.Core;
@@ -29,6 +30,7 @@ namespace Apollo.DeviceViewers {
         Canvas mainCanvas, hueCanvas;
         Thumb mainThumb, hueThumb;
         GradientStop mainColor;
+        TextBox Hex;
 
         bool main_mouseHeld, hue_mouseHeld;
 
@@ -50,6 +52,9 @@ namespace Apollo.DeviceViewers {
             hueThumb = this.Get<Thumb>("HueThumb");
 
             mainColor = this.Get<GradientStop>("MainColor");
+
+            Hex = this.Get<TextBox>("Hex");
+            Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
 
         public void Bounds_Updated(Rect bounds) {
@@ -57,11 +62,11 @@ namespace Apollo.DeviceViewers {
         }
 
         private void InitCanvas() {
-            double hueWidth = ((Canvas)hueThumb.Parent).Bounds.Width;
-            double mainWidth = ((Canvas)mainThumb.Parent).Bounds.Width;
-            double mainHeight = ((Canvas)mainThumb.Parent).Bounds.Height;
+            double hueHeight = hueCanvas.Bounds.Height;
+            double mainWidth = mainCanvas.Bounds.Width;
+            double mainHeight = mainCanvas.Bounds.Height;
 
-            if (hueWidth == 0 || mainWidth == 0 || mainHeight == 0) return;
+            if (hueHeight == 0 || mainWidth == 0 || mainHeight == 0) return;
 
             double r = _paint.Color.Red / 63.0;
             double g = _paint.Color.Green / 63.0;
@@ -88,17 +93,17 @@ namespace Apollo.DeviceViewers {
             double saturation = 0;
             if (max != 0) saturation = 1 - (min / max);
 
-            Canvas.SetLeft(hueThumb, hue * ((Canvas)hueThumb.Parent).Bounds.Width / 6);
-            Canvas.SetLeft(mainThumb, saturation * ((Canvas)mainThumb.Parent).Bounds.Width);
-            Canvas.SetTop(mainThumb, (1 - max) * ((Canvas)mainThumb.Parent).Bounds.Height);
+            Canvas.SetTop(hueThumb, hue * hueHeight / 6);
+            Canvas.SetLeft(mainThumb, saturation * mainWidth);
+            Canvas.SetTop(mainThumb, (1 - max) * mainHeight);
 
             UpdateCanvas();
         }
 
         private void UpdateColor() {
-            double hue = Canvas.GetLeft(hueThumb) * 6 / ((Canvas)hueThumb.Parent).Bounds.Width;
-            double saturation = Canvas.GetLeft(mainThumb) / ((Canvas)mainThumb.Parent).Bounds.Width;
-            double value = (1 - (Canvas.GetTop(mainThumb) / ((Canvas)mainThumb.Parent).Bounds.Height)) * 63;
+            double hue = Canvas.GetTop(hueThumb) * 6 / hueCanvas.Bounds.Height;
+            double saturation = Canvas.GetLeft(mainThumb) / mainCanvas.Bounds.Width;
+            double value = (1 - (Canvas.GetTop(mainThumb) / mainCanvas.Bounds.Height)) * 63;
 
             int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
             double f = hue - Math.Floor(hue);
@@ -119,7 +124,7 @@ namespace Apollo.DeviceViewers {
         }
 
         private void UpdateCanvas() {
-            double hue = Canvas.GetLeft(hueThumb) * 6 / ((Canvas)hueThumb.Parent).Bounds.Width;
+            double hue = Canvas.GetTop(hueThumb) * 6 / hueCanvas.Bounds.Height;
 
             int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
             double f = hue - Math.Floor(hue);
@@ -139,12 +144,12 @@ namespace Apollo.DeviceViewers {
 
         private void MainThumb_Move(object sender, VectorEventArgs e) {
             double x = Canvas.GetLeft(mainThumb) + e.Vector.X;
-            x = x < 0? 0 : x;
-            x = x > mainCanvas.Bounds.Width? mainCanvas.Bounds.Width : x;
+            x = (x < 0)? 0 : x;
+            x = (x > mainCanvas.Bounds.Width)? mainCanvas.Bounds.Width : x;
 
             double y = Canvas.GetTop(mainThumb) + e.Vector.Y;
-            y = y < 0? 0 : y;
-            y = y > mainCanvas.Bounds.Height? mainCanvas.Bounds.Height : y;
+            y = (y < 0)? 0 : y;
+            y = (y > mainCanvas.Bounds.Height)? mainCanvas.Bounds.Height : y;
 
             Canvas.SetLeft(mainThumb, x);
             Canvas.SetTop(mainThumb, y);
@@ -183,11 +188,11 @@ namespace Apollo.DeviceViewers {
         }
 
         private void HueThumb_Move(object sender, VectorEventArgs e) {
-            double x = Canvas.GetLeft(hueThumb) + e.Vector.X;
-            x = x < 0? 0 : x;
-            x = x > hueCanvas.Bounds.Width? hueCanvas.Bounds.Width : x;
+            double y = Canvas.GetTop(hueThumb) + e.Vector.Y;
+            y = (y < 0)? 0 : y;
+            y = y > hueCanvas.Bounds.Height? hueCanvas.Bounds.Height : y;
 
-            Canvas.SetLeft(hueThumb, x);
+            Canvas.SetTop(hueThumb, y);
 
             UpdateColor();
             UpdateCanvas();
@@ -199,8 +204,7 @@ namespace Apollo.DeviceViewers {
                 e.Device.Capture(hueCanvas);
 
                 Vector position = e.GetPosition(hueThumb);
-                position = position.WithX(position.X - hueThumb.Bounds.Width / 2)
-                                   .WithY(position.Y - hueThumb.Bounds.Height / 2);
+                position = position.WithY(position.Y - hueThumb.Bounds.Height / 2);
 
                 HueThumb_Move(null, new VectorEventArgs() { Vector = position });
             }
@@ -216,10 +220,23 @@ namespace Apollo.DeviceViewers {
         private void HueCanvas_MouseMove(object sender, PointerEventArgs e) {
             if (hue_mouseHeld) {
                 Vector position = e.GetPosition(hueThumb);
-                position = position.WithX(position.X - hueThumb.Bounds.Width / 2);
+                position = position.WithY(position.Y - hueThumb.Bounds.Height / 2);
 
                 HueThumb_Move(null, new VectorEventArgs() { Vector = position });
             }
+        }
+
+        private void Hex_Changed(string text) {
+            if (text == null) return;
+            if (text == "") ;
+
+            Action update = () => {};
+
+            Dispatcher.UIThread.InvokeAsync(update);
+        }
+        
+        private void Hex_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return) this.Focus();
         }
     }
 }
