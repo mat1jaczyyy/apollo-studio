@@ -98,7 +98,7 @@ namespace Apollo.Windows {
         private void BPM_Changed(string text) {
             if (text == null) return;
 
-            if (Decimal.TryParse(text, out Decimal value)) Program.Project.BPM = value;
+            if (Decimal.TryParse(text, out Decimal value) && 20 <= value && value <= 999) Program.Project.BPM = value;
             else BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
         }
 
