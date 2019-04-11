@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using GradientStop = Avalonia.Media.GradientStop;
+using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -226,13 +227,44 @@ namespace Apollo.DeviceViewers {
             }
         }
 
+        private Action HexAction(string text) {
+            Action update = () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+
+            foreach (char i in text.Substring(1))
+                if (!"0123456789ABCDEF".Contains(i))
+                    return update + (() => { Hex.Text = _paint.Color.ToHex(); });
+
+            if (text == "#") return () => {
+                Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
+                Hex.Text = text;
+            };
+
+            if (text[0] != '#' || text.Length > 7) return update + (() => { Hex.Text = _paint.Color.ToHex(); });
+            if (text.Length < 7) return () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+
+            int r = Convert.ToInt32(text.Substring(1, 2), 16);
+            int g = Convert.ToInt32(text.Substring(3, 2), 16);
+            int b = Convert.ToInt32(text.Substring(5, 2), 16);
+
+            r = (r > 63)? 63 : r;
+            g = (g > 63)? 63 : g;
+            b = (b > 63)? 63 : b;
+
+            return update + (() => { 
+                _paint.Color = new Color((byte)r, (byte)g, (byte)b);
+
+                color.Fill = _paint.Color.ToBrush();
+                InitCanvas();
+
+                Hex.Text = _paint.Color.ToHex();
+            });
+        }
+
         private void Hex_Changed(string text) {
             if (text == null) return;
-            if (text == "") ;
+            if (text == "") text = "#";
 
-            Action update = () => {};
-
-            Dispatcher.UIThread.InvokeAsync(update);
+            Dispatcher.UIThread.InvokeAsync(HexAction(text.ToUpper()));
         }
         
         private void Hex_KeyDown(object sender, KeyEventArgs e) {

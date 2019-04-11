@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -60,6 +61,8 @@ namespace Apollo.Structures {
             (byte)(_g * (255.0 / 63)),
             (byte)(_b * (255.0 / 63))
         ));
+
+        public string ToHex() => $"#{_r.ToString("X2")}{_g.ToString("X2")}{_b.ToString("X2")}";
 
         public static Color Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
