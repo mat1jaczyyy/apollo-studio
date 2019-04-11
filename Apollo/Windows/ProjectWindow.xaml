@@ -42,7 +42,7 @@
          
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock VerticalAlignment="Center" Text="BPM: " />
-              <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="30" x:Name="BPM" />
+              <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="30" KeyDown="BPM_KeyDown" x:Name="BPM" />
             </StackPanel>
           </Grid>
         </Grid>

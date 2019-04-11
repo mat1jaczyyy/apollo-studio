@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 using Apollo.Components;
@@ -97,9 +98,27 @@ namespace Apollo.Windows {
 
         private void BPM_Changed(string text) {
             if (text == null) return;
+            if (text == "") text = "0";
 
-            if (Decimal.TryParse(text, out Decimal value) && 20 <= value && value <= 999) Program.Project.BPM = value;
-            else BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
+            Action update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
+
+            if (Decimal.TryParse(text, out Decimal value))
+                if (20 <= value && value <= 999) {
+                    Program.Project.BPM = value;
+                    update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                } else {
+                    update = () => {
+                        if (value <= 0) BPM.Text = "0";
+                        if (value > 999) BPM.Text = "999";
+                        BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
+                    };
+                }
+
+            Dispatcher.UIThread.InvokeAsync(update);
+        }
+        
+        private void BPM_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return) this.Focus();
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
