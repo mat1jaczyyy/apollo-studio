@@ -36,7 +36,7 @@ namespace Apollo.Viewers {
         }
 
         private void Device_Insert(int index, Type device) {
-            _chain.Insert(index, (Device)Activator.CreateInstance(device, BindingFlags.OptionalParamBinding, null, new object[0], CultureInfo.CurrentCulture));
+            _chain.Insert(index, Device.Create(device, _chain));
             Contents_Insert(index, _chain[index]);
             this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = false;
         }

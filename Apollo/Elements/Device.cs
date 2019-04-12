@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -15,7 +17,7 @@ namespace Apollo.Elements {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
 
-        public Chain Parent = null;
+        public Chain Parent;
         public int? ParentIndex;
         public Action<Signal> MIDIExit = null;
 
@@ -24,6 +26,21 @@ namespace Apollo.Elements {
         protected Device(string device) => DeviceIdentifier = device;
 
         public abstract void MIDIEnter(Signal n);
+
+        public static Device Create(Type device, Chain parent) {
+            object obj = FormatterServices.GetUninitializedObject(device);
+            device.GetField("Parent").SetValue(obj, parent);
+
+            ConstructorInfo ctor = device.GetConstructors()[0];
+            ctor.Invoke(
+                obj,
+                BindingFlags.OptionalParamBinding,
+                null, Enumerable.Repeat(Type.Missing, ctor.GetParameters().Count()).ToArray(),
+                CultureInfo.CurrentCulture
+            );
+            
+            return (Device)obj;
+        }
 
         public static Device Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
