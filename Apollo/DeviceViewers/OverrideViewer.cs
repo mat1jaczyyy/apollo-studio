@@ -27,7 +27,7 @@ namespace Apollo.DeviceViewers {
 
             Target = this.Get<Dial>("Target");
             Target.Maximum = Program.Project.Tracks.Count;
-            Target.RawValue = _override.Target;
+            Target.RawValue = _override.Target + 1;
         }
 
         private void Target_Changed(double value) => _override.Target = (int)value - 1;
