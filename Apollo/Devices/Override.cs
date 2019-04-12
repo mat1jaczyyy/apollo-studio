@@ -13,6 +13,9 @@ namespace Apollo.Devices {
     public class Override: Device {
         public static readonly new string DeviceIdentifier = "override";
 
+        public delegate void TargetChangedEventHandler(int value);
+        public event TargetChangedEventHandler TargetChanged;
+        
         private int _target;
         public int Target {
             get => _target;
@@ -26,7 +29,10 @@ namespace Apollo.Devices {
             }
         }
 
-        private void IndexChanged(int value) => _target = value;
+        private void IndexChanged(int value) {
+            _target = value;
+            TargetChanged?.Invoke(value);
+        } 
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
 

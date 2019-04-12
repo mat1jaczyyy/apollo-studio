@@ -2,6 +2,7 @@
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 
 namespace Apollo.DeviceViewers {
@@ -11,12 +12,19 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Override _override;
+        Dial Target;
+
+        private void Update_Target(int value) => Target.RawValue = value + 1;
 
         public OverrideViewer(Override o) {
             InitializeComponent();
             
             _override = o;
-            this.Get<Dial>("Target").RawValue = _override.Target;
+            _override.TargetChanged += Update_Target;
+
+            Target = this.Get<Dial>("Target");
+            Target.Maximum = Program.Project.Tracks.Count;
+            Target.RawValue = _override.Target;
         }
 
         private void Target_Changed(double value) => _override.Target = (int)value - 1;
