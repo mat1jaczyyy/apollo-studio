@@ -40,6 +40,7 @@
           <MenuItem Header="Hold" />
           <MenuItem Header="Layer" />
           <MenuItem Header="Move" />
+          <MenuItem Header="Override" />
           <MenuItem Header="PageFilter" />
           <MenuItem Header="PageSwitch" />
           <MenuItem Header="Paint" />
