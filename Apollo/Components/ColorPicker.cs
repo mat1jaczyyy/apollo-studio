@@ -11,12 +11,8 @@ using AvaloniaColor = Avalonia.Media.Color;
 using GradientStop = Avalonia.Media.GradientStop;
 using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 
-using Apollo.Core;
-using Apollo.Devices;
 using Apollo.Structures;
-using Apollo.Windows;
 
 namespace Apollo.Components {
     public class ColorPicker: UserControl {

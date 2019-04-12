@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Globalization;
 
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 
 namespace Apollo.Components {
     public class MoveDial: UserControl {

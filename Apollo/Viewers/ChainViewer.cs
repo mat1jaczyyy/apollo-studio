@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using System.Reflection;
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;

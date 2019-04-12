@@ -9,7 +9,6 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Elements {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Reflection;
-
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {

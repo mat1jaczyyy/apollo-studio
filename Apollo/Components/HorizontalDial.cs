@@ -8,8 +8,6 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
-using Apollo.Structures;
-
 namespace Apollo.Components {
     public class HorizontalDial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

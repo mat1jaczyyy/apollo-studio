@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Devices;
