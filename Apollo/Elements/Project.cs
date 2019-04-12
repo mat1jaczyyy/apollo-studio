@@ -72,9 +72,14 @@ namespace Apollo.Elements {
                 File.WriteAllText(FilePath, Encode());
         }
 
+        public delegate void TrackCountChangedEventHandler(int value);
+        public event TrackCountChangedEventHandler TrackCountChanged;
+
         private void Reroute() {
             for (int i = 0; i < Tracks.Count; i++)
                 Tracks[i].ParentIndex = i;
+            
+            TrackCountChanged?.Invoke(Tracks.Count);
         }
 
         public Track this[int index] {
