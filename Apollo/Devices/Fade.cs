@@ -95,7 +95,7 @@ namespace Apollo.Devices {
                     int color = ++_indexes[index];
 
                     if (color < _steps.Count)
-                        MIDIExit?.Invoke(new Signal(index, _steps[color].Clone(), layer));
+                        MIDIExit?.Invoke(new Signal(Track.Get(this).Launchpad, index, _steps[color].Clone(), layer));
                 }
             }
         }

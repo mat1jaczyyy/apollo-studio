@@ -10,6 +10,7 @@ namespace Apollo.Structures {
     public class Signal {
         public static readonly string Identifier = "signal";
 
+        public Launchpad Source;
         private byte _p;
         public Color Color;
         public int Layer;
@@ -22,11 +23,13 @@ namespace Apollo.Structures {
             }
         }
 
-        public Signal Clone() => new Signal(_p, Color.Clone(), Layer);
+        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Layer);
 
-        public Signal(byte index = 11, Color color = null, int layer = 0, Launchpad.InputType format = Launchpad.InputType.XY) {
-            if (format == Launchpad.InputType.DrumRack)
+        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0) {
+            if (source?.InputFormat == Launchpad.InputType.DrumRack)
                 index = Conversion.DRtoXY[index];
+
+            Source = source;
 
             if (color == null) color = new Color(63);
             _p = 11;

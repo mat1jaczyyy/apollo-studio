@@ -26,6 +26,8 @@ namespace Apollo.Elements {
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
+        private Pixel[] screen = new Pixel[100];
+
         public enum LaunchpadType {
             MK2, PRO, CFW, Unknown
         }
@@ -94,7 +96,12 @@ namespace Apollo.Elements {
             Output.Send(in msg);
         }
 
+        public void Render(Signal n) => screen[n.Index].MIDIEnter(n);
+
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
+            for (int i = 0; i < 100; i++)
+                screen[i] = new Pixel() {MIDIExit = Send};
+            
             Input = input.CreateDevice();
             Output = output.CreateDevice();
 
@@ -112,6 +119,9 @@ namespace Apollo.Elements {
         }
 
         public Launchpad(string name) {
+            for (int i = 0; i < 100; i++)
+                screen[i] = new Pixel() {MIDIExit = Send};
+            
             Name = name;
             Available = false;
         }
@@ -156,20 +166,20 @@ namespace Apollo.Elements {
             }
         }
 
-        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal((byte)e.Key, new Color((byte)(e.Velocity >> 1)), 0, InputFormat));
+        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color((byte)(e.Velocity >> 1))));
 
-        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal((byte)e.Key, new Color(0), 0, InputFormat));
+        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color(0)));
 
         private void ControlChange(object sender, in ControlChangeMessage e) {
             switch (Type) {
                 case LaunchpadType.MK2:
                     if (104 <= e.Control && e.Control <= 111)
-                        HandleMessage(new Signal((byte)(e.Control - 13), new Color((byte)(e.Value >> 1))));
+                        HandleMessage(new Signal(this, (byte)(e.Control - 13), new Color((byte)(e.Value >> 1))));
                     break;
 
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
-                    HandleMessage(new Signal((byte)e.Control, new Color((byte)(e.Value >> 1))));
+                    HandleMessage(new Signal(this, (byte)e.Control, new Color((byte)(e.Value >> 1))));
                     break;
             }
         }

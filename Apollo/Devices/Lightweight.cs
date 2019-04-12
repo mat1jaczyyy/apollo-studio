@@ -135,7 +135,7 @@ namespace Apollo.Devices {
 
                         switch (type >> 4) {
                             case 0x8: // Note off
-                                n = new Signal(_read.ReadBytes(2)[0], new Color(0));
+                                n = new Signal(Track.Get(this).Launchpad, _read.ReadBytes(2)[0], new Color(0));
                                 add = true;
 
                                 for (int i = check; i < timers.Count; i++) {
@@ -153,7 +153,7 @@ namespace Apollo.Devices {
                                 break;
                             
                             case 0x9: // Note on
-                                n = new Signal(_read.ReadByte(), new Color((byte)(_read.ReadByte() >> 1)));
+                                n = new Signal(Track.Get(this).Launchpad, _read.ReadByte(), new Color((byte)(_read.ReadByte() >> 1)));
                                 add = true; remove = -1;
 
                                 for (int i = check; i < timers.Count; i++) {

@@ -57,7 +57,7 @@ namespace Apollo.Devices {
             if (n.Color.Lit) {
                 if (!Infinite) {
                     Courier courier = new Courier() {
-                        Info = new Signal(n.Index, new Color(0), n.Layer),
+                        Info = new Signal(Track.Get(this).Launchpad, n.Index, new Color(0), n.Layer),
                         AutoReset = false,
                         Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
                     };

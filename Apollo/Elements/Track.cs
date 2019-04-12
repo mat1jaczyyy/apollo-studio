@@ -28,9 +28,11 @@ namespace Apollo.Elements {
             }
         }
 
+        public static Track Get(Device device) => (device.Parent.Parent.GetType() == typeof(Track))? (Track)device.Parent.Parent : Get((Device)device.Parent.Parent);
+        public static Track Get(Chain chain) => (chain.Parent.GetType() == typeof(Track))? (Track)chain.Parent : Get((Device)chain.Parent);
+
         public Chain Chain;
         private Launchpad _launchpad;
-        private Pixel[] screen = new Pixel[100];
 
         public Launchpad Launchpad {
             get => _launchpad;
@@ -48,16 +50,11 @@ namespace Apollo.Elements {
             Chain = init;
             Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
-            
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = MIDIExit};
 
             Launchpad = launchpad;
         }
 
-        private void ChainExit(Signal n) => screen[n.Index].MIDIEnter(n);
-
-        private void MIDIExit(Signal n) => Launchpad?.Send(n);
+        private void ChainExit(Signal n) => n.Source?.Render(n);
 
         private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
 
