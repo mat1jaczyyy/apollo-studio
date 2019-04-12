@@ -19,6 +19,6 @@ namespace Apollo.DeviceViewers {
             this.Get<Dial>("Target").RawValue = _override.Target;
         }
 
-        private void Target_Changed(double value) => _override.Target = (int)value;
+        private void Target_Changed(double value) => _override.Target = (int)value - 1;
     }
 }
