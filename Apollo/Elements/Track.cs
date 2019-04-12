@@ -17,6 +17,9 @@ namespace Apollo.Elements {
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
 
+        public delegate void DisposedEventHandler();
+        public event DisposedEventHandler Disposed;
+
         private int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
@@ -61,6 +64,8 @@ namespace Apollo.Elements {
         public void Dispose() {
             if (Launchpad != null)
                 Launchpad.Receive -= MIDIEnter;
+
+            Disposed?.Invoke();
             
             Chain = null;
         }

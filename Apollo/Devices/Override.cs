@@ -22,17 +22,24 @@ namespace Apollo.Devices {
             set {
                 if (_target != value) {
                     Program.Project.Tracks[_target].ParentIndexChanged -= IndexChanged;
+                    Program.Project.Tracks[_target].Disposed -= IndexRemoved;
                     
                     _target = value;
                     Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
+                    Program.Project.Tracks[_target].Disposed += IndexRemoved;
                 }
             }
         }
 
         private void IndexChanged(int value) {
             _target = value;
-            TargetChanged?.Invoke(value);
-        } 
+            TargetChanged?.Invoke(_target);
+        }
+
+        private void IndexRemoved() {
+            Target = Track.Get(this).ParentIndex.Value;
+            TargetChanged?.Invoke(_target);
+        }
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
 
@@ -43,6 +50,7 @@ namespace Apollo.Devices {
             _target = target;
 
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
+            Program.Project.Tracks[_target].Disposed += IndexRemoved;
         }
 
         public override void MIDIEnter(Signal n) {
