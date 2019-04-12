@@ -41,7 +41,7 @@ namespace Apollo.Components {
             set {
                 if (_min != value) {
                     _min = value;
-                    RawValue = ToRawValue(_value);
+                    Value = ToValue(_raw);
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace Apollo.Components {
             set {
                 if (_max != value) {
                     _max = value;
-                    RawValue = ToRawValue(_value);
+                    Value = ToValue(_raw);
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace Apollo.Components {
             set {
                 if (_round != value) {
                     _round = value;
-                    RawValue = ToRawValue(_value);
+                    Value = ToValue(_raw);
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace Apollo.Components {
             set {
                 if (_exp != value) {
                     _exp = value;
-                    RawValue = ToRawValue(_value);
+                    Value = ToValue(_raw);
                 }
             }
         }
