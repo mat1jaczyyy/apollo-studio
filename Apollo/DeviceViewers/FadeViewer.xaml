@@ -16,7 +16,7 @@
           </Rectangle.Fill>
         </Rectangle>
 
-        <Components:FadeThumb x:Name="ThumbStart" />
+        <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" />
         <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" />
       </Canvas>
     </Border>

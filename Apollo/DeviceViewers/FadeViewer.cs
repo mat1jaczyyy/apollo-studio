@@ -52,10 +52,16 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Thumb_Move(FadeThumb sender, VectorEventArgs e) {
+            int i = thumbs.IndexOf(sender);
+
+            double left = Canvas.GetLeft(thumbs[i - 1]) + 1;
+            double right = Canvas.GetLeft(thumbs[i + 1]) - 1;
+
             double old = Canvas.GetLeft(sender);
             double x = old + e.Vector.X;
-            x = (x < 0)? 0 : x;
-            x = x > canvas.Bounds.Width? canvas.Bounds.Width : x;
+
+            x = (x < left)? left : x;
+            x = (x > right)? right : x;
 
             Canvas.SetLeft(sender, x);
         }
