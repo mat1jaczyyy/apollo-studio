@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -41,19 +42,23 @@ namespace Apollo.DeviceViewers {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 FadeThumb thumb = new FadeThumb();
                 int index;
-                double x = e.Device.GetPosition(canvas).X - 6;
+                double x_center = e.Device.GetPosition(canvas).X;
+                double x_left = x_center - 6;
 
                 for (index = 0; index < thumbs.Count; index++) {
-                    if (x < Canvas.GetLeft(thumbs[index])) {
+                    if (x_left < Canvas.GetLeft(thumbs[index])) {
                         thumbs.Insert(index, thumb);
                         break;
                     }
                 }
 
-                Canvas.SetLeft(thumb, e.Device.GetPosition(canvas).X - 6);
+                Canvas.SetLeft(thumb, x_left);
                 thumb.Moved += Thumb_Move;
                 thumb.Focused += Thumb_Focus;
                 thumb.Deleted += Thumb_Delete;
+
+                _fade.Colors.Insert(index, new Color());
+                _fade.Positions.Insert(index, (Decimal)x_center / 188);
 
                 canvas.Children.Add(thumb);
 
