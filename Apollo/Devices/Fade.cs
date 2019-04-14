@@ -21,10 +21,10 @@ namespace Apollo.Devices {
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
         
-        private int[] _indexes = new int[128];
-        private object[] locker = new object[128];
+        private int[] _indexes = new int[100];
+        private object[] locker = new object[100];
 
-        private List<Timer>[] _timers = new List<Timer>[128];
+        private List<Timer>[] _timers = new List<Timer>[100];
         private TimerCallback _timerexit;
 
         public Color GetColor(int index) => _colors[index];
@@ -115,7 +115,7 @@ namespace Apollo.Devices {
             _colors = colors;
             _positions = positions;
 
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 100; i++)
                 locker[i] = new object();
 
             Generate();
