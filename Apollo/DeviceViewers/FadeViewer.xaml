@@ -6,7 +6,7 @@
   <Grid RowDefinitions="*,*">
     <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="26" x:Name="Canvas"
-              PointerReleased="Canvas_MouseUp">
+              PointerPressed="Canvas_MouseDown">
         <Rectangle Canvas.Left="6" Canvas.Top="6" Width="188" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
           <Rectangle.Fill>
             <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">

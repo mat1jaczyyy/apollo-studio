@@ -31,8 +31,8 @@ namespace Apollo.DeviceViewers {
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
         }
 
-        private void Canvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right) {
+        private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 FadeThumb thumb = new FadeThumb();
                 double x = e.Device.GetPosition(canvas).X - 6;
 
