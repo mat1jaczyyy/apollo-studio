@@ -57,8 +57,7 @@ namespace Apollo.DeviceViewers {
                 thumb.Focused += Thumb_Focus;
                 thumb.Deleted += Thumb_Delete;
 
-                _fade.Colors.Insert(index, new Color());
-                _fade.Positions.Insert(index, (Decimal)x_center / 188);
+                _fade.Insert(index, new Color(), (Decimal)x_center / 188);
 
                 canvas.Children.Add(thumb);
 
@@ -69,7 +68,7 @@ namespace Apollo.DeviceViewers {
 
         private void Expand(int? index) {
             if (current != null) {
-                PickerContainer.Width = 0;
+                PickerContainer.ColumnDefinitions[0].Width = new GridLength(0);
 
                 // FadeThumb.UnfocusUI
 
