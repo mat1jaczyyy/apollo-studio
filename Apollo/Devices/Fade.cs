@@ -43,7 +43,8 @@ namespace Apollo.Devices {
                 _counts.Add(new int[] {
                     Math.Abs(Colors[i].Red - Colors[i + 1].Red),
                     Math.Abs(Colors[i].Green - Colors[i + 1].Green),
-                    Math.Abs(Colors[i].Blue - Colors[i + 1].Blue)
+                    Math.Abs(Colors[i].Blue - Colors[i + 1].Blue),
+                    1
                 }.Max());
 
                 for (int j = 0; j < _counts.Last(); j++) {
