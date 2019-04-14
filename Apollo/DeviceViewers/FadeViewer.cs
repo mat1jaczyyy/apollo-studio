@@ -64,5 +64,7 @@ namespace Apollo.DeviceViewers {
             thumbs.Remove(sender);
             canvas.Children.Remove(sender);
         }
+
+        private void Duration_Changed(double value) => _fade.Time = (int)value;
     }
 }
