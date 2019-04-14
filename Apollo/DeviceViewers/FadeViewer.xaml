@@ -17,8 +17,8 @@
             </Rectangle.Fill>
           </Rectangle>
 
-          <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" />
-          <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" />
+          <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" />
+          <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" Focused="Thumb_Focus" />
         </Canvas>
       </Border>
 
@@ -31,7 +31,7 @@
 
     <Grid Grid.Column="1" ColumnDefinitions="0" x:Name="PickerContainer">
       <Border Margin="5 0 0 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-        <Components:ColorPicker Margin="5 0 0 0" x:Name="Picker" />
+        <Components:ColorPicker Margin="5 0 0 0" x:Name="Picker" ColorChanged="Color_Changed" />
       </Border>
     </Grid>
   </Grid>

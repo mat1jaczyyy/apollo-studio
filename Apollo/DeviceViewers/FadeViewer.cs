@@ -80,7 +80,7 @@ namespace Apollo.DeviceViewers {
 
             if (index != null) {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-                Picker.SetColor(_fade.Colors[index.Value]);
+                Picker.SetColor(_fade.GetColor(index.Value));
 
                 // FadeThumb.FocusUI
             }
@@ -101,6 +101,8 @@ namespace Apollo.DeviceViewers {
             x = (x > right)? right : x;
 
             Canvas.SetLeft(sender, x);
+
+            _fade.SetPosition(i, (Decimal)x / 188);
         }
 
         private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
@@ -115,6 +117,13 @@ namespace Apollo.DeviceViewers {
 
             thumbs.Remove(sender);
             canvas.Children.Remove(sender);
+        }
+
+        private void Color_Changed(Color color) {
+            if (current != null) {
+                _fade.SetColor(current.Value, color);
+                thumbs[current.Value].Fill = color.ToBrush();
+            }
         }
 
         private void Duration_Changed(double value) => _fade.Time = (int)value;
