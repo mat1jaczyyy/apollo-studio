@@ -69,7 +69,27 @@ namespace Apollo.Devices {
             }
         }
 
+        public Color this[int index] {
+            get => Colors[index];
+        }
+
+        public int Count {
+            get => Colors.Count;
+        }
+
         public override Device Clone() => new Fade(_time, Colors, Positions);
+
+        public void Insert(int index, Color color, Decimal position) {
+            Colors.Insert(index, color);
+            Positions.Insert(index, position);
+            Generate();
+        }
+
+        public void Remove(int index) {
+            Colors.RemoveAt(index);
+            Positions.RemoveAt(index);
+            Generate();
+        }
 
         public Fade(int time = 1000, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
