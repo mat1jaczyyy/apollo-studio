@@ -35,7 +35,23 @@ namespace Apollo.DeviceViewers {
             Picker = this.Get<ColorPicker>("Picker");
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
+
+            for (int i = 1; i < _fade.Count - 1; i++) {
+                FadeThumb thumb = new FadeThumb();
+                thumbs.Insert(i, thumb);
+                Canvas.SetLeft(thumb, (double)_fade.GetPosition(i) * 188 - 6);
+                
+                thumb.Moved += Thumb_Move;
+                thumb.Focused += Thumb_Focus;
+                thumb.Deleted += Thumb_Delete;
+
+                canvas.Children.Add(thumb);
+            }
+
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
+
+            for (int i = 0; i < _fade.Count; i++)
+                thumbs[i].Fill = _fade.GetColor(i).ToBrush();
         }
 
         private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
