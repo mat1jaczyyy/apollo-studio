@@ -18,6 +18,11 @@ namespace Apollo.Components {
 
         public Thumb Base;
 
+        public IBrush Fill {
+            get => Base.Background;
+            set => Base.Background = value;
+        }
+
         public FadeThumb() {
             InitializeComponent();
             
