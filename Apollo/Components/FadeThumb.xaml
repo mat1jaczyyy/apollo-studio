@@ -1,0 +1,19 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.FadeThumb">
+  
+  <Thumb Width="12" x:Name="Thumb" Height="16" DragDelta="Move" PointerReleased="MouseUp">
+    <Thumb.Template>
+      <ControlTemplate TargetType="Thumb">
+        <Canvas Background="Transparent">
+          <Path Fill="#FF000000"
+                Data="M 0,0 L 0,10 6,16 12,10 12,0 Z" />
+          <Path Fill="#FFFFFFFF"
+                Data="M 1,1 L 1,9 6,15 11,9 11,1 Z" />
+          <Path Fill="{TemplateBinding Background}"
+                Data="M 2,2 L 2,8 6,14 10,8 10,2 Z" />
+        </Canvas>
+      </ControlTemplate>
+    </Thumb.Template>
+  </Thumb>
+</UserControl>
