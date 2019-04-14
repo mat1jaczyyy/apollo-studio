@@ -3,28 +3,36 @@
              x:Class="Apollo.DeviceViewers.FadeViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
 
-  <Grid RowDefinitions="*,*">
-    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="26" x:Name="Canvas"
-              PointerPressed="Canvas_MouseDown">
-        <Rectangle Canvas.Left="6" Canvas.Top="6" Width="188" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
-          <Rectangle.Fill>
-            <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
-              <GradientStop Offset="0" Color="#FFFF0000" />
-              <GradientStop Offset="1" Color="#FF00FF00" />
-            </LinearGradientBrush>
-          </Rectangle.Fill>
-        </Rectangle>
+  <Grid ColumnDefinitions="Auto,Auto">
+    <Grid Grid.Column="0" RowDefinitions="*,*">
+      <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+        <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="26" x:Name="Canvas"
+                PointerPressed="Canvas_MouseDown">
+          <Rectangle Canvas.Left="6" Canvas.Top="6" Width="188" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
+            <Rectangle.Fill>
+              <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                <GradientStop Offset="0" Color="#FFFF0000" />
+                <GradientStop Offset="1" Color="#FF00FF00" />
+              </LinearGradientBrush>
+            </Rectangle.Fill>
+          </Rectangle>
 
-        <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" />
-        <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" />
-      </Canvas>
-    </Border>
+          <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" />
+          <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" />
+        </Canvas>
+      </Border>
 
-    <StackPanel Grid.Row="1" Margin="0 5 0 0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-      <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms"
-                       ValueChanged="Duration_Changed" />
-      <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" />
-    </StackPanel>
+      <StackPanel Grid.Row="1" Margin="0 5 0 0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+        <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms"
+                        ValueChanged="Duration_Changed" />
+        <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" />
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Column="1" ColumnDefinitions="0" x:Name="PickerContainer">
+      <Border Margin="5 0 0 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
+        <Components:ColorPicker Margin="5 0 0 0" x:Name="Picker" />
+      </Border>
+    </Grid>
   </Grid>
 </UserControl>

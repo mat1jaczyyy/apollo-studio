@@ -15,8 +15,8 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "fade";
 
         private int _time; // milliseconds
-        private List<Color> _colors = new List<Color>();
-        private List<Decimal> _positions = new List<Decimal>();
+        public List<Color> Colors = new List<Color>();
+        public List<Decimal> Positions = new List<Decimal>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
@@ -39,18 +39,18 @@ namespace Apollo.Devices {
             _counts = new List<int>();
             _cutoffs = new List<int>() {0};
 
-            for (int i = 0; i < _colors.Count - 1; i++) {
+            for (int i = 0; i < Colors.Count - 1; i++) {
                 _counts.Add(new int[] {
-                    Math.Abs(_colors[i].Red - _colors[i + 1].Red),
-                    Math.Abs(_colors[i].Green - _colors[i + 1].Green),
-                    Math.Abs(_colors[i].Blue - _colors[i + 1].Blue)
+                    Math.Abs(Colors[i].Red - Colors[i + 1].Red),
+                    Math.Abs(Colors[i].Green - Colors[i + 1].Green),
+                    Math.Abs(Colors[i].Blue - Colors[i + 1].Blue)
                 }.Max());
 
                 for (int j = 0; j < _counts.Last(); j++) {
                     _steps.Add(new Color(
-                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / _counts.Last()),
-                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / _counts.Last()),
-                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / _counts.Last())
+                        (byte)(Colors[i].Red + (Colors[i + 1].Red - Colors[i].Red) * j / _counts.Last()),
+                        (byte)(Colors[i].Green + (Colors[i + 1].Green - Colors[i].Green) * j / _counts.Last()),
+                        (byte)(Colors[i].Blue + (Colors[i + 1].Blue - Colors[i].Blue) * j / _counts.Last())
                     ));
                 }
 
@@ -61,7 +61,7 @@ namespace Apollo.Devices {
                 }
             }
 
-            _steps.Add(_colors.Last());
+            _steps.Add(Colors.Last());
 
             if (_steps.Last().Lit) {
                 _steps.Add(new Color(0));
@@ -69,7 +69,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Fade(_time, _colors, _positions);
+        public override Device Clone() => new Fade(_time, Colors, Positions);
 
         public Fade(int time = 1000, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
@@ -78,8 +78,8 @@ namespace Apollo.Devices {
             if (positions == null) positions = new List<Decimal>() {0, 1};
             
             Time = time;
-            _colors = colors;
-            _positions = positions;
+            Colors = colors;
+            Positions = positions;
 
             for (int i = 0; i < 128; i++)
                 locker[i] = new object();
@@ -101,7 +101,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (_colors.Count > 0 && n.Color.Lit) {
+            if (Colors.Count > 0 && n.Color.Lit) {
                 if (_timers[n.Index] != null) 
                     for (int i = 0; i < _timers[n.Index].Count; i++) 
                         _timers[n.Index][i].Dispose();
@@ -117,11 +117,11 @@ namespace Apollo.Devices {
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;
 
-                    if (j < _colors.Count - 1)
+                    if (j < Colors.Count - 1)
                         _timers[n.Index].Add(new Timer(
                             _timerexit,
                             (n.Index, n.Layer),
-                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
+                            (int)((Positions[j] + (Positions[j + 1] - Positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
                             Timeout.Infinite
                         ));
                 }
@@ -174,16 +174,16 @@ namespace Apollo.Devices {
 
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < _colors.Count; i++)
-                                writer.WriteRawValue(_colors[i].Encode());
+                            for (int i = 0; i < Colors.Count; i++)
+                                writer.WriteRawValue(Colors[i].Encode());
 
                         writer.WriteEndArray();
 
                         writer.WritePropertyName("positions");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < _positions.Count; i++)
-                                writer.WriteValue(_positions[i]);
+                            for (int i = 0; i < Positions.Count; i++)
+                                writer.WriteValue(Positions[i]);
 
                         writer.WriteEndArray();
 

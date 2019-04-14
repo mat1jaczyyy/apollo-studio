@@ -17,8 +17,12 @@ namespace Apollo.DeviceViewers {
         
         Fade _fade;
         Canvas canvas;
+        Grid PickerContainer;
+        ColorPicker Picker;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
+
+        int? current;
 
         public FadeViewer(Fade fade) {
             InitializeComponent();
@@ -26,6 +30,8 @@ namespace Apollo.DeviceViewers {
             _fade = fade;
             
             canvas = this.Get<Canvas>("Canvas");
+            PickerContainer = this.Get<Grid>("PickerContainer");
+            Picker = this.Get<ColorPicker>("Picker");
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
@@ -34,21 +40,48 @@ namespace Apollo.DeviceViewers {
         private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 FadeThumb thumb = new FadeThumb();
+                int index;
                 double x = e.Device.GetPosition(canvas).X - 6;
 
-                for (int i = 0; i < thumbs.Count; i++) {
-                    if (x < Canvas.GetLeft(thumbs[i])) {
-                        thumbs.Insert(i, thumb);
+                for (index = 0; index < thumbs.Count; index++) {
+                    if (x < Canvas.GetLeft(thumbs[index])) {
+                        thumbs.Insert(index, thumb);
                         break;
                     }
                 }
 
                 Canvas.SetLeft(thumb, e.Device.GetPosition(canvas).X - 6);
                 thumb.Moved += Thumb_Move;
+                thumb.Focused += Thumb_Focus;
                 thumb.Deleted += Thumb_Delete;
 
                 canvas.Children.Add(thumb);
+
+                if (current != null && index <= current) current++;
+                Expand(index);
             }
+        }
+
+        private void Expand(int? index) {
+            if (current != null) {
+                PickerContainer.Width = 0;
+
+                // FadeThumb.UnfocusUI
+
+                if (index == current) {
+                    current = null;
+                    return;
+                }
+            }
+
+            if (index != null) {
+                PickerContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                Picker.SetColor(_fade.Colors[index.Value]);
+
+                // FadeThumb.FocusUI
+            }
+            
+            current = index;
         }
 
         private void Thumb_Move(FadeThumb sender, VectorEventArgs e) {
@@ -66,7 +99,16 @@ namespace Apollo.DeviceViewers {
             Canvas.SetLeft(sender, x);
         }
 
+        private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
+
         private void Thumb_Delete(FadeThumb sender) {
+            int index = thumbs.IndexOf(sender);
+
+            if (current != null) {
+                if (index < current) current--;
+                else if (index == current) Expand(null);
+            }
+
             thumbs.Remove(sender);
             canvas.Children.Remove(sender);
         }

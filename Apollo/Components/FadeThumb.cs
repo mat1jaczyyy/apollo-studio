@@ -12,8 +12,9 @@ namespace Apollo.Components {
         public delegate void MovedEventHandler(FadeThumb sender, VectorEventArgs e);
         public event MovedEventHandler Moved;
 
-        public delegate void DeletedEventHandler(FadeThumb sender);
-        public event DeletedEventHandler Deleted;
+        public delegate void FadeThumbEventHandler(FadeThumb sender);
+        public event FadeThumbEventHandler Focused;
+        public event FadeThumbEventHandler Deleted;
 
         public Thumb Base;
 
@@ -23,7 +24,9 @@ namespace Apollo.Components {
             Base = this.Get<Thumb>("Thumb");
         }
 
-        private void Move(object sender, VectorEventArgs e) => Moved?.Invoke(this, e);
+        private void MouseDown(object sender, VectorEventArgs e) => Focused?.Invoke(this);
+
+        private void MouseMove(object sender, VectorEventArgs e) => Moved?.Invoke(this, e);
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) Deleted?.Invoke(this);
