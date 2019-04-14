@@ -15,8 +15,8 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "fade";
 
         private int _time; // milliseconds
-        public List<Color> Colors = new List<Color>();
-        public List<Decimal> Positions = new List<Decimal>();
+        private List<Color> _colors = new List<Color>();
+        private List<Decimal> _positions = new List<Decimal>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
@@ -26,6 +26,18 @@ namespace Apollo.Devices {
 
         private List<Timer>[] _timers = new List<Timer>[128];
         private TimerCallback _timerexit;
+
+        public Color GetColor(int index) => _colors[index];
+        public void SetColor(int index, Color color) {
+            _colors[index] = color;
+            Generate();
+        }
+
+        public Decimal GetPosition(int index) => _positions[index];
+        public void SetPosition(int index, Decimal position) {
+            _positions[index] = position;
+            Generate();
+        }
 
         public int Time {
             get => _time;
@@ -39,19 +51,19 @@ namespace Apollo.Devices {
             _counts = new List<int>();
             _cutoffs = new List<int>() {0};
 
-            for (int i = 0; i < Colors.Count - 1; i++) {
+            for (int i = 0; i < _colors.Count - 1; i++) {
                 _counts.Add(new int[] {
-                    Math.Abs(Colors[i].Red - Colors[i + 1].Red),
-                    Math.Abs(Colors[i].Green - Colors[i + 1].Green),
-                    Math.Abs(Colors[i].Blue - Colors[i + 1].Blue),
+                    Math.Abs(_colors[i].Red - _colors[i + 1].Red),
+                    Math.Abs(_colors[i].Green - _colors[i + 1].Green),
+                    Math.Abs(_colors[i].Blue - _colors[i + 1].Blue),
                     1
                 }.Max());
 
                 for (int j = 0; j < _counts.Last(); j++) {
                     _steps.Add(new Color(
-                        (byte)(Colors[i].Red + (Colors[i + 1].Red - Colors[i].Red) * j / _counts.Last()),
-                        (byte)(Colors[i].Green + (Colors[i + 1].Green - Colors[i].Green) * j / _counts.Last()),
-                        (byte)(Colors[i].Blue + (Colors[i + 1].Blue - Colors[i].Blue) * j / _counts.Last())
+                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / _counts.Last()),
+                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / _counts.Last()),
+                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / _counts.Last())
                     ));
                 }
 
@@ -62,7 +74,7 @@ namespace Apollo.Devices {
                 }
             }
 
-            _steps.Add(Colors.Last());
+            _steps.Add(_colors.Last());
 
             if (_steps.Last().Lit) {
                 _steps.Add(new Color(0));
@@ -70,25 +82,21 @@ namespace Apollo.Devices {
             }
         }
 
-        public Color this[int index] {
-            get => Colors[index];
-        }
-
         public int Count {
-            get => Colors.Count;
+            get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(_time, Colors, Positions);
+        public override Device Clone() => new Fade(_time, _colors, _positions);
 
         public void Insert(int index, Color color, Decimal position) {
-            Colors.Insert(index, color);
-            Positions.Insert(index, position);
+            _colors.Insert(index, color);
+            _positions.Insert(index, position);
             Generate();
         }
 
         public void Remove(int index) {
-            Colors.RemoveAt(index);
-            Positions.RemoveAt(index);
+            _colors.RemoveAt(index);
+            _positions.RemoveAt(index);
             Generate();
         }
 
@@ -99,8 +107,8 @@ namespace Apollo.Devices {
             if (positions == null) positions = new List<Decimal>() {0, 1};
             
             Time = time;
-            Colors = colors;
-            Positions = positions;
+            _colors = colors;
+            _positions = positions;
 
             for (int i = 0; i < 128; i++)
                 locker[i] = new object();
@@ -122,7 +130,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (Colors.Count > 0 && n.Color.Lit) {
+            if (_colors.Count > 0 && n.Color.Lit) {
                 if (_timers[n.Index] != null) 
                     for (int i = 0; i < _timers[n.Index].Count; i++) 
                         _timers[n.Index][i].Dispose();
@@ -138,11 +146,11 @@ namespace Apollo.Devices {
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;
 
-                    if (j < Colors.Count - 1)
+                    if (j < _colors.Count - 1)
                         _timers[n.Index].Add(new Timer(
                             _timerexit,
                             (n.Index, n.Layer),
-                            (int)((Positions[j] + (Positions[j + 1] - Positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
+                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
                             Timeout.Infinite
                         ));
                 }
@@ -157,16 +165,16 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            List<object> colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
+            List<object> _colors = JsonConvert.DeserializeObject<List<object>>(data["_colors"].ToString());
             List<Color> initC = new List<Color>();
 
-            foreach (object color in colors)
+            foreach (object color in _colors)
                 initC.Add(Color.Decode(color.ToString()));
 
-            List<object> positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
+            List<object> _positions = JsonConvert.DeserializeObject<List<object>>(data["_positions"].ToString());
             List<Decimal> initP = new List<Decimal>();
 
-            foreach (object position in positions)
+            foreach (object position in _positions)
                 initP.Add(Decimal.Parse(position.ToString()));
 
             return new Fade(
@@ -191,20 +199,20 @@ namespace Apollo.Devices {
                         writer.WritePropertyName("time");
                         writer.WriteValue(_time);
 
-                        writer.WritePropertyName("colors");
+                        writer.WritePropertyName("_colors");
 
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < Colors.Count; i++)
-                                writer.WriteRawValue(Colors[i].Encode());
+                            for (int i = 0; i < _colors.Count; i++)
+                                writer.WriteRawValue(_colors[i].Encode());
 
                         writer.WriteEndArray();
 
-                        writer.WritePropertyName("positions");
+                        writer.WritePropertyName("_positions");
                         writer.WriteStartArray();
 
-                            for (int i = 0; i < Positions.Count; i++)
-                                writer.WriteValue(Positions[i]);
+                            for (int i = 0; i < _positions.Count; i++)
+                                writer.WriteValue(_positions[i]);
 
                         writer.WriteEndArray();
 
