@@ -24,9 +24,18 @@ namespace Apollo.Components {
             Base = this.Get<Thumb>("Thumb");
         }
 
-        private void MouseDown(object sender, VectorEventArgs e) => Focused?.Invoke(this);
+        bool dragged = false;
 
-        private void MouseMove(object sender, VectorEventArgs e) => Moved?.Invoke(this, e);
+        private void DragStarted(object sender, VectorEventArgs e) => dragged = false;
+
+        private void DragCompleted(object sender, VectorEventArgs e) {
+            if (!dragged) Focused?.Invoke(this);
+        }
+
+        private void MouseMove(object sender, VectorEventArgs e) {
+            dragged = true;
+            Moved?.Invoke(this, e);
+        } 
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) Deleted?.Invoke(this);
