@@ -46,6 +46,9 @@ namespace Apollo.Devices {
             }
         }
 
+        public delegate void GeneratedEventHandler();
+        public event GeneratedEventHandler Generated;
+
         private void Generate() {
             _steps = new List<Color>();
             _counts = new List<int>();
@@ -80,6 +83,8 @@ namespace Apollo.Devices {
                 _steps.Add(new Color(0));
                 _cutoffs[_cutoffs.Count - 1]++;
             }
+
+            Generated?.Invoke();
         }
 
         public int Count {

@@ -5,6 +5,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using GradientStop = Avalonia.Media.GradientStop;
+using LinearGradientBrush = Avalonia.Media.LinearGradientBrush;
 
 using Apollo.Components;
 using Apollo.Devices;
@@ -20,6 +22,7 @@ namespace Apollo.DeviceViewers {
         Canvas canvas;
         Grid PickerContainer;
         ColorPicker Picker;
+        LinearGradientBrush Gradient;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
 
@@ -29,10 +32,12 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _fade = fade;
+            _fade.Generated += Gradient_Generate;
             
             canvas = this.Get<Canvas>("Canvas");
             PickerContainer = this.Get<Grid>("PickerContainer");
             Picker = this.Get<ColorPicker>("Picker");
+            Gradient = this.Get<LinearGradientBrush>("Gradient");
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
 
@@ -40,7 +45,7 @@ namespace Apollo.DeviceViewers {
                 FadeThumb thumb = new FadeThumb();
                 thumbs.Insert(i, thumb);
                 Canvas.SetLeft(thumb, (double)_fade.GetPosition(i) * 188 - 6);
-                
+
                 thumb.Moved += Thumb_Move;
                 thumb.Focused += Thumb_Focus;
                 thumb.Deleted += Thumb_Delete;
@@ -52,6 +57,8 @@ namespace Apollo.DeviceViewers {
 
             for (int i = 0; i < _fade.Count; i++)
                 thumbs[i].Fill = _fade.GetColor(i).ToBrush();
+
+            Gradient_Generate();
         }
 
         private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
@@ -140,6 +147,13 @@ namespace Apollo.DeviceViewers {
                 _fade.SetColor(current.Value, color);
                 thumbs[current.Value].Fill = color.ToBrush();
             }
+        }
+
+        private void Gradient_Generate() {
+            Gradient.GradientStops.Clear();
+
+            for (int i = 0; i < _fade.Count; i++)
+                Gradient.GradientStops.Add(new GradientStop(_fade.GetColor(i).ToAvaloniaColor(), (double)_fade.GetPosition(i)));
         }
 
         private void Duration_Changed(double value) => _fade.Time = (int)value;

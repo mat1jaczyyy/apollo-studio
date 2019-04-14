@@ -54,12 +54,14 @@ namespace Apollo.Structures {
             Blue = blue;
         }
 
-        public IBrush ToBrush() => new SolidColorBrush(new AvaloniaColor(
+        public AvaloniaColor ToAvaloniaColor() => new AvaloniaColor(
             255,
             (byte)(_r * (255.0 / 63)),
             (byte)(_g * (255.0 / 63)),
             (byte)(_b * (255.0 / 63))
-        ));
+        );
+
+        public IBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
 
         public string ToHex() => $"#{_r.ToString("X2")}{_g.ToString("X2")}{_b.ToString("X2")}";
 

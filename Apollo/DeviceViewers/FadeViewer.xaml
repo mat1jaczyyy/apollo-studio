@@ -10,10 +10,7 @@
                 PointerPressed="Canvas_MouseDown">
           <Rectangle Canvas.Left="6" Canvas.Top="6" Width="188" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
             <Rectangle.Fill>
-              <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
-                <GradientStop Offset="0" Color="#FFFF0000" />
-                <GradientStop Offset="1" Color="#FF00FF00" />
-              </LinearGradientBrush>
+              <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%" x:Name="Gradient" />
             </Rectangle.Fill>
           </Rectangle>
 
