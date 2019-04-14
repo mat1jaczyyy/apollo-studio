@@ -45,5 +45,8 @@ namespace Apollo.Components {
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) Deleted?.Invoke(this);
         }
+
+        public void Select() => Base.Foreground = new SolidColorBrush(new Color(255, 255, 255, 255));
+        public void Unselect() => Base.Foreground = new SolidColorBrush(new Color(0, 255, 255, 255));
     }
 }

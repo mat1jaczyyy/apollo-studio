@@ -44,7 +44,7 @@ namespace Apollo.DeviceViewers {
             for (int i = 1; i < _fade.Count - 1; i++) {
                 FadeThumb thumb = new FadeThumb();
                 thumbs.Insert(i, thumb);
-                Canvas.SetLeft(thumb, (double)_fade.GetPosition(i) * 188 - 6);
+                Canvas.SetLeft(thumb, (double)_fade.GetPosition(i) * 186 - 7);
 
                 thumb.Moved += Thumb_Move;
                 thumb.Focused += Thumb_Focus;
@@ -66,7 +66,7 @@ namespace Apollo.DeviceViewers {
                 FadeThumb thumb = new FadeThumb();
                 int index;
                 double x_center = e.Device.GetPosition(canvas).X;
-                double x_left = x_center - 6;
+                double x_left = x_center - 7;
 
                 for (index = 0; index < thumbs.Count; index++) {
                     if (x_left < Canvas.GetLeft(thumbs[index])) {
@@ -80,7 +80,7 @@ namespace Apollo.DeviceViewers {
                 thumb.Focused += Thumb_Focus;
                 thumb.Deleted += Thumb_Delete;
 
-                _fade.Insert(index, new Color(), (Decimal)x_center / 188);
+                _fade.Insert(index, new Color(), (Decimal)x_center / 186);
 
                 canvas.Children.Add(thumb);
 
@@ -92,8 +92,7 @@ namespace Apollo.DeviceViewers {
         private void Expand(int? index) {
             if (current != null) {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(0);
-
-                // FadeThumb.UnfocusUI
+                thumbs[current.Value].Unselect();
 
                 if (index == current) {
                     current = null;
@@ -103,9 +102,9 @@ namespace Apollo.DeviceViewers {
 
             if (index != null) {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-                Picker.SetColor(_fade.GetColor(index.Value));
+                thumbs[index.Value].Select();
 
-                // FadeThumb.FocusUI
+                Picker.SetColor(_fade.GetColor(index.Value));
             }
             
             current = index;
@@ -125,7 +124,7 @@ namespace Apollo.DeviceViewers {
 
             Canvas.SetLeft(sender, x);
 
-            _fade.SetPosition(i, (Decimal)x / 188);
+            _fade.SetPosition(i, (Decimal)x / 186);
         }
 
         private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));

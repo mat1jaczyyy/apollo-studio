@@ -8,14 +8,14 @@
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
         <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="26" x:Name="Canvas"
                 PointerPressed="Canvas_MouseDown">
-          <Rectangle Canvas.Left="6" Canvas.Top="6" Width="188" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
+          <Rectangle Canvas.Left="7" Canvas.Top="7" Width="186" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1">
             <Rectangle.Fill>
               <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%" x:Name="Gradient" />
             </Rectangle.Fill>
           </Rectangle>
 
           <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" />
-          <Components:FadeThumb Canvas.Left="188" x:Name="ThumbEnd" Focused="Thumb_Focus" />
+          <Components:FadeThumb Canvas.Left="186" x:Name="ThumbEnd" Focused="Thumb_Focus" />
         </Canvas>
       </Border>
 
