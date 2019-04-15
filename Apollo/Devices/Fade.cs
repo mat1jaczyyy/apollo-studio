@@ -7,6 +7,7 @@ using System.Threading;
 
 using Newtonsoft.Json;
 
+using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -49,32 +50,41 @@ namespace Apollo.Devices {
         public delegate void GeneratedEventHandler();
         public event GeneratedEventHandler Generated;
 
-        private void Generate() {
+        private void Generate(double amount = 0) {
+            if (amount < 0.03 || 1 > amount) amount = Preferences.FadeSmoothness;
+            double tick = 1 - amount;
+
             _steps = new List<Color>();
             _counts = new List<int>();
             _cutoffs = new List<int>() {0};
 
             for (int i = 0; i < _colors.Count - 1; i++) {
-                _counts.Add(new int[] {
+                int max = new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
                     Math.Abs(_colors[i].Green - _colors[i + 1].Green),
                     Math.Abs(_colors[i].Blue - _colors[i + 1].Blue),
                     1
-                }.Max());
+                }.Max();
 
-                for (int j = 0; j < _counts.Last(); j++) {
-                    _steps.Add(new Color(
-                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / _counts.Last()),
-                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / _counts.Last()),
-                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / _counts.Last())
-                    ));
+                int count = 0;
+                for (int j = 0; j < max; j++) {
+                    tick += amount;
+
+                    if (tick >= 1) {
+                        tick += -1;
+
+                        _steps.Add(new Color(
+                            (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / max),
+                            (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / max),
+                            (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / max)
+                        ));
+
+                        count++;
+                    }
                 }
 
-                if (i > 0) {
-                    _cutoffs.Add(_counts.Last() + _cutoffs.Last());
-                } else {
-                    _cutoffs.Add(_counts.Last());
-                }
+                _counts.Add(count);
+                _cutoffs.Add(count + _cutoffs.Last());
             }
 
             _steps.Add(_colors.Last());
@@ -118,6 +128,7 @@ namespace Apollo.Devices {
             for (int i = 0; i < 100; i++)
                 locker[i] = new object();
 
+            Preferences.FadeSmoothnessChanged += Generate;
             Generate();
         }
 
