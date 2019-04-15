@@ -63,7 +63,7 @@ namespace Apollo.Core {
         public static double FadeSmoothness {
             get => _FadeSmoothness;
             set {
-                if (0.03 <= value && value <= 1) {
+                if (0.01 <= value && value <= 1) {
                     _FadeSmoothness = value;
                     FadeSmoothnessChanged?.Invoke(_FadeSmoothness);
                     Save();

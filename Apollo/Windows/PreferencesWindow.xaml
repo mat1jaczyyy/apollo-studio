@@ -40,7 +40,7 @@
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
             <StackPanel Orientation="Horizontal" Spacing="10">
               <TextBlock Text="Fade Smoothness" />
-              <Slider Width="100" Minimum="0.03" Maximum="1" x:Name="FadeSmoothness" />
+              <Slider Width="100" Minimum="0.01" Maximum="1" x:Name="FadeSmoothness" />
             </StackPanel>
           </StackPanel>
         </Border>

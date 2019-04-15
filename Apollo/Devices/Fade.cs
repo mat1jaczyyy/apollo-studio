@@ -51,8 +51,7 @@ namespace Apollo.Devices {
         public event GeneratedEventHandler Generated;
 
         private void Generate(double amount = 0) {
-            if (amount < 0.03 || 1 > amount) amount = Preferences.FadeSmoothness;
-            double tick = 1 - amount;
+            if (amount < 0.01 || 1 > amount) amount = Preferences.FadeSmoothness;
 
             _steps = new List<Color>();
             _counts = new List<int>();
@@ -67,6 +66,7 @@ namespace Apollo.Devices {
                 }.Max();
 
                 int count = 0;
+                double tick = 1 - amount;
                 for (int j = 0; j < max; j++) {
                     tick += amount;
 
