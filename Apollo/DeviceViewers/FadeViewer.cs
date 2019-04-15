@@ -33,6 +33,13 @@ namespace Apollo.DeviceViewers {
 
             _fade = fade;
             _fade.Generated += Gradient_Generate;
+
+            Dial Duration = this.Get<Dial>("Duration");
+            Duration.UsingSteps = _fade.Mode;
+            Duration.Length = _fade.Length;
+            Duration.RawValue = _fade.Time;
+
+            this.Get<Dial>("Gate").RawValue = (double)_fade.Gate * 100;
             
             canvas = this.Get<Canvas>("Canvas");
             PickerContainer = this.Get<Grid>("PickerContainer");
@@ -156,5 +163,9 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Duration_Changed(double value) => _fade.Time = (int)value;
+
+        private void Duration_ModeChanged(bool value) => _fade.Mode = value;
+
+        private void Gate_Changed(double value) => _fade.Gate = (decimal)(value / 100);
     }
 }
