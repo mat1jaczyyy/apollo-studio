@@ -3,6 +3,6 @@
              x:Class="Apollo.DeviceViewers.OverrideViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="6" Exponent="1" Round="0" Unit=""
+  <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="2" Exponent="1" Round="0" Unit=""
                    ValueChanged="Target_Changed" />
 </UserControl>

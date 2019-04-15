@@ -14,9 +14,14 @@ namespace Apollo.DeviceViewers {
         Override _override;
         Dial Target;
 
-        private void Update_Target(int value) => Target.RawValue = value + 1;
+        private void Update_Target(int value) {
+            Target.RawValue = value + 1;
+        }
 
-        private void Update_Maximum(int value) => Target.Maximum = value;
+        private void Update_Maximum(int value) {
+            Target.Enabled = (value != 1);
+            if (Target.Enabled) Target.Maximum = value;
+        } 
 
         public OverrideViewer(Override o) {
             InitializeComponent();
@@ -26,8 +31,8 @@ namespace Apollo.DeviceViewers {
             Program.Project.TrackCountChanged += Update_Maximum;
 
             Target = this.Get<Dial>("Target");
-            Target.Maximum = Program.Project.Tracks.Count;
-            Target.RawValue = _override.Target + 1;
+            Update_Maximum(Program.Project.Tracks.Count);
+            Update_Target(_override.Target);
         }
 
         private void Target_Changed(double value) => _override.Target = (int)value - 1;
