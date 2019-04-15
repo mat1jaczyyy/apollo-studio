@@ -2,34 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Remove">
 
-  <UserControl.Styles>
-    <Style Selector="Grid.collapsible">
-      <Setter Property="Width" Value="3" />
-    </Style>
-    <Style Selector="Grid.collapsible[IsPointerOver=false]">
-      <Style.Animations>
-        <Animation Duration="0:0:0.1" FillMode="Forward">
-          <KeyFrame Cue="100%">
-            <Setter Property="Width" Value="3" />
-          </KeyFrame>
-        </Animation>
-      </Style.Animations>
-    </Style>
-    <Style Selector="Grid.collapsible[IsPointerOver=true]">
-      <Style.Animations>
-        <Animation Duration="0:0:0.1" FillMode="Forward">
-          <KeyFrame Cue="100%">
-            <Setter Property="Width" Value="14" />
-          </KeyFrame>
-        </Animation>
-      </Style.Animations>
-    </Style>
-  </UserControl.Styles>
-
-  <Grid ColumnDefinitions="4,Auto,4" Background="Transparent" Classes="collapsible">
-    <Canvas Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Height="8" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
-      <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
-            Data="M 1,1 L 7,7 M 7,1 L 1,7" />
-    </Canvas>
-  </Grid>
+  <Canvas Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Height="8" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
+    <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
+          Data="M 1,1 L 7,7 M 7,1 L 1,7" />
+  </Canvas>
 </UserControl>
