@@ -25,8 +25,8 @@ namespace Apollo.Structures {
 
         public Signal Clone() => new Signal(Source, Index, Color.Clone(), Layer);
 
-        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0) {
-            if (source?.InputFormat == Launchpad.InputType.DrumRack)
+        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0, Launchpad.InputType input = Launchpad.InputType.XY) {
+            if (input == Launchpad.InputType.DrumRack)
                 index = Conversion.DRtoXY[index];
 
             Source = source;

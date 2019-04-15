@@ -166,20 +166,20 @@ namespace Apollo.Elements {
             }
         }
 
-        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color((byte)(e.Velocity >> 1))));
+        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color((byte)(e.Velocity >> 1)), 0, InputFormat));
 
-        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color(0)));
+        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(this, (byte)e.Key, new Color(0), 0, InputFormat));
 
         private void ControlChange(object sender, in ControlChangeMessage e) {
             switch (Type) {
                 case LaunchpadType.MK2:
                     if (104 <= e.Control && e.Control <= 111)
-                        HandleMessage(new Signal(this, (byte)(e.Control - 13), new Color((byte)(e.Value >> 1))));
+                        HandleMessage(new Signal(this, (byte)(e.Control - 13), new Color((byte)(e.Value >> 1)), 0, InputFormat));
                     break;
 
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
-                    HandleMessage(new Signal(this, (byte)e.Control, new Color((byte)(e.Value >> 1))));
+                    HandleMessage(new Signal(this, (byte)e.Control, new Color((byte)(e.Value >> 1)), 0, InputFormat));
                     break;
             }
         }
