@@ -15,7 +15,8 @@ namespace Apollo.Core {
 
         private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";
 
-        public delegate void CheckBoxChanged(bool NewValue);
+        public delegate void CheckBoxChanged(bool newValue);
+        public delegate void SliderChanged(double newValue);
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;
@@ -57,6 +58,19 @@ namespace Apollo.Core {
             }
         }
 
+        public static event SliderChanged FadeSmoothnessChanged;
+        private static double _FadeSmoothness = 1;
+        public static double FadeSmoothness {
+            get => _FadeSmoothness;
+            set {
+                if (0.03 <= value && value <= 1) {
+                    _FadeSmoothness = value;
+                    FadeSmoothnessChanged?.Invoke(_FadeSmoothness);
+                    Save();
+                }
+            }
+        }
+
         public static void Save() => File.WriteAllText(FilePath, Encode());
 
         static Preferences() {
@@ -74,6 +88,7 @@ namespace Apollo.Core {
                 CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
                 AutoCreateKeyFilter = Convert.ToBoolean(data["autocreatekeyfilter"]);
                 AutoCreatePageFilter = Convert.ToBoolean(data["autocreatepagefilter"]);
+                FadeSmoothness = Convert.ToDouble(data["fadesmoothness"]);
             } catch {
                 return false;
             }
@@ -104,6 +119,9 @@ namespace Apollo.Core {
 
                         writer.WritePropertyName("autocreatepagefilter");
                         writer.WriteValue(AutoCreatePageFilter);
+
+                        writer.WritePropertyName("fadesmoothness");
+                        writer.WriteValue(FadeSmoothness);
 
                     writer.WriteEndObject();
 

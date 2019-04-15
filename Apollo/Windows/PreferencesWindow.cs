@@ -15,6 +15,7 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter;
+        Slider FadeSmoothness;
         Controls Contents;
 
         private void UpdateTopmost(bool value) => Topmost = value;
@@ -51,6 +52,10 @@ namespace Apollo.Windows {
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
 
+            FadeSmoothness = this.Get<Slider>("FadeSmoothness");
+            FadeSmoothness.Value = Preferences.FadeSmoothness;
+            FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
+
             Contents = this.Get<StackPanel>("Contents").Children;
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
@@ -74,6 +79,8 @@ namespace Apollo.Windows {
         private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
         private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
+
+        private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

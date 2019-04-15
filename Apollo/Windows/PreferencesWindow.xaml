@@ -5,7 +5,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="320" MinWidth="320" MaxWidth="320"
-        Height="420" MinHeight="420" MaxHeight="420" 
+        Height="480" MinHeight="480" MaxHeight="480" 
         Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -18,7 +18,7 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="10 5">
+      <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="10 5">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
@@ -36,6 +36,16 @@
         </Border>
 
         <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <StackPanel Spacing="5">
+            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Fade Smoothness" />
+              <Slider Width="100" Minimum="0.03" Maximum="1" x:Name="FadeSmoothness" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel>
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
             <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -44,8 +54,8 @@
           </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="3" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 6" />
+        <StackPanel Grid.Row="4" Margin="10" HorizontalAlignment="Center">
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 7" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
       </Grid>
