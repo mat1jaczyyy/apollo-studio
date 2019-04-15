@@ -15,7 +15,6 @@ namespace Apollo.Devices {
     public class Fade: Device {
         public static readonly new string DeviceIdentifier = "fade";
 
-        private int _time; // milliseconds
         private List<Color> _colors = new List<Color>();
         private List<Decimal> _positions = new List<Decimal>();
         private List<Color> _steps = new List<Color>();
@@ -24,9 +23,6 @@ namespace Apollo.Devices {
         
         private int[] _indexes = new int[100];
         private object[] locker = new object[100];
-
-        private List<Timer>[] _timers = new List<Timer>[100];
-        private TimerCallback _timerexit;
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -40,10 +36,27 @@ namespace Apollo.Devices {
             Generate();
         }
 
+        private List<Timer>[] _timers = new List<Timer>[100];
+        private TimerCallback _timerexit;
+
+        public bool Mode; // true uses Length
+        public Length Length;
+        private int _time;
+        private Decimal _gate;
+
         public int Time {
             get => _time;
             set {
-                if (0 <= value) _time = value;
+                if (10 <= value && value <= 30000)
+                    _time = value;
+            }
+        }
+
+        public Decimal Gate {
+            get => _gate;
+            set {
+                if (0 <= value && value <= 4)
+                    _gate = value;
             }
         }
 
@@ -101,7 +114,7 @@ namespace Apollo.Devices {
             get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(_time, _colors, _positions);
+        public override Device Clone() => new Fade(Mode, Length, _time, _gate, _colors, _positions);
 
         public void Insert(int index, Color color, Decimal position) {
             _colors.Insert(index, color);
@@ -115,13 +128,19 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(int time = 1000, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
+        public Fade(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
+
+            if (length == null) length = new Length();
 
             if (colors == null) colors = new List<Color>() {new Color(63), new Color(0)};
             if (positions == null) positions = new List<Decimal>() {0, 1};
             
+            Mode = mode;
             Time = time;
+            Length = length;
+            Gate = gate;
+
             _colors = colors;
             _positions = positions;
 
@@ -166,12 +185,12 @@ namespace Apollo.Devices {
                         _timers[n.Index].Add(new Timer(
                             _timerexit,
                             (n.Index, n.Layer),
-                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time),
+                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
                             Timeout.Infinite
                         ));
                 }
 
-                _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), _time, Timeout.Infinite));
+                _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), (int)((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
             }
         }
 
@@ -181,20 +200,23 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            List<object> _colors = JsonConvert.DeserializeObject<List<object>>(data["_colors"].ToString());
+            List<object> _colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
             List<Color> initC = new List<Color>();
 
             foreach (object color in _colors)
                 initC.Add(Color.Decode(color.ToString()));
 
-            List<object> _positions = JsonConvert.DeserializeObject<List<object>>(data["_positions"].ToString());
+            List<object> _positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
             List<Decimal> initP = new List<Decimal>();
 
             foreach (object position in _positions)
                 initP.Add(Decimal.Parse(position.ToString()));
 
             return new Fade(
+                Convert.ToBoolean(data["mode"]),
+                Length.Decode(data["length"].ToString()),
                 Convert.ToInt32(data["time"]),
+                Convert.ToDecimal(data["gate"]),
                 initC,
                 initP
             );
@@ -212,10 +234,19 @@ namespace Apollo.Devices {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(Mode);
+
+                        writer.WritePropertyName("length");
+                        writer.WriteRawValue(Length.Encode());
+
                         writer.WritePropertyName("time");
                         writer.WriteValue(_time);
 
-                        writer.WritePropertyName("_colors");
+                        writer.WritePropertyName("gate");
+                        writer.WriteValue(_gate);
+
+                        writer.WritePropertyName("colors");
 
                         writer.WriteStartArray();
 
@@ -224,7 +255,7 @@ namespace Apollo.Devices {
 
                         writer.WriteEndArray();
 
-                        writer.WritePropertyName("_positions");
+                        writer.WritePropertyName("positions");
                         writer.WriteStartArray();
 
                             for (int i = 0; i < _positions.Count; i++)
