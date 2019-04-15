@@ -16,7 +16,7 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "fade";
 
         private List<Color> _colors = new List<Color>();
-        private List<Decimal> _positions = new List<Decimal>();
+        private List<decimal> _positions = new List<decimal>();
         private List<Color> _steps = new List<Color>();
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
@@ -30,8 +30,8 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Decimal GetPosition(int index) => _positions[index];
-        public void SetPosition(int index, Decimal position) {
+        public decimal GetPosition(int index) => _positions[index];
+        public void SetPosition(int index, decimal position) {
             _positions[index] = position;
             Generate();
         }
@@ -42,7 +42,7 @@ namespace Apollo.Devices {
         public bool Mode; // true uses Length
         public Length Length;
         private int _time;
-        private Decimal _gate;
+        private decimal _gate;
 
         public int Time {
             get => _time;
@@ -52,7 +52,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public Decimal Gate {
+        public decimal Gate {
             get => _gate;
             set {
                 if (0 <= value && value <= 4)
@@ -116,7 +116,7 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Fade(Mode, Length, _time, _gate, _colors, _positions);
 
-        public void Insert(int index, Color color, Decimal position) {
+        public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
             Generate();
@@ -128,13 +128,13 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1, List<Color> colors = null, List<Decimal> positions = null): base(DeviceIdentifier) {
+        public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
 
             if (length == null) length = new Length();
 
             if (colors == null) colors = new List<Color>() {new Color(63), new Color(0)};
-            if (positions == null) positions = new List<Decimal>() {0, 1};
+            if (positions == null) positions = new List<decimal>() {0, 1};
             
             Mode = mode;
             Time = time;
@@ -207,10 +207,10 @@ namespace Apollo.Devices {
                 initC.Add(Color.Decode(color.ToString()));
 
             List<object> _positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
-            List<Decimal> initP = new List<Decimal>();
+            List<decimal> initP = new List<decimal>();
 
             foreach (object position in _positions)
-                initP.Add(Decimal.Parse(position.ToString()));
+                initP.Add(decimal.Parse(position.ToString()));
 
             return new Fade(
                 Convert.ToBoolean(data["mode"]),

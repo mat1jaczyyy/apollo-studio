@@ -15,7 +15,7 @@ namespace Apollo.Devices {
         public bool Mode; // true uses Length
         public Length Length;
         private int _time;
-        private Decimal _gate;
+        private decimal _gate;
         public bool Infinite;
 
         public int Time {
@@ -26,7 +26,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public Decimal Gate {
+        public decimal Gate {
             get => _gate;
             set {
                 if (0 <= value && value <= 4)
@@ -36,7 +36,7 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Hold(Mode, Length, _time, _gate, Infinite);
 
-        public Hold(bool mode = false, Length length = null, int time = 1000, Decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
+        public Hold(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
             if (length == null) length = new Length();
 
             Mode = mode;

@@ -23,13 +23,13 @@ namespace Apollo.Structures {
             }
         }
         
-        public Decimal Value {
+        public decimal Value {
             get => Convert.ToDecimal(Math.Pow(2, _value - 7));
         }
 
         public Length(int step = 5) => Step = step;
 
-        public static implicit operator Decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
+        public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
 
         public override string ToString() => Steps[_value];
 

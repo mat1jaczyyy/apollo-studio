@@ -15,7 +15,7 @@ namespace Apollo.Devices {
         public bool Mode; // true uses Length
         public Length Length;
         private int _rate;
-        private Decimal _gate;
+        private decimal _gate;
         public bool Animate;
         public bool Loop;
         public List<Offset> Offsets;
@@ -28,7 +28,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public Decimal Gate {
+        public decimal Gate {
             get => _gate;
             set {
                 if (0 <= value && value <= 4)
@@ -38,7 +38,7 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Copy(Mode, Length, _rate, _gate, Animate, Loop, Offsets);
 
-        public Copy(bool mode = false, Length length = null, int rate = 500, Decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             if (length == null) length = new Length();
             if (offsets == null) offsets = new List<Offset>();
 
