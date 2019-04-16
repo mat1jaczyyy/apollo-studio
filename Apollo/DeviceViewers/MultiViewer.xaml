@@ -1,0 +1,11 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.MultiViewer"
+             xmlns:Components="clr-namespace:Apollo.Components">
+  
+  <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+    <StackPanel x:Name="Contents" Margin="10 5">
+      <Components:ChainAdd ChainAdded="Chain_InsertStart" x:Name="ChainAdd" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
