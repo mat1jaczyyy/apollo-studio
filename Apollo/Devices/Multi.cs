@@ -14,7 +14,7 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "multi";
 
         public Chain Preprocess;
-        private List<Chain> _chains;
+        private List<Chain> _chains = new List<Chain>();
         private int current = -1;
 
         private void Reroute() {
