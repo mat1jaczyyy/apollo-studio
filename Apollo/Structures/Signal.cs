@@ -14,6 +14,7 @@ namespace Apollo.Structures {
         private byte _p = 11;
         public Color Color;
         public int Layer;
+        public int? MultiTarget;
 
         public byte Index {
             get => _p;
@@ -25,7 +26,7 @@ namespace Apollo.Structures {
 
         public Signal Clone() => new Signal(Source, Index, Color.Clone(), Layer);
 
-        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0, Launchpad.InputType input = Launchpad.InputType.XY) {
+        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0, Launchpad.InputType input = Launchpad.InputType.XY, int? multiTarget = null) {
             if (input == Launchpad.InputType.DrumRack)
                 index = Conversion.DRtoXY[index];
 
