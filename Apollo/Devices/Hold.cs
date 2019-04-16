@@ -17,6 +17,7 @@ namespace Apollo.Devices {
         private int _time;
         private decimal _gate;
         public bool Infinite;
+        public bool Release;
 
         public int Time {
             get => _time;
@@ -34,14 +35,15 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Hold(Mode, Length, _time, _gate, Infinite);
+        public override Device Clone() => new Hold(Mode, Length, _time, _gate, Infinite, Release);
 
-        public Hold(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
+        public Hold(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, bool infinite = false, bool release = false): base(DeviceIdentifier) {
             Mode = mode;
             Time = time;
             Length = length?? new Length();
             Gate = gate;
             Infinite = infinite;
+            Release = release;
         }
 
         private void Tick(object sender, EventArgs e) {
@@ -52,7 +54,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (n.Color.Lit) {
+            if (n.Color.Lit ^ Release) {
                 if (!Infinite) {
                     Courier courier = new Courier() {
                         Info = new Signal(Track.Get(this).Launchpad, n.Index, new Color(0), n.Layer),
@@ -63,6 +65,7 @@ namespace Apollo.Devices {
                     courier.Start();
                 }
 
+                if (Release) n.Color = new Color();
                 MIDIExit?.Invoke(n);
             }
         }
@@ -108,6 +111,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("infinite");
                         writer.WriteValue(Infinite);
+
+                        writer.WritePropertyName("release");
+                        writer.WriteValue(Release);
 
                     writer.WriteEndObject();
 
