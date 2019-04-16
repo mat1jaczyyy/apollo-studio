@@ -18,9 +18,7 @@ namespace Apollo.Devices {
         public override Device Clone() => new Move(Offset);
 
         public Move(Offset offset = null, bool loop = false): base(DeviceIdentifier) {
-            if (offset == null) offset = new Offset();
-            
-            Offset = offset;
+            Offset = offset?? new Offset();
             Loop = loop;
         }
 

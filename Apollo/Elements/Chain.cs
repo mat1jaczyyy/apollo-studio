@@ -86,8 +86,7 @@ namespace Apollo.Elements {
         }
 
         public Chain(List<Device> init = null) {
-            if (init == null) init = new List<Device>();
-            Devices = init;
+            Devices = init?? new List<Device>();
             Reroute();
         }
 

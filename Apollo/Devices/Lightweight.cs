@@ -214,8 +214,7 @@ namespace Apollo.Devices {
 
         public Lightweight(string path = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
-
-            if (path != null) Path = path;
+            Path = path;
         }
 
         private void Tick(object info) {

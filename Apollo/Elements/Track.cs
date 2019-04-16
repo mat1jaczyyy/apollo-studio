@@ -49,8 +49,7 @@ namespace Apollo.Elements {
         }
 
         public Track(Chain init = null, Launchpad launchpad = null) {
-            if (init == null) init = new Chain();
-            Chain = init;
+            Chain = init?? new Chain();
             Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
 
@@ -62,8 +61,7 @@ namespace Apollo.Elements {
         private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
 
         public void Dispose() {
-            if (Launchpad != null)
-                Launchpad.Receive -= MIDIEnter;
+            if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
 
             Disposed?.Invoke();
             

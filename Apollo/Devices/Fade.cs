@@ -130,19 +130,14 @@ namespace Apollo.Devices {
 
         public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
             _timerexit = new TimerCallback(Tick);
-
-            if (length == null) length = new Length();
-
-            if (colors == null) colors = new List<Color>() {new Color(63), new Color(0)};
-            if (positions == null) positions = new List<decimal>() {0, 1};
             
             Mode = mode;
             Time = time;
-            Length = length;
+            Length = length?? new Length();
             Gate = gate;
 
-            _colors = colors;
-            _positions = positions;
+            _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
+            _positions = positions?? new List<decimal>() {0, 1};
 
             for (int i = 0; i < 100; i++)
                 locker[i] = new object();

@@ -62,10 +62,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public Group(List<Chain> init = null): base(DeviceIdentifier) {
-            if (init == null) init = new List<Chain>();
-            Add(init);
-        }
+        public Group(List<Chain> init = null): base(DeviceIdentifier) => Add(init?? new List<Chain>());
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 

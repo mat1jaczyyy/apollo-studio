@@ -11,7 +11,7 @@ namespace Apollo.Structures {
         public static readonly string Identifier = "signal";
 
         public Launchpad Source;
-        private byte _p;
+        private byte _p = 11;
         public Color Color;
         public int Layer;
 
@@ -30,12 +30,8 @@ namespace Apollo.Structures {
                 index = Conversion.DRtoXY[index];
 
             Source = source;
-
-            if (color == null) color = new Color(63);
-            _p = 11;
-
             Index = index;
-            Color = color;
+            Color = color?? new Color(63);
             Layer = layer;
         }
 

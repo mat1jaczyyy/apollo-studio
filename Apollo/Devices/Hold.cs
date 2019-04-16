@@ -37,11 +37,9 @@ namespace Apollo.Devices {
         public override Device Clone() => new Hold(Mode, Length, _time, _gate, Infinite);
 
         public Hold(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, bool infinite = false): base(DeviceIdentifier) {
-            if (length == null) length = new Length();
-
             Mode = mode;
             Time = time;
-            Length = length;
+            Length = length?? new Length();
             Gate = gate;
             Infinite = infinite;
         }

@@ -106,12 +106,9 @@ namespace Apollo.Elements {
         }
 
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
-            if (tracks == null)
-                tracks = (from i in MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
-
             BPM = bpm;
             Page = page;
-            Tracks = tracks;
+            Tracks = tracks?? (from i in MIDI.Devices where i.Available select new Track() { Launchpad = i }).ToList();
             FilePath = path;
 
             Reroute();

@@ -39,16 +39,13 @@ namespace Apollo.Devices {
         public override Device Clone() => new Copy(Mode, Length, _rate, _gate, Animate, Loop, Offsets);
 
         public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
-            if (length == null) length = new Length();
-            if (offsets == null) offsets = new List<Offset>();
-
             Mode = mode;
             Rate = rate;
-            Length = length;
+            Length = length?? new Length();
             Gate = gate;
             Animate = animate;
             Loop = loop;
-            Offsets = offsets;
+            Offsets = offsets?? new List<Offset>();
         }
 
         private void Tick(object sender, EventArgs e) {
