@@ -15,7 +15,7 @@ namespace Apollo.DeviceViewers {
         Hold _hold;
 
         Dial Duration, Gate;
-        CheckBox Infinite;
+        CheckBox Infinite, Release;
 
         public HoldViewer(Hold hold) {
             InitializeComponent();
@@ -33,6 +33,9 @@ namespace Apollo.DeviceViewers {
             Infinite = this.Get<CheckBox>("Infinite");
             Infinite.IsChecked = _hold.Infinite;
             Infinite_Changed(null, EventArgs.Empty);
+
+            Release = this.Get<CheckBox>("Release");
+            Release.IsChecked = _hold.Release;
         }
 
         private void Duration_Changed(double value) => _hold.Time = (int)value;
@@ -45,5 +48,7 @@ namespace Apollo.DeviceViewers {
             _hold.Infinite = Infinite.IsChecked.Value;
             Duration.Enabled = Gate.Enabled = !Infinite.IsChecked.Value;
         }
+
+        private void Release_Changed(object sender, EventArgs e) => _hold.Release = Release.IsChecked.Value;
     }
 }

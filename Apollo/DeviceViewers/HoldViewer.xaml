@@ -3,17 +3,19 @@
              x:Class="Apollo.DeviceViewers.HoldViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid RowDefinitions="*,*,Auto">
+  <Grid RowDefinitions="*,*,Auto,Auto">
     <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.7" AllowSteps="true"
+      <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.4" AllowSteps="true"
                        ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" />
     </Border>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 5 0 5" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Scale="0.7"
+      <Components:Dial Margin="0 5 0 5" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%" Scale="0.4"
                        ValueChanged="Gate_Changed" />
     </Border>
 
-    <CheckBox Grid.Row="2" Margin="0 5 0 0" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
+    <CheckBox Grid.Row="2" Margin="0 5 0 0" x:Name="Release" Click="Release_Changed">Release</CheckBox>
+
+    <CheckBox Grid.Row="3" Margin="0 5 0 0" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
   </Grid>
 </UserControl>
