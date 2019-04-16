@@ -34,25 +34,29 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _multi = multi;
+
             _parent = parent;
+            _parent.Get<Grid>("Contents").Margin = new Thickness(0);
+            _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0, 5, 5, 0);
+
             _root = _parent.Get<StackPanel>("Root").Children;
+            _root.Insert(0, new DeviceHead());
+            _root.Insert(1, new ChainViewer(_multi.Preprocess) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
 
             Contents = this.Get<StackPanel>("Contents").Children;
-
-            if (_multi.Count == 0) this.Get<ChainAdd>("ChainAdd").AlwaysShowing = true;
             
             for (int i = 0; i < _multi.Count; i++)
                 Contents_Insert(i, _multi[i]);
             
-            parent.Get<Grid>("Contents").Margin = new Thickness(0);
+            if (_multi.Count == 0) this.Get<ChainAdd>("ChainAdd").AlwaysShowing = true;
         }
 
         private void Expand(int? index) {
             if (current != null) {
-                _root.RemoveAt(2);
-                _root.RemoveAt(1);
+                _root.RemoveAt(4);
+                _root.RemoveAt(3);
 
-                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5);
+                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0, 5, 5, 0);
                 ((ChainInfo)Contents[current.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
 
                 if (index == current) {
@@ -62,10 +66,10 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                _root.Insert(1, new ChainViewer(_multi[index.Value]) { Background = new SolidColorBrush(new Color(16, 0, 0, 0)) });
-                _root.Insert(2, new GroupTail());
+                _root.Insert(3, new ChainViewer(_multi[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
+                _root.Insert(4, new DeviceTail());
 
-                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
+                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0);
                 ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
             }
             
