@@ -15,7 +15,9 @@ namespace Apollo.Devices {
 
         public Chain Preprocess;
         private List<Chain> _chains = new List<Chain>();
+        
         private int current = -1;
+        private Dictionary<int, int>[] buffer = new Dictionary<int, int>[100];
 
         private void Reroute() {
             for (int i = 0; i < _chains.Count; i++) {
@@ -70,22 +72,37 @@ namespace Apollo.Devices {
             Preprocess.MIDIExit = PreprocessExit;
 
             Add(init?? new List<Chain>());
+            
+            for (int i = 0; i < 100; i++)
+                buffer[i] = new Dictionary<int, int>();
         }
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
-            if (_chains.Count == 0) ChainExit(n);
+            if (n.Color.Lit) {
+                if (++current >= _chains.Count) current = 0;
+                n.MultiTarget = current;
+                buffer[n.Index][n.Layer] = n.MultiTarget.Value;
 
-            if (++current >= _chains.Count) current = 0;
+            } else if (buffer[n.Index].ContainsKey(n.Layer)) {
+                n.MultiTarget = buffer[n.Index][n.Layer];
+                buffer[n.Index].Remove(n.Layer);
+            
+            } else return;
 
-            n.MultiTarget = current;
             Preprocess.MIDIEnter(n);
         }
 
         private void PreprocessExit(Signal n) {
             int target = n.MultiTarget.Value;
             n.MultiTarget = null;
+            
+            if (_chains.Count == 0) {
+                MIDIExit?.Invoke(n);
+                return;
+            }
+            
             _chains[target].MIDIEnter(n);
         }
 
