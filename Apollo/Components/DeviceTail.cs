@@ -2,9 +2,9 @@
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
-    public class GroupTail: UserControl {
+    public class DeviceTail: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        public GroupTail() => InitializeComponent();
+        public DeviceTail() => InitializeComponent();
     }
 }
