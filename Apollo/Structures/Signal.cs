@@ -24,17 +24,23 @@ namespace Apollo.Structures {
             }
         }
 
-        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Layer);
+        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Layer, MultiTarget);
 
-        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0, Launchpad.InputType input = Launchpad.InputType.XY, int? multiTarget = null) {
-            if (input == Launchpad.InputType.DrumRack)
-                index = Conversion.DRtoXY[index];
-
+        public Signal(Launchpad source, byte index = 11, Color color = null, int layer = 0, int? multiTarget = null) {
             Source = source;
             Index = index;
             Color = color?? new Color(63);
             Layer = layer;
+            MultiTarget = multiTarget;
         }
+
+        public Signal(Launchpad.InputType input, Launchpad source, byte index = 11, Color color = null, int layer = 0, int? multiTarget = null): this(
+            source,
+            (input == Launchpad.InputType.DrumRack)? Conversion.DRtoXY[index] : index,
+            color,
+            layer,
+            multiTarget
+        ) {}
 
         public string Encode() {
             StringBuilder json = new StringBuilder();
