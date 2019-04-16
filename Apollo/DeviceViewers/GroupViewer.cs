@@ -34,17 +34,18 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _group = group;
+
             _parent = parent;
+            _parent.Get<Grid>("Contents").Margin = new Thickness(0);
+
             _root = _parent.Get<StackPanel>("Root").Children;
 
             Contents = this.Get<StackPanel>("Contents").Children;
-
-            if (_group.Count == 0) this.Get<ChainAdd>("ChainAdd").AlwaysShowing = true;
             
             for (int i = 0; i < _group.Count; i++)
                 Contents_Insert(i, _group[i]);
-            
-            parent.Get<Grid>("Contents").Margin = new Thickness(0);
+
+            if (_group.Count == 0) this.Get<ChainAdd>("ChainAdd").AlwaysShowing = true;
         }
 
         private void Expand(int? index) {
@@ -62,8 +63,8 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = new SolidColorBrush(new Color(16, 0, 0, 0)) });
-                _root.Insert(2, new GroupTail());
+                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
+                _root.Insert(2, new DeviceTail());
 
                 _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);
                 ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
