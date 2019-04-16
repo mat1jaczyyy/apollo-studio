@@ -21,8 +21,8 @@ namespace Apollo.Devices {
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
         
-        private int[] _indexes = new int[100];
-        private object[] locker = new object[100];
+        private Dictionary<int, int>[] _indexes = new Dictionary<int, int>[100];
+        private Dictionary<int, object>[] locker = new Dictionary<int, object>[100];
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -36,7 +36,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private List<Timer>[] _timers = new List<Timer>[100];
+        private Dictionary<int, List<Timer>>[] _timers = new Dictionary<int, List<Timer>>[100];
         private TimerCallback _timerexit;
 
         public bool Mode; // true uses Length
@@ -139,8 +139,11 @@ namespace Apollo.Devices {
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
 
-            for (int i = 0; i < 100; i++)
-                locker[i] = new object();
+            for (int i = 0; i < 100; i++) {
+                _indexes[i] = new Dictionary<int, int>();
+                _timers[i] = new Dictionary<int, List<Timer>>();
+                locker[i] = new Dictionary<int, object>();
+            }
 
             Preferences.FadeSmoothnessChanged += Generate;
             Generate();
@@ -150,8 +153,8 @@ namespace Apollo.Devices {
             if (info.GetType() == typeof((byte, int))) {
                 (byte index, int layer) = ((byte, int))info;
 
-                lock (locker[index]) {
-                    int color = ++_indexes[index];
+                lock (locker[index][layer]) {
+                    int color = ++_indexes[index][layer];
 
                     if (color < _steps.Count)
                         MIDIExit?.Invoke(new Signal(Track.Get(this).Launchpad, index, _steps[color].Clone(), layer));
@@ -161,12 +164,14 @@ namespace Apollo.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (_colors.Count > 0 && n.Color.Lit) {
-                if (_timers[n.Index] != null) 
-                    for (int i = 0; i < _timers[n.Index].Count; i++) 
-                        _timers[n.Index][i].Dispose();
+                if (_timers[n.Index].ContainsKey(n.Layer))
+                    for (int i = 0; i < _timers[n.Index][n.Layer].Count; i++)
+                        _timers[n.Index][n.Layer][i].Dispose();
 
-                _timers[n.Index] = new List<Timer>();
-                _indexes[n.Index] = 0;
+                _timers[n.Index][n.Layer] = new List<Timer>();
+                _indexes[n.Index][n.Layer] = 0;
+
+                if (!locker[n.Index].ContainsKey(n.Layer)) locker[n.Index][n.Layer] = new object();
 
                 n.Color = _steps[0].Clone();
 
@@ -177,7 +182,7 @@ namespace Apollo.Devices {
                     if (_cutoffs[j + 1] == i) j++;
 
                     if (j < _colors.Count - 1)
-                        _timers[n.Index].Add(new Timer(
+                        _timers[n.Index][n.Layer].Add(new Timer(
                             _timerexit,
                             (n.Index, n.Layer),
                             (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
@@ -185,7 +190,7 @@ namespace Apollo.Devices {
                         ));
                 }
 
-                _timers[n.Index].Add(new Timer(_timerexit, (n.Index, n.Layer), (int)((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
+                _timers[n.Index][n.Layer].Add(new Timer(_timerexit, (n.Index, n.Layer), (int)((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
             }
         }
 
