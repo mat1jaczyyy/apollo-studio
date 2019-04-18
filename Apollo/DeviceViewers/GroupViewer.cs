@@ -63,7 +63,7 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                _root.Insert(1, new ChainViewer(_group[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
+                _root.Insert(1, new ChainViewer(_group[index.Value], true));
                 _root.Insert(2, new DeviceTail());
 
                 _parent.Get<Border>("Border").CornerRadius = new CornerRadius(5, 0, 0, 5);

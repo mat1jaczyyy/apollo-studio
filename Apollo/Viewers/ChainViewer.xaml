@@ -3,7 +3,9 @@
              x:Class="Apollo.Viewers.ChainViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">
-    <Components:DeviceAdd DeviceAdded="Device_InsertStart" x:Name="DeviceAdd" />
-  </StackPanel>
+  <Grid x:Name="Root">
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">
+      <Components:DeviceAdd DeviceAdded="Device_InsertStart" x:Name="DeviceAdd" />
+    </StackPanel>
+  </Grid>
 </UserControl>

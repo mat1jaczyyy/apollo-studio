@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.DeviceTail">
   
-    <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="0 5 5 0" x:Name="Border">
-      <Grid RowDefinitions="Auto,*">
-        <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1">
-          <Grid>
-            <TextBlock Margin="5 4" Text=" " Width="0" />
-          </Grid>
-        </Border>
-      </Grid>
-    </Border>
+  <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="0 5 5 0" x:Name="Border">
+    <Grid RowDefinitions="Auto,*">
+      <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1">
+        <Grid>
+          <TextBlock Margin="5 4" Text=" " Width="0" />
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
 </UserControl>

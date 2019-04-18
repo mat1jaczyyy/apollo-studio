@@ -1,7 +1,9 @@
 ﻿using System;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 using Apollo.Components;
 using Apollo.Elements;
@@ -20,7 +22,7 @@ namespace Apollo.Viewers {
             Contents.Insert(index + 1, viewer);
         }
 
-        public ChainViewer(Chain chain) {
+        public ChainViewer(Chain chain, bool backgroundBorder = false) {
             InitializeComponent();
 
             _chain = chain;
@@ -31,6 +33,11 @@ namespace Apollo.Viewers {
 
             for (int i = 0; i < _chain.Count; i++)
                 Contents_Insert(i, _chain[i]);
+            
+            if (backgroundBorder) {
+                this.Get<Grid>("Root").Children.Insert(0, new DeviceBackground());
+                Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush");
+            }
         }
 
         private void Device_Insert(int index, Type device) {

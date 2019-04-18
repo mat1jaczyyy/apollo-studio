@@ -41,7 +41,7 @@ namespace Apollo.DeviceViewers {
 
             _root = _parent.Get<StackPanel>("Root").Children;
             _root.Insert(0, new DeviceHead());
-            _root.Insert(1, new ChainViewer(_multi.Preprocess) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
+            _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
             Contents = this.Get<StackPanel>("Contents").Children;
             
@@ -66,7 +66,7 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                _root.Insert(3, new ChainViewer(_multi[index.Value]) { Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush") });
+                _root.Insert(3, new ChainViewer(_multi[index.Value], true));
                 _root.Insert(4, new DeviceTail());
 
                 _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0);
