@@ -10,8 +10,8 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Override: Device {
-        public static readonly new string DeviceIdentifier = "override";
+    public class Output: Device {
+        public static readonly new string DeviceIdentifier = "output";
 
         public delegate void TargetChangedEventHandler(int value);
         public event TargetChangedEventHandler TargetChanged;
@@ -43,9 +43,9 @@ namespace Apollo.Devices {
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
 
-        public override Device Clone() => new Override {Parent = new Chain()};
+        public override Device Clone() => new Output {Parent = new Chain()};
 
-        public Override(int target = -1): base(DeviceIdentifier) {
+        public Output(int target = -1): base(DeviceIdentifier) {
             if (target < 0) target = Track.Get(this).ParentIndex.Value;
             _target = target;
 
@@ -69,7 +69,7 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
-            return new Override(
+            return new Output(
                 Convert.ToInt32(data["target"])
             );
         }

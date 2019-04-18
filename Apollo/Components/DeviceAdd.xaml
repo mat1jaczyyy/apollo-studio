@@ -42,7 +42,7 @@
           <MenuItem Header="Layer" />
           <MenuItem Header="Move" />
           <MenuItem Header="Multi" />
-          <MenuItem Header="Override" />
+          <MenuItem Header="Output" />
           <MenuItem Header="PageFilter" />
           <MenuItem Header="PageSwitch" />
           <MenuItem Header="Paint" />
