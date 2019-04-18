@@ -86,7 +86,6 @@ namespace Apollo.DeviceViewers {
                 thumb.Deleted += Thumb_Delete;
 
                 _fade.Insert(index, new Color(), (decimal)x_center / 186);
-
                 canvas.Children.Add(thumb);
 
                 if (current != null && index <= current) current++;
@@ -127,9 +126,8 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            Canvas.SetLeft(sender, x);
-
             _fade.SetPosition(i, (decimal)x / 186);
+            Canvas.SetLeft(sender, x);
         }
 
         private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
@@ -143,6 +141,7 @@ namespace Apollo.DeviceViewers {
             }
 
             thumbs.Remove(sender);
+            _fade.Remove(index);
             canvas.Children.Remove(sender);
         }
 
