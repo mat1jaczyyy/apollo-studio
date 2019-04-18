@@ -6,6 +6,9 @@
 # macOS .DS_Store
 .DS_Store
 
+# Windows publishing script
+publish.bat
+
 # User-specific files
 *.rsuser
 *.suo
