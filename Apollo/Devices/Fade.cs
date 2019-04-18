@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -21,8 +22,8 @@ namespace Apollo.Devices {
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
         
-        private Dictionary<Signal, int> _indexes = new Dictionary<Signal, int>();
-        private Dictionary<Signal, object> locker = new Dictionary<Signal, object>();
+        private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
+        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -36,7 +37,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private Dictionary<Signal, List<Timer>> _timers = new Dictionary<Signal, List<Timer>>();
+        private ConcurrentDictionary<Signal, List<Timer>> _timers = new ConcurrentDictionary<Signal, List<Timer>>();
         private TimerCallback _timerexit;
 
         public bool Mode; // true uses Length
