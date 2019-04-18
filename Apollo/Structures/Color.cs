@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -62,7 +63,7 @@ namespace Apollo.Structures {
         public static bool operator ==(Color a, Color b) => a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue;
         public static bool operator !=(Color a, Color b) => !(a == b);
 
-        public override int GetHashCode() => ToString().GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Red, Green, Blue);
 
         public AvaloniaColor ToAvaloniaColor() => new AvaloniaColor(
             255,

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 
@@ -50,7 +51,7 @@ namespace Apollo.Structures {
         public static bool operator ==(Signal a, Signal b) => a.Source.Equals(b.Source) && a.Index == b.Index && a.Color == b.Color && a.Layer == b.Layer && a.MultiTarget == b.MultiTarget;
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
-        public override int GetHashCode() => ToString().GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Layer, MultiTarget);
 
         public override string ToString() => $"{Source.Name} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
 
