@@ -16,16 +16,24 @@ namespace Apollo.Components {
         public event FadeThumbEventHandler Deleted;
 
         public Thumb Base;
+        Remove Remove;
 
         public IBrush Fill {
             get => Base.Background;
             set => Base.Background = value;
         }
 
+        private bool _removable = true;
+        public bool Removable {
+            get => _removable;
+            set => Remove.Opacity = (_removable = value)? 1 : 0;
+        }
+
         public FadeThumb() {
             InitializeComponent();
             
             Base = this.Get<Thumb>("Thumb");
+            Remove = this.Get<Remove>("Remove");
         }
 
         bool dragged = false;
@@ -39,11 +47,9 @@ namespace Apollo.Components {
         private void MouseMove(object sender, VectorEventArgs e) {
             dragged = true;
             Moved?.Invoke(this, e);
-        } 
-
-        private void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right) Deleted?.Invoke(this);
         }
+
+        private void Removed() => Deleted?.Invoke(this);
 
         public void Select() => Base.Foreground = new SolidColorBrush(new Color(255, 255, 255, 255));
         public void Unselect() => Base.Foreground = new SolidColorBrush(new Color(0, 255, 255, 255));
