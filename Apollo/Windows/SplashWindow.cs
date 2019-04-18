@@ -59,7 +59,6 @@ namespace Apollo.Windows {
                 Project loaded = Project.Decode(File.ReadAllText(result[0]), result[0]);
 
                 if (loaded != null) {
-                    Program.Project?.Dispose();
                     Program.Project = loaded;
                     ProjectWindow.Create(this);
                     Close();

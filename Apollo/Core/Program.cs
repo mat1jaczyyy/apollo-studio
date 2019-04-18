@@ -28,7 +28,20 @@ namespace Apollo.Core {
                 Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
         }
 
-        public static Project Project;
+        public delegate void ProjectLoadedEventHandler();
+        public static event ProjectLoadedEventHandler ProjectLoaded;
+
+        private static Project _project;
+        public static Project Project {
+            get => _project;
+            set {
+                _project?.Dispose();
+                _project = value;
+
+                ProjectLoaded?.Invoke();
+                ProjectLoaded = null;
+            }
+        }
 
         public static void WindowClose(Window sender) {
             if (Project != null) {

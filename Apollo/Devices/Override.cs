@@ -49,6 +49,11 @@ namespace Apollo.Devices {
             if (target < 0) target = Track.Get(this).ParentIndex.Value;
             _target = target;
 
+            if (Program.Project == null) Program.ProjectLoaded += Initialize;
+            else Initialize();
+        }
+
+        private void Initialize() {
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
             Program.Project.Tracks[_target].Disposed += IndexRemoved;
         }
