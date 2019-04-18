@@ -42,6 +42,18 @@ namespace Apollo.Structures {
             multiTarget
         ) {}
 
+        public override bool Equals(object obj) {
+            if (!(obj is Signal)) return false;
+            return this == (Signal)obj;
+        }
+
+        public static bool operator ==(Signal a, Signal b) => a.Source.Equals(b.Source) && a.Index == b.Index && a.Color == b.Color && a.Layer == b.Layer && a.MultiTarget == b.MultiTarget;
+        public static bool operator !=(Signal a, Signal b) => !(a == b);
+        
+        public override int GetHashCode() => ToString().GetHashCode();
+
+        public override string ToString() => $"{Source.Name} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
+
         public string Encode() {
             StringBuilder json = new StringBuilder();
 
@@ -67,7 +79,5 @@ namespace Apollo.Structures {
             
             return json.ToString();
         }
-
-        public override string ToString() => $"{Index} @ {Layer} / {Color.Red}, {Color.Green}, {Color.Blue}";
     }
 }

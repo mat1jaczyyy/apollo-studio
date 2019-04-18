@@ -54,6 +54,16 @@ namespace Apollo.Structures {
             Blue = blue;
         }
 
+        public override bool Equals(object obj) {
+            if (!(obj is Color)) return false;
+            return this == (Color)obj;
+        }
+
+        public static bool operator ==(Color a, Color b) => a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue;
+        public static bool operator !=(Color a, Color b) => !(a == b);
+
+        public override int GetHashCode() => ToString().GetHashCode();
+
         public AvaloniaColor ToAvaloniaColor() => new AvaloniaColor(
             255,
             (byte)(_r * (255.0 / 63)),
@@ -63,7 +73,9 @@ namespace Apollo.Structures {
 
         public IBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
 
-        public string ToHex() => $"#{_r.ToString("X2")}{_g.ToString("X2")}{_b.ToString("X2")}";
+        public string ToHex() => $"#{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
+
+        public override string ToString() => $"({Red}, {Green}, {Blue})";
 
         public static Color Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);

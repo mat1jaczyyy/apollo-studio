@@ -21,8 +21,8 @@ namespace Apollo.Devices {
         private List<int> _counts = new List<int>();
         private List<int> _cutoffs = new List<int>();
         
-        private Dictionary<int, int>[] _indexes = new Dictionary<int, int>[100];
-        private Dictionary<int, object>[] locker = new Dictionary<int, object>[100];
+        private Dictionary<Signal, int> _indexes = new Dictionary<Signal, int>();
+        private Dictionary<Signal, object> locker = new Dictionary<Signal, object>();
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -36,7 +36,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private Dictionary<int, List<Timer>>[] _timers = new Dictionary<int, List<Timer>>[100];
+        private Dictionary<Signal, List<Timer>> _timers = new Dictionary<Signal, List<Timer>>();
         private TimerCallback _timerexit;
 
         public bool Mode; // true uses Length
@@ -139,58 +139,60 @@ namespace Apollo.Devices {
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
 
-            for (int i = 0; i < 100; i++) {
-                _indexes[i] = new Dictionary<int, int>();
-                _timers[i] = new Dictionary<int, List<Timer>>();
-                locker[i] = new Dictionary<int, object>();
-            }
-
             Preferences.FadeSmoothnessChanged += Generate;
             Generate();
         }
 
         private void Tick(object info) {
-            if (info.GetType() == typeof((byte, int))) {
-                (byte index, int layer) = ((byte, int))info;
+            if (info.GetType() == typeof(Signal)) {
+                Signal n = (Signal)info;
 
-                lock (locker[index][layer]) {
-                    int color = ++_indexes[index][layer];
-
-                    if (color < _steps.Count)
-                        MIDIExit?.Invoke(new Signal(Track.Get(this).Launchpad, index, _steps[color].Clone(), layer));
+                lock (locker[n]) {
+                    if (++_indexes[n] < _steps.Count) {
+                        Signal m = n.Clone();
+                        m.Color = _steps[_indexes[n]].Clone();
+                        MIDIExit?.Invoke(m);
+                    }
                 }
             }
         }
 
         public override void MIDIEnter(Signal n) {
             if (_colors.Count > 0 && n.Color.Lit) {
-                if (_timers[n.Index].ContainsKey(n.Layer))
-                    for (int i = 0; i < _timers[n.Index][n.Layer].Count; i++)
-                        _timers[n.Index][n.Layer][i].Dispose();
+                n.Color = new Color();
 
-                _timers[n.Index][n.Layer] = new List<Timer>();
-                _indexes[n.Index][n.Layer] = 0;
+                if (_timers.ContainsKey(n))
+                    for (int i = 0; i < _timers[n].Count; i++)
+                        _timers[n][i].Dispose();
 
-                if (!locker[n.Index].ContainsKey(n.Layer)) locker[n.Index][n.Layer] = new object();
+                _timers[n] = new List<Timer>();
+                _indexes[n] = 0;
 
-                n.Color = _steps[0].Clone();
+                if (!locker.ContainsKey(n)) locker[n] = new object();
 
-                MIDIExit?.Invoke(n);
+                Signal m = n.Clone();
+                m.Color = _steps[0].Clone();
+                MIDIExit?.Invoke(m);
 
                 int j = 0;
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;
 
                     if (j < _colors.Count - 1)
-                        _timers[n.Index][n.Layer].Add(new Timer(
+                        _timers[n].Add(new Timer(
                             _timerexit,
-                            (n.Index, n.Layer),
+                            n,
                             (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
                             Timeout.Infinite
                         ));
                 }
 
-                _timers[n.Index][n.Layer].Add(new Timer(_timerexit, (n.Index, n.Layer), (int)((Mode? (int)Length : _time) * _gate), Timeout.Infinite));
+                _timers[n].Add(new Timer(
+                    _timerexit,
+                    n,
+                    (int)((Mode? (int)Length : _time) * _gate),
+                    Timeout.Infinite
+                ));
             }
         }
 
