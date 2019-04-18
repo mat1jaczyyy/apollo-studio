@@ -19,8 +19,8 @@ namespace Apollo.Components {
         Remove Remove;
 
         public IBrush Fill {
-            get => Base.Background;
-            set => Base.Background = value;
+            get => (IBrush)this.Resources["Color"];
+            set => this.Resources["Color"] = value;
         }
 
         private bool _removable = true;
@@ -51,7 +51,7 @@ namespace Apollo.Components {
 
         private void Removed() => Deleted?.Invoke(this);
 
-        public void Select() => Base.Foreground = new SolidColorBrush(new Color(255, 255, 255, 255));
-        public void Unselect() => Base.Foreground = new SolidColorBrush(new Color(0, 255, 255, 255));
+        public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));
+        public void Unselect() => this.Resources["Outline"] = new SolidColorBrush(new Color(0, 255, 255, 255));
     }
 }
