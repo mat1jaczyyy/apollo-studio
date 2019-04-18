@@ -130,6 +130,11 @@ namespace Apollo.Windows {
         
         private void Minimize() => WindowState = WindowState.Minimized;
 
+        private void CheckClose(bool force) {
+            if (force) foreach (Track track in Program.Project.Tracks) track.Window?.Close();
+            Close();
+        }
+
         private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
 
         private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
