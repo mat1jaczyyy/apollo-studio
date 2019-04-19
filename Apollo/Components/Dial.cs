@@ -146,7 +146,7 @@ namespace Apollo.Components {
             get => _scale;
             set {
                 value = Math.Max(0, Math.Min(1, value));
-                if (value != _value) {
+                if (value != _scale) {
                     _scale = value;
 
                     ArcCanvas.Width = width * _scale;
