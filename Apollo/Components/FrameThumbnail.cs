@@ -13,7 +13,7 @@ namespace Apollo.Components {
 
         Frame _frame = new Frame();
         LaunchpadGrid Launchpad;
-        TextBlock Time;
+        public TextBlock Time;
 
         public Frame Frame {
             get => _frame;

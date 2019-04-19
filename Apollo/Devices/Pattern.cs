@@ -23,7 +23,8 @@ namespace Apollo.Devices {
         public override Device Clone() => new Pattern();
 
         public Pattern(List<Frame> frames = null): base(DeviceIdentifier) {
-            Frames = frames?? new List<Frame>() {new Frame()};
+            if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
+            Frames = frames;
         }
 
         private void FireCourier(Signal n, Color color, byte index, int time) {

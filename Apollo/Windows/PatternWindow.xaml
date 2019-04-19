@@ -22,12 +22,12 @@
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid RowDefinitions="*,Auto">
-        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" />
+        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" x:Name="Editor" />
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
           <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" x:Name="Frames">
-              <Components:HorizontalAdd Added="Frame_InsertStart" x:Name="FrameAdd" />
+              <Components:HorizontalAdd Added="Frame_InsertStart" />
             </StackPanel>
           </ScrollViewer>
         </Border>

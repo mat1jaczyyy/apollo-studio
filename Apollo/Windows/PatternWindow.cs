@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -21,8 +22,10 @@ namespace Apollo.Windows {
         Track _track;
         Launchpad Launchpad;
 
+        LaunchpadGrid Editor;
         Controls Contents;
-        HorizontalAdd FrameAdd;
+
+        int current;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Editing Pattern - Track {index + 1}"
@@ -38,6 +41,7 @@ namespace Apollo.Windows {
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
             viewer.FrameRemoved += Frame_Remove;
+            viewer.FrameSelected += Frame_Select;
             Contents.Insert(index + 1, viewer);
         }
 
@@ -58,13 +62,16 @@ namespace Apollo.Windows {
             Launchpad.PatternWindow = this;
             Launchpad.Clear();
 
-            Contents = this.Get<StackPanel>("Frames").Children;
-            FrameAdd = this.Get<HorizontalAdd>("FrameAdd");
+            Editor = this.Get<LaunchpadGrid>("Editor");
 
-            if (_pattern.Frames.Count == 0) FrameAdd.AlwaysShowing = true;
+            Contents = this.Get<StackPanel>("Frames").Children;
 
             for (int i = 0; i < _pattern.Frames.Count; i++)
                 Contents_Insert(i, _pattern.Frames[i]);
+            
+            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+            
+            Frame_Select(0);
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -87,18 +94,37 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Insert(int index) {
+            ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
+
             _pattern.Frames.Insert(index, new Frame());
             Contents_Insert(index, _pattern.Frames[index]);
-            FrameAdd.AlwaysShowing = false;
+
+            if (index <= current) current++;
+            Frame_Select(index);
         }
 
         private void Frame_InsertStart() => Frame_Insert(0);
 
         private void Frame_Remove(int index) {
+            if (_pattern.Frames.Count == 1) return;
+
+            if (index < current) current--;
+            else if (index == current) Frame_Select(Math.Max(0, current - 1));
+
             Contents.RemoveAt(index + 1);
             _pattern.Frames.RemoveAt(index);
 
-            if (_pattern.Frames.Count == 0) FrameAdd.AlwaysShowing = true;
+            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+        }
+
+        private void Frame_Select(int index) {
+            ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Normal;
+
+            current = index;
+
+            ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
+
+            Editor.RenderFrame(_pattern.Frames[current]);
         }
 
         public void MIDIEnter(Signal n) {
