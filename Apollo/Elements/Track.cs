@@ -17,8 +17,8 @@ namespace Apollo.Elements {
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
 
-        public delegate void DisposedEventHandler();
-        public event DisposedEventHandler Disposed;
+        public delegate void DisposingEventHandler();
+        public event DisposingEventHandler Disposing;
 
         private int? _ParentIndex;
         public int? ParentIndex {
@@ -61,11 +61,15 @@ namespace Apollo.Elements {
         private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
 
         public void Dispose() {
-            if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
+            Disposing?.Invoke();
 
-            Disposed?.Invoke();
+            Window?.Close();
+            Window = null;
             
+            Chain?.Dispose();
             Chain = null;
+
+            if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
         
         public static Track Decode(string jsonString) {

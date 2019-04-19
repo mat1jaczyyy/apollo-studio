@@ -26,6 +26,8 @@ namespace Apollo.Elements {
 
         public abstract void MIDIEnter(Signal n);
 
+        public virtual void Dispose() => MIDIExit = null;
+
         public static Device Create(Type device, Chain parent) {
             object obj = FormatterServices.GetUninitializedObject(device);
             device.GetField("Parent").SetValue(obj, parent);

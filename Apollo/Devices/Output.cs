@@ -22,11 +22,11 @@ namespace Apollo.Devices {
             set {
                 if (_target != value) {
                     Program.Project.Tracks[_target].ParentIndexChanged -= IndexChanged;
-                    Program.Project.Tracks[_target].Disposed -= IndexRemoved;
+                    Program.Project.Tracks[_target].Disposing -= IndexRemoved;
                     
                     _target = value;
                     Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
-                    Program.Project.Tracks[_target].Disposed += IndexRemoved;
+                    Program.Project.Tracks[_target].Disposing += IndexRemoved;
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace Apollo.Devices {
 
         private void Initialize() {
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
-            Program.Project.Tracks[_target].Disposed += IndexRemoved;
+            Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
 
         public override void MIDIEnter(Signal n) {

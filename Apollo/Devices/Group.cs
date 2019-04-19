@@ -57,6 +57,7 @@ namespace Apollo.Devices {
         }
 
         public void Remove(int index) {
+            _chains[index].Dispose();
             _chains.RemoveAt(index);
 
             Reroute();
@@ -71,6 +72,11 @@ namespace Apollo.Devices {
 
             foreach (Chain chain in _chains)
                 chain.MIDIEnter(n.Clone());
+        }
+
+        public override void Dispose() {
+            foreach (Chain chain in _chains) chain.Dispose();
+            base.Dispose();
         }
 
         public static Device DecodeSpecific(string jsonString) {

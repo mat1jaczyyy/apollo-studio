@@ -106,6 +106,12 @@ namespace Apollo.Devices {
             _chains[target].MIDIEnter(n);
         }
 
+        public override void Dispose() {
+            Preprocess.Dispose();
+            foreach (Chain chain in _chains) chain.Dispose();
+            base.Dispose();
+        }
+
         public static Device DecodeSpecific(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != DeviceIdentifier) return null;

@@ -81,6 +81,7 @@ namespace Apollo.Elements {
         }
 
         public void Remove(int index) {
+            Devices[index].Dispose();
             Devices.RemoveAt(index);
             Reroute();
         }
@@ -91,6 +92,11 @@ namespace Apollo.Elements {
         }
 
         public void MIDIEnter(Signal n) => _chainenter?.Invoke(n);
+
+        public void Dispose() {
+            foreach (Device device in Devices) device.Dispose();
+            MIDIExit = null;
+        }
 
         public static Chain Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);

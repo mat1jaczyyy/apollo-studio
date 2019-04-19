@@ -46,6 +46,7 @@
           <MenuItem Header="PageFilter" />
           <MenuItem Header="PageSwitch" />
           <MenuItem Header="Paint" />
+          <MenuItem Header="Pattern" />
           <MenuItem Header="Preview" />
         </ContextMenu>
       </Canvas.ContextMenu>

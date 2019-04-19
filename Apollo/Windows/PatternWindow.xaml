@@ -1,0 +1,27 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Apollo.Windows.PatternWindow"
+        xmlns:Components="clr-namespace:Apollo.Components"
+        Title="Track" WindowStartupLocation="CenterOwner"
+        Icon="/Resources/WindowIcon.png"
+        Width="600" MinWidth="600" MaxWidth="600"
+        Height="600" MinHeight="600" MaxHeight="600"
+        Opened="Loaded" Closing="Unloaded">
+  
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
+      <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow">
+        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+      </Grid>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <Components:Minimize Clicked="Minimize" />
+        <Components:Close Clicked="Close" />
+      </StackPanel>
+    </Grid>
+
+    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
+      
+    </Border>
+  </Grid>
+</Window>

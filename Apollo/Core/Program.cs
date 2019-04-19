@@ -44,6 +44,7 @@ namespace Apollo.Core {
         }
 
         public static void WindowClose(Window sender) {
+
             if (Project != null) {
                 if (Project.Window != null) return;
 
@@ -52,6 +53,8 @@ namespace Apollo.Core {
             }
 
             Type type = sender.GetType();
+            
+            if (type == typeof(PatternWindow)) return;
 
             if (type == typeof(ProjectWindow)) {
                 Project.Dispose();
