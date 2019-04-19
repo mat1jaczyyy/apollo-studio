@@ -45,7 +45,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (Frames.Count > 0) {
+            if (Frames.Count > 0 && n.Color.Lit) {
                 for (int i = 0; i < Frames[0].Screen.Length; i++)
                     if (Frames[0].Screen[i].Lit)
                         MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
@@ -60,8 +60,8 @@ namespace Apollo.Devices {
                     time += Frames[i].Time;
                 }
                 
-                for (int i = 0; i < Frames[0].Screen.Length; i++)
-                    if (Frames[0].Screen[i].Lit)
+                for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                    if (Frames.Last().Screen[i].Lit)
                         FireCourier(n, new Color(0), (byte)i, time);
             }
         }
