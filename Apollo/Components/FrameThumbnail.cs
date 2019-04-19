@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Structures;
 
 namespace Apollo.Components {
-    public class FrameDisplay: UserControl {
+    public class FrameThumbnail: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void ClickedEventHandler();
@@ -15,7 +15,7 @@ namespace Apollo.Components {
         LaunchpadGrid Launchpad;
         TextBlock Time;
 
-        public FrameDisplay(Frame frame) {
+        public FrameThumbnail(Frame frame) {
             InitializeComponent();
 
             _frame = frame;
