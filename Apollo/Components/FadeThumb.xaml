@@ -8,25 +8,21 @@
     <SolidColorBrush x:Key="Color">#FFFFFFFF</SolidColorBrush>
   </UserControl.Resources>
 
-  <StackPanel Spacing="2">
-    <Components:Remove HorizontalAlignment="Center" x:Name="Remove" Removed="Removed" />
-
-    <Thumb Width="14" x:Name="Thumb" Height="18"
-          DragStarted="DragStarted" DragCompleted="DragCompleted" DragDelta="MouseMove">
-      <Thumb.Template>
-        <ControlTemplate TargetType="Thumb">
-          <Canvas Background="Transparent">
-            <Path Fill="{DynamicResource Outline}"
-                  Data="M 0,0 L 0,12 7,18 14,12 14,0 Z" />
-            <Path Fill="#FF000000"
-                  Data="M 1,1 L 1,11 7,17 13,11 13,1 Z" />
-            <Path Fill="#FFFFFFFF"
-                  Data="M 2,2 L 2,10 7,16 12,10 12,2 Z" />
-            <Path Fill="{DynamicResource Color}"
-                  Data="M 3,3 L 3,9 7,15 11,9 11,3 Z" />
-          </Canvas>
-        </ControlTemplate>
-      </Thumb.Template>
-    </Thumb>
-  </StackPanel>
+  <Thumb Width="14" x:Name="Thumb" Height="18"
+        DragStarted="DragStarted" DragCompleted="DragCompleted" DragDelta="MouseMove">
+    <Thumb.Template>
+      <ControlTemplate TargetType="Thumb">
+        <Canvas Background="Transparent">
+          <Path Fill="{DynamicResource Outline}"
+                Data="M 0,0 L 0,12 7,18 14,12 14,0 Z" />
+          <Path Fill="#FF000000"
+                Data="M 1,1 L 1,11 7,17 13,11 13,1 Z" />
+          <Path Fill="#FFFFFFFF"
+                Data="M 2,2 L 2,10 7,16 12,10 12,2 Z" />
+          <Path Fill="{DynamicResource Color}"
+                Data="M 3,3 L 3,9 7,15 11,9 11,3 Z" />
+        </Canvas>
+      </ControlTemplate>
+    </Thumb.Template>
+  </Thumb>
 </UserControl>

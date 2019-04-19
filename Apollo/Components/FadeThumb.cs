@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -16,24 +17,18 @@ namespace Apollo.Components {
         public event FadeThumbEventHandler Deleted;
 
         public Thumb Base;
-        Remove Remove;
 
         public IBrush Fill {
             get => (IBrush)this.Resources["Color"];
             set => this.Resources["Color"] = value;
         }
 
-        private bool _removable = true;
-        public bool Removable {
-            get => _removable;
-            set => Remove.Opacity = (_removable = value)? 1 : 0;
-        }
-
         public FadeThumb() {
             InitializeComponent();
             
             Base = this.Get<Thumb>("Thumb");
-            Remove = this.Get<Remove>("Remove");
+            Base.AddHandler(InputElement.PointerPressedEvent, MouseDown, RoutingStrategies.Tunnel);
+            Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
         }
 
         bool dragged = false;
@@ -44,13 +39,22 @@ namespace Apollo.Components {
             if (!dragged) Focused?.Invoke(this);
         }
 
+        private void MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton != MouseButton.Left) e.Handled = true;
+        }
+
+        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Right) {
+                Deleted?.Invoke(this);
+                e.Handled = true;
+            }
+        }
+
         private void MouseMove(object sender, VectorEventArgs e) {
             dragged = true;
             Moved?.Invoke(this, e);
         }
-
-        private void Removed() => Deleted?.Invoke(this);
-
+        
         public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));
         public void Unselect() => this.Resources["Outline"] = new SolidColorBrush(new Color(0, 255, 255, 255));
     }
