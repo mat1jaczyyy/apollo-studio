@@ -8,6 +8,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Input;
 
+using Apollo.Structures;
+
 namespace Apollo.Components {
     public class LaunchpadGrid: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -79,6 +81,11 @@ namespace Apollo.Components {
         }
 
         private void LayoutChanged(object sender, EventArgs e) => DrawPath();
+
+        public void RenderFrame(Frame frame) {
+            for (int i = 0; i < 100; i++)
+                SetColor(SignalToGrid(i), (SolidColorBrush)frame.Screen[i].ToBrush());
+        }
 
         bool mouseHeld = false;
 

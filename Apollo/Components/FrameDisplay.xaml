@@ -1,0 +1,10 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.FrameDisplay"
+             xmlns:Components="clr-namespace:Apollo.Components">
+
+  <StackPanel Spacing="2" Background="Transparent" PointerReleased="Click">
+    <Components:LaunchpadGrid HorizontalAlignment="Center" Scale="0.5" x:Name="Launchpad" />
+    <TextBlock HorizontalAlignment="Center" Text="x ms" x:Name="Time" />
+  </StackPanel>
+</UserControl>

@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
@@ -19,6 +20,8 @@ namespace Apollo.Windows {
         Pattern _pattern;
         Track _track;
         Launchpad Launchpad;
+
+        StackPanel Frames;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Editing Pattern - Track {index + 1}"
@@ -46,6 +49,11 @@ namespace Apollo.Windows {
             Launchpad.PatternWindow?.Close();
             Launchpad.PatternWindow = this;
             Launchpad.Clear();
+
+            Frames = this.Get<StackPanel>("Frames");
+
+            for (int i = 0; i < _pattern.Frames.Count; i++)
+                Frames.Children.Add(new FrameDisplay(_pattern.Frames[i]));
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -56,7 +64,9 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             _pattern.Window = null;
+
             Launchpad.PatternWindow = null;
+            Launchpad.Clear();
             
             Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;

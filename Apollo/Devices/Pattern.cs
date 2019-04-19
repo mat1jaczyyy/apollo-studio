@@ -18,12 +18,12 @@ namespace Apollo.Devices {
 
         public PatternWindow Window;
         
-        private List<Frame> _frames;
+        public List<Frame> Frames;
         
         public override Device Clone() => new Pattern();
 
         public Pattern(List<Frame> frames = null): base(DeviceIdentifier) {
-            _frames = frames?? new List<Frame>() {new Frame()};
+            Frames = frames?? new List<Frame>() {new Frame()};
         }
 
         private void FireCourier(Signal n, Color color, byte index, int time) {
@@ -44,23 +44,23 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (_frames.Count > 0) {
-                for (int i = 0; i < _frames[0].Screen.Length; i++)
-                    if (_frames[0].Screen[i].Lit)
-                        MIDIExit?.Invoke(new Signal(n.Source, (byte)i, _frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
+            if (Frames.Count > 0) {
+                for (int i = 0; i < Frames[0].Screen.Length; i++)
+                    if (Frames[0].Screen[i].Lit)
+                        MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
                 
-                int time = _frames[0].Time;
+                int time = Frames[0].Time;
 
-                for (int i = 1; i < _frames.Count; i++) {
-                    for (int j = 0; j < _frames[i].Screen.Length; j++)
-                        if (_frames[i].Screen[j] != _frames[i - 1].Screen[j])
-                            FireCourier(n, _frames[i].Screen[j].Clone(), (byte)j, time);
+                for (int i = 1; i < Frames.Count; i++) {
+                    for (int j = 0; j < Frames[i].Screen.Length; j++)
+                        if (Frames[i].Screen[j] != Frames[i - 1].Screen[j])
+                            FireCourier(n, Frames[i].Screen[j].Clone(), (byte)j, time);
 
-                    time += _frames[i].Time;
+                    time += Frames[i].Time;
                 }
                 
-                for (int i = 0; i < _frames[0].Screen.Length; i++)
-                    if (_frames[0].Screen[i].Lit)
+                for (int i = 0; i < Frames[0].Screen.Length; i++)
+                    if (Frames[0].Screen[i].Lit)
                         FireCourier(n, new Color(0), (byte)i, time);
             }
         }

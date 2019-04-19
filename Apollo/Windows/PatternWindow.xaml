@@ -4,8 +4,8 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Pattern" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="600" MinWidth="600" MaxWidth="600"
-        Height="600" MinHeight="600" MaxHeight="600"
+        Width="550" MinWidth="550" MaxWidth="550"
+        Height="650" MinHeight="650" MaxHeight="650"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -25,7 +25,11 @@
         <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" />
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-          <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Frames" />
+          <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" x:Name="Frames">
+              
+            </StackPanel>
+          </ScrollViewer>
         </Border>
       </Grid>
     </Border>
