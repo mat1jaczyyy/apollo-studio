@@ -11,7 +11,7 @@ namespace Apollo.Components {
         public delegate void ClickedEventHandler();
         public event ClickedEventHandler Clicked;
 
-        Frame _frame;
+        Frame _frame = new Frame();
         LaunchpadGrid Launchpad;
         TextBlock Time;
 
@@ -23,15 +23,13 @@ namespace Apollo.Components {
             }
         }
 
-        public FrameThumbnail(Frame frame) {
+        public FrameThumbnail() {
             InitializeComponent();
 
-            _frame = frame;
-
             Launchpad = this.Get<LaunchpadGrid>("Launchpad");
-            Launchpad.RenderFrame(_frame);
-
             Time = this.Get<TextBlock>("Time");
+
+            Launchpad.RenderFrame(_frame);
         }
 
         private void Click(object sender, PointerReleasedEventArgs e) {

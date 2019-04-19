@@ -27,7 +27,7 @@
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
           <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" x:Name="Frames">
-              
+              <Components:HorizontalAdd Added="Frame_InsertStart" x:Name="FrameAdd" />
             </StackPanel>
           </ScrollViewer>
         </Border>
