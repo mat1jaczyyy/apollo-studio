@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -17,6 +18,7 @@ namespace Apollo.Windows {
 
         Pattern _pattern;
         Track _track;
+        Launchpad Launchpad;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Editing Pattern - Track {index + 1}"
@@ -39,6 +41,11 @@ namespace Apollo.Windows {
 
             _pattern = pattern;
             _track = Track.Get(_pattern);
+
+            Launchpad = _track.Launchpad;
+            Launchpad.PatternWindow?.Close();
+            Launchpad.PatternWindow = this;
+            Launchpad.Clear();
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -49,12 +56,17 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             _pattern.Window = null;
+            Launchpad.PatternWindow = null;
             
             Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Program.WindowClose(this);
+        }
+
+        public void MIDIEnter(Signal n) {
+            
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
@@ -64,7 +76,7 @@ namespace Apollo.Windows {
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {
                 pattern.Window = new PatternWindow(pattern) {Owner = owner};
-                pattern.Window.Show();
+                pattern.Window.ShowDialog(owner);
                 pattern.Window.Owner = null;
             } else {
                 pattern.Window.WindowState = WindowState.Normal;

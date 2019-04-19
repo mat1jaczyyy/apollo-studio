@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -10,10 +11,13 @@ using RtMidi.Core.Messages;
 
 using Apollo.Core;
 using Apollo.Structures;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
         public static readonly string Identifier = "launchpad";
+
+        public PatternWindow PatternWindow;
 
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
@@ -68,40 +72,33 @@ namespace Apollo.Elements {
             }
         }
 
-        public void Send(Signal n) {
-            if (!Available || Type == LaunchpadType.Unknown) return;
+        private bool SysExSend(byte[] raw) {
+            if (!Available || Type == LaunchpadType.Unknown) return false;
 
-            byte rgb_byte;
-            byte index = n.Index;
-
-            switch (Type) {
-                case LaunchpadType.MK2:
-                    rgb_byte = 0x18;
-                    if (91 <= index && index <= 98)
-                        index += 13;
-                    break;
-                
-                case LaunchpadType.PRO:
-                case LaunchpadType.CFW:
-                    rgb_byte = 0x10;
-                    break;
-                
-                default:
-                    throw new ArgumentException("Launchpad not recognized");
-            }
-
-            Program.Log($"OUT <- {n.ToString()}");
-
-            SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, rgb_byte, 0x0B, index, n.Color.Red, n.Color.Green, n.Color.Blue});
+            SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray());
             Output.Send(in msg);
+            
+            return true;
+        }
+
+        public void Send(Signal n) {
+            if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) n.Index += 13;
+
+            if (SysExSend(new byte[] {0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue}))
+                Program.Log($"OUT <- {n.ToString()}");
+        }
+
+        public void Clear() {
+            for (int i = 0; i < 100; i++)
+                screen[i] = new Pixel() {MIDIExit = Send};
+
+            SysExSend(new byte[] {0x0E, 0x00});
+            Send(new Signal(this, 99, new Color(0)));
         }
 
         public void Render(Signal n) => screen[n.Index].MIDIEnter(n);
 
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = Send};
-            
             Input = input.CreateDevice();
             Output = output.CreateDevice();
 
@@ -162,7 +159,9 @@ namespace Apollo.Elements {
         private void HandleMessage(Signal n) {
             if (Available) {
                 Program.Log($"IN  -> {n.ToString()}");
-                Receive?.Invoke(n);
+
+                if (PatternWindow == null) Receive?.Invoke(n);
+                else PatternWindow.MIDIEnter(n);
             }
         }
 
