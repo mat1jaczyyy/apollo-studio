@@ -15,6 +15,14 @@ namespace Apollo.Components {
         LaunchpadGrid Launchpad;
         TextBlock Time;
 
+        public Frame Frame {
+            get => _frame;
+            set {
+                _frame = value;
+                Launchpad.RenderFrame(_frame);
+            }
+        }
+
         public FrameThumbnail(Frame frame) {
             InitializeComponent();
 
