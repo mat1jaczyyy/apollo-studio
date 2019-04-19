@@ -66,6 +66,9 @@ namespace Apollo.Elements {
             Type = AttemptIdentify(e);
             if (Type != LaunchpadType.Unknown) {
                 Input.SysEx -= WaitForIdentification;
+
+                Clear();
+
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
                 Input.ControlChange += ControlChange;
@@ -138,6 +141,8 @@ namespace Apollo.Elements {
                 Input.SysEx += WaitForIdentification;
                 Output.Send(in Inquiry);
             } else {
+                Clear();
+
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
                 Input.ControlChange += ControlChange;
