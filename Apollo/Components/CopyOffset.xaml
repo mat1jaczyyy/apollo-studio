@@ -9,6 +9,6 @@
       <Components:Remove VerticalAlignment="Top" Margin="0 5 0 0" Removed="Offset_Remove" />
     </StackPanel>
 
-    <Components:OffsetAdd OffsetAdded="Offset_Add" />
+    <Components:HorizontalAdd Added="Offset_Add" />
   </StackPanel>
 </UserControl>

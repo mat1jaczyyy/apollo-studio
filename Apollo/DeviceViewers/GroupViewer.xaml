@@ -5,7 +5,7 @@
   
   <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
     <StackPanel x:Name="Contents" Margin="10 5">
-      <Components:ChainAdd ChainAdded="Chain_InsertStart" x:Name="ChainAdd" />
+      <Components:VerticalAdd Added="Chain_InsertStart" x:Name="ChainAdd" />
     </StackPanel>
   </ScrollViewer>
 </UserControl>

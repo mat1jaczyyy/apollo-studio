@@ -19,6 +19,7 @@ namespace Apollo.DeviceViewers {
         CheckBox Loop, Animate;
 
         Controls Contents;
+        HorizontalAdd OffsetAdd;
 
         private void Contents_Insert(int index, Offset offset) {
             CopyOffset viewer = new CopyOffset(offset, _copy);
@@ -49,8 +50,9 @@ namespace Apollo.DeviceViewers {
             Loop_Changed(null, EventArgs.Empty);
 
             Contents = this.Get<StackPanel>("Contents").Children;
+            OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
 
-            if (_copy.Offsets.Count == 0) this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = true;
+            if (_copy.Offsets.Count == 0) OffsetAdd.AlwaysShowing = true;
 
             for (int i = 0; i < _copy.Offsets.Count; i++)
                 Contents_Insert(i, _copy.Offsets[i]);
@@ -72,7 +74,7 @@ namespace Apollo.DeviceViewers {
         private void Offset_Insert(int index) {
             _copy.Offsets.Insert(index, new Offset());
             Contents_Insert(index, _copy.Offsets[index]);
-            this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = false;
+            OffsetAdd.AlwaysShowing = false;
         }
 
         private void Offset_InsertStart() => Offset_Insert(0);
@@ -81,7 +83,7 @@ namespace Apollo.DeviceViewers {
             Contents.RemoveAt(index + 1);
             _copy.Offsets.RemoveAt(index);
 
-            if (_copy.Offsets.Count == 0) this.Get<OffsetAdd>("OffsetAdd").AlwaysShowing = true;
+            if (_copy.Offsets.Count == 0) OffsetAdd.AlwaysShowing = true;
         }
     }
 }
