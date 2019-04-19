@@ -6,8 +6,8 @@
   <Grid ColumnDefinitions="Auto,Auto">
     <Grid Grid.Column="0" RowDefinitions="*,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-        <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="36" x:Name="Canvas">
-          <Rectangle Canvas.Left="7" Canvas.Top="17" Width="186" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1"
+        <Canvas Margin="0 0 0 5" Background="Transparent" ClipToBounds="true" Width="200" Height="26" x:Name="Canvas">
+          <Rectangle Canvas.Left="7" Canvas.Top="7" Width="186" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1"
             PointerPressed="Canvas_MouseDown">
             
             <Rectangle.Fill>
