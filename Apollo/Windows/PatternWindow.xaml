@@ -21,7 +21,13 @@
     </Grid>
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Components:LaunchpadGrid Scale="3" />
+      <Grid RowDefinitions="*,Auto">
+        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" />
+
+        <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+          <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto" x:Name="Frames" />
+        </Border>
+      </Grid>
     </Border>
   </Grid>
 </Window>
