@@ -1,144 +1,158 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.LaunchpadGrid">
+             x:Class="Apollo.Components.LaunchpadGrid"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-  <StackPanel VerticalAlignment="Center">
+  <UserControl.Resources>
+    <sys:Double x:Key="PadSquareSize">15</sys:Double>
+    <sys:Double x:Key="PadCircleSize">11</sys:Double>
+    <sys:Double x:Key="PadCut1">3</sys:Double>
+    <sys:Double x:Key="PadCut2">12</sys:Double>
+    <sys:Double x:Key="ModeWidth">4</sys:Double>
+    <sys:Double x:Key="ModeHeight">2</sys:Double>
+    <Thickness x:Key="PadMargin">1</Thickness>
+    <Thickness x:Key="ModeMargin">0 5 0 0</Thickness>
+  </UserControl.Resources>
+
+  <StackPanel VerticalAlignment="Center" LayoutUpdated="LayoutChanged">
     <StackPanel.Styles>
       <Style Selector="Rectangle, Path, Ellipse">
         <Setter Property="Fill" Value="{DynamicResource ThemeForegroundLowBrush}" />
-        <Setter Property="Margin" Value="1" />
+        <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
       </Style>
     </StackPanel.Styles>
 
-    <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
-      <UniformGrid.Styles>
-        <Style Selector="Rectangle, Path">
-          <Setter Property="Width" Value="15" />
-          <Setter Property="Height" Value="15" />
-        </Style>
+    <Viewbox Stretch="None">
+      <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
+        <UniformGrid.Styles>
+          <Style Selector="Rectangle, Path">
+            <Setter Property="Width" Value="{DynamicResource PadSquareSize}" />
+            <Setter Property="Height" Value="{DynamicResource PadSquareSize}" />
+          </Style>
 
-        <Style Selector="Rectangle.empty">
-          <Setter Property="Fill" Value="#00000000" />
-        </Style>
+          <Style Selector="Rectangle.empty">
+            <Setter Property="Fill" Value="#00000000" />
+          </Style>
 
-        <Style Selector="Ellipse">
-          <Setter Property="Width" Value="11" />
-          <Setter Property="Height" Value="11" />
-        </Style>
-      </UniformGrid.Styles>
+          <Style Selector="Ellipse">
+            <Setter Property="Width" Value="{DynamicResource PadCircleSize}" />
+            <Setter Property="Height" Value="{DynamicResource PadCircleSize}" />
+          </Style>
+        </UniformGrid.Styles>
 
-      <Rectangle Classes="empty" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle Classes="empty" />
+        <Rectangle Classes="empty" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle Classes="empty" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Path Data="M 0,0 L 0,15 12,15 15,12 15,0 Z" PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Path Data="M 0,0 L 0,12 3,15 15,15 15,0 Z" PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Path PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" x:Name="TopLeft" />
+        <Path PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" x:Name="TopRight" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Path Data="M 0,0 L 0,15 15,15 15,3 12,0 Z" PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Path Data="M 0,3 L 0,15 15,15 15,0 3,0 Z" PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Path PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" x:Name="BottomLeft" />
+        <Path PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" x:Name="BottomRight" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
 
-      <Rectangle Classes="empty" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
-      <Rectangle Classes="empty" />
-    </UniformGrid>
+        <Rectangle Classes="empty" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Ellipse PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
+        <Rectangle Classes="empty" />
+      </UniformGrid>
+    </Viewbox>
 
-    <Rectangle Margin="0 5 0 0" HorizontalAlignment="Center" Width="4" Height="2" x:Name="ModeLight"
+    <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
                PointerPressed="MouseDown" PointerReleased="MouseUp" PointerEnter="MouseEnter" PointerLeave="MouseLeave" />
   </StackPanel>
 </UserControl>

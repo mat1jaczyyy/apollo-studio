@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PatternWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Track" WindowStartupLocation="CenterOwner"
+        Title="Pattern" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="600" MinWidth="600" MaxWidth="600"
         Height="600" MinHeight="600" MaxHeight="600"
@@ -21,7 +21,7 @@
     </Grid>
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      
+      <Components:LaunchpadGrid Scale="3" />
     </Border>
   </Grid>
 </Window>
