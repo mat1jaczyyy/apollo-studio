@@ -128,7 +128,14 @@ namespace Apollo.Windows {
 
             ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
 
-            _pattern.Frames.Insert(index, new Frame());
+            Frame reference = _pattern.Frames[Math.Max(0, index - 1)];
+
+            _pattern.Frames.Insert(index, new Frame(
+                reference.Mode,
+                reference.Length,
+                reference.Time
+            ));
+            
             Contents_Insert(index, _pattern.Frames[index]);
 
             if (index <= current) current++;
