@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Pattern" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="550" MinWidth="550" MaxWidth="550"
+        Width="650" MinWidth="650" MaxWidth="650"
         Height="650" MinHeight="650" MaxHeight="650"
         Opened="Loaded" Closing="Unloaded">
   
@@ -22,7 +22,17 @@
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid RowDefinitions="*,Auto">
-        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" x:Name="Editor" PadPressed="PadPressed" />
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+          <Components:LaunchpadGrid Grid.Column="0" Scale="2.5" x:Name="Editor" PadPressed="PadPressed" />
+          
+          <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
+            <Grid RowDefinitions="*,*,*">
+              <Components:ColorPicker Grid.Row="0" Padding="7" x:Name="ColorPicker" />
+
+              <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0" />
+            </Grid>
+          </Border>
+        </Grid>
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
           <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">

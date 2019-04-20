@@ -27,6 +27,7 @@ namespace Apollo.Windows {
 
         LaunchpadGrid Editor;
         Controls Contents;
+        ColorPicker ColorPicker;
 
         int current;
         
@@ -75,6 +76,8 @@ namespace Apollo.Windows {
             if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
             
             Frame_Select(0);
+
+            ColorPicker = this.Get<ColorPicker>("ColorPicker");
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -132,9 +135,10 @@ namespace Apollo.Windows {
 
         private void PadPressed(int index) {
             int signalIndex = LaunchpadGrid.GridToSignal(index);
-            Color target = new Color();
 
-            _pattern.Frames[current].Screen[signalIndex] = (_pattern.Frames[current].Screen[signalIndex] == target)? new Color(0) : target;
+            _pattern.Frames[current].Screen[signalIndex] = (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color)
+                ? new Color(0)
+                : ColorPicker.Color.Clone();
 
             SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current].Screen[signalIndex].ToBrush();
 
