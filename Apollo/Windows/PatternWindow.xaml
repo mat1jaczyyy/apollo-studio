@@ -44,8 +44,8 @@
                                    ValueChanged="Gate_Changed" />
 
                   <StackPanel Grid.Column="2" Margin="5 0 0 0" VerticalAlignment="Center" Spacing="5">
-                    <Button Content="Play" />
-                    <Button Content="Fire" />
+                    <Button Content="Play" x:Name="Play" Click="PatternPlay" />
+                    <Button Content="Fire" x:Name="Fire" Click="PatternFire" />
                   </StackPanel>
                 </Grid>
               </Border>
