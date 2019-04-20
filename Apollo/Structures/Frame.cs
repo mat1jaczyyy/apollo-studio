@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,7 +11,10 @@ namespace Apollo.Structures {
 
         public Color[] Screen;
 
-        private int _time = 200;
+        public bool Mode; // true uses Length
+        public Length Length;
+        private int _time;
+
         public int Time {
             get => _time;
             set {
@@ -19,13 +23,18 @@ namespace Apollo.Structures {
             }
         }
 
-        public Frame(Color[] screen = null, int time = 200) {
+        public string TimeString => Mode? Length.ToString() : $"{Time}ms";
+
+        public Frame(bool mode = false, Length length = null, int time = 1000, Color[] screen = null) {
             if (screen == null || screen.Length != 100) {
                 screen = new Color[100];
                 for (int i = 0; i < 100; i++) screen[i] = new Color(0);
             }
-            Screen = screen;
+
+            Mode = mode;
             Time = time;
+            Length = length?? new Length();
+            Screen = screen;
         }
 
         public static Frame Decode(string jsonString) {
@@ -41,8 +50,10 @@ namespace Apollo.Structures {
                 colors[i] = Color.Decode(screen[i - 1].ToString());
 
             return new Frame(
-                colors,
-                int.Parse(data["time"].ToString())
+                Convert.ToBoolean(data["mode"]),
+                Length.Decode(data["length"].ToString()),
+                Convert.ToInt32(data["time"]),
+                colors
             );
         }
 
@@ -58,6 +69,15 @@ namespace Apollo.Structures {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
 
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(Mode);
+
+                        writer.WritePropertyName("length");
+                        writer.WriteRawValue(Length.Encode());
+
+                        writer.WritePropertyName("time");
+                        writer.WriteValue(_time);
+
                         writer.WritePropertyName("screen");
                         writer.WriteStartArray();
 
@@ -65,9 +85,6 @@ namespace Apollo.Structures {
                                 writer.WriteRawValue(Screen[i].Encode());
 
                         writer.WriteEndArray();
-
-                        writer.WritePropertyName("time");
-                        writer.WriteValue(Time);
 
                     writer.WriteEndObject();
 

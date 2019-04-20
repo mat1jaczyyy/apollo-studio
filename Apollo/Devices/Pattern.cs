@@ -19,11 +19,22 @@ namespace Apollo.Devices {
         public PatternWindow Window;
         
         public List<Frame> Frames;
+
+        private decimal _gate;
+        public decimal Gate {
+            get => _gate;
+            set {
+                if (0 <= value && value <= 4)
+                    _gate = value;
+            }
+        }
         
         public override Device Clone() => new Pattern();
 
-        public Pattern(List<Frame> frames = null): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
+
+            Gate = gate;
             Frames = frames;
         }
 
@@ -50,19 +61,19 @@ namespace Apollo.Devices {
                     if (Frames[0].Screen[i].Lit)
                         MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
                 
-                int time = Frames[0].Time;
+                decimal time = (Frames[0].Mode? (int)Frames[0].Length : Frames[0].Time) * _gate;
 
                 for (int i = 1; i < Frames.Count; i++) {
                     for (int j = 0; j < Frames[i].Screen.Length; j++)
                         if (Frames[i].Screen[j] != Frames[i - 1].Screen[j])
-                            FireCourier(n, Frames[i].Screen[j].Clone(), (byte)j, time);
+                            FireCourier(n, Frames[i].Screen[j].Clone(), (byte)j, (int)time);
 
-                    time += Frames[i].Time;
+                    time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
                 }
                 
                 for (int i = 0; i < Frames.Last().Screen.Length; i++)
                     if (Frames.Last().Screen[i].Lit)
-                        FireCourier(n, new Color(0), (byte)i, time);
+                        FireCourier(n, new Color(0), (byte)i, (int)time);
             }
         }
 
