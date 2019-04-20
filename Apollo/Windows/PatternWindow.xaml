@@ -22,7 +22,7 @@
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid RowDefinitions="*,Auto">
-        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" x:Name="Editor" />
+        <Components:LaunchpadGrid Grid.Row="0" Scale="2.5" x:Name="Editor" PadPressed="PadPressed" />
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
           <ScrollViewer Padding="0 5" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">

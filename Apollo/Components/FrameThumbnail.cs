@@ -12,7 +12,7 @@ namespace Apollo.Components {
         public event ClickedEventHandler Clicked;
 
         Frame _frame = new Frame();
-        LaunchpadGrid Launchpad;
+        public LaunchpadGrid Launchpad;
         public TextBlock Time;
 
         public Frame Frame {

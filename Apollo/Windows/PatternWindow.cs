@@ -5,7 +5,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
+using AvaloniaColor = Avalonia.Media.Color;
+using FontWeight = Avalonia.Media.FontWeight;
+using SolidColorBrush = Avalonia.Media.SolidColorBrush;
+using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -127,8 +130,22 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern.Frames[current]);
         }
 
+        private void PadPressed(int index) {
+            int signalIndex = LaunchpadGrid.GridToSignal(index);
+            Color target = new Color();
+
+            _pattern.Frames[current].Screen[signalIndex] = (_pattern.Frames[current].Screen[signalIndex] == target)? new Color(0) : target;
+
+            SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current].Screen[signalIndex].ToBrush();
+
+            Editor.SetColor(index, brush);
+            ((FrameDisplay)Contents[current + 1]).Viewer.Launchpad.SetColor(index, brush);
+        }
+
         public void MIDIEnter(Signal n) {
-            
+            if (n.Color.Lit) Dispatcher.UIThread.InvokeAsync(() => {
+                PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
+            });
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
