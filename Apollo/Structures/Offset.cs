@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -38,8 +39,8 @@ namespace Apollo.Structures {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
             return new Offset(
-                int.Parse(data["x"].ToString()),
-                int.Parse(data["y"].ToString())
+                Convert.ToInt32(data["x"].ToString()),
+                Convert.ToInt32(data["y"].ToString())
             );
         }
 
