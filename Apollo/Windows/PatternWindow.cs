@@ -34,6 +34,7 @@ namespace Apollo.Windows {
         Button Play, Fire;
 
         int current;
+
         bool _playing = false;
         bool Playing {
             get => _playing;
@@ -42,6 +43,8 @@ namespace Apollo.Windows {
                 Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = !_playing;
             }
         }
+
+        Action<Signal> PlayExit;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Editing Pattern - Track {index + 1}"
@@ -77,6 +80,8 @@ namespace Apollo.Windows {
             Launchpad.PatternWindow?.Close();
             Launchpad.PatternWindow = this;
             Launchpad.Clear();
+
+            PlayExit = Launchpad.Send;
 
             Editor = this.Get<LaunchpadGrid>("Editor");
 
@@ -135,7 +140,7 @@ namespace Apollo.Windows {
                 reference.Length,
                 reference.Time
             ));
-            
+
             Contents_Insert(index, _pattern.Frames[index]);
 
             if (index <= current) current++;
@@ -242,6 +247,8 @@ namespace Apollo.Windows {
             courier.Elapsed -= Tick;
 
             if (courier.Info == null) {
+                PlayExit = Launchpad.Send;
+
                 Dispatcher.UIThread.InvokeAsync(() => {
                     Playing = false;
 
@@ -258,7 +265,7 @@ namespace Apollo.Windows {
                     Editor.SetColor(LaunchpadGrid.SignalToGrid(n.Index), (SolidColorBrush)n.Color.ToBrush());
                 });
 
-                Launchpad.Send(n);
+                PlayExit?.Invoke(n);
             }
         }
 
@@ -269,7 +276,7 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern.Frames[0]);
 
             for (int i = 0; i < _pattern.Frames[0].Screen.Length; i++)
-                Launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[0].Screen[i]));
+                PlayExit?.Invoke(new Signal(Launchpad, (byte)i, _pattern.Frames[0].Screen[i]));
             
             decimal time = (_pattern.Frames[0].Mode? (int)_pattern.Frames[0].Length : _pattern.Frames[0].Time) * _pattern.Gate;
 
@@ -280,12 +287,13 @@ namespace Apollo.Windows {
 
                 time += (_pattern.Frames[i].Mode? (int)_pattern.Frames[i].Length : _pattern.Frames[i].Time) * _pattern.Gate;
             }
-                    
+            
             FireStopCourier((int)time);
         }
 
         private void PatternFire(object sender, RoutedEventArgs e) {
-
+            PlayExit = _pattern.MIDIExit;
+            PatternPlay(sender, e);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
