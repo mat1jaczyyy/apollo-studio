@@ -131,6 +131,8 @@ namespace Apollo.Windows {
             ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
 
             Editor.RenderFrame(_pattern.Frames[current]);
+            for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
+                Launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
         }
 
         private void PadPressed(int index) {
@@ -144,6 +146,8 @@ namespace Apollo.Windows {
 
             Editor.SetColor(index, brush);
             ((FrameDisplay)Contents[current + 1]).Viewer.Launchpad.SetColor(index, brush);
+
+            Launchpad.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
         }
 
         public void MIDIEnter(Signal n) {
