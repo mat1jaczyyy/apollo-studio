@@ -17,6 +17,9 @@ namespace Apollo.Components {
         public delegate void DialValueChangedEventHandler(double NewValue);
         public event DialValueChangedEventHandler ValueChanged;
 
+        public delegate void DialStepChangedEventHandler(int NewValue);
+        public event DialStepChangedEventHandler StepChanged;
+
         public delegate void DialModeChangedEventHandler(bool NewValue);
         public event DialModeChangedEventHandler ModeChanged;
 
@@ -282,6 +285,7 @@ namespace Apollo.Components {
                 if (UsingSteps) {
                     if (Math.Abs(Y - lastY) >= 8) {
                         _length.Step -= (int)((Y - lastY) / 8);
+                        StepChanged?.Invoke(_length.Step);
                         DrawArcSteps();
                         lastY = Y;
                     }
