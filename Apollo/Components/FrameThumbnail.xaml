@@ -5,6 +5,6 @@
 
   <StackPanel Spacing="2" Background="Transparent" PointerReleased="Click">
     <Components:LaunchpadGrid HorizontalAlignment="Center" Scale="0.5" x:Name="Launchpad" />
-    <TextBlock HorizontalAlignment="Center" Text="x ms" x:Name="Time" />
+    <TextBlock HorizontalAlignment="Center" x:Name="Time" />
   </StackPanel>
 </UserControl>

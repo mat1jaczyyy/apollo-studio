@@ -28,6 +28,7 @@ namespace Apollo.Windows {
         LaunchpadGrid Editor;
         Controls Contents;
         ColorPicker ColorPicker;
+        Dial Duration;
 
         int current;
         
@@ -68,10 +69,15 @@ namespace Apollo.Windows {
 
             Editor = this.Get<LaunchpadGrid>("Editor");
 
+            Duration = this.Get<Dial>("Duration");
+            this.Get<Dial>("Gate").RawValue = (double)_pattern.Gate * 100;
+
             Contents = this.Get<StackPanel>("Frames").Children;
 
-            for (int i = 0; i < _pattern.Frames.Count; i++)
+            for (int i = 0; i < _pattern.Frames.Count; i++) {
                 Contents_Insert(i, _pattern.Frames[i]);
+                ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
+            }
             
             if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
             
@@ -129,8 +135,13 @@ namespace Apollo.Windows {
             current = index;
 
             ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
+            
+            Duration.UsingSteps = _pattern.Frames[current].Mode;
+            Duration.Length = _pattern.Frames[current].Length;
+            Duration.RawValue = _pattern.Frames[current].Time;
 
             Editor.RenderFrame(_pattern.Frames[current]);
+
             for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
                 Launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
         }
@@ -155,6 +166,20 @@ namespace Apollo.Windows {
                 PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
             });
         }
+
+        private void Duration_Changed(double value) {
+            _pattern.Frames[current].Time = (int)value;
+            ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+        }
+
+        private void Duration_StepChanged(int value) => ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+
+        private void Duration_ModeChanged(bool value) {
+            _pattern.Frames[current].Mode = value;
+            ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+        }
+
+        private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         

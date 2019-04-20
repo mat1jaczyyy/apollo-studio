@@ -8,6 +8,12 @@
         Height="650" MinHeight="650" MaxHeight="650"
         Opened="Loaded" Closing="Unloaded">
   
+  <Window.Styles>
+    <Style Selector="Button">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />
+    </Style>
+  </Window.Styles>
+
   <Grid RowDefinitions="Auto,*">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
       <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow">
@@ -27,9 +33,22 @@
           
           <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
             <Grid RowDefinitions="*,*,*">
-              <Components:ColorPicker Grid.Row="0" Padding="7" x:Name="ColorPicker" />
+              <Components:ColorPicker Grid.Row="0" Margin="7" x:Name="ColorPicker" />
 
-              <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0" />
+              <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                <Grid Margin="7" ColumnDefinitions="*,*,*">
+                  <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
+                                   ValueChanged="Duration_Changed" StepChanged="Duration_StepChanged" ModeChanged="Duration_ModeChanged" />
+                                    
+                  <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
+                                   ValueChanged="Gate_Changed" />
+
+                  <StackPanel Grid.Column="2" Margin="5 0 0 0" VerticalAlignment="Center" Spacing="5">
+                    <Button Content="Play" />
+                    <Button Content="Fire" />
+                  </StackPanel>
+                </Grid>
+              </Border>
             </Grid>
           </Border>
         </Grid>
