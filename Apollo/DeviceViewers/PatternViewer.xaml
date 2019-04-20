@@ -4,6 +4,6 @@
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-    <Button Content="Edit Pattern" Click="Edit" />
+    <Button Background="{DynamicResource ThemeControlHigherBrush}" Content="Edit Pattern" Click="Edit" />
   </StackPanel>
 </UserControl>

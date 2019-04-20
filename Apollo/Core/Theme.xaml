@@ -16,6 +16,7 @@
     <Color x:Key="ThemeControlLowColor">#FF111111</Color>
     <Color x:Key="ThemeControlMidColor">#FF171717</Color>
     <Color x:Key="ThemeControlHighColor">#FF1C1C1C</Color>
+    <Color x:Key="ThemeControlHigherColor">#FF222222</Color>
     <Color x:Key="ThemeControlDarkenColor">#20000000</Color>
     <Color x:Key="ThemeControlHighlightLowColor">#FFA8A8A8</Color>
     <Color x:Key="ThemeControlHighlightMidColor">#FF828282</Color>
@@ -35,6 +36,7 @@
     <SolidColorBrush x:Key="ThemeControlLowBrush" Color="{DynamicResource ThemeControlLowColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeControlMidBrush" Color="{DynamicResource ThemeControlMidColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeControlHighBrush" Color="{DynamicResource ThemeControlHighColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemeControlHigherBrush" Color="{DynamicResource ThemeControlHigherColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeControlDarkenBrush" Color="{DynamicResource ThemeControlDarkenColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="{DynamicResource ThemeControlHighlightLowColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="{DynamicResource ThemeControlHighlightMidColor}"></SolidColorBrush>
