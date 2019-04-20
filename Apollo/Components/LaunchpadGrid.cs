@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -55,9 +56,9 @@ namespace Apollo.Components {
         }
 
         public string FormatPath(string format) => String.Format(format,
-            this.Resources["PadSquareSize"],
-            this.Resources["PadCut1"],
-            this.Resources["PadCut2"]
+            ((double)this.Resources["PadSquareSize"]).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadCut1"]).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadCut2"]).ToString(CultureInfo.InvariantCulture)
         );
 
         public void DrawPath() {
