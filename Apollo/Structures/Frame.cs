@@ -47,7 +47,7 @@ namespace Apollo.Structures {
             Color[] colors = new Color[100];
 
             for (int i = 0; i < 100; i++)
-                colors[i] = Color.Decode(screen[i - 1].ToString());
+                colors[i] = Color.Decode(screen[i].ToString());
 
             return new Frame(
                 Convert.ToBoolean(data["mode"]),

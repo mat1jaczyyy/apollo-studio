@@ -250,7 +250,6 @@ namespace Apollo.Devices {
                         writer.WriteValue(_gate);
 
                         writer.WritePropertyName("colors");
-
                         writer.WriteStartArray();
 
                             for (int i = 0; i < _colors.Count; i++)

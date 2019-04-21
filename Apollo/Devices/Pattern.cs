@@ -90,8 +90,15 @@ namespace Apollo.Devices {
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
+            List<object> _frames = JsonConvert.DeserializeObject<List<object>>(data["frames"].ToString());
+            List<Frame> init = new List<Frame>();
+
+            foreach (object frame in _frames)
+                init.Add(Frame.Decode(frame.ToString()));
+
             return new Pattern(
-                
+                Convert.ToDecimal(data["gate"]),
+                init
             );
         }
 
@@ -106,6 +113,17 @@ namespace Apollo.Devices {
 
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
+
+                        writer.WritePropertyName("gate");
+                        writer.WriteValue(_gate);
+
+                        writer.WritePropertyName("frames");
+                        writer.WriteStartArray();
+
+                            for (int i = 0; i < Frames.Count; i++)
+                                writer.WriteRawValue(Frames[i].Encode());
+
+                        writer.WriteEndArray();
 
                     writer.WriteEndObject();
 
