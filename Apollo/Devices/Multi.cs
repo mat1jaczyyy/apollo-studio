@@ -66,6 +66,8 @@ namespace Apollo.Devices {
             Reroute();
         }
 
+        private void Reset() => current = -1;
+
         public Multi(Chain preprocess = null, List<Chain> init = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
             Preprocess.Parent = this;
@@ -75,6 +77,8 @@ namespace Apollo.Devices {
             
             for (int i = 0; i < 100; i++)
                 buffer[i] = new Dictionary<int, int>();
+            
+            Launchpad.MultiReset += Reset;
         }
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);

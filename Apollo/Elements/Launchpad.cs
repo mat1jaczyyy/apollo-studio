@@ -19,6 +19,9 @@ namespace Apollo.Elements {
 
         public PatternWindow PatternWindow;
 
+        public delegate void MultiResetHandler();
+        public static event MultiResetHandler MultiReset;
+
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
         private LaunchpadType Type = LaunchpadType.Unknown;
@@ -198,6 +201,11 @@ namespace Apollo.Elements {
 
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
+                    if (e.Control == 121) {
+                        MultiReset?.Invoke();
+                        return;
+                    }
+
                     HandleMessage(new Signal(
                         InputFormat,
                         this,
