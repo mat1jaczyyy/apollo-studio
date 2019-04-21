@@ -21,7 +21,7 @@ namespace Apollo.Components {
             set {
                 if (value != _always) {
                     _always = value;
-                    this.Get<Grid>("Root").MinWidth = _always? 26 : 0;
+                    this.Get<Grid>("Root").MinWidth = _always? 30 : 0;
                 }
             }
         }
