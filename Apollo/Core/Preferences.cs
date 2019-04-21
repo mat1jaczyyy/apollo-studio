@@ -5,6 +5,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
+using Apollo.Components;
 using Apollo.Windows;
 
 namespace Apollo.Core {
@@ -89,6 +90,7 @@ namespace Apollo.Core {
                 AutoCreateKeyFilter = Convert.ToBoolean(data["autocreatekeyfilter"]);
                 AutoCreatePageFilter = Convert.ToBoolean(data["autocreatepagefilter"]);
                 FadeSmoothness = Convert.ToDouble(data["fadesmoothness"]);
+                ColorHistory.Decode(data["colorhistory"].ToString());
             } catch {
                 return false;
             }
@@ -122,6 +124,9 @@ namespace Apollo.Core {
 
                         writer.WritePropertyName("fadesmoothness");
                         writer.WriteValue(FadeSmoothness);
+
+                        writer.WritePropertyName("colorhistory");
+                        writer.WriteRawValue(ColorHistory.Encode());
 
                     writer.WriteEndObject();
 
