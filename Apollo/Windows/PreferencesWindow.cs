@@ -14,7 +14,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame;
         Slider FadeSmoothness;
         Controls Contents;
 
@@ -56,6 +56,9 @@ namespace Apollo.Windows {
             FadeSmoothness.Value = Preferences.FadeSmoothness;
             FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
 
+            CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
+            CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
+
             Contents = this.Get<StackPanel>("Contents").Children;
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
@@ -81,6 +84,8 @@ namespace Apollo.Windows {
         private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
 
         private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
+
+        private void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

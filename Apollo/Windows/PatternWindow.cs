@@ -189,6 +189,10 @@ namespace Apollo.Windows {
                 reference.Time
             ));
 
+            if (Preferences.CopyPreviousFrame)
+                for (int i = 0; i < _pattern.Frames[index].Screen.Length; i++)
+                    _pattern.Frames[index].Screen[i] = reference.Screen[i].Clone();
+
             Contents_Insert(index, _pattern.Frames[index]);
 
             if (index <= current) current++;

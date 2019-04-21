@@ -72,6 +72,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _CopyPreviousFrame = false;
+        public static bool CopyPreviousFrame {
+            get => _CopyPreviousFrame;
+            set {
+                _CopyPreviousFrame = value;
+                Save();
+            }
+        }
+
         public static void Save() => File.WriteAllText(FilePath, Encode());
 
         static Preferences() {
@@ -91,6 +100,7 @@ namespace Apollo.Core {
                 AutoCreatePageFilter = Convert.ToBoolean(data["autocreatepagefilter"]);
                 FadeSmoothness = Convert.ToDouble(data["fadesmoothness"]);
                 ColorHistory.Decode(data["colorhistory"].ToString());
+                CopyPreviousFrame = Convert.ToBoolean(data["copypreviousframe"]);
             } catch {
                 return false;
             }
@@ -127,6 +137,9 @@ namespace Apollo.Core {
 
                         writer.WritePropertyName("colorhistory");
                         writer.WriteRawValue(ColorHistory.Encode());
+
+                        writer.WritePropertyName("copypreviousframe");
+                        writer.WriteValue(CopyPreviousFrame);
 
                     writer.WriteEndObject();
 

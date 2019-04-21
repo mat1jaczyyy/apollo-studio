@@ -18,7 +18,7 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="10 5">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Margin="10 5">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
@@ -29,13 +29,20 @@
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Editor" />
+            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
             <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
             <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create PageFilter in new Group Chain</CheckBox>
           </StackPanel>
         </Border>
 
         <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <StackPanel Spacing="5">
+            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
+            <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Auto copy previous frame when adding a new one</CheckBox>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
             <StackPanel Orientation="Horizontal" Spacing="10">
@@ -45,7 +52,7 @@
           </StackPanel>
         </Border>
 
-        <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+        <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel>
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
             <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -54,7 +61,7 @@
           </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="4" Margin="10" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
           <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 9" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
