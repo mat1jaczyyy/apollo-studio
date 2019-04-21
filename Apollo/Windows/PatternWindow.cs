@@ -37,13 +37,16 @@ namespace Apollo.Windows {
                 }
 
                 _launchpad = value;
-                _launchpad.PatternWindow?.Close();
-                _launchpad.PatternWindow = this;
-                _launchpad.Clear();
-                PlayExit = _launchpad.Send;
+
+                if (_launchpad != null) {
+                    _launchpad.PatternWindow?.Close();
+                    _launchpad.PatternWindow = this;
+                    _launchpad.Clear();
+                    PlayExit = _launchpad.Send;
+                } else PlayExit = null;
 
                 for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                    _launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                    _launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
             }
         }
 
@@ -219,7 +222,7 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern.Frames[current]);
 
             for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                Launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
         }
 
         private void PadPressed(int index) {
@@ -236,7 +239,7 @@ namespace Apollo.Windows {
             Editor.SetColor(index, brush);
             ((FrameDisplay)Contents[current + 1]).Viewer.Launchpad.SetColor(index, brush);
 
-            Launchpad.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
+            Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
         }
 
         public void MIDIEnter(Signal n) {
@@ -291,7 +294,8 @@ namespace Apollo.Windows {
                     if (_pattern.Frames.Last().Screen[i].Lit)
                         PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, new Color(0)));
 
-                PlayExit = Launchpad.Send;
+                if (_launchpad != null) PlayExit = Launchpad.Send;
+                else PlayExit = null;
 
                 Dispatcher.UIThread.InvokeAsync(() => {
                     Playing = false;
@@ -300,7 +304,7 @@ namespace Apollo.Windows {
                 });
 
                 for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                    Launchpad.Send(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                    Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
 
             } else {
                 Signal n = (Signal)courier.Info;
