@@ -260,12 +260,63 @@ namespace Apollo.Windows {
             Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
         }
 
-        public void MIDIEnter(Signal n) {
-            if (Playing) return;
+        int origin = -1;
+        int gesturePoint = -1;
+        bool gestureUsed = false;
 
-            if (n.Color.Lit) Dispatcher.UIThread.InvokeAsync(() => {
-                PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
-            });
+        public void MIDIEnter(Signal n) {
+            if (n.Color.Lit) {
+                if (origin == -1) {
+                    origin = n.Index;
+                    gestureUsed = false;
+
+                } else if (gesturePoint == -1)
+                    gesturePoint = n.Index;
+
+            } else {
+                if (n.Index == origin) {
+                    if (!gestureUsed && !Playing) Dispatcher.UIThread.InvokeAsync(() => {
+                        PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
+                    });
+                    origin = gesturePoint;
+
+                } else if (n.Index == gesturePoint) {
+                    int x = gesturePoint % 10 - origin % 10;
+                    int y = gesturePoint / 10 - origin / 10;
+
+                    if (!Playing) Dispatcher.UIThread.InvokeAsync(() => {
+                        if (x == -1 && y == 0) { // Left
+                            if (current == 0) Frame_Insert(0);
+                            else Frame_Select(current - 1);
+
+                        } else if (x == 1 && y == 0) { // Right
+                            if (current == _pattern.Frames.Count - 1) Frame_Insert(_pattern.Frames.Count);
+                            else Frame_Select(current + 1);
+
+                        } else if (x == 0 && y == 1) { // Up
+                            // Color History mode
+                            
+                        } else if (x == 0 && y == -1) // Down
+                            PadPressed(-1);
+                            
+                        else if (x == -1 && y == 1) // Up-Left
+                            PatternPlay(null, null);
+                            
+                        else if (x == 1 && y == -1) // Down-Right
+                            PatternFire(null, null);
+                            
+                        else if (x == 1 && y == 1) // Up-Right
+                            Frame_Insert(current + 1);
+                            
+                        else if (x == -1 && y == -1) // Down-Left
+                            Frame_Remove(current);
+                        
+                    });
+
+                    gestureUsed = true;
+                    gesturePoint = -1;
+                }
+            }
         }
 
         private void Duration_Changed(double value) {
