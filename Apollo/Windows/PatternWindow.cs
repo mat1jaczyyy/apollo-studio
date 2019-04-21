@@ -242,11 +242,14 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color) {
+            if (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color)
                 _pattern.Frames[current].Screen[signalIndex] = new Color(0);
-            } else {
+            else {
                 _pattern.Frames[current].Screen[signalIndex] = ColorPicker.Color.Clone();
-                ColorHistory.Use();
+
+                Dispatcher.UIThread.InvokeAsync(() => {
+                    ColorHistory.Use();
+                });
             }
 
             SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current].Screen[signalIndex].ToBrush();
