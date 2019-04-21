@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Avalonia;
@@ -25,8 +26,28 @@ namespace Apollo.Windows {
 
         Pattern _pattern;
         Track _track;
-        Launchpad Launchpad;
+        
+        Launchpad _launchpad;
+        private Launchpad Launchpad {
+            get => _launchpad;
+            set {
+                if (_launchpad != null) {
+                    _launchpad.PatternWindow = null;
+                    _launchpad.Clear();
+                }
 
+                _launchpad = value;
+                _launchpad.PatternWindow?.Close();
+                _launchpad.PatternWindow = this;
+                _launchpad.Clear();
+                PlayExit = _launchpad.Send;
+
+                for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
+                    _launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+            }
+        }
+
+        ComboBox PortSelector;
         LaunchpadGrid Editor;
         Controls Contents;
         ColorPicker ColorPicker;
@@ -40,7 +61,7 @@ namespace Apollo.Windows {
             get => _playing;
             set {
                 _playing = value;
-                Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = !_playing;
+                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = !_playing;
             }
         }
 
@@ -55,6 +76,17 @@ namespace Apollo.Windows {
         private void UpdateTitle() => UpdateTitle(Program.Project.FilePath, _track.ParentIndex.Value);
 
         private void UpdateTopmost(bool value) => Topmost = value;
+
+        private void UpdatePorts() {
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available select i).ToList();
+            if (Launchpad != null && !Launchpad.Available) ports.Add(Launchpad);
+
+            PortSelector.Items = ports;
+            PortSelector.SelectedIndex = -1;
+            PortSelector.SelectedItem = Launchpad;
+        }
+
+        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         private void Contents_Insert(int index, Frame frame) {
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
@@ -76,13 +108,6 @@ namespace Apollo.Windows {
             _pattern = pattern;
             _track = Track.Get(_pattern);
 
-            Launchpad = _track.Launchpad;
-            Launchpad.PatternWindow?.Close();
-            Launchpad.PatternWindow = this;
-            Launchpad.Clear();
-
-            PlayExit = Launchpad.Send;
-
             Editor = this.Get<LaunchpadGrid>("Editor");
 
             Duration = this.Get<Dial>("Duration");
@@ -101,10 +126,16 @@ namespace Apollo.Windows {
             }
             
             if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
-            
-            Frame_Select(0);
+
+            Launchpad = _track.Launchpad;
+
+            PortSelector = this.Get<ComboBox>("PortSelector");
+            UpdatePorts();
+            MIDI.DevicesUpdated += HandlePorts;
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
+            
+            Frame_Select(0);
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -126,6 +157,15 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Program.WindowClose(this);
+        }
+
+        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
+            Launchpad selected = (Launchpad)PortSelector.SelectedItem;
+
+            if (selected != null && Launchpad != selected) {
+                Launchpad = selected;
+                UpdatePorts();
+            }
         }
 
         private void Frame_Insert(int index) {
@@ -223,7 +263,7 @@ namespace Apollo.Windows {
 
         private void FireCourier(Color color, byte index, int time) {
             Courier courier = new Courier() {
-                Info = new Signal(Launchpad, (byte)index, color),
+                Info = new Signal(_track.Launchpad, (byte)index, color),
                 AutoReset = false,
                 Interval = time,
             };
@@ -256,7 +296,7 @@ namespace Apollo.Windows {
                 });
 
                 for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                    Launchpad.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                    Launchpad.Send(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
 
             } else {
                 Signal n = (Signal)courier.Info;
@@ -276,7 +316,7 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern.Frames[0]);
 
             for (int i = 0; i < _pattern.Frames[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(Launchpad, (byte)i, _pattern.Frames[0].Screen[i]));
+                PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[0].Screen[i]));
             
             decimal time = (_pattern.Frames[0].Mode? (int)_pattern.Frames[0].Length : _pattern.Frames[0].Time) * _pattern.Gate;
 
