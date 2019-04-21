@@ -54,9 +54,9 @@ namespace Apollo.Components {
             Draw();
         }
 
-        public void Select(Color color) {
+        public void Select(Color color, bool init = false) {
             _current = color;
-            CurrentIndex = -1;
+            CurrentIndex = init? History.IndexOf(color) : -1;
             Saved = false;
 
             Draw();
