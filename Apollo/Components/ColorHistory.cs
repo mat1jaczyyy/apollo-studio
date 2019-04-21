@@ -53,13 +53,11 @@ namespace Apollo.Components {
         }
         
         int CurrentIndex;
-        bool Saved = true;
 
         public void Use() {
             Use(Current);
 
             CurrentIndex = 0;
-            Saved = true;
 
             Draw();
         }
@@ -67,7 +65,6 @@ namespace Apollo.Components {
         public void Select(Color color, bool init = false) {
             _current = color;
             CurrentIndex = init? History.IndexOf(color) : -1;
-            Saved = false;
 
             Draw();
         }
@@ -80,7 +77,6 @@ namespace Apollo.Components {
 
             Current = History[index];
             CurrentIndex = index;
-            Saved = true;
 
             Draw();
         }
@@ -90,7 +86,7 @@ namespace Apollo.Components {
         private void Draw() {
             int offset = 0;
 
-            if (!Saved) {
+            if (CurrentIndex == -1) {
                 offset = 1;
 
                 Rectangle box = ((Rectangle)Grid.Children[0]);
