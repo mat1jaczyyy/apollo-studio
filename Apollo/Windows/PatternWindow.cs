@@ -185,7 +185,7 @@ namespace Apollo.Windows {
 
             _pattern.Frames.Insert(index, new Frame(
                 reference.Mode,
-                reference.Length,
+                reference.Length.Clone(),
                 reference.Time
             ));
 

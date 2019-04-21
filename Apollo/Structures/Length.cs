@@ -27,6 +27,8 @@ namespace Apollo.Structures {
             get => Convert.ToDecimal(Math.Pow(2, _value - 7));
         }
 
+        public Length Clone() => new Length(Step);
+
         public Length(int step = 5) => Step = step;
 
         public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
