@@ -287,6 +287,10 @@ namespace Apollo.Windows {
             courier.Elapsed -= Tick;
 
             if (courier.Info == null) {
+                for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
+                    if (_pattern.Frames.Last().Screen[i].Lit)
+                        PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, new Color(0)));
+
                 PlayExit = Launchpad.Send;
 
                 Dispatcher.UIThread.InvokeAsync(() => {
