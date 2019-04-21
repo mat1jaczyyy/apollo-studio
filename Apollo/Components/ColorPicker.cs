@@ -32,6 +32,7 @@ namespace Apollo.Components {
 
         public void SetColor(Color color) {
             _color = color;
+            Preview.Fill = Color.ToBrush();
             InitCanvas();
         }
 
@@ -105,8 +106,13 @@ namespace Apollo.Components {
             Canvas.SetTop(MainThumb, (1 - max) * mainHeight);
 
             UpdateCanvas();
+            UpdateText();
+        }
 
+        private void UpdateText() {
+            hexValidation = false;
             Hex.Text = Color.ToHex();
+            hexValidation = true;
         }
 
         private void UpdateColor() {
@@ -131,9 +137,7 @@ namespace Apollo.Components {
 
             Preview.Fill = Color.ToBrush();
 
-            hexValidation = false;
-            Hex.Text = Color.ToHex();
-            hexValidation = true;
+            UpdateText();
         }
 
         private void UpdateCanvas() {
@@ -244,14 +248,14 @@ namespace Apollo.Components {
 
             foreach (char i in text.Substring(1))
                 if (!"0123456789ABCDEF".Contains(i))
-                    return update + (() => { Hex.Text = Color.ToHex(); });
+                    return update + (() => { UpdateText(); });
 
             if (text == "#") return () => {
                 Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
                 Hex.Text = text;
             };
 
-            if (text[0] != '#' || text.Length > 7) return update + (() => { Hex.Text = Color.ToHex(); });
+            if (text[0] != '#' || text.Length > 7) return update + (() => { UpdateText(); });
             if (text.Length < 7) return () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
 
             int r = Convert.ToInt32(text.Substring(1, 2), 16);
