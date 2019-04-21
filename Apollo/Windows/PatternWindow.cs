@@ -343,7 +343,7 @@ namespace Apollo.Windows {
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {
                 pattern.Window = new PatternWindow(pattern) {Owner = owner};
-                pattern.Window.ShowDialog(owner);
+                pattern.Window.Show();
                 pattern.Window.Owner = null;
             } else {
                 pattern.Window.WindowState = WindowState.Normal;
