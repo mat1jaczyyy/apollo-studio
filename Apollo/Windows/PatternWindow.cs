@@ -54,6 +54,7 @@ namespace Apollo.Windows {
         LaunchpadGrid Editor;
         Controls Contents;
         ColorPicker ColorPicker;
+        ColorHistory ColorHistory;
         Dial Duration, Gate;
         Button Play, Fire;
 
@@ -137,6 +138,10 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated += HandlePorts;
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
+            ColorHistory = this.Get<ColorHistory>("ColorHistory");
+
+            ColorPicker.SetColor(ColorHistory[0]?? new Color());
+            ColorPicker_Changed(ColorPicker.Color);
             
             Frame_Select(0);
         }
@@ -225,14 +230,20 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
         }
 
+        private void ColorPicker_Changed(Color color) => ColorHistory.Select(color.Clone());
+        private void ColorHistory_Changed(Color color) => ColorPicker.SetColor(color.Clone());
+
         private void PadPressed(int index) {
             if (Playing) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            _pattern.Frames[current].Screen[signalIndex] = (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color)
-                ? new Color(0)
-                : ColorPicker.Color.Clone();
+            if (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color) {
+                _pattern.Frames[current].Screen[signalIndex] = new Color(0);
+            } else {
+                _pattern.Frames[current].Screen[signalIndex] = ColorPicker.Color.Clone();
+                ColorHistory.Use();
+            }
 
             SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current].Screen[signalIndex].ToBrush();
 

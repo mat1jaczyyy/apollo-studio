@@ -32,11 +32,15 @@
           <Components:LaunchpadGrid Grid.Column="0" Scale="2.5" x:Name="Editor" PadPressed="PadPressed" />
           
           <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-            <Grid RowDefinitions="Auto,*,*,*">
+            <Grid RowDefinitions="Auto,*,Auto,Auto">
               <ComboBox Grid.Row="0" Margin="7" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
             
               <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-                <Components:ColorPicker Margin="7" x:Name="ColorPicker" />
+                <Components:ColorPicker Margin="7" x:Name="ColorPicker" ColorChanged="ColorPicker_Changed" />
+              </Border>
+
+              <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                <Components:ColorHistory Margin="7" x:Name="ColorHistory" ColorChanged="ColorHistory_Changed" />
               </Border>
 
               <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
