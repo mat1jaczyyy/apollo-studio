@@ -117,6 +117,9 @@ namespace Apollo.Elements {
         public void Dispose() {
             foreach (Track track in Tracks)
                 track.Dispose();
+            
+            foreach (Launchpad launchpad in MIDI.Devices)
+                launchpad.Clear();
         }
 
         public static Project Decode(string jsonString, string path) {
