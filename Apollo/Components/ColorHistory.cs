@@ -23,6 +23,9 @@ namespace Apollo.Components {
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+        public delegate void HistoryChangedEventHandler();
+        public static event HistoryChangedEventHandler HistoryChanged;
+
         private static List<Color> History = new List<Color>();
 
         public Color this[int index] {
@@ -37,13 +40,15 @@ namespace Apollo.Components {
             if (History.Contains(color)) History.Remove(color);
             History.Insert(0, color);
 
-            Preferences.Save();
+            HistoryChanged?.Invoke();
         }
+        
+        static ColorHistory() => HistoryChanged += Preferences.Save;
 
         public delegate void ColorChangedEventHandler(Color value);
         public event ColorChangedEventHandler ColorChanged;
 
-        Color _current;
+        Color _current = new Color();
         Color Current {
             get => _current;
             set {
@@ -101,7 +106,7 @@ namespace Apollo.Components {
                 if (i < History.Count) {
                     box.Opacity = 1;
                     box.Fill = History[i].ToBrush();
-                    box.StrokeThickness = Convert.ToInt32(i == CurrentIndex);
+                    box.StrokeThickness = Convert.ToInt32(Current == History[i] && CurrentIndex != -1);
 
                 } else box.Opacity = 0;
             }
@@ -112,6 +117,7 @@ namespace Apollo.Components {
 
             Grid = this.Get<UniformGrid>("Grid");
 
+            HistoryChanged += Draw;
             Draw();
         }
 
