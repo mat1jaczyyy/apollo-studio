@@ -4,8 +4,8 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {
@@ -37,7 +37,7 @@ namespace Apollo.Structures {
 
         public Signal(Launchpad.InputType input, Launchpad source, byte index = 11, Color color = null, int layer = 0, int? multiTarget = null): this(
             source,
-            (input == Launchpad.InputType.DrumRack)? Conversion.DRtoXY[index] : index,
+            (input == Launchpad.InputType.DrumRack)? Converter.DRtoXY(index) : index,
             color,
             layer,
             multiTarget

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -221,7 +222,7 @@ namespace Apollo.Devices {
             if (info.GetType() == typeof(int)) {
                 Signal n = _signals[(int)info].Clone();
                 
-                n.Index = Conversion.DRtoXY[n.Index];
+                n.Index = Converter.DRtoXY(n.Index);
 
                 MIDIExit?.Invoke(n);
             }
