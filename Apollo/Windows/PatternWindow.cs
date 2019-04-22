@@ -378,7 +378,7 @@ namespace Apollo.Windows {
 
         private void FireCourier(Color color, byte index, int time) {
             Courier courier = new Courier() {
-                Info = new Signal(_track.Launchpad, (byte)index, color),
+                Info = new Signal(_track.Launchpad, (byte)index, color.Clone()),
                 AutoReset = false,
                 Interval = time,
             };
@@ -425,7 +425,7 @@ namespace Apollo.Windows {
                     Editor.SetColor(LaunchpadGrid.SignalToGrid(n.Index), (SolidColorBrush)n.Color.ToBrush());
                 });
 
-                PlayExit?.Invoke(n);
+                PlayExit?.Invoke(n.Clone());
             }
         }
 
@@ -436,14 +436,14 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern.Frames[0]);
 
             for (int i = 0; i < _pattern.Frames[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[0].Screen[i]));
+                PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[0].Screen[i].Clone()));
             
             decimal time = (_pattern.Frames[0].Mode? (int)_pattern.Frames[0].Length : _pattern.Frames[0].Time) * _pattern.Gate;
 
             for (int i = 1; i < _pattern.Frames.Count; i++) {
                 for (int j = 0; j < _pattern.Frames[i].Screen.Length; j++)
                     if (_pattern.Frames[i].Screen[j] != _pattern.Frames[i - 1].Screen[j])
-                        FireCourier(_pattern.Frames[i].Screen[j].Clone(), (byte)j, (int)time);
+                        FireCourier(_pattern.Frames[i].Screen[j], (byte)j, (int)time);
 
                 time += (_pattern.Frames[i].Mode? (int)_pattern.Frames[i].Length : _pattern.Frames[i].Time) * _pattern.Gate;
             }
