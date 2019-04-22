@@ -56,7 +56,7 @@ namespace Apollo.Devices {
         public decimal Gate {
             get => _gate;
             set {
-                if (0 <= value && value <= 4)
+                if (0.01M <= value && value <= 4)
                     _gate = value;
             }
         }
