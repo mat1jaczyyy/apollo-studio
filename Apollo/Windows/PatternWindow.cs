@@ -313,6 +313,7 @@ namespace Apollo.Windows {
                         PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
                     });
                     origin = gesturePoint;
+                    gesturePoint = -1;
 
                 } else if (n.Index == gesturePoint) {
                     int x = gesturePoint % 10 - origin % 10;
