@@ -488,6 +488,13 @@ namespace Apollo.Windows {
                 Filters = new List<FileDialogFilter>() {
                     new FileDialogFilter() {
                         Extensions = new List<string>() {
+                            "mid",
+                            "gif"
+                        },
+                        Name = "All Supported Files"
+                    },
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
                             "mid"
                         },
                         Name = "MIDI Files"
