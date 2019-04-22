@@ -137,7 +137,7 @@ namespace Apollo.Helpers {
                     }
                 }
 
-                ret.RemoveAt(ret.Count - 1); 
+                if (ret.Count > 1) ret.RemoveAt(ret.Count - 1);
                 return reader.BaseStream.Position == end;
             }
         }
