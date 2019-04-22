@@ -75,7 +75,7 @@ namespace Apollo.Windows {
             get => _locked;
             set {
                 _locked = value;
-                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
+                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Import.IsEnabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
             }
         }
 

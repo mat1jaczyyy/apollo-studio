@@ -87,13 +87,12 @@ namespace Apollo.Helpers {
                 long end = reader.BaseStream.Position + BitConverter.ToInt32(reader.ReadBytes(4).Reverse().ToArray()); // Track length
                 ret = new List<Frame>() {new Frame()};
 
-                int time = 0;
-
                 while (reader.BaseStream.Position < end) {
                     int delta = MIDIReadVariableLength(reader);
-                    time += delta;
-
-                    if (delta > 0) ret.Add(new Frame());
+                    if (delta > 0) {
+                        ret.Last().Time = (int)((double)delta * 2500 / Program.Project.BPM);
+                        ret.Add(new Frame());
+                    }
                     
                     byte type = reader.ReadByte();
 
@@ -138,6 +137,7 @@ namespace Apollo.Helpers {
                     }
                 }
 
+                ret.RemoveAt(ret.Count - 1); 
                 return reader.BaseStream.Position == end;
             }
         }
