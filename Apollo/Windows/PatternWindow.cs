@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia;
@@ -60,7 +61,7 @@ namespace Apollo.Windows {
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate;
-        Button Play, Fire;
+        Button Import, Play, Fire;
 
         int current;
 
@@ -128,6 +129,7 @@ namespace Apollo.Windows {
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_pattern.Gate * 100;
 
+            Import = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
             Fire = this.Get<Button>("Fire");
 
@@ -450,8 +452,58 @@ namespace Apollo.Windows {
         }
 
         private void PatternFire(object sender, RoutedEventArgs e) {
+            if (Locked) return;
+
             PlayExit = _pattern.MIDIExit;
             PatternPlay(sender, e);
+        }
+
+        private void ImportFile(string path) {
+            if (!Importer.FramesFromMIDI(path, out List<Frame> frames) &&
+                !Importer.FramesFromImage(path, out frames))
+                return;
+
+            _pattern.Frames = frames;
+            _pattern.Gate = 1;
+
+            Gate.RawValue = (double)_pattern.Gate * 100;
+
+            Contents = (Controls)Contents.Take(1);
+
+            for (int i = 0; i < _pattern.Frames.Count; i++) {
+                Contents_Insert(i, _pattern.Frames[i]);
+                ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
+            }
+
+            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+
+            Frame_Select(0);
+        }
+
+        private async void ImportDialog(object sender, RoutedEventArgs e) {
+            if (Locked) return;
+
+            OpenFileDialog ofd = new OpenFileDialog() {
+                AllowMultiple = false,
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "mid"
+                        },
+                        Name = "MIDI Files"
+                    },
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "gif"
+                        },
+                        Name = "GIF Images"
+                    }
+                },
+                Title = "Import Pattern"
+            };
+
+            string[] result = await ofd.ShowAsync(this);
+            if (result.Length > 0) ImportFile(result[0]);
         }
 
         private void DragOver(object sender, DragEventArgs e) {
@@ -462,28 +514,9 @@ namespace Apollo.Windows {
         }
 
         private void Drop(object sender, DragEventArgs e) {
-            if (Locked) return;
-
             if (e.Data.Contains(DataFormats.FileNames)) {
                 List<string> filenames = e.Data.GetFileNames().ToList();
-
-                if (filenames.Count == 1 && Importer.FramesFromMIDI(filenames[0], out List<Frame> frames)) {
-                    _pattern.Frames = frames;
-                    _pattern.Gate = 1;
-
-                    Gate.RawValue = (double)_pattern.Gate * 100;
-
-                    Contents = (Controls)Contents.Take(1);
-
-                    for (int i = 0; i < _pattern.Frames.Count; i++) {
-                        Contents_Insert(i, _pattern.Frames[i]);
-                        ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
-                    }
-
-                    if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
-
-                    Frame_Select(0);
-                }
+                if (filenames.Count == 1) ImportFile(filenames[0]);
             }
         }
 
