@@ -29,8 +29,8 @@
     </Style>
   </UserControl.Styles>
 
-  <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" x:Name="Root" Classes="collapsible">
-    <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
+  <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible" PointerReleased="Click">
+    <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon">
       <Canvas.ContextMenu>
         <ContextMenu>
           <MenuItem Header="Group" />

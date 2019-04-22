@@ -29,8 +29,8 @@
     </Style>
   </UserControl.Styles>
 
-  <Grid RowDefinitions="7,Auto,7" Background="Transparent" x:Name="Root" Classes="collapsible">
-    <Canvas Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon" PointerReleased="Click">
+  <Grid RowDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible" PointerReleased="Click">
+    <Canvas Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon">
       <Path Stroke="{DynamicResource ThemeForegroundBrush}" StrokeThickness="2"
             Data="M 0,8 L 16,8 M 8,0 L 8,16" />
     </Canvas>
