@@ -8,7 +8,7 @@
     <SolidColorBrush x:Key="Color">#FFFFFFFF</SolidColorBrush>
   </UserControl.Resources>
 
-  <Thumb Width="14" x:Name="Thumb" Height="18"
+  <Thumb Width="14" x:Name="Thumb" Height="18" Background="Transparent" Cursor="Hand"
         DragStarted="DragStarted" DragCompleted="DragCompleted" DragDelta="MouseMove">
     <Thumb.Template>
       <ControlTemplate TargetType="Thumb">

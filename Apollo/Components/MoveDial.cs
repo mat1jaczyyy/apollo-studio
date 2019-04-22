@@ -102,7 +102,7 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Device.Capture(null);
 
-                PlaneCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
+                PlaneCanvas.Cursor = new Cursor(StandardCursorType.Hand);
             }
         }
 

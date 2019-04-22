@@ -6,7 +6,7 @@
   <StackPanel VerticalAlignment="Stretch">
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="2 2">
       <Components:Remove Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" Removed="Chain_Remove" />
-      <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Name" PointerReleased="Clicked" />
+      <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Name" Cursor="Hand" PointerReleased="Clicked" />
     </Grid>
 
     <Components:VerticalAdd Added="Chain_Add" />

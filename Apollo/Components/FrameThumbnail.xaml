@@ -1,7 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.FrameThumbnail"
-             xmlns:Components="clr-namespace:Apollo.Components">
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Cursor="Hand">
 
   <StackPanel Spacing="2" Background="Transparent" PointerReleased="Click">
     <Components:LaunchpadGrid HorizontalAlignment="Center" Scale="0.5" x:Name="Launchpad" />

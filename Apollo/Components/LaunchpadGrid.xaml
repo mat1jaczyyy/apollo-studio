@@ -17,6 +17,7 @@
   <StackPanel VerticalAlignment="Center" LayoutUpdated="LayoutChanged">
     <StackPanel.Styles>
       <Style Selector="Rectangle, Path, Ellipse">
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Fill" Value="{DynamicResource ThemeForegroundLowBrush}" />
         <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
       </Style>

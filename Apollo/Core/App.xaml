@@ -21,5 +21,9 @@
     <Style Selector="CheckBox:pointerover /template/ Border#border">
       <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
     </Style>
+
+    <Style Selector="ComboBox">
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
   </Application.Styles>
 </Application>

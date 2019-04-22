@@ -6,6 +6,7 @@
   <UniformGrid Rows="10" Columns="10" VerticalAlignment="Center" x:Name="PagesGrid">
     <UniformGrid.Styles>
       <Style Selector="Rectangle">
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Fill" Value="{DynamicResource ThemeForegroundLowBrush}" />
         <Setter Property="Margin" Value="1" />
         <Setter Property="Width" Value="15" />

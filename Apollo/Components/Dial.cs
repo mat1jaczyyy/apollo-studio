@@ -273,7 +273,7 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Device.Capture(null);
 
-                ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
+                ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
             } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) UsingSteps = !UsingSteps;
         }

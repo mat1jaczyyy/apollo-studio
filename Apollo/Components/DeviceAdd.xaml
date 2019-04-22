@@ -32,7 +32,7 @@
   <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible" PointerReleased="Click">
     <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon">
       <Canvas.ContextMenu>
-        <ContextMenu>
+        <ContextMenu Cursor="Arrow">
           <MenuItem Header="Group" />
           <MenuItem Header="Copy" />
           <MenuItem Header="Delay" />

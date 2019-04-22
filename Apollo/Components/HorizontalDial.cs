@@ -223,7 +223,7 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Device.Capture(null);
 
-                ArcCanvas.Cursor = new Cursor(StandardCursorType.Arrow);
+                ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
             }
         }
 

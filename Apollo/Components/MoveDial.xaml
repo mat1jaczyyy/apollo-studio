@@ -5,7 +5,7 @@
   <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center">
     <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
 
-    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" Height="40" Background="Transparent" x:Name="PlaneCanvas"
+    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" Height="40" Background="Transparent" Cursor="Hand" x:Name="PlaneCanvas"
             PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
       <Path Fill="{DynamicResource ThemeControlLowBrush}" 
             Data="M 0,18 L 38,18 38,20 0,20 Z" />
