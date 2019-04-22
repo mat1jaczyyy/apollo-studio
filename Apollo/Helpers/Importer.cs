@@ -12,6 +12,8 @@ using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
 
+using SkiaSharp;
+
 namespace Apollo.Helpers {
     public class Importer {
         private static int MIDIReadVariableLength(BinaryReader reader) {
@@ -136,6 +138,42 @@ namespace Apollo.Helpers {
                 }
 
                 return reader.BaseStream.Position == end;
+            }
+        }
+
+        private static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
+
+        public static bool FramesFromImage(string path, out List<Frame> ret) {
+            ret = null;
+            
+            if (!File.Exists(path)) return false;
+            
+            using (SKCodec codec = SKCodec.Create(path)){
+                SKImageInfo info = codec.Info;
+                ret = new List<Frame>();
+                
+                for (int i = 0; i < codec.FrameCount; i++) {
+                    SKBitmap bitmap = new SKBitmap(info.Width, info.Height, true);
+
+                    if (codec.GetPixels(bitmap.Info, bitmap.GetPixels()) == SKCodecResult.Success) {
+                        ret.Add(new Frame());
+                        bitmap = bitmap.Resize(targetInfo, SKFilterQuality.High);
+
+                        for (int x = 0; x <= 9; x++) {
+                            for (int y = 0; y <= 9; y++) {
+                                SKColor color = bitmap.GetPixel(x, 9 - y);
+                                ret[i].Screen[y * 10 + x] = new Color(
+                                    (byte)(color.Red >> 2),
+                                    (byte)(color.Green >> 2),
+                                    (byte)(color.Blue >> 2)
+                                );
+                            }
+                        }
+
+                    } else return false;
+                }
+
+                return true;
             }
         }
     }
