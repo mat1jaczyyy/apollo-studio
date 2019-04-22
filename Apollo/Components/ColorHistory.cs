@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -57,6 +58,7 @@ namespace Apollo.Components {
             }
         }
         
+        UniformGrid Grid;
         int CurrentIndex;
 
         public void Use() {
@@ -85,8 +87,8 @@ namespace Apollo.Components {
 
             Draw();
         }
-        
-        UniformGrid Grid;
+
+        public void Input(int index) => Select((CurrentIndex == -1)? (index - 1) : index);
 
         private void Draw() {
             int offset = 0;
@@ -112,6 +114,31 @@ namespace Apollo.Components {
             }
         }
 
+        public void Render(Launchpad launchpad) {
+            launchpad?.Clear();
+            int offset = 0;
+
+            if (CurrentIndex == -1) {
+                offset = 1;
+                launchpad?.Send(new Signal(launchpad, 81, Current));
+            }
+
+            int x = 8;
+            int y = 1 + offset;
+
+            for (int i = 0; i < 64 - offset; i++) {
+                if (i < History.Count) {
+                    launchpad?.Send(new Signal(launchpad, (byte)(x * 10 + (y++)), History[i]));
+
+                    if (y > 8) {
+                        x--;
+                        y = 1;
+                    }
+
+                } else break;
+            }
+        }
+
         public ColorHistory() {
             InitializeComponent();
 
@@ -121,10 +148,7 @@ namespace Apollo.Components {
             Draw();
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
-            int index = Grid.Children.IndexOf((IControl)sender);
-            Select((CurrentIndex == -1)? (index - 1) : index);
-        }
+        private void Clicked(object sender, PointerReleasedEventArgs e) => Input(Grid.Children.IndexOf((IControl)sender));
 
         public static void Decode(string jsonString) {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);

@@ -45,7 +45,10 @@ namespace Apollo.Windows {
                     PlayExit = _launchpad.Send;
                 } else PlayExit = null;
 
-                for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
+                origin = gesturePoint = -1;
+
+                if (historyShowing) RenderHistory();
+                else for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
                     _launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
             }
         }
@@ -60,12 +63,17 @@ namespace Apollo.Windows {
 
         int current;
 
-        bool _playing = false;
-        bool Playing {
-            get => _playing;
+        int origin = -1;
+        int gesturePoint = -1;
+        bool gestureUsed = false;
+        bool historyShowing = false;
+
+        bool _locked = false;
+        bool Locked {
+            get => _locked;
             set {
-                _playing = value;
-                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = !_playing;
+                _locked = value;
+                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
             }
         }
 
@@ -150,10 +158,12 @@ namespace Apollo.Windows {
             Program.Project.PathChanged += UpdateTitle;
             _track.ParentIndexChanged += UpdateTitle;
             UpdateTitle();
+
+            ColorHistory.HistoryChanged += RenderHistory;
         }
 
         private void Unloaded(object sender, EventArgs e) {
-            Playing = false;
+            Locked = false;
 
             _pattern.Window = null;
 
@@ -163,6 +173,8 @@ namespace Apollo.Windows {
             Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            ColorHistory.HistoryChanged -= RenderHistory;
 
             Program.WindowClose(this);
         }
@@ -177,7 +189,7 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Insert(int index) {
-            if (Playing) return;
+            if (Locked) return;
 
             ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
 
@@ -202,7 +214,7 @@ namespace Apollo.Windows {
         private void Frame_InsertStart() => Frame_Insert(0);
 
         private void Frame_Remove(int index) {
-            if (Playing) return;
+            if (Locked) return;
 
             if (_pattern.Frames.Count == 1) return;
 
@@ -216,7 +228,7 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Select(int index) {
-            if (Playing) return;
+            if (Locked) return;
 
             ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Normal;
 
@@ -235,10 +247,19 @@ namespace Apollo.Windows {
         }
 
         private void ColorPicker_Changed(Color color) => ColorHistory.Select(color.Clone());
-        private void ColorHistory_Changed(Color color) => ColorPicker.SetColor(color.Clone());
+
+        private void ColorHistory_Changed(Color color) {
+            ColorPicker.SetColor(color.Clone());
+            RenderHistory();
+        }
+
+        private void RenderHistory() {
+            if (!historyShowing) return;
+            ColorHistory.Render(Launchpad);
+        }
 
         private void PadPressed(int index) {
-            if (Playing) return;
+            if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
@@ -260,13 +281,24 @@ namespace Apollo.Windows {
             Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
         }
 
-        int origin = -1;
-        int gesturePoint = -1;
-        bool gestureUsed = false;
-
         public void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                if (origin == -1) {
+                if (historyShowing) {
+                    int x = n.Index % 10;
+                    int y = n.Index / 10;
+
+                    if (x < 1 || 8 < x || y < 1 || 8 < y) return;
+                    
+                    int i = 64 - y * 8 + x - 1;
+
+                    if (i < ColorHistory.Count) Dispatcher.UIThread.InvokeAsync(() => {
+                        ColorHistory.Input(i);
+
+                        historyShowing = Locked = false;
+                        Frame_Select(current);
+                    });
+
+                } else if (origin == -1) {
                     origin = n.Index;
                     gestureUsed = false;
 
@@ -274,8 +306,10 @@ namespace Apollo.Windows {
                     gesturePoint = n.Index;
 
             } else {
+                if (historyShowing) return;
+
                 if (n.Index == origin) {
-                    if (!gestureUsed && !Playing) Dispatcher.UIThread.InvokeAsync(() => {
+                    if (!gestureUsed && !Locked) Dispatcher.UIThread.InvokeAsync(() => {
                         PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
                     });
                     origin = gesturePoint;
@@ -284,7 +318,7 @@ namespace Apollo.Windows {
                     int x = gesturePoint % 10 - origin % 10;
                     int y = gesturePoint / 10 - origin / 10;
 
-                    if (!Playing) Dispatcher.UIThread.InvokeAsync(() => {
+                    if (!Locked) Dispatcher.UIThread.InvokeAsync(() => {
                         if (x == -1 && y == 0) { // Left
                             if (current == 0) Frame_Insert(0);
                             else Frame_Select(current - 1);
@@ -294,7 +328,9 @@ namespace Apollo.Windows {
                             else Frame_Select(current + 1);
 
                         } else if (x == 0 && y == 1) { // Up
-                            // Color History mode
+                            origin = -1;
+                            historyShowing = Locked = true;
+                            RenderHistory();
                             
                         } else if (x == 0 && y == -1) // Down
                             PadPressed(-1);
@@ -353,7 +389,7 @@ namespace Apollo.Windows {
         }
 
         private void Tick(object sender, EventArgs e) {
-            if (!Playing) return;
+            if (!Locked) return;
 
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
@@ -367,7 +403,7 @@ namespace Apollo.Windows {
                 else PlayExit = null;
 
                 Dispatcher.UIThread.InvokeAsync(() => {
-                    Playing = false;
+                    Locked = false;
 
                     Editor.RenderFrame(_pattern.Frames[current]);
                 });
@@ -387,8 +423,8 @@ namespace Apollo.Windows {
         }
 
         private void PatternPlay(object sender, RoutedEventArgs e) {
-            if (Playing) return;
-            Playing = true;
+            if (Locked) return;
+            Locked = true;
 
             Editor.RenderFrame(_pattern.Frames[0]);
 
