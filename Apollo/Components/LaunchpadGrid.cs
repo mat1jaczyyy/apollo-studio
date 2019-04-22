@@ -54,18 +54,34 @@ namespace Apollo.Components {
                 }
             }
         }
+        
+        private bool _lowQuality = false;
+        public bool LowQuality {
+            get => _lowQuality;
+            set {
+                if (value != _lowQuality) {
+                    _lowQuality = value;
+
+                    ModeLight.Opacity = Convert.ToInt32(!LowQuality);
+                    
+                    DrawPath();
+                }
+            }
+        }
+
+        private const string LowQualityPadData = "M 0,0 L 0,{0} {0},{0} {0},0 Z";
 
         public string FormatPath(string format) => String.Format(format,
-            ((double)this.Resources["PadSquareSize"]).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadSquareSize"] + 0.5).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut1"]).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut2"]).ToString(CultureInfo.InvariantCulture)
         );
 
         public void DrawPath() {
-            TopLeft.Data = Geometry.Parse(FormatPath("M 0,0 L 0,{0} {2},{0} {0},{2} {0},0 Z"));
-            TopRight.Data = Geometry.Parse(FormatPath("M 0,0 L 0,{2} {1},{0} {0},{0} {0},0 Z"));
-            BottomLeft.Data = Geometry.Parse(FormatPath("M 0,0 L 0,{0} {0},{0} {0},{1} {2},0 Z"));
-            BottomRight.Data = Geometry.Parse(FormatPath("M 0,{1} L 0,{0} {0},{0} {0},0 {1},0 Z"));
+            TopLeft.Data = Geometry.Parse(FormatPath(LowQuality? LowQualityPadData : "M 0,0 L 0,{0} {2},{0} {0},{2} {0},0 Z"));
+            TopRight.Data = Geometry.Parse(FormatPath(LowQuality? LowQualityPadData : "M 0,0 L 0,{2} {1},{0} {0},{0} {0},0 Z"));
+            BottomLeft.Data = Geometry.Parse(FormatPath(LowQuality? LowQualityPadData : "M 0,0 L 0,{0} {0},{0} {0},{1} {2},0 Z"));
+            BottomRight.Data = Geometry.Parse(FormatPath(LowQuality? LowQualityPadData : "M 0,{1} L 0,{0} {0},{0} {0},0 {1},0 Z"));
         }
 
         public LaunchpadGrid() {
