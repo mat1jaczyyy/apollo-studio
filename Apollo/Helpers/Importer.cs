@@ -154,15 +154,16 @@ namespace Apollo.Helpers {
                 ret = new List<Frame>();
                 
                 for (int i = 0; i < codec.FrameCount; i++) {
-                    SKBitmap bitmap = new SKBitmap(info.Width, info.Height, true);
+                    SKBitmap frame = new SKBitmap(info);
 
-                    if (codec.GetPixels(bitmap.Info, bitmap.GetPixels()) == SKCodecResult.Success) {
-                        ret.Add(new Frame());
-                        bitmap = bitmap.Resize(targetInfo, SKFilterQuality.High);
+                    if (codec.GetPixels(info, frame.GetPixels(), new SKCodecOptions(i)) == SKCodecResult.Success) {
+                        frame = frame.Resize(targetInfo, SKFilterQuality.High);
+
+                        ret.Add(new Frame(false, null, codec.FrameInfo[i].Duration));
 
                         for (int x = 0; x <= 9; x++) {
                             for (int y = 0; y <= 9; y++) {
-                                SKColor color = bitmap.GetPixel(x, 9 - y);
+                                SKColor color = frame.GetPixel(x, 9 - y);
                                 ret[i].Screen[y * 10 + x] = new Color(
                                     (byte)(color.Red >> 2),
                                     (byte)(color.Green >> 2),
