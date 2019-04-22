@@ -88,9 +88,10 @@ namespace Apollo.Elements {
         }
 
         public void Send(Signal n) {
-            if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) n.Index += 13;
+            int offset = 0;
+            if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
 
-            if (SysExSend(new byte[] {0x0B, n.Index, n.Color.Red, n.Color.Green, n.Color.Blue}))
+            if (SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue}))
                 Program.Log($"OUT <- {n.ToString()}");
         }
 
