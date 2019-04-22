@@ -468,7 +468,7 @@ namespace Apollo.Windows {
 
             Gate.RawValue = (double)_pattern.Gate * 100;
 
-            Contents = (Controls)Contents.Take(1);
+            while (Contents.Count > 1) Contents.RemoveAt(1);
 
             for (int i = 0; i < _pattern.Frames.Count; i++) {
                 Contents_Insert(i, _pattern.Frames[i]);

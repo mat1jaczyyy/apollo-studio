@@ -85,7 +85,7 @@ namespace Apollo.Helpers {
                     return false;
                 
                 long end = reader.BaseStream.Position + BitConverter.ToInt32(reader.ReadBytes(4).Reverse().ToArray()); // Track length
-                ret = new List<Frame>();
+                ret = new List<Frame>() {new Frame()};
 
                 int time = 0;
 
@@ -99,7 +99,8 @@ namespace Apollo.Helpers {
 
                     switch (type >> 4) {                        
                         case 0x9: // Note on
-                            ret.Last().Screen[reader.ReadByte()] = new Color((byte)(reader.ReadByte() >> 1));
+                            byte index = Converter.DRtoXY(reader.ReadByte());
+                            ret.Last().Screen[index] = new Color((byte)(reader.ReadByte() >> 1));
                             break;
                         
                         case 0x7: // Channel Mode
