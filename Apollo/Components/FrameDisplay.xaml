@@ -3,12 +3,12 @@
              x:Class="Apollo.Components.FrameDisplay"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="3 0 0 0">
+  <StackPanel HorizontalAlignment="Stretch">
+    <StackPanel Margin="3 0 0 0" Orientation="Horizontal" Spacing="2">
+      <Components:Remove VerticalAlignment="Center" x:Name="Remove" Removed="Frame_Remove" />
       <Components:FrameThumbnail x:Name="Frame" Clicked="Clicked" />
-      <Components:Remove VerticalAlignment="Top" x:Name="Remove" Removed="Frame_Remove" />
     </StackPanel>
 
-    <Components:HorizontalAdd Added="Frame_Add" />
+    <Components:VerticalAdd Added="Frame_Add" />
   </StackPanel>
 </UserControl>
