@@ -3,6 +3,7 @@
         x:Class="Apollo.Windows.PatternWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Pattern" WindowStartupLocation="CenterOwner"
+        DragDrop.AllowDrop="true"
         Icon="/Resources/WindowIcon.png"
         Width="650" MinWidth="650" MaxWidth="650"
         Height="650" MinHeight="650" MaxHeight="650"
@@ -14,7 +15,7 @@
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="Auto,*">
+  <Grid RowDefinitions="Auto,*" DragDrop.AllowDrop="true">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
       <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow">
         <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />

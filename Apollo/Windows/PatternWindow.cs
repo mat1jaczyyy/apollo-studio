@@ -17,6 +17,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 using Apollo.Viewers;
 
@@ -160,6 +161,9 @@ namespace Apollo.Windows {
             UpdateTitle();
 
             ColorHistory.HistoryChanged += RenderHistory;
+
+            AddHandler(DragDrop.DragOverEvent, DragOver);
+            AddHandler(DragDrop.DropEvent, Drop);
         }
 
         private void Unloaded(object sender, EventArgs e) {
@@ -448,6 +452,39 @@ namespace Apollo.Windows {
         private void PatternFire(object sender, RoutedEventArgs e) {
             PlayExit = _pattern.MIDIExit;
             PatternPlay(sender, e);
+        }
+
+        private void DragOver(object sender, DragEventArgs e) {
+            e.DragEffects &= DragDropEffects.Copy;
+
+            if (!e.Data.Contains(DataFormats.FileNames))
+                e.DragEffects = DragDropEffects.None; 
+        }
+
+        private void Drop(object sender, DragEventArgs e) {
+            if (Locked) return;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                List<string> filenames = e.Data.GetFileNames().ToList();
+
+                if (filenames.Count == 1 && Importer.FramesFromMIDI(filenames[0], out List<Frame> frames)) {
+                    _pattern.Frames = frames;
+                    _pattern.Gate = 1;
+
+                    Gate.RawValue = (double)_pattern.Gate * 100;
+
+                    Contents = (Controls)Contents.Take(1);
+
+                    for (int i = 0; i < _pattern.Frames.Count; i++) {
+                        Contents_Insert(i, _pattern.Frames[i]);
+                        ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
+                    }
+
+                    if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+
+                    Frame_Select(0);
+                }
+            }
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
