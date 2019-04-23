@@ -95,21 +95,23 @@ namespace Apollo.Windows {
 
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
 
+        private Action BPM_Update;
+
         private void BPM_Changed(string text) {
             if (text == null) return;
             if (text == "") text = "0";
 
-            Action update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
+            BPM_Update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
 
             if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {
                     Program.Project.BPM = value;
-                    update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
                 }
 
-                update += () => { 
+                BPM_Update += () => { 
                     if (value <= 0) text = "0";
                     else text = text.TrimStart('0');
 
@@ -119,7 +121,10 @@ namespace Apollo.Windows {
                 };
             }
 
-            Dispatcher.UIThread.InvokeAsync(update);
+            Dispatcher.UIThread.InvokeAsync(() => {
+                BPM_Update?.Invoke();
+                BPM_Update = null;
+            });
         }
         
         private void BPM_KeyDown(object sender, KeyEventArgs e) {
