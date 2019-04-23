@@ -15,6 +15,7 @@ namespace Apollo.Components {
     public class LaunchpadGrid: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
+        StackPanel Root;
         UniformGrid Grid;
         Path TopLeft, TopRight, BottomLeft, BottomRight;
         Shape ModeLight;
@@ -72,7 +73,7 @@ namespace Apollo.Components {
         private const string LowQualityPadData = "M 0,0 L 0,{0} {0},{0} {0},0 Z";
 
         public string FormatPath(string format) => String.Format(format,
-            ((double)this.Resources["PadSquareSize"] + 0.5).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadSquareSize"] + (LowQuality? 0.5 : 0)).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut1"]).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut2"]).ToString(CultureInfo.InvariantCulture)
         );
@@ -87,6 +88,7 @@ namespace Apollo.Components {
         public LaunchpadGrid() {
             InitializeComponent();
 
+            Root = this.Get<StackPanel>("Root");
             Grid = this.Get<UniformGrid>("LaunchpadGrid");
 
             TopLeft = this.Get<Path>("TopLeft");
@@ -105,27 +107,55 @@ namespace Apollo.Components {
         }
 
         bool mouseHeld = false;
+        Shape mouseOver = null;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = true;
-                MouseEnter(sender, new PointerEventArgs());
+
+                e.Device.Capture(Root);
+                Root.Cursor = new Cursor(StandardCursorType.Hand);
+
+                MouseMove(sender, e);
             }
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
-                MouseLeave(sender, new PointerEventArgs());
+                MouseMove(sender, e);
+
                 mouseHeld = false;
+                if (mouseOver != null) MouseLeave(mouseOver);
+                mouseOver = null;
+
+                e.Device.Capture(null);
+                Root.Cursor = new Cursor(StandardCursorType.Arrow);
             }
         }
 
-        private void MouseEnter(object sender, PointerEventArgs e) {
-            if (mouseHeld) PadPressed?.Invoke(Grid.Children.IndexOf((IControl)sender));
-        }
+        private void MouseEnter(Shape control) => PadPressed?.Invoke(Grid.Children.IndexOf((IControl)control));
+        private void MouseLeave(Shape control) => PadReleased?.Invoke(Grid.Children.IndexOf((IControl)control));
 
-        private void MouseLeave(object sender, PointerEventArgs e) {
-            if (mouseHeld) PadReleased?.Invoke(Grid.Children.IndexOf((IControl)sender));
+        private void MouseMove(object sender, PointerEventArgs e) {
+            if (mouseHeld) {
+                IInputElement _over = Root.InputHitTest(e.Device.GetPosition(Root));
+
+                if (_over is Shape) {
+                    Shape over = (Shape)_over;
+                    
+                    if (mouseOver == null) MouseEnter(over);
+                    else if (mouseOver != over) {
+                        MouseLeave(mouseOver);
+                        MouseEnter(over);
+                    }
+
+                    mouseOver = over;
+
+                } else if (mouseOver != null) {
+                    MouseLeave(mouseOver);
+                    mouseOver = null;
+                }
+            }
         }
     }
 }
