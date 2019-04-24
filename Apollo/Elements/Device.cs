@@ -33,6 +33,8 @@ namespace Apollo.Elements {
 
         public void Move(Device device) {
             this.Parent.Remove(this.ParentIndex.Value);
+            if (this == device) return;
+
             this.Parent.Viewer.Contents_Remove(this.ParentIndex.Value);
 
             device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, this);
@@ -40,6 +42,8 @@ namespace Apollo.Elements {
         }
 
         public void Move(Chain chain) {
+            if (chain.Count > 0 && this == chain[0]) return;
+
             this.Parent.Viewer.Contents_Remove(this.ParentIndex.Value);
             this.Parent.Remove(this.ParentIndex.Value);
 
