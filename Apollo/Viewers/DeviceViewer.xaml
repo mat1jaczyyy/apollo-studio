@@ -3,10 +3,14 @@
              x:Class="Apollo.Viewers.DeviceViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="TitleBrush" />
+  </UserControl.Resources>
+
   <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">
     <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="5" x:Name="Border">
       <Grid RowDefinitions="Auto,*">
-        <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="0 0 0 1" CornerRadius="5 5 0 0" x:Name="Header">
           <Grid ColumnDefinitions="*,Auto" Margin="5 4">
             <Grid Grid.Column="0" Background="Transparent" x:Name="Draggable">
               <TextBlock Margin="0 0 2 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />

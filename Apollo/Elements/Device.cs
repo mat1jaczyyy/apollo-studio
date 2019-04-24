@@ -44,12 +44,13 @@ namespace Apollo.Elements {
             device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, moving);
             device.Parent.Insert(device.ParentIndex.Value + 1, moving);
 
+            moving.Parent.Viewer.Select(moving.ParentIndex);
             return true;
         }
 
-        public void Move(Chain chain, bool copy = false) {
+        public bool Move(Chain chain, bool copy = false) {
             if (!copy) {
-                if (chain.Count > 0 && this == chain[0]) return;
+                if (chain.Count > 0 && this == chain[0]) return false;
 
                 Parent.Viewer.Contents_Remove(ParentIndex.Value);
                 Parent.Remove(ParentIndex.Value);
@@ -60,6 +61,7 @@ namespace Apollo.Elements {
             chain.Viewer.Contents_Insert(0, moving);
             chain.Insert(0, moving);
 
+            moving.Parent.Viewer.Select(moving.ParentIndex);
             return true;
         }
 

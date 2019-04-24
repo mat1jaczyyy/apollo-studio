@@ -19,6 +19,8 @@ namespace Apollo.Viewers {
         Controls Contents;
         DeviceAdd DeviceAdd;
 
+        int? selected = null;
+
         public void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
@@ -31,6 +33,23 @@ namespace Apollo.Viewers {
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
             if (Contents.Count == 1) DeviceAdd.AlwaysShowing = true;
+        }
+
+        public void Select(int? index) {
+            if (selected != null) {
+                _chain[selected.Value].Viewer.Deselect();
+
+                if (index == selected) {
+                    selected = null;
+                    return;
+                }
+            }
+
+            if (index != null) {
+                _chain[index.Value].Viewer.Select();
+            }
+            
+            selected = index;
         }
 
         public ChainViewer(Chain chain, bool backgroundBorder = false) {
@@ -57,11 +76,19 @@ namespace Apollo.Viewers {
         private void Device_Insert(int index, Type device) {
             _chain.Insert(index, Device.Create(device, _chain));
             Contents_Insert(index, _chain[index]);
+
+            if (selected != null && index <= selected) selected++;
+            Select(index);
         }
 
         private void Device_InsertStart(Type device) => Device_Insert(0, device);
 
         private void Device_Remove(int index) {
+            if (selected != null) {
+                if (index < selected) selected--;
+                else if (index == selected) Select(null);
+            }
+
             _chain.Remove(index);
             Contents_Remove(index);
         }

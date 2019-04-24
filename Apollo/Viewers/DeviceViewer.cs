@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 
 using Apollo.Elements;
@@ -34,6 +35,20 @@ namespace Apollo.Viewers {
         
         Device _device;
 
+        Border Header;
+
+        public void Select() {
+            IBrush brush = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+            if (IsArrangeValid) Header.Background = brush;
+            else this.Resources["TitleBrush"] = brush;
+        }
+
+        public void Deselect() {
+            IBrush brush = (IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush");
+            if (IsArrangeValid) Header.Background = brush;
+            else this.Resources["TitleBrush"] = brush;
+        }
+
         public DeviceViewer(Device device) {
             InitializeComponent();
 
@@ -45,7 +60,10 @@ namespace Apollo.Viewers {
             this.Get<Grid>("Draggable").PointerPressed += Drag;
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
-            
+
+            Header = this.Get<Border>("Header");
+            Deselect();
+
             IControl _viewer = GetSpecificViewer(this, _device);
 
             if (_viewer != null)
@@ -61,6 +79,8 @@ namespace Apollo.Viewers {
             dragData.Set(Device.Identifier, _device);
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+
+            if (result == DragDropEffects.None) _device.Parent.Viewer.Select(_device.ParentIndex);
         }
 
         private void DragOver(object sender, DragEventArgs e) {
