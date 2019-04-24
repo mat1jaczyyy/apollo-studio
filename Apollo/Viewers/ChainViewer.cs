@@ -2,6 +2,7 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -27,6 +28,9 @@ namespace Apollo.Viewers {
 
             _chain = chain;
             _chain.Viewer = this;
+            
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             Contents = this.Get<StackPanel>("Contents").Children;
 
@@ -54,6 +58,15 @@ namespace Apollo.Viewers {
             _chain.Remove(index);
 
             if (_chain.Count == 0) this.Get<DeviceAdd>("DeviceAdd").AlwaysShowing = true;
+        }
+
+        private void DragOver(object sender, DragEventArgs e) {
+            e.DragEffects = e.DragEffects & (DragDropEffects.Move | DragDropEffects.Copy);
+            if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
+        }
+
+        private void Drop(object sender, DragEventArgs e) {
+            ((Device)e.Data.Get(Device.Identifier)).Move(_chain);
         }
     }
 }

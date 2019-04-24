@@ -39,6 +39,14 @@ namespace Apollo.Elements {
             device.Parent.Insert(device.ParentIndex.Value + 1, this);
         }
 
+        public void Move(Chain chain) {
+            this.Parent.Viewer.Contents.RemoveAt(this.ParentIndex.Value + 1);
+            this.Parent.Remove(this.ParentIndex.Value);
+
+            chain.Viewer.Contents_Insert(0, this);
+            chain.Insert(0, this);
+        }
+
         public static Device Create(Type device, Chain parent) {
             object obj = FormatterServices.GetUninitializedObject(device);
             device.GetField("Parent").SetValue(obj, parent);
