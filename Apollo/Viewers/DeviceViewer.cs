@@ -64,19 +64,22 @@ namespace Apollo.Viewers {
         }
 
         private void DragOver(object sender, DragEventArgs e) {
-            e.DragEffects = e.DragEffects & (DragDropEffects.Move | DragDropEffects.Copy);
             if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
         }
 
         private void Drop(object sender, DragEventArgs e) {
-            IControl source = (IControl)e.Source;
+            if (!e.Data.Contains(Device.Identifier)) return;
 
+            IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneAfter" && source.Name != "Contents") source = source.Parent;
+
+            Device moving = (Device)e.Data.Get(Device.Identifier);
+            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
             
             if (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2) {
-                if (_device.ParentIndex == 0) ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent);
-                else ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent[_device.ParentIndex.Value - 1]);
-            } else ((Device)e.Data.Get(Device.Identifier)).Move(_device);
+                if (_device.ParentIndex == 0) moving.Move(_device.Parent, copy);
+                else moving.Move(_device.Parent[_device.ParentIndex.Value - 1], copy);
+            } else moving.Move(_device, copy);
 
             e.Handled = true;
         }

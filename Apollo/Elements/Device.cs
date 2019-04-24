@@ -31,24 +31,30 @@ namespace Apollo.Elements {
 
         public virtual void Dispose() => MIDIExit = null;
 
-        public void Move(Device device) {
-            if (this == device) return;
+        public void Move(Device device, bool copy = false) {
+            if (!copy) {
+                if (this == device) return;
 
-            this.Parent.Viewer.Contents_Remove(this.ParentIndex.Value);
-            this.Parent.Remove(this.ParentIndex.Value, false);
+                Parent.Viewer.Contents_Remove(ParentIndex.Value);
+                Parent.Remove(ParentIndex.Value, false);
+            }
 
-            device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, this);
-            device.Parent.Insert(device.ParentIndex.Value + 1, this);
+            Device moving = copy? Clone() : this;
+
+            device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, moving);
+            device.Parent.Insert(device.ParentIndex.Value + 1, moving);
         }
 
-        public void Move(Chain chain) {
-            if (chain.Count > 0 && this == chain[0]) return;
+        public void Move(Chain chain, bool copy = false) {
+            if (!copy) {
+                if (chain.Count > 0 && this == chain[0]) return;
 
-            this.Parent.Viewer.Contents_Remove(this.ParentIndex.Value);
-            this.Parent.Remove(this.ParentIndex.Value);
+                Parent.Viewer.Contents_Remove(ParentIndex.Value);
+                Parent.Remove(ParentIndex.Value);
+            }
 
-            chain.Viewer.Contents_Insert(0, this);
-            chain.Insert(0, this);
+            chain.Viewer.Contents_Insert(0, copy? Clone() : this);
+            chain.Insert(0, copy? Clone() : this);
         }
 
         public static Device Create(Type device, Chain parent) {
