@@ -15,7 +15,7 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         Track _track;
-        StackPanel Contents;
+        Grid Root;
         
         private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
             ? $"Track {index + 1}"
@@ -27,7 +27,7 @@ namespace Apollo.Windows {
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
-        private void UpdateContentAlignment(bool value) => Contents.HorizontalAlignment = value? HorizontalAlignment.Center : HorizontalAlignment.Left;
+        private void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
         public TrackWindow(Track track) {
             InitializeComponent();
@@ -42,7 +42,7 @@ namespace Apollo.Windows {
 
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
 
-            Contents = chainViewer.Get<StackPanel>("Contents");
+            Root = chainViewer.Get<Grid>("Root");
             UpdateContentAlignment(Preferences.CenterTrackContents);
             Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
 

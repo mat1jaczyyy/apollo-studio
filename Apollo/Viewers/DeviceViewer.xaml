@@ -16,10 +16,10 @@
           </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Background="Transparent" DragDrop.AllowDrop="true" Name="DropZone" x:Name="Contents" />
+        <Grid Grid.Row="1" Background="Transparent" DragDrop.AllowDrop="true" x:Name="Contents" />
       </Grid>
     </Border>
 
-    <Components:DeviceAdd DeviceAdded="Device_Add" DragDrop.AllowDrop="true" Name="DropZoneAfter" />
+    <Components:DeviceAdd DeviceAdded="Device_Add" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

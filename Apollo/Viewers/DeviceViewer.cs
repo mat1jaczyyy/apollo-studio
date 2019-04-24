@@ -71,9 +71,9 @@ namespace Apollo.Viewers {
         private void Drop(object sender, DragEventArgs e) {
             IControl source = (IControl)e.Source;
 
-            while (source.Name != "DropZoneAfter" && source.Name != "DropZone") source = source.Parent;
+            while (source.Name != "DropZoneAfter" && source.Name != "Contents") source = source.Parent;
             
-            if (source.Name != "DropZoneAfter" && e.GetPosition(source).X < source.Bounds.Width / 2) {
+            if (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2) {
                 if (_device.ParentIndex == 0) ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent);
                 else ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent[_device.ParentIndex.Value - 1]);
             } else ((Device)e.Data.Get(Device.Identifier)).Move(_device);

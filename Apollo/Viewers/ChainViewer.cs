@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -71,7 +72,13 @@ namespace Apollo.Viewers {
         }
 
         private void Drop(object sender, DragEventArgs e) {
-            ((Device)e.Data.Get(Device.Identifier)).Move(_chain);
+            IControl source = (IControl)e.Source;
+
+            while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd") source = source.Parent;
+            
+            if (source.Name != "DropZoneAfter") ((Device)e.Data.Get(Device.Identifier)).Move(_chain);
+            else ((Device)e.Data.Get(Device.Identifier)).Move(_chain.Devices.Last());
+            
             e.Handled = true;
         }
     }
