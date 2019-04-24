@@ -28,6 +28,11 @@ namespace Apollo.Elements {
 
         public virtual void Dispose() => MIDIExit = null;
 
+        public void Move(Device device) {
+            this.Parent.Remove(this.ParentIndex.Value);
+            device.Parent.Insert(device.ParentIndex.Value + 1, this);
+        }
+
         public static Device Create(Type device, Chain parent) {
             object obj = FormatterServices.GetUninitializedObject(device);
             device.GetField("Parent").SetValue(obj, parent);

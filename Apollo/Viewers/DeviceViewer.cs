@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Elements;
@@ -34,6 +35,10 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
+            this.Get<Border>("Draggable").PointerPressed += Drag;
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+
             this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
@@ -47,5 +52,20 @@ namespace Apollo.Viewers {
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
         private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
+
+        private async void Drag(object sender, PointerPressedEventArgs e) {
+            DataObject dragData = new DataObject();
+            dragData.Set(Device.Identifier, _device);
+            await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+        }
+
+        private void DragOver(object sender, DragEventArgs e) {
+            e.DragEffects = e.DragEffects & (DragDropEffects.Move | DragDropEffects.Copy);
+            if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
+        }
+
+        private void Drop(object sender, DragEventArgs e) {
+            ((Device)e.Data.Get(Device.Identifier)).Move(_device);
+        }
     }
 }
