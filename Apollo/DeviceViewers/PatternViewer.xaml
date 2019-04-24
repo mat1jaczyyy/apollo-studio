@@ -1,7 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.PatternViewer"
-             xmlns:Components="clr-namespace:Apollo.Components">
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5">
   
   <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
     <Button Background="{DynamicResource ThemeControlHigherBrush}" Content="Edit" Click="Edit" />

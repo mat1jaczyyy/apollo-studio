@@ -47,7 +47,6 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             
             IControl _viewer = GetSpecificViewer(this, _device);
-            ((UserControl)_viewer).Margin = new Thickness(10, 5);
 
             if (_viewer != null)
                 this.Get<Grid>("Contents").Children.Add(_viewer);

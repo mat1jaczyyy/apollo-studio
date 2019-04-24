@@ -44,7 +44,6 @@ namespace Apollo.DeviceViewers {
             _multi = multi;
 
             _parent = parent;
-            _parent.Get<Grid>("Contents").Margin = new Thickness(0);
             _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0, 5, 5, 0);
 
             _root = _parent.Get<StackPanel>("Root").Children;
