@@ -35,13 +35,14 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
-            this.Get<Border>("Draggable").PointerPressed += Drag;
+            this.Get<Grid>("Draggable").PointerPressed += Drag;
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
+            _device.Viewer = this;
             
             IControl _viewer = GetSpecificViewer(this, _device);
 

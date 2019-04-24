@@ -13,9 +13,9 @@ namespace Apollo.Viewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Chain _chain;
-        Controls Contents;
+        public Controls Contents;
 
-        private void Contents_Insert(int index, Device device) {
+        public void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
             viewer.DeviceRemoved += Device_Remove;
@@ -26,6 +26,7 @@ namespace Apollo.Viewers {
             InitializeComponent();
 
             _chain = chain;
+            _chain.Viewer = this;
 
             Contents = this.Get<StackPanel>("Contents").Children;
 

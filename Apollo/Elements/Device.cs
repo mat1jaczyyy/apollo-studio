@@ -10,11 +10,14 @@ using System.Text;
 using Newtonsoft.Json;
 
 using Apollo.Structures;
+using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public abstract class Device {
         public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
+
+        public DeviceViewer Viewer;
 
         public Chain Parent;
         public int? ParentIndex;
@@ -29,7 +32,10 @@ namespace Apollo.Elements {
         public virtual void Dispose() => MIDIExit = null;
 
         public void Move(Device device) {
+            this.Parent.Viewer.Contents.RemoveAt(this.ParentIndex.Value + 1);
             this.Parent.Remove(this.ParentIndex.Value);
+
+            device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, this);
             device.Parent.Insert(device.ParentIndex.Value + 1, this);
         }
 

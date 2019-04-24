@@ -8,10 +8,13 @@ using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Structures;
+using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public class Chain {
         public static readonly string Identifier = "chain";
+
+        public ChainViewer Viewer;
 
         public IChainParent Parent = null;
 
