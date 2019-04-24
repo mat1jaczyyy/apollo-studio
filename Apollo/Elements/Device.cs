@@ -31,9 +31,9 @@ namespace Apollo.Elements {
 
         public virtual void Dispose() => MIDIExit = null;
 
-        public void Move(Device device, bool copy = false) {
+        public bool Move(Device device, bool copy = false) {
             if (!copy) {
-                if (this == device) return;
+                if (this == device) return false;
 
                 Parent.Viewer.Contents_Remove(ParentIndex.Value);
                 Parent.Remove(ParentIndex.Value, false);
@@ -43,6 +43,8 @@ namespace Apollo.Elements {
 
             device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, moving);
             device.Parent.Insert(device.ParentIndex.Value + 1, moving);
+
+            return true;
         }
 
         public void Move(Chain chain, bool copy = false) {
@@ -53,8 +55,12 @@ namespace Apollo.Elements {
                 Parent.Remove(ParentIndex.Value);
             }
 
-            chain.Viewer.Contents_Insert(0, copy? Clone() : this);
-            chain.Insert(0, copy? Clone() : this);
+            Device moving = copy? Clone() : this;
+
+            chain.Viewer.Contents_Insert(0, moving);
+            chain.Insert(0, moving);
+
+            return true;
         }
 
         public static Device Create(Type device, Chain parent) {

@@ -59,7 +59,8 @@ namespace Apollo.Viewers {
         private async void Drag(object sender, PointerPressedEventArgs e) {
             DataObject dragData = new DataObject();
             dragData.Set(Device.Identifier, _device);
-            await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+
+            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
         }
 
         private void DragOver(object sender, DragEventArgs e) {
@@ -74,11 +75,15 @@ namespace Apollo.Viewers {
 
             Device moving = (Device)e.Data.Get(Device.Identifier);
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+
+            bool result;
             
             if (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2) {
-                if (_device.ParentIndex == 0) moving.Move(_device.Parent, copy);
-                else moving.Move(_device.Parent[_device.ParentIndex.Value - 1], copy);
-            } else moving.Move(_device, copy);
+                if (_device.ParentIndex == 0) result = moving.Move(_device.Parent, copy);
+                else result = moving.Move(_device.Parent[_device.ParentIndex.Value - 1], copy);
+            } else result = moving.Move(_device, copy);
+
+            if (!result) e.DragEffects = DragDropEffects.None;
 
             e.Handled = true;
         }
