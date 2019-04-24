@@ -72,6 +72,7 @@ namespace Apollo.Viewers {
 
         private void Drop(object sender, DragEventArgs e) {
             ((Device)e.Data.Get(Device.Identifier)).Move(_chain);
+            e.Handled = true;
         }
     }
 }
