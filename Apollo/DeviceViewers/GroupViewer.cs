@@ -18,17 +18,25 @@ namespace Apollo.DeviceViewers {
         Group _group;
         DeviceViewer _parent;
         Controls _root;
+
         Controls Contents;
         VerticalAdd ChainAdd;
 
         int? current;
 
-        private void Contents_Insert(int index, Chain chain) {
+        public void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);
             viewer.ChainAdded += Chain_Insert;
             viewer.ChainRemoved += Chain_Remove;
             viewer.ChainExpanded += Expand;
+
             Contents.Insert(index + 1, viewer);
+            ChainAdd.AlwaysShowing = false;
+        }
+
+        public void Contents_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            if (Contents.Count == 1) ChainAdd.AlwaysShowing = true;
         }
 
         public GroupViewer(Group group, DeviceViewer parent) {
@@ -43,8 +51,6 @@ namespace Apollo.DeviceViewers {
 
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
-
-            if (_group.Count == 0) ChainAdd.AlwaysShowing = true;
             
             for (int i = 0; i < _group.Count; i++)
                 Contents_Insert(i, _group[i]);
@@ -85,8 +91,6 @@ namespace Apollo.DeviceViewers {
 
             if (current != null && index <= current) current++;
             Expand(index);
-
-            ChainAdd.AlwaysShowing = false;
         }
 
         private void Chain_InsertStart() => Chain_Insert(0);
@@ -97,10 +101,8 @@ namespace Apollo.DeviceViewers {
                 else if (index == current) Expand(null);
             }
 
-            Contents.RemoveAt(index + 1);
             _group.Remove(index);
-
-            if (_group.Count == 0) ChainAdd.AlwaysShowing = true;
+            Contents_Remove(index);
         }
     }
 }

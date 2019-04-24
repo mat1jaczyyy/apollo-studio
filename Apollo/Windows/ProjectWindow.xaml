@@ -31,7 +31,7 @@
           <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 15 5">
             <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
               <StackPanel x:Name="Contents">
-                <Components:TrackAdd TrackAdded="Track_InsertStart" x:Name="TrackAdd" />
+                <Components:TrackAdd AlwaysShowing="true" TrackAdded="Track_InsertStart" x:Name="TrackAdd" />
               </StackPanel>
             </ScrollViewer>
           </Border>

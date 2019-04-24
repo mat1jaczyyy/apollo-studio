@@ -21,11 +21,18 @@ namespace Apollo.DeviceViewers {
         Controls Contents;
         HorizontalAdd OffsetAdd;
 
-        private void Contents_Insert(int index, Offset offset) {
+        public void Contents_Insert(int index, Offset offset) {
             CopyOffset viewer = new CopyOffset(offset, _copy);
             viewer.OffsetAdded += Offset_Insert;
             viewer.OffsetRemoved += Offset_Remove;
+
             Contents.Insert(index + 1, viewer);
+            OffsetAdd.AlwaysShowing = false;
+        }
+
+        public void Contents_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            if (Contents.Count == 1) OffsetAdd.AlwaysShowing = true;
         }
 
         public CopyViewer(Copy copy) {
@@ -52,8 +59,6 @@ namespace Apollo.DeviceViewers {
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
 
-            if (_copy.Offsets.Count == 0) OffsetAdd.AlwaysShowing = true;
-
             for (int i = 0; i < _copy.Offsets.Count; i++)
                 Contents_Insert(i, _copy.Offsets[i]);
         }
@@ -74,16 +79,13 @@ namespace Apollo.DeviceViewers {
         private void Offset_Insert(int index) {
             _copy.Offsets.Insert(index, new Offset());
             Contents_Insert(index, _copy.Offsets[index]);
-            OffsetAdd.AlwaysShowing = false;
         }
 
         private void Offset_InsertStart() => Offset_Insert(0);
 
         private void Offset_Remove(int index) {
-            Contents.RemoveAt(index + 1);
             _copy.Offsets.RemoveAt(index);
-
-            if (_copy.Offsets.Count == 0) OffsetAdd.AlwaysShowing = true;
+            Contents_Remove(index);
         }
     }
 }

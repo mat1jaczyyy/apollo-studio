@@ -5,7 +5,7 @@
   
   <Grid x:Name="Root">
     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" x:Name="Contents">
-      <Components:DeviceAdd DeviceAdded="Device_InsertStart" DragDrop.AllowDrop="true" x:Name="DeviceAdd" />
+      <Components:DeviceAdd AlwaysShowing="true" DeviceAdded="Device_InsertStart" DragDrop.AllowDrop="true" x:Name="DeviceAdd" />
     </StackPanel>
   </Grid>
 </UserControl>

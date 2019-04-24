@@ -23,7 +23,7 @@
     </Border>
 
     <StackPanel Grid.Column="1" Margin="10 0 0 0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Contents">
-      <Components:HorizontalAdd Added="Offset_InsertStart" x:Name="OffsetAdd" />
+      <Components:HorizontalAdd AlwaysShowing="true" Added="Offset_InsertStart" x:Name="OffsetAdd" />
     </StackPanel>
   </Grid>
 </UserControl>

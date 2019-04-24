@@ -25,16 +25,25 @@ namespace Apollo.Windows {
         private void UpdateTopmost(bool value) => Topmost = value;
 
         Controls Contents;
+        TrackAdd TrackAdd;
+
         TextBox BPM;
         HorizontalDial Page;
 
-        private void Contents_Insert(int index, Track track) {
+        public void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
             viewer.TrackAdded += Track_Insert;
             viewer.TrackRemoved += Track_Remove;
+
             Contents.Insert(index + 1, viewer);
+            TrackAdd.AlwaysShowing = false;
         }
 
+        public void Contents_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            if (Contents.Count == 1) TrackAdd.AlwaysShowing = true;
+        }
+        
         public ProjectWindow() {
             InitializeComponent();
             #if DEBUG
@@ -45,8 +54,7 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             Contents = this.Get<StackPanel>("Contents").Children;
-            
-            if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
+            TrackAdd = this.Get<TrackAdd>("TrackAdd");
             
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
@@ -80,17 +88,14 @@ namespace Apollo.Windows {
         private void Track_Insert(int index) {
             Program.Project.Insert(index, new Track());
             Contents_Insert(index, Program.Project[index]);
-            this.Get<TrackAdd>("TrackAdd").AlwaysShowing = false;
         }
 
         private void Track_InsertStart() => Track_Insert(0);
 
         private void Track_Remove(int index) {
-            Contents.RemoveAt(index + 1);
             Program.Project[index].Window?.Close();
             Program.Project.Remove(index);
-
-            if (Program.Project.Count == 0) this.Get<TrackAdd>("TrackAdd").AlwaysShowing = true;
+            Contents_Remove(index);
         }
 
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
