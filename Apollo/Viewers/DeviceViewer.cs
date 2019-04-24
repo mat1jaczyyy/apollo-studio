@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Reflection;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 using Apollo.Elements;
 
@@ -45,6 +47,7 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             
             IControl _viewer = GetSpecificViewer(this, _device);
+            ((UserControl)_viewer).Margin = new Thickness(10, 5);
 
             if (_viewer != null)
                 this.Get<Grid>("Contents").Children.Add(_viewer);
@@ -66,7 +69,13 @@ namespace Apollo.Viewers {
         }
 
         private void Drop(object sender, DragEventArgs e) {
-            ((Device)e.Data.Get(Device.Identifier)).Move(_device);
+            IControl source = (IControl)e.Source;
+
+            if (source.Name != "DropZoneAfter" && e.GetPosition(source).X < source.Bounds.Width / 2) {
+                if (_device.ParentIndex == 0) ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent);
+                else ((Device)e.Data.Get(Device.Identifier)).Move(_device.Parent[_device.ParentIndex.Value - 1]);
+            } else ((Device)e.Data.Get(Device.Identifier)).Move(_device);
+
             e.Handled = true;
         }
     }
