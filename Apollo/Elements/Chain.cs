@@ -83,8 +83,8 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public void Remove(int index) {
-            Devices[index].Dispose();
+        public void Remove(int index, bool dispose = true) {
+            if (dispose) Devices[index].Dispose();
             Devices.RemoveAt(index);
             Reroute();
         }

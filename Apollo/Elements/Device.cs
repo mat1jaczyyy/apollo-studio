@@ -32,10 +32,10 @@ namespace Apollo.Elements {
         public virtual void Dispose() => MIDIExit = null;
 
         public void Move(Device device) {
-            this.Parent.Remove(this.ParentIndex.Value);
             if (this == device) return;
 
             this.Parent.Viewer.Contents_Remove(this.ParentIndex.Value);
+            this.Parent.Remove(this.ParentIndex.Value, false);
 
             device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, this);
             device.Parent.Insert(device.ParentIndex.Value + 1, this);
