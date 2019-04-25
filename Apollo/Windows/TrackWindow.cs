@@ -29,6 +29,39 @@ namespace Apollo.Windows {
 
         private void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
+        Device SelectionStart = null;
+        Device SelectionEnd = null;
+
+        public void Select(Device device, bool shift = false) {
+            if (SelectionStart != null)
+                if (SelectionEnd != null) {
+                    for (int i = SelectionStart.ParentIndex.Value;
+                        (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? (i <= SelectionEnd.ParentIndex.Value) : (i >= SelectionEnd.ParentIndex.Value);
+                        i += (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? 1 : -1) {
+
+                        SelectionStart.Parent[i].Viewer?.Deselect();
+                    }
+                } else SelectionStart.Viewer?.Deselect();
+
+            if (shift && SelectionStart != null && SelectionStart.Parent == device.Parent && SelectionStart != device) {
+                SelectionEnd = device;
+
+            } else {
+                SelectionStart = device;
+                SelectionEnd = null;
+            }
+
+            if (SelectionStart != null)
+                if (SelectionEnd != null) {
+                    for (int i = SelectionStart.ParentIndex.Value;
+                        (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? (i <= SelectionEnd.ParentIndex.Value) : (i >= SelectionEnd.ParentIndex.Value);
+                        i += (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? 1 : -1) {
+
+                        SelectionStart.Parent[i].Viewer?.Select();
+                    }
+                } else SelectionStart.Viewer?.Select();
+        }
+
         public TrackWindow(Track track) {
             InitializeComponent();
             #if DEBUG

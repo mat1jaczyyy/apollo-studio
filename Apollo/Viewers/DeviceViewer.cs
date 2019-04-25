@@ -95,7 +95,8 @@ namespace Apollo.Viewers {
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
-            if (result == DragDropEffects.None) _device.Parent.Viewer.Select(_device.ParentIndex);
+            if (result == DragDropEffects.None)
+                Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }
 
         public void DragOver(object sender, DragEventArgs e) {

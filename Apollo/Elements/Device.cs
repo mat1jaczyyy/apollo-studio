@@ -44,7 +44,7 @@ namespace Apollo.Elements {
             device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, moving);
             device.Parent.Insert(device.ParentIndex.Value + 1, moving);
 
-            moving.Parent.Viewer.Select(moving.ParentIndex);
+            Track.Get(moving).Window?.Select(moving);
             return true;
         }
 
@@ -61,7 +61,7 @@ namespace Apollo.Elements {
             chain.Viewer.Contents_Insert(0, moving);
             chain.Insert(0, moving);
 
-            moving.Parent.Viewer.Select(moving.ParentIndex);
+            Track.Get(moving).Window?.Select(moving);
             return true;
         }
 
