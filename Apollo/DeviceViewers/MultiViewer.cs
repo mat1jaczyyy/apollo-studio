@@ -42,6 +42,7 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _multi = multi;
+            _multi.Preprocess.ClearParentIndexChanged();
 
             _parent = parent;
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
@@ -55,8 +56,10 @@ namespace Apollo.DeviceViewers {
             
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
             
-            for (int i = 0; i < _multi.Count; i++)
+            for (int i = 0; i < _multi.Count; i++) {
+                _multi[i].ClearParentIndexChanged();
                 Contents_Insert(i, _multi[i]);
+            }
         }
 
         private void Expand(int? index) {

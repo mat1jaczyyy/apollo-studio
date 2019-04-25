@@ -51,8 +51,10 @@ namespace Apollo.DeviceViewers {
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
             
-            for (int i = 0; i < _group.Count; i++)
+            for (int i = 0; i < _group.Count; i++) {
+                _group[i].ClearParentIndexChanged();
                 Contents_Insert(i, _group[i]);
+            }
         }
 
         private void Expand(int? index) {

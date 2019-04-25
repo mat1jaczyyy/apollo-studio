@@ -20,6 +20,7 @@ namespace Apollo.Elements {
 
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
+        public void ClearParentIndexChanged() => ParentIndexChanged = null;
 
         private int? _ParentIndex;
         public int? ParentIndex {
