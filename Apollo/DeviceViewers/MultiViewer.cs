@@ -31,11 +31,18 @@ namespace Apollo.DeviceViewers {
 
             Contents.Insert(index + 1, viewer);
             ChainAdd.AlwaysShowing = false;
+
+            if (current != null && index <= current) current++;
         }
 
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
             if (Contents.Count == 1) ChainAdd.AlwaysShowing = true;
+
+            if (current != null) {
+                if (index < current) current--;
+                else if (index == current) Expand(null);
+            }
         }
 
         public MultiViewer(Multi multi, DeviceViewer parent) {
@@ -92,19 +99,13 @@ namespace Apollo.DeviceViewers {
         private void Chain_Insert(int index) {
             _multi.Insert(index, new Chain());
             Contents_Insert(index, _multi[index]);
-
-            if (current != null && index <= current) current++;
+            
             Expand(index);
         }
 
         private void Chain_InsertStart() => Chain_Insert(0);
 
         private void Chain_Remove(int index) {
-            if (current != null) {
-                if (index < current) current--;
-                else if (index == current) Expand(null);
-            }
-
             _multi.Remove(index);
             Contents_Remove(index);
         }

@@ -109,6 +109,8 @@ namespace Apollo.Windows {
             viewer.FrameSelected += Frame_Select;
 
             Contents.Insert(index + 1, viewer);
+
+            if (index <= current) current++;
         }
 
         public void Contents_Remove(int index) => Contents.RemoveAt(index + 1);
@@ -215,8 +217,7 @@ namespace Apollo.Windows {
                     _pattern.Frames[index].Screen[i] = reference.Screen[i].Clone();
 
             Contents_Insert(index, _pattern.Frames[index]);
-
-            if (index <= current) current++;
+            
             Frame_Select(index);
         }
 

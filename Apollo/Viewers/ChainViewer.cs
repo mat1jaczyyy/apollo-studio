@@ -28,11 +28,18 @@ namespace Apollo.Viewers {
 
             Contents.Insert(index + 1, viewer);
             DeviceAdd.AlwaysShowing = false;
+
+            if (selected != null && index <= selected) selected++;
         }
 
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
             if (Contents.Count == 1) DeviceAdd.AlwaysShowing = true;
+
+            if (selected != null) {
+                if (index < selected) selected--;
+                else if (index == selected) Select(null);
+            }
         }
 
         public void Select(int? index) {
@@ -76,19 +83,13 @@ namespace Apollo.Viewers {
         private void Device_Insert(int index, Type device) {
             _chain.Insert(index, Device.Create(device, _chain));
             Contents_Insert(index, _chain[index]);
-
-            if (selected != null && index <= selected) selected++;
+            
             Select(index);
         }
 
         private void Device_InsertStart(Type device) => Device_Insert(0, device);
 
         private void Device_Remove(int index) {
-            if (selected != null) {
-                if (index < selected) selected--;
-                else if (index == selected) Select(null);
-            }
-
             _chain.Remove(index);
             Contents_Remove(index);
         }
