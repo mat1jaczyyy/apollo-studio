@@ -90,8 +90,8 @@ namespace Apollo.Viewers {
         private void Device_InsertStart(Type device) => Device_Insert(0, device);
 
         private void Device_Remove(int index) {
-            _chain.Remove(index);
             Contents_Remove(index);
+            _chain.Remove(index);
         }
 
         private void DragOver(object sender, DragEventArgs e) {

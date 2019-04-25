@@ -84,8 +84,8 @@ namespace Apollo.DeviceViewers {
         private void Offset_InsertStart() => Offset_Insert(0);
 
         private void Offset_Remove(int index) {
-            _copy.Offsets.RemoveAt(index);
             Contents_Remove(index);
+            _copy.Offsets.RemoveAt(index);
         }
     }
 }

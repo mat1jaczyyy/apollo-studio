@@ -106,8 +106,8 @@ namespace Apollo.DeviceViewers {
         private void Chain_InsertStart() => Chain_Insert(0);
 
         private void Chain_Remove(int index) {
-            _multi.Remove(index);
             Contents_Remove(index);
+            _multi.Remove(index);
         }
     }
 }

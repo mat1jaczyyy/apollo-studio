@@ -93,9 +93,9 @@ namespace Apollo.Windows {
         private void Track_InsertStart() => Track_Insert(0);
 
         private void Track_Remove(int index) {
+            Contents_Remove(index);
             Program.Project[index].Window?.Close();
             Program.Project.Remove(index);
-            Contents_Remove(index);
         }
 
         private void Page_Changed(double value) => Program.Project.Page = (int)value;

@@ -103,6 +103,8 @@ namespace Apollo.Windows {
         private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public void Contents_Insert(int index, Frame frame) {
+            ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
+
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
             viewer.FrameRemoved += Frame_Remove;
@@ -113,7 +115,13 @@ namespace Apollo.Windows {
             if (index <= current) current++;
         }
 
-        public void Contents_Remove(int index) => Contents.RemoveAt(index + 1);
+        public void Contents_Remove(int index) {
+            Contents.RemoveAt(index + 1);
+            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+            
+            if (index < current) current--;
+            else if (index == current) Frame_Select(Math.Max(0, current - 1));
+        }
 
         public PatternWindow(Pattern pattern) {
             InitializeComponent();
@@ -202,8 +210,6 @@ namespace Apollo.Windows {
         private void Frame_Insert(int index) {
             if (Locked) return;
 
-            ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
-
             Frame reference = _pattern.Frames[Math.Max(0, index - 1)];
 
             _pattern.Frames.Insert(index, new Frame(
@@ -228,13 +234,8 @@ namespace Apollo.Windows {
 
             if (_pattern.Frames.Count == 1) return;
 
-            if (index < current) current--;
-            else if (index == current) Frame_Select(Math.Max(0, current - 1));
-
-            _pattern.Frames.RemoveAt(index);
             Contents_Remove(index);
-
-            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+            _pattern.Frames.RemoveAt(index);
         }
 
         private void Frame_Select(int index) {
