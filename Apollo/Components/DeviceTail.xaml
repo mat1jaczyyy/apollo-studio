@@ -9,10 +9,12 @@
   <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="0 5 5 0" x:Name="Border">
     <Grid RowDefinitions="Auto,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="0 0 0 1" CornerRadius="0 5 0 0" x:Name="Header">
-        <Grid>
+        <Grid Background="Transparent" x:Name="Draggable">
           <TextBlock Margin="5 4" Text=" " Width="0" />
         </Grid>
       </Border>
+
+      <Grid Grid.Row="1" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneTail" />
     </Grid>
   </Border>
 </UserControl>

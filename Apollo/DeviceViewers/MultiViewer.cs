@@ -56,7 +56,7 @@ namespace Apollo.DeviceViewers {
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
 
             _root = _parent.Root.Children;
-            _root.Insert(0, new DeviceHead((IBrush)_parent.Resources["TitleBrush"]));
+            _root.Insert(0, new DeviceHead(parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
             Contents = this.Get<StackPanel>("Contents").Children;
@@ -86,7 +86,7 @@ namespace Apollo.DeviceViewers {
 
             if (index != null) {
                 _root.Insert(3, new ChainViewer(_multi[index.Value], true));
-                _root.Insert(4, new DeviceTail(_parent.Header.Background));
+                _root.Insert(4, new DeviceTail(_parent));
 
                 _parent.Border.CornerRadius = new CornerRadius(0);
                 _parent.Header.CornerRadius = new CornerRadius(0);

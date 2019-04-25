@@ -89,7 +89,7 @@ namespace Apollo.Viewers {
 
         private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
 
-        private async void Drag(object sender, PointerPressedEventArgs e) {
+        public async void Drag(object sender, PointerPressedEventArgs e) {
             DataObject dragData = new DataObject();
             dragData.Set(Device.Identifier, _device);
 
@@ -98,22 +98,22 @@ namespace Apollo.Viewers {
             if (result == DragDropEffects.None) _device.Parent.Viewer.Select(_device.ParentIndex);
         }
 
-        private void DragOver(object sender, DragEventArgs e) {
+        public void DragOver(object sender, DragEventArgs e) {
             if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
         }
 
-        private void Drop(object sender, DragEventArgs e) {
+        public void Drop(object sender, DragEventArgs e) {
             if (!e.Data.Contains(Device.Identifier)) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "Contents") source = source.Parent;
+            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") source = source.Parent;
 
             Device moving = (Device)e.Data.Get(Device.Identifier);
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;
             
-            if (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2) {
+            if (source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2)) {
                 if (_device.ParentIndex == 0) result = moving.Move(_device.Parent, copy);
                 else result = moving.Move(_device.Parent[_device.ParentIndex.Value - 1], copy);
             } else result = moving.Move(_device, copy);
