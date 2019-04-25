@@ -42,7 +42,7 @@ namespace Apollo.Windows {
 
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
 
-            Root = chainViewer.Get<Grid>("Root");
+            Root = chainViewer.Get<Grid>("Layout");
             UpdateContentAlignment(Preferences.CenterTrackContents);
             Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
 
