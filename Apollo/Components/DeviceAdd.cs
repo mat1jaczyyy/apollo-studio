@@ -30,7 +30,6 @@ namespace Apollo.Components {
             InitializeComponent();
 
             Icon = this.Get<Canvas>("Icon");
-
             Icon.ContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
         }
 

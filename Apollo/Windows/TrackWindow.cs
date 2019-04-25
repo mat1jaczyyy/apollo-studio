@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+
+using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -32,34 +38,106 @@ namespace Apollo.Windows {
         public Device SelectionStart { get; private set; } = null;
         public Device SelectionEnd { get; private set; } = null;
 
+        List<Device> Selection {
+            get {
+                if (SelectionStart != null) {
+                    if (SelectionEnd != null) {
+                        Device left = (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? SelectionStart : SelectionEnd;
+                        Device right = (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? SelectionEnd : SelectionStart;
+
+                        return left.Parent.Devices.Skip(left.ParentIndex.Value).Take(right.ParentIndex.Value - left.ParentIndex.Value + 1).ToList();
+                    }
+                    
+                    return new List<Device>() {SelectionStart};
+                }
+
+                return new List<Device>();
+            }
+        }
+
         public void Select(Device device, bool shift = false) {
             if (SelectionStart != null)
-                if (SelectionEnd != null) {
-                    for (int i = SelectionStart.ParentIndex.Value;
-                        (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? (i <= SelectionEnd.ParentIndex.Value) : (i >= SelectionEnd.ParentIndex.Value);
-                        i += (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? 1 : -1) {
+                if (SelectionEnd != null)
+                    foreach (Device selected in Selection)
+                        selected.Viewer?.Deselect();
+                else SelectionStart.Viewer?.Deselect();
 
-                        SelectionStart.Parent[i].Viewer?.Deselect();
-                    }
-                } else SelectionStart.Viewer?.Deselect();
-
-            if (shift && SelectionStart != null && SelectionStart.Parent == device.Parent && SelectionStart != device) {
+            if (shift && SelectionStart != null && SelectionStart.Parent == device.Parent && SelectionStart != device)
                 SelectionEnd = device;
 
-            } else {
+            else {
                 SelectionStart = device;
                 SelectionEnd = null;
             }
 
             if (SelectionStart != null)
-                if (SelectionEnd != null) {
-                    for (int i = SelectionStart.ParentIndex.Value;
-                        (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? (i <= SelectionEnd.ParentIndex.Value) : (i >= SelectionEnd.ParentIndex.Value);
-                        i += (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? 1 : -1) {
+                if (SelectionEnd != null)
+                    foreach (Device selected in Selection)
+                        selected.Viewer?.Select();
+                else SelectionStart.Viewer?.Select();
+        }
 
-                        SelectionStart.Parent[i].Viewer?.Select();
-                    }
-                } else SelectionStart.Viewer?.Select();
+        private async void Copy(bool cut = false) {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("clipboard");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("content");
+                        writer.WriteValue("device");
+
+                        writer.WritePropertyName("devices");
+                        writer.WriteStartArray();
+
+                            foreach (Device selected in Selection) {
+                                writer.WriteRawValue(selected.Encode());
+                                if (cut) selected.Viewer?.Device_Remove();
+                            }
+
+                        writer.WriteEndArray();
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            await Application.Current.Clipboard.SetTextAsync(json.ToString());
+        }
+        
+        public async void Paste() {
+            string jsonString = await Application.Current.Clipboard.GetTextAsync();
+
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "clipboard") return;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (data["content"].ToString() != "device") return;
+
+            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
+            Device left = Selection.First();
+
+            foreach (Device device in (from i in devices select Device.Decode(i.ToString())))
+                left.Viewer?.Device_Paste(left = device);
+        }
+        
+        public void Delete() {
+            foreach (Device selected in Selection)
+                selected.Viewer?.Device_Remove();
+        }
+
+        public void SelectionAction(string action) {
+            if (SelectionStart == null) return;
+
+            if (action == "Cut") Copy(true);
+            else if (action == "Copy") Copy();
+            else if (action == "Paste") Paste();
+            else if (action == "Delete") Delete();
         }
 
         public TrackWindow(Track track) {

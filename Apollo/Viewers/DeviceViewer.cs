@@ -5,9 +5,9 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Elements;
@@ -31,6 +31,9 @@ namespace Apollo.Viewers {
         public delegate void DeviceAddedEventHandler(int index, Type device);
         public event DeviceAddedEventHandler DeviceAdded;
 
+        public delegate void DevicePastedEventHandler(int index, Device device);
+        public event DevicePastedEventHandler DevicePasted;
+
         public delegate void DeviceRemovedEventHandler(int index);
         public event DeviceRemovedEventHandler DeviceRemoved;
         
@@ -39,7 +42,9 @@ namespace Apollo.Viewers {
 
         public StackPanel Root;
         public Border Border, Header;
+
         Grid Draggable;
+        ContextMenu DeviceContextMenu;
 
         private void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -87,6 +92,10 @@ namespace Apollo.Viewers {
             Deselect();
             
             Draggable = this.Get<Grid>("Draggable");
+
+            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -98,7 +107,16 @@ namespace Apollo.Viewers {
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
-        private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
+        public void Device_Paste(Device device) => DevicePasted?.Invoke(_device.ParentIndex.Value + 1, device);
+
+        public void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
+
+        private void DeviceContextMenu_Click(object _, EventArgs e) {
+            IInteractive sender = ((RoutedEventArgs)e).Source;
+
+            if (sender.GetType() == typeof(MenuItem))
+                Track.Get(_device).Window?.SelectionAction((string)((MenuItem)sender).Header);
+        }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
             DataObject dragData = new DataObject();

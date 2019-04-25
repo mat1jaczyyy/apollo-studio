@@ -22,6 +22,7 @@ namespace Apollo.Viewers {
         public void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
+            viewer.DevicePasted += Device_Insert;
             viewer.DeviceRemoved += Device_Remove;
 
             Contents.Insert(index + 1, viewer);
@@ -56,8 +57,10 @@ namespace Apollo.Viewers {
             }
         }
 
-        private void Device_Insert(int index, Type device) {
-            _chain.Insert(index, Device.Create(device, _chain));
+        private void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
+
+        private void Device_Insert(int index, Device device) {
+            _chain.Insert(index, device);
             Contents_Insert(index, _chain[index]);
             
             Track.Get(_chain).Window?.Select(_chain[index]);
