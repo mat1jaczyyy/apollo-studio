@@ -117,11 +117,11 @@ namespace Apollo.Windows {
         }
 
         public void Contents_Remove(int index) {
-            Contents.RemoveAt(index + 1);
-            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
-            
             if (index < current) current--;
             else if (index == current) Frame_Select(Math.Max(0, current.Value - 1));
+
+            Contents.RemoveAt(index + 1);
+            if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
 
         public PatternWindow(Pattern pattern) {
