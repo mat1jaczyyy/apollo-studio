@@ -46,7 +46,7 @@ namespace Apollo.DeviceViewers {
 
             _parent = parent;
 
-            _root = _parent.Get<StackPanel>("Root").Children;
+            _root = _parent.Root.Children;
 
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
@@ -72,7 +72,7 @@ namespace Apollo.DeviceViewers {
 
             if (index != null) {
                 _root.Insert(1, new ChainViewer(_group[index.Value], true));
-                _root.Insert(2, new DeviceTail());
+                _root.Insert(2, new DeviceTail(_parent.Header.Background));
 
                 _parent.Border.CornerRadius = new CornerRadius(5, 0, 0, 5);
                 _parent.Header.CornerRadius = new CornerRadius(5, 0, 0, 0);

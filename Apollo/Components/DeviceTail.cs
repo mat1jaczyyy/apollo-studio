@@ -1,10 +1,18 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 namespace Apollo.Components {
     public class DeviceTail: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        public DeviceTail() => InitializeComponent();
+        public Border Header;
+
+        public DeviceTail(IBrush brush) {
+            InitializeComponent();
+
+            Header = this.Get<Border>("Header");
+            this.Resources["TitleBrush"] = brush;
+        } 
     }
 }

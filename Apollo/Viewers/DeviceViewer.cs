@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
+using Apollo.Components;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
@@ -35,19 +36,30 @@ namespace Apollo.Viewers {
         
         Device _device;
 
+        public StackPanel Root;
         public Border Border, Header;
 
-        public void Select() {
-            IBrush brush = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+        private void ApplyHeaderBrush(IBrush brush) {
+            if (Root.Children[0].GetType() == typeof(DeviceHead)) {
+                DeviceHead target = ((DeviceHead)Root.Children[0]);
+
+                if (IsArrangeValid) target.Header.Background = brush;
+                else target.Resources["TitleBrush"] = brush;
+            }
+
+            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail)) {
+                DeviceTail target = ((DeviceTail)Root.Children[Root.Children.Count - 2]);
+
+                if (IsArrangeValid) target.Header.Background = brush;
+                else target.Resources["TitleBrush"] = brush;
+            }
+
             if (IsArrangeValid) Header.Background = brush;
             else this.Resources["TitleBrush"] = brush;
         }
 
-        public void Deselect() {
-            IBrush brush = (IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush");
-            if (IsArrangeValid) Header.Background = brush;
-            else this.Resources["TitleBrush"] = brush;
-        }
+        public void Select() => ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
+        public void Deselect() => ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush"));
 
         public DeviceViewer(Device device) {
             InitializeComponent();
@@ -56,14 +68,16 @@ namespace Apollo.Viewers {
 
             _device = device;
             _device.Viewer = this;
-            
-            this.Get<Grid>("Draggable").PointerPressed += Drag;
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+
+            Root = this.Get<StackPanel>("Root");
 
             Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
             Deselect();
+            
+            this.Get<Grid>("Draggable").PointerPressed += Drag;
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             IControl _viewer = GetSpecificViewer(this, _device);
 
