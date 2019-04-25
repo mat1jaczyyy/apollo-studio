@@ -50,8 +50,9 @@ namespace Apollo.Windows {
                 origin = gesturePoint = -1;
 
                 if (historyShowing) RenderHistory();
-                else for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                    _launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                else if (current.HasValue)
+                    for (int i = 0; i < _pattern.Frames[current.Value].Screen.Length; i++)
+                        _launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current.Value].Screen[i]));
             }
         }
 
@@ -63,7 +64,7 @@ namespace Apollo.Windows {
         Dial Duration, Gate;
         Button Import, Play, Fire;
 
-        int current;
+        int? current = null;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -103,7 +104,7 @@ namespace Apollo.Windows {
         private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public void Contents_Insert(int index, Frame frame) {
-            ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
+            if (Contents.Count > 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
@@ -112,7 +113,7 @@ namespace Apollo.Windows {
 
             Contents.Insert(index + 1, viewer);
 
-            if (index <= current) current++;
+            if (current.HasValue && index <= current) current++;
         }
 
         public void Contents_Remove(int index) {
@@ -120,7 +121,7 @@ namespace Apollo.Windows {
             if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
             
             if (index < current) current--;
-            else if (index == current) Frame_Select(Math.Max(0, current - 1));
+            else if (index == current) Frame_Select(Math.Max(0, current.Value - 1));
         }
 
         public PatternWindow(Pattern pattern) {
@@ -241,20 +242,20 @@ namespace Apollo.Windows {
         private void Frame_Select(int index) {
             if (Locked) return;
 
-            ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Normal;
+            if (current.HasValue) ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.FontWeight = FontWeight.Normal;
 
             current = index;
 
-            ((FrameDisplay)Contents[current + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
+            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
             
-            Duration.UsingSteps = _pattern.Frames[current].Mode;
-            Duration.Length = _pattern.Frames[current].Length;
-            Duration.RawValue = _pattern.Frames[current].Time;
+            Duration.UsingSteps = _pattern.Frames[current.Value].Mode;
+            Duration.Length = _pattern.Frames[current.Value].Length;
+            Duration.RawValue = _pattern.Frames[current.Value].Time;
 
-            Editor.RenderFrame(_pattern.Frames[current]);
+            Editor.RenderFrame(_pattern.Frames[current.Value]);
 
-            for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+            for (int i = 0; i < _pattern.Frames[current.Value].Screen.Length; i++)
+                Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern.Frames[current.Value].Screen[i]));
         }
 
         private void ColorPicker_Changed(Color color) => ColorHistory.Select(color.Clone());
@@ -274,22 +275,52 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (_pattern.Frames[current].Screen[signalIndex] == ColorPicker.Color)
-                _pattern.Frames[current].Screen[signalIndex] = new Color(0);
+            if (_pattern.Frames[current.Value].Screen[signalIndex] == ColorPicker.Color)
+                _pattern.Frames[current.Value].Screen[signalIndex] = new Color(0);
             else {
-                _pattern.Frames[current].Screen[signalIndex] = ColorPicker.Color.Clone();
+                _pattern.Frames[current.Value].Screen[signalIndex] = ColorPicker.Color.Clone();
 
                 Dispatcher.UIThread.InvokeAsync(() => {
                     ColorHistory.Use();
                 });
             }
 
-            SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current].Screen[signalIndex].ToBrush();
+            SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[current.Value].Screen[signalIndex].ToBrush();
 
             Editor.SetColor(index, brush);
-            ((FrameDisplay)Contents[current + 1]).Viewer.Launchpad.SetColor(index, brush);
+            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Launchpad.SetColor(index, brush);
 
-            Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current].Screen[signalIndex]));
+            Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern.Frames[current.Value].Screen[signalIndex]));
+        }
+
+        private void HandleGesture(int x, int y) {
+            if (x == -1 && y == 0) { // Left
+                if (current == 0) Frame_Insert(0);
+                else Frame_Select(current.Value - 1);
+
+            } else if (x == 1 && y == 0) { // Right
+                if (current == _pattern.Frames.Count - 1) Frame_Insert(_pattern.Frames.Count);
+                else Frame_Select(current.Value + 1);
+
+            } else if (x == 0 && y == 1) { // Up
+                origin = -1;
+                historyShowing = Locked = true;
+                RenderHistory();
+                
+            } else if (x == 0 && y == -1) // Down
+                PadPressed(-1);
+                
+            else if (x == -1 && y == 1) // Up-Left
+                PatternPlay(null, null);
+                
+            else if (x == 1 && y == -1) // Down-Right
+                PatternFire(null, null);
+                
+            else if (x == 1 && y == 1) // Up-Right
+                Frame_Insert(current.Value + 1);
+                
+            else if (x == -1 && y == -1) // Down-Left
+                Frame_Remove(current.Value);
         }
 
         public void MIDIEnter(Signal n) {
@@ -306,7 +337,7 @@ namespace Apollo.Windows {
                         ColorHistory.Input(i);
 
                         historyShowing = Locked = false;
-                        Frame_Select(current);
+                        Frame_Select(current.Value);
                     });
 
                 } else if (origin == -1) {
@@ -330,36 +361,7 @@ namespace Apollo.Windows {
                     int x = gesturePoint % 10 - origin % 10;
                     int y = gesturePoint / 10 - origin / 10;
 
-                    if (!Locked) Dispatcher.UIThread.InvokeAsync(() => {
-                        if (x == -1 && y == 0) { // Left
-                            if (current == 0) Frame_Insert(0);
-                            else Frame_Select(current - 1);
-
-                        } else if (x == 1 && y == 0) { // Right
-                            if (current == _pattern.Frames.Count - 1) Frame_Insert(_pattern.Frames.Count);
-                            else Frame_Select(current + 1);
-
-                        } else if (x == 0 && y == 1) { // Up
-                            origin = -1;
-                            historyShowing = Locked = true;
-                            RenderHistory();
-                            
-                        } else if (x == 0 && y == -1) // Down
-                            PadPressed(-1);
-                            
-                        else if (x == -1 && y == 1) // Up-Left
-                            PatternPlay(null, null);
-                            
-                        else if (x == 1 && y == -1) // Down-Right
-                            PatternFire(null, null);
-                            
-                        else if (x == 1 && y == 1) // Up-Right
-                            Frame_Insert(current + 1);
-                            
-                        else if (x == -1 && y == -1) // Down-Left
-                            Frame_Remove(current);
-                        
-                    });
+                    if (!Locked) Dispatcher.UIThread.InvokeAsync(() => { HandleGesture(x, y); });
 
                     gestureUsed = true;
                     gesturePoint = -1;
@@ -367,16 +369,27 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Duration_Changed(double value) {
-            _pattern.Frames[current].Time = (int)value;
-            ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+        private void KeyReleased(object sender, KeyEventArgs e) {
+            if (e.Key == Key.NumPad4) HandleGesture(-1, 0);
+            else if (e.Key == Key.NumPad6) HandleGesture(1, 0);
+            else if (e.Key == Key.NumPad8) HandleGesture(0, 1);
+            else if (e.Key == Key.NumPad2) HandleGesture(0, -1);
+            else if (e.Key == Key.NumPad7) HandleGesture(-1, 1);
+            else if (e.Key == Key.NumPad3) HandleGesture(1, -1);
+            else if (e.Key == Key.NumPad9) HandleGesture(1, 1);
+            else if (e.Key == Key.NumPad1) HandleGesture(-1, -1);
         }
 
-        private void Duration_StepChanged(int value) => ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+        private void Duration_Changed(double value) {
+            _pattern.Frames[current.Value].Time = (int)value;
+            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+        }
+
+        private void Duration_StepChanged(int value) => ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
 
         private void Duration_ModeChanged(bool value) {
-            _pattern.Frames[current].Mode = value;
-            ((FrameDisplay)Contents[current + 1]).Viewer.Time.Text = _pattern.Frames[current].TimeString;
+            _pattern.Frames[current.Value].Mode = value;
+            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
         }
 
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
@@ -417,11 +430,11 @@ namespace Apollo.Windows {
                 Dispatcher.UIThread.InvokeAsync(() => {
                     Locked = false;
 
-                    Editor.RenderFrame(_pattern.Frames[current]);
+                    Editor.RenderFrame(_pattern.Frames[current.Value]);
                 });
 
-                for (int i = 0; i < _pattern.Frames[current].Screen.Length; i++)
-                    Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[current].Screen[i]));
+                for (int i = 0; i < _pattern.Frames[current.Value].Screen.Length; i++)
+                    Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern.Frames[current.Value].Screen[i]));
 
             } else {
                 Signal n = (Signal)courier.Info;
