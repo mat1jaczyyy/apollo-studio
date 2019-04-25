@@ -44,7 +44,8 @@ namespace Apollo.DeviceViewers {
             _multi = multi;
 
             _parent = parent;
-            _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0, 5, 5, 0);
+            _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
+            _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
 
             _root = _parent.Get<StackPanel>("Root").Children;
             _root.Insert(0, new DeviceHead());
@@ -63,7 +64,8 @@ namespace Apollo.DeviceViewers {
                 _root.RemoveAt(4);
                 _root.RemoveAt(3);
 
-                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0, 5, 5, 0);
+                _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
+                _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
                 ((ChainInfo)Contents[current.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
 
                 if (index == current) {
@@ -76,7 +78,8 @@ namespace Apollo.DeviceViewers {
                 _root.Insert(3, new ChainViewer(_multi[index.Value], true));
                 _root.Insert(4, new DeviceTail());
 
-                _parent.Get<Border>("Border").CornerRadius = new CornerRadius(0);
+                _parent.Border.CornerRadius = new CornerRadius(0);
+                _parent.Header.CornerRadius = new CornerRadius(0);
                 ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
             }
             

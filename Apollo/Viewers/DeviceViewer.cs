@@ -35,7 +35,7 @@ namespace Apollo.Viewers {
         
         Device _device;
 
-        Border Header;
+        public Border Border, Header;
 
         public void Select() {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
@@ -61,6 +61,7 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
+            Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
             Deselect();
 
