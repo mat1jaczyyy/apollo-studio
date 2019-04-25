@@ -32,8 +32,8 @@
     </Grid>
 
     <Grid ColumnDefinitions="Auto,*,Auto">
-      <Canvas Grid.Column="0" Background="Transparent" VerticalAlignment="Stretch" Width="4" PointerPressed="ResizeWest" />
-      <Canvas Grid.Column="2" Background="Transparent" VerticalAlignment="Stretch" Width="4" PointerPressed="ResizeEast" />
+      <Canvas Grid.Column="0" Background="Transparent" VerticalAlignment="Stretch" Width="4" Cursor="SizeWestEast" PointerPressed="ResizeWest" />
+      <Canvas Grid.Column="2" Background="Transparent" VerticalAlignment="Stretch" Width="4" Cursor="SizeWestEast" PointerPressed="ResizeEast" />
     </Grid>
   </Grid>
 </Window>

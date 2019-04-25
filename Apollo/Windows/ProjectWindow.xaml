@@ -51,8 +51,8 @@
     </Grid>
 
     <Grid RowDefinitions="Auto,*,Auto">
-      <Canvas Grid.Row="0" Background="Transparent" HorizontalAlignment="Stretch" Height="4" PointerPressed="ResizeNorth" />
-      <Canvas Grid.Row="2" Background="Transparent" HorizontalAlignment="Stretch" Height="4" PointerPressed="ResizeSouth" />
+      <Canvas Grid.Row="0" Background="Transparent" HorizontalAlignment="Stretch" Height="4" Cursor="SizeNorthSouth" PointerPressed="ResizeNorth" />
+      <Canvas Grid.Row="2" Background="Transparent" HorizontalAlignment="Stretch" Height="4" Cursor="SizeNorthSouth" PointerPressed="ResizeSouth" />
     </Grid>
   </Grid>
 </Window>
