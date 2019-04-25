@@ -35,11 +35,15 @@ namespace Apollo.Viewers {
         public event DeviceRemovedEventHandler DeviceRemoved;
         
         Device _device;
+        bool selected = false;
 
         public StackPanel Root;
         public Border Border, Header;
+        Grid Draggable;
 
-        private void ApplyHeaderBrush(IBrush brush) {
+        private void ApplyHeaderBrush(string resource) {
+            IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
+
             if (Root.Children[0].GetType() == typeof(DeviceHead)) {
                 DeviceHead target = ((DeviceHead)Root.Children[0]);
 
@@ -58,8 +62,15 @@ namespace Apollo.Viewers {
             else this.Resources["TitleBrush"] = brush;
         }
 
-        public void Select() => ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
-        public void Deselect() => ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeControlLowBrush"));
+        public void Select() {
+            ApplyHeaderBrush("ThemeAccentBrush2");
+            selected = true;
+        }
+
+        public void Deselect() {
+            ApplyHeaderBrush("ThemeControlLowBrush");
+            selected = false;
+        }
 
         public DeviceViewer(Device device) {
             InitializeComponent();
@@ -75,7 +86,7 @@ namespace Apollo.Viewers {
             Header = this.Get<Border>("Header");
             Deselect();
             
-            this.Get<Grid>("Draggable").PointerPressed += Drag;
+            Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -95,8 +106,12 @@ namespace Apollo.Viewers {
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
-            if (result == DragDropEffects.None)
-                Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+            if (result == DragDropEffects.None) {
+                if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
+                    Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                
+                if (e.MouseButton == MouseButton.Right) ((ContextMenu)this.Resources["DeviceContextMenu"]).Open(Draggable);
+            }
         }
 
         public void DragOver(object sender, DragEventArgs e) {

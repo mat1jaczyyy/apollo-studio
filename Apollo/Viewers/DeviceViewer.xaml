@@ -5,6 +5,14 @@
   
   <UserControl.Resources>
     <SolidColorBrush x:Key="TitleBrush" />
+    <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+      <MenuItem Header="Group" />
+      <MenuItem Header="Ungroup" />
+    </ContextMenu>
   </UserControl.Resources>
 
   <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">
@@ -12,7 +20,7 @@
       <Grid RowDefinitions="Auto,*">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="0 0 0 1" CornerRadius="5 5 0 0" x:Name="Header">
           <Grid ColumnDefinitions="*,Auto" Margin="5 4">
-            <Grid Grid.Column="0" Background="Transparent" x:Name="Draggable">
+            <Grid Grid.Column="0" Background="Transparent" PointerPressed="Drag" x:Name="Draggable">
               <TextBlock Margin="0 0 2 0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />
             </Grid>
 

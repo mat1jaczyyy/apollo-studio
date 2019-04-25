@@ -20,7 +20,6 @@ namespace Apollo.Components {
             Header = this.Get<Border>("Header");
             this.Resources["TitleBrush"] = Owner.Header.Background;
 
-            this.Get<Grid>("Draggable").PointerPressed += Drag;
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
         }

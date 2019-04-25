@@ -29,8 +29,8 @@ namespace Apollo.Windows {
 
         private void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
-        Device SelectionStart = null;
-        Device SelectionEnd = null;
+        public Device SelectionStart { get; private set; } = null;
+        public Device SelectionEnd { get; private set; } = null;
 
         public void Select(Device device, bool shift = false) {
             if (SelectionStart != null)
