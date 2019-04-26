@@ -32,8 +32,6 @@ namespace Apollo.Viewers {
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
             if (Contents.Count == 1) DeviceAdd.AlwaysShowing = true;
-
-            // was a removed thing selected?
         }
 
         public ChainViewer(Chain chain, bool backgroundBorder = false) {

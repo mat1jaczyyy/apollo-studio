@@ -37,13 +37,13 @@ namespace Apollo.DeviceViewers {
         }
 
         public void Contents_Remove(int index) {
-            Contents.RemoveAt(index + 1);
-            if (Contents.Count == 1) ChainAdd.AlwaysShowing = true;
-
             if (current != null) {
                 if (index < current) current--;
                 else if (index == current) Expand(null);
             }
+
+            Contents.RemoveAt(index + 1);
+            if (Contents.Count == 1) ChainAdd.AlwaysShowing = true;
         }
 
         public GroupViewer(Group group, DeviceViewer parent) {
