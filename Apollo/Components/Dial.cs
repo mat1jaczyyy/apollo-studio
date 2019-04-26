@@ -23,6 +23,17 @@ namespace Apollo.Components {
         public delegate void DialModeChangedEventHandler(bool NewValue);
         public event DialModeChangedEventHandler ModeChanged;
 
+        InputModifiers lastModifiers;
+
+        public delegate void DialValueModsChangedEventHandler(double NewValue, InputModifiers mods);
+        public event DialValueModsChangedEventHandler ValueModsChanged;
+
+        public delegate void DialStepModsChangedEventHandler(int NewValue, InputModifiers mods);
+        public event DialStepModsChangedEventHandler StepModsChanged;
+
+        public delegate void DialModeModsChangedEventHandler(bool NewValue, InputModifiers mods);
+        public event DialModeModsChangedEventHandler ModeModsChanged;
+
         Canvas ArcCanvas;
         Path ArcBase, Arc;
         TextBlock TitleText, Display;
@@ -104,7 +115,9 @@ namespace Apollo.Components {
                     _raw = value;
                     Value = ToValue(_raw);
                     Display.Text = ValueString;
+
                     ValueChanged?.Invoke(_raw);
+                    ValueModsChanged?.Invoke(_raw, lastModifiers);
                 }
             }
         }
@@ -177,7 +190,9 @@ namespace Apollo.Components {
                 if (AllowSteps && Enabled) {
                     _usingSteps = value;
                     DrawArcAuto();
+                    
                     ModeChanged?.Invoke(UsingSteps);
+                    ModeModsChanged?.Invoke(UsingSteps, lastModifiers);
                 }
             }
         }
@@ -259,6 +274,8 @@ namespace Apollo.Components {
         private double lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
+            lastModifiers = e.InputModifiers;
+
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
                 mouseHeld = true;
                 e.Device.Capture(ArcCanvas);
@@ -269,6 +286,8 @@ namespace Apollo.Components {
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
+            lastModifiers = e.InputModifiers;
+
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
                 e.Device.Capture(null);
@@ -280,12 +299,16 @@ namespace Apollo.Components {
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld && Enabled) {
+                lastModifiers = e.InputModifiers;
                 double Y = e.GetPosition(ArcCanvas).Y;
 
                 if (UsingSteps) {
                     if (Math.Abs(Y - lastY) >= 8) {
                         _length.Step -= (int)((Y - lastY) / 8);
+
                         StepChanged?.Invoke(_length.Step);
+                        StepModsChanged?.Invoke(_length.Step, lastModifiers);
+
                         DrawArcSteps();
                         lastY = Y;
                     }

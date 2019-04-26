@@ -380,16 +380,36 @@ namespace Apollo.Windows {
             else if (e.Key == Key.NumPad1) HandleGesture(-1, -1);
         }
 
-        private void Duration_Changed(double value) {
-            _pattern.Frames[current.Value].Time = (int)value;
-            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+        private void Duration_Changed(double value, InputModifiers mods) {
+            if (mods.HasFlag(InputModifiers.Control)) {
+                for (int i = 0; i < _pattern.Frames.Count; i++) {
+                    _pattern.Frames[i].Time = (int)value;
+                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
+                }
+            } else {
+                _pattern.Frames[current.Value].Time = (int)value;
+                ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+            }
         }
 
-        private void Duration_StepChanged(int value) => ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+        private void Duration_StepChanged(int value, InputModifiers mods) {
+            if (mods.HasFlag(InputModifiers.Control))
+                for (int i = 0; i < _pattern.Frames.Count; i++)
+                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+            else
+                ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+        }
 
-        private void Duration_ModeChanged(bool value) {
-            _pattern.Frames[current.Value].Mode = value;
-            ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+        private void Duration_ModeChanged(bool value, InputModifiers mods) {
+            if (mods.HasFlag(InputModifiers.Control)) {
+                for (int i = 0; i < _pattern.Frames.Count; i++) {
+                    _pattern.Frames[i].Mode = value;
+                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
+                }
+            } else {
+                _pattern.Frames[current.Value].Mode = value;
+                ((FrameDisplay)Contents[current.Value + 1]).Viewer.Time.Text = _pattern.Frames[current.Value].TimeString;
+            }
         }
 
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
