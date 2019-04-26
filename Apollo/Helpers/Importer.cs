@@ -150,6 +150,8 @@ namespace Apollo.Helpers {
             if (!File.Exists(path)) return false;
             
             using (SKCodec codec = SKCodec.Create(path)){
+                if (codec == null) return false;
+
                 SKImageInfo info = codec.Info;
                 ret = new List<Frame>();
                 
