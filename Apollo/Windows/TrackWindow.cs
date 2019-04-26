@@ -83,6 +83,7 @@ namespace Apollo.Windows {
 
             if (action == "Cut") Copy(true);
             else if (action == "Copy") Copy();
+            else if (action == "Duplicate") Duplicate();
             else if (action == "Paste") Paste();
             else if (action == "Delete") Delete();
             else if (action == "Group") Group();
@@ -193,9 +194,16 @@ namespace Apollo.Windows {
             foreach (Device device in (from i in devices select Device.Decode(i.ToString())))
                 left.Viewer?.Device_Paste(left = device);
         }
+
+        private void Duplicate() {
+            Device left = Selection.Last();
+
+            foreach (Device device in Selection)
+                left.Viewer?.Device_Paste(left = device.Clone());
+        }
         
-        private void Delete(List<Device> selection = null) {
-            foreach (Device selected in selection?? Selection)
+        private void Delete() {
+            foreach (Device selected in Selection)
                 selected.Viewer?.Device_Remove();
         }
 
@@ -206,17 +214,19 @@ namespace Apollo.Windows {
                 new Group(new List<Chain>() {new Chain((from i in Selection select i.Clone()).ToList())})
             );
 
-            Delete(selection);
+            foreach (Device selected in selection)
+                selected.Viewer?.Device_Remove();
         }
 
         private void Ungroup() {
             List<Device> selection = Selection;
             Device left = Selection.First();
 
-            foreach (Device device in (from i in ((Group)SelectionStart)[0].Devices select i.Clone()))
-                left.Viewer?.Device_Paste(left = device);
+            foreach (Device device in ((Group)SelectionStart)[0].Devices)
+                left.Viewer?.Device_Paste(left = device.Clone());
             
-            Delete(selection);
+            foreach (Device selected in selection)
+                selected.Viewer?.Device_Remove();
         }
     }
 }
