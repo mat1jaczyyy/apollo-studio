@@ -20,6 +20,7 @@
       <MenuItem Header="Paint" />
       <MenuItem Header="Pattern" />
       <MenuItem Header="Preview" />
+      <MenuItem Header="Rotate" />
     </ContextMenu>
 
     <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
