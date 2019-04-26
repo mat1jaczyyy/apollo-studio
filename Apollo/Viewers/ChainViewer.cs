@@ -28,7 +28,6 @@ namespace Apollo.Viewers {
         public void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
-            viewer.DevicePasted += Device_Insert;
             viewer.DeviceRemoved += Device_Remove;
 
             Contents.Insert(index + 1, viewer);
@@ -76,6 +75,8 @@ namespace Apollo.Viewers {
             Contents_Remove(index);
             _chain.Remove(index);
         }
+
+        private void Device_Action(string action) => Track.Get(_chain).Window?.SelectionAction(action, _chain, -1);
 
         private void DragOver(object sender, DragEventArgs e) {
             if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 

@@ -2,6 +2,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.DeviceAdd">
 
+  <UserControl.Resources>
+    <ContextMenu x:Key="AddContextMenu" Cursor="Arrow">
+      <MenuItem Header="Group" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Delay" />
+      <MenuItem Header="Fade" />
+      <MenuItem Header="KeyFilter" />
+      <MenuItem Header="Hold" />
+      <MenuItem Header="Layer" />
+      <MenuItem Header="Move" />
+      <MenuItem Header="Multi" />
+      <MenuItem Header="Output" />
+      <MenuItem Header="PageFilter" />
+      <MenuItem Header="PageSwitch" />
+      <MenuItem Header="Paint" />
+      <MenuItem Header="Pattern" />
+      <MenuItem Header="Preview" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+  </UserControl.Resources>
+
   <UserControl.Styles>
     <Style Selector="Grid.collapsible">
       <Setter Property="Width" Value="5" />
@@ -31,26 +55,6 @@
 
   <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible" PointerReleased="Click">
     <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon">
-      <Canvas.ContextMenu>
-        <ContextMenu Cursor="Arrow">
-          <MenuItem Header="Group" />
-          <MenuItem Header="Copy" />
-          <MenuItem Header="Delay" />
-          <MenuItem Header="Fade" />
-          <MenuItem Header="KeyFilter" />
-          <MenuItem Header="Hold" />
-          <MenuItem Header="Layer" />
-          <MenuItem Header="Move" />
-          <MenuItem Header="Multi" />
-          <MenuItem Header="Output" />
-          <MenuItem Header="PageFilter" />
-          <MenuItem Header="PageSwitch" />
-          <MenuItem Header="Paint" />
-          <MenuItem Header="Pattern" />
-          <MenuItem Header="Preview" />
-        </ContextMenu>
-      </Canvas.ContextMenu>
-
       <Path Stroke="{DynamicResource ThemeForegroundBrush}" StrokeThickness="2"
             Data="M 0,8 L 16,8 M 8,0 L 8,16" />
     </Canvas>

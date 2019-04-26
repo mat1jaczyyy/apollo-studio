@@ -87,6 +87,12 @@ namespace Apollo.Windows {
                 right = temp;
             }
 
+            SelectionAction(action, chain, left, right);
+        }
+
+        public void SelectionAction(string action, Chain chain, int index) => SelectionAction(action, chain, index, index);
+
+        public void SelectionAction(string action, Chain chain, int left, int right) {
             if (action == "Cut") chain.Viewer?.Copy(left, right, true);
             else if (action == "Copy") chain.Viewer?.Copy(left, right);
             else if (action == "Duplicate") chain.Viewer?.Duplicate(left, right);

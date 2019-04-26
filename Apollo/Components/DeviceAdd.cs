@@ -13,7 +13,12 @@ namespace Apollo.Components {
         public delegate void DeviceAddedEventHandler(Type device);
         public event DeviceAddedEventHandler DeviceAdded;
 
+        public delegate void DeviceActionEventHandler(string action);
+        public event DeviceActionEventHandler DeviceAction;
+
         Canvas Icon;
+
+        ContextMenu AddContextMenu, DeviceContextMenu;
 
         private bool _always;
         public bool AlwaysShowing {
@@ -30,20 +35,33 @@ namespace Apollo.Components {
             InitializeComponent();
 
             Icon = this.Get<Canvas>("Icon");
-            Icon.ContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+
+            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
+            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
+            
+            AddContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(AddContextMenu_Click));
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
         }
 
-        private void ContextMenu_Click(object _, EventArgs e) {
+        private void AddContextMenu_Click(object _, EventArgs e) {
             IInteractive sender = ((RoutedEventArgs)e).Source;
 
             if (sender.GetType() == typeof(MenuItem)) {
-                string selected = ((MenuItem)sender).Header.ToString();
+                string selected = (string)((MenuItem)sender).Header;
                 DeviceAdded?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{selected}"));
             }
         }
 
+        private void DeviceContextMenu_Click(object _, EventArgs e) {
+            IInteractive sender = ((RoutedEventArgs)e).Source;
+
+            if (sender.GetType() == typeof(MenuItem))
+                DeviceAction?.Invoke((string)((MenuItem)sender).Header);
+        }
+
         private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Icon.ContextMenu.Open(Icon);
+            if (e.MouseButton == MouseButton.Left) AddContextMenu.Open(Icon);
+            else if (e.MouseButton == MouseButton.Right) DeviceContextMenu.Open(Icon);
             e.Handled = true;
         }
     }

@@ -8,7 +8,7 @@
       <Grid Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneBefore" />
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Contents">
-        <Components:DeviceAdd AlwaysShowing="true" DeviceAdded="Device_InsertStart" DragDrop.AllowDrop="true" x:Name="DeviceAdd" />
+        <Components:DeviceAdd AlwaysShowing="true" DeviceAdded="Device_InsertStart" DeviceAction="Device_Action" DragDrop.AllowDrop="true" x:Name="DeviceAdd" />
       </StackPanel>
 
       <Grid Grid.Column="2" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
