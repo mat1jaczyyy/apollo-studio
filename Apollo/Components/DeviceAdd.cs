@@ -43,20 +43,18 @@ namespace Apollo.Components {
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
         }
 
-        private void AddContextMenu_Click(object _, EventArgs e) {
-            IInteractive sender = ((RoutedEventArgs)e).Source;
+        private void AddContextMenu_Click(object sender, EventArgs e) {
+            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (sender.GetType() == typeof(MenuItem)) {
-                string selected = (string)((MenuItem)sender).Header;
-                DeviceAdded?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{selected}"));
-            }
+            if (item.GetType() == typeof(MenuItem))
+                DeviceAdded?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{(string)((MenuItem)item).Header}"));
         }
 
-        private void DeviceContextMenu_Click(object _, EventArgs e) {
+        private void DeviceContextMenu_Click(object item, EventArgs e) {
             IInteractive sender = ((RoutedEventArgs)e).Source;
 
-            if (sender.GetType() == typeof(MenuItem))
-                DeviceAction?.Invoke((string)((MenuItem)sender).Header);
+            if (item.GetType() == typeof(MenuItem))
+                DeviceAction?.Invoke((string)((MenuItem)item).Header);
         }
 
         private void Click(object sender, PointerReleasedEventArgs e) {

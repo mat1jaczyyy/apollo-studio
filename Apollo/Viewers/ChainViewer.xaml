@@ -3,15 +3,25 @@
              x:Class="Apollo.Viewers.ChainViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
+  <UserControl.Resources>
+    <ContextMenu x:Key="DeviceContextMenuBefore" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="DeviceContextMenuAfter" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+  </UserControl.Resources>
+
   <Grid x:Name="Root">
     <Grid ColumnDefinitions="*,Auto,*" x:Name="Layout">
-      <Grid Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneBefore" />
+      <Grid Grid.Column="0" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneBefore" PointerReleased="Click" />
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Contents">
         <Components:DeviceAdd AlwaysShowing="true" DeviceAdded="Device_InsertStart" DeviceAction="Device_Action" DragDrop.AllowDrop="true" x:Name="DeviceAdd" />
       </StackPanel>
 
-      <Grid Grid.Column="2" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+      <Grid Grid.Column="2" HorizontalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
     </Grid>
   </Grid>
 </UserControl>

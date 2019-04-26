@@ -7,6 +7,7 @@ using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -21,6 +22,9 @@ namespace Apollo.Viewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Chain _chain;
+
+        Grid DropZoneBefore, DropZoneAfter;
+        ContextMenu DeviceContextMenuBefore, DeviceContextMenuAfter;
 
         Controls Contents;
         DeviceAdd DeviceAdd;
@@ -44,7 +48,16 @@ namespace Apollo.Viewers {
 
             _chain = chain;
             _chain.Viewer = this;
+
+            DropZoneBefore = this.Get<Grid>("DropZoneBefore");
+            DropZoneAfter = this.Get<Grid>("DropZoneAfter");
             
+            DeviceContextMenuBefore = (ContextMenu)this.Resources["DeviceContextMenuBefore"];
+            DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+            
+            DeviceContextMenuAfter = (ContextMenu)this.Resources["DeviceContextMenuAfter"];
+            DeviceContextMenuAfter.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -76,7 +89,23 @@ namespace Apollo.Viewers {
             _chain.Remove(index);
         }
 
-        private void Device_Action(string action) => Track.Get(_chain).Window?.SelectionAction(action, _chain, -1);
+        private void Device_Action(string action) => Device_Action(action, false);
+        private void Device_Action(string action, bool right) => Track.Get(_chain).Window?.SelectionAction(action, _chain, (right? _chain.Count : 0) - 1);
+
+        private void DeviceContextMenu_Click(object sender, EventArgs e) {
+            IInteractive item = ((RoutedEventArgs)e).Source;
+
+            if (item.GetType() == typeof(MenuItem))
+                Device_Action((string)((MenuItem)item).Header, sender == DeviceContextMenuAfter);
+        }
+
+        private void Click(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Right) 
+                if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
+                else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
+
+            e.Handled = true;
+        }
 
         private void DragOver(object sender, DragEventArgs e) {
             if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
