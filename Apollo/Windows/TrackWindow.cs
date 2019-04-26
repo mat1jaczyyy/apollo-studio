@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -10,10 +8,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 
-using Newtonsoft.Json;
-
 using Apollo.Core;
-using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Viewers;
 
@@ -81,13 +76,24 @@ namespace Apollo.Windows {
         public void SelectionAction(string action) {
             if (SelectionStart == null) return;
 
-            if (action == "Cut") Copy(true);
-            else if (action == "Copy") Copy();
-            else if (action == "Duplicate") Duplicate();
-            else if (action == "Paste") Paste();
-            else if (action == "Delete") Delete();
-            else if (action == "Group") Group();
-            else if (action == "Ungroup") Ungroup();
+            Chain chain = SelectionStart.Parent;
+            
+            int left = SelectionStart.ParentIndex.Value;
+            int right = (SelectionEnd == null)? left: SelectionEnd.ParentIndex.Value;
+            
+            if (left > right) {
+                int temp = left;
+                left = right;
+                right = temp;
+            }
+
+            if (action == "Cut") chain.Viewer?.Copy(left, right, true);
+            else if (action == "Copy") chain.Viewer?.Copy(left, right);
+            else if (action == "Duplicate") chain.Viewer?.Duplicate(left, right);
+            else if (action == "Paste") chain.Viewer?.Paste(right);
+            else if (action == "Delete") chain.Viewer?.Delete(left, right);
+            else if (action == "Group") chain.Viewer?.Group(left, right);
+            else if (action == "Ungroup") chain.Viewer?.Ungroup(left);
         }
 
         public TrackWindow(Track track) {
@@ -144,89 +150,6 @@ namespace Apollo.Windows {
                 track.Window.WindowState = WindowState.Normal;
                 track.Window.Activate();
             }
-        }
-
-        private async void Copy(bool cut = false) {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue("clipboard");
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("content");
-                        writer.WriteValue("device");
-
-                        writer.WritePropertyName("devices");
-                        writer.WriteStartArray();
-
-                            foreach (Device selected in Selection) {
-                                writer.WriteRawValue(selected.Encode());
-                                if (cut) selected.Viewer?.Device_Remove();
-                            }
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            await Application.Current.Clipboard.SetTextAsync(json.ToString());
-        }
-        
-        private async void Paste() {
-            string jsonString = await Application.Current.Clipboard.GetTextAsync();
-
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "clipboard") return;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            if (data["content"].ToString() != "device") return;
-
-            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
-            Device left = Selection.First();
-
-            foreach (Device device in (from i in devices select Device.Decode(i.ToString())))
-                left.Viewer?.Device_Paste(left = device);
-        }
-
-        private void Duplicate() {
-            Device left = Selection.Last();
-
-            foreach (Device device in Selection)
-                left.Viewer?.Device_Paste(left = device.Clone());
-        }
-        
-        private void Delete() {
-            foreach (Device selected in Selection)
-                selected.Viewer?.Device_Remove();
-        }
-
-        private void Group() {
-            List<Device> selection = Selection;
-
-            Selection.First().Viewer?.Device_Paste(
-                new Group(new List<Chain>() {new Chain((from i in Selection select i.Clone()).ToList())})
-            );
-
-            foreach (Device selected in selection)
-                selected.Viewer?.Device_Remove();
-        }
-
-        private void Ungroup() {
-            List<Device> selection = Selection;
-            Device left = Selection.First();
-
-            foreach (Device device in ((Group)SelectionStart)[0].Devices)
-                left.Viewer?.Device_Paste(left = device.Clone());
-            
-            foreach (Device selected in selection)
-                selected.Viewer?.Device_Remove();
         }
     }
 }

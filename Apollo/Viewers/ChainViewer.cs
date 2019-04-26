@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -7,7 +10,10 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Newtonsoft.Json;
+
 using Apollo.Components;
+using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
@@ -91,6 +97,84 @@ namespace Apollo.Viewers {
             if (!result) e.DragEffects = DragDropEffects.None;
             
             e.Handled = true;
+        }
+
+        public async void Copy(int left, int right, bool cut = false) {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("clipboard");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("content");
+                        writer.WriteValue("device");
+
+                        writer.WritePropertyName("devices");
+                        writer.WriteStartArray();
+
+                            for (int i = left; i <= right; i++)
+                                writer.WriteRawValue(_chain.Devices[i].Encode());
+
+                        writer.WriteEndArray();
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+
+            if (cut) Delete(left, right);
+            
+            await Application.Current.Clipboard.SetTextAsync(json.ToString());
+        }
+
+        public async void Paste(int right) {
+            string jsonString = await Application.Current.Clipboard.GetTextAsync();
+
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "clipboard") return;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (data["content"].ToString() != "device") return;
+
+            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
+            
+            for (int i = 0; i < devices.Count; i++)
+                Device_Insert(right + i + 1, Device.Decode(devices[i].ToString()));
+        }
+
+        public void Duplicate(int left, int right) {
+            for (int i = 0; i <= right - left; i++)
+                Device_Insert(right + i + 1, _chain.Devices[left + i].Clone());
+        }
+
+        public void Delete(int left, int right) {
+            for (int i = right; i >= left; i--)
+                Device_Remove(i);
+        }
+
+        public void Group(int left, int right) {
+            Chain init = new Chain();
+
+            for (int i = left; i <= right; i++)
+                init.Add(_chain.Devices[i]);
+
+            Delete(left, right);
+
+            Device_Insert(left, new Group(new List<Chain>() {init}));
+        }
+
+        public void Ungroup(int index) {
+            List<Device> init = ((Group)_chain.Devices[index])[0].Devices;
+
+            Delete(index, index);
+            
+            for (int i = 0; i < init.Count; i++)
+                Device_Insert(index + i, init[i]);
         }
     }
 }

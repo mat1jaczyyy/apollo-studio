@@ -111,9 +111,9 @@ namespace Apollo.Viewers {
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
-        public void Device_Paste(Device device) => DevicePasted?.Invoke(_device.ParentIndex.Value + 1, device);
+        private void Device_Paste(Device device) => DevicePasted?.Invoke(_device.ParentIndex.Value + 1, device);
 
-        public void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
+        private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
 
         private void ContextMenu_Click(object _, EventArgs e) {
             IInteractive sender = ((RoutedEventArgs)e).Source;
