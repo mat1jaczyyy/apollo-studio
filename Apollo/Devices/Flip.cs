@@ -36,11 +36,15 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Flip(_mode);
+        public bool Bypass;
 
-        public Flip(FlipType mode = FlipType.Horizontal): base(DeviceIdentifier) => _mode = mode;
+        public override Device Clone() => new Flip(_mode, Bypass);
+
+        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base(DeviceIdentifier) => _mode = mode;
 
         public override void MIDIEnter(Signal n) {
+            if (Bypass) MIDIExit?.Invoke(n.Clone());
+            
             int x = n.Index % 10;
             int y = n.Index / 10;
 
@@ -74,7 +78,10 @@ namespace Apollo.Devices {
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             if (!Enum.TryParse(data["mode"].ToString(), out FlipType mode)) return null;
 
-            return new Flip(mode);
+            return new Flip(
+                mode,
+                Convert.ToBoolean(data["bypass"].ToString())
+            );
         }
 
         public override string EncodeSpecific() {
@@ -91,6 +98,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("mode");
                         writer.WriteValue(_mode);
+
+                        writer.WritePropertyName("bypass");
+                        writer.WriteValue(Bypass);
 
                     writer.WriteEndObject();
 

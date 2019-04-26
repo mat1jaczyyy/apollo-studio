@@ -6,11 +6,15 @@
              Margin="10 5">
 
   <StackPanel VerticalAlignment="Center">
-    <ComboBox BorderThickness="0" VerticalAlignment="Center" x:Name="ComboBox" SelectionChanged="Mode_Changed">
-      <sys:String>Horizontal</sys:String>
-      <sys:String>Vertical</sys:String>
-      <sys:String>Diagonal+</sys:String>
-      <sys:String>Diagonal-</sys:String>
-    </ComboBox>
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+      <ComboBox BorderThickness="0" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+        <sys:String>Horizontal</sys:String>
+        <sys:String>Vertical</sys:String>
+        <sys:String>Diagonal+</sys:String>
+        <sys:String>Diagonal-</sys:String>
+      </ComboBox>
+    </Border>
+
+    <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Bypass" Click="Bypass_Changed">Bypass</CheckBox>
   </StackPanel>
 </UserControl>
