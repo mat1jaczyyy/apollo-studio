@@ -81,7 +81,8 @@ namespace Apollo.Viewers {
             if (!e.Data.Contains(Device.Identifier)) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd") source = source.Parent;
+            while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd")
+                source = source.Parent;
 
             Device moving = (Device)e.Data.Get(Device.Identifier);
             bool result;

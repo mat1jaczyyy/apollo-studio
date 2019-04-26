@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -10,6 +11,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
@@ -44,7 +46,7 @@ namespace Apollo.Viewers {
         public Border Border, Header;
 
         Grid Draggable;
-        ContextMenu DeviceContextMenu;
+        ContextMenu DeviceContextMenu, GroupContextMenu;
 
         private void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -90,12 +92,14 @@ namespace Apollo.Viewers {
             Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
             Deselect();
-            
-            Draggable = this.Get<Grid>("Draggable");
 
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
-
+            GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
+            
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            GroupContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            
+            Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -111,7 +115,7 @@ namespace Apollo.Viewers {
 
         public void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
 
-        private void DeviceContextMenu_Click(object _, EventArgs e) {
+        private void ContextMenu_Click(object _, EventArgs e) {
             IInteractive sender = ((RoutedEventArgs)e).Source;
 
             if (sender.GetType() == typeof(MenuItem))
@@ -125,10 +129,20 @@ namespace Apollo.Viewers {
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
+                Track track = Track.Get(_device);
+
                 if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                    Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                    track.Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
                 
-                if (e.MouseButton == MouseButton.Right) ((ContextMenu)this.Resources["DeviceContextMenu"]).Open(Draggable);
+                if (e.MouseButton == MouseButton.Right) {
+                    ContextMenu menu = DeviceContextMenu;
+                    List<Device> selection = track.Window?.Selection;
+
+                    if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
+                        menu = GroupContextMenu;
+
+                    menu.Open(Draggable);
+                }
             }
         }
 
@@ -140,7 +154,8 @@ namespace Apollo.Viewers {
             if (!e.Data.Contains(Device.Identifier)) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") source = source.Parent;
+            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter")
+                source = source.Parent;
 
             Device moving = (Device)e.Data.Get(Device.Identifier);
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);

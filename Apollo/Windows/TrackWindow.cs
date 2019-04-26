@@ -13,6 +13,7 @@ using Avalonia.Markup.Xaml;
 using Newtonsoft.Json;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Viewers;
 
@@ -38,7 +39,7 @@ namespace Apollo.Windows {
         public Device SelectionStart { get; private set; } = null;
         public Device SelectionEnd { get; private set; } = null;
 
-        List<Device> Selection {
+        public List<Device> Selection {
             get {
                 if (SelectionStart != null) {
                     if (SelectionEnd != null) {
@@ -77,60 +78,6 @@ namespace Apollo.Windows {
                 else SelectionStart.Viewer?.Select();
         }
 
-        private async void Copy(bool cut = false) {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue("clipboard");
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("content");
-                        writer.WriteValue("device");
-
-                        writer.WritePropertyName("devices");
-                        writer.WriteStartArray();
-
-                            foreach (Device selected in Selection) {
-                                writer.WriteRawValue(selected.Encode());
-                                if (cut) selected.Viewer?.Device_Remove();
-                            }
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            await Application.Current.Clipboard.SetTextAsync(json.ToString());
-        }
-        
-        public async void Paste() {
-            string jsonString = await Application.Current.Clipboard.GetTextAsync();
-
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "clipboard") return;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            if (data["content"].ToString() != "device") return;
-
-            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
-            Device left = Selection.First();
-
-            foreach (Device device in (from i in devices select Device.Decode(i.ToString())))
-                left.Viewer?.Device_Paste(left = device);
-        }
-        
-        public void Delete() {
-            foreach (Device selected in Selection)
-                selected.Viewer?.Device_Remove();
-        }
-
         public void SelectionAction(string action) {
             if (SelectionStart == null) return;
 
@@ -138,6 +85,8 @@ namespace Apollo.Windows {
             else if (action == "Copy") Copy();
             else if (action == "Paste") Paste();
             else if (action == "Delete") Delete();
+            else if (action == "Group") Group();
+            else if (action == "Ungroup") Ungroup();
         }
 
         public TrackWindow(Track track) {
@@ -194,6 +143,80 @@ namespace Apollo.Windows {
                 track.Window.WindowState = WindowState.Normal;
                 track.Window.Activate();
             }
+        }
+
+        private async void Copy(bool cut = false) {
+            StringBuilder json = new StringBuilder();
+
+            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
+                writer.WriteStartObject();
+
+                    writer.WritePropertyName("object");
+                    writer.WriteValue("clipboard");
+
+                    writer.WritePropertyName("data");
+                    writer.WriteStartObject();
+
+                        writer.WritePropertyName("content");
+                        writer.WriteValue("device");
+
+                        writer.WritePropertyName("devices");
+                        writer.WriteStartArray();
+
+                            foreach (Device selected in Selection) {
+                                writer.WriteRawValue(selected.Encode());
+                                if (cut) selected.Viewer?.Device_Remove();
+                            }
+
+                        writer.WriteEndArray();
+
+                    writer.WriteEndObject();
+
+                writer.WriteEndObject();
+            }
+            
+            await Application.Current.Clipboard.SetTextAsync(json.ToString());
+        }
+        
+        private async void Paste() {
+            string jsonString = await Application.Current.Clipboard.GetTextAsync();
+
+            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            if (json["object"].ToString() != "clipboard") return;
+
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
+            if (data["content"].ToString() != "device") return;
+
+            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
+            Device left = Selection.First();
+
+            foreach (Device device in (from i in devices select Device.Decode(i.ToString())))
+                left.Viewer?.Device_Paste(left = device);
+        }
+        
+        private void Delete(List<Device> selection = null) {
+            foreach (Device selected in selection?? Selection)
+                selected.Viewer?.Device_Remove();
+        }
+
+        private void Group() {
+            List<Device> selection = Selection;
+
+            Selection.First().Viewer?.Device_Paste(
+                new Group(new List<Chain>() {new Chain((from i in Selection select i.Clone()).ToList())})
+            );
+
+            Delete(selection);
+        }
+
+        private void Ungroup() {
+            List<Device> selection = Selection;
+            Device left = Selection.First();
+
+            foreach (Device device in (from i in ((Group)SelectionStart)[0].Devices select i.Clone()))
+                left.Viewer?.Device_Paste(left = device);
+            
+            Delete(selection);
         }
     }
 }

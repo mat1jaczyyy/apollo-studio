@@ -11,6 +11,14 @@
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
       <MenuItem Header="Group" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="GroupContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+      <MenuItem Header="Group" />
       <MenuItem Header="Ungroup" />
     </ContextMenu>
   </UserControl.Resources>
