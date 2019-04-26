@@ -1,0 +1,16 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.FlipViewer"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5">
+
+  <StackPanel VerticalAlignment="Center">
+    <ComboBox BorderThickness="0" VerticalAlignment="Center" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+      <sys:String>Horizontal</sys:String>
+      <sys:String>Vertical</sys:String>
+      <sys:String>Diagonal+</sys:String>
+      <sys:String>Diagonal-</sys:String>
+    </ComboBox>
+  </StackPanel>
+</UserControl>

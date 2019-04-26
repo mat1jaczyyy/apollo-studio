@@ -19,25 +19,40 @@ namespace Apollo.Devices {
             Diagonal2
         }
 
-        public FlipType Mode;
+        FlipType _mode;
+        public string Mode {
+            get {
+                if (_mode == FlipType.Horizontal) return "Horizontal";
+                else if (_mode == FlipType.Vertical) return "Vertical";
+                else if (_mode == FlipType.Diagonal1) return "Diagonal+";
+                else if (_mode == FlipType.Diagonal2) return "Diagonal-";
+                return null;
+            }
+            set {
+                if (value == "Horizontal") _mode = FlipType.Horizontal;
+                else if (value == "Vertical") _mode = FlipType.Vertical;
+                else if (value == "Diagonal+") _mode = FlipType.Diagonal1;
+                else if (value == "Diagonal-") _mode = FlipType.Diagonal2;
+            }
+        }
 
-        public override Device Clone() => new Flip(Mode);
+        public override Device Clone() => new Flip(_mode);
 
-        public Flip(FlipType mode = FlipType.Horizontal): base(DeviceIdentifier) => Mode = mode;
+        public Flip(FlipType mode = FlipType.Horizontal): base(DeviceIdentifier) => _mode = mode;
 
         public override void MIDIEnter(Signal n) {
             int x = n.Index % 10;
             int y = n.Index / 10;
 
-            if (Mode == FlipType.Horizontal) x = 9 - x;
-            else if (Mode == FlipType.Vertical) y = 9 - y;
+            if (_mode == FlipType.Horizontal) x = 9 - x;
+            else if (_mode == FlipType.Vertical) y = 9 - y;
 
-            else if (Mode == FlipType.Diagonal1) {
+            else if (_mode == FlipType.Diagonal1) {
                 int temp = x;
                 x = y;
                 y = temp;
             
-            } else if (Mode == FlipType.Diagonal2) {
+            } else if (_mode == FlipType.Diagonal2) {
                 x = 9 - x;
                 y = 9 - y;
 
@@ -75,7 +90,7 @@ namespace Apollo.Devices {
                     writer.WriteStartObject();
 
                         writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
+                        writer.WriteValue(_mode);
 
                     writer.WriteEndObject();
 

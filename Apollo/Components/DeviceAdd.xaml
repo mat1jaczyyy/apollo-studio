@@ -8,6 +8,7 @@
       <MenuItem Header="Copy" />
       <MenuItem Header="Delay" />
       <MenuItem Header="Fade" />
+      <MenuItem Header="Flip" />
       <MenuItem Header="KeyFilter" />
       <MenuItem Header="Hold" />
       <MenuItem Header="Layer" />
