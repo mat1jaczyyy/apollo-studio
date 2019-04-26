@@ -4,9 +4,11 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Viewers;
 
@@ -83,9 +85,11 @@ namespace Apollo.Windows {
 
         private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
 
-        private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
-
         private void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
+
+        public void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
+
+        private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

@@ -5,7 +5,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="320" MinWidth="320" MaxWidth="320"
-        Height="480" MinHeight="480" MaxHeight="480" 
+        Height="540" MinHeight="540" MaxHeight="540" 
         Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -39,6 +39,7 @@
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
             <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Auto copy previous frame when adding a new one</CheckBox>
+            <Button Background="{DynamicResource ThemeControlHighBrush}"  HorizontalAlignment="Center" Content="Clear Color History" Click="ClearColorHistory" />
           </StackPanel>
         </Border>
 
@@ -62,7 +63,7 @@
         </Border>
 
         <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 10" />
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 11" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
       </Grid>

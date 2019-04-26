@@ -43,6 +43,11 @@ namespace Apollo.Components {
 
             HistoryChanged?.Invoke();
         }
+
+        public static void Clear() {
+            History = new List<Color>();
+            HistoryChanged?.Invoke();
+        }
         
         static ColorHistory() => HistoryChanged += Preferences.Save;
 
@@ -98,6 +103,7 @@ namespace Apollo.Components {
 
                 Rectangle box = ((Rectangle)Grid.Children[0]);
                 box.Opacity = 1;
+                box.IsHitTestVisible = true;
                 box.Fill = Current.ToBrush();
                 box.StrokeThickness = 1;
             }
@@ -107,10 +113,14 @@ namespace Apollo.Components {
 
                 if (i < History.Count) {
                     box.Opacity = 1;
+                    box.IsHitTestVisible = true;
                     box.Fill = History[i].ToBrush();
                     box.StrokeThickness = Convert.ToInt32(Current == History[i] && CurrentIndex != -1);
 
-                } else box.Opacity = 0;
+                } else {
+                    box.Opacity = 0;
+                    box.IsHitTestVisible = false;
+                }
             }
         }
 
