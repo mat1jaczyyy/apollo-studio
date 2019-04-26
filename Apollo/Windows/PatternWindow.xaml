@@ -16,12 +16,14 @@
   </Window.Styles>
 
   <Grid RowDefinitions="Auto,*" DragDrop.AllowDrop="true">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-      <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
+      <Components:PreferencesButton Grid.Column="0" Margin="5 5" />
+
+      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
         <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
       </Grid>
 
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5 5" Spacing="5">
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
         <Components:Minimize Clicked="Minimize" />
         <Components:Close Clicked="Close" />
       </StackPanel>
