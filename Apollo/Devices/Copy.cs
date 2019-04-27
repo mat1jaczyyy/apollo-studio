@@ -70,6 +70,9 @@ namespace Apollo.Devices {
             int ox = n.Index % 10;
             int oy = n.Index / 10;
 
+            int px = ox;
+            int py = oy;
+
             for (int i = 0; i < Offsets.Count; i++) {
                 int x = ox + Offsets[i].X;
                 int y = oy + Offsets[i].Y;
@@ -82,13 +85,16 @@ namespace Apollo.Devices {
                 int result = y * 10 + x;
                     
                 if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
-                    Signal m = n.Clone();
-                    m.Index = (byte)result;
-
                     if (_copymode == CopyType.Static) {
+                        Signal m = n.Clone();
+                        m.Index = (byte)result;
+
                         MIDIExit?.Invoke(m);
 
                     } else if (_copymode == CopyType.Animate) {
+                        Signal m = n.Clone();
+                        m.Index = (byte)result;
+
                         Courier courier = new Courier() {
                             Info = m,
                             AutoReset = false,
@@ -98,8 +104,39 @@ namespace Apollo.Devices {
                         courier.Start();
                     
                     } else if (_copymode == CopyType.Interpolate) {
+                        List<(int, int)> points = new List<(int, int)>();
 
+                        int dx = x - px;
+                        int dy = y - py;
+
+                        int ax = Math.Abs(dx);
+                        int ay = Math.Abs(dy);
+
+                        int bx = (dx < 0)? -1 : 1;
+                        int by = (dy < 0)? -1 : 1;
+
+                        if (ax > ay) for (int j = 1; j <= ax; j++)
+                            points.Add((px + j * bx, py + (int)Math.Round((double)j / ax * ay) * by));
+
+                        else for (int j = 1; j <= ay; j++)
+                            points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
+                        
+                        for (int j = 0; j < points.Count; j++) {
+                            Signal m = n.Clone();
+                            m.Index = (byte)(points[j].Item2 * 10 + points[j].Item1);
+
+                            Courier courier = new Courier() {
+                                Info = m,
+                                AutoReset = false,
+                                Interval = Convert.ToInt32((Mode? (int)Length : _rate) * _gate * (i + ((decimal)j + 1) / points.Count)),
+                            };
+                            courier.Elapsed += Tick;
+                            courier.Start();
+                        }
                     }
+
+                    px = x;
+                    py = y;
                 }
             }
 
