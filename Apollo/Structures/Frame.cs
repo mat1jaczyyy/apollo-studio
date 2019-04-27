@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -24,6 +25,8 @@ namespace Apollo.Structures {
         }
 
         public string TimeString => Mode? Length.ToString() : $"{Time}ms";
+
+        public Frame Clone() => new Frame(Mode, Length.Clone(), Time, (from i in Screen select i.Clone()).ToArray());
 
         public Frame(bool mode = false, Length length = null, int time = 1000, Color[] screen = null) {
             if (screen == null || screen.Length != 100) {

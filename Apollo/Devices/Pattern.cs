@@ -29,7 +29,7 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern();
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), Expanded);
 
         public int Expanded;
 
