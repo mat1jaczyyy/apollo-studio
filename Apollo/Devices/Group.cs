@@ -62,8 +62,11 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public Group(List<Chain> init = null): base(DeviceIdentifier) {
+        public int? Expanded;
+
+        public Group(List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
             foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
+            Expanded = expanded;
 
             Reroute();
         }
@@ -86,14 +89,18 @@ namespace Apollo.Devices {
             Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
             if (json["device"].ToString() != DeviceIdentifier) return null;
 
-            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
+            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
             
+            List<object> chains = JsonConvert.DeserializeObject<List<object>>(data["chains"].ToString());
             List<Chain> init = new List<Chain>();
 
-            foreach (object chain in data)
+            foreach (object chain in chains)
                 init.Add(Chain.Decode(chain.ToString()));
             
-            return new Group(init);
+            return new Group(
+                init,
+                int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null
+            );
         }
 
         public override string EncodeSpecific() {
@@ -106,12 +113,20 @@ namespace Apollo.Devices {
                     writer.WriteValue(DeviceIdentifier);
 
                     writer.WritePropertyName("data");
-                    writer.WriteStartArray();
+                    writer.WriteStartObject();
 
-                        for (int i = 0; i < _chains.Count; i++)
-                            writer.WriteRawValue(_chains[i].Encode());
+                        writer.WritePropertyName("chains");
+                        writer.WriteStartArray();
 
-                    writer.WriteEndArray();
+                            for (int i = 0; i < _chains.Count; i++)
+                                writer.WriteRawValue(_chains[i].Encode());
+                        
+                        writer.WriteEndArray();
+
+                        writer.WritePropertyName("expanded");
+                        writer.WriteValue(Expanded);
+                
+                    writer.WriteEndObject();
 
                 writer.WriteEndObject();
             }
