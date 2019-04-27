@@ -21,7 +21,7 @@ namespace Apollo.Elements {
 
         public Chain Parent;
         public int? ParentIndex;
-        public Action<Signal> MIDIExit = null;
+        public virtual Action<Signal> MIDIExit { get; set; } = null;
 
         public abstract Device Clone();
         

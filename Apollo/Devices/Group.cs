@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -13,12 +14,22 @@ namespace Apollo.Devices {
     public class Group: Device, IChainParent {
         public static readonly new string DeviceIdentifier = "group";
 
+        private Action<Signal> _midiexit;
+        public override Action<Signal> MIDIExit {
+            get => _midiexit;
+            set {
+                _midiexit = value;
+                Reroute();
+            }
+        }
+
         private List<Chain> _chains = new List<Chain>();
 
         private void Reroute() {
             for (int i = 0; i < _chains.Count; i++) {
                 _chains[i].Parent = this;
                 _chains[i].ParentIndex = i;
+                _chains[i].MIDIExit = ChainExit;
             }
         }
 
@@ -32,28 +43,16 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Group((from i in _chains select i.Clone()).ToList());
 
-        public void Insert(int index) {
-            _chains.Insert(index, new Chain() {MIDIExit = ChainExit});
-            
-            Reroute();
-        }
-
-        public void Insert(int index, Chain chain) {
-            chain.MIDIExit = ChainExit;
-            _chains.Insert(index, chain);
+        public void Insert(int index, Chain chain = null) {
+            _chains.Insert(index, chain?? new Chain());
             
             Reroute();
         }
 
         public void Add(Chain chain) {
-            chain.Parent = this;
-            chain.ParentIndex = _chains.Count;
-            chain.MIDIExit = ChainExit;
             _chains.Add(chain);
-        }
 
-        public void Add(List<Chain> chains) {
-            foreach (Chain chain in chains) Add(chain);
+            Reroute();
         }
 
         public void Remove(int index) {
@@ -63,7 +62,11 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public Group(List<Chain> init = null): base(DeviceIdentifier) => Add(init?? new List<Chain>());
+        public Group(List<Chain> init = null): base(DeviceIdentifier) {
+            foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
+
+            Reroute();
+        }
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
