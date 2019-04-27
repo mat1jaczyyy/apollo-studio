@@ -82,7 +82,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double _exp = 100;
+        private double _exp = 1;
         public double Exponent {
             get => _exp;
             set {
