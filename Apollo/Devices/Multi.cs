@@ -70,11 +70,15 @@ namespace Apollo.Devices {
 
         private void Reset() => current = -1;
 
-        public Multi(Chain preprocess = null, List<Chain> init = null): base(DeviceIdentifier) {
+        public int? Expanded;
+
+        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
             
+            Expanded = expanded;
+
             for (int i = 0; i < 100; i++)
                 buffer[i] = new Dictionary<int, int>();
             
@@ -132,7 +136,8 @@ namespace Apollo.Devices {
             
             return new Multi(
                 Chain.Decode(data["preprocess"].ToString()),
-                init
+                init,
+                int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null
             );
         }
 
@@ -158,6 +163,9 @@ namespace Apollo.Devices {
                                 writer.WriteRawValue(_chains[i].Encode());
 
                         writer.WriteEndArray();
+
+                        writer.WritePropertyName("expanded");
+                        writer.WriteValue(Expanded);
                         
                     writer.WriteEndObject();
 

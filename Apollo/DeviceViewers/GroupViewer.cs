@@ -61,16 +61,16 @@ namespace Apollo.DeviceViewers {
                 Contents_Insert(i, _group[i]);
             }
 
-            if (_group.Expanded != null) Expand_Insert(_group.Expanded);
+            if (_group.Expanded != null) Expand_Insert(_group.Expanded.Value);
         }
 
-        private void Expand_Insert(int? index) {
-            _root.Insert(1, new ChainViewer(_group[index.Value], true));
+        private void Expand_Insert(int index) {
+            _root.Insert(1, new ChainViewer(_group[index], true));
             _root.Insert(2, new DeviceTail(_parent));
 
             _parent.Border.CornerRadius = new CornerRadius(5, 0, 0, 5);
             _parent.Header.CornerRadius = new CornerRadius(5, 0, 0, 0);
-            ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
+            ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
         }
 
         private void Expand_Remove() {
@@ -92,7 +92,7 @@ namespace Apollo.DeviceViewers {
                 }
             }
 
-            if (index != null) Expand_Insert(index);
+            if (index != null) Expand_Insert(index.Value);
             
             _group.Expanded = index;
         }

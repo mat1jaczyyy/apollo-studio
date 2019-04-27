@@ -21,8 +21,6 @@ namespace Apollo.DeviceViewers {
         Controls Contents;
         VerticalAdd ChainAdd;
 
-        int? current;
-
         public void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);
             viewer.ChainAdded += Chain_Insert;
@@ -32,13 +30,13 @@ namespace Apollo.DeviceViewers {
             Contents.Insert(index + 1, viewer);
             ChainAdd.AlwaysShowing = false;
 
-            if (current != null && index <= current) current++;
+            if (IsArrangeValid && _multi.Expanded != null && index <= _multi.Expanded) _multi.Expanded++;
         }
 
         public void Contents_Remove(int index) {
-            if (current != null) {
-                if (index < current) current--;
-                else if (index == current) Expand(null);
+            if (IsArrangeValid && _multi.Expanded != null) {
+                if (index < _multi.Expanded) _multi.Expanded--;
+                else if (index == _multi.Expanded) Expand(null);
             }
 
             Contents.RemoveAt(index + 1);
@@ -67,33 +65,41 @@ namespace Apollo.DeviceViewers {
                 _multi[i].ClearParentIndexChanged();
                 Contents_Insert(i, _multi[i]);
             }
+
+            if (_multi.Expanded != null) Expand_Insert(multi.Expanded.Value);
+        }
+
+        private void Expand_Insert(int index) {
+            _root.Insert(3, new ChainViewer(_multi[index], true));
+            _root.Insert(4, new DeviceTail(_parent));
+
+            _parent.Border.CornerRadius = new CornerRadius(0);
+            _parent.Header.CornerRadius = new CornerRadius(0);
+            ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
+        }
+
+        private void Expand_Remove() {
+            _root.RemoveAt(4);
+            _root.RemoveAt(3);
+
+            _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
+            _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
+            ((ChainInfo)Contents[_multi.Expanded.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
         }
 
         private void Expand(int? index) {
-            if (current != null) {
-                _root.RemoveAt(4);
-                _root.RemoveAt(3);
+            if (_multi.Expanded != null) {
+                Expand_Remove();
 
-                _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
-                _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
-                ((ChainInfo)Contents[current.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
-
-                if (index == current) {
-                    current = null;
+                if (index == _multi.Expanded) {
+                    _multi.Expanded = null;
                     return;
                 }
             }
 
-            if (index != null) {
-                _root.Insert(3, new ChainViewer(_multi[index.Value], true));
-                _root.Insert(4, new DeviceTail(_parent));
-
-                _parent.Border.CornerRadius = new CornerRadius(0);
-                _parent.Header.CornerRadius = new CornerRadius(0);
-                ((ChainInfo)Contents[index.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
-            }
+            if (index != null) Expand_Insert(index.Value);
             
-            current = index;
+            _multi.Expanded = index;
         }
 
         private void Chain_Insert(int index) {
