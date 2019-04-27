@@ -37,7 +37,10 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Rotate(_mode, Bypass);
 
-        public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base(DeviceIdentifier) => _mode = mode;
+        public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base(DeviceIdentifier) {
+            _mode = mode;
+            Bypass = bypass;
+        }
 
         public override void MIDIEnter(Signal n) {
             if (Bypass) MIDIExit?.Invoke(n.Clone());

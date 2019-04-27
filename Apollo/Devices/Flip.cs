@@ -40,7 +40,10 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Flip(_mode, Bypass);
 
-        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base(DeviceIdentifier) => _mode = mode;
+        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base(DeviceIdentifier) {
+            _mode = mode;
+            Bypass = bypass;
+        }
 
         public override void MIDIEnter(Signal n) {
             if (Bypass) MIDIExit?.Invoke(n.Clone());
