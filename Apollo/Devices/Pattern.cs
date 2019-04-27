@@ -31,11 +31,14 @@ namespace Apollo.Devices {
         
         public override Device Clone() => new Pattern();
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null): base(DeviceIdentifier) {
+        public int Expanded;
+
+        public Pattern(decimal gate = 1, List<Frame> frames = null, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
             Frames = frames;
+            Expanded = expanded;
         }
 
         private void FireCourier(Signal n, Color color, byte index, int time) {
@@ -98,7 +101,8 @@ namespace Apollo.Devices {
 
             return new Pattern(
                 Convert.ToDecimal(data["gate"]),
-                init
+                init,
+                Convert.ToInt32(data["expanded"])
             );
         }
 
@@ -115,7 +119,7 @@ namespace Apollo.Devices {
                     writer.WriteStartObject();
 
                         writer.WritePropertyName("gate");
-                        writer.WriteValue(_gate);
+                        writer.WriteValue(Gate);
 
                         writer.WritePropertyName("frames");
                         writer.WriteStartArray();
@@ -124,6 +128,9 @@ namespace Apollo.Devices {
                                 writer.WriteRawValue(Frames[i].Encode());
 
                         writer.WriteEndArray();
+
+                        writer.WritePropertyName("expanded");
+                        writer.WriteValue(Expanded);
 
                     writer.WriteEndObject();
 
