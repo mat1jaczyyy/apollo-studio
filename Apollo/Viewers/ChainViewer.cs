@@ -118,11 +118,13 @@ namespace Apollo.Viewers {
             while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd")
                 source = source.Parent;
 
-            Device moving = (Device)e.Data.Get(Device.Identifier);
+            List<Device> moving = (List<Device>)e.Data.Get(Device.Identifier);
+            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+
             bool result;
 
-            if (source.Name != "DropZoneAfter") result = moving.Move(_chain);
-            else result = moving.Move(_chain.Devices.Last());
+            if (source.Name != "DropZoneAfter") result = Device.Move(moving, _chain, copy);
+            else result = Device.Move(moving, _chain.Devices.Last(), copy);
 
             if (!result) e.DragEffects = DragDropEffects.None;
             

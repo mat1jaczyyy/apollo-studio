@@ -119,21 +119,25 @@ namespace Apollo.Viewers {
                 Track.Get(_device).Window?.SelectionAction((string)((MenuItem)item).Header);
         }
 
+        private void Select(PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
+                Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+        }
+
         public async void Drag(object sender, PointerPressedEventArgs e) {
+            if (!selected) Select(e);
+
             DataObject dragData = new DataObject();
-            dragData.Set(Device.Identifier, _device);
+            dragData.Set(Device.Identifier, Track.Get(_device).Window?.Selection);
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
-                Track track = Track.Get(_device);
-
-                if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                    track.Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                if (selected) Select(e);
                 
                 if (e.MouseButton == MouseButton.Right) {
                     ContextMenu menu = DeviceContextMenu;
-                    List<Device> selection = track.Window?.Selection;
+                    List<Device> selection = Track.Get(_device).Window?.Selection;
 
                     if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
                         menu = GroupContextMenu;
@@ -154,15 +158,15 @@ namespace Apollo.Viewers {
             while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter")
                 source = source.Parent;
 
-            Device moving = (Device)e.Data.Get(Device.Identifier);
+            List<Device> moving = (List<Device>)e.Data.Get(Device.Identifier);
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;
             
             if (source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2)) {
-                if (_device.ParentIndex == 0) result = moving.Move(_device.Parent, copy);
-                else result = moving.Move(_device.Parent[_device.ParentIndex.Value - 1], copy);
-            } else result = moving.Move(_device, copy);
+                if (_device.ParentIndex == 0) result = Device.Move(moving, _device.Parent, copy);
+                else result = Device.Move(moving, _device.Parent[_device.ParentIndex.Value - 1], copy);
+            } else result = Device.Move(moving, _device, copy);
 
             if (!result) e.DragEffects = DragDropEffects.None;
 

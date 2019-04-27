@@ -20,7 +20,7 @@ namespace Apollo.Core {
                 .UsePlatformDetect()
                 .LogToDebug();
         
-        public static bool log = true;
+        public static bool log = false;
         static Stopwatch logTimer = new Stopwatch();
 
         public static void Log(string text) {

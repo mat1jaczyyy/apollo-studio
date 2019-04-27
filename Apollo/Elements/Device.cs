@@ -31,37 +31,54 @@ namespace Apollo.Elements {
 
         public virtual void Dispose() => MIDIExit = null;
 
-        public bool Move(Device device, bool copy = false) {
-            if (!copy) {
-                if (this == device) return false;
+        public static bool Move(List<Device> source, Device target, bool copy = false) {
+            if (!copy)
+                for (int i = 0; i < source.Count; i++)
+                    if (source[i] == target) return false;
+            
+            List<Device> moved = new List<Device>();
 
-                Parent.Viewer.Contents_Remove(ParentIndex.Value);
-                Parent.Remove(ParentIndex.Value, false);
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    source[i].Parent.Viewer.Contents_Remove(source[i].ParentIndex.Value);
+                    source[i].Parent.Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                target.Parent.Viewer.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
+                target.Parent.Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
-            Device moving = copy? Clone() : this;
-
-            device.Parent.Viewer.Contents_Insert(device.ParentIndex.Value + 1, moving);
-            device.Parent.Insert(device.ParentIndex.Value + 1, moving);
-
-            Track.Get(moving).Window?.Select(moving);
+            Track track = Track.Get(moved.First());
+            track.Window.Select(moved.First());
+            track.Window.Select(moved.Last(), true);
+            
             return true;
         }
 
-        public bool Move(Chain chain, bool copy = false) {
-            if (!copy) {
-                if (chain.Count > 0 && this == chain[0]) return false;
+        public static bool Move(List<Device> source, Chain target, bool copy = false) {
+            if (!copy)
+                if (target.Count > 0 && source[0] == target[0]) return false;
+            
+            List<Device> moved = new List<Device>();
 
-                Parent.Viewer.Contents_Remove(ParentIndex.Value);
-                Parent.Remove(ParentIndex.Value);
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    source[i].Parent.Viewer.Contents_Remove(source[i].ParentIndex.Value);
+                    source[i].Parent.Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                target.Viewer.Contents_Insert(i, moved.Last());
+                target.Insert(i, moved.Last());
             }
 
-            Device moving = copy? Clone() : this;
-
-            chain.Viewer.Contents_Insert(0, moving);
-            chain.Insert(0, moving);
-
-            Track.Get(moving).Window?.Select(moving);
+            Track track = Track.Get(moved.First());
+            track.Window.Select(moved.First());
+            track.Window.Select(moved.Last(), true);
+            
             return true;
         }
 
