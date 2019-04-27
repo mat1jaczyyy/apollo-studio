@@ -44,7 +44,6 @@ namespace Apollo.Core {
         }
 
         public static void WindowClose(Window sender) {
-
             if (Project != null) {
                 if (Project.Window != null) return;
 
