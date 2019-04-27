@@ -5,7 +5,7 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
 
-  <StackPanel VerticalAlignment="Center">
+  <StackPanel VerticalAlignment="Center" Spacing="5">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="ComboBox" SelectionChanged="Mode_Changed">
         <sys:String>Horizontal</sys:String>
@@ -15,6 +15,6 @@
       </ComboBox>
     </Border>
 
-    <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Bypass" Click="Bypass_Changed">Bypass</CheckBox>
+    <CheckBox HorizontalAlignment="Center" x:Name="Bypass" Click="Bypass_Changed">Bypass</CheckBox>
   </StackPanel>
 </UserControl>

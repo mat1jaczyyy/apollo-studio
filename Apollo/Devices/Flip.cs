@@ -76,10 +76,9 @@ namespace Apollo.Devices {
             if (json["device"].ToString() != DeviceIdentifier) return null;
 
             Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            if (!Enum.TryParse(data["mode"].ToString(), out FlipType mode)) return null;
 
             return new Flip(
-                mode,
+                Enum.Parse<FlipType>(data["mode"].ToString()),
                 Convert.ToBoolean(data["bypass"].ToString())
             );
         }

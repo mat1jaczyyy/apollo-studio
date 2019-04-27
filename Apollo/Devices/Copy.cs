@@ -12,11 +12,17 @@ namespace Apollo.Devices {
     public class Copy: Device {
         public static readonly new string DeviceIdentifier = "copy";
 
+        public enum CopyType {
+            Static,
+            Animate,
+            Interpolate
+        }
+
         public bool Mode; // true uses Length
         public Length Length;
         private int _rate;
         private decimal _gate;
-        public bool Animate;
+        CopyType _copymode;
         public bool Loop;
         public List<Offset> Offsets;
 
@@ -36,14 +42,19 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Copy(Mode, Length, _rate, _gate, Animate, Loop, Offsets);
+        public string CopyMode {
+            get => _copymode.ToString();
+            set => _copymode = Enum.Parse<CopyType>(value);
+        }
 
-        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, bool animate = false, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public override Device Clone() => new Copy(Mode, Length, _rate, _gate, _copymode, Loop, Offsets);
+
+        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Mode = mode;
             Rate = rate;
             Length = length?? new Length();
             Gate = gate;
-            Animate = animate;
+            _copymode = copymode;
             Loop = loop;
             Offsets = offsets?? new List<Offset>();
         }
@@ -74,7 +85,10 @@ namespace Apollo.Devices {
                     Signal m = n.Clone();
                     m.Index = (byte)result;
 
-                    if (Animate) {
+                    if (_copymode == CopyType.Static) {
+                        MIDIExit?.Invoke(m);
+
+                    } else if (_copymode == CopyType.Animate) {
                         Courier courier = new Courier() {
                             Info = m,
                             AutoReset = false,
@@ -83,8 +97,8 @@ namespace Apollo.Devices {
                         courier.Elapsed += Tick;
                         courier.Start();
                     
-                    } else {
-                        MIDIExit?.Invoke(m);
+                    } else if (_copymode == CopyType.Interpolate) {
+
                     }
                 }
             }
@@ -109,7 +123,7 @@ namespace Apollo.Devices {
                 Length.Decode(data["length"].ToString()),
                 Convert.ToInt32(data["rate"]),
                 Convert.ToDecimal(data["gate"]),
-                Convert.ToBoolean(data["animate"]),
+                Enum.Parse<CopyType>(data["copymode"].ToString()),
                 Convert.ToBoolean(data["loop"]),
                 initO
             );
@@ -139,8 +153,8 @@ namespace Apollo.Devices {
                         writer.WritePropertyName("gate");
                         writer.WriteValue(_gate);
 
-                        writer.WritePropertyName("animate");
-                        writer.WriteValue(Animate);
+                        writer.WritePropertyName("copymode");
+                        writer.WriteValue(_copymode);
 
                         writer.WritePropertyName("loop");
                         writer.WriteValue(Loop);

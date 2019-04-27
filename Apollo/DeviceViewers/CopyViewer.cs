@@ -15,8 +15,9 @@ namespace Apollo.DeviceViewers {
         
         Copy _copy;
 
+        ComboBox ComboBox;
         Dial Rate, Gate;
-        CheckBox Loop, Animate;
+        CheckBox Loop;
 
         Controls Contents;
         HorizontalAdd OffsetAdd;
@@ -48,9 +49,9 @@ namespace Apollo.DeviceViewers {
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_copy.Gate * 100;
 
-            Animate = this.Get<CheckBox>("Animate");
-            Animate.IsChecked = _copy.Animate;
-            Animate_Changed(null, EventArgs.Empty);
+            ComboBox = this.Get<ComboBox>("ComboBox");
+            ComboBox.SelectedItem = _copy.CopyMode;
+            CopyMode_Changed(null, null);
 
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _copy.Loop;
@@ -69,9 +70,9 @@ namespace Apollo.DeviceViewers {
 
         private void Gate_Changed(double value) => _copy.Gate = (decimal)(value / 100);
 
-        private void Animate_Changed(object sender, EventArgs e) {
-            _copy.Animate = Animate.IsChecked.Value;
-            Rate.Enabled = Gate.Enabled = Animate.IsChecked.Value;
+        private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
+            _copy.CopyMode = (string)ComboBox.SelectedItem;
+            Rate.Enabled = Gate.Enabled = ComboBox.SelectedIndex > 0;
         }
 
         private void Loop_Changed(object sender, EventArgs e) => _copy.Loop = Loop.IsChecked.Value;
