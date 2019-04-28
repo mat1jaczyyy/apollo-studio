@@ -156,6 +156,8 @@ namespace Apollo.Components {
             get => _enabled;
             set {
                 _enabled = value;
+
+                this.Focus();
                 DrawArcAuto();
             }
         }
@@ -283,6 +285,11 @@ namespace Apollo.Components {
             lastModifiers = e.InputModifiers;
 
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
+                if (e.ClickCount == 2) {
+                    DisplayPressed(sender, e);
+                    return;
+                }
+
                 mouseHeld = true;
                 e.Device.Capture(ArcCanvas);
 
@@ -370,7 +377,7 @@ namespace Apollo.Components {
         }
 
         private void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
                 Input.Opacity = 1;
