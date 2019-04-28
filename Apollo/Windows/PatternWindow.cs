@@ -108,7 +108,7 @@ namespace Apollo.Windows {
             if (Contents.Count > 1) ((FrameDisplay)Contents.Last()).FrameAdd.AlwaysShowing = true;
         }
 
-        public void Contents_Insert(int index, Frame frame) {
+        public void Contents_Insert(int index, Frame frame, bool ignoreExpanded = false) {
             if (Contents.Count > 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
@@ -119,7 +119,7 @@ namespace Apollo.Windows {
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
 
-            if (IsArrangeValid && index <= _pattern.Expanded) _pattern.Expanded++;
+            if (!ignoreExpanded && index <= _pattern.Expanded) _pattern.Expanded++;
         }
 
         public void Contents_Remove(int index) {
@@ -158,7 +158,7 @@ namespace Apollo.Windows {
             Contents = this.Get<StackPanel>("Frames").Children;
 
             for (int i = 0; i < _pattern.Frames.Count; i++) {
-                Contents_Insert(i, _pattern.Frames[i]);
+                Contents_Insert(i, _pattern.Frames[i], true);
                 ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
             }
             
@@ -533,7 +533,7 @@ namespace Apollo.Windows {
             _pattern.Expanded = 0;
 
             for (int i = 0; i < _pattern.Frames.Count; i++) {
-                Contents_Insert(i, _pattern.Frames[i]);
+                Contents_Insert(i, _pattern.Frames[i], true);
                 ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
             }
 
