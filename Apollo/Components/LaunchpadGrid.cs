@@ -20,6 +20,9 @@ namespace Apollo.Components {
         Path TopLeft, TopRight, BottomLeft, BottomRight;
         Shape ModeLight;
 
+        public delegate void PadStartedEventHandler(int index);
+        public event PadStartedEventHandler PadStarted;
+
         public delegate void PadChangedEventHandler(int index);
         public event PadChangedEventHandler PadPressed;
         public event PadChangedEventHandler PadReleased;
@@ -116,6 +119,7 @@ namespace Apollo.Components {
                 e.Device.Capture(Root);
                 Root.Cursor = new Cursor(StandardCursorType.Hand);
 
+                PadStarted?.Invoke(Grid.Children.IndexOf((IControl)sender));
                 MouseMove(sender, e);
             }
         }
