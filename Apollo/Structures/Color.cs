@@ -85,8 +85,10 @@ namespace Apollo.Structures {
             return (hue * 60, saturation, max);
         }
 
-        public Color FromHSV(double hue, double saturation, double value) {
-            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+        public static Color FromHSV(double hue, double saturation, double value) {
+            hue /= 60;
+
+            int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
             double f = hue - Math.Floor(hue);
             value *= 63;
 
