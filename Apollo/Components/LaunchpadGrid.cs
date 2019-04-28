@@ -27,6 +27,9 @@ namespace Apollo.Components {
         public event PadChangedEventHandler PadPressed;
         public event PadChangedEventHandler PadReleased;
 
+        public delegate void PadModsChangedEventHandler(int index, InputModifiers mods);
+        public event PadModsChangedEventHandler PadModsPressed;
+
         public static int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
         public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
@@ -137,7 +140,12 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseEnter(Shape control) => PadPressed?.Invoke(Grid.Children.IndexOf((IControl)control));
+        private void MouseEnter(Shape control, InputModifiers mods) {
+            int index = Grid.Children.IndexOf((IControl)control);
+            PadPressed?.Invoke(index);
+            PadModsPressed?.Invoke(index, mods);
+        }
+
         private void MouseLeave(Shape control) => PadReleased?.Invoke(Grid.Children.IndexOf((IControl)control));
 
         private void MouseMove(object sender, PointerEventArgs e) {
@@ -147,10 +155,10 @@ namespace Apollo.Components {
                 if (_over is Shape) {
                     Shape over = (Shape)_over;
                     
-                    if (mouseOver == null) MouseEnter(over);
+                    if (mouseOver == null) MouseEnter(over, e.InputModifiers);
                     else if (mouseOver != over) {
                         MouseLeave(mouseOver);
-                        MouseEnter(over);
+                        MouseEnter(over, e.InputModifiers);
                     }
 
                     mouseOver = over;

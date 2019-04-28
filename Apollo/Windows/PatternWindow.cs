@@ -284,10 +284,19 @@ namespace Apollo.Windows {
             ? new Color(0)
             : ColorPicker.Color;
     
-        private void PadPressed(int index) {
+        private void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
+
+            if (mods.HasFlag(InputModifiers.Control)) {
+                if (_pattern.Frames[_pattern.Expanded].Screen[signalIndex] != new Color(0)) {
+                    Color color = _pattern.Frames[_pattern.Expanded].Screen[signalIndex];
+                    ColorPicker.SetColor(color.Clone());
+                    ColorHistory.Select(color.Clone(), true);
+                }
+                return;
+            }
 
             if (_pattern.Frames[_pattern.Expanded].Screen[signalIndex] != ColorPicker.Color) Dispatcher.UIThread.InvokeAsync(() => {
                 ColorHistory.Use();

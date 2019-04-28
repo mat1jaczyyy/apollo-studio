@@ -39,7 +39,7 @@
         </ScrollViewer>
         
         <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-          <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadPressed="PadPressed" />
+          <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" />
         </Border>
         
         <Border Grid.Column="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
