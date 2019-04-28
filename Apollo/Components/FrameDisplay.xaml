@@ -9,6 +9,6 @@
       <Components:FrameThumbnail x:Name="Frame" Clicked="Clicked" />
     </StackPanel>
 
-    <Components:VerticalAdd Added="Frame_Add" />
+    <Components:VerticalAdd Added="Frame_Add" x:Name="FrameAdd" />
   </StackPanel>
 </UserControl>

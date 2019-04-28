@@ -100,6 +100,13 @@ namespace Apollo.Windows {
         }
 
         private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        
+        private void SetAlwaysShowing() {
+            for (int i = 1; i < Contents.Count; i++)
+                ((FrameDisplay)Contents[i]).FrameAdd.AlwaysShowing = false;
+
+            if (Contents.Count > 1) ((FrameDisplay)Contents.Last()).FrameAdd.AlwaysShowing = true;
+        }
 
         public void Contents_Insert(int index, Frame frame) {
             if (Contents.Count > 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
@@ -110,6 +117,7 @@ namespace Apollo.Windows {
             viewer.FrameSelected += Frame_Select;
 
             Contents.Insert(index + 1, viewer);
+            SetAlwaysShowing();
 
             if (IsArrangeValid && index <= _pattern.Expanded) _pattern.Expanded++;
         }
@@ -119,6 +127,8 @@ namespace Apollo.Windows {
             else if (index == _pattern.Expanded) Frame_Select(Math.Max(0, _pattern.Expanded - 1));
 
             Contents.RemoveAt(index + 1);
+            SetAlwaysShowing();
+
             if (_pattern.Frames.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
 

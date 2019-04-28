@@ -16,6 +16,7 @@ namespace Apollo.Components {
         Pattern _pattern;
         public FrameThumbnail Viewer;
         public Remove Remove;
+        public VerticalAdd FrameAdd;
 
         public FrameDisplay(Frame frame, Pattern pattern) {
             InitializeComponent();
@@ -26,6 +27,7 @@ namespace Apollo.Components {
             Viewer.Frame = frame;
             
             Remove = this.Get<Remove>("Remove");
+            FrameAdd = this.Get<VerticalAdd>("FrameAdd");
         }
 
         private void Frame_Add() => FrameAdded?.Invoke(_pattern.Frames.IndexOf(Viewer.Frame) + 1);
