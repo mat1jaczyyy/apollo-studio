@@ -104,7 +104,7 @@ namespace Apollo.Devices {
                         courier.Start();
                     
                     } else if (_copymode == CopyType.Interpolate) {
-                        List<(int, int)> points = new List<(int, int)>();
+                        List<(int X, int Y)> points = new List<(int, int)>();
 
                         int dx = x - px;
                         int dy = y - py;
@@ -123,7 +123,7 @@ namespace Apollo.Devices {
                         
                         for (int j = 0; j < points.Count; j++) {
                             Signal m = n.Clone();
-                            m.Index = (byte)(points[j].Item2 * 10 + points[j].Item1);
+                            m.Index = (byte)(points[j].Y * 10 + points[j].X);
 
                             Courier courier = new Courier() {
                                 Info = m,
