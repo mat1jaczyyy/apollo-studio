@@ -48,7 +48,13 @@ namespace Apollo.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                
+                (double hue, double saturation, double value) = n.Color.ToHSV();
+
+                hue = (hue + (double)Hue) % 360;
+                saturation = Math.Min(1, saturation * (double)Saturation);
+                value = Math.Min(1, value * (double)value);
+
+                n.Color = Color.FromHSV(hue, saturation, value);
             }
 
             MIDIExit?.Invoke(n);
