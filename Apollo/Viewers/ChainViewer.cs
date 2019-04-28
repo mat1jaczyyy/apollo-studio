@@ -29,18 +29,29 @@ namespace Apollo.Viewers {
         Controls Contents;
         DeviceAdd DeviceAdd;
 
+        private void SetAlwaysShowing() {
+            bool RootChain = _chain.Parent.GetType() == typeof(Track);
+
+            DeviceAdd.AlwaysShowing = (Contents.Count == 1 && RootChain);
+
+            for (int i = 1; i < Contents.Count; i++)
+                ((DeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;
+
+            if (Contents.Count > 1 && RootChain) ((DeviceViewer)Contents.Last()).DeviceAdd.AlwaysShowing = true;
+        }
+
         public void Contents_Insert(int index, Device device) {
             DeviceViewer viewer = new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
             viewer.DeviceRemoved += Device_Remove;
 
             Contents.Insert(index + 1, viewer);
-            DeviceAdd.AlwaysShowing = false;
+            SetAlwaysShowing();
         }
 
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
-            if (Contents.Count == 1) DeviceAdd.AlwaysShowing = true;
+            SetAlwaysShowing();
         }
 
         public ChainViewer(Chain chain, bool backgroundBorder = false) {

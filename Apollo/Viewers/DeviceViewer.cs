@@ -41,6 +41,7 @@ namespace Apollo.Viewers {
 
         public StackPanel Root;
         public Border Border, Header;
+        public DeviceAdd DeviceAdd;
 
         Grid Draggable;
         ContextMenu DeviceContextMenu, GroupContextMenu;
@@ -89,6 +90,8 @@ namespace Apollo.Viewers {
             Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
             Deselect();
+            
+            DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
 
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
