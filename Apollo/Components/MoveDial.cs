@@ -146,7 +146,7 @@ namespace Apollo.Components {
             }
         }
 
-        private Action InputX_Update, InputY_Update;
+        private Action InputX_Update = null, InputY_Update = null;
 
         private void InputX_Changed(string text) => X = Input_Changed(InputX, InputX_Update, X, text);
         private void InputY_Changed(string text) => Y = Input_Changed(InputY, InputY_Update, Y, text);
