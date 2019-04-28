@@ -4,18 +4,26 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
   
-  <Grid RowDefinitions="*,*">
-    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Hue" Title="Hue Shift" Minimum="-180" Maximum="180" Round="0" Unit="°" Centered="true"
+  <StackPanel Orientation="Horizontal" Spacing="10">
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+      <Components:Dial Margin="0 0 10 0" x:Name="Hue" Title="Hue ±" Minimum="-180" Maximum="180" Round="0" Unit="°" Centered="true"
                        ValueChanged="Hue_Changed" />
     </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*">
-      <Components:Dial Grid.Column="0" Width="70" x:Name="Saturation" Title="Saturation" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
-                       ValueChanged="Saturation_Changed" />
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+      <Grid RowDefinitions="*,*" Margin="0 0 10 0">
+        <Components:Dial Grid.Row="0" x:Name="SaturationHigh" Title="Sat Hi" Minimum="0" Maximum="100" Round="0" Unit="%"
+                         ValueChanged="SaturationHigh_Changed" />
+        <Components:Dial Grid.Row="1" x:Name="SaturationLow" Title="Sat Lo" Minimum="0" Maximum="100" Round="0" Unit="%"
+                         ValueChanged="SaturationLow_Changed" />
+      </Grid>
+    </Border>
       
-      <Components:Dial Grid.Column="1" x:Name="Value" Title="Value" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
-                       ValueChanged="Value_Changed" />
+    <Grid RowDefinitions="*,*">
+      <Components:Dial Grid.Row="0" x:Name="ValueHigh" Title="Val Hi" Minimum="0" Maximum="100" Round="0" Unit="%"
+                       ValueChanged="ValueHigh_Changed" />
+      <Components:Dial Grid.Row="1" x:Name="ValueLow" Title="Val Lo" Minimum="0" Maximum="100" Round="0" Unit="%"
+                       ValueChanged="ValueLow_Changed" />
     </Grid>
-  </Grid>
+  </StackPanel>
 </UserControl>
