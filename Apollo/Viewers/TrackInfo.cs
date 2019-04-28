@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Windows;
@@ -22,6 +23,7 @@ namespace Apollo.Viewers {
         
         Track _track;
         ComboBox PortSelector;
+        public TrackAdd TrackAdd;
 
         private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
 
@@ -47,6 +49,8 @@ namespace Apollo.Viewers {
             PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
+
+            TrackAdd = this.Get<TrackAdd>("TrackAdd");
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {

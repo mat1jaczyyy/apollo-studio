@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -29,6 +30,15 @@ namespace Apollo.Windows {
 
         TextBox BPM;
         HorizontalDial Page;
+        
+        private void SetAlwaysShowing() {
+            TrackAdd.AlwaysShowing = (Contents.Count == 1);
+
+            for (int i = 1; i < Contents.Count; i++)
+                ((TrackInfo)Contents[i]).TrackAdd.AlwaysShowing = false;
+
+            if (Contents.Count > 1) ((TrackInfo)Contents.Last()).TrackAdd.AlwaysShowing = true;
+        }
 
         public void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
@@ -36,12 +46,12 @@ namespace Apollo.Windows {
             viewer.TrackRemoved += Track_Remove;
 
             Contents.Insert(index + 1, viewer);
-            TrackAdd.AlwaysShowing = false;
+            SetAlwaysShowing();
         }
 
         public void Contents_Remove(int index) {
             Contents.RemoveAt(index + 1);
-            if (Contents.Count == 1) TrackAdd.AlwaysShowing = true;
+            SetAlwaysShowing();
         }
         
         public ProjectWindow() {

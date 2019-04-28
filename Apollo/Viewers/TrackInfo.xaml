@@ -12,6 +12,6 @@
       </Grid>
     </Border>
 
-    <Components:TrackAdd TrackAdded="Track_Add" />
+    <Components:TrackAdd TrackAdded="Track_Add" x:Name="TrackAdd" />
   </StackPanel>
 </UserControl>
