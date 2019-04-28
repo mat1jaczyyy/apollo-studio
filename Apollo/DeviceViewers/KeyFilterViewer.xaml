@@ -4,5 +4,5 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
 
-  <Components:LaunchpadGrid x:Name="Grid" PadPressed="PadPressed" />
+  <Components:LaunchpadGrid x:Name="Grid" PadStarted="PadStarted" PadPressed="PadPressed" />
 </UserControl>
