@@ -268,20 +268,22 @@ namespace Apollo.Windows {
             ColorHistory.Render(Launchpad);
         }
 
+        Color drawingState;
+        
+        private void PadStarted(int index) => drawingState = (_pattern.Frames[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
+            ? new Color(0)
+            : ColorPicker.Color;
+    
         private void PadPressed(int index) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (_pattern.Frames[_pattern.Expanded].Screen[signalIndex] == ColorPicker.Color)
-                _pattern.Frames[_pattern.Expanded].Screen[signalIndex] = new Color(0);
-            else {
-                _pattern.Frames[_pattern.Expanded].Screen[signalIndex] = ColorPicker.Color.Clone();
+            _pattern.Frames[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
 
-                Dispatcher.UIThread.InvokeAsync(() => {
-                    ColorHistory.Use();
-                });
-            }
+            if (_pattern.Frames[_pattern.Expanded].Screen[signalIndex] != ColorPicker.Color) Dispatcher.UIThread.InvokeAsync(() => {
+                ColorHistory.Use();
+            });
 
             SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[_pattern.Expanded].Screen[signalIndex].ToBrush();
 
@@ -305,10 +307,11 @@ namespace Apollo.Windows {
                 historyShowing = Locked = true;
                 RenderHistory();
                 
-            } else if (x == 0 && y == -1) // Down
+            } else if (x == 0 && y == -1) { // Down
+                PadStarted(-1);
                 PadPressed(-1);
                 
-            else if (x == -1 && y == 1) // Up-Left
+            } else if (x == -1 && y == 1) // Up-Left
                 PatternPlay(null, null);
                 
             else if (x == 1 && y == -1) // Down-Right
@@ -350,8 +353,11 @@ namespace Apollo.Windows {
 
                 if (n.Index == origin) {
                     if (!gestureUsed && !Locked) Dispatcher.UIThread.InvokeAsync(() => {
-                        PadPressed(LaunchpadGrid.SignalToGrid(n.Index));
+                        int index = LaunchpadGrid.SignalToGrid(n.Index);
+                        PadStarted(index);
+                        PadPressed(index);
                     });
+
                     origin = gesturePoint;
                     gesturePoint = -1;
 
