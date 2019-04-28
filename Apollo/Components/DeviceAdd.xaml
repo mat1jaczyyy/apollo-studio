@@ -21,6 +21,7 @@
       <MenuItem Header="Pattern" />
       <MenuItem Header="Preview" />
       <MenuItem Header="Rotate" />
+      <MenuItem Header="Tone" />
     </ContextMenu>
 
     <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">

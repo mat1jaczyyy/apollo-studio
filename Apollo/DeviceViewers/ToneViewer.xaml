@@ -1,0 +1,21 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.ToneViewer"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5">
+  
+  <Grid RowDefinitions="*,*">
+    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+      <Components:Dial Margin="0 0 0 5" x:Name="Hue" Title="Hue Shift" Minimum="-180" Maximum="180" Round="0" Unit="°" Centered="true"
+                       ValueChanged="Hue_Changed" />
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,*">
+      <Components:Dial Grid.Column="0" Width="70" x:Name="Saturation" Title="Saturation" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
+                       ValueChanged="Saturation_Changed" />
+      
+      <Components:Dial Grid.Column="1" x:Name="Value" Title="Value" Minimum="0" Maximum="400" Exponent="2" Round="0" Unit="%"
+                       ValueChanged="Value_Changed" />
+    </Grid>
+  </Grid>
+</UserControl>
