@@ -37,7 +37,7 @@ namespace Apollo.Components {
             get => History.Count;
         }
 
-        public static void Use(Color color) {
+        private static void Use(Color color) {
             if (History.Contains(color)) History.Remove(color);
             History.Insert(0, color);
 
@@ -67,6 +67,8 @@ namespace Apollo.Components {
         int CurrentIndex;
 
         public void Use() {
+            if (Current == new Color(0)) return;
+
             Use(Current);
 
             CurrentIndex = 0;

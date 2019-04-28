@@ -279,11 +279,11 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            _pattern.Frames[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
-
             if (_pattern.Frames[_pattern.Expanded].Screen[signalIndex] != ColorPicker.Color) Dispatcher.UIThread.InvokeAsync(() => {
                 ColorHistory.Use();
             });
+
+            _pattern.Frames[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
 
             SolidColorBrush brush = (SolidColorBrush)_pattern.Frames[_pattern.Expanded].Screen[signalIndex].ToBrush();
 
