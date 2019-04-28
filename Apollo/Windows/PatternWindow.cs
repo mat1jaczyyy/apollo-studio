@@ -233,8 +233,8 @@ namespace Apollo.Windows {
 
             if (_pattern.Frames.Count == 1) return;
 
-            Contents_Remove(index);
             _pattern.Frames.RemoveAt(index);
+            Contents_Remove(index);
         }
 
         private void Frame_Select(int index) {
