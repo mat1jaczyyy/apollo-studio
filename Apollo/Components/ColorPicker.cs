@@ -76,34 +76,11 @@ namespace Apollo.Components {
 
             if (hueHeight == 0 || mainWidth == 0 || mainHeight == 0) return;
 
-            double r = Color.Red / 63.0;
-            double g = Color.Green / 63.0;
-            double b = Color.Blue / 63.0;
-            double[] colors = new double[] {r, g, b};
+            (double hue, double saturation, double value) = Color.ToHSV();
 
-            double min = colors.Min();
-            double max = colors.Max();
-
-            double hue = 0;
-            if (min != max) {
-                double diff = max - min;
-
-                if (max == r) {
-                    hue = (g - b) / diff;
-                } else if (max == g) {
-                    hue = (b - r) / diff + 2.0;
-                } else if (max == b) {
-                    hue = (r - g) / diff + 4.0;
-                }
-                if (hue < 0) hue += 6.0;
-            }
-
-            double saturation = 0;
-            if (max != 0) saturation = 1 - (min / max);
-
-            Canvas.SetTop(HueThumb, hue * hueHeight / 6);
+            Canvas.SetTop(HueThumb, hue * hueHeight / 360);
             Canvas.SetLeft(MainThumb, saturation * mainWidth);
-            Canvas.SetTop(MainThumb, (1 - max) * mainHeight);
+            Canvas.SetTop(MainThumb, (1 - value) * mainHeight);
 
             UpdateCanvas();
             UpdateText();
@@ -116,24 +93,11 @@ namespace Apollo.Components {
         }
 
         private void UpdateColor() {
-            double hue = Canvas.GetTop(HueThumb) * 6 / HueCanvas.Bounds.Height;
+            double hue = Canvas.GetTop(HueThumb) * 360 / HueCanvas.Bounds.Height;
             double saturation = Canvas.GetLeft(MainThumb) / MainCanvas.Bounds.Width;
-            double value = (1 - (Canvas.GetTop(MainThumb) / MainCanvas.Bounds.Height)) * 63;
+            double value = (1 - (Canvas.GetTop(MainThumb) / MainCanvas.Bounds.Height));
 
-            int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
-            double f = hue - Math.Floor(hue);
-
-            byte v = Convert.ToByte(value);
-            byte p = Convert.ToByte(value * (1 - saturation));
-            byte q = Convert.ToByte(value * (1 - f * saturation));
-            byte t = Convert.ToByte(value * (1 - (1 - f) * saturation));
-
-            if (hi == 0)      Color = new Color(v, t, p);
-            else if (hi == 1) Color = new Color(q, v, p);
-            else if (hi == 2) Color = new Color(p, v, t);
-            else if (hi == 3) Color = new Color(p, q, v);
-            else if (hi == 4) Color = new Color(t, p, v);
-            else              Color = new Color(v, p, q);
+            Color = Color.FromHSV(hue, saturation, value);
 
             Preview.Fill = Color.ToBrush();
 

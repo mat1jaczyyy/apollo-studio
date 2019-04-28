@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Avalonia.Media;
@@ -53,6 +54,53 @@ namespace Apollo.Structures {
             Red = red;
             Green = green;
             Blue = blue;
+        }
+
+        public (double, double, double) ToHSV() {
+            double r = Red / 63.0;
+            double g = Green / 63.0;
+            double b = Blue / 63.0;
+            double[] colors = new double[] {r, g, b};
+
+            double min = colors.Min();
+            double max = colors.Max();
+
+            double hue = 0;
+            if (min != max) {
+                double diff = max - min;
+
+                if (max == r) {
+                    hue = (g - b) / diff;
+                } else if (max == g) {
+                    hue = (b - r) / diff + 2.0;
+                } else if (max == b) {
+                    hue = (r - g) / diff + 4.0;
+                }
+                if (hue < 0) hue += 6.0;
+            }
+
+            double saturation = 0;
+            if (max != 0) saturation = 1 - (min / max);
+
+            return (hue * 60, saturation, max);
+        }
+
+        public Color FromHSV(double hue, double saturation, double value) {
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            double f = hue - Math.Floor(hue);
+            value *= 63;
+
+            byte v = Convert.ToByte(value);
+            byte p = Convert.ToByte(value * (1 - saturation));
+            byte q = Convert.ToByte(value * (1 - f * saturation));
+            byte t = Convert.ToByte(value * (1 - (1 - f) * saturation));
+
+            if (hi == 0)      return new Color(v, t, p);
+            else if (hi == 1) return new Color(q, v, p);
+            else if (hi == 2) return new Color(p, v, t);
+            else if (hi == 3) return new Color(p, q, v);
+            else if (hi == 4) return new Color(t, p, v);
+            else              return new Color(v, p, q);
         }
 
         public override bool Equals(object obj) {
