@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Globalization;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace Apollo.Components {
     public class MoveDial: UserControl {
@@ -14,6 +19,8 @@ namespace Apollo.Components {
 
         Canvas PlaneCanvas;
         Rectangle XRect, YRect, Point;
+        TextBlock TitleText, Display;
+        TextBox InputX, InputY;
 
         private int _x = 0;
         public int X {
@@ -47,7 +54,7 @@ namespace Apollo.Components {
         public string Title {
             get => _title;
             set {
-                this.Get<TextBlock>("Title").Text = _title = value;
+                TitleText.Text = _title = value;
             }
         }
 
@@ -57,7 +64,7 @@ namespace Apollo.Components {
             Canvas.SetLeft(Point, 18 + 2 * _x);
             Canvas.SetTop(Point, 18 - 2 * _y);
 
-            this.Get<TextBlock>("Display").Text = ValueString;
+            Display.Text = ValueString;
         }
 
         private void DrawX() {
@@ -78,6 +85,17 @@ namespace Apollo.Components {
             YRect = this.Get<Rectangle>("YRect");
             Point = this.Get<Rectangle>("Point");
 
+            Display = this.Get<TextBlock>("Display");
+            TitleText = this.Get<TextBlock>("Title");
+
+            InputX = this.Get<TextBox>("InputX");
+            InputX.GetObservable(TextBox.TextProperty).Subscribe(InputX_Changed);
+            InputX.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
+
+            InputY = this.Get<TextBox>("InputY");
+            InputY.GetObservable(TextBox.TextProperty).Subscribe(InputY_Changed);
+            InputY.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
+
             DrawX();
             DrawY();
             DrawPoint();
@@ -88,6 +106,11 @@ namespace Apollo.Components {
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
+                if (e.ClickCount == 2) {
+                    DisplayPressed(sender, e);
+                    return;
+                }
+
                 mouseHeld = true;
                 e.Device.Capture(PlaneCanvas);
 
@@ -122,5 +145,100 @@ namespace Apollo.Components {
                 }
             }
         }
+
+        private Action InputX_Update, InputY_Update;
+
+        private void InputX_Changed(string text) => X = Input_Changed(InputX, InputX_Update, X, text);
+        private void InputY_Changed(string text) => Y = Input_Changed(InputY, InputY_Update, Y, text);
+
+        private int Input_Changed(TextBox Input, Action Update, int RawValue, string text) {
+            if (text == null) return RawValue;
+            if (text == "") return RawValue;
+
+            Update = () => { Input.Text = RawValue.ToString(CultureInfo.InvariantCulture); };
+
+            if (int.TryParse(text, out int value)) {
+                if (-9 <= value && value <= 9) {
+                    RawValue = value;
+                    Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                } else {
+                    Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                }
+
+                Update += () => {
+                    if (value < 0) text = $"-{text.Substring(1).TrimStart('0')}";
+                    else if (value > 0) text = text.TrimStart('0');
+                    else text = "0";
+
+                    if (value < -9) text = "-9";
+                    if (value > 9) text = "9";
+                    
+                    Input.Text = text;
+                };
+            }
+
+            if (text == "-") Update = null;
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Update?.Invoke();
+                Update = null;
+            });
+
+            return RawValue;
+        }
+
+        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+                InputX.Text = X.ToString(CultureInfo.InvariantCulture);
+                InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
+
+                Display.Opacity = 0;
+                Display.IsHitTestVisible = false;
+
+                InputX.Opacity = InputY.Opacity = 1;
+                InputX.IsHitTestVisible = InputY.IsHitTestVisible = true;
+                InputX.Focus();
+
+                e.Handled = true;
+            }
+        }
+
+        bool SkipLostFocus = false;
+        
+        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+            if (SkipLostFocus) {
+                SkipLostFocus = false;
+                return;
+            }
+
+            InputX.Text = X.ToString(CultureInfo.InvariantCulture);
+            InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
+
+            Display.Opacity = 1;
+            Display.IsHitTestVisible = true;
+
+            InputX.Opacity = InputY.Opacity = 0;
+            InputX.IsHitTestVisible = InputY.IsHitTestVisible = false;
+        }
+
+        private void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return)
+                this.Focus();
+
+            e.Handled = true;
+        }
+
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Handled = true;
+
+        private void Input_MouseDown(object sender, PointerPressedEventArgs e) {
+            TextBox Input = (TextBox)sender;
+
+            if (!Input.IsFocused) {
+                SkipLostFocus = true;
+                Input.Focus();
+            }
+        }
+
+        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }
