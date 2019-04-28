@@ -7,7 +7,8 @@
         Icon="/Resources/WindowIcon.png"
         Width="750" MinWidth="750" MaxWidth="750"
         Height="520" MinHeight="520" MaxHeight="520"
-        Opened="Loaded" Closing="Unloaded" KeyUp="KeyReleased">
+        Opened="Loaded" Closing="Unloaded"
+        KeyUp="KeyReleased" PointerPressed="Window_Focus">
   
   <Window.Styles>
     <Style Selector="Button">

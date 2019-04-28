@@ -5,8 +5,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 using Apollo.Structures;
 
@@ -37,6 +39,7 @@ namespace Apollo.Components {
         Canvas ArcCanvas;
         Path ArcBase, Arc;
         TextBlock TitleText, Display;
+        TextBox Input;
 
         private const double width = 43, height = 39;
         private const double radius = 18, stroke = 7;
@@ -265,6 +268,9 @@ namespace Apollo.Components {
             Display = this.Get<TextBlock>("Display");
             TitleText = this.Get<TextBlock>("Title");
 
+            Input = this.Get<TextBox>("Input");
+            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+
             DrawArcBase();
         }
 
@@ -318,5 +324,83 @@ namespace Apollo.Components {
                 }
             }
         }
+
+        private Action Input_Update;
+
+        private void Input_Changed(string text) {
+            if (text == null) return;
+            if (text == "") return;
+
+            Input_Update = () => { Input.Text = RawValue.ToString(CultureInfo.InvariantCulture); };
+
+            if (int.TryParse(text, out int value)) {
+                if (Minimum <= value && value <= Maximum) {
+                    RawValue = value;
+                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                } else {
+                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                }
+
+                Input_Update += () => {
+                    if (value < 0) text = $"-{text.Substring(1).TrimStart('0')}";
+                    else if (value > 0) text = text.TrimStart('0');
+                    else text = "0";
+
+                    if (Minimum >= 0) {
+                        if (value < 0) text = "0";
+
+                    } else {
+                        int lower = - (int)Math.Pow(10, ((int)Minimum).ToString().Length - 1) + 1;
+                        if (value < lower) text = lower.ToString();
+                    }
+
+                    int upper = (int)Math.Pow(10, ((int)Maximum).ToString().Length) - 1;
+                    if (value > upper) text = upper.ToString();
+                    
+                    Input.Text = text;
+                };
+            }
+
+            if (Minimum < 0 && text == "-") Input_Update = null;
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Input_Update?.Invoke();
+                Input_Update = null;
+            });
+        }
+
+        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+                Input.Text = RawValue.ToString();
+
+                Input.Opacity = 1;
+                Input.IsHitTestVisible = true;
+                Input.Focus();
+
+                e.Handled = true;
+            }
+        }
+        
+        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+            Input.Text = RawValue.ToString();
+
+            Input.Opacity = 0;
+            Input.IsHitTestVisible = false;
+        }
+
+        private void Input_KeyDown(object sender, KeyEventArgs e) {
+            lastModifiers = e.Modifiers;
+
+            if (e.Key == Key.Return) {
+                ValueModsChanged?.Invoke(_raw, lastModifiers);
+                this.Focus();
+            }
+
+            e.Handled = true;
+        }
+
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Handled = true;
+
+        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }
