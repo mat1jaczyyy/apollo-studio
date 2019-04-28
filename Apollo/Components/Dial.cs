@@ -350,12 +350,12 @@ namespace Apollo.Components {
                         if (value < 0) text = "0";
 
                     } else {
-                        int lower = - (int)Math.Pow(10, ((int)Minimum).ToString().Length - 1) + 1;
-                        if (value < lower) text = lower.ToString();
+                        int lower = - (int)Math.Pow(10, ((int)Minimum).ToString(CultureInfo.InvariantCulture).Length - 1) + 1;
+                        if (value < lower) text = lower.ToString(CultureInfo.InvariantCulture);
                     }
 
-                    int upper = (int)Math.Pow(10, ((int)Maximum).ToString().Length) - 1;
-                    if (value > upper) text = upper.ToString();
+                    int upper = (int)Math.Pow(10, ((int)Maximum).ToString(CultureInfo.InvariantCulture).Length) - 1;
+                    if (value > upper) text = upper.ToString(CultureInfo.InvariantCulture);
                     
                     Input.Text = text;
                 };
@@ -371,7 +371,7 @@ namespace Apollo.Components {
 
         private void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
-                Input.Text = RawValue.ToString();
+                Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
@@ -382,7 +382,7 @@ namespace Apollo.Components {
         }
         
         private void Input_LostFocus(object sender, RoutedEventArgs e) {
-            Input.Text = RawValue.ToString();
+            Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
