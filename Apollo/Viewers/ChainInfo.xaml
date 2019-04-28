@@ -9,6 +9,6 @@
       <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Name" Cursor="Hand" PointerReleased="Clicked" />
     </Grid>
 
-    <Components:VerticalAdd Added="Chain_Add" />
+    <Components:VerticalAdd Added="Chain_Add" x:Name="ChainAdd" />
   </StackPanel>
 </UserControl>

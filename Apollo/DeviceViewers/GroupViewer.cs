@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -22,6 +24,15 @@ namespace Apollo.DeviceViewers {
         Controls Contents;
         VerticalAdd ChainAdd;
 
+        private void SetAlwaysShowing() {
+            ChainAdd.AlwaysShowing = (Contents.Count == 1);
+
+            for (int i = 1; i < Contents.Count; i++)
+                ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
+
+            if (Contents.Count > 1) ((ChainInfo)Contents.Last()).ChainAdd.AlwaysShowing = true;
+        }
+
         public void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);
             viewer.ChainAdded += Chain_Insert;
@@ -29,7 +40,7 @@ namespace Apollo.DeviceViewers {
             viewer.ChainExpanded += Expand;
 
             Contents.Insert(index + 1, viewer);
-            ChainAdd.AlwaysShowing = false;
+            SetAlwaysShowing();
 
             if (IsArrangeValid && _group.Expanded != null && index <= _group.Expanded) _group.Expanded++;
         }
@@ -41,7 +52,7 @@ namespace Apollo.DeviceViewers {
             }
 
             Contents.RemoveAt(index + 1);
-            if (Contents.Count == 1) ChainAdd.AlwaysShowing = true;
+            SetAlwaysShowing();
         }
 
         public GroupViewer(Group group, DeviceViewer parent) {

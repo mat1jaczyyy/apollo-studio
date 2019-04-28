@@ -2,6 +2,7 @@
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Components;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
@@ -16,6 +17,7 @@ namespace Apollo.Viewers {
         public event ChainExpandedEventHandler ChainExpanded;
 
         Chain _chain;
+        public VerticalAdd ChainAdd;
 
         private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Chain {index + 1}";
         
@@ -23,6 +25,8 @@ namespace Apollo.Viewers {
             InitializeComponent();
             
             _chain = chain;
+
+            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
             
             UpdateText(_chain.ParentIndex.Value);
             _chain.ParentIndexChanged += UpdateText;
