@@ -25,7 +25,10 @@ namespace Apollo.Devices {
 
         public Chain Preprocess;
         private List<Chain> _chains = new List<Chain>();
-        
+
+        public Random RNG = new Random();
+        public bool Random;
+
         private int current = -1;
         private Dictionary<int, int>[] buffer = new Dictionary<int, int>[100];
 
@@ -48,7 +51,7 @@ namespace Apollo.Devices {
             get => _chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in _chains select i.Clone()).ToList(), Expanded);
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in _chains select i.Clone()).ToList(), Random, Expanded);
 
         public void Insert(int index, Chain chain = null) {
             _chains.Insert(index, chain?? new Chain());
@@ -72,10 +75,12 @@ namespace Apollo.Devices {
 
         public int? Expanded;
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
+        public Multi(Chain preprocess = null, List<Chain> init = null, bool random = false, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
+
+            Random = random;
             
             Expanded = expanded;
 
@@ -91,7 +96,9 @@ namespace Apollo.Devices {
 
         public override void MIDIEnter(Signal n) {
             if (n.Color.Lit) {
-                if (++current >= _chains.Count) current = 0;
+                if (Random) current = RNG.Next(_chains.Count);
+                else if (++current >= _chains.Count) current = 0;
+                
                 n.MultiTarget = current;
                 buffer[n.Index][n.Layer] = n.MultiTarget.Value;
 
@@ -137,6 +144,7 @@ namespace Apollo.Devices {
             return new Multi(
                 Chain.Decode(data["preprocess"].ToString()),
                 init,
+                Convert.ToBoolean(data["random"].ToString()),
                 int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null
             );
         }
@@ -163,6 +171,9 @@ namespace Apollo.Devices {
                                 writer.WriteRawValue(_chains[i].Encode());
 
                         writer.WriteEndArray();
+
+                        writer.WritePropertyName("random");
+                        writer.WriteValue(Random);
 
                         writer.WritePropertyName("expanded");
                         writer.WriteValue(Expanded);

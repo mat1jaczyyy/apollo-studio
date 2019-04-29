@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -20,7 +21,9 @@ namespace Apollo.DeviceViewers {
         Multi _multi;
         DeviceViewer _parent;
         Controls _root;
+
         Controls Contents;
+        CheckBox Random;
         VerticalAdd ChainAdd;
 
         private void SetAlwaysShowing() {
@@ -63,6 +66,10 @@ namespace Apollo.DeviceViewers {
             _parent = parent;
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
+
+            Random = this.Get<CheckBox>("Random");
+            Random.IsChecked = _multi.Random;
+            Random_Changed(null, EventArgs.Empty);
 
             _root = _parent.Root.Children;
             _root.Insert(0, new DeviceHead(parent));
@@ -126,5 +133,7 @@ namespace Apollo.DeviceViewers {
             Contents_Remove(index);
             _multi.Remove(index);
         }
+
+        private void Random_Changed(object sender, EventArgs e) => _multi.Random = Random.IsChecked.Value;
     }
 }

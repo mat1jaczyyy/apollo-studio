@@ -3,9 +3,15 @@
              x:Class="Apollo.DeviceViewers.MultiViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-    <StackPanel x:Name="Contents" Margin="10 5">
-      <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" x:Name="ChainAdd" />
-    </StackPanel>
-  </ScrollViewer>
+  <Grid RowDefinitions="*,Auto">
+    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+      <StackPanel x:Name="Contents" Margin="10 5">
+        <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" x:Name="ChainAdd" />
+      </StackPanel>
+    </ScrollViewer>
+  
+    <Border Grid.Row="1" Margin="10 0 10 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+      <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Random" Click="Random_Changed">Random</CheckBox>
+    </Border>
+  </Grid>
 </UserControl>
