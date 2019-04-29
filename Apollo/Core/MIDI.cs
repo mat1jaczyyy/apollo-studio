@@ -16,6 +16,8 @@ namespace Apollo.Core {
         public delegate void DevicesUpdatedEventHandler();
         public static event DevicesUpdatedEventHandler DevicesUpdated;
 
+        public static void DoneIdentifying() => DevicesUpdated?.Invoke();
+
         public static List<Launchpad> Devices = new List<Launchpad>();
         private static Courier courier = new Courier() { Interval = 100 };
         private static bool started = false;

@@ -10,6 +10,7 @@ using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -24,7 +25,7 @@ namespace Apollo.Windows {
 
         private void UpdatePorts() {
             Contents.Clear();
-            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available select new LaunchpadInfo(i))) {
+            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new LaunchpadInfo(i))) {
                 Contents.Add(control);
             }
         }

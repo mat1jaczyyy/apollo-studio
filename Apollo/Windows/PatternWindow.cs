@@ -91,8 +91,8 @@ namespace Apollo.Windows {
         private void UpdateTopmost(bool value) => Topmost = value;
 
         private void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available select i).ToList();
-            if (Launchpad != null && !Launchpad.Available) ports.Add(Launchpad);
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
+            if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(Launchpad);
 
             PortSelector.Items = ports;
             PortSelector.SelectedIndex = -1;

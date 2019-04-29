@@ -28,8 +28,8 @@ namespace Apollo.Viewers {
         private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
 
         private void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available select i).ToList();
-            if (_track.Launchpad != null && !_track.Launchpad.Available) ports.Add(_track.Launchpad);
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
+            if (_track.Launchpad != null && (!_track.Launchpad.Available || _track.Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(_track.Launchpad);
 
             PortSelector.Items = ports;
             PortSelector.SelectedIndex = -1;

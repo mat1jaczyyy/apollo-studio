@@ -24,7 +24,7 @@ namespace Apollo.Elements {
 
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
-        private LaunchpadType Type = LaunchpadType.Unknown;
+        public LaunchpadType Type { get; private set; } = LaunchpadType.Unknown;
         public InputType InputFormat = InputType.XY;
 
         public string Name { get; private set; }
@@ -75,6 +75,8 @@ namespace Apollo.Elements {
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
                 Input.ControlChange += ControlChange;
+
+                MIDI.DoneIdentifying();
             }
         }
 
@@ -103,7 +105,7 @@ namespace Apollo.Elements {
             Send(new Signal(this, 99, new Color(0)));
         }
 
-        public void Render(Signal n) => screen[n.Index].MIDIEnter(n);
+        public void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);
 
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
             Input = input.CreateDevice();
