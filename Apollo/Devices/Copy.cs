@@ -213,7 +213,7 @@ namespace Apollo.Devices {
                             Signal m = n.Clone();
                             m.Index = (byte)(points[j].Y * 10 + points[j].X);
 
-                            FireCourier(m, (int)((Mode? (int)Length : _rate) * _gate * (i + ((decimal)j + 1) / points.Count)));
+                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * ++time);
                         }
                     }
 
