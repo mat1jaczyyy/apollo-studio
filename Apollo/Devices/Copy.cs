@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,8 +17,12 @@ namespace Apollo.Devices {
         public enum CopyType {
             Static,
             Animate,
-            Interpolate
+            Interpolate,
+            RandomSingle,
+            RandomLoop
         }
+        
+        private Random RNG = new Random();
 
         public bool Mode; // true uses Length
         public Length Length;
@@ -44,9 +49,24 @@ namespace Apollo.Devices {
         }
 
         public string CopyMode {
-            get => _copymode.ToString();
-            set => _copymode = Enum.Parse<CopyType>(value);
+            get {
+                if (_copymode == CopyType.Static) return "Static";
+                else if (_copymode == CopyType.Animate) return "Animate";
+                else if (_copymode == CopyType.Interpolate) return "Interpolate";
+                else if (_copymode == CopyType.RandomSingle) return "Random Single";
+                else if (_copymode == CopyType.RandomLoop) return "Random Loop";
+                return null;
+            }
+            set {
+                if (value == "Static") _copymode = CopyType.Static;
+                else if (value == "Animate") _copymode = CopyType.Animate;
+                else if (value == "Interpolate") _copymode = CopyType.Interpolate;
+                else if (value == "Random Single") _copymode = CopyType.RandomSingle;
+                else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
+            }
         }
+
+        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
 
         public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, Loop, (from i in Offsets select i.Clone()).ToList());
 
@@ -74,6 +94,8 @@ namespace Apollo.Devices {
             int px = ox;
             int py = oy;
 
+            List<int> validOffsets = new List<int>() {n.Index};
+
             for (int i = 0; i < Offsets.Count; i++) {
                 int x = ox + Offsets[i].X;
                 int y = oy + Offsets[i].Y;
@@ -86,6 +108,8 @@ namespace Apollo.Devices {
                 int result = y * 10 + x;
                     
                 if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
+                    validOffsets.Add(result);
+
                     if (_copymode == CopyType.Static) {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
@@ -141,7 +165,25 @@ namespace Apollo.Devices {
                 }
             }
 
-            MIDIExit?.Invoke(n);
+            if (_copymode == CopyType.RandomSingle) {
+                Signal m = n.Clone();
+                n.Color = new Color();
+
+                if (!buffer.ContainsKey(n)) {
+                    if (!m.Color.Lit) return;
+                    buffer[n] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
+
+                } else {
+                    m.Index = (byte)buffer[n];
+                    if (!m.Color.Lit) buffer.Remove(n, out int _);
+                }
+
+                MIDIExit?.Invoke(m);
+
+            } else if (_copymode == CopyType.RandomLoop) {
+                
+            
+            } else MIDIExit?.Invoke(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {
