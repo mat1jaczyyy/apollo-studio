@@ -134,8 +134,15 @@ namespace Apollo.Devices {
                     o.Color = new Color(0);
                     MIDIExit?.Invoke(o);
 
-                    if (m.Color.Lit) buffer[n] = m.Index = (byte)offsets[RNG.Next(offsets.Count)];
-                    else buffer.Remove(n, out int _);
+                    if (m.Color.Lit) {
+                        if (offsets.Count > 1) {
+                            int old = buffer[n];
+                            buffer[n] = offsets[RNG.Next(offsets.Count - 1)];
+                            if (buffer[n] >= old) buffer[n]++;
+                        }
+                        m.Index = (byte)buffer[n];
+                    
+                    } else buffer.Remove(n, out int _);
                 }
 
                 MIDIExit?.Invoke(m);
