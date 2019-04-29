@@ -140,6 +140,18 @@ namespace Apollo.Devices {
             Generate();
         }
 
+        private void FireCourier(Signal n, int time) {
+            Courier courier;
+
+            _timers[n].Add(courier = new Courier() {
+                Info = n,
+                AutoReset = false,
+                Interval = time,
+            });
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
         private void Tick(object sender, EventArgs e) {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
@@ -161,43 +173,30 @@ namespace Apollo.Devices {
             if (_colors.Count > 0 && n.Color.Lit) {
                 n.Color = new Color();
 
-                if (_timers.ContainsKey(n))
-                    for (int i = 0; i < _timers[n].Count; i++)
-                        _timers[n][i].Dispose();
-
-                _timers[n] = new List<Courier>();
-                _indexes[n] = 0;
-
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
-                Signal m = n.Clone();
-                m.Color = _steps[0].Clone();
-                MIDIExit?.Invoke(m);
-                
-                Courier courier;
+                lock (locker[n]) {
+                    if (_timers.ContainsKey(n))
+                        for (int i = 0; i < _timers[n].Count; i++)
+                            _timers[n][i].Dispose();
 
-                int j = 0;
-                for (int i = 1; i < _steps.Count; i++) {
-                    if (_cutoffs[j + 1] == i) j++;
+                    _timers[n] = new List<Courier>();
+                    _indexes[n] = 0;
+                    
+                    Signal m = n.Clone();
+                    m.Color = _steps[0].Clone();
+                    MIDIExit?.Invoke(m);
+                    
+                    int j = 0;
+                    for (int i = 1; i < _steps.Count; i++) {
+                        if (_cutoffs[j + 1] == i) j++;
 
-                    if (j < _colors.Count - 1) {
-                        _timers[n].Add(courier = new Courier() {
-                            Info = n,
-                            AutoReset = false,
-                            Interval = (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
-                        });
-                        courier.Elapsed += Tick;
-                        courier.Start();
+                        if (j < _colors.Count - 1)
+                            FireCourier(n, (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate));
                     }
-                }
 
-                _timers[n].Add(courier = new Courier() {
-                    Info = n,
-                    AutoReset = false,
-                    Interval = (int)((Mode? (int)Length : _time) * _gate),
-                });
-                courier.Elapsed += Tick;
-                courier.Start();
+                    FireCourier(n, (int)((Mode? (int)Length : _time) * _gate));
+                }
             }
         }
 
