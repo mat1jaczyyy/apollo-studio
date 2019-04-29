@@ -33,7 +33,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Delay(Mode, Length, _time, _gate);
+        public override Device Clone() => new Delay(Mode, Length.Clone(), _time, _gate);
 
         public Delay(bool mode = false, Length length = null, int time = 1000, decimal gate = 1): base(DeviceIdentifier) {
             Mode = mode;

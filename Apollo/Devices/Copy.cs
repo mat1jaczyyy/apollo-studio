@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -47,7 +48,7 @@ namespace Apollo.Devices {
             set => _copymode = Enum.Parse<CopyType>(value);
         }
 
-        public override Device Clone() => new Copy(Mode, Length, _rate, _gate, _copymode, Loop, Offsets);
+        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, Loop, (from i in Offsets select i.Clone()).ToList());
 
         public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Mode = mode;

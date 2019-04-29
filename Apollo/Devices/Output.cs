@@ -43,7 +43,7 @@ namespace Apollo.Devices {
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
 
-        public override Device Clone() => new Output {Parent = new Chain()};
+        public override Device Clone() => new Output(Target);
 
         public Output(int target = -1): base(DeviceIdentifier) {
             if (target < 0) target = Track.Get(this).ParentIndex.Value;

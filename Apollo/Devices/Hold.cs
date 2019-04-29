@@ -35,7 +35,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Hold(Mode, Length, _time, _gate, Infinite, Release);
+        public override Device Clone() => new Hold(Mode, Length.Clone(), _time, _gate, Infinite, Release);
 
         public Hold(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, bool infinite = false, bool release = false): base(DeviceIdentifier) {
             Mode = mode;

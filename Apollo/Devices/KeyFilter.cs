@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace Apollo.Devices {
 
         private bool[] _filter;
 
-        public override Device Clone() => new KeyFilter(_filter);
+        public override Device Clone() => new KeyFilter(_filter.ToArray());
 
         public bool this[int index] {
             get => _filter[index];

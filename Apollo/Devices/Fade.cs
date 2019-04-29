@@ -113,7 +113,7 @@ namespace Apollo.Devices {
             get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(Mode, Length, _time, _gate, _colors, _positions);
+        public override Device Clone() => new Fade(Mode, Length.Clone(), _time, _gate, (from i in _colors select i.Clone()).ToList(), _positions.ToList());
 
         public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
