@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,10 @@ namespace Apollo.Devices {
         public PatternWindow Window;
         
         public List<Frame> Frames;
+
+        private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
+        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
         private decimal _gate;
         public decimal Gate {
@@ -41,12 +46,14 @@ namespace Apollo.Devices {
             Expanded = expanded;
         }
 
-        private void FireCourier(Signal n, Color color, byte index, int time) {
-            Courier courier = new Courier() {
-                Info = new Signal(n.Source, (byte)index, color, n.Layer, n.MultiTarget),
+        private void FireCourier(Signal n, int time) {
+            Courier courier;
+
+            _timers[n].Add(courier = new Courier() {
+                Info = n,
                 AutoReset = false,
                 Interval = time,
-            };
+            });
             courier.Elapsed += Tick;
             courier.Start();
         }
@@ -55,28 +62,48 @@ namespace Apollo.Devices {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
             
-            MIDIExit?.Invoke((Signal)courier.Info);
+            if (courier.Info.GetType() == typeof(Signal)) {
+                Signal n = (Signal)courier.Info;
+
+                lock (locker[n]) {
+                    if (++_indexes[n] < Frames.Count) {
+                        for (int i = 0; i < Frames[_indexes[n]].Screen.Length; i++)
+                            if (Frames[_indexes[n]].Screen[i] != Frames[_indexes[n] - 1].Screen[i])
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[_indexes[n]].Screen[i].Clone(), n.Layer, n.MultiTarget));
+                    } else
+                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                            if (Frames.Last().Screen[i].Lit)
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
+                }
+            }
         }
 
         public override void MIDIEnter(Signal n) {
             if (Frames.Count > 0 && n.Color.Lit) {
-                for (int i = 0; i < Frames[0].Screen.Length; i++)
-                    if (Frames[0].Screen[i].Lit)
-                        MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
+                n.Index = 11;
+                n.Color = new Color();
+
+                if (!locker.ContainsKey(n)) locker[n] = new object();
                 
-                decimal time = (Frames[0].Mode? (int)Frames[0].Length : Frames[0].Time) * _gate;
+                lock (locker[n]) {
+                    if (_timers.ContainsKey(n))
+                        for (int i = 0; i < _timers[n].Count; i++)
+                            _timers[n][i].Dispose();
 
-                for (int i = 1; i < Frames.Count; i++) {
-                    for (int j = 0; j < Frames[i].Screen.Length; j++)
-                        if (Frames[i].Screen[j] != Frames[i - 1].Screen[j])
-                            FireCourier(n, Frames[i].Screen[j].Clone(), (byte)j, (int)time);
+                    _timers[n] = new List<Courier>();
+                    _indexes[n] = 0;
 
-                    time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
+                    for (int i = 0; i < Frames[0].Screen.Length; i++)
+                        if (Frames[0].Screen[i].Lit)
+                            MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
+                    
+                    decimal time = 0;
+
+                    for (int i = 0; i < Frames.Count; i++) {
+                        time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
+                        FireCourier(n, (int)time);
+                    }
                 }
-                
-                for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                    if (Frames.Last().Screen[i].Lit)
-                        FireCourier(n, new Color(0), (byte)i, (int)time);
             }
         }
 
