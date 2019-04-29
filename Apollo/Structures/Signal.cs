@@ -48,7 +48,7 @@ namespace Apollo.Structures {
             return this == (Signal)obj;
         }
 
-        public static bool operator ==(Signal a, Signal b) => a.Source.Equals(b.Source) && a.Index == b.Index && a.Color == b.Color && a.Layer == b.Layer && a.MultiTarget == b.MultiTarget;
+        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && a.Index == b.Index && a.Color == b.Color && a.Layer == b.Layer && a.MultiTarget == b.MultiTarget;
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Layer, MultiTarget);
