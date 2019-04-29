@@ -175,7 +175,7 @@ namespace Apollo.Devices {
                 }
 
                 int result = y * 10 + x;
-                    
+                
                 if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
                     validOffsets.Add(result);
 
@@ -190,36 +190,42 @@ namespace Apollo.Devices {
                         m.Index = (byte)result;
 
                         FireCourier(m, (Mode? (int)Length : _rate) * _gate * (i + 1));
+                    }
+                }
+
+                if (_copymode == CopyType.Interpolate) {
+                    List<(int X, int Y)> points = new List<(int, int)>();
+
+                    int dx = x - px;
+                    int dy = y - py;
+
+                    int ax = Math.Abs(dx);
+                    int ay = Math.Abs(dy);
+
+                    int bx = (dx < 0)? -1 : 1;
+                    int by = (dy < 0)? -1 : 1;
+
+                    if (ax > ay) for (int j = 1; j <= ax; j++)
+                        points.Add((px + j * bx, py + (int)Math.Round((double)j / ax * ay) * by));
+
+                    else for (int j = 1; j <= ay; j++)
+                        points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
                     
-                    } else if (_copymode == CopyType.Interpolate) {
-                        List<(int X, int Y)> points = new List<(int, int)>();
-
-                        int dx = x - px;
-                        int dy = y - py;
-
-                        int ax = Math.Abs(dx);
-                        int ay = Math.Abs(dy);
-
-                        int bx = (dx < 0)? -1 : 1;
-                        int by = (dy < 0)? -1 : 1;
-
-                        if (ax > ay) for (int j = 1; j <= ax; j++)
-                            points.Add((px + j * bx, py + (int)Math.Round((double)j / ax * ay) * by));
-
-                        else for (int j = 1; j <= ay; j++)
-                            points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
+                    foreach ((int ix, int iy) in points) {
+                        int iresult = iy * 10 + ix;
+                        time++;
                         
-                        for (int j = 0; j < points.Count; j++) {
+                        if (0 <= ix && ix <= 9 && 0 <= iy && iy <= 9 && 1 <= iresult && iresult <= 99 && iresult != 9 && iresult != 90) {
                             Signal m = n.Clone();
-                            m.Index = (byte)(points[j].Y * 10 + points[j].X);
+                            m.Index = (byte)(iy * 10 + ix);
 
-                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * ++time);
+                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
                         }
                     }
-
-                    px = x;
-                    py = y;
                 }
+
+                px = x;
+                py = y;
             }
 
             if (_copymode == CopyType.RandomSingle) {
