@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -26,11 +27,11 @@ namespace Apollo.Devices {
         public Chain Preprocess;
         private List<Chain> _chains = new List<Chain>();
 
-        public Random RNG = new Random();
+        private Random RNG = new Random();
         public bool Random;
 
         private int current = -1;
-        private Dictionary<int, int>[] buffer = new Dictionary<int, int>[100];
+        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
 
         private void Reroute() {
             Preprocess.Parent = this;
@@ -83,9 +84,6 @@ namespace Apollo.Devices {
             Random = random;
             
             Expanded = expanded;
-
-            for (int i = 0; i < 100; i++)
-                buffer[i] = new Dictionary<int, int>();
             
             Launchpad.MultiReset += Reset;
 
@@ -95,20 +93,23 @@ namespace Apollo.Devices {
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
-            if (n.Color.Lit) {
+            Signal m = n.Clone();
+            n.Color = new Color();
+
+            if (!buffer.ContainsKey(n)) {
+                if (!m.Color.Lit) return;
+
                 if (Random) current = RNG.Next(_chains.Count);
                 else if (++current >= _chains.Count) current = 0;
-                
-                n.MultiTarget = current;
-                buffer[n.Index][n.Layer] = n.MultiTarget.Value;
 
-            } else if (buffer[n.Index].ContainsKey(n.Layer)) {
-                n.MultiTarget = buffer[n.Index][n.Layer];
-                buffer[n.Index].Remove(n.Layer);
-            
-            } else return;
+                m.MultiTarget = buffer[n] = current;
 
-            Preprocess.MIDIEnter(n);
+            } else {
+                m.MultiTarget = buffer[n];
+                if (!m.Color.Lit) buffer.Remove(n, out int _);
+            }
+
+            Preprocess.MIDIEnter(m);
         }
 
         private void PreprocessExit(Signal n) {
