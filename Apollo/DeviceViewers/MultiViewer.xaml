@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.MultiViewer"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components">
   
   <Grid RowDefinitions="*,Auto">
@@ -11,7 +12,12 @@
     </ScrollViewer>
   
     <Border Grid.Row="1" Margin="10 0 10 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-      <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Random" Click="Random_Changed">Random</CheckBox>
+      <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+        <sys:String>Forward</sys:String>
+        <sys:String>Backward</sys:String>
+        <sys:String>Random</sys:String>
+        <sys:String>Random+</sys:String>
+      </ComboBox>
     </Border>
   </Grid>
 </UserControl>

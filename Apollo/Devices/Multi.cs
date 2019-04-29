@@ -28,7 +28,30 @@ namespace Apollo.Devices {
         private List<Chain> _chains = new List<Chain>();
 
         private Random RNG = new Random();
-        public bool Random;
+        
+        public enum MultiType {
+            Forward,
+            Backward,
+            Random,
+            RandomPlus
+        }
+
+        private MultiType _mode;
+        public string Mode {
+            get {
+                if (_mode == MultiType.Forward) return "Forward";
+                else if (_mode == MultiType.Backward) return "Backward";
+                else if (_mode == MultiType.Random) return "Random";
+                else if (_mode == MultiType.RandomPlus) return "Random+";
+                return null;
+            }
+            set {
+                if (value == "Forward") _mode = MultiType.Forward;
+                else if (value == "Backward") _mode = MultiType.Backward;
+                else if (value == "Random") _mode = MultiType.Random;
+                else if (value == "Random+") _mode = MultiType.RandomPlus;
+            }
+        }
 
         private int current = -1;
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
@@ -52,7 +75,7 @@ namespace Apollo.Devices {
             get => _chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in _chains select i.Clone()).ToList(), Random, Expanded);
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in _chains select i.Clone()).ToList(), _mode, Expanded);
 
         public void Insert(int index, Chain chain = null) {
             _chains.Insert(index, chain?? new Chain());
@@ -76,12 +99,12 @@ namespace Apollo.Devices {
 
         public int? Expanded;
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, bool random = false, int? expanded = null): base(DeviceIdentifier) {
+        public Multi(Chain preprocess = null, List<Chain> init = null, MultiType mode = MultiType.Forward, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
 
-            Random = random;
+            _mode = mode;
             
             Expanded = expanded;
             
@@ -99,8 +122,20 @@ namespace Apollo.Devices {
             if (!buffer.ContainsKey(n)) {
                 if (!m.Color.Lit) return;
 
-                if (Random) current = RNG.Next(_chains.Count);
-                else if (++current >= _chains.Count) current = 0;
+                if (_mode == MultiType.Forward) {
+                    if (++current >= _chains.Count) current = 0;
+                
+                } else if (_mode == MultiType.Backward) {
+                    if (--current < 0) current = _chains.Count - 1;
+                
+                } else if (_mode == MultiType.Random || current == -1)
+                    current = RNG.Next(_chains.Count);
+                
+                else if (_mode == MultiType.RandomPlus) {
+                    int old = current;
+                    current = RNG.Next(_chains.Count - 1);
+                    if (current >= old) current++;
+                }
 
                 m.MultiTarget = buffer[n] = current;
 
@@ -145,7 +180,7 @@ namespace Apollo.Devices {
             return new Multi(
                 Chain.Decode(data["preprocess"].ToString()),
                 init,
-                Convert.ToBoolean(data["random"].ToString()),
+                Enum.Parse<MultiType>(data["mode"].ToString()),
                 int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null
             );
         }
@@ -173,8 +208,8 @@ namespace Apollo.Devices {
 
                         writer.WriteEndArray();
 
-                        writer.WritePropertyName("random");
-                        writer.WriteValue(Random);
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(Mode);
 
                         writer.WritePropertyName("expanded");
                         writer.WriteValue(Expanded);

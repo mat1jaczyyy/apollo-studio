@@ -23,7 +23,7 @@ namespace Apollo.DeviceViewers {
         Controls _root;
 
         Controls Contents;
-        CheckBox Random;
+        ComboBox ComboBox;
         VerticalAdd ChainAdd;
 
         private void SetAlwaysShowing() {
@@ -67,9 +67,9 @@ namespace Apollo.DeviceViewers {
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
 
-            Random = this.Get<CheckBox>("Random");
-            Random.IsChecked = _multi.Random;
-            Random_Changed(null, EventArgs.Empty);
+            ComboBox = this.Get<ComboBox>("ComboBox");
+            ComboBox.SelectedItem = _multi.Mode;
+            Mode_Changed(null, null);
 
             _root = _parent.Root.Children;
             _root.Insert(0, new DeviceHead(parent));
@@ -134,6 +134,6 @@ namespace Apollo.DeviceViewers {
             _multi.Remove(index);
         }
 
-        private void Random_Changed(object sender, EventArgs e) => _multi.Random = Random.IsChecked.Value;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)ComboBox.SelectedItem;
     }
 }
