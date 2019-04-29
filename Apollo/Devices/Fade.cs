@@ -140,13 +140,13 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private void FireCourier(Signal n, int time) {
+        private void FireCourier(Signal n, decimal time) {
             Courier courier;
 
             _timers[n].Add(courier = new Courier() {
                 Info = n,
                 AutoReset = false,
-                Interval = time,
+                Interval = (double)time,
             });
             courier.Elapsed += Tick;
             courier.Start();
@@ -192,10 +192,10 @@ namespace Apollo.Devices {
                         if (_cutoffs[j + 1] == i) j++;
 
                         if (j < _colors.Count - 1)
-                            FireCourier(n, (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate));
+                            FireCourier(n, (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate);
                     }
 
-                    FireCourier(n, (int)((Mode? (int)Length : _time) * _gate));
+                    FireCourier(n, (Mode? (int)Length : _time) * _gate);
                 }
             }
         }

@@ -437,20 +437,20 @@ namespace Apollo.Windows {
 
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
 
-        private void FireCourier(Color color, byte index, int time) {
+        private void FireCourier(Color color, byte index, decimal time) {
             Courier courier = new Courier() {
                 Info = new Signal(_track.Launchpad, (byte)index, color.Clone()),
                 AutoReset = false,
-                Interval = time,
+                Interval = (double)time,
             };
             courier.Elapsed += Tick;
             courier.Start();
         }
 
-        private void FireStopCourier(int time) {
+        private void FireStopCourier(decimal time) {
             Courier courier = new Courier() {
                 AutoReset = false,
-                Interval = time,
+                Interval = (double)time,
             };
             courier.Elapsed += Tick;
             courier.Start();
@@ -504,12 +504,12 @@ namespace Apollo.Windows {
             for (int i = 1; i < _pattern.Frames.Count; i++) {
                 for (int j = 0; j < _pattern.Frames[i].Screen.Length; j++)
                     if (_pattern.Frames[i].Screen[j] != _pattern.Frames[i - 1].Screen[j])
-                        FireCourier(_pattern.Frames[i].Screen[j], (byte)j, (int)time);
+                        FireCourier(_pattern.Frames[i].Screen[j], (byte)j, time);
 
                 time += (_pattern.Frames[i].Mode? (int)_pattern.Frames[i].Length : _pattern.Frames[i].Time) * _pattern.Gate;
             }
             
-            FireStopCourier((int)time);
+            FireStopCourier(time);
         }
 
         private void PatternFire(object sender, RoutedEventArgs e) {

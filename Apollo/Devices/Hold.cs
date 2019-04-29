@@ -59,7 +59,7 @@ namespace Apollo.Devices {
                     Courier courier = new Courier() {
                         Info = new Signal(Track.Get(this).Launchpad, n.Index, new Color(0), n.Layer),
                         AutoReset = false,
-                        Interval = Convert.ToInt32((Mode? (int)Length : _time) * _gate),
+                        Interval = (double)((Mode? (int)Length : _time) * _gate),
                     };
                     courier.Elapsed += Tick;
                     courier.Start();

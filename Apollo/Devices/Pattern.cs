@@ -46,13 +46,13 @@ namespace Apollo.Devices {
             Expanded = expanded;
         }
 
-        private void FireCourier(Signal n, int time) {
+        private void FireCourier(Signal n, decimal time) {
             Courier courier;
 
             _timers[n].Add(courier = new Courier() {
                 Info = n,
                 AutoReset = false,
-                Interval = time,
+                Interval = (double)time,
             });
             courier.Elapsed += Tick;
             courier.Start();
@@ -101,7 +101,7 @@ namespace Apollo.Devices {
 
                     for (int i = 0; i < Frames.Count; i++) {
                         time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
-                        FireCourier(n, (int)time);
+                        FireCourier(n, time);
                     }
                 }
             }

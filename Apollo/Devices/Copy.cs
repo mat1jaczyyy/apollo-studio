@@ -82,21 +82,21 @@ namespace Apollo.Devices {
             Offsets = offsets?? new List<Offset>();
         }
 
-        private void FireCourier(Signal n, int time) {
+        private void FireCourier(Signal n, decimal time) {
             Courier courier = new Courier() {
                 Info = n,
                 AutoReset = false,
-                Interval = time
+                Interval = (double)time
             };
             courier.Elapsed += Tick;
             courier.Start();
         }
 
-        private void FireCourier((Signal n, List<int>) info, int time) {
+        private void FireCourier((Signal n, List<int>) info, decimal time) {
             Courier courier = timers[info.n] = new Courier() {
                 Info = info,
                 AutoReset = false,
-                Interval = time
+                Interval = (double)time
             };
             courier.Elapsed += Tick;
             courier.Start();
@@ -147,7 +147,7 @@ namespace Apollo.Devices {
 
                 MIDIExit?.Invoke(m);
 
-                if (buffer.ContainsKey(n)) FireCourier((original, offsets), (int)((Mode? (int)Length : _rate) * _gate));
+                if (buffer.ContainsKey(n)) FireCourier((original, offsets), (Mode? (int)Length : _rate) * _gate);
                 else {
                     timers[n].Dispose();
                     timers.Remove(n, out Courier _);
@@ -163,6 +163,7 @@ namespace Apollo.Devices {
             int py = oy;
 
             List<int> validOffsets = new List<int>() {n.Index};
+            int time = 0;
 
             for (int i = 0; i < Offsets.Count; i++) {
                 int x = ox + Offsets[i].X;
@@ -188,7 +189,7 @@ namespace Apollo.Devices {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
 
-                        FireCourier(m, (int)((Mode? (int)Length : _rate) * _gate * (i + 1)));
+                        FireCourier(m, (Mode? (int)Length : _rate) * _gate * (i + 1));
                     
                     } else if (_copymode == CopyType.Interpolate) {
                         List<(int X, int Y)> points = new List<(int, int)>();
