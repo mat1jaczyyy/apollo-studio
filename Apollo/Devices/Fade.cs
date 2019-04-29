@@ -37,8 +37,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private ConcurrentDictionary<Signal, List<Timer>> _timers = new ConcurrentDictionary<Signal, List<Timer>>();
-        private TimerCallback _timerexit;
+        private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
         public bool Mode; // true uses Length
         public Length Length;
@@ -130,8 +129,6 @@ namespace Apollo.Devices {
         }
 
         public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
-            _timerexit = new TimerCallback(Tick);
-            
             Mode = mode;
             Time = time;
             Length = length?? new Length();
@@ -144,9 +141,12 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        private void Tick(object info) {
-            if (info.GetType() == typeof(Signal)) {
-                Signal n = (Signal)info;
+        private void Tick(object sender, EventArgs e) {
+            Courier courier = (Courier)sender;
+            courier.Elapsed -= Tick;
+
+            if (courier.Info.GetType() == typeof(Signal)) {
+                Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
                     if (++_indexes[n] < _steps.Count) {
@@ -166,7 +166,7 @@ namespace Apollo.Devices {
                     for (int i = 0; i < _timers[n].Count; i++)
                         _timers[n][i].Dispose();
 
-                _timers[n] = new List<Timer>();
+                _timers[n] = new List<Courier>();
                 _indexes[n] = 0;
 
                 if (!locker.ContainsKey(n)) locker[n] = new object();
@@ -174,26 +174,31 @@ namespace Apollo.Devices {
                 Signal m = n.Clone();
                 m.Color = _steps[0].Clone();
                 MIDIExit?.Invoke(m);
+                
+                Courier courier;
 
                 int j = 0;
                 for (int i = 1; i < _steps.Count; i++) {
                     if (_cutoffs[j + 1] == i) j++;
 
-                    if (j < _colors.Count - 1)
-                        _timers[n].Add(new Timer(
-                            _timerexit,
-                            n,
-                            (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
-                            Timeout.Infinite
-                        ));
+                    if (j < _colors.Count - 1) {
+                        _timers[n].Add(courier = new Courier() {
+                            Info = n,
+                            AutoReset = false,
+                            Interval = (int)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate),
+                        });
+                        courier.Elapsed += Tick;
+                        courier.Start();
+                    }
                 }
 
-                _timers[n].Add(new Timer(
-                    _timerexit,
-                    n,
-                    (int)((Mode? (int)Length : _time) * _gate),
-                    Timeout.Infinite
-                ));
+                _timers[n].Add(courier = new Courier() {
+                    Info = n,
+                    AutoReset = false,
+                    Interval = (int)((Mode? (int)Length : _time) * _gate),
+                });
+                courier.Elapsed += Tick;
+                courier.Start();
             }
         }
 
