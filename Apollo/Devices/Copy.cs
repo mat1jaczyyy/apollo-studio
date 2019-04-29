@@ -67,6 +67,8 @@ namespace Apollo.Devices {
         }
 
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
 
         public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, Loop, (from i in Offsets select i.Clone()).ToList());
 
@@ -80,11 +82,70 @@ namespace Apollo.Devices {
             Offsets = offsets?? new List<Offset>();
         }
 
+        private void FireCourier(Signal n, int time) {
+            Courier courier = new Courier() {
+                Info = n,
+                AutoReset = false,
+                Interval = time
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
+        private void FireCourier((Signal n, List<int>) info, int time) {
+            Courier courier = timers[info.n] = new Courier() {
+                Info = info,
+                AutoReset = false,
+                Interval = time
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
         private void Tick(object sender, EventArgs e) {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
+
+            Type infoType = courier.Info.GetType();
             
-            MIDIExit?.Invoke((Signal)courier.Info);
+            if (infoType == typeof(Signal))
+                MIDIExit?.Invoke((Signal)courier.Info);
+            else if (infoType == typeof((Signal, List<int>))) {
+                (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
+                HandleRandomLoop(n, offsets);
+            }
+        }
+
+        private void HandleRandomLoop(Signal original, List<int> offsets) {
+            Signal n = original.Clone();
+            Signal m = original.Clone();
+            n.Color = new Color();
+
+            if (!locker.ContainsKey(n)) locker[n] = new object();
+
+            lock (locker[n]) {
+                if (!buffer.ContainsKey(n)) {
+                    if (!m.Color.Lit) return;
+                    buffer[n] = m.Index = (byte)offsets[RNG.Next(offsets.Count)];
+
+                } else {
+                    Signal o = original.Clone();
+                    o.Index = (byte)buffer[n];
+                    o.Color = new Color(0);
+                    MIDIExit?.Invoke(o);
+
+                    if (m.Color.Lit) buffer[n] = m.Index = (byte)offsets[RNG.Next(offsets.Count)];
+                    else buffer.Remove(n, out int _);
+                }
+
+                MIDIExit?.Invoke(m);
+
+                if (buffer.ContainsKey(n)) FireCourier((original, offsets), (int)((Mode? (int)Length : _rate) * _gate));
+                else {
+                    timers[n].Dispose();
+                    timers.Remove(n, out Courier _);
+                }
+            }
         }
 
         public override void MIDIEnter(Signal n) {
@@ -120,13 +181,7 @@ namespace Apollo.Devices {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
 
-                        Courier courier = new Courier() {
-                            Info = m,
-                            AutoReset = false,
-                            Interval = Convert.ToInt32((Mode? (int)Length : _rate) * _gate * (i + 1)),
-                        };
-                        courier.Elapsed += Tick;
-                        courier.Start();
+                        FireCourier(m, (int)((Mode? (int)Length : _rate) * _gate * (i + 1)));
                     
                     } else if (_copymode == CopyType.Interpolate) {
                         List<(int X, int Y)> points = new List<(int, int)>();
@@ -150,13 +205,7 @@ namespace Apollo.Devices {
                             Signal m = n.Clone();
                             m.Index = (byte)(points[j].Y * 10 + points[j].X);
 
-                            Courier courier = new Courier() {
-                                Info = m,
-                                AutoReset = false,
-                                Interval = Convert.ToInt32((Mode? (int)Length : _rate) * _gate * (i + ((decimal)j + 1) / points.Count)),
-                            };
-                            courier.Elapsed += Tick;
-                            courier.Start();
+                            FireCourier(m, (int)((Mode? (int)Length : _rate) * _gate * (i + ((decimal)j + 1) / points.Count)));
                         }
                     }
 
@@ -180,10 +229,9 @@ namespace Apollo.Devices {
 
                 MIDIExit?.Invoke(m);
 
-            } else if (_copymode == CopyType.RandomLoop) {
-                
+            } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
             
-            } else MIDIExit?.Invoke(n);
+            else MIDIExit?.Invoke(n);
         }
 
         public static Device DecodeSpecific(string jsonString) {
