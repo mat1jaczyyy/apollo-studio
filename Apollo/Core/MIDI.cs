@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Timers;
 
 using Newtonsoft.Json;
 using RtMidi.Core;
 
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.Core {
     public static class MIDI {
@@ -17,14 +17,14 @@ namespace Apollo.Core {
         public static event DevicesUpdatedEventHandler DevicesUpdated;
 
         public static List<Launchpad> Devices = new List<Launchpad>();
-        private static Timer timer = new Timer() { Interval = 100 };
+        private static Courier courier = new Courier() { Interval = 100 };
         private static bool started = false;
 
         public static void Start() {
             if (started) new InvalidOperationException("MIDI Rescan Timer is already running");
 
-            timer.Elapsed += Rescan;
-            timer.Start();
+            courier.Elapsed += Rescan;
+            courier.Start();
             started = true;
         }
 
