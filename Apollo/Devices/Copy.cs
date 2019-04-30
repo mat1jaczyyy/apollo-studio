@@ -126,29 +126,30 @@ namespace Apollo.Devices {
             lock (locker[n]) {
                 if (!buffer.ContainsKey(n)) {
                     if (!m.Color.Lit) return;
-                    buffer[n] = m.Index = (byte)offsets[RNG.Next(offsets.Count)];
+                    buffer[n] = RNG.Next(offsets.Count);
+                    m.Index = (byte)offsets[buffer[n]];
 
                 } else {
                     Signal o = original.Clone();
-                    o.Index = (byte)buffer[n];
+                    o.Index = (byte)offsets[buffer[n]];
                     o.Color = new Color(0);
                     MIDIExit?.Invoke(o);
 
                     if (m.Color.Lit) {
                         if (offsets.Count > 1) {
                             int old = buffer[n];
-                            buffer[n] = offsets[RNG.Next(offsets.Count - 1)];
+                            buffer[n] = RNG.Next(offsets.Count - 1);
                             if (buffer[n] >= old) buffer[n]++;
                         }
-                        m.Index = (byte)buffer[n];
+                        m.Index = (byte)offsets[buffer[n]];
                     
                     } else buffer.Remove(n, out int _);
                 }
 
-                MIDIExit?.Invoke(m);
-
-                if (buffer.ContainsKey(n)) FireCourier((original, offsets), (Mode? (int)Length : _rate) * _gate);
-                else {
+                if (buffer.ContainsKey(n)) {
+                    MIDIExit?.Invoke(m);
+                    FireCourier((original, offsets), (Mode? (int)Length : _rate) * _gate);
+                } else {
                     timers[n].Dispose();
                     timers.Remove(n, out Courier _);
                 }
