@@ -143,14 +143,15 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            if (Frames.Count > 0 && n.Color.Lit) {
+            if (Frames.Count > 0) {
+                bool lit = n.Color.Lit;
                 n.Index = 11;
                 n.Color = new Color();
 
                 if (!locker.ContainsKey(n)) locker[n] = new object();
-                
+
                 lock (locker[n]) {
-                    if (_mode != PlaybackType.Poly) {
+                    if ((_mode == PlaybackType.Mono && lit) || _mode == PlaybackType.Loop) {
                         if (_indexes.ContainsKey(n) && _indexes[n] < Frames.Count)
                             for (int i = 0; i < Frames[_indexes[n]].Screen.Length; i++)
                                 if (Frames[_indexes[n]].Screen[i].Lit)
@@ -164,17 +165,19 @@ namespace Apollo.Devices {
                         _indexes[n] = 0;
                     }
 
-                    for (int i = 0; i < Frames[0].Screen.Length; i++)
-                        if (Frames[0].Screen[i].Lit)
-                            MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
-                    
-                    decimal time = 0;
-                    PolyInfo info = new PolyInfo(n);
+                    if (lit) {
+                        for (int i = 0; i < Frames[0].Screen.Length; i++)
+                            if (Frames[0].Screen[i].Lit)
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
+                        
+                        decimal time = 0;
+                        PolyInfo info = new PolyInfo(n);
 
-                    for (int i = 0; i < Frames.Count; i++) {
-                        time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
-                        if (_mode == PlaybackType.Poly) FireCourier(info, time);
-                        else FireCourier(n, time);
+                        for (int i = 0; i < Frames.Count; i++) {
+                            time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
+                            if (_mode == PlaybackType.Poly) FireCourier(info, time);
+                            else FireCourier(n, time);
+                        }
                     }
                 }
             }
