@@ -63,6 +63,7 @@ namespace Apollo.Windows {
         ColorHistory ColorHistory;
         Dial Duration, Gate;
         ComboBox ComboBox;
+        BoxDial Choke;
         Button Import, Play, Fire;
 
         int origin = -1;
@@ -155,6 +156,12 @@ namespace Apollo.Windows {
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _pattern.Mode;
             Mode_Changed(null, null);
+
+            Choke = this.Get<BoxDial>("Choke");
+            if (_pattern.Choke != null) {
+                Choke.Enabled = true;
+                Choke.RawValue = _pattern.Choke.Value;
+            }
 
             Import = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
@@ -445,6 +452,13 @@ namespace Apollo.Windows {
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)ComboBox.SelectedItem;
+
+        private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Right && (Choke.Enabled = !Choke.Enabled) == false)
+                _pattern.Choke = null;
+        }
+
+        private void Choke_Changed(double value) => _pattern.Choke = (int)value;
 
         private void FireCourier(Color color, byte index, decimal time) {
             Courier courier = new Courier() {

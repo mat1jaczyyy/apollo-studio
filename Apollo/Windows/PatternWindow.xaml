@@ -6,7 +6,7 @@
         Title="Pattern" WindowStartupLocation="CenterOwner"
         DragDrop.AllowDrop="true"
         Icon="/Resources/WindowIcon.png"
-        Width="750" MinWidth="750" MaxWidth="750"
+        Width="780" MinWidth="780" MaxWidth="780"
         Height="520" MinHeight="520" MaxHeight="520"
         Opened="Loaded" Closing="Unloaded"
         KeyUp="KeyReleased" PointerPressed="Window_Focus">
@@ -69,16 +69,23 @@
               <Grid Margin="7" ColumnDefinitions="*,*,*">
                 <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
                                  ValueModsChanged="Duration_Changed" StepModsChanged="Duration_StepChanged" ModeModsChanged="Duration_ModeChanged" />
-                                  
-                <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Round="0" Unit="%"
-                                 ValueChanged="Gate_Changed" />
 
-                <Grid Grid.Column="2" RowDefinitions="*,*,*">
-                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Stretch" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+                <Border Grid.Column="1" Margin="0 0 5 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+                  <Components:Dial Grid.Column="1" HorizontalAlignment="Left" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Round="0" Unit="%"
+                                   ValueChanged="Gate_Changed" />
+                </Border>
+
+                <Grid Grid.Column="2" RowDefinitions="*,2*,*">
+                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="1" x:Name="ComboBox" SelectionChanged="Mode_Changed">
                     <sys:String>Mono</sys:String>
                     <sys:String>Poly</sys:String>
                     <sys:String>Loop</sys:String>
                   </ComboBox>
+
+                  <Components:BoxDial Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Choke" Title="Choke" Minimum="1" Maximum="16" Scale="0.4" Enabled="false"
+                                      PointerReleased="Choke_MouseUp" ValueChanged="Choke_Changed" />
+
+                  <CheckBox Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" x:Name="Interpolate">Interp.</CheckBox>
                 </Grid>
               </Grid>
             </Border>

@@ -17,8 +17,11 @@ namespace Apollo.Devices {
     public class Pattern: Device {
         public static readonly new string DeviceIdentifier = "pattern";
 
+        public delegate void ChokedEventHandler(Pattern sender, int index);
+        public static event ChokedEventHandler Choked;
+
         public PatternWindow Window;
-        
+
         public List<Frame> Frames;
 
         private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
@@ -53,18 +56,23 @@ namespace Apollo.Devices {
             get => _mode.ToString();
             set => _mode = Enum.Parse<PlaybackType>(value);
         }
+
+        public int? Choke;
         
-        public override Device Clone() => new Pattern(Gate, _mode, (from i in Frames select i.Clone()).ToList(), Expanded);
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, Choke, Expanded);
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, PlaybackType mode = PlaybackType.Mono, List<Frame> frames = null, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, int? choke = null, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
-            _mode = mode;
             Frames = frames;
+            _mode = mode;
+            Choke = choke;
             Expanded = expanded;
+
+            Choked += HandleChoke;
         }
 
         private void FireCourier(Signal n, decimal time) {
@@ -183,6 +191,10 @@ namespace Apollo.Devices {
             }
         }
 
+        private void HandleChoke(Pattern sender, int index) {
+
+        }
+
         public override void Dispose() {
             Window?.Close();
             Window = null;
@@ -204,8 +216,9 @@ namespace Apollo.Devices {
 
             return new Pattern(
                 Convert.ToDecimal(data["gate"].ToString()),
-                Enum.Parse<PlaybackType>(data["mode"].ToString()),
                 init,
+                Enum.Parse<PlaybackType>(data["mode"].ToString()),
+                int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null,
                 Convert.ToInt32(data["expanded"].ToString())
             );
         }
@@ -225,9 +238,6 @@ namespace Apollo.Devices {
                         writer.WritePropertyName("gate");
                         writer.WriteValue(Gate);
 
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(_mode);
-
                         writer.WritePropertyName("frames");
                         writer.WriteStartArray();
 
@@ -235,6 +245,12 @@ namespace Apollo.Devices {
                                 writer.WriteRawValue(Frames[i].Encode());
 
                         writer.WriteEndArray();
+
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(_mode);
+
+                        writer.WritePropertyName("choke");
+                        writer.WriteValue(Choke);
 
                         writer.WritePropertyName("expanded");
                         writer.WriteValue(Expanded);
