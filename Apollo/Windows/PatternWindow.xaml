@@ -1,6 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PatternWindow"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Pattern" WindowStartupLocation="CenterOwner"
         DragDrop.AllowDrop="true"
@@ -32,11 +33,21 @@
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid ColumnDefinitions="3*,12*,5*">
-        <ScrollViewer Grid.Column="0" Padding="5 0" VerticalScrollBarVisibility="Visible">
-          <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Frames">
-            <Components:VerticalAdd Added="Frame_InsertStart" />
-          </StackPanel>
-        </ScrollViewer>
+        <Grid Grid.Column="0" RowDefinitions="*,Auto">
+          <ScrollViewer Grid.Row="0" Padding="5 0" VerticalScrollBarVisibility="Visible">
+            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Frames">
+              <Components:VerticalAdd Added="Frame_InsertStart" />
+            </StackPanel>
+          </ScrollViewer>
+        
+          <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+            <StackPanel Margin="7" HorizontalAlignment="Stretch" Spacing="5">
+              <Button Content="Import" x:Name="Import" Click="ImportDialog" />
+              <Button Content="Play" x:Name="Play" Click="PatternPlay" />
+              <Button Content="Fire" x:Name="Fire" Click="PatternFire" />
+            </StackPanel>
+          </Border>
+        </Grid>
         
         <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
           <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" />
@@ -62,11 +73,13 @@
                 <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Round="0" Unit="%"
                                  ValueChanged="Gate_Changed" />
 
-                <StackPanel Grid.Column="2" Margin="5 0 0 0" VerticalAlignment="Center" Spacing="5">
-                  <Button Content="Import" x:Name="Import" Click="ImportDialog" />
-                  <Button Content="Play" x:Name="Play" Click="PatternPlay" />
-                  <Button Content="Fire" x:Name="Fire" Click="PatternFire" />
-                </StackPanel>
+                <Grid Grid.Column="2" RowDefinitions="*,*,*">
+                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Stretch" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+                    <sys:String>Mono</sys:String>
+                    <sys:String>Poly</sys:String>
+                    <sys:String>Loop</sys:String>
+                  </ComboBox>
+                </Grid>
               </Grid>
             </Border>
           </Grid>

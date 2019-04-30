@@ -62,6 +62,7 @@ namespace Apollo.Windows {
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate;
+        ComboBox ComboBox;
         Button Import, Play, Fire;
 
         int origin = -1;
@@ -150,6 +151,10 @@ namespace Apollo.Windows {
             
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_pattern.Gate * 100;
+
+            ComboBox = this.Get<ComboBox>("ComboBox");
+            ComboBox.SelectedItem = _pattern.Mode;
+            Mode_Changed(null, null);
 
             Import = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
@@ -436,6 +441,8 @@ namespace Apollo.Windows {
         }
 
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
+
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)ComboBox.SelectedItem;
 
         private void FireCourier(Color color, byte index, decimal time) {
             Courier courier = new Courier() {

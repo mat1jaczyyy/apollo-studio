@@ -33,15 +33,36 @@ namespace Apollo.Devices {
                     _gate = value;
             }
         }
+
+        private class PolyInfo {
+            public Signal n;
+            public int index = 0;
+            public object locker = new object();
+
+            public PolyInfo(Signal init) => n = init;
+        }
+
+        public enum PlaybackType {
+            Mono,
+            Poly,
+            Loop
+        }
+
+        private PlaybackType _mode;
+        public string Mode {
+            get => _mode.ToString();
+            set => _mode = Enum.Parse<PlaybackType>(value);
+        }
         
-        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), Expanded);
+        public override Device Clone() => new Pattern(Gate, _mode, (from i in Frames select i.Clone()).ToList(), Expanded);
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, PlaybackType mode = PlaybackType.Mono, List<Frame> frames = null, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
+            _mode = mode;
             Frames = frames;
             Expanded = expanded;
         }
@@ -58,11 +79,23 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
+        private void FireCourier(PolyInfo info, decimal time) {
+            Courier courier = new Courier() {
+                Info = info,
+                AutoReset = false,
+                Interval = (double)time,
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
         private void Tick(object sender, EventArgs e) {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
+
+            Type infoType = courier.Info.GetType();
             
-            if (courier.Info.GetType() == typeof(Signal)) {
+            if (infoType == typeof(Signal)) {
                 Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
@@ -74,6 +107,22 @@ namespace Apollo.Devices {
                         for (int i = 0; i < Frames.Last().Screen.Length; i++)
                             if (Frames.Last().Screen[i].Lit)
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
+
+                    _timers[n].Remove(courier);
+                }
+
+            } else if (infoType == typeof(PolyInfo)) {
+                PolyInfo info = (PolyInfo)courier.Info;
+                
+                lock (info.locker) {
+                    if (++info.index < Frames.Count) {
+                        for (int i = 0; i < Frames[info.index].Screen.Length; i++)
+                            if (Frames[info.index].Screen[i] != Frames[info.index - 1].Screen[i])
+                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, Frames[info.index].Screen[i].Clone(), info.n.Layer, info.n.MultiTarget));
+                    } else
+                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                            if (Frames.Last().Screen[i].Lit)
+                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Layer, info.n.MultiTarget));
                 }
             }
         }
@@ -86,12 +135,14 @@ namespace Apollo.Devices {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
                 
                 lock (locker[n]) {
-                    if (_timers.ContainsKey(n))
-                        for (int i = 0; i < _timers[n].Count; i++)
-                            _timers[n][i].Dispose();
+                    if (_mode != PlaybackType.Poly) {
+                        if (_timers.ContainsKey(n))
+                            for (int i = 0; i < _timers[n].Count; i++)
+                                _timers[n][i].Dispose();
 
-                    _timers[n] = new List<Courier>();
-                    _indexes[n] = 0;
+                        _timers[n] = new List<Courier>();
+                        _indexes[n] = 0;
+                    }
 
                     for (int i = 0; i < Frames[0].Screen.Length; i++)
                         if (Frames[0].Screen[i].Lit)
@@ -99,9 +150,12 @@ namespace Apollo.Devices {
                     
                     decimal time = 0;
 
+                    PolyInfo info = new PolyInfo(n);
+
                     for (int i = 0; i < Frames.Count; i++) {
                         time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
-                        FireCourier(n, time);
+                        if (_mode == PlaybackType.Poly) FireCourier(info, time);
+                        else FireCourier(n, time);
                     }
                 }
             }
@@ -127,9 +181,10 @@ namespace Apollo.Devices {
                 init.Add(Frame.Decode(frame.ToString()));
 
             return new Pattern(
-                Convert.ToDecimal(data["gate"]),
+                Convert.ToDecimal(data["gate"].ToString()),
+                Enum.Parse<PlaybackType>(data["mode"].ToString()),
                 init,
-                Convert.ToInt32(data["expanded"])
+                Convert.ToInt32(data["expanded"].ToString())
             );
         }
 
@@ -147,6 +202,9 @@ namespace Apollo.Devices {
 
                         writer.WritePropertyName("gate");
                         writer.WriteValue(Gate);
+
+                        writer.WritePropertyName("mode");
+                        writer.WriteValue(_mode);
 
                         writer.WritePropertyName("frames");
                         writer.WriteStartArray();
