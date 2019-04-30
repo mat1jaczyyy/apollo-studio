@@ -200,8 +200,10 @@ namespace Apollo.Windows {
 
             _pattern.Window = null;
 
-            Launchpad.PatternWindow = null;
-            Launchpad.Clear();
+            if (Launchpad != null) {
+                Launchpad.PatternWindow = null;
+                Launchpad.Clear();
+            }
             
             Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;
