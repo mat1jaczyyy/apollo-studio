@@ -176,10 +176,17 @@ namespace Apollo.Devices {
                 }
 
                 int result = y * 10 + x;
+                bool valid = true;
                 
-                if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
+                if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
                     validOffsets.Add(result);
 
+                else if (y == -1 && 4 <= x && x <= 5)
+                    validOffsets.Add(result = 99);
+
+                else valid = false;
+
+                if (valid)
                     if (_copymode == CopyType.Static) {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
@@ -192,7 +199,6 @@ namespace Apollo.Devices {
 
                         FireCourier(m, (Mode? (int)Length : _rate) * _gate * (i + 1));
                     }
-                }
 
                 if (_copymode == CopyType.Interpolate) {
                     List<(int X, int Y)> points = new List<(int, int)>();
@@ -216,12 +222,18 @@ namespace Apollo.Devices {
                         int iresult = iy * 10 + ix;
                         time++;
                         
-                        if (0 <= ix && ix <= 9 && 0 <= iy && iy <= 9 && 1 <= iresult && iresult <= 99 && iresult != 9 && iresult != 90) {
-                            Signal m = n.Clone();
+                        Signal m = n.Clone();
+                        bool ivalid = true;
+                        
+                        if (0 <= ix && ix <= 9 && 0 <= iy && iy <= 9 && 1 <= iresult && iresult <= 98 && iresult != 9 && iresult != 90)
                             m.Index = (byte)(iy * 10 + ix);
+                        
+                        else if (iy == -1 && 4 <= ix && ix <= 5)
+                            m.Index = 99;
+                        
+                        else ivalid = false;
 
-                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
-                        }
+                        if (ivalid) FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
                     }
                 }
 
