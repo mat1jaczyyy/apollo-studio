@@ -23,6 +23,11 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
+            if (n.Index == 99) {
+                MIDIExit?.Invoke(n);
+                return;
+            }
+
             int x = n.Index % 10 + Offset.X;
             int y = n.Index / 10 + Offset.Y;
 
@@ -33,8 +38,12 @@ namespace Apollo.Devices {
 
             int result = y * 10 + x;
                 
-            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 99 && result != 9 && result != 90) {
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90) {
                 n.Index = (byte)result;
+                MIDIExit?.Invoke(n);
+
+            } else if (y == -1 && 4 <= x && x <= 5) {
+                n.Index = 99;
                 MIDIExit?.Invoke(n);
             }
         }
