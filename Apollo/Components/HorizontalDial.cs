@@ -50,6 +50,7 @@ namespace Apollo.Components {
             set {
                 if (_max != value) {
                     _max = value;
+                    Input.Width = (double)((int)_max).ToString(CultureInfo.InvariantCulture).Length * 25 / 3;
                     RawValue = ToRawValue(_value);
                 }
             }
@@ -66,7 +67,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double _exp = 100;
+        private double _exp = 1;
         public double Exponent {
             get => _exp;
             set {
@@ -112,7 +113,7 @@ namespace Apollo.Components {
             }
         }
 
-        private string _unit = "%";
+        private string _unit = "";
         public string Unit {
             get => _unit;
             set {
@@ -296,7 +297,6 @@ namespace Apollo.Components {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
-                Input.Width = (double)((int)Maximum).ToString(CultureInfo.InvariantCulture).Length * 25 / 3;
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
                 Input.Focus();
