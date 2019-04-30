@@ -151,6 +151,11 @@ namespace Apollo.Devices {
                 
                 lock (locker[n]) {
                     if (_mode != PlaybackType.Poly) {
+                        if (_indexes.ContainsKey(n) && _indexes[n] < Frames.Count)
+                            for (int i = 0; i < Frames[_indexes[n]].Screen.Length; i++)
+                                if (Frames[_indexes[n]].Screen[i].Lit)
+                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
+
                         if (_timers.ContainsKey(n))
                             for (int i = 0; i < _timers[n].Count; i++)
                                 _timers[n][i].Dispose();
