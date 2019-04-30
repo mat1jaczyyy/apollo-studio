@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -80,11 +81,14 @@ namespace Apollo.Elements {
             }
         }
 
+        [HandleProcessCorruptedStateExceptions]
         private bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
             SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray());
-            Output.Send(in msg);
+            try {
+                Output.Send(in msg);
+            } catch {};
             
             return true;
         }
