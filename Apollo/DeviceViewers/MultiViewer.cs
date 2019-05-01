@@ -69,7 +69,6 @@ namespace Apollo.DeviceViewers {
 
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _multi.Mode;
-            Mode_Changed(null, null);
 
             _root = _parent.Root.Children;
             _root.Insert(0, new DeviceHead(parent));

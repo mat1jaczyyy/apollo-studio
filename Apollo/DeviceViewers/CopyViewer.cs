@@ -51,11 +51,9 @@ namespace Apollo.DeviceViewers {
 
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _copy.CopyMode;
-            CopyMode_Changed(null, null);
 
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _copy.Loop;
-            Loop_Changed(null, EventArgs.Empty);
 
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");

@@ -23,11 +23,9 @@ namespace Apollo.DeviceViewers {
 
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _flip.Mode;
-            Mode_Changed(null, null);
             
             Bypass = this.Get<CheckBox>("Bypass");
             Bypass.IsChecked = _flip.Bypass;
-            Bypass_Changed(null, EventArgs.Empty);
         }
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _flip.Mode = (string)ComboBox.SelectedItem;

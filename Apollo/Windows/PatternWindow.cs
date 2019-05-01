@@ -155,7 +155,6 @@ namespace Apollo.Windows {
 
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _pattern.Mode;
-            Mode_Changed(null, null);
 
             Choke = this.Get<BoxDial>("Choke");
             if (_pattern.Choke != null) {

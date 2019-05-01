@@ -27,7 +27,6 @@ namespace Apollo.DeviceViewers {
 
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _move.Loop;
-            Loop_Changed(null, EventArgs.Empty);
         }
 
         private void Offset_Changed(int x, int y) {

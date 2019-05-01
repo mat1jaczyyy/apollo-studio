@@ -17,19 +17,22 @@ namespace Apollo.Viewers {
         public event ChainExpandedEventHandler ChainExpanded;
 
         Chain _chain;
+
+        TextBlock NameText;
         public VerticalAdd ChainAdd;
 
-        private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Chain {index + 1}";
+        private void UpdateText(int index) => NameText.Text = $"Chain {index + 1}";
         
         public ChainInfo(Chain chain) {
             InitializeComponent();
             
             _chain = chain;
 
-            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
-            
+            NameText = this.Get<TextBlock>("Name");
             UpdateText(_chain.ParentIndex.Value);
             _chain.ParentIndexChanged += UpdateText;
+
+            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
         }
         
         private void Clicked(object sender, PointerReleasedEventArgs e) {

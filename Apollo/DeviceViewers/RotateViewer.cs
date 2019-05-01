@@ -23,11 +23,9 @@ namespace Apollo.DeviceViewers {
 
             ComboBox = this.Get<ComboBox>("ComboBox");
             ComboBox.SelectedItem = _rotate.Mode;
-            Mode_Changed(null, null);
             
             Bypass = this.Get<CheckBox>("Bypass");
             Bypass.IsChecked = _rotate.Bypass;
-            Bypass_Changed(null, EventArgs.Empty);
         }
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _rotate.Mode = (string)ComboBox.SelectedItem;

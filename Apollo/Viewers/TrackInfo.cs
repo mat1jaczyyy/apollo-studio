@@ -22,10 +22,11 @@ namespace Apollo.Viewers {
         public event TrackInfoEventHandler TrackRemoved;
         
         Track _track;
+        TextBlock NameText;
         ComboBox PortSelector;
         public TrackAdd TrackAdd;
 
-        private void UpdateText(int index) => this.Get<TextBlock>("Name").Text = $"Track {index + 1}";
+        private void UpdateText(int index) => NameText.Text = $"Track {index + 1}";
 
         private void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
@@ -43,6 +44,7 @@ namespace Apollo.Viewers {
             
             _track = track;
             
+            NameText = this.Get<TextBlock>("Name");
             UpdateText(_track.ParentIndex.Value);
             _track.ParentIndexChanged += UpdateText;
 
