@@ -71,43 +71,5 @@ namespace Apollo.Elements {
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
-        
-        public static Track Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Track(
-                Chain.Decode(data["chain"].ToString()),
-                Launchpad.Decode(data["launchpad"].ToString())
-            );
-        }
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("chain");
-                        writer.WriteRawValue(Chain.Encode());
-
-                        writer.WritePropertyName("launchpad");
-                        writer.WriteRawValue(Launchpad.Encode());
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

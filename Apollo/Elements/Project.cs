@@ -121,57 +121,5 @@ namespace Apollo.Elements {
             foreach (Launchpad launchpad in MIDI.Devices)
                 launchpad.Clear();
         }
-
-        public static Project Decode(string jsonString, string path) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            List<object> tracks = JsonConvert.DeserializeObject<List<object>>(data["tracks"].ToString());
-
-            return new Project(
-                Convert.ToInt32(data["bpm"]),
-                Convert.ToInt32(data["page"]),
-                (from i in tracks select Track.Decode(i.ToString())).ToList(),
-                path
-            );
-        }
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("version");
-                        writer.WriteValue("alpha");
-
-                        writer.WritePropertyName("bpm");
-                        writer.WriteValue(BPM);
-
-                        writer.WritePropertyName("page");
-                        writer.WriteValue(Page);
-
-                        writer.WritePropertyName("tracks");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < Tracks.Count; i++)
-                                writer.WriteRawValue(Tracks[i].Encode());
-                        
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

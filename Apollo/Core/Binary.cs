@@ -57,5 +57,43 @@ namespace Apollo.Core {
         }
 
         private static void EncodeID(BinaryWriter writer, Type type) => writer.Write((byte)Array.IndexOf(id, type));
+
+        private static void Encode(BinaryWriter writer, Project o) {
+            EncodeID(writer, typeof(Project));
+
+            writer.Write(o.BPM);
+            writer.Write(o.Tracks.Count);
+
+            for (int i = 0; i < o.Tracks.Count; i++)
+                Encode(writer, o.Tracks[i]);
+        }
+
+        private static void Encode(BinaryWriter writer, Track o) {
+            EncodeID(writer, typeof(Track));
+
+            Encode(writer, o.Chain);
+            Encode(writer, o.Launchpad);
+        }
+
+        private static void Encode(BinaryWriter writer, Chain o) {
+            EncodeID(writer, typeof(Chain));
+
+            writer.Write(o.Count);
+
+            for (int i = 0; i < o.Count; i++)
+                Encode(writer, o[i]);
+        }
+
+        private static void Encode(BinaryWriter writer, Device o) {
+            EncodeID(writer, typeof(Device));
+
+            Encode(writer, (dynamic)o);
+        }
+
+        private static void Encode(BinaryWriter writer, Launchpad o) {
+            EncodeID(writer, typeof(Launchpad));
+
+            writer.Write(o.Name);
+        }
     }
 }
