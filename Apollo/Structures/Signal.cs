@@ -54,31 +54,5 @@ namespace Apollo.Structures {
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Layer, MultiTarget);
 
         public override string ToString() => $"{Source.Name} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-                    
-                        writer.WritePropertyName("index");
-                        writer.WriteValue(_p);
-                        
-                        writer.WritePropertyName("color");
-                        writer.WriteRawValue(Color.Encode());
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

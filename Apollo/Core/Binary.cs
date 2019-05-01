@@ -271,25 +271,33 @@ namespace Apollo.Core {
         private static void Encode(BinaryWriter writer, Color o) {
             EncodeID(writer, typeof(Color));
 
-
+            writer.Write(o.Red);
+            writer.Write(o.Green);
+            writer.Write(o.Blue);
         }
 
         private static void Encode(BinaryWriter writer, Frame o) {
             EncodeID(writer, typeof(Frame));
 
+            writer.Write(o.Mode);
+            Encode(writer, o.Length);
+            writer.Write(o.Time);
 
+            for (int i = 0; i < 100; i++)
+                Encode(writer, o.Screen[i]);
         }
 
         private static void Encode(BinaryWriter writer, Length o) {
             EncodeID(writer, typeof(Length));
 
-
+            writer.Write(o.Step);
         }
 
         private static void Encode(BinaryWriter writer, Offset o) {
             EncodeID(writer, typeof(Offset));
 
-
+            writer.Write(o.X);
+            writer.Write(o.Y);
         }
     }
 }
