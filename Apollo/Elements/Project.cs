@@ -68,7 +68,7 @@ namespace Apollo.Elements {
             string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
-                File.WriteAllText(FilePath, Encode());
+                File.WriteAllBytes(FilePath, Binary.Encode(this).ToArray());
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
