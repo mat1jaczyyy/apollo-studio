@@ -29,7 +29,12 @@ namespace Apollo.Elements {
 
         public abstract void MIDIEnter(Signal n);
 
-        public virtual void Dispose() => MIDIExit = null;
+        public bool Disposed { get; private set; } = false;
+
+        public virtual void Dispose() {
+            MIDIExit = null;
+            Disposed = true;
+        }
 
         public static bool Move(List<Device> source, Device target, bool copy = false) {
             if (!copy)
