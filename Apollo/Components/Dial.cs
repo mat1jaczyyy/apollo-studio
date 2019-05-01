@@ -377,7 +377,7 @@ namespace Apollo.Components {
         }
 
         private void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && Enabled) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && !UsingSteps && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
                 Input.Opacity = 1;
