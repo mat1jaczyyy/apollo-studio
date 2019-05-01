@@ -419,6 +419,7 @@ namespace Apollo.Windows {
         private void Duration_Changed(double value, InputModifiers mods) {
             if (mods.HasFlag(InputModifiers.Control)) {
                 for (int i = 0; i < _pattern.Frames.Count; i++) {
+                    _pattern.Frames[i].Mode = false;
                     _pattern.Frames[i].Time = (int)value;
                     ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[i].TimeString;
                 }
@@ -431,6 +432,7 @@ namespace Apollo.Windows {
         private void Duration_StepChanged(int value, InputModifiers mods) {
             if (mods.HasFlag(InputModifiers.Control))
                 for (int i = 0; i < _pattern.Frames.Count; i++) {
+                    _pattern.Frames[i].Mode = true;
                     _pattern.Frames[i].Length.Step = value;
                     ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern.Frames[_pattern.Expanded].TimeString;
                 } 
