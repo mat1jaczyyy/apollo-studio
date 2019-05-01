@@ -56,7 +56,7 @@ namespace Apollo.Windows {
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
 
             FadeSmoothness = this.Get<Slider>("FadeSmoothness");
-            FadeSmoothness.Value = Preferences.FadeSmoothness;
+            FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
             FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
 
             CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");

@@ -11,6 +11,9 @@ namespace Apollo.Structures {
     public class Length {
         public static readonly string Identifier = "length";
 
+        public delegate void ChangedEventHandler();
+        public event ChangedEventHandler Changed;
+
         private static string[] Steps = new string[]
             {"1/128", "1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1"};
 
@@ -18,8 +21,10 @@ namespace Apollo.Structures {
         public int Step {
             get => _value;
             set {
-                if (0 <= value && value <= 9)
+                if (0 <= value && value <= 9) {
                     _value = value;
+                    Changed?.Invoke();
+                }
             }
         }
         

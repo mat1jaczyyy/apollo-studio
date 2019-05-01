@@ -17,7 +17,7 @@ namespace Apollo.Core {
         private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";
 
         public delegate void CheckBoxChanged(bool newValue);
-        public delegate void SliderChanged(double newValue);
+        public delegate void SmoothnessChanged(double newValue);
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;
@@ -59,13 +59,15 @@ namespace Apollo.Core {
             }
         }
 
-        public static event SliderChanged FadeSmoothnessChanged;
-        private static double _FadeSmoothness = 1;
+        public static event SmoothnessChanged FadeSmoothnessChanged;
+        public static double FadeSmoothnessSlider { get; private set; } = 1;
+        private static double _FadeSmoothness;
         public static double FadeSmoothness {
             get => _FadeSmoothness;
             set {
-                if (0.01 <= value && value <= 1) {
-                    _FadeSmoothness = value;
+                if (0 <= value && value <= 1) {
+                    FadeSmoothnessSlider = value;
+                    _FadeSmoothness = 1000 / (1081.45 * Math.Pow(Math.Log(1 - value), 2) + 2);
                     FadeSmoothnessChanged?.Invoke(_FadeSmoothness);
                     Save();
                 }
@@ -133,7 +135,7 @@ namespace Apollo.Core {
                         writer.WriteValue(AutoCreatePageFilter);
 
                         writer.WritePropertyName("fadesmoothness");
-                        writer.WriteValue(FadeSmoothness);
+                        writer.WriteValue(FadeSmoothnessSlider);
 
                         writer.WritePropertyName("colorhistory");
                         writer.WriteRawValue(ColorHistory.Encode());

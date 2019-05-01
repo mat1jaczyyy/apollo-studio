@@ -15,14 +15,19 @@ namespace Apollo.Devices {
     public class Fade: Device {
         public static readonly new string DeviceIdentifier = "fade";
 
+        private class FadeInfo {
+            public Color Color;
+            public double Time;
+
+            public FadeInfo(Color color, double time) {
+                Color = color;
+                Time = time;
+            }
+        }
+
         private List<Color> _colors = new List<Color>();
         private List<decimal> _positions = new List<decimal>();
-        private List<Color> _steps = new List<Color>();
-        private List<int> _counts = new List<int>();
-        private List<int> _cutoffs = new List<int>();
-        
-        private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
-        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        private List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -35,39 +40,55 @@ namespace Apollo.Devices {
             _positions[index] = position;
             Generate();
         }
-
+        
+        private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
+        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
-        public bool Mode; // true uses Length
+        private bool _mode; // true uses Length
         public Length Length;
         private int _time;
         private decimal _gate;
 
+        public bool Mode {
+            get => _mode;
+            set {
+                _mode = value;
+                Generate();
+            }
+        }
+
         public int Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000)
+                if (10 <= value && value <= 30000) {
                     _time = value;
+                    Generate();
+                }
             }
         }
 
         public decimal Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4)
+                if (0.01M <= value && value <= 4) {
                     _gate = value;
+                    Generate();
+                }
             }
         }
 
         public delegate void GeneratedEventHandler();
         public event GeneratedEventHandler Generated;
 
-        private void Generate(double amount = 0) {
-            if (amount < 0.01 || 1 > amount) amount = Preferences.FadeSmoothness;
+        private void Generate() => Generate(Preferences.FadeSmoothness);
 
-            _steps = new List<Color>();
-            _counts = new List<int>();
-            _cutoffs = new List<int>() {0};
+        private void Generate(double smoothness) {
+            if (_colors.Count < 2 || _positions.Count < 2) return;
+
+            List<Color> _steps = new List<Color>();
+            List<int> _counts = new List<int>();
+            List<int> _cutoffs = new List<int>() {0};
 
             for (int i = 0; i < _colors.Count - 1; i++) {
                 int max = new int[] {
@@ -77,26 +98,16 @@ namespace Apollo.Devices {
                     1
                 }.Max();
 
-                int count = 0;
-                double tick = 1 - amount;
-                for (int j = 0; j < max; j++) {
-                    tick += amount;
-
-                    if (tick >= 1) {
-                        tick += -1;
-
-                        _steps.Add(new Color(
-                            (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * j / max),
-                            (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * j / max),
-                            (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * j / max)
-                        ));
-
-                        count++;
-                    }
+                for (int k = 0; k < max; k++) {
+                    _steps.Add(new Color(
+                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * k / max),
+                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * k / max),
+                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * k / max)
+                    ));
                 }
 
-                _counts.Add(count);
-                _cutoffs.Add(count + _cutoffs.Last());
+                _counts.Add(max);
+                _cutoffs.Add(max + _cutoffs.Last());
             }
 
             _steps.Add(_colors.Last());
@@ -106,6 +117,20 @@ namespace Apollo.Devices {
                 _cutoffs[_cutoffs.Count - 1]++;
             }
 
+            fade = new List<FadeInfo>() {new FadeInfo(_steps[0], 0)};
+
+            int j = 0;
+            for (int i = 1; i < _steps.Count; i++) {
+                if (_cutoffs[j + 1] == i) j++;
+
+                if (j < _colors.Count - 1) {
+                    double time = (double)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate);
+                    if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
+                }
+            }
+
+            fade.Add(new FadeInfo(_steps.Last(), (double)((Mode? (int)Length : _time) * _gate)));
+            
             Generated?.Invoke();
         }
 
@@ -136,17 +161,19 @@ namespace Apollo.Devices {
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
 
-            Preferences.FadeSmoothnessChanged += Generate;
             Generate();
+            
+            Length.Changed += Generate;
+            Preferences.FadeSmoothnessChanged += Generate;
         }
 
-        private void FireCourier(Signal n, decimal time) {
+        private void FireCourier(Signal n, double time) {
             Courier courier;
 
             _timers[n].Add(courier = new Courier() {
                 Info = n,
                 AutoReset = false,
-                Interval = (double)time,
+                Interval = time,
             });
             courier.Elapsed += Tick;
             courier.Start();
@@ -160,9 +187,9 @@ namespace Apollo.Devices {
                 Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
-                    if (++_indexes[n] < _steps.Count) {
+                    if (++_indexes[n] < fade.Count) {
                         Signal m = n.Clone();
-                        m.Color = _steps[_indexes[n]].Clone();
+                        m.Color = fade[_indexes[n]].Color.Clone();
                         MIDIExit?.Invoke(m);
                     }
                 }
@@ -184,18 +211,11 @@ namespace Apollo.Devices {
                     _indexes[n] = 0;
                     
                     Signal m = n.Clone();
-                    m.Color = _steps[0].Clone();
+                    m.Color = fade[0].Color.Clone();
                     MIDIExit?.Invoke(m);
                     
-                    int j = 0;
-                    for (int i = 1; i < _steps.Count; i++) {
-                        if (_cutoffs[j + 1] == i) j++;
-
-                        if (j < _colors.Count - 1)
-                            FireCourier(n, (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate);
-                    }
-
-                    FireCourier(n, (Mode? (int)Length : _time) * _gate);
+                    for (int i = 1; i < fade.Count; i++)
+                        FireCourier(n, fade[i].Time);
                 }
             }
         }

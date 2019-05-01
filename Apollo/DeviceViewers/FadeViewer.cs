@@ -31,6 +31,11 @@ namespace Apollo.DeviceViewers {
 
             _fade = fade;
             _fade.Generated += Gradient_Generate;
+            
+            canvas = this.Get<Canvas>("Canvas");
+            PickerContainer = this.Get<Grid>("PickerContainer");
+            Picker = this.Get<ColorPicker>("Picker");
+            Gradient = this.Get<LinearGradientBrush>("Gradient");
 
             Dial Duration = this.Get<Dial>("Duration");
             Duration.UsingSteps = _fade.Mode;
@@ -38,11 +43,6 @@ namespace Apollo.DeviceViewers {
             Duration.RawValue = _fade.Time;
 
             this.Get<Dial>("Gate").RawValue = (double)_fade.Gate * 100;
-            
-            canvas = this.Get<Canvas>("Canvas");
-            PickerContainer = this.Get<Grid>("PickerContainer");
-            Picker = this.Get<ColorPicker>("Picker");
-            Gradient = this.Get<LinearGradientBrush>("Gradient");
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
 
