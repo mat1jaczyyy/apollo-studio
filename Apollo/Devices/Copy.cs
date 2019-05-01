@@ -66,6 +66,8 @@ namespace Apollo.Devices {
             }
         }
 
+        public CopyType GetCopyMode() => _copymode;
+
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
@@ -261,75 +263,6 @@ namespace Apollo.Devices {
             } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
             
             else MIDIExit?.Invoke(n);
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            List<object> offsets = JsonConvert.DeserializeObject<List<object>>(data["offsets"].ToString());
-            List<Offset> initO = new List<Offset>();
-
-            foreach (object offset in offsets)
-                initO.Add(Offset.Decode(offset.ToString()));
-
-            return new Copy(
-                Convert.ToBoolean(data["mode"]),
-                Length.Decode(data["length"].ToString()),
-                Convert.ToInt32(data["rate"]),
-                Convert.ToDecimal(data["gate"]),
-                Enum.Parse<CopyType>(data["copymode"].ToString()),
-                Convert.ToBoolean(data["loop"]),
-                initO
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
-
-                        writer.WritePropertyName("length");
-                        writer.WriteRawValue(Length.Encode());
-
-                        writer.WritePropertyName("rate");
-                        writer.WriteValue(_rate);
-
-                        writer.WritePropertyName("gate");
-                        writer.WriteValue(_gate);
-
-                        writer.WritePropertyName("copymode");
-                        writer.WriteValue(_copymode);
-
-                        writer.WritePropertyName("loop");
-                        writer.WriteValue(Loop);
-
-                        writer.WritePropertyName("offsets");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < Offsets.Count; i++)
-                                writer.WriteRawValue(Offsets[i].Encode());
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

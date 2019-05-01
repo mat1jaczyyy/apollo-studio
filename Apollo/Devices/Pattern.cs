@@ -58,6 +58,8 @@ namespace Apollo.Devices {
             set => _mode = Enum.Parse<PlaybackType>(value);
         }
 
+        public PlaybackType GetPlaybackType() => _mode;
+
         public int? Choke;
         bool choked;
         
@@ -235,67 +237,6 @@ namespace Apollo.Devices {
             Window = null;
 
             base.Dispose();
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            List<object> _frames = JsonConvert.DeserializeObject<List<object>>(data["frames"].ToString());
-            List<Frame> init = new List<Frame>();
-
-            foreach (object frame in _frames)
-                init.Add(Frame.Decode(frame.ToString()));
-
-            return new Pattern(
-                Convert.ToDecimal(data["gate"].ToString()),
-                init,
-                Enum.Parse<PlaybackType>(data["mode"].ToString()),
-                int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null,
-                Convert.ToInt32(data["expanded"].ToString())
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("gate");
-                        writer.WriteValue(Gate);
-
-                        writer.WritePropertyName("frames");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < Frames.Count; i++)
-                                writer.WriteRawValue(Frames[i].Encode());
-
-                        writer.WriteEndArray();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(_mode);
-
-                        writer.WritePropertyName("choke");
-                        writer.WriteValue(Choke);
-
-                        writer.WritePropertyName("expanded");
-                        writer.WriteValue(Expanded);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

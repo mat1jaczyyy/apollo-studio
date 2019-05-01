@@ -79,55 +79,5 @@ namespace Apollo.Devices {
 
             MIDIExit?.Invoke(n);
         }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Tone(
-                Convert.ToDouble(data["hue"].ToString()),
-                Convert.ToDouble(data["saturation_high"].ToString()),
-                Convert.ToDouble(data["saturation_low"].ToString()),
-                Convert.ToDouble(data["value_high"].ToString()),
-                Convert.ToDouble(data["value_low"].ToString())
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("hue");
-                        writer.WriteValue(Hue);
-
-                        writer.WritePropertyName("saturation_high");
-                        writer.WriteValue(SaturationHigh);
-
-                        writer.WritePropertyName("saturation_low");
-                        writer.WriteValue(SaturationLow);
-
-                        writer.WritePropertyName("value_high");
-                        writer.WriteValue(ValueHigh);
-
-                        writer.WritePropertyName("value_low");
-                        writer.WriteValue(ValueLow);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

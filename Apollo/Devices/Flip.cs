@@ -36,6 +36,8 @@ namespace Apollo.Devices {
             }
         }
 
+        public FlipType GetFlipMode() => _mode;
+
         public bool Bypass;
 
         public override Device Clone() => new Flip(_mode, Bypass);
@@ -72,44 +74,6 @@ namespace Apollo.Devices {
             
             n.Index = (byte)result;
             MIDIExit?.Invoke(n);
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-
-            return new Flip(
-                Enum.Parse<FlipType>(data["mode"].ToString()),
-                Convert.ToBoolean(data["bypass"].ToString())
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(_mode);
-
-                        writer.WritePropertyName("bypass");
-                        writer.WriteValue(Bypass);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

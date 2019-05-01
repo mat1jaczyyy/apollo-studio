@@ -143,51 +143,24 @@ namespace Apollo.Viewers {
         }
 
         public async void Copy(int left, int right, bool cut = false) {
-            StringBuilder json = new StringBuilder();
+            throw new NotImplementedException();
 
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
+            // Encode Array of Devices to binary -> base64 and copy
 
-                    writer.WritePropertyName("object");
-                    writer.WriteValue("clipboard");
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("content");
-                        writer.WriteValue("device");
-
-                        writer.WritePropertyName("devices");
-                        writer.WriteStartArray();
-
-                            for (int i = left; i <= right; i++)
-                                writer.WriteRawValue(_chain.Devices[i].Encode());
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-
-            if (cut) Delete(left, right);
+            //if (cut) Delete(left, right);
             
-            await Application.Current.Clipboard.SetTextAsync(json.ToString());
+            //await Application.Current.Clipboard.SetTextAsync(json.ToString());
         }
 
         public async void Paste(int right) {
-            string jsonString = await Application.Current.Clipboard.GetTextAsync();
+            throw new NotImplementedException();
 
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "clipboard") return;
+            //string base64 = await Application.Current.Clipboard.GetTextAsync();
 
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            if (data["content"].ToString() != "device") return;
-
-            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
+            // Decode Array of Devices from base64 -> binary and paste
             
-            for (int i = 0; i < devices.Count; i++)
-                Device_Insert(right + i + 1, Device.Decode(devices[i].ToString()));
+            //for (int i = 0; i < Count; i++)
+            //    Device_Insert(right + i + 1, /* decoded Device object */));
         }
 
         public void Duplicate(int left, int right) {

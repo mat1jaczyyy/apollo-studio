@@ -47,43 +47,5 @@ namespace Apollo.Devices {
                 MIDIExit?.Invoke(n);
             }
         }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Move(
-                Offset.Decode(data["offset"].ToString()),
-                Convert.ToBoolean(data["loop"])
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("offset");
-                        writer.WriteRawValue(Offset.Encode());
-
-                        writer.WritePropertyName("loop");
-                        writer.WriteValue(Loop);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

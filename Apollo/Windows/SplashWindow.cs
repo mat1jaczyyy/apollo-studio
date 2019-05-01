@@ -56,13 +56,14 @@ namespace Apollo.Windows {
 
             string[] result = await ofd.ShowAsync(this);
             if (result.Length > 0) {
-                Project loaded = Project.Decode(File.ReadAllText(result[0]), result[0]);
+                throw new NotImplementedException();
+                //Project loaded = /* decode */ File.ReadAllBytes(result[0]);
 
-                if (loaded != null) {
-                    Program.Project = loaded;
-                    ProjectWindow.Create(this);
-                    Close();
-                }
+                //if (loaded != null) {
+                //    Program.Project = loaded;
+                //    ProjectWindow.Create(this);
+                //    Close();
+                //}
             }
         }
 

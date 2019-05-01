@@ -69,58 +69,5 @@ namespace Apollo.Devices {
                 MIDIExit?.Invoke(n);
             }
         }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Hold(
-                Convert.ToBoolean(data["mode"]),
-                Length.Decode(data["length"].ToString()),
-                Convert.ToInt32(data["time"]),
-                Convert.ToDecimal(data["gate"]),
-                Convert.ToBoolean(data["infinite"])
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
-
-                        writer.WritePropertyName("length");
-                        writer.WriteRawValue(Length.Encode());
-
-                        writer.WritePropertyName("time");
-                        writer.WriteValue(_time);
-
-                        writer.WritePropertyName("gate");
-                        writer.WriteValue(_gate);
-
-                        writer.WritePropertyName("infinite");
-                        writer.WriteValue(Infinite);
-
-                        writer.WritePropertyName("release");
-                        writer.WriteValue(Release);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

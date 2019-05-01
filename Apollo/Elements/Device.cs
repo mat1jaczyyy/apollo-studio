@@ -101,7 +101,5 @@ namespace Apollo.Elements {
             
             return (Device)obj;
         }
-
-        public abstract string EncodeSpecific();
     }
 }
