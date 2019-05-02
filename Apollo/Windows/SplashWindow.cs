@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Elements;
 
@@ -55,14 +57,13 @@ namespace Apollo.Windows {
 
             string[] result = await ofd.ShowAsync(this);
             if (result.Length > 0) {
-                throw new NotImplementedException();
-                //Project loaded = /* decode */ File.ReadAllBytes(result[0]);
+                Project loaded = Decoder.Decode(File.Open(result[0], FileMode.Open), typeof(Project));
 
-                //if (loaded != null) {
-                //    Program.Project = loaded;
-                //    ProjectWindow.Create(this);
-                //    Close();
-                //}
+                if (loaded != null) {
+                    Program.Project = loaded;
+                    ProjectWindow.Create(this);
+                    Close();
+                }
             }
         }
 
