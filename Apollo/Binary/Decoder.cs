@@ -8,6 +8,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Binary {
@@ -42,6 +43,11 @@ namespace Apollo.Binary {
                 ColorHistory.Set(
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
                 );
+
+            } else if (t == typeof(Copyable)) {
+                return new Copyable() {
+                    Contents = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList()
+                };
 
             } else if (t == typeof(Project))
                 return new Project(

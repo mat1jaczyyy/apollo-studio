@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia;
@@ -9,9 +10,11 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 
 namespace Apollo.Viewers {
     public class ChainViewer: UserControl {
@@ -139,24 +142,25 @@ namespace Apollo.Viewers {
         }
 
         public async void Copy(int left, int right, bool cut = false) {
-            throw new NotImplementedException();
-
-            // Encode Array of Devices to binary -> base64 and copy
-
-            //if (cut) Delete(left, right);
+            Copyable copy = new Copyable();
             
-            //await Application.Current.Clipboard.SetTextAsync(json.ToString());
+            for (int i = left; i <= right; i++)
+                copy.Contents.Add(_chain[i]);
+
+            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
+
+            if (cut) Delete(left, right);
+            
+            await Application.Current.Clipboard.SetTextAsync(b64);
         }
 
         public async void Paste(int right) {
-            throw new NotImplementedException();
-
-            //string base64 = await Application.Current.Clipboard.GetTextAsync();
-
-            // Decode Array of Devices from base64 -> binary and paste
+            string b64 = await Application.Current.Clipboard.GetTextAsync();
             
-            //for (int i = 0; i < Count; i++)
-            //    Device_Insert(right + i + 1, /* decoded Device object */));
+            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            
+            for (int i = 0; i < paste.Contents.Count; i++)
+                Device_Insert(right + i + 1, paste.Contents[i]);
         }
 
         public void Duplicate(int left, int right) {
