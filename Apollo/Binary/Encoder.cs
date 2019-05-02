@@ -97,7 +97,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Launchpad o) {
             EncodeID(writer, typeof(Launchpad));
 
-            writer.Write(o.Name);
+            writer.Write((o == null)? "" : o.Name);
         }
 
         private static void Encode(BinaryWriter writer, Group o) {

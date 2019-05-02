@@ -72,6 +72,8 @@ namespace Apollo.Binary {
             
             else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
+                
+                if (name == "") return null;
 
                 foreach (Launchpad lp in MIDI.Devices)
                     if (lp.Name == name) return lp;
