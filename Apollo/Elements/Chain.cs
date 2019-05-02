@@ -8,8 +8,6 @@ using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public class Chain {
-        public static readonly string Identifier = "chain";
-
         public ChainViewer Viewer;
 
         public IChainParent Parent = null;

@@ -6,8 +6,6 @@ using AvaloniaColor = Avalonia.Media.Color;
 
 namespace Apollo.Structures {
     public class Color {
-        public static readonly string Identifier = "color";
-
         private byte _r, _g, _b;
 
         private bool IsValid(byte value) => 0 <= value && value <= 63;

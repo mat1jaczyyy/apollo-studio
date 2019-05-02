@@ -10,7 +10,6 @@ using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public abstract class Device {
-        public static readonly string Identifier = "device";
         public readonly string DeviceIdentifier;
 
         public DeviceViewer Viewer;

@@ -5,8 +5,6 @@ using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {
-        public static readonly string Identifier = "signal";
-
         public Launchpad Source;
         private byte _p = 11;
         public Color Color;

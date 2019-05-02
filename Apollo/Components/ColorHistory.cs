@@ -13,8 +13,6 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class ColorHistory: UserControl {
-        public static readonly string Identifier = "colorhistory";
-
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void HistoryChangedEventHandler();

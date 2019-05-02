@@ -9,8 +9,6 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Project {
-        public static readonly string Identifier = "project";
-
         public ProjectWindow Window;
 
         public List<Track> Tracks;

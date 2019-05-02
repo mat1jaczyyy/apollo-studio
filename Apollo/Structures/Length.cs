@@ -4,8 +4,6 @@ using Apollo.Core;
 
 namespace Apollo.Structures {
     public class Length {
-        public static readonly string Identifier = "length";
-
         public delegate void ChangedEventHandler();
         public event ChangedEventHandler Changed;
 

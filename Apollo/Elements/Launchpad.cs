@@ -11,8 +11,6 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
-        public static readonly string Identifier = "launchpad";
-
         public PatternWindow PatternWindow;
 
         public delegate void MultiResetHandler();

@@ -8,8 +8,6 @@ using Apollo.Structures;
 
 namespace Apollo.Core {
     public static class MIDI {
-        public static readonly string Identifier = "midi";
-
         public delegate void DevicesUpdatedEventHandler();
         public static event DevicesUpdatedEventHandler DevicesUpdated;
 

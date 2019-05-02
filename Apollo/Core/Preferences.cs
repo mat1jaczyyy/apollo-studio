@@ -5,8 +5,6 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     public static class Preferences {
-        public static readonly string Identifier = "preferences";
-
         public static PreferencesWindow Window;
 
         private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";

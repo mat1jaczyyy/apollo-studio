@@ -4,8 +4,6 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Track: IChainParent {
-        public static readonly string Identifier = "track";
-
         public TrackWindow Window;
 
         public delegate void ParentIndexChangedEventHandler(int index);

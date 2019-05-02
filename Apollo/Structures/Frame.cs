@@ -2,8 +2,6 @@ using System.Linq;
 
 namespace Apollo.Structures {
     public class Frame {
-        public static readonly string Identifier = "frame";
-
         public Color[] Screen;
 
         public bool Mode; // true uses Length

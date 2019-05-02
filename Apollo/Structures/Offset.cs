@@ -1,7 +1,5 @@
 namespace Apollo.Structures {
     public class Offset {
-        public static readonly string Identifier = "offset";
-
         private int _x = 0;
         public int X {
             get => _x;
