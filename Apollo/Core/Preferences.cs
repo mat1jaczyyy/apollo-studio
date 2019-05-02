@@ -8,7 +8,7 @@ namespace Apollo.Core {
     public static class Preferences {
         public static PreferencesWindow Window;
 
-        private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config.json";
+        private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config";
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
@@ -77,10 +77,18 @@ namespace Apollo.Core {
             }
         }
 
-        public static void Save() => File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
+        public static void Save() {
+            try {
+                File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
+            } catch (IOException) {}
+        } 
 
         static Preferences() {
-            if (!(File.Exists(FilePath) /* && decode with success return -> File.ReadAllBytes(FilePath) */)) Save();
+            if (File.Exists(FilePath)) 
+                using (FileStream file = File.Open(FilePath, FileMode.Open))
+                    Decoder.Decode(file, typeof(Preferences));
+
+            Save();
         }
     }
 }
