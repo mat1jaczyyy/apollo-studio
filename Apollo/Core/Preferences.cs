@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 
+using Apollo.Binary;
 using Apollo.Windows;
 
 namespace Apollo.Core {
@@ -76,7 +77,7 @@ namespace Apollo.Core {
             }
         }
 
-        public static void Save() => File.WriteAllBytes(FilePath, Binary.EncodePreferences().ToArray());
+        public static void Save() => File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
 
         static Preferences() {
             if (!(File.Exists(FilePath) /* && decode with success return -> File.ReadAllBytes(FilePath) */)) Save();

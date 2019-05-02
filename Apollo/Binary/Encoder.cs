@@ -2,12 +2,13 @@ using System;
 using System.IO;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 
-namespace Apollo.Core {
-    public static class Binary {
+namespace Apollo.Binary {
+    public static class Encoder {
         private const int version = 0;
 
         public static readonly Type[] id = new Type[] {

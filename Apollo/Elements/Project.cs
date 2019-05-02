@@ -4,6 +4,7 @@ using System.IO;
 
 using Avalonia.Controls;
 
+using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Windows;
 
@@ -62,7 +63,7 @@ namespace Apollo.Elements {
             string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
-                File.WriteAllBytes(FilePath, Binary.Encode(this).ToArray());
+                File.WriteAllBytes(FilePath, Encoder.Encode(this).ToArray());
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
