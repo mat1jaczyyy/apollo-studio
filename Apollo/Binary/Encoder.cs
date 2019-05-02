@@ -5,6 +5,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Binary {
@@ -50,6 +51,14 @@ namespace Apollo.Binary {
             }
 
             return output;
+        }
+
+        private static void Encode(BinaryWriter writer, Copyable o) {
+            EncodeID(writer, typeof(Copyable));
+            
+            writer.Write(o.Contents.Count);
+            for (int i = 0; i < o.Contents.Count; i++)
+                Encode(writer, o.Contents[i]);
         }
 
         private static void Encode(BinaryWriter writer, Project o) {

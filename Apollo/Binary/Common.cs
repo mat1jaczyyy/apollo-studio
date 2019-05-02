@@ -4,6 +4,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Binary {
@@ -12,6 +13,7 @@ namespace Apollo.Binary {
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),
+            typeof(Copyable),
 
             typeof(Project),
             typeof(Track),
