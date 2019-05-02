@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
+using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -12,6 +13,9 @@ namespace Apollo.Core {
         private const int version = 0;
 
         public static readonly Type[] id = new Type[] {
+            typeof(Preferences),
+            typeof(ColorHistory),
+
             typeof(Project),
             typeof(Track),
             typeof(Chain),
@@ -43,20 +47,48 @@ namespace Apollo.Core {
             typeof(Offset)
         };
 
+        private static void EncodeHeader(BinaryWriter writer) {
+            writer.Write(new char[] {'A', 'P', 'O', 'L'});
+            writer.Write(version);
+        }
+
+        private static void EncodeID(BinaryWriter writer, Type type) {
+            writer.Write((byte)Array.IndexOf(id, type));
+        }
+
         public static MemoryStream Encode(object o) {
             MemoryStream output = new MemoryStream();
 
             using (BinaryWriter writer = new BinaryWriter(output)) {
-                writer.Write(new char[] {'A', 'P', 'O', 'L'});
-                writer.Write(version);
-
+                EncodeHeader(writer);
                 Encode(writer, (dynamic)o);
             }
 
             return output;
         }
 
-        private static void EncodeID(BinaryWriter writer, Type type) => writer.Write((byte)Array.IndexOf(id, type));
+        public static MemoryStream EncodePreferences() {
+            MemoryStream output = new MemoryStream();
+
+            using (BinaryWriter writer = new BinaryWriter(output)) {
+                EncodeHeader(writer);
+                EncodeID(writer, typeof(Preferences));
+
+                writer.Write(Preferences.AlwaysOnTop);
+                writer.Write(Preferences.CenterTrackContents);
+                writer.Write(Preferences.AutoCreateKeyFilter);
+                writer.Write(Preferences.AutoCreatePageFilter);
+                writer.Write(Preferences.FadeSmoothnessSlider);
+                writer.Write(Preferences.CopyPreviousFrame);
+
+                int count = Math.Min(64, ColorHistory.Count);
+                writer.Write(count);
+                for (int i = 0; i < count; i++)
+                    Encode(ColorHistory.GetColor(i));
+            }
+
+            return output;
+        }
 
         private static void Encode(BinaryWriter writer, Project o) {
             EncodeID(writer, typeof(Project));

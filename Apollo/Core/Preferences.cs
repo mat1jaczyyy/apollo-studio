@@ -83,72 +83,10 @@ namespace Apollo.Core {
             }
         }
 
-        public static void Save() => File.WriteAllText(FilePath, Encode());
+        public static void Save() => File.WriteAllBytes(FilePath, Binary.EncodePreferences().ToArray());
 
         static Preferences() {
-            if (!(File.Exists(FilePath) && Decode(File.ReadAllText(FilePath)))) Save();
-        }
-        
-        private static bool Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return false;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            try {
-                AlwaysOnTop = Convert.ToBoolean(data["alwaysontop"]);
-                CenterTrackContents = Convert.ToBoolean(data["centertrackcontents"]);
-                AutoCreateKeyFilter = Convert.ToBoolean(data["autocreatekeyfilter"]);
-                AutoCreatePageFilter = Convert.ToBoolean(data["autocreatepagefilter"]);
-                FadeSmoothness = Convert.ToDouble(data["fadesmoothness"]);
-                ColorHistory.Decode(data["colorhistory"].ToString());
-                CopyPreviousFrame = Convert.ToBoolean(data["copypreviousframe"]);
-            } catch {
-                return false;
-            }
-
-            return true;
-        }
-
-        private static string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("alwaysontop");
-                        writer.WriteValue(AlwaysOnTop);
-
-                        writer.WritePropertyName("centertrackcontents");
-                        writer.WriteValue(CenterTrackContents);
-
-                        writer.WritePropertyName("autocreatekeyfilter");
-                        writer.WriteValue(AutoCreateKeyFilter);
-
-                        writer.WritePropertyName("autocreatepagefilter");
-                        writer.WriteValue(AutoCreatePageFilter);
-
-                        writer.WritePropertyName("fadesmoothness");
-                        writer.WriteValue(FadeSmoothnessSlider);
-
-                        writer.WritePropertyName("colorhistory");
-                        writer.WriteRawValue(ColorHistory.Encode());
-
-                        writer.WritePropertyName("copypreviousframe");
-                        writer.WriteValue(CopyPreviousFrame);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
+            if (!(File.Exists(FilePath) /* && decode with success return -> File.ReadAllBytes(FilePath) */)) Save();
         }
     }
 }

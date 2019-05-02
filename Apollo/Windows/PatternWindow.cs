@@ -184,7 +184,7 @@ namespace Apollo.Windows {
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
 
-            ColorPicker.SetColor(ColorHistory[0]?? new Color());
+            ColorPicker.SetColor(ColorHistory.GetColor(0)?? new Color());
             ColorHistory.Select(ColorPicker.Color.Clone(), true);
             
             Frame_Select(_pattern.Expanded);
