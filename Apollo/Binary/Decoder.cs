@@ -181,6 +181,32 @@ namespace Apollo.Binary {
                     reader.ReadDouble(),
                     reader.ReadDouble()
                 );
+            
+            else if (t == typeof(Color))
+                return new Color(
+                    reader.ReadByte(),
+                    reader.ReadByte(),
+                    reader.ReadByte()
+                );
+            
+            else if (t == typeof(Frame))
+                return new Frame(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32(),
+                    (from i in Enumerable.Range(0, 100) select (Color)Decode(reader, version)).ToArray()
+                );
+            
+            else if (t == typeof(Length))
+                return new Length(
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(Offset))
+                return new Offset(
+                    reader.ReadInt32(),
+                    reader.ReadInt32()
+                );
 
             return null;
         }
