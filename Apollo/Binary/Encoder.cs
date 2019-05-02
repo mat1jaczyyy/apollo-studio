@@ -57,6 +57,8 @@ namespace Apollo.Binary {
 
             writer.Write(o.BPM);
 
+            writer.Write(o.Page);
+
             writer.Write(o.Tracks.Count);
             for (int i = 0; i < o.Tracks.Count; i++)
                 Encode(writer, o.Tracks[i]);
