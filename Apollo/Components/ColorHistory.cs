@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Input;
 
-using Newtonsoft.Json;
-
 using Apollo.Core;
-using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 

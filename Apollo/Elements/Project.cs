@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Text;
 
 using Avalonia.Controls;
-
-using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Windows;

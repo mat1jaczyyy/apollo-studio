@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Structures;
 using Apollo.Viewers;

@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
-
 namespace Apollo.Structures {
     public class Offset {
         public static readonly string Identifier = "offset";

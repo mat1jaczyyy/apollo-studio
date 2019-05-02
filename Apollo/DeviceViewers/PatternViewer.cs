@@ -2,7 +2,6 @@
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
-using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Windows;

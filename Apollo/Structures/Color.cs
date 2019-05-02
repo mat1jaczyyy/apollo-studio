@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 using Avalonia.Media;
 using AvaloniaColor = Avalonia.Media.Color;
-
-using Newtonsoft.Json;
 
 namespace Apollo.Structures {
     public class Color {

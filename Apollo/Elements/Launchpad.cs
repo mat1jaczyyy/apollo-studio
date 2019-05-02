@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 
-using Newtonsoft.Json;
 using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;

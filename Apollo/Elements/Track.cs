@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
-
-using Apollo.Core;
+﻿using Apollo.Core;
 using Apollo.Structures;
 using Apollo.Windows;
 

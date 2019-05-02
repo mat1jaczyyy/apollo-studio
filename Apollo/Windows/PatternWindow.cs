@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
-using AvaloniaColor = Avalonia.Media.Color;
 using FontWeight = Avalonia.Media.FontWeight;
 using SolidColorBrush = Avalonia.Media.SolidColorBrush;
 using Avalonia.Threading;
@@ -20,7 +17,6 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
-using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class PatternWindow: Window {

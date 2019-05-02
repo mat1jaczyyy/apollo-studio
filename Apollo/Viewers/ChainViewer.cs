@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -10,8 +8,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-
-using Newtonsoft.Json;
 
 using Apollo.Components;
 using Apollo.Devices;
