@@ -1,16 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Core;
 
 namespace Apollo.Structures {
     public class Length {
-        public static readonly string Identifier = "length";
-
         public delegate void ChangedEventHandler();
         public event ChangedEventHandler Changed;
 
@@ -39,39 +32,5 @@ namespace Apollo.Structures {
         public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
 
         public override string ToString() => Steps[_value];
-
-        public static Length Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Length(
-                Convert.ToInt32(data["value"].ToString())
-            );
-        }
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("value");
-                        writer.WriteValue(_value.ToString());
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-        
-            return json.ToString();
-        }
     }
 }

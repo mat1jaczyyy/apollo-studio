@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 
-using Newtonsoft.Json;
 using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
@@ -16,8 +11,6 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
-        public static readonly string Identifier = "launchpad";
-
         public PatternWindow PatternWindow;
 
         public delegate void MultiResetHandler();
@@ -224,44 +217,5 @@ namespace Apollo.Elements {
         }
 
         public override string ToString() => (Available? "" : "(unavailable) ") + Name;
-
-        public static Launchpad Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-
-            foreach (Launchpad launchpad in MIDI.Devices)
-                if (launchpad.Name == data["port"].ToString())
-                    return launchpad;
-            
-            Launchpad lp = new Launchpad(data["port"].ToString());
-            MIDI.Devices.Add(lp);
-            
-            return lp;
-        }
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("port");
-                        writer.WriteValue(Name);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

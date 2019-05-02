@@ -131,7 +131,7 @@ namespace Apollo.Viewers {
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
-            dragData.Set(Device.Identifier, Track.Get(_device).Window?.Selection);
+            dragData.Set("device", Track.Get(_device).Window?.Selection);
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
@@ -151,17 +151,17 @@ namespace Apollo.Viewers {
         }
 
         public void DragOver(object sender, DragEventArgs e) {
-            if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
-            if (!e.Data.Contains(Device.Identifier)) return;
+            if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter")
                 source = source.Parent;
 
-            List<Device> moving = (List<Device>)e.Data.Get(Device.Identifier);
+            List<Device> moving = (List<Device>)e.Data.Get("device");
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;

@@ -1,18 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 using Avalonia.Media;
 using AvaloniaColor = Avalonia.Media.Color;
 
-using Newtonsoft.Json;
-
 namespace Apollo.Structures {
     public class Color {
-        public static readonly string Identifier = "color";
-
         private byte _r, _g, _b;
 
         private bool IsValid(byte value) => 0 <= value && value <= 63;
@@ -127,47 +120,5 @@ namespace Apollo.Structures {
         public string ToHex() => $"#{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
 
         public override string ToString() => $"({Red}, {Green}, {Blue})";
-
-        public static Color Decode(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != Identifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            return new Color(
-                byte.Parse(data["red"].ToString()),
-                byte.Parse(data["green"].ToString()),
-                byte.Parse(data["blue"].ToString())
-            );
-        }
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("red");
-                        writer.WriteValue(_r);
-
-                        writer.WritePropertyName("green");
-                        writer.WriteValue(_g);
-
-                        writer.WritePropertyName("blue");
-                        writer.WriteValue(_b);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }

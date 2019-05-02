@@ -1,9 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Elements;
 using Apollo.Structures;
@@ -57,52 +52,6 @@ namespace Apollo.Devices {
             };
             courier.Elapsed += Tick;
             courier.Start();
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-
-            return new Delay(
-                Convert.ToBoolean(data["mode"]),
-                Length.Decode(data["length"].ToString()),
-                Convert.ToInt32(data["time"]),
-                Convert.ToDecimal(data["gate"])
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
-
-                        writer.WritePropertyName("length");
-                        writer.WriteRawValue(Length.Encode());
-
-                        writer.WritePropertyName("time");
-                        writer.WriteValue(_time);
-
-                        writer.WritePropertyName("gate");
-                        writer.WriteValue(_gate);
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -11,11 +10,11 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
-using Newtonsoft.Json;
-
+using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 
 namespace Apollo.Viewers {
     public class ChainViewer: UserControl {
@@ -119,17 +118,17 @@ namespace Apollo.Viewers {
         }
 
         private void DragOver(object sender, DragEventArgs e) {
-            if (!e.Data.Contains(Device.Identifier)) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
         private void Drop(object sender, DragEventArgs e) {
-            if (!e.Data.Contains(Device.Identifier)) return;
+            if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd")
                 source = source.Parent;
 
-            List<Device> moving = (List<Device>)e.Data.Get(Device.Identifier);
+            List<Device> moving = (List<Device>)e.Data.Get("device");
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;
@@ -143,51 +142,25 @@ namespace Apollo.Viewers {
         }
 
         public async void Copy(int left, int right, bool cut = false) {
-            StringBuilder json = new StringBuilder();
+            Copyable copy = new Copyable();
+            
+            for (int i = left; i <= right; i++)
+                copy.Contents.Add(_chain[i]);
 
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue("clipboard");
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("content");
-                        writer.WriteValue("device");
-
-                        writer.WritePropertyName("devices");
-                        writer.WriteStartArray();
-
-                            for (int i = left; i <= right; i++)
-                                writer.WriteRawValue(_chain.Devices[i].Encode());
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
+            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
 
             if (cut) Delete(left, right);
             
-            await Application.Current.Clipboard.SetTextAsync(json.ToString());
+            await Application.Current.Clipboard.SetTextAsync(b64);
         }
 
         public async void Paste(int right) {
-            string jsonString = await Application.Current.Clipboard.GetTextAsync();
-
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["object"].ToString() != "clipboard") return;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            if (data["content"].ToString() != "device") return;
-
-            List<object> devices = JsonConvert.DeserializeObject<List<object>>(data["devices"].ToString());
+            string b64 = await Application.Current.Clipboard.GetTextAsync();
             
-            for (int i = 0; i < devices.Count; i++)
-                Device_Insert(right + i + 1, Device.Decode(devices[i].ToString()));
+            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            
+            for (int i = 0; i < paste.Contents.Count; i++)
+                Device_Insert(right + i + 1, paste.Contents[i]);
         }
 
         public void Duplicate(int left, int right) {

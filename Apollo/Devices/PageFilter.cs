@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -37,43 +31,6 @@ namespace Apollo.Devices {
         public override void MIDIEnter(Signal n) {
             if (_filter[Program.Project.Page - 1])
                 MIDIExit?.Invoke(n);
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            List<object> data = JsonConvert.DeserializeObject<List<object>>(json["data"].ToString());
-            
-            bool[] filter = new bool[100];
-
-            for (int i = 0; i < 100; i++)
-                filter[i] = Convert.ToBoolean(data[i].ToString());
-
-            return new PageFilter(filter);
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartArray();
-
-                        for (int i = 0; i < 100; i++)
-                            writer.WriteValue(_filter[i]);
-
-                    writer.WriteEndArray();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

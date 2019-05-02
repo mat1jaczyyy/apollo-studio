@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Elements;
 
@@ -56,7 +57,10 @@ namespace Apollo.Windows {
 
             string[] result = await ofd.ShowAsync(this);
             if (result.Length > 0) {
-                Project loaded = Project.Decode(File.ReadAllText(result[0]), result[0]);
+                Project loaded;
+
+                using (FileStream file = File.Open(result[0], FileMode.Open))
+                    loaded = Decoder.Decode(file, typeof(Project));
 
                 if (loaded != null) {
                     Program.Project = loaded;

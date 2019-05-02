@@ -2,10 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -52,6 +48,8 @@ namespace Apollo.Devices {
                 else if (value == "Random+") _mode = MultiType.RandomPlus;
             }
         }
+
+        public MultiType GetMultiMode() => _mode;
 
         private int current = -1;
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
@@ -163,63 +161,6 @@ namespace Apollo.Devices {
             Preprocess.Dispose();
             foreach (Chain chain in _chains) chain.Dispose();
             base.Dispose();
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            List<object> chains = JsonConvert.DeserializeObject<List<object>>(data["chains"].ToString());
-            List<Chain> init = new List<Chain>();
-
-            foreach (object chain in chains)
-                init.Add(Chain.Decode(chain.ToString()));
-            
-            return new Multi(
-                Chain.Decode(data["preprocess"].ToString()),
-                init,
-                Enum.Parse<MultiType>(data["mode"].ToString()),
-                int.TryParse(data["expanded"].ToString(), out int i)? (int?)i : null
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("preprocess");
-                        writer.WriteRawValue(Preprocess.Encode());
-
-                        writer.WritePropertyName("chains");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < _chains.Count; i++)
-                                writer.WriteRawValue(_chains[i].Encode());
-
-                        writer.WriteEndArray();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
-
-                        writer.WritePropertyName("expanded");
-                        writer.WriteValue(Expanded);
-                        
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

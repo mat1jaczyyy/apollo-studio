@@ -2,10 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Core;
 using Apollo.Elements;
@@ -218,82 +214,6 @@ namespace Apollo.Devices {
                         FireCourier(n, fade[i].Time);
                 }
             }
-        }
-
-        public static Device DecodeSpecific(string jsonString) {
-            Dictionary<string, object> json = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
-            if (json["device"].ToString() != DeviceIdentifier) return null;
-
-            Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json["data"].ToString());
-            
-            List<object> _colors = JsonConvert.DeserializeObject<List<object>>(data["colors"].ToString());
-            List<Color> initC = new List<Color>();
-
-            foreach (object color in _colors)
-                initC.Add(Color.Decode(color.ToString()));
-
-            List<object> _positions = JsonConvert.DeserializeObject<List<object>>(data["positions"].ToString());
-            List<decimal> initP = new List<decimal>();
-
-            foreach (object position in _positions)
-                initP.Add(decimal.Parse(position.ToString()));
-
-            return new Fade(
-                Convert.ToBoolean(data["mode"]),
-                Length.Decode(data["length"].ToString()),
-                Convert.ToInt32(data["time"]),
-                Convert.ToDecimal(data["gate"]),
-                initC,
-                initP
-            );
-        }
-
-        public override string EncodeSpecific() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("device");
-                    writer.WriteValue(DeviceIdentifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-
-                        writer.WritePropertyName("mode");
-                        writer.WriteValue(Mode);
-
-                        writer.WritePropertyName("length");
-                        writer.WriteRawValue(Length.Encode());
-
-                        writer.WritePropertyName("time");
-                        writer.WriteValue(_time);
-
-                        writer.WritePropertyName("gate");
-                        writer.WriteValue(_gate);
-
-                        writer.WritePropertyName("colors");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < _colors.Count; i++)
-                                writer.WriteRawValue(_colors[i].Encode());
-
-                        writer.WriteEndArray();
-
-                        writer.WritePropertyName("positions");
-                        writer.WriteStartArray();
-
-                            for (int i = 0; i < _positions.Count; i++)
-                                writer.WriteValue(_positions[i]);
-
-                        writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
         }
     }
 }

@@ -3,7 +3,6 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-using Apollo.Components;
 using Apollo.Devices;
 
 namespace Apollo.DeviceViewers {

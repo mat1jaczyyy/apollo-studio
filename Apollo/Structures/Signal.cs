@@ -1,16 +1,10 @@
 using System;
-using System.IO;
-using System.Text;
-
-using Newtonsoft.Json;
 
 using Apollo.Elements;
 using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {
-        public static readonly string Identifier = "signal";
-
         public Launchpad Source;
         private byte _p = 11;
         public Color Color;
@@ -54,31 +48,5 @@ namespace Apollo.Structures {
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Layer, MultiTarget);
 
         public override string ToString() => $"{Source.Name} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
-
-        public string Encode() {
-            StringBuilder json = new StringBuilder();
-
-            using (JsonWriter writer = new JsonTextWriter(new StringWriter(json))) {
-                writer.WriteStartObject();
-
-                    writer.WritePropertyName("object");
-                    writer.WriteValue(Identifier);
-
-                    writer.WritePropertyName("data");
-                    writer.WriteStartObject();
-                    
-                        writer.WritePropertyName("index");
-                        writer.WriteValue(_p);
-                        
-                        writer.WritePropertyName("color");
-                        writer.WriteRawValue(Color.Encode());
-
-                    writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-            
-            return json.ToString();
-        }
     }
 }
