@@ -12,7 +12,6 @@ namespace Apollo.Binary {
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),
-            typeof(ColorHistory),
 
             typeof(Project),
             typeof(Track),

@@ -22,6 +22,11 @@ namespace Apollo.Components {
 
         public static Color GetColor(int index) => (index < Count)? History[index] : null;
 
+        public static void Set(List<Color> history) {
+            History = history;
+            HistoryChanged?.Invoke();
+        }
+
         public static int Count {
             get => History.Count;
         }

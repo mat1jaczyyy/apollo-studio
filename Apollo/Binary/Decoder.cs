@@ -20,17 +20,30 @@ namespace Apollo.Binary {
             return Common.id[(reader.ReadByte())];
         }
 
-        public static dynamic Decode(Stream input) {
+        public static dynamic Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
                 DecodeHeader(reader);
-                return Decode(reader, reader.ReadInt32());
+                return Decode(reader, reader.ReadInt32(), ensure, true);
             }
         }
         
-        private static dynamic Decode(BinaryReader reader, int version) {
+        private static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
             Type t = DecodeID(reader);
+            if (ensure != null && ensure != t) return null;
 
-            if (t == typeof(Project))
+            if (t == typeof(Preferences) && root) {
+                Preferences.AlwaysOnTop = reader.ReadBoolean();
+                Preferences.CenterTrackContents = reader.ReadBoolean();
+                Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
+                Preferences.AutoCreatePageFilter = reader.ReadBoolean();
+                Preferences.FadeSmoothness = reader.ReadDouble();
+                Preferences.CopyPreviousFrame = reader.ReadBoolean();
+
+                ColorHistory.Set(
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
+                );
+
+            } else if (t == typeof(Project))
                 return new Project(
                     reader.ReadInt32(),
                     reader.ReadInt32(),
