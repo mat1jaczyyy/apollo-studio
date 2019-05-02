@@ -49,7 +49,7 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Device))
-                return (Device)Decode(reader, version);
+                return Decode(reader, version);
             
             else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
@@ -58,8 +58,130 @@ namespace Apollo.Binary {
                     if (lp.Name == name) return lp;
                 
                 return new Launchpad(name);
-            }
+
+            } else if (t == typeof(Group))
+                return new Group(
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
+                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null
+                );
             
+            else if (t == typeof(Copy))
+                return new Copy(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32(),
+                    reader.ReadDecimal(),
+                    (Copy.CopyType)reader.ReadInt32(),
+                    reader.ReadBoolean(),
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
+                );
+            
+            else if (t == typeof(Delay))
+                return new Delay(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32(),
+                    reader.ReadDecimal()
+                );
+            
+            else if (t == typeof(Fade)) {
+                int count;
+                return new Fade(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32(),
+                    reader.ReadDecimal(),
+                    (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList(),
+                    (from i in Enumerable.Range(0, count) select reader.ReadDecimal()).ToList()
+                );
+
+            } else if (t == typeof(Flip))
+                return new Flip(
+                    (Flip.FlipType)reader.ReadInt32(),
+                    reader.ReadBoolean()
+                );
+            
+            else if (t == typeof(Hold))
+                return new Hold(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32(),
+                    reader.ReadDecimal(),
+                    reader.ReadBoolean(),
+                    reader.ReadBoolean()
+                );
+            
+            else if (t == typeof(KeyFilter))
+                return new KeyFilter(
+                    (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
+                );
+
+            else if (t == typeof(Layer))
+                return new Layer(
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(Move))
+                return new Move(
+                    Decode(reader, version),
+                    reader.ReadBoolean()
+                );
+            
+            else if (t == typeof(Multi))
+                return new Multi(
+                    Decode(reader, version),
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
+                    (Multi.MultiType)reader.ReadInt32(),
+                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null
+                );
+            
+            else if (t == typeof(Output))
+                return new Output(
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(PageFilter))
+                return new PageFilter(
+                    (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
+                );
+            
+            else if (t == typeof(PageSwitch))
+                return new PageSwitch(
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(Paint))
+                return new Paint(
+                    Decode(reader, version)
+                );
+            
+            else if (t == typeof(Pattern))
+                return new Pattern(
+                    reader.ReadDecimal(),
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList(),
+                    (Pattern.PlaybackType)reader.ReadInt32(),
+                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(Preview))
+                return new Preview();
+            
+            else if (t == typeof(Rotate))
+                return new Rotate(
+                    (Rotate.RotateType)reader.ReadInt32(),
+                    reader.ReadBoolean()
+                );
+            
+            else if (t == typeof(Tone))
+                return new Tone(
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble()
+                );
+
             return null;
         }
     }

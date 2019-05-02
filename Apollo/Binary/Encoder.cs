@@ -137,10 +137,11 @@ namespace Apollo.Binary {
             writer.Write(o.Gate);
 
             writer.Write(o.Count);
-            for (int i = 0; i < o.Count; i++) {
+            for (int i = 0; i < o.Count; i++)
                 Encode(writer, o.GetColor(i));
+            
+            for (int i = 0; i < o.Count; i++)
                 writer.Write(o.GetPosition(i));
-            }
         }
 
         private static void Encode(BinaryWriter writer, Flip o) {
@@ -165,7 +166,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, KeyFilter o) {
             EncodeID(writer, typeof(KeyFilter));
 
-            for (int i = 1; i <= 99; i++)
+            for (int i = 0; i < 100; i++)
                 writer.Write(o[i]);
         }
 
