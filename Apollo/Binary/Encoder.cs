@@ -58,7 +58,7 @@ namespace Apollo.Binary {
             
             writer.Write(o.Contents.Count);
             for (int i = 0; i < o.Contents.Count; i++)
-                Encode(writer, o.Contents[i]);
+                Encode(writer, (dynamic)o.Contents[i]);
         }
 
         private static void Encode(BinaryWriter writer, Project o) {

@@ -161,7 +161,7 @@ namespace Apollo.Viewers {
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             
             for (int i = 0; i < paste.Contents.Count; i++)
-                Device_Insert(right + i + 1, paste.Contents[i]);
+                Device_Insert(right + i + 1, (Device)paste.Contents[i]);
         }
 
         public void Duplicate(int left, int right) {

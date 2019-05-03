@@ -46,7 +46,7 @@ namespace Apollo.Binary {
 
             } else if (t == typeof(Copyable)) {
                 return new Copyable() {
-                    Contents = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList()
+                    Contents = (from i in Enumerable.Range(0, reader.ReadInt32()) select (ISelect)Decode(reader, version)).ToList()
                 };
 
             } else if (t == typeof(Project))

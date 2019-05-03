@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 
-using Apollo.Elements;
+using Apollo.Core;
 
 namespace Apollo.Helpers {
     public class Copyable {
-        public List<Device> Contents = new List<Device>();
+        public List<ISelect> Contents = new List<ISelect>();
     }
 }

@@ -1,18 +1,23 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Viewers;
 
 namespace Apollo.DeviceViewers {
-    public class MultiViewer: UserControl, IMultipleChainParentViewer {
+    public class MultiViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
         public static readonly string DeviceIdentifier = "multi";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -120,10 +125,13 @@ namespace Apollo.DeviceViewers {
             _multi.Expanded = index;
         }
 
-        private void Chain_Insert(int index) {
-            _multi.Insert(index, new Chain());
+        private void Chain_Insert(int index) => Chain_Insert(index, new Chain());
+
+        private void Chain_Insert(int index, Chain chain) {
+            _multi.Insert(index, chain);
             Contents_Insert(index, _multi[index]);
             
+            Track.Get(chain).Window?.Select(chain);
             Expand(index);
         }
 
@@ -135,5 +143,41 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)ComboBox.SelectedItem;
+
+        public async void Copy(int left, int right, bool cut = false) {
+            Copyable copy = new Copyable();
+            
+            for (int i = left; i <= right; i++)
+                copy.Contents.Add(_multi[i]);
+
+            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
+
+            if (cut) Delete(left, right);
+            
+            await Application.Current.Clipboard.SetTextAsync(b64);
+        }
+
+        public async void Paste(int right) {
+            string b64 = await Application.Current.Clipboard.GetTextAsync();
+            
+            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            
+            for (int i = 0; i < paste.Contents.Count; i++)
+                Chain_Insert(right + i + 1, (Chain)paste.Contents[i]);
+        }
+
+        public void Duplicate(int left, int right) {
+            for (int i = 0; i <= right - left; i++)
+                Chain_Insert(right + i + 1, (Chain)_multi[left + i].Clone());
+        }
+
+        public void Delete(int left, int right) {
+            for (int i = right; i >= left; i--)
+                Chain_Remove(i);
+        }
+
+        public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");
+
+        public void Ungroup(int index) => throw new InvalidOperationException("A Chain cannot be ungrouped.");
     }
 }
