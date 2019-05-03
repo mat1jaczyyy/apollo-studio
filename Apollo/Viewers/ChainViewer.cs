@@ -134,7 +134,7 @@ namespace Apollo.Viewers {
 
             bool result;
 
-            if (source.Name != "DropZoneAfter") result = Device.Move(moving, _chain, copy);
+            if (source.Name != "DropZoneAfter" || _chain.Devices.Count == 0) result = Device.Move(moving, _chain, copy);
             else result = Device.Move(moving, _chain.Devices.Last(), copy);
 
             if (!result) e.DragEffects = DragDropEffects.None;
