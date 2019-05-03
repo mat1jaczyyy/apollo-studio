@@ -3,9 +3,19 @@
              x:Class="Apollo.DeviceViewers.GroupViewer"
              xmlns:Components="clr-namespace:Apollo.Components">
   
+  <UserControl.Resources>
+    <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+  </UserControl.Resources>
+
   <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-    <StackPanel x:Name="Contents" Margin="10 5">
-      <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" x:Name="ChainAdd" />
-    </StackPanel>
+    <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
+      <StackPanel Grid.Row="0" x:Name="Contents">
+        <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
+      </StackPanel>
+
+      <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
+    </Grid>
   </ScrollViewer>
 </UserControl>

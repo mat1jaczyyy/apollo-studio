@@ -20,7 +20,7 @@ namespace Apollo.Devices {
         }
 
         public List<ISelect> IChildren {
-            get => _chains.Select(i => (ISelect)i).ToList();
+            get => Chains.Select(i => (ISelect)i).ToList();
         }
 
         private Action<Signal> _midiexit;
@@ -33,7 +33,7 @@ namespace Apollo.Devices {
         }
 
         public Chain Preprocess;
-        private List<Chain> _chains = new List<Chain>();
+        public List<Chain> Chains = new List<Chain>();
 
         private Random RNG = new Random();
         
@@ -70,36 +70,36 @@ namespace Apollo.Devices {
             Preprocess.Parent = this;
             Preprocess.MIDIExit = PreprocessExit;
 
-            for (int i = 0; i < _chains.Count; i++) {
-                _chains[i].Parent = this;
-                _chains[i].ParentIndex = i;
-                _chains[i].MIDIExit = ChainExit;
+            for (int i = 0; i < Chains.Count; i++) {
+                Chains[i].Parent = this;
+                Chains[i].ParentIndex = i;
+                Chains[i].MIDIExit = ChainExit;
             }
         }
 
         public Chain this[int index] {
-            get => _chains[index];
+            get => Chains[index];
         }
 
         public int Count {
-            get => _chains.Count;
+            get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in _chains select i.Clone()).ToList(), _mode, Expanded);
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), _mode, Expanded);
 
         public void Insert(int index, Chain chain = null) {
-            _chains.Insert(index, chain?? new Chain());
+            Chains.Insert(index, chain?? new Chain());
             Reroute();
         }
 
         public void Add(Chain chain) {
-            _chains.Add(chain);
+            Chains.Add(chain);
             Reroute();
         }
 
         public void Remove(int index, bool dispose = true) {
-            if (dispose) _chains[index].Dispose();
-            _chains.RemoveAt(index);
+            if (dispose) Chains[index].Dispose();
+            Chains.RemoveAt(index);
             Reroute();
         }
 
@@ -110,7 +110,7 @@ namespace Apollo.Devices {
         public Multi(Chain preprocess = null, List<Chain> init = null, MultiType mode = MultiType.Forward, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
 
-            foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
+            foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
 
             _mode = mode;
             
@@ -131,17 +131,17 @@ namespace Apollo.Devices {
                 if (!m.Color.Lit) return;
 
                 if (_mode == MultiType.Forward) {
-                    if (++current >= _chains.Count) current = 0;
+                    if (++current >= Chains.Count) current = 0;
                 
                 } else if (_mode == MultiType.Backward) {
-                    if (--current < 0) current = _chains.Count - 1;
+                    if (--current < 0) current = Chains.Count - 1;
                 
                 } else if (_mode == MultiType.Random || current == -1)
-                    current = RNG.Next(_chains.Count);
+                    current = RNG.Next(Chains.Count);
                 
                 else if (_mode == MultiType.RandomPlus) {
                     int old = current;
-                    current = RNG.Next(_chains.Count - 1);
+                    current = RNG.Next(Chains.Count - 1);
                     if (current >= old) current++;
                 }
 
@@ -159,17 +159,17 @@ namespace Apollo.Devices {
             int target = n.MultiTarget.Value;
             n.MultiTarget = null;
             
-            if (_chains.Count == 0) {
+            if (Chains.Count == 0) {
                 MIDIExit?.Invoke(n);
                 return;
             }
             
-            _chains[target].MIDIEnter(n);
+            Chains[target].MIDIEnter(n);
         }
 
         public override void Dispose() {
             Preprocess.Dispose();
-            foreach (Chain chain in _chains) chain.Dispose();
+            foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
         }
     }

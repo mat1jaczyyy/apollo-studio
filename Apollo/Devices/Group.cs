@@ -19,7 +19,7 @@ namespace Apollo.Devices {
         }
 
         public List<ISelect> IChildren {
-            get => _chains.Select(i => (ISelect)i).ToList();
+            get => Chains.Select(i => (ISelect)i).ToList();
         }
 
         private Action<Signal> _midiexit;
@@ -31,46 +31,46 @@ namespace Apollo.Devices {
             }
         }
 
-        private List<Chain> _chains = new List<Chain>();
+        public List<Chain> Chains = new List<Chain>();
 
         private void Reroute() {
-            for (int i = 0; i < _chains.Count; i++) {
-                _chains[i].Parent = this;
-                _chains[i].ParentIndex = i;
-                _chains[i].MIDIExit = ChainExit;
+            for (int i = 0; i < Chains.Count; i++) {
+                Chains[i].Parent = this;
+                Chains[i].ParentIndex = i;
+                Chains[i].MIDIExit = ChainExit;
             }
         }
 
         public Chain this[int index] {
-            get => _chains[index];
+            get => Chains[index];
         }
 
         public int Count {
-            get => _chains.Count;
+            get => Chains.Count;
         }
 
-        public override Device Clone() => new Group((from i in _chains select i.Clone()).ToList(), Expanded);
+        public override Device Clone() => new Group((from i in Chains select i.Clone()).ToList(), Expanded);
 
         public void Insert(int index, Chain chain = null) {
-            _chains.Insert(index, chain?? new Chain());
+            Chains.Insert(index, chain?? new Chain());
             Reroute();
         }
 
         public void Add(Chain chain) {
-            _chains.Add(chain);
+            Chains.Add(chain);
             Reroute();
         }
 
         public void Remove(int index, bool dispose = true) {
-            if (dispose) _chains[index].Dispose();
-            _chains.RemoveAt(index);
+            if (dispose) Chains[index].Dispose();
+            Chains.RemoveAt(index);
             Reroute();
         }
 
         public int? Expanded;
 
         public Group(List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
-            foreach (Chain chain in init?? new List<Chain>()) _chains.Add(chain);
+            foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
             Expanded = expanded;
 
             Reroute();
@@ -79,14 +79,14 @@ namespace Apollo.Devices {
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIEnter(Signal n) {
-            if (_chains.Count == 0) ChainExit(n);
+            if (Chains.Count == 0) ChainExit(n);
 
-            foreach (Chain chain in _chains)
+            foreach (Chain chain in Chains)
                 chain.MIDIEnter(n.Clone());
         }
 
         public override void Dispose() {
-            foreach (Chain chain in _chains) chain.Dispose();
+            foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
         }
     }

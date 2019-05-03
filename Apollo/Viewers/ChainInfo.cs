@@ -106,10 +106,13 @@ namespace Apollo.Viewers {
         }
 
         public void DragOver(object sender, DragEventArgs e) {
+            e.Handled = true;
             if (!e.Data.Contains("chain")) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
+            e.Handled = true;
+
             if (!e.Data.Contains("chain")) return;
 
             IControl source = (IControl)e.Source;
@@ -127,8 +130,6 @@ namespace Apollo.Viewers {
             } else result = Chain.Move(moving, _chain, copy);
 
             if (!result) e.DragEffects = DragDropEffects.None;
-
-            e.Handled = true;
         }
         
         private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);

@@ -4,11 +4,21 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components">
   
+  <UserControl.Resources>
+    <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+  </UserControl.Resources>
+  
   <Grid RowDefinitions="*,Auto">
     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-      <StackPanel x:Name="Contents" Margin="10 5">
-        <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" x:Name="ChainAdd" />
-      </StackPanel>
+      <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
+        <StackPanel Grid.Row="0" x:Name="Contents">
+          <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
+      </Grid>
     </ScrollViewer>
   
     <Border Grid.Row="1" Margin="10 0 10 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">

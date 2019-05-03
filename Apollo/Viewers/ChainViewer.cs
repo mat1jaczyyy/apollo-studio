@@ -119,10 +119,13 @@ namespace Apollo.Viewers {
         }
 
         private void DragOver(object sender, DragEventArgs e) {
+            e.Handled = true;
             if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
         private void Drop(object sender, DragEventArgs e) {
+            e.Handled = true;
+
             if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
@@ -138,8 +141,6 @@ namespace Apollo.Viewers {
             else result = Device.Move(moving, _chain.Devices.Last(), copy);
 
             if (!result) e.DragEffects = DragDropEffects.None;
-            
-            e.Handled = true;
         }
 
         public async void Copy(int left, int right, bool cut = false) {

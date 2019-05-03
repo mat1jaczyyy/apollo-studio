@@ -5,6 +5,8 @@ using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -25,6 +27,8 @@ namespace Apollo.DeviceViewers {
         Group _group;
         DeviceViewer _parent;
         Controls _root;
+
+        ContextMenu ChainContextMenu;
 
         Controls Contents;
         VerticalAdd ChainAdd;
@@ -66,10 +70,14 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _group = group;
-
             _parent = parent;
-
             _root = _parent.Root.Children;
+
+            ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
+            ChainContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ChainContextMenu_Click));
+
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
@@ -140,6 +148,45 @@ namespace Apollo.DeviceViewers {
 
         private void Chain_Action(string action) => Chain_Action(action, false);
         private void Chain_Action(string action, bool right) => Track.Get(_group).Window?.SelectionAction(action, _group, (right? _group.Count : 0) - 1);
+
+        private void ChainContextMenu_Click(object sender, EventArgs e) {
+            IInteractive item = ((RoutedEventArgs)e).Source;
+
+            if (item.GetType() == typeof(MenuItem))
+                Chain_Action((string)((MenuItem)item).Header, true);
+        }
+
+        private void Click(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Right)
+                ChainContextMenu.Open((Control)sender);
+
+            e.Handled = true;
+        }
+
+        private void DragOver(object sender, DragEventArgs e) {
+            e.Handled = true;
+            if (!e.Data.Contains("chain")) e.DragEffects = DragDropEffects.None; 
+        }
+
+        private void Drop(object sender, DragEventArgs e) {
+            e.Handled = true;
+
+            if (!e.Data.Contains("chain")) return;
+
+            IControl source = (IControl)e.Source;
+            while (source.Name != "DropZoneAfter" && source.Name != "ChainAdd")
+                source = source.Parent;
+
+            List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
+            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+
+            bool result;
+
+            if (source.Name != "DropZoneAfter" || _group.Chains.Count == 0) result = Chain.Move(moving, _group, copy);
+            else result = Chain.Move(moving, _group.Chains.Last(), copy);
+
+            if (!result) e.DragEffects = DragDropEffects.None;
+        }
 
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
