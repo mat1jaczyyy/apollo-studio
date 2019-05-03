@@ -17,7 +17,7 @@ namespace Apollo.Components {
             Owner = owner;
 
             Header = this.Get<Border>("Header");
-            this.Resources["TitleBrush"] = Owner.Resources["TitleBrush"];
+            this.Resources["TitleBrush"] = Owner.Header.Background?? Owner.Resources["TitleBrush"];
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
