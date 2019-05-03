@@ -142,6 +142,9 @@ namespace Apollo.DeviceViewers {
             _multi.Remove(index);
         }
 
+        private void Chain_Action(string action) => Chain_Action(action, false);
+        private void Chain_Action(string action, bool right) => Track.Get(_multi).Window?.SelectionAction(action, _multi, (right? _multi.Count : 0) - 1);
+
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)ComboBox.SelectedItem;
 
         public async void Copy(int left, int right, bool cut = false) {

@@ -23,6 +23,6 @@
       </Grid>
     </Grid>
 
-    <Components:VerticalAdd Added="Chain_Add" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+    <Components:VerticalAdd Added="Chain_Add" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

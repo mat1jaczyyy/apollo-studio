@@ -72,6 +72,8 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
         }
 
+        private void Chain_Action(string action) => Track.Get(_chain).Window?.SelectionAction(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
+
         private void ContextMenu_Click(object sender, EventArgs e) {
             IInteractive item = ((RoutedEventArgs)e).Source;
 

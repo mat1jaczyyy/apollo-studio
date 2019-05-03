@@ -138,6 +138,9 @@ namespace Apollo.DeviceViewers {
             _group.Remove(index);
         }
 
+        private void Chain_Action(string action) => Chain_Action(action, false);
+        private void Chain_Action(string action, bool right) => Track.Get(_group).Window?.SelectionAction(action, _group, (right? _group.Count : 0) - 1);
+
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
