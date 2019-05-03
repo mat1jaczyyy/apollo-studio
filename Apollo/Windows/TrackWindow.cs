@@ -99,6 +99,7 @@ namespace Apollo.Windows {
             else if (action == "Delete") parent.IViewer?.Delete(left, right);
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
+            else if (action == "Rename") parent.IViewer?.Rename(left, right);
         }
 
         public TrackWindow(Track track) {

@@ -8,7 +8,6 @@ using Apollo.Viewers;
 
 namespace Apollo.Elements {
     public class Chain: ISelect, ISelectParent {
-
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -37,6 +36,9 @@ namespace Apollo.Elements {
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
         public void ClearParentIndexChanged() => ParentIndexChanged = null;
+
+        public delegate void NameChangedEventHandler(string name);
+        public event NameChangedEventHandler NameChanged;
 
         private int? _ParentIndex;
         public int? ParentIndex {
@@ -88,7 +90,16 @@ namespace Apollo.Elements {
             get => Devices.Count;
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList());
+        private string _name;
+        public string Name {
+            get => _name;
+            set {
+                _name = value;
+                NameChanged?.Invoke(_name);
+            }
+        }
+
+        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name);
 
         public void Insert(int index, Device device) {
             Devices.Insert(index, device);
@@ -106,8 +117,9 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Chain(List<Device> init = null) {
+        public Chain(List<Device> init = null, string name = "Chain #") {
             Devices = init?? new List<Device>();
+            Name = name;
             Reroute();
         }
 

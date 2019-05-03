@@ -194,5 +194,7 @@ namespace Apollo.Viewers {
             for (int i = 0; i < init.Count; i++)
                 Device_Insert(index + i, init[i]);
         }
+
+        public void Rename(int left, int right) => throw new InvalidOperationException("A Device cannot be renamed.");
     }
 }

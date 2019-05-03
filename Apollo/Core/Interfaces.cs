@@ -48,5 +48,6 @@ namespace Apollo.Core {
         void Delete(int left, int right);
         void Group(int left, int right);
         void Ungroup(int left);
+        void Rename(int left, int right);
     }
 }

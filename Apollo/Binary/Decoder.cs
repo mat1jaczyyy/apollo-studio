@@ -64,7 +64,8 @@ namespace Apollo.Binary {
             
             else if (t == typeof(Chain))
                 return new Chain(
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList()
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList(),
+                    reader.ReadString()
                 );
             
             else if (t == typeof(Device))

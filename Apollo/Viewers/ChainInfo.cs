@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -33,8 +34,12 @@ namespace Apollo.Viewers {
 
         Grid Draggable;
         ContextMenu ChainContextMenu;
+        TextBox Input;
 
-        private void UpdateText(int index) => NameText.Text = $"Chain {index + 1}";
+        private void UpdateText() => UpdateText(_chain.ParentIndex.Value, _chain.Name);
+        private void UpdateText(int index) => UpdateText(index, _chain.Name);
+        private void UpdateText(string name) => UpdateText(_chain.ParentIndex.Value, name);
+        private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
         
         private void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -59,8 +64,9 @@ namespace Apollo.Viewers {
             Root = this.Get<Grid>("DropZone");
 
             NameText = this.Get<TextBlock>("Name");
-            UpdateText(_chain.ParentIndex.Value);
+            UpdateText();
             _chain.ParentIndexChanged += UpdateText;
+            _chain.NameChanged += UpdateText;
 
             ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
@@ -70,6 +76,9 @@ namespace Apollo.Viewers {
             Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
+
+            Input = this.Get<TextBox>("Input");
+            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
         }
 
         private void Chain_Action(string action) => Track.Get(_chain).Window?.SelectionAction(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
@@ -134,5 +143,53 @@ namespace Apollo.Viewers {
         
         private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
         private void Chain_Remove() => ChainRemoved?.Invoke(_chain.ParentIndex.Value);
+
+        private Action Input_Update;
+
+        int Input_Left, Input_Right;
+
+        private void Input_Changed(string text) {
+            if (text == null) return;
+            if (text == "") return;
+
+            Input_Update = () => {
+                for (int i = Input_Left; i <= Input_Right; i++)
+                    ((IMultipleChainParent)_chain.Parent)[i].Name = text;
+            };
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Input_Update?.Invoke();
+                Input_Update = null;
+            });
+        }
+
+        public void StartInput(int left, int right) {
+            Input_Left = left;
+            Input_Right = right;
+
+            Input.Text = _chain.Name;
+
+            Input.Opacity = 1;
+            Input.IsHitTestVisible = true;
+            Input.Focus();
+        }
+        
+        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+            Input.Text = _chain.Name;
+
+            Input.Opacity = 0;
+            Input.IsHitTestVisible = false;
+        }
+
+        private void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return)
+                this.Focus();
+
+            e.Handled = true;
+        }
+
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Handled = true;
+
+        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

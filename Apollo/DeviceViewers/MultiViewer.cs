@@ -231,5 +231,7 @@ namespace Apollo.DeviceViewers {
         public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");
 
         public void Ungroup(int index) => throw new InvalidOperationException("A Chain cannot be ungrouped.");
+
+        public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
     }
 }

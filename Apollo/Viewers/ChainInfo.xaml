@@ -7,6 +7,7 @@
     <SolidColorBrush x:Key="BackgroundBrush" />
 
     <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
+      <MenuItem Header="Rename" />
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
@@ -18,9 +19,13 @@
   <StackPanel VerticalAlignment="Stretch">
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="2 2" Background="{DynamicResource BackgroundBrush}" DragDrop.AllowDrop="true" x:Name="DropZone">
       <Components:Remove Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" Removed="Chain_Remove" />
+      
       <Grid Grid.Column="1" Background="Transparent" PointerPressed="Drag" x:Name="Draggable">
         <TextBlock VerticalAlignment="Center" x:Name="Name" Cursor="Hand" />
       </Grid>
+      
+      <TextBox Grid.Column="1" Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" Padding="1" x:Name="Input"
+               LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
     </Grid>
 
     <Components:VerticalAdd Added="Chain_Add" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
