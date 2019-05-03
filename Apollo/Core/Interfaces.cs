@@ -19,6 +19,8 @@ namespace Apollo.Core {
     public interface IMultipleChainParentViewer {
         void Contents_Insert(int index, Chain chain);
         void Contents_Remove(int index);
+
+        void Expand(int? index);
     }
 
     public interface ISelect {

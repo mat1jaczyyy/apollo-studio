@@ -110,7 +110,7 @@ namespace Apollo.DeviceViewers {
             ((ChainInfo)Contents[_multi.Expanded.Value + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Normal;
         }
 
-        private void Expand(int? index) {
+        public void Expand(int? index) {
             if (_multi.Expanded != null) {
                 Expand_Remove();
 
