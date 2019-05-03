@@ -40,6 +40,8 @@ namespace Apollo.Viewers {
         Device _device;
         bool selected = false;
 
+        public IControl SpecificViewer;
+
         public StackPanel Root;
         public Border Border, Header;
         public DeviceAdd DeviceAdd;
@@ -104,10 +106,10 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
-            IControl _viewer = GetSpecificViewer(this, _device);
+            SpecificViewer = GetSpecificViewer(this, _device);
 
-            if (_viewer != null)
-                this.Get<Grid>("Contents").Children.Add(_viewer);
+            if (SpecificViewer != null)
+                this.Get<Grid>("Contents").Children.Add(SpecificViewer);
         }
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
@@ -162,7 +164,7 @@ namespace Apollo.Viewers {
             while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter")
                 source = source.Parent;
 
-            List<Device> moving = (List<Device>)e.Data.Get("device");
+            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;

@@ -7,7 +7,20 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public class Chain: ISelectParent {
+    public class Chain: ISelect, ISelectParent {
+
+        public ISelectViewer IInfo {
+            get => Info;
+        }
+
+        public ISelectParent IParent {
+            get => (ISelectParent)Parent;
+        }
+
+        public int? IParentIndex {
+            get => ParentIndex;
+        }
+
         public ISelectParentViewer IViewer {
             get => Viewer;
         }
@@ -16,6 +29,7 @@ namespace Apollo.Elements {
             get => Devices.Select(i => (ISelect)i).ToList();
         }
 
+        public ChainInfo Info;
         public ChainViewer Viewer;
 
         public IChainParent Parent = null;
@@ -102,6 +116,57 @@ namespace Apollo.Elements {
         public void Dispose() {
             foreach (Device device in Devices) device.Dispose();
             MIDIExit = null;
+        }
+
+        public static bool Move(List<Chain> source, Chain target, bool copy = false) {
+            if (!copy)
+                for (int i = 0; i < source.Count; i++)
+                    if (source[i] == target) return false;
+            
+            List<Chain> moved = new List<Chain>();
+
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
+                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                ((IMultipleChainParent)target.Parent).SpecificViewer.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
+                ((IMultipleChainParent)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
+            }
+
+            Track track = Track.Get(moved.First());
+            track.Window.Select(moved.First());
+            track.Window.Select(moved.Last(), true);
+            
+            return true;
+        }
+
+        public static bool Move(List<Chain> source, IMultipleChainParent target, bool copy = false) {
+            if (!copy)
+                if (target.Count > 0 && source[0] == target[0]) return false;
+            
+            List<Chain> moved = new List<Chain>();
+
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
+                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                target.SpecificViewer.Contents_Insert(i, moved.Last());
+                target.Insert(i, moved.Last());
+            }
+
+            Track track = Track.Get(moved.First());
+            track.Window.Select(moved.First());
+            track.Window.Select(moved.Last(), true);
+            
+            return true;
         }
     }
 }

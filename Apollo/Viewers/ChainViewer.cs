@@ -129,7 +129,7 @@ namespace Apollo.Viewers {
             while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd")
                 source = source.Parent;
 
-            List<Device> moving = (List<Device>)e.Data.Get("device");
+            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
             bool result;

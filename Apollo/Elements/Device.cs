@@ -13,7 +13,7 @@ namespace Apollo.Elements {
     public abstract class Device: ISelect {
         public readonly string DeviceIdentifier;
 
-        public ISelectViewer IViewer {
+        public ISelectViewer IInfo {
             get => Viewer;
         }
 
@@ -25,7 +25,7 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
 
-        public DeviceViewer Viewer;
+        public DeviceViewer Viewer { get; set; }
         
         public Chain Parent;
         public int? ParentIndex;

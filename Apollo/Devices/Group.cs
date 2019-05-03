@@ -7,8 +7,20 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Group: Device, IChainParent {
+    public class Group: Device, IMultipleChainParent, ISelectParent {
         public static readonly new string DeviceIdentifier = "group";
+
+        public IMultipleChainParentViewer SpecificViewer {
+            get => (IMultipleChainParentViewer)Viewer.SpecificViewer;
+        }
+
+        public ISelectParentViewer IViewer {
+            get => (ISelectParentViewer)Viewer.SpecificViewer;
+        }
+
+        public List<ISelect> IChildren {
+            get => _chains.Select(i => (ISelect)i).ToList();
+        }
 
         private Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
@@ -41,20 +53,17 @@ namespace Apollo.Devices {
 
         public void Insert(int index, Chain chain = null) {
             _chains.Insert(index, chain?? new Chain());
-            
             Reroute();
         }
 
         public void Add(Chain chain) {
             _chains.Add(chain);
-
             Reroute();
         }
 
-        public void Remove(int index) {
-            _chains[index].Dispose();
+        public void Remove(int index, bool dispose = true) {
+            if (dispose) _chains[index].Dispose();
             _chains.RemoveAt(index);
-
             Reroute();
         }
 

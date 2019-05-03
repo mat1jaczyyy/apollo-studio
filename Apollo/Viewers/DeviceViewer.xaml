@@ -5,6 +5,7 @@
   
   <UserControl.Resources>
     <SolidColorBrush x:Key="TitleBrush" />
+    
     <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />

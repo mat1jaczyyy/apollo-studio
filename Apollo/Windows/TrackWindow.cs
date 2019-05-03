@@ -54,8 +54,8 @@ namespace Apollo.Windows {
             if (SelectionStart != null)
                 if (SelectionEnd != null)
                     foreach (ISelect selected in Selection)
-                        selected.IViewer?.Deselect();
-                else SelectionStart.IViewer?.Deselect();
+                        selected.IInfo?.Deselect();
+                else SelectionStart.IInfo?.Deselect();
 
             if (shift && SelectionStart != null && SelectionStart.IParent == select.IParent && SelectionStart != select)
                 SelectionEnd = select;
@@ -68,8 +68,8 @@ namespace Apollo.Windows {
             if (SelectionStart != null)
                 if (SelectionEnd != null)
                     foreach (ISelect selected in Selection)
-                        selected.IViewer?.Select();
-                else SelectionStart.IViewer?.Select();
+                        selected.IInfo?.Select();
+                else SelectionStart.IInfo?.Select();
         }
 
         public void SelectionAction(string action) {

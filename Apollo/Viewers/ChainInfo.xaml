@@ -3,12 +3,26 @@
              x:Class="Apollo.Viewers.ChainInfo"
              xmlns:Components="clr-namespace:Apollo.Components">
   
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="BackgroundBrush" />
+
+    <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Duplicate" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+    </ContextMenu>
+  </UserControl.Resources>
+
   <StackPanel VerticalAlignment="Stretch">
-    <Grid ColumnDefinitions="Auto,*,Auto" Margin="2 2">
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="2 2" Background="{DynamicResource BackgroundBrush}" DragDrop.AllowDrop="true" x:Name="DropZone">
       <Components:Remove Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" Removed="Chain_Remove" />
-      <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Name" Cursor="Hand" PointerReleased="Clicked" />
+      <Grid Grid.Column="1" Background="Transparent" PointerPressed="Drag" x:Name="Draggable">
+        <TextBlock VerticalAlignment="Center" x:Name="Name" Cursor="Hand" />
+      </Grid>
     </Grid>
 
-    <Components:VerticalAdd Added="Chain_Add" x:Name="ChainAdd" />
+    <Components:VerticalAdd Added="Chain_Add" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

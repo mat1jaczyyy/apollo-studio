@@ -12,7 +12,7 @@ using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.DeviceViewers {
-    public class GroupViewer: UserControl {
+    public class GroupViewer: UserControl, IMultipleChainParentViewer {
         public static readonly string DeviceIdentifier = "group";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -38,6 +38,7 @@ namespace Apollo.DeviceViewers {
             viewer.ChainAdded += Chain_Insert;
             viewer.ChainRemoved += Chain_Remove;
             viewer.ChainExpanded += Expand;
+            chain.Info = viewer;
 
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
@@ -51,6 +52,7 @@ namespace Apollo.DeviceViewers {
                 else if (index == _group.Expanded) Expand(null);
             }
 
+            _group[index].Info = null;
             Contents.RemoveAt(index + 1);
             SetAlwaysShowing();
         }

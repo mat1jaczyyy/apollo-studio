@@ -6,12 +6,13 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.DeviceViewers {
-    public class MultiViewer: UserControl {
+    public class MultiViewer: UserControl, IMultipleChainParentViewer {
         public static readonly string DeviceIdentifier = "multi";
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -38,6 +39,7 @@ namespace Apollo.DeviceViewers {
             viewer.ChainAdded += Chain_Insert;
             viewer.ChainRemoved += Chain_Remove;
             viewer.ChainExpanded += Expand;
+            chain.Info = viewer;
 
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
@@ -51,6 +53,7 @@ namespace Apollo.DeviceViewers {
                 else if (index == _multi.Expanded) Expand(null);
             }
 
+            _multi[index].Info = null;
             Contents.RemoveAt(index + 1);
             SetAlwaysShowing();
         }
