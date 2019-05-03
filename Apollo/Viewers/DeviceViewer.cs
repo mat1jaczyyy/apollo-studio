@@ -11,11 +11,12 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
-    public class DeviceViewer: UserControl {
+    public class DeviceViewer: UserControl, ISelectViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
@@ -140,7 +141,7 @@ namespace Apollo.Viewers {
                 
                 if (e.MouseButton == MouseButton.Right) {
                     ContextMenu menu = DeviceContextMenu;
-                    List<Device> selection = Track.Get(_device).Window?.Selection;
+                    List<ISelect> selection = Track.Get(_device).Window?.Selection;
 
                     if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
                         menu = GroupContextMenu;

@@ -30,55 +30,55 @@ namespace Apollo.Windows {
 
         private void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
-        public Device SelectionStart { get; private set; } = null;
-        public Device SelectionEnd { get; private set; } = null;
+        public ISelect SelectionStart { get; private set; } = null;
+        public ISelect SelectionEnd { get; private set; } = null;
 
-        public List<Device> Selection {
+        public List<ISelect> Selection {
             get {
                 if (SelectionStart != null) {
                     if (SelectionEnd != null) {
-                        Device left = (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? SelectionStart : SelectionEnd;
-                        Device right = (SelectionStart.ParentIndex.Value < SelectionEnd.ParentIndex.Value)? SelectionEnd : SelectionStart;
+                        ISelect left = (SelectionStart.IParentIndex.Value < SelectionEnd.IParentIndex.Value)? SelectionStart : SelectionEnd;
+                        ISelect right = (SelectionStart.IParentIndex.Value < SelectionEnd.IParentIndex.Value)? SelectionEnd : SelectionStart;
 
-                        return left.Parent.Devices.Skip(left.ParentIndex.Value).Take(right.ParentIndex.Value - left.ParentIndex.Value + 1).ToList();
+                        return left.IParent.IChildren.Skip(left.IParentIndex.Value).Take(right.IParentIndex.Value - left.IParentIndex.Value + 1).ToList();
                     }
                     
-                    return new List<Device>() {SelectionStart};
+                    return new List<ISelect>() {SelectionStart};
                 }
 
-                return new List<Device>();
+                return new List<ISelect>();
             }
         }
 
-        public void Select(Device device, bool shift = false) {
+        public void Select(ISelect select, bool shift = false) {
             if (SelectionStart != null)
                 if (SelectionEnd != null)
-                    foreach (Device selected in Selection)
-                        selected.Viewer?.Deselect();
-                else SelectionStart.Viewer?.Deselect();
+                    foreach (ISelect selected in Selection)
+                        selected.IViewer?.Deselect();
+                else SelectionStart.IViewer?.Deselect();
 
-            if (shift && SelectionStart != null && SelectionStart.Parent == device.Parent && SelectionStart != device)
-                SelectionEnd = device;
+            if (shift && SelectionStart != null && SelectionStart.IParent == select.IParent && SelectionStart != select)
+                SelectionEnd = select;
 
             else {
-                SelectionStart = device;
+                SelectionStart = select;
                 SelectionEnd = null;
             }
 
             if (SelectionStart != null)
                 if (SelectionEnd != null)
-                    foreach (Device selected in Selection)
-                        selected.Viewer?.Select();
-                else SelectionStart.Viewer?.Select();
+                    foreach (ISelect selected in Selection)
+                        selected.IViewer?.Select();
+                else SelectionStart.IViewer?.Select();
         }
 
         public void SelectionAction(string action) {
             if (SelectionStart == null) return;
 
-            Chain chain = SelectionStart.Parent;
+            ISelectParent parent = SelectionStart.IParent;
             
-            int left = SelectionStart.ParentIndex.Value;
-            int right = (SelectionEnd == null)? left: SelectionEnd.ParentIndex.Value;
+            int left = SelectionStart.IParentIndex.Value;
+            int right = (SelectionEnd == null)? left: SelectionEnd.IParentIndex.Value;
             
             if (left > right) {
                 int temp = left;
@@ -86,19 +86,19 @@ namespace Apollo.Windows {
                 right = temp;
             }
 
-            SelectionAction(action, chain, left, right);
+            SelectionAction(action, parent, left, right);
         }
 
-        public void SelectionAction(string action, Chain chain, int index) => SelectionAction(action, chain, index, index);
+        public void SelectionAction(string action, ISelectParent parent, int index) => SelectionAction(action, parent, index, index);
 
-        public void SelectionAction(string action, Chain chain, int left, int right) {
-            if (action == "Cut") chain.Viewer?.Copy(left, right, true);
-            else if (action == "Copy") chain.Viewer?.Copy(left, right);
-            else if (action == "Duplicate") chain.Viewer?.Duplicate(left, right);
-            else if (action == "Paste") chain.Viewer?.Paste(right);
-            else if (action == "Delete") chain.Viewer?.Delete(left, right);
-            else if (action == "Group") chain.Viewer?.Group(left, right);
-            else if (action == "Ungroup") chain.Viewer?.Ungroup(left);
+        public void SelectionAction(string action, ISelectParent parent, int left, int right) {
+            if (action == "Cut") parent.IViewer?.Copy(left, right, true);
+            else if (action == "Copy") parent.IViewer?.Copy(left, right);
+            else if (action == "Duplicate") parent.IViewer?.Duplicate(left, right);
+            else if (action == "Paste") parent.IViewer?.Paste(right);
+            else if (action == "Delete") parent.IViewer?.Delete(left, right);
+            else if (action == "Group") parent.IViewer?.Group(left, right);
+            else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
         }
 
         public TrackWindow(Track track) {

@@ -12,12 +12,13 @@ using Avalonia.Media;
 
 using Apollo.Binary;
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 
 namespace Apollo.Viewers {
-    public class ChainViewer: UserControl {
+    public class ChainViewer: UserControl, ISelectParentViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Chain _chain;

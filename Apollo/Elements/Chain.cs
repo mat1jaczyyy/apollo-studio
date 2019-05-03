@@ -7,7 +7,15 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public class Chain {
+    public class Chain: ISelectParent {
+        public ISelectParentViewer IViewer {
+            get => Viewer;
+        }
+
+        public List<ISelect> IChildren {
+            get => Devices.Select(i => (ISelect)i).ToList();
+        }
+
         public ChainViewer Viewer;
 
         public IChainParent Parent = null;

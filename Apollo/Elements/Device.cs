@@ -5,15 +5,28 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+using Apollo.Core;
 using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public abstract class Device {
+    public abstract class Device: ISelect {
         public readonly string DeviceIdentifier;
 
-        public DeviceViewer Viewer;
+        public ISelectViewer IViewer {
+            get => Viewer;
+        }
 
+        public ISelectParent IParent {
+            get => Parent;
+        }
+
+        public int? IParentIndex {
+            get => ParentIndex;
+        }
+
+        public DeviceViewer Viewer;
+        
         public Chain Parent;
         public int? ParentIndex;
         public virtual Action<Signal> MIDIExit { get; set; } = null;
