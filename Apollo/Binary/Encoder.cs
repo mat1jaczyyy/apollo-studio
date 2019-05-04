@@ -47,7 +47,7 @@ namespace Apollo.Binary {
                 int count = Math.Min(64, ColorHistory.Count);
                 writer.Write(count);
                 for (int i = 0; i < count; i++)
-                    Encode(ColorHistory.GetColor(i));
+                    Encode(writer, ColorHistory.GetColor(i));
             }
 
             return output;
