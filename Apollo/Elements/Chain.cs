@@ -150,8 +150,8 @@ namespace Apollo.Elements {
             }
 
             Track track = Track.Get(moved.First());
-            track.Window.Select(moved.First());
-            track.Window.Select(moved.Last(), true);
+            track.Window.Selection.Select(moved.First());
+            track.Window.Selection.Select(moved.Last(), true);
 
             ((IMultipleChainParent)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
             
@@ -177,8 +177,8 @@ namespace Apollo.Elements {
             }
 
             Track track = Track.Get(moved.First());
-            track.Window.Select(moved.First());
-            track.Window.Select(moved.Last(), true);
+            track.Window.Selection.Select(moved.First());
+            track.Window.Selection.Select(moved.Last(), true);
 
             target.SpecificViewer.Expand(moved.Last().ParentIndex);
             

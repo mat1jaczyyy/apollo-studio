@@ -116,25 +116,25 @@ namespace Apollo.Viewers {
 
         private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
 
-        private void Device_Action(string action) => Track.Get(_device).Window?.SelectionAction(action, _device.Parent, _device.ParentIndex.Value);
+        private void Device_Action(string action) => Track.Get(_device).Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
         private void ContextMenu_Click(object sender, EventArgs e) {
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))
-                Track.Get(_device).Window?.SelectionAction((string)((MenuItem)item).Header);
+                Track.Get(_device).Window?.Selection.Action((string)((MenuItem)item).Header);
         }
 
         private void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Track.Get(_device).Window?.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                Track.Get(_device).Window?.Selection.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
-            dragData.Set("device", Track.Get(_device).Window?.Selection);
+            dragData.Set("device", Track.Get(_device).Window?.Selection.Selection);
 
             DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
 
@@ -143,7 +143,7 @@ namespace Apollo.Viewers {
                 
                 if (e.MouseButton == MouseButton.Right) {
                     ContextMenu menu = DeviceContextMenu;
-                    List<ISelect> selection = Track.Get(_device).Window?.Selection;
+                    List<ISelect> selection = Track.Get(_device).Window?.Selection.Selection;
 
                     if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
                         menu = GroupContextMenu;

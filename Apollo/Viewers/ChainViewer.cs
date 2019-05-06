@@ -90,7 +90,7 @@ namespace Apollo.Viewers {
             _chain.Insert(index, device);
             Contents_Insert(index, _chain[index]);
             
-            Track.Get(_chain).Window?.Select(_chain[index]);
+            Track.Get(_chain).Window?.Selection.Select(_chain[index]);
         }
 
         private void Device_InsertStart(Type device) => Device_Insert(0, device);
@@ -101,7 +101,7 @@ namespace Apollo.Viewers {
         }
 
         private void Device_Action(string action) => Device_Action(action, false);
-        private void Device_Action(string action, bool right) => Track.Get(_chain).Window?.SelectionAction(action, _chain, (right? _chain.Count : 0) - 1);
+        private void Device_Action(string action, bool right) => Track.Get(_chain).Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
 
         private void DeviceContextMenu_Click(object sender, EventArgs e) {
             IInteractive item = ((RoutedEventArgs)e).Source;
