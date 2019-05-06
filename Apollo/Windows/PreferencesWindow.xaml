@@ -63,7 +63,7 @@
         </Border>
 
         <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 14" />
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 15" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
       </Grid>
