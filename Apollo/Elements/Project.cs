@@ -9,7 +9,15 @@ using Apollo.Core;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Project {
+    public class Project: ISelectParent {
+        public ISelectParentViewer IViewer {
+            get => Window;
+        }
+
+        public List<ISelect> IChildren {
+            get => Tracks.Select(i => (ISelect)i).ToList();
+        }
+
         public ProjectWindow Window;
 
         public List<Track> Tracks;
@@ -94,8 +102,8 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public void Remove(int index) {
-            Tracks[index].Dispose();
+        public void Remove(int index, bool dispose = true) {
+            if (dispose) Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
         }

@@ -1,9 +1,26 @@
-﻿using Apollo.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using Apollo.Core;
 using Apollo.Structures;
+using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: IChainParent {
+    public class Track: ISelect, IChainParent {
+        public ISelectViewer IInfo {
+            get => Info;
+        }
+
+        public ISelectParent IParent {
+            get => Program.Project;
+        }
+
+        public int? IParentIndex {
+            get => ParentIndex;
+        }
+
+        public TrackInfo Info;
         public TrackWindow Window;
 
         public delegate void ParentIndexChangedEventHandler(int index);
@@ -40,6 +57,8 @@ namespace Apollo.Elements {
             }
         }
 
+        public Track Clone() => new Track(Chain.Clone());
+
         public Track(Chain init = null, Launchpad launchpad = null) {
             Chain = init?? new Chain();
             Chain.Parent = this;
@@ -62,6 +81,55 @@ namespace Apollo.Elements {
             Chain = null;
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
+        }
+
+        public static bool Move(List<Track> source, Track target, bool copy = false) {
+            if (!copy)
+                for (int i = 0; i < source.Count; i++)
+                    if (source[i] == target) return false;
+            
+            List<Track> moved = new List<Track>();
+
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
+                    Program.Project.Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
+                Program.Project.Window.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
+            }
+
+            Program.Project.Window.Selection.Select(moved.First());
+            Program.Project.Window.Selection.Select(moved.Last(), true);
+            
+            return true;
+        }
+
+        public static bool Move(List<Track> source, Project target, bool copy = false) {
+            if (!copy)
+                if (target.Count > 0 && source[0] == target[0]) return false;
+            
+            List<Track> moved = new List<Track>();
+
+            for (int i = 0; i < source.Count; i++) {
+                if (!copy) {
+                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
+                    Program.Project.Remove(source[i].ParentIndex.Value, false);
+                }
+
+                moved.Add(copy? source[i].Clone() : source[i]);
+
+                Program.Project.Insert(i, moved.Last());
+                Program.Project.Window.Contents_Insert(i, moved.Last());
+            }
+
+            Program.Project.Window.Selection.Select(moved.First());
+            Program.Project.Window.Selection.Select(moved.Last(), true);
+            
+            return true;
         }
     }
 }

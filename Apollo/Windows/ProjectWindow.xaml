@@ -9,6 +9,17 @@
         Opened="Loaded" Closing="Unloaded"
         PointerPressed="Window_Focus">
   
+  <Window.Resources>
+    <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
+      <MenuItem Header="Rename" />
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Duplicate" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+    </ContextMenu>
+  </Window.Resources>
+
   <Grid>
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
@@ -31,9 +42,13 @@
         <Grid RowDefinitions="*,Auto">
           <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 15 5">
             <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-              <StackPanel x:Name="Contents">
-                <Components:TrackAdd AlwaysShowing="true" TrackAdded="Track_InsertStart" x:Name="TrackAdd" />
-              </StackPanel>
+              <Grid RowDefinitions="Auto,*" x:Name="Layout">
+                <StackPanel Grid.Row="0" x:Name="Contents">
+                  <Components:TrackAdd AlwaysShowing="true" TrackAdded="Track_InsertStart" TrackAction="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
+                </StackPanel>
+
+                <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
+              </Grid>
             </ScrollViewer>
           </Border>
 

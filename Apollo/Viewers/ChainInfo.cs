@@ -62,6 +62,7 @@ namespace Apollo.Viewers {
             _chain = chain;
 
             Root = this.Get<Grid>("DropZone");
+            Deselect();
 
             NameText = this.Get<TextBlock>("Name");
             UpdateText();
