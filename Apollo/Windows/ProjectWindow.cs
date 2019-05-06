@@ -23,12 +23,14 @@ namespace Apollo.Windows {
     public class ProjectWindow: Window, ISelectParentViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void UpdateTitle(string path) => this.Get<TextBlock>("Title").Text = (path == "")? "New Project" : path;
+        private void UpdateTitle() => TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FilePath;
 
         private void UpdatePage() => Page.RawValue = Program.Project.Page;
         private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
 
         private void UpdateTopmost(bool value) => Topmost = value;
+
+        TextBlock TitleText;
 
         ContextMenu TrackContextMenu;
         Controls Contents;
@@ -72,6 +74,8 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
+            TitleText = this.Get<TextBlock>("Title");
+
             TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
             TrackContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(TrackContextMenu_Click));
             
@@ -95,7 +99,7 @@ namespace Apollo.Windows {
         
         private void Loaded(object sender, EventArgs e) {
             Program.Project.PathChanged += UpdateTitle;
-            UpdateTitle(Program.Project.FilePath);
+            UpdateTitle();
 
             Program.Project.PageChanged += HandlePage;
             UpdatePage();
@@ -269,6 +273,6 @@ namespace Apollo.Windows {
 
         public void Ungroup(int index) => throw new InvalidOperationException("A Track cannot be ungrouped.");
 
-        public void Rename(int left, int right) => throw new NotImplementedException(); //((TrackInfo)Contents[left + 1]).StartInput(left, right);
+        public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
     }
 }

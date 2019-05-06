@@ -31,11 +31,15 @@ namespace Apollo.Viewers {
         ComboBox PortSelector;
         public TrackAdd TrackAdd;
 
+        Grid Draggable;
         Border DropZone;
         ContextMenu TrackContextMenu;
         TextBox Input;
-
-        private void UpdateText(int index) => NameText.Text = $"Track {index + 1}";
+        
+        private void UpdateText() => UpdateText(_track.ParentIndex.Value, _track.Name);
+        private void UpdateText(int index) => UpdateText(index, _track.Name);
+        private void UpdateText(string name) => UpdateText(_track.ParentIndex.Value, name);
+        private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
 
         private void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
@@ -70,9 +74,12 @@ namespace Apollo.Viewers {
             
             _track = track;
 
-            NameText = this.Get<TextBlock>("Draggable");
-            UpdateText(_track.ParentIndex.Value);
+            NameText = this.Get<TextBlock>("Name");
+            UpdateText();
             _track.ParentIndexChanged += UpdateText;
+            _track.NameChanged += UpdateText;
+
+            Draggable = this.Get<Grid>("Draggable");
 
             PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();
@@ -89,8 +96,8 @@ namespace Apollo.Viewers {
             
             Deselect();
 
-            //Input = this.Get<TextBox>("Input");
-            //Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+            Input = this.Get<TextBox>("Input");
+            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
         }
         
         private void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
@@ -122,7 +129,7 @@ namespace Apollo.Viewers {
                     TrackWindow.Create(_track, (Window)this.GetVisualRoot());
                 
                 if (e.MouseButton == MouseButton.Right)
-                    TrackContextMenu.Open(NameText);
+                    TrackContextMenu.Open(Draggable);
             }
         }
 
@@ -154,7 +161,6 @@ namespace Apollo.Viewers {
         }
 
         private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
-
         private void Track_Remove() => TrackRemoved?.Invoke(_track.ParentIndex.Value);
 
         private void Port_Changed(object sender, SelectionChangedEventArgs e) {
@@ -165,5 +171,54 @@ namespace Apollo.Viewers {
                 UpdatePorts();
             }
         }
+
+        
+        private Action Input_Update;
+
+        int Input_Left, Input_Right;
+
+        private void Input_Changed(string text) {
+            if (text == null) return;
+            if (text == "") return;
+
+            Input_Update = () => {
+                for (int i = Input_Left; i <= Input_Right; i++)
+                    Program.Project[i].Name = text;
+            };
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Input_Update?.Invoke();
+                Input_Update = null;
+            });
+        }
+
+        public void StartInput(int left, int right) {
+            Input_Left = left;
+            Input_Right = right;
+
+            Input.Text = _track.Name;
+
+            Input.Opacity = 1;
+            Input.IsHitTestVisible = true;
+            Input.Focus();
+        }
+        
+        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+            Input.Text = _track.Name;
+
+            Input.Opacity = 0;
+            Input.IsHitTestVisible = false;
+        }
+
+        private void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return)
+                this.Focus();
+
+            e.Handled = true;
+        }
+
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Handled = true;
+
+        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

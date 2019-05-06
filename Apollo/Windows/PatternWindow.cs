@@ -52,6 +52,7 @@ namespace Apollo.Windows {
             }
         }
 
+        TextBlock TitleText;
         ComboBox PortSelector;
         LaunchpadGrid Editor;
         Controls Contents;
@@ -78,13 +79,11 @@ namespace Apollo.Windows {
 
         Action<Signal> PlayExit;
         
-        private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
-            ? $"Editing Pattern - Track {index + 1}"
-            : $"Editing Pattern - Track {index + 1} - {path}";
-
-        private void UpdateTitle(string path) => UpdateTitle(path, _track.ParentIndex.Value);
-        private void UpdateTitle(int index) => UpdateTitle(Program.Project.FilePath, index);
-        private void UpdateTitle() => UpdateTitle(Program.Project.FilePath, _track.ParentIndex.Value);
+        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.Name);
+        private void UpdateTitle(int index) => UpdateTitle(index, _track.Name);
+        private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
+        private void UpdateTitle(int index, string name)
+            => TitleText.Text = $"Editing Pattern - {name.Replace("#", (index + 1).ToString())}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -142,6 +141,8 @@ namespace Apollo.Windows {
             _pattern = pattern;
             _track = Track.Get(_pattern);
 
+            TitleText = this.Get<TextBlock>("Title");
+
             Editor = this.Get<LaunchpadGrid>("Editor");
 
             Duration = this.Get<Dial>("Duration");
@@ -187,8 +188,8 @@ namespace Apollo.Windows {
         }
 
         private void Loaded(object sender, EventArgs e) {
-            Program.Project.PathChanged += UpdateTitle;
             _track.ParentIndexChanged += UpdateTitle;
+            _track.NameChanged += UpdateTitle;
             UpdateTitle();
 
             ColorHistory.HistoryChanged += RenderHistory;
@@ -207,8 +208,8 @@ namespace Apollo.Windows {
                 Launchpad.Clear();
             }
             
-            Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;
+            _track.NameChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             ColorHistory.HistoryChanged -= RenderHistory;

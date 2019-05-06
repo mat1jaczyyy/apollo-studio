@@ -59,7 +59,8 @@ namespace Apollo.Binary {
             else if (t == typeof(Track))
                 return new Track(
                     (Chain)Decode(reader, version),
-                    (Launchpad)Decode(reader, version)
+                    (Launchpad)Decode(reader, version),
+                    reader.ReadString()
                 );
             
             else if (t == typeof(Chain))

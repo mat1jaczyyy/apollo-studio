@@ -17,15 +17,15 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         Track _track;
-        Grid Root;
-        
-        private void UpdateTitle(string path, int index) => this.Get<TextBlock>("Title").Text = (path == "")
-            ? $"Track {index + 1}"
-            : $"Track {index + 1} - {path}";
 
-        private void UpdateTitle(string path) => UpdateTitle(path, _track.ParentIndex.Value);
-        private void UpdateTitle(int index) => UpdateTitle(Program.Project.FilePath, index);
-        private void UpdateTitle() => UpdateTitle(Program.Project.FilePath, _track.ParentIndex.Value);
+        Grid Root;
+        TextBlock TitleText;
+        
+        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.Name);
+        private void UpdateTitle(int index) => UpdateTitle(index, _track.Name);
+        private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
+        private void UpdateTitle(int index, string name)
+            => TitleText.Text = $"{name.Replace("#", (index + 1).ToString())}{((Program.Project.FilePath != "")? $" - {Program.Project.FilePath}" : "")}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -44,6 +44,8 @@ namespace Apollo.Windows {
 
             _track = track;
 
+            TitleText = this.Get<TextBlock>("Title");
+
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
 
             Root = chainViewer.Get<Grid>("Layout");
@@ -56,6 +58,7 @@ namespace Apollo.Windows {
         private void Loaded(object sender, EventArgs e) {
             Program.Project.PathChanged += UpdateTitle;
             _track.ParentIndexChanged += UpdateTitle;
+            _track.NameChanged += UpdateTitle;
             UpdateTitle();
         }
 
@@ -64,6 +67,7 @@ namespace Apollo.Windows {
             
             Program.Project.PathChanged -= UpdateTitle;
             _track.ParentIndexChanged -= UpdateTitle;
+            _track.NameChanged += UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
 

@@ -25,6 +25,9 @@ namespace Apollo.Elements {
 
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
+        
+        public delegate void NameChangedEventHandler(string name);
+        public event NameChangedEventHandler NameChanged;
 
         public delegate void DisposingEventHandler();
         public event DisposingEventHandler Disposing;
@@ -56,15 +59,25 @@ namespace Apollo.Elements {
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;
             }
         }
+        
+        private string _name;
+        public string Name {
+            get => _name;
+            set {
+                _name = value;
+                NameChanged?.Invoke(_name);
+            }
+        }
 
-        public Track Clone() => new Track(Chain.Clone());
+        public Track Clone() => new Track(Chain.Clone(), null, Name);
 
-        public Track(Chain init = null, Launchpad launchpad = null) {
+        public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
             Chain = init?? new Chain();
             Chain.Parent = this;
             Chain.MIDIExit = ChainExit;
 
             Launchpad = launchpad;
+            Name = name;
         }
 
         private void ChainExit(Signal n) => n.Source?.Render(n);

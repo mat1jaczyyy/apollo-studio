@@ -24,7 +24,7 @@ namespace Apollo.Elements {
 
         public int BPM;
 
-        public delegate void PathChangedEventHandler(string path);
+        public delegate void PathChangedEventHandler();
         public event PathChangedEventHandler PathChanged;
 
         private string _path;
@@ -32,7 +32,7 @@ namespace Apollo.Elements {
             get => _path;
             set {
                 _path = value;
-                PathChanged?.Invoke(_path);
+                PathChanged?.Invoke();
             }
         }
 
