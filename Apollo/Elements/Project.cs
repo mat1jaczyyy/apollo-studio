@@ -22,7 +22,7 @@ namespace Apollo.Elements {
         private string _path;
         public string FilePath {
             get => _path;
-            private set {
+            set {
                 _path = value;
                 PathChanged?.Invoke(_path);
             }
