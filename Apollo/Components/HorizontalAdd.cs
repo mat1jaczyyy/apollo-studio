@@ -15,6 +15,7 @@ namespace Apollo.Components {
         public delegate void ActionEventHandler(string action);
         public event ActionEventHandler Action;
 
+        Grid Root;
         Canvas Icon;
 
         ContextMenu ActionContextMenu;
@@ -25,7 +26,7 @@ namespace Apollo.Components {
             set {
                 if (value != _always) {
                     _always = value;
-                    this.Get<Grid>("Root").MinWidth = _always? 26 : 0;
+                    Root.MinWidth = _always? 26 : 0;
                 }
             }
         }
@@ -33,6 +34,7 @@ namespace Apollo.Components {
         public HorizontalAdd() {
             InitializeComponent();
             
+            Root = this.Get<Grid>("Root");
             Icon = this.Get<Canvas>("Icon");
 
             ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];

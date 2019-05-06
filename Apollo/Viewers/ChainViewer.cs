@@ -32,7 +32,7 @@ namespace Apollo.Viewers {
         private void SetAlwaysShowing() {
             bool RootChain = _chain.Parent.GetType() == typeof(Track);
 
-            DeviceAdd.AlwaysShowing = (Contents.Count == 1 && RootChain);
+            DeviceAdd.AlwaysShowing = Contents.Count == 1;
 
             for (int i = 1; i < Contents.Count; i++)
                 ((DeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;

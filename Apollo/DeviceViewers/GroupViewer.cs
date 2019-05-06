@@ -165,25 +165,37 @@ namespace Apollo.DeviceViewers {
 
         private void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("chain")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
         private void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
-
-            if (!e.Data.Contains("chain")) return;
-
+            
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneAfter" && source.Name != "ChainAdd")
                 source = source.Parent;
 
-            List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
-
             bool result;
 
-            if (source.Name != "DropZoneAfter" || _group.Chains.Count == 0) result = Chain.Move(moving, _group, copy);
-            else result = Chain.Move(moving, _group.Chains.Last(), copy);
+            if (e.Data.Contains("chain")) {
+                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
+
+                if (source.Name != "DropZoneAfter" || _group.Chains.Count == 0) result = Chain.Move(moving, _group, copy);
+                else result = Chain.Move(moving, _group.Chains.Last(), copy);
+            
+            } else if (e.Data.Contains("device")) {
+                List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
+
+                if (source.Name != "DropZoneAfter") {
+                    Chain_Insert(0);
+                    result = Device.Move(moving, _group[0], copy);
+                } else {
+                    Chain_Insert(_group.Count);
+                    result = Device.Move(moving, _group.Chains.Last(), copy);
+                } 
+
+            } else return;
 
             if (!result) e.DragEffects = DragDropEffects.None;
         }

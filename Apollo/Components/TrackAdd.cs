@@ -15,6 +15,7 @@ namespace Apollo.Components {
         public delegate void TrackActionEventHandler(string action);
         public event TrackActionEventHandler TrackAction;
         
+        Grid Root;
         Canvas Icon;
 
         ContextMenu ActionContextMenu;
@@ -25,7 +26,7 @@ namespace Apollo.Components {
             set {
                 if (value != _always) {
                     _always = value;
-                    this.Get<Grid>("Root").MinHeight = _always? 30 : 0;
+                    Root.MinHeight = _always? 30 : 0;
                 }
             }
         }
@@ -33,6 +34,7 @@ namespace Apollo.Components {
         public TrackAdd() {
             InitializeComponent();
             
+            Root = this.Get<Grid>("Root");
             Icon = this.Get<Canvas>("Icon");
 
             ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];

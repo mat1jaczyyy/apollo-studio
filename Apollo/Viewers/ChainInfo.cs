@@ -117,27 +117,41 @@ namespace Apollo.Viewers {
 
         public void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("chain")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
-            if (!e.Data.Contains("chain")) return;
-
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZone" && source.Name != "DropZoneAfter")
                 source = source.Parent;
 
-            List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
-
             bool result;
+
+            if (e.Data.Contains("chain")) {
+                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
             
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
-                if (_chain.ParentIndex == 0) result = Chain.Move(moving, (IMultipleChainParent)_chain.Parent, copy);
-                else result = Chain.Move(moving, ((IMultipleChainParent)_chain.Parent)[_chain.ParentIndex.Value - 1], copy);
-            } else result = Chain.Move(moving, _chain, copy);
+                if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
+                    if (_chain.ParentIndex == 0) result = Chain.Move(moving, (IMultipleChainParent)_chain.Parent, copy);
+                    else result = Chain.Move(moving, ((IMultipleChainParent)_chain.Parent)[_chain.ParentIndex.Value - 1], copy);
+                } else result = Chain.Move(moving, _chain, copy);
+
+            } else if (e.Data.Contains("device")) {
+                List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
+            
+                if (source.Name == "DropZone") {
+                    ((IMultipleChainParent)_chain.Parent).SpecificViewer.Expand(_chain.ParentIndex);
+                    
+                    if (_chain.Count > 0) result = Device.Move(moving, _chain.Devices.Last(), copy);
+                    else result = Device.Move(moving, _chain, copy);
+                } else {
+                    Chain_Add();
+                    result = Device.Move(moving, ((IMultipleChainParent)_chain.Parent)[_chain.ParentIndex.Value + 1], copy);
+                }
+
+            } else return;
 
             if (!result) e.DragEffects = DragDropEffects.None;
         }

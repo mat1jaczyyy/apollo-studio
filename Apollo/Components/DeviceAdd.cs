@@ -16,6 +16,7 @@ namespace Apollo.Components {
         public delegate void DeviceActionEventHandler(string action);
         public event DeviceActionEventHandler DeviceAction;
 
+        Grid Root;
         Canvas Icon;
 
         ContextMenu AddContextMenu, DeviceContextMenu;
@@ -26,7 +27,7 @@ namespace Apollo.Components {
             set {
                 if (value != _always) {
                     _always = value;
-                    this.Get<Grid>("Root").MinWidth = _always? 30 : 0;
+                    Root.MinWidth = _always? 30 : 0;
                 }
             }
         }
@@ -34,6 +35,7 @@ namespace Apollo.Components {
         public DeviceAdd() {
             InitializeComponent();
 
+            Root = this.Get<Grid>("Root");
             Icon = this.Get<Canvas>("Icon");
 
             AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
