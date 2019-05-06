@@ -32,6 +32,7 @@ namespace Apollo.DeviceViewers {
 
             Infinite = this.Get<CheckBox>("Infinite");
             Infinite.IsChecked = _hold.Infinite;
+            Infinite_Changed(null, EventArgs.Empty); // required to set Dial Enabled properties
 
             Release = this.Get<CheckBox>("Release");
             Release.IsChecked = _hold.Release;
