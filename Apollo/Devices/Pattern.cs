@@ -3,13 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Structures;
 using Apollo.Windows;
 
 namespace Apollo.Devices {
-    public class Pattern: Device {
-        public static readonly new string DeviceIdentifier = "pattern";
+    public class Pattern: Device, ISelectParent {
+        public static readonly new string DeviceIdentifier = "pattern";        
+
+        public ISelectParentViewer IViewer {
+            get => Window;
+        }
+
+        public List<ISelect> IChildren {
+            get => Frames.Select(i => (ISelect)i).ToList();
+        }
 
         public delegate void ChokedEventHandler(Pattern sender, int index);
         public static event ChokedEventHandler Choked;
@@ -17,6 +26,36 @@ namespace Apollo.Devices {
         public PatternWindow Window;
 
         public List<Frame> Frames;
+
+        private void Reroute() {
+            for (int i = 0; i < Frames.Count; i++) {
+                Frames[i].Parent = this;
+                Frames[i].ParentIndex = i;
+            }
+        }
+
+        public Frame this[int index] {
+            get => Frames[index];
+        }
+
+        public int Count {
+            get => Frames.Count;
+        }
+        
+        public void Insert(int index, Frame frame) {
+            Frames.Insert(index, frame);
+            Reroute();
+        }
+
+        public void Add(Frame frame) {
+            Frames.Add(frame);
+            Reroute();
+        }
+
+        public void Remove(int index) {
+            Frames.RemoveAt(index);
+            Reroute();
+        }
 
         private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
@@ -71,6 +110,7 @@ namespace Apollo.Devices {
             Expanded = expanded;
 
             Choked += HandleChoke;
+            Reroute();
         }
 
         private void FireCourier(Signal n, decimal time) {

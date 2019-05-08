@@ -4,7 +4,6 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Pattern" WindowStartupLocation="CenterOwner"
-        DragDrop.AllowDrop="true"
         Icon="/Resources/WindowIcon.png"
         Width="780" MinWidth="780" MaxWidth="780"
         Height="520" MinHeight="520" MaxHeight="520"
@@ -17,7 +16,7 @@
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="Auto,*" DragDrop.AllowDrop="true">
+  <Grid RowDefinitions="Auto,*">
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
       <Components:PreferencesButton Grid.Column="0" Margin="5 5" />
 

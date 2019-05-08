@@ -232,7 +232,7 @@ namespace Apollo.DeviceViewers {
 
         public void Duplicate(int left, int right) {
             for (int i = 0; i <= right - left; i++)
-                Chain_Insert(right + i + 1, (Chain)_multi[left + i].Clone());
+                Chain_Insert(right + i + 1, _multi[left + i].Clone());
         }
 
         public void Delete(int left, int right) {

@@ -224,7 +224,7 @@ namespace Apollo.DeviceViewers {
 
         public void Duplicate(int left, int right) {
             for (int i = 0; i <= right - left; i++)
-                Chain_Insert(right + i + 1, (Chain)_group[left + i].Clone());
+                Chain_Insert(right + i + 1, _group[left + i].Clone());
         }
 
         public void Delete(int left, int right) {

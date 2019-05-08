@@ -1,11 +1,22 @@
-﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using AvaloniaColor = Avalonia.Media.Color;
+using IBrush = Avalonia.Media.IBrush;
+using SolidColorBrush = Avalonia.Media.SolidColorBrush;
+
+using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Structures;
 
 namespace Apollo.Components {
-    public class FrameDisplay: UserControl {
+    public class FrameDisplay: UserControl, ISelectViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void FrameEventHandler(int index);
@@ -14,26 +25,111 @@ namespace Apollo.Components {
         public event FrameEventHandler FrameSelected;
         
         Pattern _pattern;
+        bool selected = false;
         public FrameThumbnail Viewer;
+
+        StackPanel Root;
+        TextBlock NameText;
         public Remove Remove;
         public VerticalAdd FrameAdd;
+        ContextMenu FrameContextMenu;
+
+        private void ApplyHeaderBrush(IBrush brush) {
+            if (IsArrangeValid) Root.Background = brush;
+            else this.Resources["BackgroundBrush"] = brush;
+        }
+
+        public void Select() {
+            ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
+            selected = true;
+        }
+
+        public void Deselect() {
+            ApplyHeaderBrush(new SolidColorBrush(AvaloniaColor.Parse("Transparent")));
+            selected = false;
+        }
 
         public FrameDisplay(Frame frame, Pattern pattern) {
             InitializeComponent();
 
             _pattern = pattern;
 
-            Viewer = this.Get<FrameThumbnail>("Frame");
+            Root = this.Get<StackPanel>("Root");
+
+            Viewer = this.Get<FrameThumbnail>("Draggable");
             Viewer.Frame = frame;
             
             Remove = this.Get<Remove>("Remove");
-            FrameAdd = this.Get<VerticalAdd>("FrameAdd");
+            FrameAdd = this.Get<VerticalAdd>("DropZoneAfter");
+
+            FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
+            FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
         }
 
-        private void Frame_Add() => FrameAdded?.Invoke(_pattern.Frames.IndexOf(Viewer.Frame) + 1);
+        private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
-        private void Frame_Remove() => FrameRemoved?.Invoke(_pattern.Frames.IndexOf(Viewer.Frame));
+        private void ContextMenu_Click(object sender, EventArgs e) {
+            IInteractive item = ((RoutedEventArgs)e).Source;
 
-        private void Clicked() => FrameSelected?.Invoke(_pattern.Frames.IndexOf(Viewer.Frame));
+            if (item.GetType() == typeof(MenuItem))
+                _pattern.Window?.Selection.Action((string)((MenuItem)item).Header);
+        }
+
+        private void Select(PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
+                _pattern.Window?.Selection.Select(Viewer.Frame, e.InputModifiers.HasFlag(InputModifiers.Shift));
+        }
+
+        public async void Drag(object sender, PointerPressedEventArgs e) {
+            if (!selected) Select(e);
+
+            DataObject dragData = new DataObject();
+            dragData.Set("frame", _pattern.Window?.Selection.Selection);
+
+            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+
+            if (result == DragDropEffects.None) {
+                if (selected) Select(e);
+                
+                if (e.MouseButton == MouseButton.Left)
+                    FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
+        
+                if (e.MouseButton == MouseButton.Right)
+                    FrameContextMenu.Open(Viewer);
+            }
+        }
+
+        public void DragOver(object sender, DragEventArgs e) {
+            e.Handled = true;
+            if (!e.Data.Contains("frame")) e.DragEffects = DragDropEffects.None; 
+        }
+
+        public void Drop(object sender, DragEventArgs e) {
+            e.Handled = true;
+
+            if (!e.Data.Contains("frame")) return;
+
+            IControl source = (IControl)e.Source;
+            while (source.Name != "DropZone" && source.Name != "DropZoneAfter")
+                source = source.Parent;
+
+            List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
+            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+
+            bool result;
+            
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
+                if (Viewer.Frame.ParentIndex == 0) result = Frame.Move(moving, _pattern, copy);
+                else result = Frame.Move(moving, _pattern[Viewer.Frame.ParentIndex.Value - 1], copy);
+            } else result = Frame.Move(moving, Viewer.Frame, copy);
+
+            if (!result) e.DragEffects = DragDropEffects.None;
+        }
+        
+        private void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);
+        private void Frame_Remove() => FrameRemoved?.Invoke(Viewer.Frame.ParentIndex.Value);
     }
 }

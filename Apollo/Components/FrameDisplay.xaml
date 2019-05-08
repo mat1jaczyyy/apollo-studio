@@ -3,12 +3,24 @@
              x:Class="Apollo.Components.FrameDisplay"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <StackPanel HorizontalAlignment="Stretch">
-    <StackPanel Margin="3 0 0 0" Orientation="Horizontal" Spacing="2">
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="BackgroundBrush" />
+
+    <ContextMenu x:Key="FrameContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Duplicate" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+    </ContextMenu>
+  </UserControl.Resources>
+
+  <StackPanel Background="{DynamicResource BackgroundBrush}" HorizontalAlignment="Stretch" x:Name="Root">
+    <StackPanel Margin="3 0 0 0" Background="Transparent" HorizontalAlignment="Stretch" Orientation="Horizontal" Spacing="2" DragDrop.AllowDrop="true" x:Name="DropZone">
       <Components:Remove VerticalAlignment="Center" x:Name="Remove" Removed="Frame_Remove" />
-      <Components:FrameThumbnail x:Name="Frame" Clicked="Clicked" />
+      <Components:FrameThumbnail Background="Transparent" x:Name="Draggable" PointerPressed="Drag" />
     </StackPanel>
 
-    <Components:VerticalAdd Added="Frame_Add" x:Name="FrameAdd" />
+    <Components:VerticalAdd Added="Frame_Add" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>
