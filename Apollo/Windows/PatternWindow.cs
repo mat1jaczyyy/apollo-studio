@@ -247,14 +247,14 @@ namespace Apollo.Windows {
 
             Frame reference = _pattern[Math.Max(0, index - 1)];
 
-            _pattern.Insert(index, frame);
-
             if (Preferences.CopyPreviousFrame)
                 for (int i = 0; i < _pattern[index].Screen.Length; i++)
-                    _pattern[index].Screen[i] = reference.Screen[i].Clone();
-
+                    frame.Screen[i] = reference.Screen[i].Clone();
+            
+            _pattern.Insert(index, frame);
             Contents_Insert(index, _pattern[index]);
             
+            Selection.Select(frame);
             Frame_Select(index);
         }
 
@@ -474,7 +474,7 @@ namespace Apollo.Windows {
 
         private void FireCourier(Color color, byte index, decimal time) {
             Courier courier = new Courier() {
-                Info = new Signal(_track.Launchpad, (byte)index, color.Clone()),
+                Info = new Signal(Launchpad, (byte)index, color.Clone()),
                 AutoReset = false,
                 Interval = (double)time,
             };
@@ -532,7 +532,7 @@ namespace Apollo.Windows {
             Editor.RenderFrame(_pattern[0]);
 
             for (int i = 0; i < _pattern[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
+                PlayExit?.Invoke(new Signal(Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
             
             decimal time = (_pattern[0].Mode? (int)_pattern[0].Length : _pattern[0].Time) * _pattern.Gate;
 

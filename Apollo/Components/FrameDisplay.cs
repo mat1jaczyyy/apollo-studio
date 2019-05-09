@@ -54,7 +54,7 @@ namespace Apollo.Components {
 
             _pattern = pattern;
 
-            Root = this.Get<StackPanel>("Root");
+            Root = this.Get<StackPanel>("DropZone");
 
             Viewer = this.Get<FrameThumbnail>("Draggable");
             Viewer.Frame = frame;

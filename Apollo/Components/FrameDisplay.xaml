@@ -15,8 +15,8 @@
     </ContextMenu>
   </UserControl.Resources>
 
-  <StackPanel Background="{DynamicResource BackgroundBrush}" HorizontalAlignment="Stretch" x:Name="Root">
-    <StackPanel Margin="3 0 0 0" Background="Transparent" HorizontalAlignment="Stretch" Orientation="Horizontal" Spacing="2" DragDrop.AllowDrop="true" x:Name="DropZone">
+  <StackPanel HorizontalAlignment="Stretch">
+    <StackPanel Margin="3 0 0 0" Background="{DynamicResource BackgroundBrush}" HorizontalAlignment="Stretch" Orientation="Horizontal" Spacing="2" DragDrop.AllowDrop="true" x:Name="DropZone">
       <Components:Remove VerticalAlignment="Center" x:Name="Remove" Removed="Frame_Remove" />
       <Components:FrameThumbnail Background="Transparent" x:Name="Draggable" PointerPressed="Drag" />
     </StackPanel>
