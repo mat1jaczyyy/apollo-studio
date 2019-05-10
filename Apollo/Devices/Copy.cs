@@ -80,6 +80,32 @@ namespace Apollo.Devices {
             Offsets = offsets?? new List<Offset>();
         }
 
+        private bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
+            x = index % 10 + offset.X;
+            y = index / 10 + offset.Y;
+
+            return Validate(x, y, out result);
+        }
+
+        private bool Validate(int x, int y, out int result) {
+            if (Loop) {
+                x = (x + 10) % 10;
+                y = (y + 10) % 10;
+            }
+
+            result = y * 10 + x;
+
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+                return true;
+            
+            if (y == -1 && 4 <= x && x <= 5) {
+                result = 99;
+                return true;
+            }
+
+            return false;
+        }
+
         private void FireCourier(Signal n, decimal time) {
             Courier courier = new Courier() {
                 Info = n,
@@ -157,36 +183,16 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIEnter(Signal n) {
-            int ox = n.Index % 10;
-            int oy = n.Index / 10;
-
-            int px = ox;
-            int py = oy;
+            int px = n.Index % 10;
+            int py = n.Index / 10;
 
             List<int> validOffsets = new List<int>() {n.Index};
             int time = 0;
 
             for (int i = 0; i < Offsets.Count; i++) {
-                int x = ox + Offsets[i].X;
-                int y = oy + Offsets[i].Y;
-
-                if (Loop) {
-                    x = (x + 10) % 10;
-                    y = (y + 10) % 10;
-                }
-
-                int result = y * 10 + x;
-                bool valid = true;
-                
-                if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result)) {
                     validOffsets.Add(result);
 
-                else if (y == -1 && 4 <= x && x <= 5)
-                    validOffsets.Add(result = 99);
-
-                else valid = false;
-
-                if (valid)
                     if (_copymode == CopyType.Static) {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
@@ -199,6 +205,7 @@ namespace Apollo.Devices {
 
                         FireCourier(m, (Mode? (int)Length : _rate) * _gate * (i + 1));
                     }
+                }
 
                 if (_copymode == CopyType.Interpolate) {
                     List<(int X, int Y)> points = new List<(int, int)>();
@@ -219,21 +226,13 @@ namespace Apollo.Devices {
                         points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
                     
                     foreach ((int ix, int iy) in points) {
-                        int iresult = iy * 10 + ix;
                         time++;
                         
-                        Signal m = n.Clone();
-                        bool ivalid = true;
-                        
-                        if (0 <= ix && ix <= 9 && 0 <= iy && iy <= 9 && 1 <= iresult && iresult <= 98 && iresult != 9 && iresult != 90)
-                            m.Index = (byte)(iy * 10 + ix);
-                        
-                        else if (iy == -1 && 4 <= ix && ix <= 5)
-                            m.Index = 99;
-                        
-                        else ivalid = false;
-
-                        if (ivalid) FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
+                        if (Validate(ix, iy, out int iresult)) {
+                            Signal m = n.Clone();
+                            m.Index = (byte)iresult;
+                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
+                        }
                     }
                 }
 
