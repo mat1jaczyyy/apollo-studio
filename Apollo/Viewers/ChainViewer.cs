@@ -180,8 +180,11 @@ namespace Apollo.Viewers {
 
             for (int i = left; i <= right; i++)
                 init.Add(_chain.Devices[i]);
-
-            Delete(left, right);
+            
+            for (int i = right; i >= left; i--) {
+                Contents_Remove(i);
+                _chain.Remove(i, false);
+            }
 
             Device_Insert(left, new Group(new List<Chain>() {init}));
         }
@@ -189,7 +192,8 @@ namespace Apollo.Viewers {
         public void Ungroup(int index) {
             List<Device> init = ((Group)_chain.Devices[index])[0].Devices;
 
-            Delete(index, index);
+            Contents_Remove(index);
+            _chain.Remove(index, false);
             
             for (int i = 0; i < init.Count; i++)
                 Device_Insert(index + i, init[i]);
