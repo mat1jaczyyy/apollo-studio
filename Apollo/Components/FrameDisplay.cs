@@ -29,7 +29,6 @@ namespace Apollo.Components {
         public FrameThumbnail Viewer;
 
         StackPanel Root;
-        TextBlock NameText;
         public Remove Remove;
         public VerticalAdd FrameAdd;
         ContextMenu FrameContextMenu;
