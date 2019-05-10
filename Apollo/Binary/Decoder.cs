@@ -147,6 +147,7 @@ namespace Apollo.Binary {
             else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
+                    (Move.GridType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
             

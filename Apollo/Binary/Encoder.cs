@@ -192,6 +192,7 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Move));
 
             Encode(writer, o.Offset);
+            writer.Write((int)o.GetGridMode());
             writer.Write(o.Loop);
         }
 

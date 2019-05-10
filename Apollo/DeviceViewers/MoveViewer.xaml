@@ -1,12 +1,22 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.MoveViewer"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
 
   <Grid RowDefinitions="*,Auto">
     <Components:MoveDial Grid.Row="0" x:Name="Offset" Title="Offset" />
 
-    <CheckBox Grid.Row="1" Margin="0 5 0 0" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+    <StackPanel Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" Spacing="5">
+      <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+        <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="ComboBox" SelectionChanged="GridMode_Changed">
+          <sys:String>10x10</sys:String>
+          <sys:String>8x8</sys:String>
+        </ComboBox>
+      </Border>
+
+      <CheckBox Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+    </StackPanel>
   </Grid>
 </UserControl>
