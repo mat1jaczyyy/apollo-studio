@@ -75,7 +75,7 @@
                 </Border>
 
                 <Grid Grid.Column="2" RowDefinitions="*,2*,*">
-                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="1" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="1" x:Name="PlaybackMode" SelectionChanged="Mode_Changed">
                     <sys:String>Mono</sys:String>
                     <sys:String>Poly</sys:String>
                     <sys:String>Loop</sys:String>

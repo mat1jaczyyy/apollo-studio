@@ -10,7 +10,7 @@
 
     <StackPanel Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" Spacing="5">
       <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
-        <ComboBox BorderThickness="0" Background="Transparent" x:Name="ComboBox" SelectionChanged="GridMode_Changed">
+        <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
           <sys:String>10x10</sys:String>
           <sys:String>8x8</sys:String>
         </ComboBox>

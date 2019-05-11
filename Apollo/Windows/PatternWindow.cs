@@ -55,13 +55,12 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText;
-        ComboBox PortSelector;
+        ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor;
         Controls Contents;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate;
-        ComboBox ComboBox;
         BoxDial Choke;
         Button Import, Play, Fire;
 
@@ -156,8 +155,8 @@ namespace Apollo.Windows {
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_pattern.Gate * 100;
 
-            ComboBox = this.Get<ComboBox>("ComboBox");
-            ComboBox.SelectedItem = _pattern.Mode;
+            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
+            PlaybackMode.SelectedItem = _pattern.Mode;
 
             Choke = this.Get<BoxDial>("Choke");
             if (_pattern.Choke != null) {
@@ -463,7 +462,7 @@ namespace Apollo.Windows {
 
         private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)ComboBox.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)PlaybackMode.SelectedItem;
 
         private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right && (Choke.Enabled = !Choke.Enabled) == false)

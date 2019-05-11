@@ -7,7 +7,7 @@
 
   <StackPanel VerticalAlignment="Center" Spacing="5">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="ComboBox" SelectionChanged="Mode_Changed">
+      <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="FlipMode" SelectionChanged="Mode_Changed">
         <sys:String>Horizontal</sys:String>
         <sys:String>Vertical</sys:String>
         <sys:String>Diagonal+</sys:String>

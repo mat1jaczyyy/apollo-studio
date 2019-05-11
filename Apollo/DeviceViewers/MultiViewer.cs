@@ -31,7 +31,7 @@ namespace Apollo.DeviceViewers {
         ContextMenu ChainContextMenu;
 
         Controls Contents;
-        ComboBox ComboBox;
+        ComboBox MultiMode;
         VerticalAdd ChainAdd;
 
         private void SetAlwaysShowing() {
@@ -81,8 +81,8 @@ namespace Apollo.DeviceViewers {
             _root.Insert(0, new DeviceHead(parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
-            ComboBox = this.Get<ComboBox>("ComboBox");
-            ComboBox.SelectedItem = _multi.Mode;
+            MultiMode = this.Get<ComboBox>("MultiMode");
+            MultiMode.SelectedItem = _multi.Mode;
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
             ChainContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ChainContextMenu_Click));
@@ -206,7 +206,7 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)ComboBox.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)MultiMode.SelectedItem;
 
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();

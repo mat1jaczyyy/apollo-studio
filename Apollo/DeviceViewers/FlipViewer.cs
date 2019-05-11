@@ -12,7 +12,7 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Flip _flip;
-        ComboBox ComboBox;
+        ComboBox FlipMode;
         CheckBox Bypass;
 
         public FlipViewer(Flip flip) {
@@ -20,14 +20,14 @@ namespace Apollo.DeviceViewers {
 
             _flip = flip;
 
-            ComboBox = this.Get<ComboBox>("ComboBox");
-            ComboBox.SelectedItem = _flip.Mode;
+            FlipMode = this.Get<ComboBox>("FlipMode");
+            FlipMode.SelectedItem = _flip.Mode;
             
             Bypass = this.Get<CheckBox>("Bypass");
             Bypass.IsChecked = _flip.Bypass;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _flip.Mode = (string)ComboBox.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _flip.Mode = (string)FlipMode.SelectedItem;
 
         private void Bypass_Changed(object sender, EventArgs e) => _flip.Bypass = Bypass.IsChecked.Value;
     }
