@@ -183,6 +183,8 @@ namespace Apollo.Viewers {
             Input_Right = right;
 
             Input.Text = _chain.Name;
+            Input.SelectionStart = 0;
+            Input.SelectionEnd = Input.Text.Length;
 
             Input.Opacity = 1;
             Input.IsHitTestVisible = true;
