@@ -63,46 +63,83 @@ namespace Apollo.Devices {
         }
 
         public CopyType GetCopyMode() => _copymode;
+        
+        public enum GridType {
+            Full,
+            Square
+        }
+
+        public string GridMode {
+            get {
+                if (_gridmode == GridType.Full) return "10x10";
+                else if (_gridmode == GridType.Square) return "8x8";
+                return null;
+            }
+            set {
+                if (value == "10x10") _gridmode = GridType.Full;
+                else if (value == "8x8") _gridmode = GridType.Square;
+            }
+        }
+
+        GridType _gridmode;
+        
+        public GridType GetGridMode() => _gridmode;
 
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
 
-        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, Loop, (from i in Offsets select i.Clone()).ToList());
+        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, _gridmode, Loop, (from i in Offsets select i.Clone()).ToList());
 
-        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Mode = mode;
             Rate = rate;
             Length = length?? new Length();
             Gate = gate;
             _copymode = copymode;
+            _gridmode = gridmode;
             Loop = loop;
             Offsets = offsets?? new List<Offset>();
         }
+        
+        private int ApplyLoop(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         private bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
-            x = index % 10 + offset.X;
-            y = index / 10 + offset.Y;
+            x = index % 10;
+            y = index / 10;
+
+            if (_gridmode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
+                result = 0;
+                return false;
+            }
+
+            x += offset.X;
+            y += offset.Y;
 
             return Validate(x, y, out result);
         }
 
         private bool Validate(int x, int y, out int result) {
             if (Loop) {
-                x = (x + 10) % 10;
-                y = (y + 10) % 10;
+                x = ApplyLoop(x);
+                y = ApplyLoop(y);
             }
 
             result = y * 10 + x;
 
-            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
-                return true;
-            
-            if (y == -1 && 4 <= x && x <= 5) {
-                result = 99;
-                return true;
-            }
+            if (_gridmode == GridType.Full) {
+                if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+                    return true;
+                
+                if (y == -1 && 4 <= x && x <= 5) {
+                    result = 99;
+                    return true;
+                }
 
+            } else if (_gridmode == GridType.Square)
+                if (1 <= x && x <= 8 && 1 <= y && y <= 8)
+                    return true;
+             
             return false;
         }
 

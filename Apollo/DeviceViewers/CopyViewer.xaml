@@ -9,9 +9,9 @@
     <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
       <Grid RowDefinitions="*,*" Margin="0 0 5 0">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-          <StackPanel Margin="0 0 0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
-            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-              <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="ComboBox" SelectionChanged="CopyMode_Changed">
+          <StackPanel Margin="0 0 0 5" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
+              <ComboBox BorderThickness="0" Background="Transparent" x:Name="CopyMode" SelectionChanged="CopyMode_Changed">
                 <sys:String>Static</sys:String>
                 <sys:String>Animate</sys:String>
                 <sys:String>Interpolate</sys:String>
@@ -20,7 +20,14 @@
               </ComboBox>
             </Border>
 
-            <CheckBox HorizontalAlignment="Center" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
+              <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
+                <sys:String>10x10</sys:String>
+                <sys:String>8x8</sys:String>
+              </ComboBox>
+            </Border>
+
+            <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
           </StackPanel>
         </Border>
         

@@ -124,6 +124,7 @@ namespace Apollo.Binary {
             writer.Write(o.Gate);
 
             writer.Write((int)o.GetCopyMode());
+            writer.Write((int)o.GetGridMode());
             writer.Write(o.Loop);
 
             writer.Write(o.Offsets.Count);

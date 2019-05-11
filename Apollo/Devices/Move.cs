@@ -31,9 +31,9 @@ namespace Apollo.Devices {
 
         public override Device Clone() => new Move(Offset.Clone());
 
-        public Move(Offset offset = null, GridType grid = GridType.Full, bool loop = false): base(DeviceIdentifier) {
+        public Move(Offset offset = null, GridType gridmode = GridType.Full, bool loop = false): base(DeviceIdentifier) {
             Offset = offset?? new Offset();
-            _gridmode = grid;
+            _gridmode = gridmode;
             Loop = loop;
         }
 

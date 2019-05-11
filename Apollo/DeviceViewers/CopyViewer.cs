@@ -15,9 +15,9 @@ namespace Apollo.DeviceViewers {
         
         Copy _copy;
 
-        ComboBox ComboBox;
-        Dial Rate, Gate;
+        ComboBox CopyMode, GridMode;
         CheckBox Loop;
+        Dial Rate, Gate;
 
         Controls Contents;
         HorizontalAdd OffsetAdd;
@@ -49,8 +49,11 @@ namespace Apollo.DeviceViewers {
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_copy.Gate * 100;
 
-            ComboBox = this.Get<ComboBox>("ComboBox");
-            ComboBox.SelectedItem = _copy.CopyMode;
+            CopyMode = this.Get<ComboBox>("CopyMode");
+            CopyMode.SelectedItem = _copy.CopyMode;
+
+            GridMode = this.Get<ComboBox>("GridMode");
+            GridMode.SelectedItem = _copy.GridMode;
 
             Loop = this.Get<CheckBox>("Loop");
             Loop.IsChecked = _copy.Loop;
@@ -69,9 +72,11 @@ namespace Apollo.DeviceViewers {
         private void Gate_Changed(double value) => _copy.Gate = (decimal)(value / 100);
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
-            _copy.CopyMode = (string)ComboBox.SelectedItem;
-            Rate.Enabled = Gate.Enabled = ComboBox.SelectedIndex > 0;
+            _copy.CopyMode = (string)CopyMode.SelectedItem;
+            Rate.Enabled = Gate.Enabled = CopyMode.SelectedIndex > 0;
         }
+
+        private void GridMode_Changed(object sender, SelectionChangedEventArgs e) => _copy.GridMode = (string)GridMode.SelectedItem;
 
         private void Loop_Changed(object sender, EventArgs e) => _copy.Loop = Loop.IsChecked.Value;
 

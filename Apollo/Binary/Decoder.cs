@@ -95,6 +95,7 @@ namespace Apollo.Binary {
                     reader.ReadInt32(),
                     reader.ReadDecimal(),
                     (Copy.CopyType)reader.ReadInt32(),
+                    (Copy.GridType)reader.ReadInt32(),
                     reader.ReadBoolean(),
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
                 );
