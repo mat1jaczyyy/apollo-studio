@@ -649,6 +649,8 @@ namespace Apollo.Windows {
         }
 
         public async void Copy(int left, int right, bool cut = false) {
+            if (Locked) return;
+
             Copyable copy = new Copyable();
             
             for (int i = left; i <= right; i++)
@@ -662,6 +664,8 @@ namespace Apollo.Windows {
         }
 
         public async void Paste(int right) {
+            if (Locked) return;
+
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
@@ -671,11 +675,15 @@ namespace Apollo.Windows {
         }
 
         public void Duplicate(int left, int right) {
+            if (Locked) return;
+
             for (int i = 0; i <= right - left; i++)
                 Frame_Insert(right + i + 1, _pattern[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            if (Locked) return;
+
             for (int i = right; i >= left; i--)
                 Frame_Remove(i);
         }
