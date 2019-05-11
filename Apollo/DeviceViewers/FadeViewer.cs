@@ -17,6 +17,8 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Fade _fade;
+        
+        ComboBox PlaybackMode;
         Canvas canvas;
         Grid PickerContainer;
         ColorPicker Picker;
@@ -36,6 +38,9 @@ namespace Apollo.DeviceViewers {
             PickerContainer = this.Get<Grid>("PickerContainer");
             Picker = this.Get<ColorPicker>("Picker");
             Gradient = this.Get<LinearGradientBrush>("Gradient");
+
+            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
+            PlaybackMode.SelectedItem = _fade.PlayMode;
 
             Dial Duration = this.Get<Dial>("Duration");
             Duration.UsingSteps = _fade.Mode;
@@ -164,5 +169,7 @@ namespace Apollo.DeviceViewers {
         private void Duration_ModeChanged(bool value) => _fade.Mode = value;
 
         private void Gate_Changed(double value) => _fade.Gate = (decimal)(value / 100);
+
+        private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) => _fade.PlayMode = (string)PlaybackMode.SelectedItem;
     }
 }

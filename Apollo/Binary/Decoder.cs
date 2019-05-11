@@ -115,6 +115,7 @@ namespace Apollo.Binary {
                     Decode(reader, version),
                     reader.ReadInt32(),
                     reader.ReadDecimal(),
+                    (Fade.PlaybackType)reader.ReadInt32(),
                     (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList(),
                     (from i in Enumerable.Range(0, count) select reader.ReadDecimal()).ToList()
                 );

@@ -74,6 +74,19 @@ namespace Apollo.Devices {
             }
         }
 
+        public enum PlaybackType {
+            Mono,
+            Loop
+        }
+
+        private PlaybackType _playmode;
+        public string PlayMode {
+            get => _playmode.ToString();
+            set => _playmode = Enum.Parse<PlaybackType>(value);
+        }
+
+        public PlaybackType GetPlaybackType() => _playmode;
+
         public delegate void GeneratedEventHandler();
         public event GeneratedEventHandler Generated;
 
@@ -134,7 +147,7 @@ namespace Apollo.Devices {
             get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(Mode, Length.Clone(), _time, _gate, (from i in _colors select i.Clone()).ToList(), _positions.ToList());
+        public override Device Clone() => new Fade(Mode, Length.Clone(), _time, _gate, _playmode, (from i in _colors select i.Clone()).ToList(), _positions.ToList());
 
         public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
@@ -148,11 +161,12 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
+        public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, PlaybackType playmode = PlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
             Mode = mode;
             Time = time;
             Length = length?? new Length();
             Gate = gate;
+            _playmode = playmode;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
@@ -183,7 +197,16 @@ namespace Apollo.Devices {
                 Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
-                    if (++_indexes[n] < fade.Count) {
+                    if (_playmode == PlaybackType.Loop && !_timers[n].Contains(courier)) return;
+
+                    if (++_indexes[n] == fade.Count - 1 && _playmode == PlaybackType.Loop) {
+                        Stop(n);
+                        
+                        for (int i = 1; i < fade.Count; i++)
+                            FireCourier(n, fade[i].Time);
+                    }
+                    
+                    if (_indexes[n] < fade.Count) {
                         Signal m = n.Clone();
                         m.Color = fade[_indexes[n]].Color.Clone();
                         MIDIExit?.Invoke(m);
@@ -192,26 +215,43 @@ namespace Apollo.Devices {
             }
         }
 
+        private void Stop(Signal n) {
+            if (!locker.ContainsKey(n)) locker[n] = new object();
+
+            lock (locker[n]) {
+                if (_timers.ContainsKey(n))
+                    for (int i = 0; i < _timers[n].Count; i++)
+                        _timers[n][i].Dispose();
+                
+                if (_playmode == PlaybackType.Loop && _indexes.ContainsKey(n) && _indexes[n] < fade.Count - 1) {
+                    Signal m = n.Clone();
+                    m.Color = fade.Last().Color.Clone();
+                    MIDIExit?.Invoke(m);
+                }
+
+                _timers[n] = new List<Courier>();
+                _indexes[n] = 0;
+            }
+        }
+
         public override void MIDIEnter(Signal n) {
-            if (_colors.Count > 0 && n.Color.Lit) {
+            if (_colors.Count > 0) {
+                bool lit = n.Color.Lit;
                 n.Color = new Color();
 
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
                 lock (locker[n]) {
-                    if (_timers.ContainsKey(n))
-                        for (int i = 0; i < _timers[n].Count; i++)
-                            _timers[n][i].Dispose();
+                    if ((_playmode == PlaybackType.Mono && lit) || _playmode == PlaybackType.Loop) Stop(n);
 
-                    _timers[n] = new List<Courier>();
-                    _indexes[n] = 0;
-                    
-                    Signal m = n.Clone();
-                    m.Color = fade[0].Color.Clone();
-                    MIDIExit?.Invoke(m);
-                    
-                    for (int i = 1; i < fade.Count; i++)
-                        FireCourier(n, fade[i].Time);
+                    if (lit) {
+                        Signal m = n.Clone();
+                        m.Color = fade[0].Color.Clone();
+                        MIDIExit?.Invoke(m);
+                        
+                        for (int i = 1; i < fade.Count; i++)
+                            FireCourier(n, fade[i].Time);
+                    }
                 }
             }
         }

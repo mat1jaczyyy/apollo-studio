@@ -148,6 +148,7 @@ namespace Apollo.Binary {
             Encode(writer, o.Length);
             writer.Write(o.Time);
             writer.Write(o.Gate);
+            writer.Write((int)o.GetPlaybackType());
 
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
