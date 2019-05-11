@@ -25,7 +25,7 @@ namespace Apollo.Devices {
         private int _rate;
         private decimal _gate;
         CopyType _copymode;
-        public bool Loop;
+        public bool Wrap;
         public List<Offset> Offsets;
 
         public int Rate {
@@ -89,20 +89,20 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
 
-        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, _gridmode, Loop, (from i in Offsets select i.Clone()).ToList());
+        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList());
 
-        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool loop = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Mode = mode;
             Rate = rate;
             Length = length?? new Length();
             Gate = gate;
             _copymode = copymode;
             _gridmode = gridmode;
-            Loop = loop;
+            Wrap = wrap;
             Offsets = offsets?? new List<Offset>();
         }
         
-        private int ApplyLoop(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        private int ApplyWrap(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         private bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
             x = index % 10;
@@ -120,9 +120,9 @@ namespace Apollo.Devices {
         }
 
         private bool Validate(int x, int y, out int result) {
-            if (Loop) {
-                x = ApplyLoop(x);
-                y = ApplyLoop(y);
+            if (Wrap) {
+                x = ApplyWrap(x);
+                y = ApplyWrap(y);
             }
 
             result = y * 10 + x;

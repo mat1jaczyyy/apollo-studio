@@ -16,7 +16,7 @@
         </ComboBox>
       </Border>
 
-      <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Loop" Click="Loop_Changed">Loop</CheckBox>
+      <CheckBox HorizontalAlignment="Center" x:Name="Wrap" Click="Wrap_Changed">Wrap</CheckBox>
     </StackPanel>
   </Grid>
 </UserControl>

@@ -15,7 +15,7 @@ namespace Apollo.DeviceViewers {
         Move _move;
 
         ComboBox GridMode;
-        CheckBox Loop;
+        CheckBox Wrap;
 
         public MoveViewer(Move move) {
             InitializeComponent();
@@ -30,8 +30,8 @@ namespace Apollo.DeviceViewers {
             GridMode = this.Get<ComboBox>("GridMode");
             GridMode.SelectedItem = _move.GridMode;
 
-            Loop = this.Get<CheckBox>("Loop");
-            Loop.IsChecked = _move.Loop;
+            Wrap = this.Get<CheckBox>("Wrap");
+            Wrap.IsChecked = _move.Wrap;
         }
 
         private void Offset_Changed(int x, int y) {
@@ -41,6 +41,6 @@ namespace Apollo.DeviceViewers {
         
         private void GridMode_Changed(object sender, SelectionChangedEventArgs e) => _move.GridMode = (string)GridMode.SelectedItem;
 
-        private void Loop_Changed(object sender, EventArgs e) => _move.Loop = Loop.IsChecked.Value;
+        private void Wrap_Changed(object sender, EventArgs e) => _move.Wrap = Wrap.IsChecked.Value;
     }
 }

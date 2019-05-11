@@ -125,7 +125,7 @@ namespace Apollo.Binary {
 
             writer.Write((int)o.GetCopyMode());
             writer.Write((int)o.GetGridMode());
-            writer.Write(o.Loop);
+            writer.Write(o.Wrap);
 
             writer.Write(o.Offsets.Count);
             for (int i = 0; i < o.Offsets.Count; i++)
@@ -195,7 +195,7 @@ namespace Apollo.Binary {
 
             Encode(writer, o.Offset);
             writer.Write((int)o.GetGridMode());
-            writer.Write(o.Loop);
+            writer.Write(o.Wrap);
         }
 
         private static void Encode(BinaryWriter writer, Multi o) {

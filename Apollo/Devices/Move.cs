@@ -27,17 +27,17 @@ namespace Apollo.Devices {
         public GridType GetGridMode() => _gridmode;
 
         public Offset Offset;
-        public bool Loop;
+        public bool Wrap;
 
         public override Device Clone() => new Move(Offset.Clone());
 
-        public Move(Offset offset = null, GridType gridmode = GridType.Full, bool loop = false): base(DeviceIdentifier) {
+        public Move(Offset offset = null, GridType gridmode = GridType.Full, bool wrap = false): base(DeviceIdentifier) {
             Offset = offset?? new Offset();
             _gridmode = gridmode;
-            Loop = loop;
+            Wrap = wrap;
         }
 
-        private int ApplyLoop(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        private int ApplyWrap(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         private bool ApplyOffset(int index, out int result) {
             int x = index % 10;
@@ -51,9 +51,9 @@ namespace Apollo.Devices {
             x += Offset.X;
             y += Offset.Y;
 
-            if (Loop) {
-                x = ApplyLoop(x);
-                y = ApplyLoop(y);
+            if (Wrap) {
+                x = ApplyWrap(x);
+                y = ApplyWrap(y);
             }
 
             result = y * 10 + x;

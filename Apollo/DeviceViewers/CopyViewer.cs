@@ -16,7 +16,7 @@ namespace Apollo.DeviceViewers {
         Copy _copy;
 
         ComboBox CopyMode, GridMode;
-        CheckBox Loop;
+        CheckBox Wrap;
         Dial Rate, Gate;
 
         Controls Contents;
@@ -55,8 +55,8 @@ namespace Apollo.DeviceViewers {
             GridMode = this.Get<ComboBox>("GridMode");
             GridMode.SelectedItem = _copy.GridMode;
 
-            Loop = this.Get<CheckBox>("Loop");
-            Loop.IsChecked = _copy.Loop;
+            Wrap = this.Get<CheckBox>("Wrap");
+            Wrap.IsChecked = _copy.Wrap;
 
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
@@ -78,7 +78,7 @@ namespace Apollo.DeviceViewers {
 
         private void GridMode_Changed(object sender, SelectionChangedEventArgs e) => _copy.GridMode = (string)GridMode.SelectedItem;
 
-        private void Loop_Changed(object sender, EventArgs e) => _copy.Loop = Loop.IsChecked.Value;
+        private void Wrap_Changed(object sender, EventArgs e) => _copy.Wrap = Wrap.IsChecked.Value;
 
         private void Offset_Insert(int index) {
             _copy.Offsets.Insert(index, new Offset());
