@@ -471,21 +471,20 @@ namespace Apollo.Windows {
 
         private void Choke_Changed(double value) => _pattern.Choke = (int)value;
 
-        private void FireCourier(Color color, byte index, decimal time) {
-            Courier courier = new Courier() {
-                Info = new Signal(Launchpad, (byte)index, color.Clone()),
-                AutoReset = false,
-                Interval = (double)time,
-            };
-            courier.Elapsed += Tick;
-            courier.Start();
+        private void PlayColor(int index, Color color) {
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Editor.SetColor(LaunchpadGrid.SignalToGrid(index), (SolidColorBrush)color.ToBrush());
+            });
+
+            PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)index, color.Clone()));
         }
 
-        private void FireStopCourier(decimal time) {
-            Courier courier = new Courier() {
+        private void FireCourier(decimal time) {
+            Courier courier;
+            PlayTimers.Add(courier = new Courier() {
                 AutoReset = false,
                 Interval = (double)time,
-            };
+            });
             courier.Elapsed += Tick;
             courier.Start();
         }
@@ -496,31 +495,50 @@ namespace Apollo.Windows {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
 
-            if (courier.Info == null) {
-                for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
-                    if (_pattern.Frames.Last().Screen[i].Lit)
-                        PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, new Color(0)));
+            lock (PlayLocker) {
+                if (++PlayIndex < _pattern.Count) {
+                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
+                        if (_pattern[PlayIndex].Screen[i] != _pattern[PlayIndex - 1].Screen[i])
+                            PlayColor(i, _pattern[PlayIndex].Screen[i]);
 
-                if (_launchpad != null) PlayExit = Launchpad.Send;
-                else PlayExit = null;
+                } else {
+                    for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
+                        if (_pattern.Frames.Last().Screen[i].Lit)
+                            PlayColor(i, new Color(0));
 
-                Dispatcher.UIThread.InvokeAsync(() => {
-                    Locked = false;
+                    if (_launchpad != null) PlayExit = Launchpad.Send;
+                    else PlayExit = null;
 
-                    Editor.RenderFrame(_pattern[_pattern.Expanded]);
-                });
+                    Dispatcher.UIThread.InvokeAsync(() => {
+                        Locked = false;
 
-                for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                    Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+                        Editor.RenderFrame(_pattern[_pattern.Expanded]);
+                    });
 
-            } else {
-                Signal n = (Signal)courier.Info;
+                    for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
+                        Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+                }
+
+                PlayTimers.Remove(courier);
+            }
+        }
+
+        private int PlayIndex;
+        private object PlayLocker = new object();
+        private List<Courier> PlayTimers = new List<Courier>();
+
+        private void PatternStop() {
+            lock (PlayLocker) {
+                for (int i = 0; i < PlayTimers.Count; i++)
+                    PlayTimers[i].Dispose();
                 
-                Dispatcher.UIThread.InvokeAsync(() => {
-                    Editor.SetColor(LaunchpadGrid.SignalToGrid(n.Index), (SolidColorBrush)n.Color.ToBrush());
-                });
+                if (PlayIndex < _pattern.Count)
+                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
+                        if (_pattern[PlayIndex].Screen[i].Lit)
+                            PlayColor(i, new Color(0));
 
-                PlayExit?.Invoke(n.Clone());
+                PlayTimers = new List<Courier>();
+                PlayIndex = 0;
             }
         }
 
@@ -528,22 +546,18 @@ namespace Apollo.Windows {
             if (Locked) return;
             Locked = true;
 
+            PatternStop();
             Editor.RenderFrame(_pattern[0]);
 
             for (int i = 0; i < _pattern[0].Screen.Length; i++)
                 PlayExit?.Invoke(new Signal(Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
-            
-            decimal time = (_pattern[0].Mode? (int)_pattern[0].Length : _pattern[0].Time) * _pattern.Gate;
 
-            for (int i = 1; i < _pattern.Count; i++) {
-                for (int j = 0; j < _pattern[i].Screen.Length; j++)
-                    if (_pattern[i].Screen[j] != _pattern[i - 1].Screen[j])
-                        FireCourier(_pattern[i].Screen[j], (byte)j, time);
+            decimal time = 0;
 
+            for (int i = 0; i < _pattern.Count; i++) {
                 time += (_pattern[i].Mode? (int)_pattern[i].Length : _pattern[i].Time) * _pattern.Gate;
+                FireCourier(time);
             }
-            
-            FireStopCourier(time);
         }
 
         private void PatternFire(object sender, RoutedEventArgs e) {
