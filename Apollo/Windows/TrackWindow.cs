@@ -74,6 +74,23 @@ namespace Apollo.Windows {
             Program.WindowClose(this);
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Modifiers == InputModifiers.Control) {
+                if (e.Key == Key.X) Selection.Action("Cut");
+                else if (e.Key == Key.C) Selection.Action("Copy");
+                else if (e.Key == Key.D) Selection.Action("Duplicate");
+                else if (e.Key == Key.V) Selection.Action("Paste");
+                else if (e.Key == Key.G) Selection.Action("Group");
+                else if (e.Key == Key.U) Selection.Action("Ungroup");
+                else if (e.Key == Key.R) Selection.Action("Rename");
+                else if (e.Key == Key.A) Selection.SelectAll();
+            } else {
+                if (e.Key == Key.Delete) Selection.Action("Delete");
+                else if (e.Key == Key.Left) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                else if (e.Key == Key.Right) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+            }
+        }
+
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

@@ -7,7 +7,7 @@
         Width="600" MinWidth="180"
         Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded"
-        PointerPressed="Window_Focus">
+        KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
   <Grid>
     <Grid RowDefinitions="Auto,*">

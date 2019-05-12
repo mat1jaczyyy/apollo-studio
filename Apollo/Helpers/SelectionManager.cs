@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -45,6 +46,23 @@ namespace Apollo.Helpers {
                     foreach (ISelect selected in Selection)
                         selected.IInfo?.Select();
                 else SelectionStart.IInfo?.Select();
+        }
+
+        public void SelectAll() {
+            ISelectParent target = SelectionStart.IParent;
+            Select(target.IChildren.First());
+            Select(target.IChildren.Last(), true);
+        }
+
+        public void Move(bool right, bool shift = false) {
+            ISelect target = (shift? (SelectionEnd?? SelectionStart) : SelectionStart);
+            if (target == null) return;
+
+            Select(target.IParent.IChildren[
+                right
+                    ? Math.Min(target.IParent.IChildren.Count - 1, target.IParentIndex.Value + 1)
+                    : Math.Max(0, target.IParentIndex.Value - 1)
+            ], shift);
         }
 
         public void Action(string action) {
