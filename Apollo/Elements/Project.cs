@@ -18,6 +18,10 @@ namespace Apollo.Elements {
             get => Tracks.Select(i => (ISelect)i).ToList();
         }
 
+        public bool IRoot {
+            get => true;
+        }
+
         public ProjectWindow Window;
 
         public List<Track> Tracks;

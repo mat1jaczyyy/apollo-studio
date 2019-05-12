@@ -22,6 +22,10 @@ namespace Apollo.DeviceViewers {
     public class MultiViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
         public static readonly string DeviceIdentifier = "multi";
 
+        public int? IExpanded {
+            get => _multi.Expanded;
+        }
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Multi _multi;

@@ -23,6 +23,10 @@ namespace Apollo.Devices {
             get => Chains.Select(i => (ISelect)i).ToList();
         }
 
+        public bool IRoot {
+            get => false;
+        }
+
         private Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
             get => _midiexit;

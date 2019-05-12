@@ -39,9 +39,14 @@ namespace Apollo.Core {
         ISelectParentViewer IViewer { get; }
 
         List<ISelect> IChildren { get; }
+
+        bool IRoot { get; }
     }
 
     public interface ISelectParentViewer {
+        int? IExpanded { get; }
+        void Expand(int? index);
+
         void Copy(int left, int right, bool cut = false);
         void Duplicate(int left, int right);
         void Paste(int right);

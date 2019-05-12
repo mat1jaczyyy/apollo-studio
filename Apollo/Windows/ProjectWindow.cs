@@ -21,6 +21,10 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class ProjectWindow: Window, ISelectParentViewer {
+        public int? IExpanded {
+            get => null;
+        }
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         private void UpdateTitle() => TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FilePath;
@@ -96,6 +100,8 @@ namespace Apollo.Windows {
             Page = this.Get<HorizontalDial>("Page");
             Page.RawValue = Program.Project.Page;
         }
+        
+        public void Expand(int? index) {}
         
         private void Loaded(object sender, EventArgs e) {
             Program.Project.PathChanged += UpdateTitle;

@@ -20,6 +20,10 @@ namespace Apollo.Devices {
             get => Frames.Select(i => (ISelect)i).ToList();
         }
 
+        public bool IRoot {
+            get => true;
+        }
+
         public delegate void ChokedEventHandler(Pattern sender, int index);
         public static event ChokedEventHandler Choked;
 

@@ -22,6 +22,10 @@ namespace Apollo.DeviceViewers {
     public class GroupViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
         public static readonly string DeviceIdentifier = "group";
 
+        public int? IExpanded {
+            get => _group.Expanded;
+        }
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Group _group;

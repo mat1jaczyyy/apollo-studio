@@ -22,6 +22,10 @@ using Apollo.Structures;
 
 namespace Apollo.Windows {
     public class PatternWindow: Window, ISelectParentViewer {
+        public int? IExpanded {
+            get => _pattern.Expanded;
+        }
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         Pattern _pattern;
@@ -193,6 +197,10 @@ namespace Apollo.Windows {
             ColorHistory.Select(ColorPicker.Color.Clone(), true);
             
             Frame_Select(_pattern.Expanded);
+        }
+
+        public void Expand(int? index) {
+            if (index != null) Frame_Select(index.Value);
         }
 
         private void Loaded(object sender, EventArgs e) {

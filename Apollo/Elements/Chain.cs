@@ -28,6 +28,10 @@ namespace Apollo.Elements {
             get => Devices.Select(i => (ISelect)i).ToList();
         }
 
+        public bool IRoot { 
+            get => Parent.GetType() == typeof(Track);
+        }
+
         public ChainInfo Info;
         public ChainViewer Viewer;
 

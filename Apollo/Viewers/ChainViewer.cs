@@ -19,6 +19,10 @@ using Apollo.Helpers;
 
 namespace Apollo.Viewers {
     public class ChainViewer: UserControl, ISelectParentViewer {
+        public int? IExpanded {
+            get => null;
+        }
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Chain _chain;
@@ -83,6 +87,8 @@ namespace Apollo.Viewers {
                 Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush");
             }
         }
+
+        public void Expand(int? index) {}
 
         private void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
 

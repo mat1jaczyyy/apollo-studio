@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Input;
+
 using Apollo.Core;
 
 namespace Apollo.Helpers {
@@ -58,11 +60,27 @@ namespace Apollo.Helpers {
             ISelect target = (shift? (SelectionEnd?? SelectionStart) : SelectionStart);
             if (target == null) return;
 
-            Select(target.IParent.IChildren[
-                right
-                    ? Math.Min(target.IParent.IChildren.Count - 1, target.IParentIndex.Value + 1)
-                    : Math.Max(0, target.IParentIndex.Value - 1)
-            ], shift);
+            if (right) {
+                target = target.IParent.IChildren[Math.Min(target.IParent.IChildren.Count - 1, target.IParentIndex.Value + 1)];
+
+            } else {
+                if (target.IParentIndex.Value == 0 && target.IParent is ISelect && !target.IParent.IRoot) target = (ISelect)target.IParent;
+                else target = target.IParent.IChildren[Math.Max(0, target.IParentIndex.Value - 1)];
+            }
+
+            Select(target, shift);
+        }
+
+        public void Expand() {
+            if (SelectionStart.IParent.IViewer.IExpanded != SelectionStart.IParentIndex)
+                SelectionStart.IParent.IViewer.Expand(SelectionStart.IParentIndex);
+        }
+
+        public void MoveChild() {
+            Expand();
+
+            if (SelectionStart is ISelectParent && ((ISelectParent)SelectionStart).IChildren.Count > 0)
+                Select(((ISelectParent)SelectionStart).IChildren[0]);
         }
 
         public void Action(string action) {
@@ -93,6 +111,26 @@ namespace Apollo.Helpers {
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
+        }
+
+        public bool ActionKey(KeyEventArgs e) {
+            if (e.Modifiers == InputModifiers.Control) {
+                if (e.Key == Key.X) Action("Cut");
+                else if (e.Key == Key.C) Action("Copy");
+                else if (e.Key == Key.D) Action("Duplicate");
+                else if (e.Key == Key.V) Action("Paste");
+                else if (e.Key == Key.G) Action("Group");
+                else if (e.Key == Key.U) Action("Ungroup");
+                else if (e.Key == Key.R) Action("Rename");
+                else if (e.Key == Key.A) SelectAll();
+                else return false;
+
+            } else {
+                if (e.Key == Key.Delete) Action("Delete");
+                else return false;
+            }
+
+            return true;
         }
     }
 }

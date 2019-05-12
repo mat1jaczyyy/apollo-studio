@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Viewers;
@@ -75,20 +76,21 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Modifiers == InputModifiers.Control) {
-                if (e.Key == Key.X) Selection.Action("Cut");
-                else if (e.Key == Key.C) Selection.Action("Copy");
-                else if (e.Key == Key.D) Selection.Action("Duplicate");
-                else if (e.Key == Key.V) Selection.Action("Paste");
-                else if (e.Key == Key.G) Selection.Action("Group");
-                else if (e.Key == Key.U) Selection.Action("Ungroup");
-                else if (e.Key == Key.R) Selection.Action("Rename");
-                else if (e.Key == Key.A) Selection.SelectAll();
-            } else {
-                if (e.Key == Key.Delete) Selection.Action("Delete");
-                else if (e.Key == Key.Left) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-                else if (e.Key == Key.Right) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
-            }
+            if (Selection.ActionKey(e)) return;
+
+            bool vertical = Selection.SelectionStart.GetType() == typeof(Chain);
+
+            if (vertical) {
+                if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                else if (e.Key == Key.Right) Selection.MoveChild();
+                else if (e.Key == Key.Enter) Selection.Expand();
+                else if (e.Key == Key.Left && Selection.SelectionStart.IParent.GetType() == typeof(Multi))
+                    Selection.Select(((Multi)Selection.SelectionStart.IParent).Preprocess.Devices.Last());
+
+            } else if (e.Key == Key.Left) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+            else if (e.Key == Key.Right) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+            else if (e.Key == Key.Down) Selection.MoveChild();
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
