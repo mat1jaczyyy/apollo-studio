@@ -25,7 +25,14 @@ namespace Apollo.Devices {
 
         public PatternWindow Window;
 
-        public List<Frame> Frames;
+        private List<Frame> _frames;
+        public List<Frame> Frames {
+            get => _frames;
+            set {
+                _frames = value;
+                Reroute();
+            }
+        }
 
         private void Reroute() {
             for (int i = 0; i < Frames.Count; i++) {
