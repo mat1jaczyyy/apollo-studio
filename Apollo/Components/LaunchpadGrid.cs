@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using AvaloniaColor = Avalonia.Media.Color;
 using Avalonia.Input;
 
 using Apollo.Structures;
@@ -109,7 +110,7 @@ namespace Apollo.Components {
 
         public void RenderFrame(Frame frame) {
             for (int i = 0; i < 100; i++)
-                SetColor(SignalToGrid(i), (SolidColorBrush)frame.Screen[i].ToBrush());
+                SetColor(SignalToGrid(i), frame.Screen[i].ToScreenBrush());
         }
 
         bool mouseHeld = false;

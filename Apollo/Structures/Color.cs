@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using AvaloniaColor = Avalonia.Media.Color;
 
@@ -115,7 +117,19 @@ namespace Apollo.Structures {
             (byte)(_b * (255.0 / 63))
         );
 
-        public IBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
+        public SolidColorBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
+        public SolidColorBrush ToScreenBrush() {
+            double max = new byte[] {_r, _g, _b}.Max() / 63.0;
+
+            AvaloniaColor bg = (AvaloniaColor)Application.Current.Styles.FindResource("ThemeForegroundLowColor");
+
+            return new SolidColorBrush(new AvaloniaColor(
+                255,
+                (byte)(_r * (255 / 63.0) * max + bg.R * (1 - max)),
+                (byte)(_g * (255 / 63.0) * max + bg.G * (1 - max)),
+                (byte)(_b * (255 / 63.0) * max + bg.B * (1 - max))
+            ));
+        }
 
         public string ToHex() => $"#{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
 

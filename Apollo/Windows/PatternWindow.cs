@@ -325,7 +325,7 @@ namespace Apollo.Windows {
 
             _pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
 
-            SolidColorBrush brush = (SolidColorBrush)_pattern[_pattern.Expanded].Screen[signalIndex].ToBrush();
+            SolidColorBrush brush = (SolidColorBrush)_pattern[_pattern.Expanded].Screen[signalIndex].ToScreenBrush();
 
             Editor.SetColor(index, brush);
             ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Launchpad.SetColor(index, brush);
@@ -473,7 +473,7 @@ namespace Apollo.Windows {
 
         private void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {
-                Editor.SetColor(LaunchpadGrid.SignalToGrid(index), (SolidColorBrush)color.ToBrush());
+                Editor.SetColor(LaunchpadGrid.SignalToGrid(index), color.ToScreenBrush());
             });
 
             PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)index, color.Clone()));

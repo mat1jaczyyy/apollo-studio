@@ -30,14 +30,14 @@ namespace Apollo.DeviceViewers {
             Grid = this.Get<LaunchpadGrid>("Grid");
 
             for (int i = 0; i < 100; i++)
-                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new SolidColorBrush(new AvaloniaColor(255, 0, 0, 0)));
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
         }
 
         private void PadChanged(int index, bool state) => _preview.MIDIEnter(new Signal(Track.Get(_preview).Launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
         private void PadPressed(int index) => PadChanged(index, true);
         private void PadReleased(int index) => PadChanged(index, false);
 
-        private void SignalRender(Signal n) => Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), (SolidColorBrush)n.Color.ToBrush());
+        private void SignalRender(Signal n) => Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
 
         private void HandleRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => { SignalRender(n); });
     }
