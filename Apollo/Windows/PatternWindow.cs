@@ -365,6 +365,16 @@ namespace Apollo.Windows {
         }
 
         public void MIDIEnter(Signal n) {
+            if (!Preferences.EnableGestures) {
+                if (n.Color.Lit) Dispatcher.UIThread.InvokeAsync(() => {
+                    int index = LaunchpadGrid.SignalToGrid(n.Index);
+                    PadStarted(index);
+                    PadPressed(index);
+                });
+
+                return;
+            }
+
             if (n.Color.Lit) {
                 if (historyShowing) {
                     int x = n.Index % 10;

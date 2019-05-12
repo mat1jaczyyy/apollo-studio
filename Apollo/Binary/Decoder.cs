@@ -33,16 +33,22 @@ namespace Apollo.Binary {
             if (ensure != null && ensure != t) return null;
 
             if (t == typeof(Preferences) && root) {
-                Preferences.AlwaysOnTop = reader.ReadBoolean();
-                Preferences.CenterTrackContents = reader.ReadBoolean();
-                Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
-                Preferences.AutoCreatePageFilter = reader.ReadBoolean();
-                Preferences.FadeSmoothness = reader.ReadDouble();
-                Preferences.CopyPreviousFrame = reader.ReadBoolean();
+                try {
+                    Preferences.AlwaysOnTop = reader.ReadBoolean();
+                    Preferences.CenterTrackContents = reader.ReadBoolean();
+                    Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
+                    Preferences.AutoCreatePageFilter = reader.ReadBoolean();
+                    Preferences.FadeSmoothness = reader.ReadDouble();
+                    Preferences.CopyPreviousFrame = reader.ReadBoolean();
+                    Preferences.EnableGestures = reader.ReadBoolean();
 
-                ColorHistory.Set(
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
-                );
+                    ColorHistory.Set(
+                        (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
+                    );
+
+                } catch (EndOfStreamException) {
+                    return null;
+                }
 
             } else if (t == typeof(Copyable)) {
                 return new Copyable() {

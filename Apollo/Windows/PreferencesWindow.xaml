@@ -39,6 +39,7 @@
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
             <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Auto copy previous frame when adding a new one</CheckBox>
+            <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
             <Button Background="{DynamicResource ThemeControlHighBrush}"  HorizontalAlignment="Center" Content="Clear Color History" Click="ClearColorHistory" />
           </StackPanel>
         </Border>
@@ -63,7 +64,7 @@
         </Border>
 
         <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 15" />
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 16" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
       </Grid>

@@ -43,6 +43,7 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.AutoCreatePageFilter);
                 writer.Write(Preferences.FadeSmoothnessSlider);
                 writer.Write(Preferences.CopyPreviousFrame);
+                writer.Write(Preferences.EnableGestures);
 
                 int count = Math.Min(64, ColorHistory.Count);
                 writer.Write(count);

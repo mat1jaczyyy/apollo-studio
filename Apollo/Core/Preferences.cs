@@ -77,6 +77,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _EnableGestures = false;
+        public static bool EnableGestures {
+            get => _EnableGestures;
+            set {
+                _EnableGestures = value;
+                Save();
+            }
+        }
+
         public static void Save() {
             try {
                 File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
