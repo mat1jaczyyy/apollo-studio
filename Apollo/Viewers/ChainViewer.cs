@@ -104,6 +104,13 @@ namespace Apollo.Viewers {
         private void Device_Remove(int index) {
             Contents_Remove(index);
             _chain.Remove(index);
+
+            if (index < _chain.Count)
+                Track.Get(_chain).Window?.Selection.Select(_chain[index]);
+            else if (_chain.Count > 0)
+                Track.Get(_chain).Window?.Selection.Select(_chain.Devices.Last());
+            else
+                Track.Get(_chain).Window?.Selection.Select(null);
         }
 
         private void Device_Action(string action) => Device_Action(action, false);
@@ -179,13 +186,6 @@ namespace Apollo.Viewers {
         public void Delete(int left, int right) {
             for (int i = right; i >= left; i--)
                 Device_Remove(i);
-            
-            if (left < _chain.Count)
-                Track.Get(_chain).Window?.Selection.Select(_chain[left]);
-            else if (_chain.Count > 0)
-                Track.Get(_chain).Window?.Selection.Select(_chain.Devices.Last());
-            else
-                Track.Get(_chain).Window?.Selection.Select(null);
         }
 
         public void Group(int left, int right) {

@@ -135,6 +135,13 @@ namespace Apollo.Windows {
             Contents_Remove(index);
             Program.Project[index].Window?.Close();
             Program.Project.Remove(index);
+            
+            if (index < Program.Project.Count)
+                Selection.Select(Program.Project[index]);
+            else if (Program.Project.Count > 0)
+                Selection.Select(Program.Project.Tracks.Last());
+            else
+                Selection.Select(null);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
@@ -285,13 +292,6 @@ namespace Apollo.Windows {
         public void Delete(int left, int right) {
             for (int i = right; i >= left; i--)
                 Track_Remove(i);
-            
-            if (left < Program.Project.Count)
-                Selection.Select(Program.Project[left]);
-            else if (Program.Project.Count > 0)
-                Selection.Select(Program.Project.Tracks.Last());
-            else
-                Selection.Select(null);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");
