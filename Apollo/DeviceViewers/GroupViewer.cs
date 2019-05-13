@@ -234,6 +234,13 @@ namespace Apollo.DeviceViewers {
         public void Delete(int left, int right) {
             for (int i = right; i >= left; i--)
                 Chain_Remove(i);
+            
+            if (left < _group.Count)
+                Track.Get(_group).Window?.Selection.Select(_group[left]);
+            else if (_group.Count > 0)
+                Track.Get(_group).Window?.Selection.Select(_group.Chains.Last());
+            else
+                Track.Get(_group).Window?.Selection.Select(null);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");

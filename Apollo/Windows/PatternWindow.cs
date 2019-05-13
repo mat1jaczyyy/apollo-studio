@@ -133,7 +133,7 @@ namespace Apollo.Windows {
             Contents.RemoveAt(index + 1);
             SetAlwaysShowing();
 
-            if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+            if (Contents.Count == 2) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
 
         public SelectionManager Selection = new SelectionManager();
@@ -704,6 +704,11 @@ namespace Apollo.Windows {
 
             for (int i = right; i >= left; i--)
                 Frame_Remove(i);
+            
+            if (left < _pattern.Count)
+                Frame_Select(left);
+            else if (_pattern.Count > 0)
+                Frame_Select(_pattern.Count - 1);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Frame cannot be grouped.");
