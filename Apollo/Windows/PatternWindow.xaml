@@ -8,7 +8,7 @@
         Width="780" MinWidth="780" MaxWidth="780"
         Height="520" MinHeight="520" MaxHeight="520"
         Opened="Loaded" Closing="Unloaded"
-        KeyUp="KeyReleased" PointerPressed="Window_Focus">
+        KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
   <Window.Styles>
     <Style Selector="Button">

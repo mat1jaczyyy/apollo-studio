@@ -126,11 +126,12 @@ namespace Apollo.Windows {
         }
 
         public void Contents_Remove(int index) {
+            _pattern[index].Info = null;
+            Contents.RemoveAt(index + 1);
+
             if (index < _pattern.Expanded) _pattern.Expanded--;
             else if (index == _pattern.Expanded) Frame_Select(Math.Max(0, _pattern.Expanded - 1));
 
-            _pattern[index].Info = null;
-            Contents.RemoveAt(index + 1);
             SetAlwaysShowing();
 
             if (Contents.Count == 2) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
@@ -197,6 +198,7 @@ namespace Apollo.Windows {
             ColorHistory.Select(ColorPicker.Color.Clone(), true);
             
             Frame_Select(_pattern.Expanded);
+            Selection.Select(_pattern[_pattern.Expanded]);
         }
 
         public void Expand(int? index) {
@@ -274,6 +276,9 @@ namespace Apollo.Windows {
 
             Contents_Remove(index);
             _pattern.Remove(index);
+
+            Frame_Select(_pattern.Expanded);
+            Selection.Select(_pattern[_pattern.Expanded]);
         }
 
         public void Frame_Select(int index) {
@@ -293,6 +298,28 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
                 Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter) {
+                if (e.Modifiers == InputModifiers.Shift) HandleGesture(1, -1);
+                else HandleGesture(-1, 1);
+            
+            } else if (e.Key == Key.Insert) HandleGesture(1, 1);
+            else if (e.Key == Key.Delete) HandleGesture(-1, -1);
+
+            if (Selection.SelectionStart == null) return;
+
+            if (Selection.ActionKey(e)) return;
+
+            if (e.Key == Key.Up || e.Key == Key.Left) {
+                Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                Frame_Select(Selection.SelectionStart.IParentIndex.Value);
+
+            } else if (e.Key == Key.Down || e.Key == Key.Right) {
+                Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                Frame_Select(Selection.SelectionStart.IParentIndex.Value);
+            }
         }
 
         private void ColorPicker_Changed(Color color) => ColorHistory.Select(color.Clone());
@@ -429,17 +456,6 @@ namespace Apollo.Windows {
                     gesturePoint = -1;
                 }
             }
-        }
-
-        private void KeyReleased(object sender, KeyEventArgs e) {
-            if (e.Key == Key.NumPad4) HandleGesture(-1, 0);
-            else if (e.Key == Key.NumPad6) HandleGesture(1, 0);
-            else if (e.Key == Key.NumPad8) HandleGesture(0, 1);
-            else if (e.Key == Key.NumPad2) HandleGesture(0, -1);
-            else if (e.Key == Key.NumPad7) HandleGesture(-1, 1);
-            else if (e.Key == Key.NumPad3) HandleGesture(1, -1);
-            else if (e.Key == Key.NumPad9) HandleGesture(1, 1);
-            else if (e.Key == Key.NumPad1) HandleGesture(-1, -1);
         }
 
         private void Duration_Changed(double value, InputModifiers mods) {
@@ -704,11 +720,6 @@ namespace Apollo.Windows {
 
             for (int i = right; i >= left; i--)
                 Frame_Remove(i);
-            
-            if (left < _pattern.Count)
-                Frame_Select(left);
-            else if (_pattern.Count > 0)
-                Frame_Select(_pattern.Count - 1);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Frame cannot be grouped.");
