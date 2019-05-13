@@ -13,7 +13,7 @@ namespace Apollo.Elements {
         }
 
         public ISelectParent IParent {
-            get => (ISelectParent)Parent;
+            get => (Parent is ISelectParent)? (ISelectParent)Parent : null;
         }
 
         public int? IParentIndex {

@@ -172,7 +172,6 @@ namespace Apollo.Viewers {
             }
         }
 
-        
         private Action Input_Update;
 
         int Input_Left, Input_Right;

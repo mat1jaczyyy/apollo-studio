@@ -75,7 +75,14 @@ namespace Apollo.Windows {
             Program.WindowClose(this);
         }
 
+        private bool InMultiPreprocess() => Selection.SelectionStart is Device &&
+            Selection.SelectionStart.IParent is ISelect &&
+            ((ISelect)Selection.SelectionStart.IParent).IParentIndex == null &&
+            ((ISelect)Selection.SelectionStart.IParent).IParent?.GetType() == typeof(Multi);
+
         private void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (Selection.SelectionStart == null) return;
+
             if (Selection.ActionKey(e)) return;
 
             bool vertical = Selection.SelectionStart.GetType() == typeof(Chain);
@@ -88,9 +95,17 @@ namespace Apollo.Windows {
                 else if (e.Key == Key.Left && Selection.SelectionStart.IParent.GetType() == typeof(Multi))
                     Selection.Select(((Multi)Selection.SelectionStart.IParent).Preprocess.Devices.Last());
 
-            } else if (e.Key == Key.Left) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-            else if (e.Key == Key.Right) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
-            else if (e.Key == Key.Down) Selection.MoveChild();
+            } else if (e.Key == Key.Left) {
+                if (!(InMultiPreprocess() && Selection.SelectionStart.IParentIndex.Value == 0))
+                    Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+            
+            }else if (e.Key == Key.Right) {
+                if (InMultiPreprocess() && Selection.SelectionStart.IParentIndex.Value == Selection.SelectionStart.IParent.IChildren.Count - 1)
+                    Selection.Select((ISelect)((ISelect)Selection.SelectionStart.IParent).IParent, e.Modifiers == InputModifiers.Shift);
+
+                else Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+
+            } else if (e.Key == Key.Down) Selection.MoveChild();
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
