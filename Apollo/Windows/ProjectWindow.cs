@@ -137,6 +137,18 @@ namespace Apollo.Windows {
             Program.Project.Remove(index);
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (Selection.SelectionStart == null) return;
+
+            if (Selection.ActionKey(e)) return;
+
+            if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+            else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+            else if (e.Key == Key.Enter)
+                foreach (ISelect i in Selection.Selection)
+                    TrackWindow.Create((Track)i, this);
+        }
+
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
 
         private Action BPM_Update;
