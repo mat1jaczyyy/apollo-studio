@@ -308,17 +308,17 @@ namespace Apollo.Windows {
             } else if (e.Key == Key.Insert) HandleGesture(1, 1);
             else if (e.Key == Key.Delete) HandleGesture(-1, -1);
 
-            if (Selection.SelectionStart == null) return;
+            if (Selection.Start == null) return;
 
             if (Selection.ActionKey(e)) return;
 
             if (e.Key == Key.Up || e.Key == Key.Left) {
                 Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-                Frame_Select(Selection.SelectionStart.IParentIndex.Value);
+                Frame_Select(Selection.Start.IParentIndex.Value);
 
             } else if (e.Key == Key.Down || e.Key == Key.Right) {
                 Selection.Move(true, e.Modifiers == InputModifiers.Shift);
-                Frame_Select(Selection.SelectionStart.IParentIndex.Value);
+                Frame_Select(Selection.Start.IParentIndex.Value);
             }
         }
 

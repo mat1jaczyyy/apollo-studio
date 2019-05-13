@@ -75,33 +75,33 @@ namespace Apollo.Windows {
             Program.WindowClose(this);
         }
 
-        private bool InMultiPreprocess() => Selection.SelectionStart is Device &&
-            Selection.SelectionStart.IParent is ISelect &&
-            ((ISelect)Selection.SelectionStart.IParent).IParentIndex == null &&
-            ((ISelect)Selection.SelectionStart.IParent).IParent?.GetType() == typeof(Multi);
+        private bool InMultiPreprocess() => Selection.Start is Device &&
+            Selection.Start.IParent is ISelect &&
+            ((ISelect)Selection.Start.IParent).IParentIndex == null &&
+            ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Selection.SelectionStart == null) return;
+            if (Selection.Start == null) return;
 
             if (Selection.ActionKey(e)) return;
 
-            bool vertical = Selection.SelectionStart.GetType() == typeof(Chain);
+            bool vertical = Selection.Start.GetType() == typeof(Chain);
 
             if (vertical) {
                 if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
                 else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
                 else if (e.Key == Key.Right) Selection.MoveChild();
                 else if (e.Key == Key.Enter) Selection.Expand();
-                else if (e.Key == Key.Left && Selection.SelectionStart.IParent.GetType() == typeof(Multi))
-                    Selection.Select(((Multi)Selection.SelectionStart.IParent).Preprocess.Devices.Last());
+                else if (e.Key == Key.Left && Selection.Start.IParent.GetType() == typeof(Multi))
+                    Selection.Select(((Multi)Selection.Start.IParent).Preprocess.Devices.Last());
 
             } else if (e.Key == Key.Left) {
-                if (!(InMultiPreprocess() && Selection.SelectionStart.IParentIndex.Value == 0))
+                if (!(InMultiPreprocess() && Selection.Start.IParentIndex.Value == 0))
                     Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             
             }else if (e.Key == Key.Right) {
-                if (InMultiPreprocess() && Selection.SelectionStart.IParentIndex.Value == Selection.SelectionStart.IParent.IChildren.Count - 1)
-                    Selection.Select((ISelect)((ISelect)Selection.SelectionStart.IParent).IParent, e.Modifiers == InputModifiers.Shift);
+                if (InMultiPreprocess() && Selection.Start.IParentIndex.Value == Selection.Start.IParent.IChildren.Count - 1)
+                    Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.Modifiers == InputModifiers.Shift);
 
                 else Selection.Move(true, e.Modifiers == InputModifiers.Shift);
 

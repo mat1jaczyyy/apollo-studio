@@ -8,20 +8,20 @@ using Apollo.Core;
 
 namespace Apollo.Helpers {
     public class SelectionManager {
-        public ISelect SelectionStart { get; private set; } = null;
-        public ISelect SelectionEnd { get; private set; } = null;
+        public ISelect Start { get; private set; } = null;
+        public ISelect End { get; private set; } = null;
 
         public List<ISelect> Selection {
             get {
-                if (SelectionStart != null) {
-                    if (SelectionEnd != null) {
-                        ISelect left = (SelectionStart.IParentIndex.Value < SelectionEnd.IParentIndex.Value)? SelectionStart : SelectionEnd;
-                        ISelect right = (SelectionStart.IParentIndex.Value < SelectionEnd.IParentIndex.Value)? SelectionEnd : SelectionStart;
+                if (Start != null) {
+                    if (End != null) {
+                        ISelect left = (Start.IParentIndex.Value < End.IParentIndex.Value)? Start : End;
+                        ISelect right = (Start.IParentIndex.Value < End.IParentIndex.Value)? End : Start;
 
                         return left.IParent.IChildren.Skip(left.IParentIndex.Value).Take(right.IParentIndex.Value - left.IParentIndex.Value + 1).ToList();
                     }
                     
-                    return new List<ISelect>() {SelectionStart};
+                    return new List<ISelect>() {Start};
                 }
 
                 return new List<ISelect>();
@@ -29,35 +29,35 @@ namespace Apollo.Helpers {
         }
 
         public void Select(ISelect select, bool shift = false) {
-            if (SelectionStart != null)
-                if (SelectionEnd != null)
+            if (Start != null)
+                if (End != null)
                     foreach (ISelect selected in Selection)
                         selected.IInfo?.Deselect();
-                else SelectionStart.IInfo?.Deselect();
+                else Start.IInfo?.Deselect();
 
-            if (shift && SelectionStart != null && SelectionStart.IParent == select.IParent && SelectionStart != select)
-                SelectionEnd = select;
+            if (shift && Start != null && Start.IParent == select.IParent && Start != select)
+                End = select;
 
             else {
-                SelectionStart = select;
-                SelectionEnd = null;
+                Start = select;
+                End = null;
             }
 
-            if (SelectionStart != null)
-                if (SelectionEnd != null)
+            if (Start != null)
+                if (End != null)
                     foreach (ISelect selected in Selection)
                         selected.IInfo?.Select();
-                else SelectionStart.IInfo?.Select();
+                else Start.IInfo?.Select();
         }
 
         public void SelectAll() {
-            ISelectParent target = SelectionStart.IParent;
+            ISelectParent target = Start.IParent;
             Select(target.IChildren.First());
             Select(target.IChildren.Last(), true);
         }
 
         public void Move(bool right, bool shift = false) {
-            ISelect target = (shift? (SelectionEnd?? SelectionStart) : SelectionStart);
+            ISelect target = (shift? (End?? Start) : Start);
             if (target == null) return;
 
             if (right) {
@@ -72,24 +72,24 @@ namespace Apollo.Helpers {
         }
 
         public void Expand() {
-            if (SelectionStart.IParent.IViewer.IExpanded != SelectionStart.IParentIndex)
-                SelectionStart.IParent.IViewer.Expand(SelectionStart.IParentIndex);
+            if (Start.IParent.IViewer.IExpanded != Start.IParentIndex)
+                Start.IParent.IViewer.Expand(Start.IParentIndex);
         }
 
         public void MoveChild() {
             Expand();
 
-            if (SelectionStart is ISelectParent && ((ISelectParent)SelectionStart).IChildren.Count > 0)
-                Select(((ISelectParent)SelectionStart).IChildren[0]);
+            if (Start is ISelectParent && ((ISelectParent)Start).IChildren.Count > 0)
+                Select(((ISelectParent)Start).IChildren[0]);
         }
 
         public void Action(string action) {
-            if (SelectionStart == null) return;
+            if (Start == null) return;
 
-            ISelectParent parent = SelectionStart.IParent;
+            ISelectParent parent = Start.IParent;
             
-            int left = SelectionStart.IParentIndex.Value;
-            int right = (SelectionEnd == null)? left: SelectionEnd.IParentIndex.Value;
+            int left = Start.IParentIndex.Value;
+            int right = (End == null)? left: End.IParentIndex.Value;
             
             if (left > right) {
                 int temp = left;

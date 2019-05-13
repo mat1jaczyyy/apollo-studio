@@ -145,7 +145,7 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Selection.SelectionStart == null) return;
+            if (Selection.Start == null) return;
 
             if (Selection.ActionKey(e)) return;
 
