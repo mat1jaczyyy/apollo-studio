@@ -10,6 +10,7 @@ using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using IBrush = Avalonia.Media.IBrush;
 using SolidColorBrush = Avalonia.Media.SolidColorBrush;
+using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
@@ -71,6 +72,7 @@ namespace Apollo.Components {
         private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
         private void ContextMenu_Click(object sender, EventArgs e) {
+            ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))

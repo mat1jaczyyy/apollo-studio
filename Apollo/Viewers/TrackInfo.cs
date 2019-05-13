@@ -103,6 +103,7 @@ namespace Apollo.Viewers {
         private void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
 
         private void ContextMenu_Click(object sender, EventArgs e) {
+            ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))

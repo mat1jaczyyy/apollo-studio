@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class VerticalAdd: UserControl {
@@ -42,6 +43,7 @@ namespace Apollo.Components {
         }
 
         private void ActionContextMenu_Click(object sender, EventArgs e) {
+            ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))

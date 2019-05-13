@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -85,6 +86,7 @@ namespace Apollo.Viewers {
         private void Chain_Action(string action) => Track.Get(_chain).Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
 
         private void ContextMenu_Click(object sender, EventArgs e) {
+            ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))

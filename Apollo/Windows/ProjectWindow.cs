@@ -224,6 +224,7 @@ namespace Apollo.Windows {
         private void Track_Action(string action, bool right) => Program.Project.Window?.Selection.Action(action, Program.Project, (right? Program.Project.Count : 0) - 1);
 
         private void TrackContextMenu_Click(object sender, EventArgs e) {
+            this.Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))
