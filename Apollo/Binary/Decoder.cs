@@ -46,7 +46,8 @@ namespace Apollo.Binary {
                         (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
                     );
 
-                } catch (EndOfStreamException) {
+                } catch (Exception) {
+                    Program.Log("Error reading Preferences");
                     return null;
                 }
 
