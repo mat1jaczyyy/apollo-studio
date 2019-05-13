@@ -11,12 +11,7 @@
   
   <Window.Resources>
     <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
-      <MenuItem Header="Rename" />
-      <MenuItem Header="Cut" />
-      <MenuItem Header="Copy" />
-      <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
-      <MenuItem Header="Delete" />
     </ContextMenu>
   </Window.Resources>
 
