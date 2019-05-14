@@ -24,7 +24,17 @@ namespace Apollo.Helpers {
             new UndoEntry("Initial State")
         };
 
-        public int Position { get; private set; } = 0;
+        public delegate void PositionChangedEventHandler(int position);
+        public event PositionChangedEventHandler PositionChanged;
+
+        private int _position = 0;
+        public int Position { 
+            get => _position;
+            private set {
+                _position = value;
+                PositionChanged?.Invoke(_position);
+            }
+        }
 
         public void Add(string desc, Action undo, Action redo) {
             for (int i = Position + 1; i < History.Count; i++)
@@ -46,8 +56,8 @@ namespace Apollo.Helpers {
             Position = index;
         }
 
-        public void Undo() => Select(Math.Min(0, Position - 1));
-        public void Redo() => Select(Math.Max(History.Count - 1, Position + 1));
+        public void Undo() => Select(Math.Max(0, Position - 1));
+        public void Redo() => Select(Math.Min(History.Count - 1, Position + 1));
 
         public bool HandleKey(KeyEventArgs e) {
             if (e.Modifiers == InputModifiers.Control) {

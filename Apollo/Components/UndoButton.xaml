@@ -1,0 +1,16 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.UndoButton">
+
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="CanvasBrush" />
+  </UserControl.Resources>
+
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
+    <Path Stroke="{DynamicResource CanvasBrush}" StrokeThickness="2"
+          Data="M 3.05,3.05 A 7,7 270 1 1 3.05,12.95" />
+    <Path Fill="{DynamicResource CanvasBrush}"
+          Data="M 0,0 L 6,6 0,6 Z" />
+  
+  </Canvas>
+</UserControl>
