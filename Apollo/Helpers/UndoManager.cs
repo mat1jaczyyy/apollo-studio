@@ -51,12 +51,12 @@ namespace Apollo.Helpers {
 
         public bool HandleKey(KeyEventArgs e) {
             if (e.Modifiers == InputModifiers.Control) {
-                if (e.Key == Key.Z) {} // Undo
-                else if (e.Key == Key.Y) {} // Redo
+                if (e.Key == Key.Z) Undo();
+                else if (e.Key == Key.Y) Redo();
                 else return false;
 
             } else if (e.Modifiers == (InputModifiers.Control | InputModifiers.Shift)) {
-                if (e.Key == Key.Z) {} // Redo
+                if (e.Key == Key.Z) Redo();
                 else return false;
             }
 

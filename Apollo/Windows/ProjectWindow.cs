@@ -145,8 +145,9 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Selection.Start == null) return;
+            if (Program.Project.Undo.HandleKey(e)) return
 
+            if (Selection.Start == null) return;
             if (Selection.ActionKey(e)) return;
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
@@ -159,6 +160,8 @@ namespace Apollo.Windows {
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
 
         private Action BPM_Update;
+        private bool BPM_Dirty = false;
+        private int BPM_Clean;
 
         private void BPM_Changed(string text) {
             if (text == null) return;
@@ -168,7 +171,13 @@ namespace Apollo.Windows {
 
             if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {
+                    if (value != Program.Project.BPM && !BPM_Dirty) {
+                        BPM_Clean = Program.Project.BPM;
+                        BPM_Dirty = true;
+                    }
+                    
                     Program.Project.BPM = value;
+                    
                     BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
                 } else {
                     BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
@@ -192,6 +201,23 @@ namespace Apollo.Windows {
         
         private void BPM_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return) this.Focus();
+        }
+
+        private void BPM_Unfocus(object sender, RoutedEventArgs e) {
+            if (BPM_Clean != Program.Project.BPM) {
+                int u = BPM_Clean;
+                int r = Program.Project.BPM;
+
+                Program.Project.Undo.Add($"BPM Changed to {r}", () => {
+                    Program.Project.BPM = u;
+                    BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
+                }, () => {
+                    Program.Project.BPM = r;
+                    BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
+                });
+            }
+
+            BPM_Dirty = false;
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();

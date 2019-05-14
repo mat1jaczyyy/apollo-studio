@@ -6,6 +6,7 @@ using Avalonia.Controls;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Helpers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -27,6 +28,8 @@ namespace Apollo.Elements {
         public List<Track> Tracks;
 
         public int BPM;
+
+        public UndoManager Undo = new UndoManager();
 
         public delegate void PathChangedEventHandler();
         public event PathChangedEventHandler PathChanged;
