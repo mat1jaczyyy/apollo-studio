@@ -121,27 +121,30 @@ namespace Apollo.Windows {
         }
 
         private void Track_Insert(int index) => Track_Insert(index, new Track());
-
-        private void Track_Insert(int index, Track track) {
-            Program.Project.Insert(index, track);
-            Contents_Insert(index, Program.Project[index]);
-            
-            Selection.Select(Program.Project[index]);
-        }
-
         private void Track_InsertStart() => Track_Insert(0);
 
-        private void Track_Remove(int index) {
-            Contents_Remove(index);
-            Program.Project[index].Window?.Close();
-            Program.Project.Remove(index);
+        private void Track_Insert(int index, Track track) {
+            Track r = track.Clone();
+
+            Program.Project.Undo.Add($"Track Added", () => {
+                Program.Project.Remove(index);
+            }, () => {
+                Program.Project.Insert(index, r.Clone());
+            });
             
-            if (index < Program.Project.Count)
-                Selection.Select(Program.Project[index]);
-            else if (Program.Project.Count > 0)
-                Selection.Select(Program.Project.Tracks.Last());
-            else
-                Selection.Select(null);
+            Program.Project.Insert(index, track);
+        }
+
+        private void Track_Remove(int index) {
+            Track u = Program.Project[index].Clone();
+
+            Program.Project.Undo.Add($"Track Deleted", () => {
+                Program.Project.Remove(index);
+            }, () => {
+                Program.Project.Insert(index, u.Clone());
+            });
+
+            Program.Project.Remove(index);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
@@ -208,7 +211,7 @@ namespace Apollo.Windows {
                 int u = BPM_Clean;
                 int r = Program.Project.BPM;
 
-                Program.Project.Undo.Add($"BPM Changed to {r}", () => {
+                Program.Project.Undo.Add($"BPM Changed", () => {
                     Program.Project.BPM = u;
                     BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
                 }, () => {
@@ -308,12 +311,12 @@ namespace Apollo.Windows {
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             
             for (int i = 0; i < paste.Contents.Count; i++)
-                Track_Insert(right + i + 1, (Track)paste.Contents[i]);
+                Program.Project.Insert(right + i + 1, (Track)paste.Contents[i]);
         }
 
         public void Duplicate(int left, int right) {
             for (int i = 0; i <= right - left; i++)
-                Track_Insert(right + i + 1, Program.Project[left + i].Clone());
+                Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
         }
 
         public void Delete(int left, int right) {

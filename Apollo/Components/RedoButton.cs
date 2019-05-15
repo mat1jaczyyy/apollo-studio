@@ -25,7 +25,7 @@ namespace Apollo.Components {
         }
 
         private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Program.Project.Undo.Undo();
+            if (e.MouseButton == MouseButton.Left) Program.Project.Undo.Redo();
         }
     }
 }

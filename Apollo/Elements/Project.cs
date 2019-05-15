@@ -102,17 +102,26 @@ namespace Apollo.Elements {
         public void Insert(int index, Track track) {
             Tracks.Insert(index, track);
             Reroute();
-        }
 
-        public void Add(Track track) {
-            Tracks.Add(track);
-            Reroute();
+            Window?.Contents_Insert(index, Tracks[index]);
+
+            Window?.Selection.Select(Program.Project[index]);
         }
 
         public void Remove(int index, bool dispose = true) {
+            Window?.Contents_Remove(index);
+            Tracks[index].Window?.Close();
+
             if (dispose) Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
+            
+            if (index < Tracks.Count)
+                Window?.Selection.Select(Tracks[index]);
+            else if (Tracks.Count > 0)
+                Window?.Selection.Select(Tracks.Last());
+            else
+                Window?.Selection.Select(null);
         }
 
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {

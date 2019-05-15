@@ -104,19 +104,13 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
+                if (!copy)
                     Program.Project.Remove(source[i].ParentIndex.Value, false);
-                }
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
-                Program.Project.Window.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
-
-            Program.Project.Window.Selection.Select(moved.First());
-            Program.Project.Window.Selection.Select(moved.Last(), true);
             
             return true;
         }
@@ -128,15 +122,12 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
+                if (!copy) 
                     Program.Project.Remove(source[i].ParentIndex.Value, false);
-                }
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 Program.Project.Insert(i, moved.Last());
-                Program.Project.Window.Contents_Insert(i, moved.Last());
             }
 
             Program.Project.Window.Selection.Select(moved.First());
