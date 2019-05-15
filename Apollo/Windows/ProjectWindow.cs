@@ -136,12 +136,16 @@ namespace Apollo.Windows {
         }
 
         private void Track_Remove(int index) {
-            Track u = Program.Project[index].Clone();
+            Track ut = Program.Project[index].Clone();
+            Launchpad ul = Program.Project[index].Launchpad;
 
             Program.Project.Undo.Add($"Track Deleted", () => {
-                Program.Project.Remove(index);
+                Track restored = ut.Clone();
+                restored.Launchpad = ul;
+                Program.Project.Insert(index, restored);
+                
             }, () => {
-                Program.Project.Insert(index, u.Clone());
+                Program.Project.Remove(index);
             });
 
             Program.Project.Remove(index);
