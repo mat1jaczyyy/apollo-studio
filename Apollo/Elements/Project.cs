@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 
@@ -27,7 +28,16 @@ namespace Apollo.Elements {
 
         public List<Track> Tracks;
 
-        public int BPM;
+        private int _bpm;
+        public int BPM {
+            get => _bpm;
+            set {
+                if (20 <= value && value <= 999) {
+                    _bpm = value;
+                    if (Window != null) Window.SetBPM(_bpm.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+        }
 
         public UndoManager Undo = new UndoManager();
 

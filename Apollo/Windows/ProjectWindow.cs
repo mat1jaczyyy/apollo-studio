@@ -164,7 +164,8 @@ namespace Apollo.Windows {
 
         private Action BPM_Update;
         private bool BPM_Dirty = false;
-        private int BPM_Clean;
+        private int BPM_Clean = Program.Project.BPM;
+        private bool BPM_Ignore = false;
 
         private void BPM_Changed(string text) {
             if (text == null) return;
@@ -178,8 +179,10 @@ namespace Apollo.Windows {
                         BPM_Clean = Program.Project.BPM;
                         BPM_Dirty = true;
                     }
-                    
+
+                    BPM_Ignore = true;
                     Program.Project.BPM = value;
+                    BPM_Ignore = false;
                     
                     BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
                 } else {
@@ -209,17 +212,22 @@ namespace Apollo.Windows {
         private void BPM_Unfocus(object sender, RoutedEventArgs e) {
             if (BPM_Clean != Program.Project.BPM) {
                 int u = BPM_Clean;
-                int r = Program.Project.BPM;
+                int r = BPM_Clean = Program.Project.BPM;
 
                 Program.Project.Undo.Add($"BPM Changed", () => {
                     Program.Project.BPM = u;
-                    BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
                 }, () => {
                     Program.Project.BPM = r;
-                    BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
                 });
             }
 
+            BPM_Dirty = false;
+        }
+
+        public void SetBPM(string bpm) {
+            if (BPM_Ignore) return;
+
+            BPM.Text = bpm;
             BPM_Dirty = false;
         }
 
