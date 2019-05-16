@@ -170,11 +170,12 @@ namespace Apollo.Viewers {
             if (selected != null && _track.Launchpad != selected) {
                 Launchpad u = _track.Launchpad;
                 Launchpad r = selected;
+                int path = _track.ParentIndex.Value;
 
                 Program.Project.Undo.Add($"Track {_track.ParentIndex} Launchpad Changed", () => {
-                    _track.Launchpad = u;
+                    Program.Project[path].Launchpad = u;
                 }, () => {
-                    _track.Launchpad = r;
+                    Program.Project[path].Launchpad = r;
                 });
 
                 _track.Launchpad = selected;
