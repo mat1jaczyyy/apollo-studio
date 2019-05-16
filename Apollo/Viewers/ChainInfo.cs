@@ -14,6 +14,7 @@ using Avalonia.VisualTree;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer {
@@ -206,20 +207,31 @@ namespace Apollo.Viewers {
                 int left = Input_Left;
                 int right = Input_Right;
                 List<string> u = (from i in Input_Clean select i).ToList();
+                List<int> path = Track.GetPath(_chain);
 
                 Program.Project.Undo.Add($"Chain Renamed", () => {
+                    Chain chain = ((Chain)Track.TraversePath(path));
+                    IMultipleChainParent parent = (IMultipleChainParent)chain.Parent;
+
                     for (int i = left; i <= right; i++)
-                        ((IMultipleChainParent)_chain.Parent)[i].Name = u[i - left];
+                        parent[i].Name = u[i - left];
                     
-                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[left]);
-                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[right], true);
+                    TrackWindow window = Track.Get(chain).Window;
+
+                    window?.Selection.Select(parent[left]);
+                    window?.Selection.Select(parent[right], true);
                     
                 }, () => {
+                    Chain chain = ((Chain)Track.TraversePath(path));
+                    IMultipleChainParent parent = (IMultipleChainParent)chain.Parent;
+
                     for (int i = left; i <= right; i++)
-                        ((IMultipleChainParent)_chain.Parent)[i].Name = r[i - left];
+                        parent[i].Name = r[i - left];
                     
-                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[left]);
-                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[right], true);
+                    TrackWindow window = Track.Get(chain).Window;
+
+                    window?.Selection.Select(parent[left]);
+                    window?.Selection.Select(parent[right], true);
                 });
             }
         }

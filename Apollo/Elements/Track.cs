@@ -46,6 +46,35 @@ namespace Apollo.Elements {
         public static Track Get(Device device) => (device.Parent.Parent.GetType() == typeof(Track))? (Track)device.Parent.Parent : Get((Device)device.Parent.Parent);
         public static Track Get(Chain chain) => (chain.Parent.GetType() == typeof(Track))? (Track)chain.Parent : Get((Device)chain.Parent);
 
+        public static List<int> GetPath(ISelect child) {
+            List<int> path = new List<int>();
+            ISelect last = child;
+
+            while (true) {
+                if (last.GetType() == typeof(Chain) && ((Chain)last).IRoot)
+                    last = (ISelect)((Chain)last).Parent;
+
+                path.Add(last.IParentIndex?? -1);
+
+                if (last.GetType() == typeof(Track)) break;
+                
+                last = (ISelect)last.IParent;
+            }
+
+            return path;
+        }
+
+        public static ISelect TraversePath(List<int> path) {
+            ISelectParent ret = Program.Project[path.Last()].Chain;
+
+            if (path.Count == 1) return (ISelect)ret;
+
+            for (int i = path.Count - 2; i > 0; i--)
+                ret = (ISelectParent)ret.IChildren[path[i]];
+
+            return (ISelect)ret.IChildren[path[0]];
+        }
+
         public Chain Chain;
         private Launchpad _launchpad;
 

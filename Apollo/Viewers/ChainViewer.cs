@@ -92,26 +92,32 @@ namespace Apollo.Viewers {
         public void Expand(int? index) {}
 
         private void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
-
-        private void Device_Insert(int index, Device device) {
-            _chain.Insert(index, device);
-            Contents_Insert(index, _chain[index]);
-            
-            Track.Get(_chain).Window?.Selection.Select(_chain[index]);
-        }
-
         private void Device_InsertStart(Type device) => Device_Insert(0, device);
 
-        private void Device_Remove(int index) {
-            Contents_Remove(index);
-            _chain.Remove(index);
+        private void Device_Insert(int index, Device device) {
+            Device r = device.Clone();
+            List<int> path = Track.GetPath(_chain);
 
-            if (index < _chain.Count)
-                Track.Get(_chain).Window?.Selection.Select(_chain[index]);
-            else if (_chain.Count > 0)
-                Track.Get(_chain).Window?.Selection.Select(_chain.Devices.Last());
-            else
-                Track.Get(_chain).Window?.Selection.Select(null);
+            Program.Project.Undo.Add($"Device Added", () => {
+                ((Chain)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Chain)Track.TraversePath(path)).Insert(index, r.Clone());
+            });
+            
+            _chain.Insert(index, device);
+        }
+
+        private void Device_Remove(int index) {
+            Device u = _chain[index].Clone();
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Deleted", () => {
+                ((Chain)Track.TraversePath(path)).Insert(index, u.Clone());
+            }, () => {
+                ((Chain)Track.TraversePath(path)).Remove(index);
+            });
+
+            _chain.Remove(index);
         }
 
         private void Device_Action(string action) => Device_Action(action, false);
