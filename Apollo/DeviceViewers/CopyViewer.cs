@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
@@ -72,11 +75,46 @@ namespace Apollo.DeviceViewers {
         private void Gate_Changed(double value) => _copy.Gate = (decimal)(value / 100);
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
-            _copy.CopyMode = (string)CopyMode.SelectedItem;
+            string selected = (string)CopyMode.SelectedItem;
+
+            if (_copy.CopyMode != selected) {
+                string u = _copy.CopyMode;
+                string r = selected;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Mode Changed", () => {
+                    ((Copy)Track.TraversePath(path)).CopyMode = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).CopyMode = r;
+                });
+
+                _copy.CopyMode = selected;
+            }
+
             Rate.Enabled = Gate.Enabled = CopyMode.SelectedIndex > 0;
         }
 
-        private void GridMode_Changed(object sender, SelectionChangedEventArgs e) => _copy.GridMode = (string)GridMode.SelectedItem;
+        public void SetCopyMode(string mode) => CopyMode.SelectedItem = mode;
+
+        private void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)GridMode.SelectedItem;
+
+            if (_copy.GridMode != selected) {
+                string u = _copy.GridMode;
+                string r = selected;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Grid Changed", () => {
+                    ((Copy)Track.TraversePath(path)).GridMode = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).GridMode = r;
+                });
+
+                _copy.GridMode = selected;
+            }
+        }
+
+        public void SetGridMode(string mode) => GridMode.SelectedItem = mode;
 
         private void Wrap_Changed(object sender, EventArgs e) => _copy.Wrap = Wrap.IsChecked.Value;
 

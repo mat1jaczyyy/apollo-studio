@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -59,6 +60,8 @@ namespace Apollo.Devices {
                 else if (value == "Interpolate") _copymode = CopyType.Interpolate;
                 else if (value == "Random Single") _copymode = CopyType.RandomSingle;
                 else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
+
+                if (Viewer.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetCopyMode(CopyMode);
             }
         }
 
@@ -78,6 +81,8 @@ namespace Apollo.Devices {
             set {
                 if (value == "10x10") _gridmode = GridType.Full;
                 else if (value == "8x8") _gridmode = GridType.Square;
+
+                if (Viewer.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetGridMode(GridMode);
             }
         }
 
