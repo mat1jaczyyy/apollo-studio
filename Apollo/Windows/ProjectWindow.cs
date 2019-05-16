@@ -152,10 +152,10 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.Project.Undo.HandleKey(e)) return;
-
-            if (Selection.Start == null) return;
-            if (Selection.ActionKey(e)) return;
+            if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                this.Focus();
+                return;
+            }
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
@@ -179,7 +179,7 @@ namespace Apollo.Windows {
 
             if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {
-                    if (value != Program.Project.BPM && !BPM_Dirty) {
+                    if (!BPM_Dirty && value != Program.Project.BPM) {
                         BPM_Clean = Program.Project.BPM;
                         BPM_Dirty = true;
                     }
@@ -233,6 +233,8 @@ namespace Apollo.Windows {
 
             BPM.Text = bpm;
             BPM_Dirty = false;
+
+            this.Focus();
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
