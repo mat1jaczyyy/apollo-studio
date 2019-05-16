@@ -224,7 +224,25 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _multi.Mode = (string)MultiMode.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)MultiMode.SelectedItem;
+
+            if (_multi.Mode != selected) {
+                string u = _multi.Mode;
+                string r = selected;
+                List<int> path = Track.GetPath(_multi);
+
+                Program.Project.Undo.Add($"Multi Direction Changed", () => {
+                    ((Multi)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Multi)Track.TraversePath(path)).Mode = r;
+                });
+
+                _multi.Mode = selected;
+            }
+        }
+
+        public void SetMode(string mode) => MultiMode.SelectedItem = mode;
 
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();

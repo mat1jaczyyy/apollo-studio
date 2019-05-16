@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -62,6 +63,8 @@ namespace Apollo.Devices {
                 else if (value == "Backward") _mode = MultiType.Backward;
                 else if (value == "Random") _mode = MultiType.Random;
                 else if (value == "Random+") _mode = MultiType.RandomPlus;
+
+                if (SpecificViewer != null) ((MultiViewer)SpecificViewer)?.SetMode(Mode);
             }
         }
 
