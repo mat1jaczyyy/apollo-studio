@@ -100,6 +100,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(_name);
+                Info?.SetName(_name);
             }
         }
 
