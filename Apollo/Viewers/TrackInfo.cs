@@ -230,9 +230,15 @@ namespace Apollo.Viewers {
                 Program.Project.Undo.Add($"Track Renamed", () => {
                     for (int i = left; i <= right; i++)
                         Program.Project[i].Name = u[i - left];
+
+                    Program.Project.Window?.Selection.Select(Program.Project[left]);
+                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
                 }, () => {
                     for (int i = left; i <= right; i++)
                         Program.Project[i].Name = r[i - left];
+                    
+                    Program.Project.Window?.Selection.Select(Program.Project[left]);
+                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
                 });
             }
         }

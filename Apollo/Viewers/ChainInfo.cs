@@ -210,9 +210,16 @@ namespace Apollo.Viewers {
                 Program.Project.Undo.Add($"Chain Renamed", () => {
                     for (int i = left; i <= right; i++)
                         ((IMultipleChainParent)_chain.Parent)[i].Name = u[i - left];
+                    
+                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[left]);
+                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[right], true);
+                    
                 }, () => {
                     for (int i = left; i <= right; i++)
                         ((IMultipleChainParent)_chain.Parent)[i].Name = r[i - left];
+                    
+                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[left]);
+                    Track.Get(_chain).Window?.Selection.Select(((IMultipleChainParent)_chain.Parent)[right], true);
                 });
             }
         }
