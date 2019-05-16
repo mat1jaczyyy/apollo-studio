@@ -136,16 +136,30 @@ namespace Apollo.DeviceViewers {
 
         public void SetWrap(bool value) => Wrap.IsChecked = value;
 
-        private void Offset_Insert(int index) {
-            _copy.Offsets.Insert(index, new Offset());
-            Contents_Insert(index, _copy.Offsets[index]);
-        }
-
         private void Offset_InsertStart() => Offset_Insert(0);
 
+        private void Offset_Insert(int index) {
+            List<int> path = Track.GetPath(_copy);
+
+            Program.Project.Undo.Add($"Copy Offset Added", () => {
+                ((Copy)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Copy)Track.TraversePath(path)).Insert(index);
+            });
+
+            _copy.Insert(index);
+        }
+
         private void Offset_Remove(int index) {
-            Contents_Remove(index);
-            _copy.Offsets.RemoveAt(index);
+            List<int> path = Track.GetPath(_copy);
+
+            Program.Project.Undo.Add($"Copy Offset Deleted", () => {
+                ((Copy)Track.TraversePath(path)).Insert(index);
+            }, () => {
+                ((Copy)Track.TraversePath(path)).Remove(index);
+            });
+
+            _copy.Remove(index);
         }
     }
 }

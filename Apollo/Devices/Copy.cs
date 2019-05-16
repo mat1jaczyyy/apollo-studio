@@ -23,8 +23,20 @@ namespace Apollo.Devices {
 
         public bool Mode; // true uses Length
         public Length Length;
-        CopyType _copymode;
+
         public List<Offset> Offsets;
+
+        public void Insert(int index, Offset offset = null) {
+            Offsets.Insert(index, offset?? new Offset());
+
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index]);
+        }
+
+        public void Remove(int index, bool dispose = true) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Remove(index);
+
+            Offsets.RemoveAt(index);
+        }
 
         private int _rate;
         public int Rate {
@@ -73,6 +85,8 @@ namespace Apollo.Devices {
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetCopyMode(CopyMode);
             }
         }
+
+        CopyType _copymode;
 
         public CopyType GetCopyMode() => _copymode;
         
