@@ -161,28 +161,29 @@ namespace Apollo.Viewers {
         private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
         private void Chain_Remove() => ChainRemoved?.Invoke(_chain.ParentIndex.Value);
 
-        private Action Input_Update;
-
         int Input_Left, Input_Right;
+        List<string> Input_Clean;
+        bool Input_Ignore = false;
 
         private void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
-            Input_Update = () => {
-                for (int i = Input_Left; i <= Input_Right; i++)
-                    ((IMultipleChainParent)_chain.Parent)[i].Name = text;
-            };
+            if (Input_Ignore) return;
 
-            Dispatcher.UIThread.InvokeAsync(() => {
-                Input_Update?.Invoke();
-                Input_Update = null;
-            });
+            Input_Ignore = true;
+            for (int i = Input_Left; i <= Input_Right; i++)
+                ((IMultipleChainParent)_chain.Parent)[i].Name = text;
+            Input_Ignore = false;
         }
 
         public void StartInput(int left, int right) {
             Input_Left = left;
             Input_Right = right;
+
+            Input_Clean = new List<string>();
+            for (int i = left; i <= right; i++)
+                Input_Clean.Add(((IMultipleChainParent)_chain.Parent)[i].Name);
 
             Input.Text = _chain.Name;
             Input.SelectionStart = 0;
@@ -198,6 +199,30 @@ namespace Apollo.Viewers {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
+
+            List<string> r = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
+
+            if (!r.SequenceEqual(Input_Clean)) {
+                int left = Input_Left;
+                int right = Input_Right;
+                List<string> u = (from i in Input_Clean select i).ToList();
+
+                Program.Project.Undo.Add($"Chain Renamed", () => {
+                    for (int i = left; i <= right; i++)
+                        ((IMultipleChainParent)_chain.Parent)[i].Name = u[i - left];
+                }, () => {
+                    for (int i = left; i <= right; i++)
+                        ((IMultipleChainParent)_chain.Parent)[i].Name = r[i - left];
+                });
+            }
+        }
+
+        public void SetName(string name) {
+            if (Input_Ignore) return;
+
+            Input_Ignore = true;
+            Input.Text = name;
+            Input_Ignore = false;
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {

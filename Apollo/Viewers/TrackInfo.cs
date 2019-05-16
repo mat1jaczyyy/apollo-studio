@@ -182,8 +182,8 @@ namespace Apollo.Viewers {
         }
 
         int Input_Left, Input_Right;
-        private List<string> Input_Clean;
-        private bool Input_Ignore = false;
+        List<string> Input_Clean;
+        bool Input_Ignore = false;
 
         private void Input_Changed(string text) {
             if (text == null) return;
