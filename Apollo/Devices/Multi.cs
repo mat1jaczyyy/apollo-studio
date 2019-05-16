@@ -64,7 +64,7 @@ namespace Apollo.Devices {
                 else if (value == "Random") _mode = MultiType.Random;
                 else if (value == "Random+") _mode = MultiType.RandomPlus;
 
-                if (SpecificViewer != null) ((MultiViewer)SpecificViewer)?.SetMode(Mode);
+                if (SpecificViewer != null) ((MultiViewer)SpecificViewer).SetMode(Mode);
             }
         }
 

@@ -116,7 +116,25 @@ namespace Apollo.DeviceViewers {
 
         public void SetGridMode(string mode) => GridMode.SelectedItem = mode;
 
-        private void Wrap_Changed(object sender, EventArgs e) => _copy.Wrap = Wrap.IsChecked.Value;
+        private void Wrap_Changed(object sender, EventArgs e) {
+            bool value = Wrap.IsChecked.Value;
+
+            if (_copy.Wrap != value) {
+                bool u = _copy.Wrap;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Wrap Changed", () => {
+                    ((Copy)Track.TraversePath(path)).Wrap = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Wrap = r;
+                });
+
+                _copy.Wrap = value;
+            }
+        }
+
+        public void SetWrap(bool value) => Wrap.IsChecked = value;
 
         private void Offset_Insert(int index) {
             _copy.Offsets.Insert(index, new Offset());

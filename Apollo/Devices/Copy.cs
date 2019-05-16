@@ -23,12 +23,10 @@ namespace Apollo.Devices {
 
         public bool Mode; // true uses Length
         public Length Length;
-        private int _rate;
-        private decimal _gate;
         CopyType _copymode;
-        public bool Wrap;
         public List<Offset> Offsets;
 
+        private int _rate;
         public int Rate {
             get => _rate;
             set {
@@ -37,11 +35,22 @@ namespace Apollo.Devices {
             }
         }
 
+        private decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
                 if (0.01M <= value && value <= 4)
                     _gate = value;
+            }
+        }
+
+        private bool _wrap;
+        public bool Wrap {
+            get => _wrap;
+            set {
+                _wrap = value;
+
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetWrap(Wrap);
             }
         }
 
@@ -61,7 +70,7 @@ namespace Apollo.Devices {
                 else if (value == "Random Single") _copymode = CopyType.RandomSingle;
                 else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
 
-                if (Viewer.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetCopyMode(CopyMode);
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetCopyMode(CopyMode);
             }
         }
 
@@ -82,7 +91,7 @@ namespace Apollo.Devices {
                 if (value == "10x10") _gridmode = GridType.Full;
                 else if (value == "8x8") _gridmode = GridType.Square;
 
-                if (Viewer.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetGridMode(GridMode);
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGridMode(GridMode);
             }
         }
 
