@@ -94,17 +94,26 @@ namespace Apollo.Devices {
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
             Reroute();
-        }
 
-        public void Add(Chain chain) {
-            Chains.Add(chain);
-            Reroute();
+            SpecificViewer?.Contents_Insert(index, Chains[index]);
+            
+            Track.Get(this).Window?.Selection.Select(Chains[index]);
+            SpecificViewer?.Expand(index);
         }
 
         public void Remove(int index, bool dispose = true) {
+            SpecificViewer?.Contents_Remove(index);
+
             if (dispose) Chains[index].Dispose();
             Chains.RemoveAt(index);
             Reroute();
+            
+            if (index < Chains.Count)
+                Track.Get(this).Window?.Selection.Select(Chains[index]);
+            else if (Chains.Count > 0)
+                Track.Get(this).Window?.Selection.Select(Chains.Last());
+            else
+                Track.Get(this).Window?.Selection.Select(null);
         }
 
         private void Reset() => current = -1;

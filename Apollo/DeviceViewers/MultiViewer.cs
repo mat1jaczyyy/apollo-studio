@@ -141,27 +141,32 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Chain_Insert(int index) => Chain_Insert(index, new Chain());
-
-        private void Chain_Insert(int index, Chain chain) {
-            _multi.Insert(index, chain);
-            Contents_Insert(index, _multi[index]);
-            
-            Track.Get(chain).Window?.Selection.Select(chain);
-            Expand(index);
-        }
-
         private void Chain_InsertStart() => Chain_Insert(0);
 
+        private void Chain_Insert(int index, Chain chain) {
+            Chain r = chain.Clone();
+            List<int> path = Track.GetPath(_multi);
+
+            Program.Project.Undo.Add($"Chain Added", () => {
+                ((Multi)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Multi)Track.TraversePath(path)).Insert(index, r.Clone());
+            });
+
+            _multi.Insert(index, chain);
+        }
+
         private void Chain_Remove(int index) {
-            Contents_Remove(index);
+            Chain u = _multi[index].Clone();
+            List<int> path = Track.GetPath(_multi);
+
+            Program.Project.Undo.Add($"Chain Deleted", () => {
+                ((Multi)Track.TraversePath(path)).Insert(index, u.Clone());
+            }, () => {
+                ((Multi)Track.TraversePath(path)).Remove(index);
+            });
+
             _multi.Remove(index);
-            
-            if (index < _multi.Count)
-                Track.Get(_multi).Window?.Selection.Select(_multi[index]);
-            else if (_multi.Count > 0)
-                Track.Get(_multi).Window?.Selection.Select(_multi.Chains.Last());
-            else
-                Track.Get(_multi).Window?.Selection.Select(null);
         }
 
         private void Chain_Action(string action) => Chain_Action(action, false);

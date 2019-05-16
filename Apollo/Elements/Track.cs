@@ -2,6 +2,7 @@
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Structures;
 using Apollo.Viewers;
 using Apollo.Windows;
@@ -70,9 +71,11 @@ namespace Apollo.Elements {
             if (path.Count == 1) return (ISelect)ret;
 
             for (int i = path.Count - 2; i > 0; i--)
-                ret = (ISelectParent)ret.IChildren[path[i]];
+                if (path[i] == -1) ret = ((Multi)ret).Preprocess;
+                else ret = (ISelectParent)ret.IChildren[path[i]];
 
-            return (ISelect)ret.IChildren[path[0]];
+            if (path[0] == -1) return ((Multi)ret).Preprocess;
+            else return (ISelect)ret.IChildren[path[0]];
         }
 
         public Chain Chain;

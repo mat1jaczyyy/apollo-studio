@@ -139,7 +139,7 @@ namespace Apollo.DeviceViewers {
         private void Chain_InsertStart() => Chain_Insert(0);
 
         private void Chain_Insert(int index, Chain chain) {
-            Chain r = chain.Clone();            
+            Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Added", () => {
