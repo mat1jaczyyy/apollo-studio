@@ -136,26 +136,32 @@ namespace Apollo.DeviceViewers {
             Chain_Insert(index, chain);
         }
 
-        private void Chain_Insert(int index, Chain chain) {
-            _group.Insert(index, chain);
-            Contents_Insert(index, _group[index]);
-            
-            Track.Get(chain).Window?.Selection.Select(chain);
-            Expand(index);
-        }
-
         private void Chain_InsertStart() => Chain_Insert(0);
 
+        private void Chain_Insert(int index, Chain chain) {
+            Chain r = chain.Clone();            
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Added", () => {
+                ((Group)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Group)Track.TraversePath(path)).Insert(index, r.Clone());
+            });
+
+            _group.Insert(index, chain);
+        }
+
         private void Chain_Remove(int index) {
-            Contents_Remove(index);
+            Chain u = _group[index].Clone();
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Deleted", () => {
+                ((Group)Track.TraversePath(path)).Insert(index, u.Clone());
+            }, () => {
+                ((Group)Track.TraversePath(path)).Remove(index);
+            });
+
             _group.Remove(index);
-            
-            if (index < _group.Count)
-                Track.Get(_group).Window?.Selection.Select(_group[index]);
-            else if (_group.Count > 0)
-                Track.Get(_group).Window?.Selection.Select(_group.Chains.Last());
-            else
-                Track.Get(_group).Window?.Selection.Select(null);
         }
 
         private void Chain_Action(string action) => Chain_Action(action, false);
