@@ -57,6 +57,8 @@ namespace Apollo.Elements {
                 _launchpad = value;
 
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;
+
+                Info?.UpdatePorts();
             }
         }
         

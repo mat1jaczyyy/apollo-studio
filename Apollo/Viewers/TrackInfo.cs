@@ -41,7 +41,7 @@ namespace Apollo.Viewers {
         private void UpdateText(string name) => UpdateText(_track.ParentIndex.Value, name);
         private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
 
-        private void UpdatePorts() {
+        public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
             if (_track.Launchpad != null && (!_track.Launchpad.Available || _track.Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(_track.Launchpad);
 
@@ -168,8 +168,16 @@ namespace Apollo.Viewers {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
 
             if (selected != null && _track.Launchpad != selected) {
+                Launchpad u = _track.Launchpad;
+                Launchpad r = selected;
+
+                Program.Project.Undo.Add($"Track {_track.ParentIndex} Launchpad Changed", () => {
+                    _track.Launchpad = u;
+                }, () => {
+                    _track.Launchpad = r;
+                });
+
                 _track.Launchpad = selected;
-                UpdatePorts();
             }
         }
 
