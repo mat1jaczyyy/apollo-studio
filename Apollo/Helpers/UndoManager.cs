@@ -37,7 +37,7 @@ namespace Apollo.Helpers {
         }
 
         public void Add(string desc, Action undo, Action redo) {
-            for (int i = Position + 1; i < History.Count; i++)
+            for (int i = History.Count - 1; i > Position; i--)
                 History.RemoveAt(i);
             
             History.Add(new UndoEntry(desc, undo, redo));
