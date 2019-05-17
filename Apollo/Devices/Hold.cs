@@ -79,6 +79,8 @@ namespace Apollo.Devices {
             Gate = gate;
             Infinite = infinite;
             Release = release;
+
+            Length.Changed += LengthChanged;
         }
 
         private void Tick(object sender, EventArgs e) {
