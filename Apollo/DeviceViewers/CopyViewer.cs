@@ -225,5 +225,7 @@ namespace Apollo.DeviceViewers {
 
             _copy.Remove(index);
         }
+
+        public void SetOffset(int index, int x, int y) => ((CopyOffset)Contents[index + 1]).SetOffset(x, y);
     }
 }

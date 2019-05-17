@@ -1,11 +1,16 @@
 namespace Apollo.Structures {
     public class Offset {
+        public delegate void ChangedEventHandler(Offset sender);
+        public event ChangedEventHandler Changed;
+
         private int _x = 0;
         public int X {
             get => _x;
             set {
-                if (-9 <= value && value <= 9)
+                if (-9 <= value && value <= 9 && _x != value) {
                     _x = value;
+                    Changed?.Invoke(this);
+                }
             }
         }
 
@@ -13,8 +18,10 @@ namespace Apollo.Structures {
         public int Y {
             get => _y;
             set {
-                if (-9 <= value && value <= 9)
+                if (-9 <= value && value <= 9 && _y != value) {
                     _y = value;
+                    Changed?.Invoke(this);
+                }
             }
         }
 

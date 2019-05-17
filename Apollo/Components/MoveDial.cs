@@ -14,7 +14,7 @@ namespace Apollo.Components {
     public class MoveDial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void MoveDialChangedEventHandler(int x, int y);
+        public delegate void MoveDialChangedEventHandler(int x, int y, int? old_x, int? old_y);
         public event MoveDialChangedEventHandler Changed;
 
         Canvas PlaneCanvas;
@@ -31,7 +31,7 @@ namespace Apollo.Components {
                     _x = value;
                     DrawX();
                     DrawPoint();
-                    Changed?.Invoke(_x, _y);
+                    Changed?.Invoke(_x, _y, null, null);
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace Apollo.Components {
                     _y = value;
                     DrawY();
                     DrawPoint();
-                    Changed?.Invoke(_x, _y);
+                    Changed?.Invoke(_x, _y, null, null);
                 }
             }
         }
@@ -102,6 +102,7 @@ namespace Apollo.Components {
         }
 
         private bool mouseHeld = false;
+        private int old_x, old_y;
         private double lastX, lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
@@ -116,6 +117,9 @@ namespace Apollo.Components {
 
                 lastX = e.GetPosition(PlaneCanvas).X;
                 lastY = e.GetPosition(PlaneCanvas).Y;
+                old_x = X;
+                old_y = Y;
+
                 PlaneCanvas.Cursor = new Cursor(StandardCursorType.SizeAll);
             }
         }
@@ -124,6 +128,9 @@ namespace Apollo.Components {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
                 e.Device.Capture(null);
+
+                if (old_x != X || old_y != Y)
+                    Changed?.Invoke(X, Y, old_x, old_y);
 
                 PlaneCanvas.Cursor = new Cursor(StandardCursorType.Hand);
             }
@@ -219,6 +226,9 @@ namespace Apollo.Components {
 
             InputX.Opacity = InputY.Opacity = 0;
             InputX.IsHitTestVisible = InputY.IsHitTestVisible = false;
+
+            if (old_x != X || old_y != Y)
+                Changed?.Invoke(X, Y, old_x, old_y);
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {

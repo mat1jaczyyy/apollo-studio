@@ -34,7 +34,7 @@ namespace Apollo.DeviceViewers {
             Wrap.IsChecked = _move.Wrap;
         }
 
-        private void Offset_Changed(int x, int y) {
+        private void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             _move.Offset.X = x;
             _move.Offset.Y = y;
         }
