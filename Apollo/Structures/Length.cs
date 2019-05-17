@@ -14,7 +14,7 @@ namespace Apollo.Structures {
         public int Step {
             get => _value;
             set {
-                if (0 <= value && value <= 9) {
+                if (0 <= value && value <= 9 && _value != value) {
                     _value = value;
                     Changed?.Invoke();
                 }

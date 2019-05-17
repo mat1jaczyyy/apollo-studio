@@ -398,6 +398,7 @@ namespace Apollo.Components {
         private void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && !UsingSteps && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
+                oldValue = RawValue;
 
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
@@ -413,8 +414,10 @@ namespace Apollo.Components {
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
 
-            ValueChanged?.Invoke(_raw, null);
-            ValueModsChanged?.Invoke(_raw, null, lastModifiers);
+            if (oldValue != RawValue) {
+                ValueChanged?.Invoke(_raw, oldValue);
+                ValueModsChanged?.Invoke(_raw, oldValue, lastModifiers);
+            }
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {
