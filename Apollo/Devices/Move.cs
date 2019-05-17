@@ -1,3 +1,4 @@
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -19,6 +20,8 @@ namespace Apollo.Devices {
             set {
                 if (value == "10x10") _gridmode = GridType.Full;
                 else if (value == "8x8") _gridmode = GridType.Square;
+
+                if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetGridMode(GridMode);
             }
         }
 
@@ -27,7 +30,20 @@ namespace Apollo.Devices {
         public GridType GetGridMode() => _gridmode;
 
         public Offset Offset;
-        public bool Wrap;
+
+        private void OffsetChanged(Offset sender) {
+            if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetOffset(Offset.X, Offset.Y);
+        }
+
+        private bool _wrap;
+        public bool Wrap {
+            get => _wrap;
+            set {
+                _wrap = value;
+
+                if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetWrap(Wrap);
+            }
+        }
 
         public override Device Clone() => new Move(Offset.Clone());
 
@@ -35,6 +51,8 @@ namespace Apollo.Devices {
             Offset = offset?? new Offset();
             _gridmode = gridmode;
             Wrap = wrap;
+
+            Offset.Changed += OffsetChanged;
         }
 
         private int ApplyWrap(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;

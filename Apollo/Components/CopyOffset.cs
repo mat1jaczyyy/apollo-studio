@@ -32,6 +32,10 @@ namespace Apollo.Components {
             _viewer.Changed += Offset_Changed;
         }
 
+        private void Offset_Add() => OffsetAdded?.Invoke(_copy.Offsets.IndexOf(_offset) + 1);
+
+        private void Offset_Remove() => OffsetRemoved?.Invoke(_copy.Offsets.IndexOf(_offset));
+
         private void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             _offset.X = x;
             _offset.Y = y;
@@ -45,7 +49,7 @@ namespace Apollo.Components {
 
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Gate Changed", () => {
+                Program.Project.Undo.Add($"Copy Offset {index} Changed", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].X = ux;
                     copy.Offsets[index].Y = uy;
@@ -57,10 +61,6 @@ namespace Apollo.Components {
                 });
             }
         }
-
-        private void Offset_Add() => OffsetAdded?.Invoke(_copy.Offsets.IndexOf(_offset) + 1);
-
-        private void Offset_Remove() => OffsetRemoved?.Invoke(_copy.Offsets.IndexOf(_offset));
 
         public void SetOffset(int x, int y) {
             _viewer.X = x;
