@@ -306,6 +306,8 @@ namespace Apollo.Components {
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             lastModifiers = e.InputModifiers;
 
+            if (!Enabled) return;
+            
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
                 e.Device.Capture(null);
