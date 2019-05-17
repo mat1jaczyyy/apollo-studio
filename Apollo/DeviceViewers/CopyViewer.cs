@@ -68,11 +68,75 @@ namespace Apollo.DeviceViewers {
                 Contents_Insert(i, _copy.Offsets[i]);
         }
 
-        private void Rate_Changed(double value) => _copy.Rate = (int)value;
+        private void Rate_ValueChanged(double value, double? old) {
+            if (old != null) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_copy);
 
-        private void Rate_ModeChanged(bool value) => _copy.Mode = value;
+                Program.Project.Undo.Add($"Copy Rate Changed", () => {
+                    ((Copy)Track.TraversePath(path)).Rate = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Rate = r;
+                });
+            }
 
-        private void Gate_Changed(double value) => _copy.Gate = (decimal)(value / 100);
+            _copy.Rate = (int)value;
+        }
+
+        public void SetRateValue(int rate) => Rate.RawValue = rate;
+
+        private void Rate_ModeChanged(bool value, bool? old) {
+            if (old != null) {
+                bool u = old.Value;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Rate Switched", () => {
+                    ((Copy)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Mode = r;
+                });
+            }
+
+            _copy.Mode = value;
+        }
+
+        public void SetMode(bool mode) => Rate.UsingSteps = mode;
+
+        private void Rate_StepChanged(int value, int? old) {
+            if (old != null) {
+                int u = old.Value;
+                int r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Rate Changed", () => {
+                    ((Copy)Track.TraversePath(path)).Length.Step = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Length.Step = r;
+                });
+            }
+        }
+
+        public void SetRateStep(int rate) => Rate.DrawArcAuto();
+
+        private void Gate_Changed(double value, double? old) {
+            if (old != null) {
+                decimal u = (decimal)(old.Value / 100);
+                decimal r = (decimal)(value / 100);
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Gate Changed", () => {
+                    ((Copy)Track.TraversePath(path)).Gate = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Gate = r;
+                });
+            }
+
+            _copy.Gate = (decimal)(value / 100);
+        }
+
+        public void SetGate(decimal gate) => Rate.RawValue = (double)gate;
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
             string selected = (string)CopyMode.SelectedItem;

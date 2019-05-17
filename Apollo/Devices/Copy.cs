@@ -21,7 +21,6 @@ namespace Apollo.Devices {
         
         private Random RNG = new Random();
 
-        public bool Mode; // true uses Length
         public Length Length;
 
         public List<Offset> Offsets;
@@ -42,17 +41,39 @@ namespace Apollo.Devices {
         public int Rate {
             get => _rate;
             set {
-                if (10 <= value && value <= 5000)
+                if (10 <= value && value <= 5000 && _rate != value) {
                     _rate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateValue(Rate);
+                }  
             }
+        }
+
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetMode(Mode);
+                }
+            }
+        }
+
+        private void LengthChanged() {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(Length.Step);
         }
 
         private decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4)
+                if (0.01M <= value && value <= 4) {
                     _gate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGate(Gate);
+                }
             }
         }
 
@@ -123,6 +144,7 @@ namespace Apollo.Devices {
             Mode = mode;
             Rate = rate;
             Length = length?? new Length();
+            Length.Changed += LengthChanged;
             Gate = gate;
             _copymode = copymode;
             _gridmode = gridmode;

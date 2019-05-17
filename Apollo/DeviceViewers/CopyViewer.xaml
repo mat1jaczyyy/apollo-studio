@@ -33,7 +33,7 @@
         
         <StackPanel Grid.Row="1" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="10">
           <Components:Dial VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="10" Maximum="5000" Exponent="3.348186161" Round="0" Unit="ms" AllowSteps="true"
-                           ValueChanged="Rate_Changed" ModeChanged="Rate_ModeChanged" />
+                           ValueChanged="Rate_ValueChanged" ModeChanged="Rate_ModeChanged" StepChanged="Rate_StepChanged" />
         
           <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Round="0" Unit="%"
                            ValueChanged="Gate_Changed" />
