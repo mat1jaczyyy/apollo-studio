@@ -7,7 +7,7 @@
   <Grid RowDefinitions="*,*,Auto,Auto">
     <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <Components:Dial Margin="0 0 0 5" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" Scale="0.4" AllowSteps="true"
-                       ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" />
+                       ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
     </Border>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">

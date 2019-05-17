@@ -1,5 +1,6 @@
 using System;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -7,26 +8,65 @@ namespace Apollo.Devices {
     public class Hold: Device {
         public static readonly new string DeviceIdentifier = "hold";
 
-        public bool Mode; // true uses Length
-        public Length Length;
         private int _time;
-        private decimal _gate;
-        public bool Infinite;
-        public bool Release;
-
         public int Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000)
+                if (10 <= value && value <= 30000 && _time != value) {
                     _time = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetDurationValue(Time);
+                }  
             }
         }
 
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetMode(Mode);
+                }
+            }
+        }
+
+        public Length Length;
+
+        private void LengthChanged() {
+            if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetDurationStep(Length.Step);
+        }
+
+        private decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4)
+                if (0.01M <= value && value <= 4) {
                     _gate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetGate(Gate);
+                }
+            }
+        }
+
+        private bool _infinite;
+        public bool Infinite {
+            get => _infinite;
+            set {
+                _infinite = value;
+                
+                if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetInfinite(Infinite);
+            }
+        }
+
+        private bool _release;
+        public bool Release {
+            get => _release;
+            set {
+                _release = value;
+                
+                if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetRelease(Release);
             }
         }
 
