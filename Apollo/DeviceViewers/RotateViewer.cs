@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class RotateViewer: UserControl {
@@ -27,8 +30,44 @@ namespace Apollo.DeviceViewers {
             Bypass.IsChecked = _rotate.Bypass;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _rotate.Mode = (string)RotateMode.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)RotateMode.SelectedItem;
 
-        private void Bypass_Changed(object sender, EventArgs e) => _rotate.Bypass = Bypass.IsChecked.Value;
+            if (_rotate.Mode != selected) {
+                string u = _rotate.Mode;
+                string r = selected;
+                List<int> path = Track.GetPath(_rotate);
+
+                Program.Project.Undo.Add($"Rotate Angle Changed", () => {
+                    ((Rotate)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Rotate)Track.TraversePath(path)).Mode = r;
+                });
+
+                _rotate.Mode = selected;
+            }
+        }
+
+        public void SetMode(string mode) => RotateMode.SelectedItem = mode;
+
+        private void Bypass_Changed(object sender, EventArgs e) {
+            bool value = Bypass.IsChecked.Value;
+
+            if (_rotate.Bypass != value) {
+                bool u = _rotate.Bypass;
+                bool r = value;
+                List<int> path = Track.GetPath(_rotate);
+
+                Program.Project.Undo.Add($"Rotate Bypass Changed", () => {
+                    ((Rotate)Track.TraversePath(path)).Bypass = u;
+                }, () => {
+                    ((Rotate)Track.TraversePath(path)).Bypass = r;
+                });
+
+                _rotate.Bypass = value;
+            }
+        }
+
+        public void SetBypass(bool value) => Bypass.IsChecked = value;
     }
 }

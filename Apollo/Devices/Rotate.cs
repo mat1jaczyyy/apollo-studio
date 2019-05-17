@@ -1,3 +1,4 @@
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -23,12 +24,22 @@ namespace Apollo.Devices {
                 if (value == "90°") _mode = RotateType.D90;
                 else if (value == "180°") _mode = RotateType.D180;
                 else if (value == "270°") _mode = RotateType.D270;
+                
+                if (Viewer?.SpecificViewer != null) ((RotateViewer)Viewer.SpecificViewer).SetMode(Mode);
             }
         }
 
         public RotateType GetRotateMode() => _mode;
 
-        public bool Bypass;
+        private bool _bypass;
+        public bool Bypass {
+            get => _bypass;
+            set {
+                _bypass = value;
+                
+                if (Viewer?.SpecificViewer != null) ((RotateViewer)Viewer.SpecificViewer).SetBypass(Bypass);
+            }
+        }
 
         public override Device Clone() => new Rotate(_mode, Bypass);
 
