@@ -16,24 +16,24 @@ namespace Apollo.Components {
     public class Dial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void DialValueChangedEventHandler(double NewValue);
+        public delegate void DialValueChangedEventHandler(double NewValue, double? OldValue);
         public event DialValueChangedEventHandler ValueChanged;
 
-        public delegate void DialStepChangedEventHandler(int NewValue);
+        public delegate void DialStepChangedEventHandler(int NewValue, int? OldValue);
         public event DialStepChangedEventHandler StepChanged;
 
-        public delegate void DialModeChangedEventHandler(bool NewValue);
+        public delegate void DialModeChangedEventHandler(bool NewValue, bool? OldValue);
         public event DialModeChangedEventHandler ModeChanged;
 
         InputModifiers lastModifiers;
 
-        public delegate void DialValueModsChangedEventHandler(double NewValue, InputModifiers mods);
+        public delegate void DialValueModsChangedEventHandler(double NewValue, double? OldValue, InputModifiers mods);
         public event DialValueModsChangedEventHandler ValueModsChanged;
 
-        public delegate void DialStepModsChangedEventHandler(int NewValue, InputModifiers mods);
+        public delegate void DialStepModsChangedEventHandler(int NewValue, int? OldValue, InputModifiers mods);
         public event DialStepModsChangedEventHandler StepModsChanged;
 
-        public delegate void DialModeModsChangedEventHandler(bool NewValue, InputModifiers mods);
+        public delegate void DialModeModsChangedEventHandler(bool NewValue, bool? OldValue, InputModifiers mods);
         public event DialModeModsChangedEventHandler ModeModsChanged;
 
         Canvas ArcCanvas;
@@ -119,8 +119,8 @@ namespace Apollo.Components {
                     Value = ToValue(_raw);
                     Display.Text = ValueString;
 
-                    ValueChanged?.Invoke(_raw);
-                    ValueModsChanged?.Invoke(_raw, lastModifiers);
+                    ValueChanged?.Invoke(_raw, null);
+                    ValueModsChanged?.Invoke(_raw, null, lastModifiers);
                 }
             }
         }
@@ -192,12 +192,12 @@ namespace Apollo.Components {
         public bool UsingSteps {
             get => _usingSteps;
             set {
-                if (AllowSteps && Enabled) {
+                if (AllowSteps && Enabled && _usingSteps != value) {
                     _usingSteps = value;
                     DrawArcAuto();
                     
-                    ModeChanged?.Invoke(UsingSteps);
-                    ModeModsChanged?.Invoke(UsingSteps, lastModifiers);
+                    ModeChanged?.Invoke(UsingSteps, null);
+                    ModeModsChanged?.Invoke(UsingSteps, null, lastModifiers);
                 }
             }
         }
@@ -255,7 +255,7 @@ namespace Apollo.Components {
             if (UsingSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeExtraBrush");
         }
 
-        private void DrawArcAuto() {
+        public void DrawArcAuto() {
             if (UsingSteps) DrawArcSteps();
             else DrawArcValue();
         }
@@ -279,6 +279,8 @@ namespace Apollo.Components {
         private void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
 
         private bool mouseHeld = false;
+        private double oldValue;
+        private int oldStep;
         private double lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
@@ -294,6 +296,9 @@ namespace Apollo.Components {
                 e.Device.Capture(ArcCanvas);
 
                 lastY = e.GetPosition(ArcCanvas).Y;
+                if (UsingSteps) oldStep = Length.Step;
+                else oldValue = RawValue;
+
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
             }
         }
@@ -305,9 +310,23 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Device.Capture(null);
 
+                if (UsingSteps) {
+                    if (oldStep != Length.Step) {
+                        StepChanged?.Invoke(Length.Step, oldStep);
+                        StepModsChanged?.Invoke(Length.Step, oldStep, lastModifiers);
+                    }
+                } else if (oldValue != RawValue) {
+                    ValueChanged?.Invoke(RawValue, oldValue);
+                    ValueModsChanged?.Invoke(RawValue, oldValue, lastModifiers);
+                }
+
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
-            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) UsingSteps = !UsingSteps;
+            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) {
+                UsingSteps = !UsingSteps;
+                ModeChanged?.Invoke(UsingSteps, !UsingSteps);
+                ModeModsChanged?.Invoke(UsingSteps, !UsingSteps, lastModifiers);
+            }
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
@@ -319,8 +338,8 @@ namespace Apollo.Components {
                     if (Math.Abs(Y - lastY) >= 8) {
                         _length.Step -= (int)((Y - lastY) / 8);
 
-                        StepChanged?.Invoke(_length.Step);
-                        StepModsChanged?.Invoke(_length.Step, lastModifiers);
+                        StepChanged?.Invoke(_length.Step, null);
+                        StepModsChanged?.Invoke(_length.Step, null, lastModifiers);
 
                         DrawArcSteps();
                         lastY = Y;
@@ -393,15 +412,16 @@ namespace Apollo.Components {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
+
+            ValueChanged?.Invoke(_raw, null);
+            ValueModsChanged?.Invoke(_raw, null, lastModifiers);
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {
             lastModifiers = e.Modifiers;
 
-            if (e.Key == Key.Return) {
-                ValueModsChanged?.Invoke(_raw, lastModifiers);
+            if (e.Key == Key.Return)
                 this.Focus();
-            }
 
             e.Handled = true;
         }
