@@ -21,8 +21,6 @@ namespace Apollo.Devices {
         
         private Random RNG = new Random();
 
-        public Length Length;
-
         public List<Offset> Offsets;
 
         public void Insert(int index, Offset offset = null) {
@@ -66,6 +64,8 @@ namespace Apollo.Devices {
                 }
             }
         }
+
+        public Length Length;
 
         private void LengthChanged() {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(Length.Step);

@@ -136,7 +136,7 @@ namespace Apollo.DeviceViewers {
             _copy.Gate = (decimal)(value / 100);
         }
 
-        public void SetGate(decimal gate) => Rate.RawValue = (double)gate;
+        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
             string selected = (string)CopyMode.SelectedItem;
