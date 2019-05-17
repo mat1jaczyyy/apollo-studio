@@ -1,3 +1,4 @@
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -26,12 +27,22 @@ namespace Apollo.Devices {
                 else if (value == "Vertical") _mode = FlipType.Vertical;
                 else if (value == "Diagonal+") _mode = FlipType.Diagonal1;
                 else if (value == "Diagonal-") _mode = FlipType.Diagonal2;
+
+                if (Viewer?.SpecificViewer != null) ((FlipViewer)Viewer.SpecificViewer).SetMode(Mode);
             }
         }
 
         public FlipType GetFlipMode() => _mode;
 
-        public bool Bypass;
+        private bool _bypass;
+        public bool Bypass {
+            get => _bypass;
+            set {
+                _bypass = value;
+                
+                if (Viewer?.SpecificViewer != null) ((FlipViewer)Viewer.SpecificViewer).SetBypass(Bypass);
+            }
+        }
 
         public override Device Clone() => new Flip(_mode, Bypass);
 
