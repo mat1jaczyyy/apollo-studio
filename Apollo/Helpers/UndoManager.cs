@@ -68,7 +68,8 @@ namespace Apollo.Helpers {
             } else if (e.Modifiers == (InputModifiers.Control | InputModifiers.Shift)) {
                 if (e.Key == Key.Z) Redo();
                 else return false;
-            }
+            
+            } else return false;
 
             return true;
         }
