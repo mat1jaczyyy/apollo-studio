@@ -1,8 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.Generic;
+
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class ToneViewer: UserControl {
@@ -12,26 +16,117 @@ namespace Apollo.DeviceViewers {
         
         Tone _tone;
 
+        Dial Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow;
+
         public ToneViewer(Tone tone) {
             InitializeComponent();
 
             _tone = tone;
 
-            this.Get<Dial>("Hue").RawValue = _tone.Hue;
+            Hue = this.Get<Dial>("Hue");
+            Hue.RawValue = _tone.Hue;
 
-            this.Get<Dial>("SaturationHigh").RawValue = _tone.SaturationHigh * 100;
-            this.Get<Dial>("SaturationLow").RawValue = _tone.SaturationLow * 100;
+            SaturationHigh = this.Get<Dial>("SaturationHigh");
+            SaturationHigh.RawValue = _tone.SaturationHigh * 100;
             
-            this.Get<Dial>("ValueHigh").RawValue = _tone.ValueHigh * 100;
-            this.Get<Dial>("ValueLow").RawValue = _tone.ValueLow * 100;
+            SaturationLow = this.Get<Dial>("SaturationLow");
+            SaturationLow.RawValue = _tone.SaturationLow * 100;
+            
+            ValueHigh = this.Get<Dial>("ValueHigh");
+            ValueHigh.RawValue = _tone.ValueHigh * 100;
+            
+            ValueLow = this.Get<Dial>("ValueLow");
+            ValueLow.RawValue = _tone.ValueLow * 100;
         }
 
-        private void Hue_Changed(double value) => _tone.Hue = value;
+        private void Hue_Changed(double value, double? old) {
+            if (old != null) {
+                double u = old.Value;
+                double r = value;
+                List<int> path = Track.GetPath(_tone);
 
-        private void SaturationHigh_Changed(double value) => _tone.SaturationHigh = value / 100;
-        private void SaturationLow_Changed(double value) => _tone.SaturationLow = value / 100;
+                Program.Project.Undo.Add($"Tone Hue Changed", () => {
+                    ((Tone)Track.TraversePath(path)).Hue = u;
+                }, () => {
+                    ((Tone)Track.TraversePath(path)).Hue = r;
+                });
+            }
 
-        private void ValueHigh_Changed(double value) => _tone.ValueHigh = value / 100;
-        private void ValueLow_Changed(double value) => _tone.ValueLow = value / 100;
+            _tone.Hue = value;
+        }
+
+        public void SetHue(double value) => Hue.RawValue = value;
+
+        private void SaturationHigh_Changed(double value, double? old) {
+            if (old != null) {
+                double u = old.Value / 100;
+                double r = value / 100;
+                List<int> path = Track.GetPath(_tone);
+
+                Program.Project.Undo.Add($"Tone Sat Hi Changed", () => {
+                    ((Tone)Track.TraversePath(path)).SaturationHigh = u;
+                }, () => {
+                    ((Tone)Track.TraversePath(path)).SaturationHigh = r;
+                });
+            }
+
+            _tone.SaturationHigh = value / 100;
+        }
+
+        public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
+
+        private void SaturationLow_Changed(double value, double? old) {
+            if (old != null) {
+                double u = old.Value / 100;
+                double r = value / 100;
+                List<int> path = Track.GetPath(_tone);
+
+                Program.Project.Undo.Add($"Tone Sat Lo Changed", () => {
+                    ((Tone)Track.TraversePath(path)).SaturationLow = u;
+                }, () => {
+                    ((Tone)Track.TraversePath(path)).SaturationLow = r;
+                });
+            }
+
+            _tone.SaturationLow = value / 100;
+        }
+
+        public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
+
+        private void ValueHigh_Changed(double value, double? old) {
+            if (old != null) {
+                double u = old.Value / 100;
+                double r = value / 100;
+                List<int> path = Track.GetPath(_tone);
+
+                Program.Project.Undo.Add($"Tone Val Hi Changed", () => {
+                    ((Tone)Track.TraversePath(path)).ValueHigh = u;
+                }, () => {
+                    ((Tone)Track.TraversePath(path)).ValueHigh = r;
+                });
+            }
+
+            _tone.ValueHigh = value / 100;
+        }
+
+        public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
+
+        private void ValueLow_Changed(double value, double? old) {
+            if (old != null) {
+                double u = old.Value / 100;
+                double r = value / 100;
+                List<int> path = Track.GetPath(_tone);
+
+                Program.Project.Undo.Add($"Tone Val Lo Changed", () => {
+                    ((Tone)Track.TraversePath(path)).ValueLow = u;
+                }, () => {
+                    ((Tone)Track.TraversePath(path)).ValueLow = r;
+                });
+            }
+
+            _tone.ValueLow = value / 100;
+        }
+
+        public void SetValueLow(double value) => ValueLow.RawValue = value * 100;
     }
 }
