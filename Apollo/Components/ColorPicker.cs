@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using GradientStop = Avalonia.Media.GradientStop;
@@ -17,7 +18,7 @@ namespace Apollo.Components {
     public class ColorPicker: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        public delegate void ColorChangedEventHandler(Color value);
+        public delegate void ColorChangedEventHandler(Color value, Color old);
         public event ColorChangedEventHandler ColorChanged;
 
         private Color _color = new Color();
@@ -25,7 +26,7 @@ namespace Apollo.Components {
             get => _color;
             private set {
                 _color = value;
-                ColorChanged?.Invoke(_color);
+                ColorChanged?.Invoke(_color, null);
             }
         }
 
@@ -42,6 +43,7 @@ namespace Apollo.Components {
         TextBox Hex;
 
         bool main_mouseHeld, hue_mouseHeld, hexValidation;
+        private Color oldColor;
 
         public ColorPicker() {
             InitializeComponent();
@@ -142,6 +144,8 @@ namespace Apollo.Components {
                 main_mouseHeld = true;
                 e.Device.Capture(MainCanvas);
 
+                oldColor = Color.Clone();
+
                 Vector position = e.GetPosition(MainThumb);
                 position = position.WithX(position.X - MainThumb.Bounds.Width / 2)
                                    .WithY(position.Y - MainThumb.Bounds.Height / 2);
@@ -154,6 +158,9 @@ namespace Apollo.Components {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = false;
                 e.Device.Capture(null);
+
+                if (oldColor != Color)
+                    ColorChanged?.Invoke(Color, oldColor);
             }
         }
 
@@ -183,6 +190,8 @@ namespace Apollo.Components {
                 hue_mouseHeld = true;
                 e.Device.Capture(HueCanvas);
 
+                oldColor = Color.Clone();
+
                 Vector position = e.GetPosition(HueThumb);
                 position = position.WithY(position.Y - HueThumb.Bounds.Height / 2);
 
@@ -194,6 +203,9 @@ namespace Apollo.Components {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = false;
                 e.Device.Capture(null);
+                
+                if (oldColor != Color)
+                    ColorChanged?.Invoke(Color, oldColor);
             }
         }
 
@@ -205,6 +217,8 @@ namespace Apollo.Components {
                 HueThumb_Move(null, new VectorEventArgs() { Vector = position });
             }
         }
+
+        private bool Hex_Dirty = false;
 
         private Action HexAction(string text) {
             Action update = () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
@@ -229,6 +243,11 @@ namespace Apollo.Components {
             g = (g > 63)? 63 : g;
             b = (b > 63)? 63 : b;
 
+            if (!Hex_Dirty) {
+                oldColor = Color.Clone();
+                Hex_Dirty = true;
+            }
+
             return update + (() => { 
                 Color = new Color((byte)r, (byte)g, (byte)b);
 
@@ -248,6 +267,13 @@ namespace Apollo.Components {
         
         private void Hex_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return) this.Focus();
+        }
+
+        private void Hex_Unfocus(object sender, RoutedEventArgs e) {
+            if (oldColor != Color)
+                ColorChanged?.Invoke(Color, oldColor);
+
+            Hex_Dirty = false;
         }
     }
 }

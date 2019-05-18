@@ -1,8 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.Generic;
+
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
@@ -23,6 +27,20 @@ namespace Apollo.DeviceViewers {
             Picker.SetColor(_paint.Color);
         }
         
-        private void Color_Changed(Color color) => _paint.Color = color;
+        private void Color_Changed(Color color, Color old) {
+            if (old != null) {
+                Color u = old.Clone();
+                Color r = color.Clone();
+                List<int> path = Track.GetPath(_paint);
+
+                Program.Project.Undo.Add($"Paint Color Changed", () => {
+                    ((Paint)Track.TraversePath(path)).Color = u.Clone();
+                }, () => {
+                    ((Paint)Track.TraversePath(path)).Color = r.Clone();
+                });
+            }
+
+            _paint.Color = color;
+        }
     }
 }
