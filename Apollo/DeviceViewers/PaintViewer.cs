@@ -42,5 +42,7 @@ namespace Apollo.DeviceViewers {
 
             _paint.Color = color;
         }
+
+        public void Set(Color color) => Picker.SetColor(color);
     }
 }
