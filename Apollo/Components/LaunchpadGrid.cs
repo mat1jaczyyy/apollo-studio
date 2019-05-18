@@ -21,10 +21,9 @@ namespace Apollo.Components {
         Path TopLeft, TopRight, BottomLeft, BottomRight;
         Shape ModeLight;
 
-        public delegate void PadStartedEventHandler(int index);
-        public event PadStartedEventHandler PadStarted;
-
         public delegate void PadChangedEventHandler(int index);
+        public event PadChangedEventHandler PadStarted;
+        public event PadChangedEventHandler PadFinished;
         public event PadChangedEventHandler PadPressed;
         public event PadChangedEventHandler PadReleased;
 
@@ -131,6 +130,7 @@ namespace Apollo.Components {
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 MouseMove(sender, e);
+                PadFinished?.Invoke(Grid.Children.IndexOf((IControl)sender));
 
                 mouseHeld = false;
                 if (mouseOver != null) MouseLeave(mouseOver);

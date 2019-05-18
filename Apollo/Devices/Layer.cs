@@ -14,7 +14,7 @@ namespace Apollo.Devices {
                     _target = value;
                     
                     if (Viewer?.SpecificViewer != null) ((LayerViewer)Viewer.SpecificViewer).SetTarget(Target);
-                }  
+                }
             }
         }
 
