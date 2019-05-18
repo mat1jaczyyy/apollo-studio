@@ -126,11 +126,11 @@ namespace Apollo.Windows {
         }
 
         public void Contents_Remove(int index) {
-            _pattern[index].Info = null;
-            Contents.RemoveAt(index + 1);
-
             if (index < _pattern.Expanded) _pattern.Expanded--;
             else if (index == _pattern.Expanded) Frame_Select(Math.Max(0, _pattern.Expanded - 1));
+
+            _pattern[index].Info = null;
+            Contents.RemoveAt(index + 1);
 
             SetAlwaysShowing();
 
@@ -178,10 +178,8 @@ namespace Apollo.Windows {
 
             Contents = this.Get<StackPanel>("Frames").Children;
 
-            for (int i = 0; i < _pattern.Count; i++) {
+            for (int i = 0; i < _pattern.Count; i++)
                 Contents_Insert(i, _pattern[i], true);
-                ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern[i].TimeString;
-            }
             
             if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
 
@@ -249,7 +247,7 @@ namespace Apollo.Windows {
                 reference.Length.Clone(),
                 reference.Time
             ));
-        } 
+        }
 
         private void Frame_Insert(int index, Frame frame) {
             if (Locked) return;
@@ -257,7 +255,7 @@ namespace Apollo.Windows {
             Frame reference = _pattern[Math.Max(0, index - 1)];
 
             if (Preferences.CopyPreviousFrame)
-                for (int i = 0; i < _pattern[index].Screen.Length; i++)
+                for (int i = 0; i < reference.Screen.Length; i++)
                     frame.Screen[i] = reference.Screen[i].Clone();
             
             _pattern.Insert(index, frame);
@@ -322,7 +320,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void ColorPicker_Changed(Color color) => ColorHistory.Select(color.Clone());
+        private void ColorPicker_Changed(Color color, Color old) => ColorHistory.Select(color.Clone());
 
         private void ColorHistory_Changed(Color color) {
             ColorPicker.SetColor(color.Clone());
@@ -458,7 +456,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Duration_Changed(double value, InputModifiers mods) {
+        private void Duration_Changed(double value, double? old, InputModifiers mods) {
             if (mods.HasFlag(InputModifiers.Control)) {
                 for (int i = 0; i < _pattern.Count; i++) {
                     _pattern[i].Mode = false;
@@ -471,7 +469,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Duration_StepChanged(int value, InputModifiers mods) {
+        private void Duration_StepChanged(int value, int? old, InputModifiers mods) {
             if (mods.HasFlag(InputModifiers.Control))
                 for (int i = 0; i < _pattern.Count; i++) {
                     _pattern[i].Mode = true;
@@ -482,7 +480,7 @@ namespace Apollo.Windows {
                 ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.Text = _pattern[_pattern.Expanded].TimeString;
         }
 
-        private void Duration_ModeChanged(bool value, InputModifiers mods) {
+        private void Duration_ModeChanged(bool value, bool? old, InputModifiers mods) {
             if (mods.HasFlag(InputModifiers.Control)) {
                 for (int i = 0; i < _pattern.Count; i++) {
                     _pattern[i].Mode = value;
@@ -494,7 +492,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Gate_Changed(double value) => _pattern.Gate = (decimal)(value / 100);
+        private void Gate_Changed(double value, double? old) => _pattern.Gate = (decimal)(value / 100);
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)PlaybackMode.SelectedItem;
 
@@ -557,7 +555,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private int PlayIndex;
+        private int PlayIndex = 0;
         private object PlayLocker = new object();
         private List<Courier> PlayTimers = new List<Courier>();
 
@@ -614,10 +612,8 @@ namespace Apollo.Windows {
             while (Contents.Count > 1) Contents.RemoveAt(1);
             _pattern.Expanded = 0;
 
-            for (int i = 0; i < _pattern.Count; i++) {
+            for (int i = 0; i < _pattern.Count; i++)
                 Contents_Insert(i, _pattern[i], true);
-                ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern[i].TimeString;
-            }
 
             if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
 
