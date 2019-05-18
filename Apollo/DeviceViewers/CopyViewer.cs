@@ -215,10 +215,11 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Offset_Remove(int index) {
+            Offset u = _copy.Offsets[index].Clone();
             List<int> path = Track.GetPath(_copy);
 
             Program.Project.Undo.Add($"Copy Offset Deleted", () => {
-                ((Copy)Track.TraversePath(path)).Insert(index);
+                ((Copy)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Copy)Track.TraversePath(path)).Remove(index);
             });
