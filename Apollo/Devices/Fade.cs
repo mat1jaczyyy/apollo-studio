@@ -38,8 +38,12 @@ namespace Apollo.Devices {
 
         public decimal GetPosition(int index) => _positions[index];
         public void SetPosition(int index, decimal position) {
-            _positions[index] = position;
-            Generate();
+            if (_positions[index] != position) {
+                _positions[index] = position;
+                Generate();
+                
+                if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetPosition(index, _positions[index]);
+            }
         }
         
         private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
@@ -173,12 +177,23 @@ namespace Apollo.Devices {
         public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
+
+            if (Viewer?.SpecificViewer != null) {
+                FadeViewer SpecificViewer = ((FadeViewer)Viewer.SpecificViewer);
+                SpecificViewer.Contents_Insert(index, _colors[index]);
+
+                SpecificViewer.Expand(index);
+            }
+
             Generate();
         }
 
         public void Remove(int index) {
             _colors.RemoveAt(index);
             _positions.RemoveAt(index);
+
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).Contents_Remove(index);
+
             Generate();
         }
 

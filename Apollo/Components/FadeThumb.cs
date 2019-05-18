@@ -9,7 +9,7 @@ namespace Apollo.Components {
     public class FadeThumb: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void MovedEventHandler(FadeThumb sender, VectorEventArgs e);
+        public delegate void MovedEventHandler(FadeThumb sender, double change, double? total);
         public event MovedEventHandler Moved;
 
         public delegate void FadeThumbEventHandler(FadeThumb sender);
@@ -37,6 +37,7 @@ namespace Apollo.Components {
 
         private void DragCompleted(object sender, VectorEventArgs e) {
             if (!dragged) Focused?.Invoke(this);
+            else if (change != 0) Moved?.Invoke(this, 0, change);
         }
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
@@ -50,9 +51,14 @@ namespace Apollo.Components {
             }
         }
 
+        double change;
+
         private void MouseMove(object sender, VectorEventArgs e) {
+            if (!dragged) change = 0;
+            change += e.Vector.X;
+
             dragged = true;
-            Moved?.Invoke(this, e);
+            Moved?.Invoke(this, e.Vector.X, null);
         }
         
         public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));

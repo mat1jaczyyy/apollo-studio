@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -31,6 +32,30 @@ namespace Apollo.DeviceViewers {
 
         int? current;
 
+        public void Contents_Insert(int index, Color color) {
+            FadeThumb thumb = new FadeThumb();
+            thumbs.Insert(index, thumb);
+            Canvas.SetLeft(thumb, (double)_fade.GetPosition(index) * 186);
+
+            thumb.Moved += Thumb_Move;
+            thumb.Focused += Thumb_Focus;
+            thumb.Deleted += Thumb_Delete;
+            thumb.Fill = color.ToBrush();
+            
+            canvas.Children.Add(thumb);
+            if (current != null && index <= current) current++;
+        }
+
+        public void Contents_Remove(int index) {
+            if (current != null) {
+                if (index < current) current--;
+                else if (index == current) Expand(null);
+            }
+
+            canvas.Children.Remove(thumbs[index]);
+            thumbs.RemoveAt(index);
+        }
+
         public FadeViewer(Fade fade) {
             InitializeComponent();
 
@@ -54,55 +79,18 @@ namespace Apollo.DeviceViewers {
             Gate.RawValue = (double)_fade.Gate * 100;
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
+            thumbs[0].Fill = _fade.GetColor(0).ToBrush();
 
-            for (int i = 1; i < _fade.Count - 1; i++) {
-                FadeThumb thumb = new FadeThumb();
-                thumbs.Insert(i, thumb);
-                Canvas.SetLeft(thumb, (double)_fade.GetPosition(i) * 186 - 7);
-
-                thumb.Moved += Thumb_Move;
-                thumb.Focused += Thumb_Focus;
-                thumb.Deleted += Thumb_Delete;
-
-                canvas.Children.Add(thumb);
-            }
+            for (int i = 1; i < _fade.Count - 1; i++) 
+                Contents_Insert(i, _fade.GetColor(i));
 
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
-
-            for (int i = 0; i < _fade.Count; i++)
-                thumbs[i].Fill = _fade.GetColor(i).ToBrush();
+            thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
 
             Gradient_Generate();
         }
 
-        private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
-                FadeThumb thumb = new FadeThumb();
-                int index;
-                double x_center = e.Device.GetPosition(canvas).X;
-                double x_left = x_center - 7;
-
-                for (index = 0; index < thumbs.Count; index++) {
-                    if (x_left < Canvas.GetLeft(thumbs[index])) {
-                        thumbs.Insert(index, thumb);
-                        break;
-                    }
-                }
-
-                Canvas.SetLeft(thumb, x_left);
-                thumb.Moved += Thumb_Move;
-                thumb.Focused += Thumb_Focus;
-                thumb.Deleted += Thumb_Delete;
-
-                _fade.Insert(index, new Color(), (decimal)x_center / 186);
-                canvas.Children.Add(thumb);
-
-                if (current != null && index <= current) current++;
-                Expand(index);
-            }
-        }
-
-        private void Expand(int? index) {
+        public void Expand(int? index) {
             if (current != null) {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(0);
                 thumbs[current.Value].Unselect();
@@ -123,36 +111,75 @@ namespace Apollo.DeviceViewers {
             current = index;
         }
 
-        private void Thumb_Move(FadeThumb sender, VectorEventArgs e) {
+        private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+                int index;
+                double x = e.Device.GetPosition(canvas).X - 7;
+
+                for (index = 0; index < thumbs.Count; index++)
+                    if (x < Canvas.GetLeft(thumbs[index])) break;
+                
+                decimal pos = (decimal)x / 186;
+
+                List<int> path = Track.GetPath(_fade);
+
+                Program.Project.Undo.Add($"Fade Color Added", () => {
+                    ((Fade)Track.TraversePath(path)).Remove(index);
+                }, () => {
+                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos);
+                });
+
+                _fade.Insert(index, new Color(), pos);
+            }
+        }
+
+        private void Thumb_Delete(FadeThumb sender) {
+            int index = thumbs.IndexOf(sender);
+
+            Color uc = _fade.GetColor(index).Clone();
+            decimal up = _fade.GetPosition(index);
+            List<int> path = Track.GetPath(_fade);
+
+            Program.Project.Undo.Add($"Fade Color Added", () => {
+                ((Fade)Track.TraversePath(path)).Insert(index, uc, up);
+            }, () => {
+                ((Fade)Track.TraversePath(path)).Remove(index);
+            });
+
+            _fade.Remove(index);
+        }
+
+        private void Thumb_Move(FadeThumb sender, double change, double? total) {
             int i = thumbs.IndexOf(sender);
 
             double left = Canvas.GetLeft(thumbs[i - 1]) + 1;
             double right = Canvas.GetLeft(thumbs[i + 1]) - 1;
 
             double old = Canvas.GetLeft(sender);
-            double x = old + e.Vector.X;
+            double x = old + change;
 
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            _fade.SetPosition(i, (decimal)x / 186);
-            Canvas.SetLeft(sender, x);
-        }
+            decimal pos = (decimal)x / 186;
 
-        private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
+            if (total != null) {
+                double u = x - total.Value;
+                List<int> path = Track.GetPath(_fade);
 
-        private void Thumb_Delete(FadeThumb sender) {
-            int index = thumbs.IndexOf(sender);
-
-            if (current != null) {
-                if (index < current) current--;
-                else if (index == current) Expand(null);
+                Program.Project.Undo.Add($"Fade Color Moved", () => {
+                    ((Fade)Track.TraversePath(path)).SetPosition(i, (decimal)u / 186);
+                }, () => {
+                    ((Fade)Track.TraversePath(path)).SetPosition(i, pos);
+                });
             }
 
-            thumbs.Remove(sender);
-            _fade.Remove(index);
-            canvas.Children.Remove(sender);
+            _fade.SetPosition(i, pos);
         }
+
+        public void SetPosition(int index, decimal position) => Canvas.SetLeft(thumbs[index], (double)position * 186);
+
+        private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
 
         private void Color_Changed(Color color, Color old) {
             if (current != null) {
