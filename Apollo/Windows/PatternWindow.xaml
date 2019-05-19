@@ -10,6 +10,12 @@
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
+  <Window.Resources>
+    <ContextMenu x:Key="FrameContextMenu" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+    </ContextMenu>
+  </Window.Resources>
+
   <Window.Styles>
     <Style Selector="Button">
       <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />
@@ -38,9 +44,13 @@
       <Grid ColumnDefinitions="3*,12*,5*">
         <Grid Grid.Column="0" RowDefinitions="*,Auto">
           <ScrollViewer Grid.Row="0" Padding="5 0" VerticalScrollBarVisibility="Visible">
-            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Frames">
-              <Components:VerticalAdd Added="Frame_InsertStart" />
-            </StackPanel>
+            <Grid RowDefinitions="Auto,*">
+              <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
+                <Components:VerticalAdd Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
+              </StackPanel>
+              
+              <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Frame_AfterClick" />
+            </Grid>
           </ScrollViewer>
         
           <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">

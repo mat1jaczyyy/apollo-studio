@@ -92,11 +92,12 @@ namespace Apollo.Structures {
             : Frame.Move(source, target[position], copy);
 
         public static bool Move(List<Frame> source, Frame target, bool copy = false) {
-            if (source[0].Parent.Count == source.Count) return false;
+            if (!copy) {
+                if (source[0].Parent != target.Parent && source[0].Parent.Count == source.Count) return false;
 
-            if (!copy)
                 for (int i = 0; i < source.Count; i++)
                     if (source[i] == target) return false;
+            }
             
             List<Frame> moved = new List<Frame>();
 
@@ -117,10 +118,11 @@ namespace Apollo.Structures {
         }
 
         public static bool Move(List<Frame> source, Pattern target, bool copy = false) {
-            if (source[0].Parent.Count == source.Count) return false;
+            if (!copy) {
+                if (source[0].Parent != target && source[0].Parent.Count == source.Count) return false;
 
-            if (!copy)
-                if (target.Count > 0 && source[0] == target[0]) return false;
+                if (source[0] == target[0]) return false;
+            }
             
             List<Frame> moved = new List<Frame>();
 

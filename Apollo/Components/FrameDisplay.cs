@@ -66,8 +66,8 @@ namespace Apollo.Components {
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            this.AddHandler(DragDrop.DropEvent, Drop);
         }
 
         private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
