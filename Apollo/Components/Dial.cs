@@ -25,17 +25,6 @@ namespace Apollo.Components {
         public delegate void DialModeChangedEventHandler(bool NewValue, bool? OldValue);
         public event DialModeChangedEventHandler ModeChanged;
 
-        InputModifiers lastModifiers;
-
-        public delegate void DialValueModsChangedEventHandler(double NewValue, double? OldValue, InputModifiers mods);
-        public event DialValueModsChangedEventHandler ValueModsChanged;
-
-        public delegate void DialStepModsChangedEventHandler(int NewValue, int? OldValue, InputModifiers mods);
-        public event DialStepModsChangedEventHandler StepModsChanged;
-
-        public delegate void DialModeModsChangedEventHandler(bool NewValue, bool? OldValue, InputModifiers mods);
-        public event DialModeModsChangedEventHandler ModeModsChanged;
-
         Canvas ArcCanvas;
         Path ArcBase, Arc;
         TextBlock TitleText, Display;
@@ -120,7 +109,6 @@ namespace Apollo.Components {
                     Display.Text = ValueString;
 
                     ValueChanged?.Invoke(_raw, null);
-                    ValueModsChanged?.Invoke(_raw, null, lastModifiers);
                 }
             }
         }
@@ -197,7 +185,6 @@ namespace Apollo.Components {
                     DrawArcAuto();
                     
                     ModeChanged?.Invoke(UsingSteps, null);
-                    ModeModsChanged?.Invoke(UsingSteps, null, lastModifiers);
                 }
             }
         }
@@ -284,8 +271,6 @@ namespace Apollo.Components {
         private double lastY;
 
         private void MouseDown(object sender, PointerPressedEventArgs e) {
-            lastModifiers = e.InputModifiers;
-
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
                 if (e.ClickCount == 2) {
                     DisplayPressed(sender, e);
@@ -304,8 +289,6 @@ namespace Apollo.Components {
         }
 
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
-            lastModifiers = e.InputModifiers;
-
             if (!Enabled) return;
             
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
@@ -313,27 +296,22 @@ namespace Apollo.Components {
                 e.Device.Capture(null);
 
                 if (UsingSteps) {
-                    if (oldStep != Length.Step) {
+                    if (oldStep != Length.Step)
                         StepChanged?.Invoke(Length.Step, oldStep);
-                        StepModsChanged?.Invoke(Length.Step, oldStep, lastModifiers);
-                    }
-                } else if (oldValue != RawValue) {
+
+                } else if (oldValue != RawValue)
                     ValueChanged?.Invoke(RawValue, oldValue);
-                    ValueModsChanged?.Invoke(RawValue, oldValue, lastModifiers);
-                }
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
             } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) {
                 UsingSteps = !UsingSteps;
                 ModeChanged?.Invoke(UsingSteps, !UsingSteps);
-                ModeModsChanged?.Invoke(UsingSteps, !UsingSteps, lastModifiers);
             }
         }
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld && Enabled) {
-                lastModifiers = e.InputModifiers;
                 double Y = e.GetPosition(ArcCanvas).Y;
 
                 if (UsingSteps) {
@@ -341,7 +319,6 @@ namespace Apollo.Components {
                         _length.Step -= (int)((Y - lastY) / 8);
 
                         StepChanged?.Invoke(_length.Step, null);
-                        StepModsChanged?.Invoke(_length.Step, null, lastModifiers);
 
                         DrawArcSteps();
                         lastY = Y;
@@ -416,15 +393,11 @@ namespace Apollo.Components {
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
 
-            if (oldValue != RawValue) {
+            if (oldValue != RawValue)
                 ValueChanged?.Invoke(_raw, oldValue);
-                ValueModsChanged?.Invoke(_raw, oldValue, lastModifiers);
-            }
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {
-            lastModifiers = e.Modifiers;
-
             if (e.Key == Key.Return)
                 this.Focus();
 
