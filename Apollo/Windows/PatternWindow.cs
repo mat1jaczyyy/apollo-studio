@@ -59,13 +59,14 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText;
+        UndoButton UndoButton;
+        RedoButton RedoButton;
         ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor;
         Controls Contents;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate;
-        BoxDial Choke;
+        Dial Duration, Gate, Choke;
         Button Import, Play, Fire;
 
         int origin = -1;
@@ -78,7 +79,7 @@ namespace Apollo.Windows {
             get => _locked;
             set {
                 _locked = value;
-                PortSelector.IsEnabled = Duration.Enabled = Gate.Enabled = Import.IsEnabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
+                PortSelector.IsEnabled = UndoButton.IsEnabled = RedoButton.IsEnabled = Duration.Enabled = Gate.Enabled = Import.IsEnabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
             }
         }
 
@@ -152,6 +153,8 @@ namespace Apollo.Windows {
             _track = Track.Get(_pattern);
 
             TitleText = this.Get<TextBlock>("Title");
+            UndoButton = this.Get<UndoButton>("UndoButton");
+            RedoButton = this.Get<RedoButton>("RedoButton");
 
             Editor = this.Get<LaunchpadGrid>("Editor");
 
@@ -163,7 +166,7 @@ namespace Apollo.Windows {
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             PlaybackMode.SelectedItem = _pattern.Mode;
 
-            Choke = this.Get<BoxDial>("Choke");
+            Choke = this.Get<Dial>("Choke");
             if (_pattern.Choke != null) {
                 Choke.Enabled = true;
                 Choke.RawValue = _pattern.Choke.Value;
@@ -258,11 +261,16 @@ namespace Apollo.Windows {
                 for (int i = 0; i < reference.Screen.Length; i++)
                     frame.Screen[i] = reference.Screen[i].Clone();
             
+            Frame r = frame.Clone();
+            List<int> path = Track.GetPath(_pattern);
+
+            Program.Project.Undo.Add($"Frame Added", () => {
+                ((Pattern)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Pattern)Track.TraversePath(path)).Insert(index, r.Clone());
+            });
+
             _pattern.Insert(index, frame);
-            Contents_Insert(index, _pattern[index]);
-            
-            Selection.Select(frame);
-            Frame_Select(index);
         }
 
         private void Frame_InsertStart() => Frame_Insert(0);
@@ -272,11 +280,16 @@ namespace Apollo.Windows {
 
             if (_pattern.Count == 1) return;
 
-            Contents_Remove(index);
-            _pattern.Remove(index);
+            Frame u = _pattern[index].Clone();
+            List<int> path = Track.GetPath(_pattern);
 
-            Frame_Select(_pattern.Expanded);
-            Selection.Select(_pattern[_pattern.Expanded]);
+            Program.Project.Undo.Add($"Frame Deleted", () => {
+                ((Pattern)Track.TraversePath(path)).Insert(index, u.Clone());
+            }, () => {
+                ((Pattern)Track.TraversePath(path)).Remove(index);
+            });
+
+            _pattern.Remove(index);
         }
 
         public void Frame_Select(int index) {
@@ -299,6 +312,8 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (Locked) return;
+
             if (e.Key == Key.Enter) {
                 if (e.Modifiers == InputModifiers.Shift) HandleGesture(1, -1);
                 else HandleGesture(-1, 1);
@@ -306,9 +321,10 @@ namespace Apollo.Windows {
             } else if (e.Key == Key.Insert) HandleGesture(1, 1);
             else if (e.Key == Key.Delete) HandleGesture(-1, -1);
 
-            if (Selection.Start == null) return;
-
-            if (Selection.ActionKey(e)) return;
+            if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                this.Focus();
+                return;
+            }
 
             if (e.Key == Key.Up || e.Key == Key.Left) {
                 Selection.Move(false, e.Modifiers == InputModifiers.Shift);
@@ -456,52 +472,135 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Duration_Changed(double value, double? old, InputModifiers mods) {
-            if (mods.HasFlag(InputModifiers.Control)) {
-                for (int i = 0; i < _pattern.Count; i++) {
-                    _pattern[i].Mode = false;
-                    _pattern[i].Time = (int)value;
-                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern[i].TimeString;
-                }
-            } else {
-                _pattern[_pattern.Expanded].Time = (int)value;
-                ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.Text = _pattern[_pattern.Expanded].TimeString;
+        private void Duration_Changed(double value, double? old) {
+            if (old != null) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                int index = _pattern.Expanded;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Frame {index} Duration Changed", () => {
+                    ((Pattern)Track.TraversePath(path))[index].Time = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path))[index].Time = r;
+                });
             }
+
+            _pattern[_pattern.Expanded].Time = (int)value;
         }
 
-        private void Duration_StepChanged(int value, int? old, InputModifiers mods) {
-            if (mods.HasFlag(InputModifiers.Control))
-                for (int i = 0; i < _pattern.Count; i++) {
-                    _pattern[i].Mode = true;
-                    _pattern[i].Length.Step = value;
-                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern[_pattern.Expanded].TimeString;
-                } 
-            else
-                ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.Text = _pattern[_pattern.Expanded].TimeString;
+        public void SetDurationValue(int index, int value) {
+            if (_pattern.Expanded == index)
+                Duration.RawValue = value;
         }
 
-        private void Duration_ModeChanged(bool value, bool? old, InputModifiers mods) {
-            if (mods.HasFlag(InputModifiers.Control)) {
-                for (int i = 0; i < _pattern.Count; i++) {
-                    _pattern[i].Mode = value;
-                    ((FrameDisplay)Contents[i + 1]).Viewer.Time.Text = _pattern[i].TimeString;
-                }
-            } else {
-                _pattern[_pattern.Expanded].Mode = value;
-                ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.Text = _pattern[_pattern.Expanded].TimeString;
+        private void Duration_StepChanged(int value, int? old) {
+            if (old != null) {
+                int u = old.Value;
+                int r = value;
+                int index = _pattern.Expanded;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Frame {index} Duration Changed", () => {
+                    ((Pattern)Track.TraversePath(path))[index].Length.Step = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path))[index].Length.Step = r;
+                });
             }
+
+            _pattern[_pattern.Expanded].Length.Step = value;
         }
 
-        private void Gate_Changed(double value, double? old) => _pattern.Gate = (decimal)(value / 100);
+        public void SetDurationStep(int index, int value) {
+            if (_pattern.Expanded == index)
+                Duration.DrawArcAuto();
+        }
+
+        private void Duration_ModeChanged(bool value, bool? old) {
+            if (old != null) {
+                bool u = old.Value;
+                bool r = value;
+                int index = _pattern.Expanded;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Frame {index} Duration Switched", () => {
+                    ((Pattern)Track.TraversePath(path))[index].Mode = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path))[index].Mode = r;
+                });
+            }
+
+            _pattern[_pattern.Expanded].Mode = value;
+        }
+
+        public void SetDurationMode(int index, bool value) {
+            if (_pattern.Expanded == index)
+                Duration.UsingSteps = value;
+        }
+
+        private void Gate_Changed(double value, double? old) {
+            if (old != null) {
+                decimal u = (decimal)(old.Value / 100);
+                decimal r = (decimal)(value / 100);
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Gate Changed", () => {
+                    ((Pattern)Track.TraversePath(path)).Gate = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Gate = r;
+                });
+            }
+
+            _pattern.Gate = (decimal)(value / 100);
+        }
+
+        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)PlaybackMode.SelectedItem;
 
         private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right && (Choke.Enabled = !Choke.Enabled) == false)
-                _pattern.Choke = null;
+            if (e.MouseButton == MouseButton.Right) {
+                bool u = Choke.Enabled;
+                bool r = !Choke.Enabled;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Choke Changed", () => {
+                    Pattern pattern = ((Pattern)Track.TraversePath(path));
+                    if (pattern.Window != null) {
+                        pattern.Window.Choke.Enabled = u;
+                        if (!pattern.Window.Choke.Enabled) pattern.Choke = null;
+                    }
+
+                }, () => {
+                    Pattern pattern = ((Pattern)Track.TraversePath(path));
+                    if (pattern.Window != null) {
+                        pattern.Window.Choke.Enabled = r;
+                        if (!pattern.Window.Choke.Enabled) pattern.Choke = null;
+                    }
+                });
+
+                Choke.Enabled = !Choke.Enabled;
+                if (!Choke.Enabled) _pattern.Choke = null;
+            }
         }
 
-        private void Choke_Changed(double value) => _pattern.Choke = (int)value;
+        private void Choke_Changed(double value, double? old) {
+            if (old != null) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Choke Changed", () => {
+                    ((Pattern)Track.TraversePath(path)).Choke = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Choke = r;
+                });
+            }
+
+            _pattern.Choke = (int)value;
+        }
+
+        public void SetChoke(int choke) => Choke.RawValue = choke;
 
         private void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {

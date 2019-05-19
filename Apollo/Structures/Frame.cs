@@ -25,16 +25,37 @@ namespace Apollo.Structures {
         public Pattern Parent;
         public int? ParentIndex;
 
-        public bool Mode; // true uses Length
-        public Length Length;
         private int _time;
-
         public int Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000)
+                if (10 <= value && value <= 30000 && _time != value) {
                     _time = value;
+
+                    Parent?.Window?.SetDurationValue(ParentIndex.Value, Time);
+                    if (Info != null) Info.Viewer.Time.Text = TimeString;
+                }
             }
+        }
+
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    
+                    Parent?.Window?.SetDurationMode(ParentIndex.Value, Mode);
+                    if (Info != null) Info.Viewer.Time.Text = TimeString;
+                }
+            }
+        }
+
+        public Length Length;
+
+        private void LengthChanged() {
+            Parent?.Window?.SetDurationStep(ParentIndex.Value, Length.Step);
+            if (Info != null) Info.Viewer.Time.Text = TimeString;
         }
 
         public string TimeString => Mode? Length.ToString() : $"{Time}ms";
@@ -51,6 +72,8 @@ namespace Apollo.Structures {
             Time = time;
             Length = length?? new Length();
             Screen = screen;
+
+            Length.Changed += LengthChanged;
         }
 
         public static bool Move(List<Frame> source, Frame target, bool copy = false) {
