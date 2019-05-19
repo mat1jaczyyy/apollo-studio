@@ -1,3 +1,4 @@
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -10,40 +11,55 @@ namespace Apollo.Devices {
         public double Hue {
             get => _h;
             set {
-                if (-180 <= value && value <= 180)
+                if (-180 <= value && value <= 180 && _h != value) {
                     _h = value;
+
+                    if (Viewer?.SpecificViewer != null) ((ToneViewer)Viewer.SpecificViewer).SetHue(Hue);
+                }
             }
         }
 
         public double SaturationHigh {
             get => _sh;
             set {
-                if (0 <= value && value <= 1)
+                if (0 <= value && value <= 1 && _sh != value) {
                     _sh = value;
+
+                    if (Viewer?.SpecificViewer != null) ((ToneViewer)Viewer.SpecificViewer).SetSaturationHigh(SaturationHigh);
+                }
             }
         }
 
         public double SaturationLow {
             get => _sl;
             set {
-                if (0 <= value && value <= 1)
+                if (0 <= value && value <= 1 && _sl != value) {
                     _sl = value;
+
+                    if (Viewer?.SpecificViewer != null) ((ToneViewer)Viewer.SpecificViewer).SetSaturationLow(SaturationLow);
+                }
             }
         }
 
         public double ValueHigh {
             get => _vh;
             set {
-                if (0 <= value && value <= 1)
+                if (0 <= value && value <= 1 && _vh != value) {
                     _vh = value;
+
+                    if (Viewer?.SpecificViewer != null) ((ToneViewer)Viewer.SpecificViewer).SetValueHigh(ValueHigh);
+                }
             }
         }
 
         public double ValueLow {
             get => _vl;
             set {
-                if (0 <= value && value <= 1)
+                if (0 <= value && value <= 1 && _vl != value) {
                     _vl = value;
+
+                    if (Viewer?.SpecificViewer != null) ((ToneViewer)Viewer.SpecificViewer).SetValueLow(ValueLow);
+                }
             }
         }
 

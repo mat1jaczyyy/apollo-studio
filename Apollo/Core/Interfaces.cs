@@ -12,6 +12,8 @@ namespace Apollo.Core {
         Chain this[int index] { get; }
         int Count { get; }
 
+        int? Expanded { get; }
+
         void Insert(int index, Chain chain = null);
         void Remove(int index, bool dispose = true);
     }

@@ -21,6 +21,8 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
           <Components:PreferencesButton />
           <Components:SaveButton />
+          <Components:UndoButton />
+          <Components:RedoButton />
         </StackPanel>
 
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
@@ -54,7 +56,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock VerticalAlignment="Center" Text="BPM: " />
               <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
-                       KeyDown="BPM_KeyDown" />
+                       KeyDown="BPM_KeyDown" LostFocus="BPM_Unfocus" />
             </StackPanel>
           </Grid>
         </Grid>

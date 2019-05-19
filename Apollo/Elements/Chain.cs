@@ -100,6 +100,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(_name);
+                Info?.SetName(_name);
             }
         }
 
@@ -108,17 +109,27 @@ namespace Apollo.Elements {
         public void Insert(int index, Device device) {
             Devices.Insert(index, device);
             Reroute();
-        }
 
-        public void Add(Device device) {
-            Devices.Add(device);
-            Reroute();
+            Viewer?.Contents_Insert(index, Devices[index]);
+
+            Track.Get(this)?.Window?.Selection.Select(Devices[index]);
         }
+        
+        public void Add(Device device) => Insert(Devices.Count, device);
 
         public void Remove(int index, bool dispose = true) {
+            Viewer?.Contents_Remove(index);
+
             if (dispose) Devices[index].Dispose();
             Devices.RemoveAt(index);
             Reroute();
+
+            if (index < Devices.Count)
+                Track.Get(this).Window?.Selection.Select(Devices[index]);
+            else if (Devices.Count > 0)
+                Track.Get(this).Window?.Selection.Select(Devices.Last());
+            else
+                Track.Get(this).Window?.Selection.Select(null);
         }
 
         public Chain(List<Device> init = null, string name = "Chain #") {
@@ -134,6 +145,10 @@ namespace Apollo.Elements {
             MIDIExit = null;
         }
 
+        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) => (position == -1)
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
+
         public static bool Move(List<Chain> source, Chain target, bool copy = false) {
             if (!copy)
                 for (int i = 0; i < source.Count; i++)
@@ -142,20 +157,16 @@ namespace Apollo.Elements {
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
-                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                ((IMultipleChainParent)target.Parent).SpecificViewer.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
                 ((IMultipleChainParent)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
             Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
+            track?.Window?.Selection.Select(moved.First());
+            track?.Window?.Selection.Select(moved.Last(), true);
 
             ((IMultipleChainParent)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
             
@@ -169,14 +180,10 @@ namespace Apollo.Elements {
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
-                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.SpecificViewer.Contents_Insert(i, moved.Last());
                 target.Insert(i, moved.Last());
             }
 

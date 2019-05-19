@@ -56,16 +56,21 @@ namespace Apollo.Devices {
         public void Insert(int index, Frame frame) {
             Frames.Insert(index, frame);
             Reroute();
-        }
 
-        public void Add(Frame frame) {
-            Frames.Add(frame);
-            Reroute();
+            Window?.Contents_Insert(index, Frames[index]);
+            
+            Window?.Selection.Select(frame);
+            Window?.Frame_Select(index);
         }
 
         public void Remove(int index) {
+            Window?.Contents_Remove(index);
+
             Frames.RemoveAt(index);
             Reroute();
+
+            Window?.Frame_Select(Expanded);
+            Window?.Selection.Select(Frames[Expanded]);
         }
 
         private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
@@ -77,8 +82,11 @@ namespace Apollo.Devices {
         public decimal Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4)
+                if (0.01M <= value && value <= 4) {
                     _gate = value;
+                    
+                    Window?.SetGate(Gate);
+                }
             }
         }
 
@@ -99,12 +107,27 @@ namespace Apollo.Devices {
         private PlaybackType _mode;
         public string Mode {
             get => _mode.ToString();
-            set => _mode = Enum.Parse<PlaybackType>(value);
+            set {
+                _mode = Enum.Parse<PlaybackType>(value);
+
+                Window?.SetPlaybackMode(Mode);
+            }
         }
 
         public PlaybackType GetPlaybackType() => _mode;
 
-        public int? Choke;
+        private int? _choke;
+        public int? Choke {
+            get => _choke;
+            set {
+                if (_choke != value) {
+                    _choke = value;
+
+                    if (Choke != null) Window?.SetChoke(_choke.Value);
+                }
+            }
+        }
+
         bool choked;
         
         public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, Choke, Expanded);

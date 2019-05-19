@@ -121,33 +121,41 @@ namespace Apollo.Windows {
         }
 
         private void Track_Insert(int index) => Track_Insert(index, new Track());
-
-        private void Track_Insert(int index, Track track) {
-            Program.Project.Insert(index, track);
-            Contents_Insert(index, Program.Project[index]);
-            
-            Selection.Select(Program.Project[index]);
-        }
-
         private void Track_InsertStart() => Track_Insert(0);
 
-        private void Track_Remove(int index) {
-            Contents_Remove(index);
-            Program.Project[index].Window?.Close();
-            Program.Project.Remove(index);
+        private void Track_Insert(int index, Track track) {
+            Track r = track.Clone();
+
+            Program.Project.Undo.Add($"Track Added", () => {
+                Program.Project.Remove(index);
+            }, () => {
+                Program.Project.Insert(index, r.Clone());
+            });
             
-            if (index < Program.Project.Count)
-                Selection.Select(Program.Project[index]);
-            else if (Program.Project.Count > 0)
-                Selection.Select(Program.Project.Tracks.Last());
-            else
-                Selection.Select(null);
+            Program.Project.Insert(index, track);
+        }
+
+        private void Track_Remove(int index) {
+            Track ut = Program.Project[index].Clone();
+            Launchpad ul = Program.Project[index].Launchpad;
+
+            Program.Project.Undo.Add($"Track Deleted", () => {
+                Track restored = ut.Clone();
+                restored.Launchpad = ul;
+                Program.Project.Insert(index, restored);
+                
+            }, () => {
+                Program.Project.Remove(index);
+            });
+
+            Program.Project.Remove(index);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Selection.Start == null) return;
-
-            if (Selection.ActionKey(e)) return;
+            if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                this.Focus();
+                return;
+            }
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
@@ -159,6 +167,9 @@ namespace Apollo.Windows {
         private void Page_Changed(double value) => Program.Project.Page = (int)value;
 
         private Action BPM_Update;
+        private bool BPM_Dirty = false;
+        private int BPM_Clean = Program.Project.BPM;
+        private bool BPM_Ignore = false;
 
         private void BPM_Changed(string text) {
             if (text == null) return;
@@ -168,7 +179,15 @@ namespace Apollo.Windows {
 
             if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {
+                    if (!BPM_Dirty && value != Program.Project.BPM) {
+                        BPM_Clean = Program.Project.BPM;
+                        BPM_Dirty = true;
+                    }
+
+                    BPM_Ignore = true;
                     Program.Project.BPM = value;
+                    BPM_Ignore = false;
+                    
                     BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
                 } else {
                     BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
@@ -192,6 +211,30 @@ namespace Apollo.Windows {
         
         private void BPM_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return) this.Focus();
+        }
+
+        private void BPM_Unfocus(object sender, RoutedEventArgs e) {
+            if (BPM_Clean != Program.Project.BPM) {
+                int u = BPM_Clean;
+                int r = BPM_Clean = Program.Project.BPM;
+
+                Program.Project.Undo.Add($"BPM Changed", () => {
+                    Program.Project.BPM = u;
+                }, () => {
+                    Program.Project.BPM = r;
+                });
+            }
+
+            BPM_Dirty = false;
+        }
+
+        public void SetBPM(string bpm) {
+            if (BPM_Ignore) return;
+
+            BPM.Text = bpm;
+            BPM_Dirty = false;
+
+            this.Focus();
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
@@ -253,14 +296,39 @@ namespace Apollo.Windows {
                 source = source.Parent;
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
-            bool result;
+            bool result = Track.Move(moving, Program.Project, after, copy);
 
-            if (source.Name != "DropZoneAfter" || Program.Project.Count == 0) result = Track.Move(moving, Program.Project, copy);
-            else result = Track.Move(moving, Program.Project.Tracks.Last(), copy);
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+                if (after < before)
+                    before_pos += count;
+                
+                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                    ? new Action(() => {
+                        for (int i = after + count; i > after; i--)
+                            Program.Project.Remove(i);
+
+                    }) : new Action(() => {
+                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
+
+                        Track.Move(umoving, Program.Project, before_pos);
+
+                }), () => {
+                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
+
+                    Track.Move(rmoving, Program.Project, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         public async void Copy(int left, int right, bool cut = false) {
@@ -280,19 +348,48 @@ namespace Apollo.Windows {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+
+            Program.Project.Undo.Add($"Track Pasted", () => {
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    Program.Project.Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
+            });
             
             for (int i = 0; i < paste.Contents.Count; i++)
-                Track_Insert(right + i + 1, (Track)paste.Contents[i]);
+                Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
+            Program.Project.Undo.Add($"Track Duplicated", () => {
+                for (int i = right - left; i >= 0; i--)
+                    Program.Project.Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i <= right - left; i++)
+                    Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
-                Track_Insert(right + i + 1, Program.Project[left + i].Clone());
+                Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+
+            Program.Project.Undo.Add($"Track Deleted", () => {
+                for (int i = left; i <= right; i++)
+                    Program.Project.Insert(i, u[i - left].Clone());
+
+            }, () => {
+                for (int i = right; i >= left; i--)
+                    Program.Project.Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Track_Remove(i);
+                Program.Project.Remove(i);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");

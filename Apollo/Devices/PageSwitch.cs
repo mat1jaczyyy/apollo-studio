@@ -1,4 +1,5 @@
 using Apollo.Core;
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -10,8 +11,11 @@ namespace Apollo.Devices {
         public int Target {
             get => _target;
             set {
-                if (1 <= value && value <= 100)
+                if (1 <= value && value <= 100 && _target != value) {
                     _target = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((PageSwitchViewer)Viewer.SpecificViewer).SetTarget(Target);
+                }
             }
         }
 

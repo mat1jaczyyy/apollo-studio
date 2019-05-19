@@ -2,6 +2,7 @@
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Structures;
 using Apollo.Viewers;
 using Apollo.Windows;
@@ -43,8 +44,48 @@ namespace Apollo.Elements {
             }
         }
 
-        public static Track Get(Device device) => (device.Parent.Parent.GetType() == typeof(Track))? (Track)device.Parent.Parent : Get((Device)device.Parent.Parent);
-        public static Track Get(Chain chain) => (chain.Parent.GetType() == typeof(Track))? (Track)chain.Parent : Get((Device)chain.Parent);
+        public static Track Get(Device device) => (device.Parent?.Parent != null)
+            ? ((device.Parent?.Parent.GetType() == typeof(Track))
+                ? (Track)device.Parent?.Parent
+                : Get((Device)device.Parent?.Parent)
+            ) : null;
+
+        public static Track Get(Chain chain) => (chain.Parent != null)
+            ? ((chain.Parent.GetType() == typeof(Track))
+                ? (Track)chain.Parent
+                : Get((Device)chain.Parent)
+            ) : null;
+
+        public static List<int> GetPath(ISelect child) {
+            List<int> path = new List<int>();
+            ISelect last = child;
+
+            while (true) {
+                if (last.GetType() == typeof(Chain) && ((Chain)last).IRoot)
+                    last = (ISelect)((Chain)last).Parent;
+
+                path.Add(last.IParentIndex?? -1);
+
+                if (last.GetType() == typeof(Track)) break;
+                
+                last = (ISelect)last.IParent;
+            }
+
+            return path;
+        }
+
+        public static ISelect TraversePath(List<int> path) {
+            ISelectParent ret = Program.Project[path.Last()].Chain;
+
+            if (path.Count == 1) return (ISelect)ret;
+
+            for (int i = path.Count - 2; i > 0; i--)
+                if (path[i] == -1) ret = ((Multi)ret).Preprocess;
+                else ret = (ISelectParent)ret.IChildren[path[i]];
+
+            if (path[0] == -1) return ((Multi)ret).Preprocess;
+            else return (ISelect)ret.IChildren[path[0]];
+        }
 
         public Chain Chain;
         private Launchpad _launchpad;
@@ -57,6 +98,8 @@ namespace Apollo.Elements {
                 _launchpad = value;
 
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;
+
+                Info?.UpdatePorts();
             }
         }
         
@@ -66,6 +109,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(_name);
+                Info?.SetName(_name);
             }
         }
 
@@ -96,6 +140,10 @@ namespace Apollo.Elements {
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
 
+        public static bool Move(List<Track> source, Project target, int position, bool copy = false) => (position == -1)
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
+
         public static bool Move(List<Track> source, Track target, bool copy = false) {
             if (!copy)
                 for (int i = 0; i < source.Count; i++)
@@ -104,15 +152,11 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    Program.Project.Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
-                Program.Project.Window.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
             Program.Project.Window.Selection.Select(moved.First());
@@ -128,15 +172,11 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    Program.Project.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    Program.Project.Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 Program.Project.Insert(i, moved.Last());
-                Program.Project.Window.Contents_Insert(i, moved.Last());
             }
 
             Program.Project.Window.Selection.Select(moved.First());

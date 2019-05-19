@@ -7,7 +7,18 @@ using Apollo.Devices;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {
-        public Color[] Screen;
+        private Color[] _screen;
+        public Color[] Screen {
+            get => _screen;
+            set {
+                if (_screen == null || !_screen.SequenceEqual(value)) {
+                    _screen = value;
+
+                    Info?.Viewer.Launchpad.RenderFrame(this);
+                    Parent?.Window?.SetGrid(ParentIndex.Value, this);
+                }
+            }
+        }
 
         public ISelectViewer IInfo {
             get => Info;
@@ -25,16 +36,37 @@ namespace Apollo.Structures {
         public Pattern Parent;
         public int? ParentIndex;
 
-        public bool Mode; // true uses Length
-        public Length Length;
         private int _time;
-
         public int Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000)
+                if (10 <= value && value <= 30000 && _time != value) {
                     _time = value;
+
+                    Parent?.Window?.SetDurationValue(ParentIndex.Value, Time);
+                    if (Info != null) Info.Viewer.Time.Text = TimeString;
+                }
             }
+        }
+
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    
+                    Parent?.Window?.SetDurationMode(ParentIndex.Value, Mode);
+                    if (Info != null) Info.Viewer.Time.Text = TimeString;
+                }
+            }
+        }
+
+        public Length Length;
+
+        private void LengthChanged() {
+            Parent?.Window?.SetDurationStep(ParentIndex.Value, Length.Step);
+            if (Info != null) Info.Viewer.Time.Text = TimeString;
         }
 
         public string TimeString => Mode? Length.ToString() : $"{Time}ms";
@@ -51,26 +83,29 @@ namespace Apollo.Structures {
             Time = time;
             Length = length?? new Length();
             Screen = screen;
+
+            Length.Changed += LengthChanged;
         }
 
-        public static bool Move(List<Frame> source, Frame target, bool copy = false) {
-            if (source[0].Parent.Count == source.Count) return false;
+        public static bool Move(List<Frame> source, Pattern target, int position, bool copy = false) => (position == -1)
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
 
-            if (!copy)
+        public static bool Move(List<Frame> source, Frame target, bool copy = false) {
+            if (!copy) {
+                if (source[0].Parent != target.Parent && source[0].Parent.Count == source.Count) return false;
+
                 for (int i = 0; i < source.Count; i++)
                     if (source[i] == target) return false;
+            }
             
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    source[i].Parent.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    source[i].Parent.Remove(source[i].ParentIndex.Value);
-                }
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.Parent.Window.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
                 target.Parent.Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
@@ -83,22 +118,19 @@ namespace Apollo.Structures {
         }
 
         public static bool Move(List<Frame> source, Pattern target, bool copy = false) {
-            if (source[0].Parent.Count == source.Count) return false;
+            if (!copy) {
+                if (source[0].Parent != target && source[0].Parent.Count == source.Count) return false;
 
-            if (!copy)
-                if (target.Count > 0 && source[0] == target[0]) return false;
+                if (source[0] == target[0]) return false;
+            }
             
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    source[i].Parent.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    source[i].Parent.Remove(source[i].ParentIndex.Value);
-                }
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.Window.Contents_Insert(i, moved.Last());
                 target.Insert(i, moved.Last());
             }
 

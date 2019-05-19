@@ -81,9 +81,10 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Selection.Start == null) return;
-
-            if (Selection.ActionKey(e)) return;
+            if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                this.Focus();
+                return;
+            }
 
             bool vertical = Selection.Start.GetType() == typeof(Chain);
 

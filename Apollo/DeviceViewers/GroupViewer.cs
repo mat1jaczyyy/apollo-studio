@@ -136,30 +136,36 @@ namespace Apollo.DeviceViewers {
             Chain_Insert(index, chain);
         }
 
-        private void Chain_Insert(int index, Chain chain) {
-            _group.Insert(index, chain);
-            Contents_Insert(index, _group[index]);
-            
-            Track.Get(chain).Window?.Selection.Select(chain);
-            Expand(index);
-        }
-
         private void Chain_InsertStart() => Chain_Insert(0);
 
+        private void Chain_Insert(int index, Chain chain) {
+            Chain r = chain.Clone();
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Added", () => {
+                ((Group)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                ((Group)Track.TraversePath(path)).Insert(index, r.Clone());
+            });
+
+            _group.Insert(index, chain);
+        }
+
         private void Chain_Remove(int index) {
-            Contents_Remove(index);
+            Chain u = _group[index].Clone();
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Deleted", () => {
+                ((Group)Track.TraversePath(path)).Insert(index, u.Clone());
+            }, () => {
+                ((Group)Track.TraversePath(path)).Remove(index);
+            });
+
             _group.Remove(index);
-            
-            if (index < _group.Count)
-                Track.Get(_group).Window?.Selection.Select(_group[index]);
-            else if (_group.Count > 0)
-                Track.Get(_group).Window?.Selection.Select(_group.Chains.Last());
-            else
-                Track.Get(_group).Window?.Selection.Select(null);
         }
 
         private void Chain_Action(string action) => Chain_Action(action, false);
-        private void Chain_Action(string action, bool right) => Track.Get(_group).Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
+        private void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
 
         private void ChainContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
@@ -194,19 +200,114 @@ namespace Apollo.DeviceViewers {
             if (e.Data.Contains("chain")) {
                 List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
-                if (source.Name != "DropZoneAfter" || _group.Chains.Count == 0) result = Chain.Move(moving, _group, copy);
-                else result = Chain.Move(moving, _group.Chains.Last(), copy);
+                IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
+
+                int before = moving[0].IParentIndex.Value - 1;
+                int after = (source.Name == "DropZoneAfter")? _group.Count - 1 : -1;
+
+                if (result = Chain.Move(moving, _group, after, copy)) {
+                    int before_pos = before;
+                    int after_pos = moving[0].IParentIndex.Value - 1;
+                    int count = moving.Count;
+
+                    if (source_parent == _group && after < before)
+                        before_pos += count;
+                    
+                    List<int> sourcepath = Track.GetPath((ISelect)source_parent);
+                    List<int> targetpath = Track.GetPath((ISelect)_group);
+                    
+                    Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
+                        ? new Action(() => {
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                            for (int i = after + count; i > after; i--)
+                                targetdevice.Remove(i);
+
+                        }) : new Action(() => {
+                            IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                            List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
+
+                            Chain.Move(umoving, sourcedevice, before_pos, copy);
+
+                    }), () => {
+                        IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                        IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                        List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
+
+                        Chain.Move(rmoving, targetdevice, after);
+                    });
+                }
             
             } else if (e.Data.Contains("device")) {
                 List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
 
+                Chain source_chain = moving[0].Parent;
+                Chain target_chain;
+
+                int before = moving[0].IParentIndex.Value - 1;
+                int after = -1;
+
+                int? remove = null;
+
                 if (source.Name != "DropZoneAfter") {
-                    Chain_Insert(0);
-                    result = Device.Move(moving, _group[0], copy);
+                    _group.Insert((remove = 0).Value);
+                    target_chain = _group[0];
                 } else {
-                    Chain_Insert(_group.Count);
-                    result = Device.Move(moving, _group.Chains.Last(), copy);
-                } 
+                    _group.Insert((remove = _group.Count).Value);
+                    target_chain = _group.Chains.Last();
+                }
+
+                if (result = Device.Move(moving, target_chain, after = target_chain.Count - 1, copy)) {
+                    int before_pos = before;
+                    int after_pos = moving[0].IParentIndex.Value - 1;
+                    int count = moving.Count;
+
+                    if (source_chain == target_chain && after < before)
+                        before_pos += count;
+                    
+                    List<int> sourcepath = Track.GetPath(source_chain);
+                    List<int> targetpath = Track.GetPath(target_chain);
+                    
+                    Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                        ? new Action(() => {
+                            Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                            for (int i = after + count; i > after; i--)
+                                targetchain.Remove(i);
+                            
+                            if (remove != null)
+                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+
+                        }) : new Action(() => {
+                            Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                            Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                            List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
+
+                            Device.Move(umoving, sourcechain, before_pos);
+
+                            if (remove != null)
+                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+
+                    }), () => {
+                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                        Chain targetchain;
+
+                        if (remove != null) {
+                            IMultipleChainParent target = ((IMultipleChainParent)Track.TraversePath(targetpath.Skip(1).ToList()));
+                            target.Insert(remove.Value);
+                            targetchain = target[remove.Value];
+                        
+                        } else targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                        List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
+
+                        Device.Move(rmoving, targetchain, after, copy);
+                    });
+                }
 
             } else return;
 
@@ -230,19 +331,66 @@ namespace Apollo.DeviceViewers {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Pasted", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    group.Remove(right + i + 1);
+
+            }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+            });
+
             for (int i = 0; i < paste.Contents.Count; i++)
-                Chain_Insert(right + i + 1, (Chain)paste.Contents[i]);
+                _group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Duplicated", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = right - left; i >= 0; i--)
+                    group.Remove(right + i + 1);
+
+            }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = 0; i <= right - left; i++)
+                    group.Insert(right + i + 1, group[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
-                Chain_Insert(right + i + 1, _group[left + i].Clone());
+                _group.Insert(right + i + 1, _group[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Deleted", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    group.Insert(i, u[i - left].Clone());
+
+            }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = right; i >= left; i--)
+                    group.Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Chain_Remove(i);
+                _group.Remove(i);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");

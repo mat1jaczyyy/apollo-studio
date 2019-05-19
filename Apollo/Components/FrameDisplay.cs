@@ -14,6 +14,7 @@ using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -65,8 +66,8 @@ namespace Apollo.Components {
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            this.AddHandler(DragDrop.DropEvent, Drop);
         }
 
         private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
@@ -118,16 +119,53 @@ namespace Apollo.Components {
                 source = source.Parent;
 
             List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
+
+            Pattern source_parent = moving[0].Parent;
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = Viewer.Frame.ParentIndex.Value;
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
-
-            bool result;
             
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
-                if (Viewer.Frame.ParentIndex == 0) result = Frame.Move(moving, _pattern, copy);
-                else result = Frame.Move(moving, _pattern[Viewer.Frame.ParentIndex.Value - 1], copy);
-            } else result = Frame.Move(moving, Viewer.Frame, copy);
+            bool result = Frame.Move(moving, _pattern, after, copy);
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
+
+                if (source_parent == _pattern && after < before)
+                    before_pos += count;
+                
+                List<int> sourcepath = Track.GetPath(source_parent);
+                List<int> targetpath = Track.GetPath(_pattern);
+                
+                Program.Project.Undo.Add(copy? $"Frame Copied" : $"Frame Moved", copy
+                    ? new Action(() => {
+                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+
+                        for (int i = after + count; i > after; i--)
+                            targetpattern.Remove(i);
+
+                    }) : new Action(() => {
+                        Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
+                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+
+                        List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
+
+                        Frame.Move(umoving, sourcepattern, before_pos);
+
+                }), () => {
+                    Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
+                    Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+
+                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
+
+                    Frame.Move(rmoving, targetpattern, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
         
         private void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);

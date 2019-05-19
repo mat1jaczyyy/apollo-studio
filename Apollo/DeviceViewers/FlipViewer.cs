@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class FlipViewer: UserControl {
@@ -27,8 +30,44 @@ namespace Apollo.DeviceViewers {
             Bypass.IsChecked = _flip.Bypass;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _flip.Mode = (string)FlipMode.SelectedItem;
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)FlipMode.SelectedItem;
 
-        private void Bypass_Changed(object sender, EventArgs e) => _flip.Bypass = Bypass.IsChecked.Value;
+            if (_flip.Mode != selected) {
+                string u = _flip.Mode;
+                string r = selected;
+                List<int> path = Track.GetPath(_flip);
+
+                Program.Project.Undo.Add($"Flip Orientation Changed", () => {
+                    ((Flip)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Flip)Track.TraversePath(path)).Mode = r;
+                });
+
+                _flip.Mode = selected;
+            }
+        }
+
+        public void SetMode(string mode) => FlipMode.SelectedItem = mode;
+
+        private void Bypass_Changed(object sender, EventArgs e) {
+            bool value = Bypass.IsChecked.Value;
+
+            if (_flip.Bypass != value) {
+                bool u = _flip.Bypass;
+                bool r = value;
+                List<int> path = Track.GetPath(_flip);
+
+                Program.Project.Undo.Add($"Flip Bypass Changed", () => {
+                    ((Flip)Track.TraversePath(path)).Bypass = u;
+                }, () => {
+                    ((Flip)Track.TraversePath(path)).Bypass = r;
+                });
+
+                _flip.Bypass = value;
+            }
+        }
+
+        public void SetBypass(bool value) => Bypass.IsChecked = value;
     }
 }

@@ -1,10 +1,16 @@
-﻿using Avalonia;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class KeyFilterViewer: UserControl {
@@ -29,8 +35,30 @@ namespace Apollo.DeviceViewers {
         }
 
         bool drawingState;
+        bool[] old;
         
-        private void PadStarted(int index) => drawingState = !_filter[LaunchpadGrid.GridToSignal(index)];
+        private void PadStarted(int index) {
+            drawingState = !_filter[LaunchpadGrid.GridToSignal(index)];
+            old = _filter.Filter.ToArray();
+        }
+
         private void PadPressed(int index) => Grid.SetColor(index, GetColor(_filter[LaunchpadGrid.GridToSignal(index)] = drawingState));
+
+        private void PadFinished(int index) {
+            bool[] u = old.ToArray();
+            bool[] r = _filter.Filter.ToArray();
+            List<int> path = Track.GetPath(_filter);
+
+            Program.Project.Undo.Add($"KeyFilter Changed", () => {
+                ((KeyFilter)Track.TraversePath(path)).Filter = u.ToArray();
+            }, () => {
+                ((KeyFilter)Track.TraversePath(path)).Filter = r.ToArray();
+            });
+        }
+
+        public void Set(bool[] filter) {
+            for (int i = 0; i < 100; i++)
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(filter[i]));
+        }
     }
 }

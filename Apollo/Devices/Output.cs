@@ -1,4 +1,5 @@
 using Apollo.Core;
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -20,6 +21,8 @@ namespace Apollo.Devices {
                     _target = value;
                     Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
                     Program.Project.Tracks[_target].Disposing += IndexRemoved;
+                    
+                    if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).Update_Target(Target);
                 }
             }
         }

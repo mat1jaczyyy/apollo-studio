@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -27,49 +28,69 @@ namespace Apollo.Devices {
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
-            _colors[index] = color;
-            Generate();
+            if (_colors[index] != color) {
+                _colors[index] = color;
+                Generate();
+
+                if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetColor(index, _colors[index]);
+            }
         }
 
         public decimal GetPosition(int index) => _positions[index];
         public void SetPosition(int index, decimal position) {
-            _positions[index] = position;
-            Generate();
+            if (_positions[index] != position) {
+                _positions[index] = position;
+                Generate();
+                
+                if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetPosition(index, _positions[index]);
+            }
         }
         
         private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
-        private bool _mode; // true uses Length
-        public Length Length;
         private int _time;
-        private decimal _gate;
-
-        public bool Mode {
-            get => _mode;
-            set {
-                _mode = value;
-                Generate();
-            }
-        }
-
         public int Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000) {
+                if (10 <= value && value <= 30000 && _time != value) {
                     _time = value;
                     Generate();
+                    
+                    if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationValue(Time);
+                }  
+            }
+        }
+
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    Generate();
+                    
+                    if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetMode(Mode);
                 }
             }
         }
 
+        public Length Length;
+
+        private void LengthChanged() {
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(Length.Step);
+        }
+
+        private decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
                 if (0.01M <= value && value <= 4) {
                     _gate = value;
                     Generate();
+                    
+                    if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetGate(Gate);
                 }
             }
         }
@@ -82,7 +103,11 @@ namespace Apollo.Devices {
         private PlaybackType _playmode;
         public string PlayMode {
             get => _playmode.ToString();
-            set => _playmode = Enum.Parse<PlaybackType>(value);
+            set {
+                _playmode = Enum.Parse<PlaybackType>(value);
+
+                if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetPlaybackMode(PlayMode);
+            }
         }
 
         public PlaybackType GetPlaybackType() => _playmode;
@@ -152,12 +177,23 @@ namespace Apollo.Devices {
         public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
+
+            if (Viewer?.SpecificViewer != null) {
+                FadeViewer SpecificViewer = ((FadeViewer)Viewer.SpecificViewer);
+                SpecificViewer.Contents_Insert(index, _colors[index]);
+
+                SpecificViewer.Expand(index);
+            }
+
             Generate();
         }
 
         public void Remove(int index) {
             _colors.RemoveAt(index);
             _positions.RemoveAt(index);
+
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).Contents_Remove(index);
+
             Generate();
         }
 
@@ -167,6 +203,8 @@ namespace Apollo.Devices {
             Length = length?? new Length();
             Gate = gate;
             _playmode = playmode;
+
+            Length.Changed += LengthChanged;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};

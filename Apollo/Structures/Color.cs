@@ -105,7 +105,10 @@ namespace Apollo.Structures {
             return this == (Color)obj;
         }
 
-        public static bool operator ==(Color a, Color b) => a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue;
+        public static bool operator ==(Color a, Color b) {
+            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue;
+        }
         public static bool operator !=(Color a, Color b) => !(a == b);
 
         public override int GetHashCode() => HashCode.Combine(Red, Green, Blue);

@@ -41,7 +41,7 @@ namespace Apollo.Viewers {
         private void UpdateText(string name) => UpdateText(_track.ParentIndex.Value, name);
         private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
 
-        private void UpdatePorts() {
+        public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
             if (_track.Launchpad != null && (!_track.Launchpad.Available || _track.Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(_track.Launchpad);
 
@@ -149,16 +149,40 @@ namespace Apollo.Viewers {
                 source = source.Parent;
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = _track.ParentIndex.Value;
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
-            bool result;
-            
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
-                if (_track.ParentIndex == 0) result = Track.Move(moving, Program.Project, copy);
-                else result = Track.Move(moving, Program.Project[_track.ParentIndex.Value - 1], copy);
-            } else result = Track.Move(moving, _track, copy);
+            bool result = Track.Move(moving, Program.Project, after, copy);
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
+
+                if (after < before)
+                    before_pos += count;
+                
+                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                    ? new Action(() => {
+                        for (int i = after + count; i > after; i--)
+                            Program.Project.Remove(i);
+
+                    }) : new Action(() => {
+                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
+
+                        Track.Move(umoving, Program.Project, before_pos);
+
+                }), () => {
+                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
+
+                    Track.Move(rmoving, Program.Project, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
@@ -168,33 +192,43 @@ namespace Apollo.Viewers {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
 
             if (selected != null && _track.Launchpad != selected) {
+                Launchpad u = _track.Launchpad;
+                Launchpad r = selected;
+                int path = _track.ParentIndex.Value;
+
+                Program.Project.Undo.Add($"Track {_track.ParentIndex} Launchpad Changed", () => {
+                    Program.Project[path].Launchpad = u;
+                }, () => {
+                    Program.Project[path].Launchpad = r;
+                });
+
                 _track.Launchpad = selected;
-                UpdatePorts();
             }
         }
 
-        private Action Input_Update;
-
         int Input_Left, Input_Right;
+        List<string> Input_Clean;
+        bool Input_Ignore = false;
 
         private void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
-            Input_Update = () => {
-                for (int i = Input_Left; i <= Input_Right; i++)
-                    Program.Project[i].Name = text;
-            };
+            if (Input_Ignore) return;
 
-            Dispatcher.UIThread.InvokeAsync(() => {
-                Input_Update?.Invoke();
-                Input_Update = null;
-            });
+            Input_Ignore = true;
+            for (int i = Input_Left; i <= Input_Right; i++)
+                Program.Project[i].Name = text;
+            Input_Ignore = false;
         }
 
         public void StartInput(int left, int right) {
             Input_Left = left;
             Input_Right = right;
+
+            Input_Clean = new List<string>();
+            for (int i = left; i <= right; i++)
+                Input_Clean.Add(Program.Project[i].Name);
 
             Input.Text = _track.Name;
             Input.SelectionStart = 0;
@@ -210,6 +244,37 @@ namespace Apollo.Viewers {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
+
+            List<string> r = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
+
+            if (!r.SequenceEqual(Input_Clean)) {
+                int left = Input_Left;
+                int right = Input_Right;
+                List<string> u = (from i in Input_Clean select i).ToList();
+
+                Program.Project.Undo.Add($"Track Renamed", () => {
+                    for (int i = left; i <= right; i++)
+                        Program.Project[i].Name = u[i - left];
+
+                    Program.Project.Window?.Selection.Select(Program.Project[left]);
+                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
+                    
+                }, () => {
+                    for (int i = left; i <= right; i++)
+                        Program.Project[i].Name = r[i - left];
+                    
+                    Program.Project.Window?.Selection.Select(Program.Project[left]);
+                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
+                });
+            }
+        }
+
+        public void SetName(string name) {
+            if (Input_Ignore) return;
+
+            Input_Ignore = true;
+            Input.Text = name;
+            Input_Ignore = false;
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {

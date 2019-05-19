@@ -1,3 +1,4 @@
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -5,7 +6,17 @@ namespace Apollo.Devices {
     public class Paint: Device {
         public static readonly new string DeviceIdentifier = "paint";
 
-        public Color Color;
+        private Color _color;
+        public Color Color {
+            get => _color;
+            set {
+                if (_color != value) {
+                    _color = value;
+
+                    if (Viewer?.SpecificViewer != null) ((PaintViewer)Viewer.SpecificViewer).Set(Color);
+                }
+            }
+        }
 
         public override Device Clone() => new Paint(Color.Clone());
 

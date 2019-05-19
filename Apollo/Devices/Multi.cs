@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -62,6 +63,8 @@ namespace Apollo.Devices {
                 else if (value == "Backward") _mode = MultiType.Backward;
                 else if (value == "Random") _mode = MultiType.Random;
                 else if (value == "Random+") _mode = MultiType.RandomPlus;
+
+                if (SpecificViewer != null) ((MultiViewer)SpecificViewer).SetMode(Mode);
             }
         }
 
@@ -94,22 +97,31 @@ namespace Apollo.Devices {
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
             Reroute();
-        }
 
-        public void Add(Chain chain) {
-            Chains.Add(chain);
-            Reroute();
+            SpecificViewer?.Contents_Insert(index, Chains[index]);
+            
+            Track.Get(this)?.Window?.Selection.Select(Chains[index]);
+            SpecificViewer?.Expand(index);
         }
 
         public void Remove(int index, bool dispose = true) {
+            SpecificViewer?.Contents_Remove(index);
+
             if (dispose) Chains[index].Dispose();
             Chains.RemoveAt(index);
             Reroute();
+            
+            if (index < Chains.Count)
+                Track.Get(this)?.Window?.Selection.Select(Chains[index]);
+            else if (Chains.Count > 0)
+                Track.Get(this)?.Window?.Selection.Select(Chains.Last());
+            else
+                Track.Get(this)?.Window?.Selection.Select(null);
         }
 
         private void Reset() => current = -1;
 
-        public int? Expanded;
+        public int? Expanded { get; set; }
 
         public Multi(Chain preprocess = null, List<Chain> init = null, MultiType mode = MultiType.Forward, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();

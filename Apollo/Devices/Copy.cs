@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -20,27 +21,75 @@ namespace Apollo.Devices {
         
         private Random RNG = new Random();
 
-        public bool Mode; // true uses Length
-        public Length Length;
-        private int _rate;
-        private decimal _gate;
-        CopyType _copymode;
-        public bool Wrap;
         public List<Offset> Offsets;
 
+        public void Insert(int index, Offset offset = null) {
+            Offsets.Insert(index, offset?? new Offset());
+            Offsets.Last().Changed += OffsetChanged;
+
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index]);
+        }
+
+        public void Remove(int index, bool dispose = true) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Remove(index);
+
+            Offsets[index].Changed -= OffsetChanged;
+            Offsets.RemoveAt(index);
+        }
+
+        private void OffsetChanged(Offset sender) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
+        }
+
+        private int _rate;
         public int Rate {
             get => _rate;
             set {
-                if (10 <= value && value <= 5000)
+                if (10 <= value && value <= 5000 && _rate != value) {
                     _rate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateValue(Rate);
+                }  
             }
         }
 
+        private bool _mode; // true uses Length
+        public bool Mode {
+            get => _mode;
+            set {
+                if (_mode != value) {
+                    _mode = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetMode(Mode);
+                }
+            }
+        }
+
+        public Length Length;
+
+        private void LengthChanged() {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(Length.Step);
+        }
+
+        private decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4)
+                if (0.01M <= value && value <= 4) {
                     _gate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGate(Gate);
+                }
+            }
+        }
+
+        private bool _wrap;
+        public bool Wrap {
+            get => _wrap;
+            set {
+                _wrap = value;
+
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetWrap(Wrap);
             }
         }
 
@@ -59,8 +108,12 @@ namespace Apollo.Devices {
                 else if (value == "Interpolate") _copymode = CopyType.Interpolate;
                 else if (value == "Random Single") _copymode = CopyType.RandomSingle;
                 else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
+
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetCopyMode(CopyMode);
             }
         }
+
+        CopyType _copymode;
 
         public CopyType GetCopyMode() => _copymode;
         
@@ -78,6 +131,8 @@ namespace Apollo.Devices {
             set {
                 if (value == "10x10") _gridmode = GridType.Full;
                 else if (value == "8x8") _gridmode = GridType.Square;
+
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGridMode(GridMode);
             }
         }
 
@@ -95,6 +150,7 @@ namespace Apollo.Devices {
             Mode = mode;
             Rate = rate;
             Length = length?? new Length();
+            Length.Changed += LengthChanged;
             Gate = gate;
             _copymode = copymode;
             _gridmode = gridmode;

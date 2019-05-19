@@ -1,5 +1,6 @@
 using System.Linq;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -8,6 +9,16 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "keyfilter";
 
         private bool[] _filter;
+        public bool[] Filter {
+            get => _filter;
+            set {
+                if (value != null && value.Length == 100) {
+                    _filter = value;
+
+                    if (Viewer?.SpecificViewer != null) ((KeyFilterViewer)Viewer.SpecificViewer).Set(_filter);
+                }
+            }
+        }
 
         public override Device Clone() => new KeyFilter(_filter.ToArray());
 

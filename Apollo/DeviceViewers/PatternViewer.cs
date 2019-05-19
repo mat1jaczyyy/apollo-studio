@@ -20,6 +20,6 @@ namespace Apollo.DeviceViewers {
             _pattern = pattern;
         }
 
-        private void Edit(object sender, RoutedEventArgs e) => PatternWindow.Create(_pattern, Track.Get(_pattern).Window);
+        private void Edit(object sender, RoutedEventArgs e) => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
     }
 }

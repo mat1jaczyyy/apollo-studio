@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 
@@ -6,6 +7,7 @@ using Avalonia.Controls;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Helpers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -26,7 +28,18 @@ namespace Apollo.Elements {
 
         public List<Track> Tracks;
 
-        public int BPM;
+        private int _bpm;
+        public int BPM {
+            get => _bpm;
+            set {
+                if (20 <= value && value <= 999) {
+                    _bpm = value;
+                    if (Window != null) Window.SetBPM(_bpm.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+        }
+
+        public UndoManager Undo = new UndoManager();
 
         public delegate void PathChangedEventHandler();
         public event PathChangedEventHandler PathChanged;
@@ -74,8 +87,10 @@ namespace Apollo.Elements {
 
             string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
-            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
+            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
                 File.WriteAllBytes(FilePath, Encoder.Encode(this).ToArray());
+                Undo.SavePosition();
+            }
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
@@ -99,17 +114,26 @@ namespace Apollo.Elements {
         public void Insert(int index, Track track) {
             Tracks.Insert(index, track);
             Reroute();
-        }
 
-        public void Add(Track track) {
-            Tracks.Add(track);
-            Reroute();
+            Window?.Contents_Insert(index, Tracks[index]);
+
+            Window?.Selection.Select(Program.Project[index]);
         }
 
         public void Remove(int index, bool dispose = true) {
+            Window?.Contents_Remove(index);
+            Tracks[index].Window?.Close();
+
             if (dispose) Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
+            
+            if (index < Tracks.Count)
+                Window?.Selection.Select(Tracks[index]);
+            else if (Tracks.Count > 0)
+                Window?.Selection.Select(Tracks.Last());
+            else
+                Window?.Selection.Select(null);
         }
 
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
