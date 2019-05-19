@@ -7,7 +7,18 @@ using Apollo.Devices;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {
-        public Color[] Screen;
+        private Color[] _screen;
+        public Color[] Screen {
+            get => _screen;
+            set {
+                if (_screen == null || !_screen.SequenceEqual(value)) {
+                    _screen = value;
+
+                    Info?.Viewer.Launchpad.RenderFrame(this);
+                    Parent?.Window?.SetGrid(ParentIndex.Value, this);
+                }
+            }
+        }
 
         public ISelectViewer IInfo {
             get => Info;

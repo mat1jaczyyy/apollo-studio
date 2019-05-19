@@ -349,10 +349,15 @@ namespace Apollo.Windows {
         }
 
         Color drawingState;
+        Color[] old;
         
-        private void PadStarted(int index) => drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
-            ? new Color(0)
-            : ColorPicker.Color;
+        private void PadStarted(int index) {
+            drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
+                ? new Color(0)
+                : ColorPicker.Color;
+            
+            old = _pattern[_pattern.Expanded].Screen.ToArray();
+        }
     
         private void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
             if (Locked) return;
@@ -382,6 +387,30 @@ namespace Apollo.Windows {
             Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
 
+        private void PadFinished(int index) {
+            if (!old.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
+                Color[] u = old.ToArray();
+                Color[] r = _pattern[_pattern.Expanded].Screen.ToArray();
+                int i = _pattern.Expanded;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Frame {i} Changed", () => {
+                    ((Pattern)Track.TraversePath(path))[i].Screen = u.ToArray();
+                }, () => {
+                    ((Pattern)Track.TraversePath(path))[i].Screen = r.ToArray();
+                });
+            }
+        }
+
+        public void SetGrid(int index, Frame frame) {
+            if (_pattern.Expanded == index) {
+                Editor.RenderFrame(frame);
+
+                for (int i = 0; i < frame.Screen.Length; i++)
+                    _launchpad?.Send(new Signal(Launchpad, (byte)i, frame.Screen[i]));
+            }
+        }
+
         private void HandleGesture(int x, int y) {
             if (x == -1 && y == 0) { // Left
                 if (_pattern.Expanded == 0) Frame_Insert(0);
@@ -399,6 +428,7 @@ namespace Apollo.Windows {
             } else if (x == 0 && y == -1) { // Down
                 PadStarted(-1);
                 PadPressed(-1);
+                PadFinished(-1);
                 
             } else if (x == -1 && y == 1) // Up-Left
                 PatternPlay(null, null);
@@ -419,6 +449,7 @@ namespace Apollo.Windows {
                     int index = LaunchpadGrid.SignalToGrid(n.Index);
                     PadStarted(index);
                     PadPressed(index);
+                    PadFinished(index);
                 });
 
                 return;
@@ -455,6 +486,7 @@ namespace Apollo.Windows {
                         int index = LaunchpadGrid.SignalToGrid(n.Index);
                         PadStarted(index);
                         PadPressed(index);
+                        PadFinished(index);
                     });
 
                     origin = gesturePoint;
@@ -556,7 +588,25 @@ namespace Apollo.Windows {
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) => _pattern.Mode = (string)PlaybackMode.SelectedItem;
+        private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)PlaybackMode.SelectedItem;
+
+            if (_pattern.Mode != selected) {
+                string u = _pattern.Mode;
+                string r = selected;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Playback Mode Changed", () => {
+                    ((Pattern)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Mode = r;
+                });
+
+                _pattern.Mode = selected;
+            }
+        }
+
+        public void SetPlaybackMode(string mode) => PlaybackMode.SelectedItem = mode;
 
         private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) {

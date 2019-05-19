@@ -107,7 +107,11 @@ namespace Apollo.Devices {
         private PlaybackType _mode;
         public string Mode {
             get => _mode.ToString();
-            set => _mode = Enum.Parse<PlaybackType>(value);
+            set {
+                _mode = Enum.Parse<PlaybackType>(value);
+
+                Window?.SetPlaybackMode(Mode);
+            }
         }
 
         public PlaybackType GetPlaybackType() => _mode;
@@ -123,7 +127,6 @@ namespace Apollo.Devices {
                 }
             }
         }
-
 
         bool choked;
         

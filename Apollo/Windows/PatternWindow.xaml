@@ -53,7 +53,7 @@
         </Grid>
         
         <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-          <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" />
+          <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" PadFinished="PadFinished" />
         </Border>
         
         <Border Grid.Column="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
@@ -79,7 +79,8 @@
                 </Border>
 
                 <Grid Grid.Column="2" RowDefinitions="Auto,*">
-                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="1" x:Name="PlaybackMode" SelectionChanged="Mode_Changed">
+                  <ComboBox Grid.Row="0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="1" x:Name="PlaybackMode"
+                            SelectionChanged="PlaybackMode_Changed">
                     <sys:String>Mono</sys:String>
                     <sys:String>Poly</sys:String>
                     <sys:String>Loop</sys:String>
