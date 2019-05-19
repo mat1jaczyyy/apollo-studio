@@ -87,6 +87,10 @@ namespace Apollo.Structures {
             Length.Changed += LengthChanged;
         }
 
+        public static bool Move(List<Frame> source, Pattern target, int position, bool copy = false) => (position == -1)
+            ? Frame.Move(source, target, copy)
+            : Frame.Move(source, target[position], copy);
+
         public static bool Move(List<Frame> source, Frame target, bool copy = false) {
             if (source[0].Parent.Count == source.Count) return false;
 
@@ -97,14 +101,10 @@ namespace Apollo.Structures {
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    source[i].Parent.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    source[i].Parent.Remove(source[i].ParentIndex.Value);
-                }
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.Parent.Window.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
                 target.Parent.Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
@@ -125,14 +125,10 @@ namespace Apollo.Structures {
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    source[i].Parent.Window.Contents_Remove(source[i].ParentIndex.Value);
-                    source[i].Parent.Remove(source[i].ParentIndex.Value);
-                }
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.Window.Contents_Insert(i, moved.Last());
                 target.Insert(i, moved.Last());
             }
 

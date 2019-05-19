@@ -14,6 +14,7 @@ using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -118,16 +119,46 @@ namespace Apollo.Components {
                 source = source.Parent;
 
             List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = Viewer.Frame.ParentIndex.Value;
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
-
-            bool result;
             
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
-                if (Viewer.Frame.ParentIndex == 0) result = Frame.Move(moving, _pattern, copy);
-                else result = Frame.Move(moving, _pattern[Viewer.Frame.ParentIndex.Value - 1], copy);
-            } else result = Frame.Move(moving, Viewer.Frame, copy);
+            bool result = Frame.Move(moving, _pattern, after, copy);
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
+
+                if (after < before)
+                    before_pos += count;
+                
+                List<int> path = Track.GetPath(_pattern);
+                
+                Program.Project.Undo.Add(copy? $"Frame Copied" : $"Frame Moved", copy
+                    ? new Action(() => {
+                        Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                        for (int i = after + count; i > after; i--)
+                            pattern.Remove(i);
+
+                    }) : new Action(() => {
+                        Pattern pattern = ((Pattern)Track.TraversePath(path));
+                        List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select pattern[i]).ToList();
+
+                        Frame.Move(umoving, pattern, before_pos);
+
+                }), () => {
+                    Pattern pattern = ((Pattern)Track.TraversePath(path));
+                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select pattern[i]).ToList();
+
+                    Frame.Move(rmoving, pattern, after, true);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
         
         private void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);
