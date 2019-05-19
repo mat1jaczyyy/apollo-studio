@@ -748,25 +748,39 @@ namespace Apollo.Windows {
             PatternPlay(sender, e);
         }
 
-        private void ImportFile(string path) {
-            if (!Importer.FramesFromMIDI(path, out List<Frame> frames) &&
-                !Importer.FramesFromImage(path, out frames))
+        private static void ImportFrames(Pattern pattern, List<Frame> frames, decimal gate) {
+            pattern.Frames = frames;
+            pattern.Gate = gate;
+
+            while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
+            pattern.Expanded = 0;
+
+            for (int i = 0; i < pattern.Count; i++)
+                pattern.Window?.Contents_Insert(i, pattern[i], true);
+
+            if (pattern.Count == 1) ((FrameDisplay)pattern.Window?.Contents[1]).Remove.Opacity = 0;
+
+            pattern.Window?.Frame_Select(0);
+        }
+
+        private void ImportFile(string filepath) {
+            if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) &&
+                !Importer.FramesFromImage(filepath, out frames))
                 return;
 
-            _pattern.Frames = frames;
-            _pattern.Gate = 1;
+            List<Frame> uf = _pattern.Frames.ToList();
+            decimal ug = _pattern.Gate;
+            List<Frame> rf = frames.ToList();
+            decimal rg = 1;
+            List<int> path = Track.GetPath(_pattern);
 
-            Gate.RawValue = (double)_pattern.Gate * 100;
+            Program.Project.Undo.Add($"Pattern File Imported", () => {
+                ImportFrames((Pattern)Track.TraversePath(path), uf.ToList(), ug);
+            }, () => {
+                ImportFrames((Pattern)Track.TraversePath(path), rf.ToList(), rg);
+            });
 
-            while (Contents.Count > 1) Contents.RemoveAt(1);
-            _pattern.Expanded = 0;
-
-            for (int i = 0; i < _pattern.Count; i++)
-                Contents_Insert(i, _pattern[i], true);
-
-            if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
-
-            Frame_Select(0);
+            ImportFrames(_pattern, frames, 1);
         }
 
         private async void ImportDialog(object sender, RoutedEventArgs e) {
