@@ -348,19 +348,48 @@ namespace Apollo.Windows {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+
+            Program.Project.Undo.Add($"Track Pasted", () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    Program.Project.Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
+            });
             
             for (int i = 0; i < paste.Contents.Count; i++)
-                Program.Project.Insert(right + i + 1, (Track)paste.Contents[i]);
+                Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
+            Program.Project.Undo.Add($"Track Duplicated", () => {
+                for (int i = 0; i <= right - left; i++)
+                    Program.Project.Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i <= right - left; i++)
+                    Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
                 Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+
+            Program.Project.Undo.Add($"Track Deleted", () => {
+                for (int i = left; i <= right; i++)
+                    Program.Project.Insert(i, u[i - left].Clone());
+
+            }, () => {
+                for (int i = right; i >= left; i--)
+                    Program.Project.Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Track_Remove(i);
+                Program.Project.Remove(i);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");
