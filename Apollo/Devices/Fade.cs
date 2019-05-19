@@ -209,7 +209,8 @@ namespace Apollo.Devices {
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
 
-            Generate();
+            if (Program.Project == null) Program.ProjectLoaded += Generate;
+            else Generate();
             
             Length.Changed += Generate;
             Preferences.FadeSmoothnessChanged += Generate;
