@@ -205,19 +205,114 @@ namespace Apollo.DeviceViewers {
             if (e.Data.Contains("chain")) {
                 List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
-                if (source.Name != "DropZoneAfter" || _multi.Chains.Count == 0) result = Chain.Move(moving, _multi, copy);
-                else result = Chain.Move(moving, _multi.Chains.Last(), copy);
+                IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
+
+                int before = moving[0].IParentIndex.Value - 1;
+                int after = (source.Name == "DropZoneAfter")? _multi.Count - 1 : -1;
+
+                if (result = Chain.Move(moving, _multi, after, copy)) {
+                    int before_pos = before;
+                    int after_pos = moving[0].IParentIndex.Value - 1;
+                    int count = moving.Count;
+
+                    if (after < before)
+                        before_pos += count;
+                    
+                    List<int> sourcepath = Track.GetPath((ISelect)source_parent);
+                    List<int> targetpath = Track.GetPath((ISelect)_multi);
+                    
+                    Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
+                        ? new Action(() => {
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                            for (int i = after + count; i > after; i--)
+                                targetdevice.Remove(i);
+
+                        }) : new Action(() => {
+                            IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                            List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
+
+                            Chain.Move(umoving, sourcedevice, before_pos, copy);
+
+                    }), () => {
+                        IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                        IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
+
+                        List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
+
+                        Chain.Move(rmoving, targetdevice, after);
+                    });
+                }
             
             } else if (e.Data.Contains("device")) {
                 List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
 
+                Chain source_chain = moving[0].Parent;
+                Chain target_chain;
+
+                int before = moving[0].IParentIndex.Value - 1;
+                int after = -1;
+
+                int? remove = null;
+
                 if (source.Name != "DropZoneAfter") {
-                    Chain_Insert(0);
-                    result = Device.Move(moving, _multi[0], copy);
+                    _multi.Insert((remove = 0).Value);
+                    target_chain = _multi[0];
                 } else {
-                    Chain_Insert(_multi.Count);
-                    result = Device.Move(moving, _multi.Chains.Last(), copy);
-                } 
+                    _multi.Insert((remove = _multi.Count).Value);
+                    target_chain = _multi.Chains.Last();
+                }
+
+                if (result = Device.Move(moving, target_chain, after = target_chain.Count - 1, copy)) {
+                    int before_pos = before;
+                    int after_pos = moving[0].IParentIndex.Value - 1;
+                    int count = moving.Count;
+
+                    if (source_chain == target_chain && after < before)
+                        before_pos += count;
+                    
+                    List<int> sourcepath = Track.GetPath(source_chain);
+                    List<int> targetpath = Track.GetPath(target_chain);
+                    
+                    Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                        ? new Action(() => {
+                            Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                            for (int i = after + count; i > after; i--)
+                                targetchain.Remove(i);
+                            
+                            if (remove != null)
+                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+
+                        }) : new Action(() => {
+                            Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                            Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                            List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
+
+                            Device.Move(umoving, sourcechain, before_pos);
+
+                            if (remove != null)
+                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+
+                    }), () => {
+                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                        Chain targetchain;
+
+                        if (remove != null) {
+                            IMultipleChainParent target = ((IMultipleChainParent)Track.TraversePath(targetpath.Skip(1).ToList()));
+                            target.Insert(remove.Value);
+                            targetchain = target[remove.Value];
+                        
+                        } else targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                        List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
+
+                        Device.Move(rmoving, targetchain, after, copy);
+                    });
+                }
 
             } else return;
 
