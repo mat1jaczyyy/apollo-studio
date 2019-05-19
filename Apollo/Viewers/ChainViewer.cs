@@ -154,14 +154,52 @@ namespace Apollo.Viewers {
                 source = source.Parent;
 
             List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
+
+            Chain source_parent = moving[0].Parent;
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = (source.Name == "DropZoneAfter")? _chain.Count - 1 : -1;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
-            bool result;
+            bool result = Device.Move(moving, _chain, after, copy);
+            
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
 
-            if (source.Name != "DropZoneAfter" || _chain.Devices.Count == 0) result = Device.Move(moving, _chain, copy);
-            else result = Device.Move(moving, _chain.Devices.Last(), copy);
+                if (after < before)
+                    before_pos += count;
+                
+                List<int> sourcepath = Track.GetPath(source_parent);
+                List<int> targetpath = Track.GetPath(_chain);
+                
+                Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                    ? new Action(() => {
+                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+                        for (int i = after + count; i > after; i--)
+                            targetchain.Remove(i);
+
+                    }) : new Action(() => {
+                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                        List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
+
+                        Device.Move(umoving, sourcechain, before_pos);
+
+                }), () => {
+                    Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
+                    Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+
+                    List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
+
+                    Device.Move(rmoving, targetchain, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         public async void Copy(int left, int right, bool cut = false) {
