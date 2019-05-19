@@ -136,6 +136,7 @@ namespace Apollo.Viewers {
             if (e.Data.Contains("chain")) {
                 List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
+                IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
                 IMultipleChainParent _device = (IMultipleChainParent)_chain.Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
@@ -150,26 +151,31 @@ namespace Apollo.Viewers {
                     if (after < before)
                         before_pos += count;
                     
-                    List<int> path = Track.GetPath((ISelect)_device);
+                    List<int> sourcepath = Track.GetPath((ISelect)source_parent);
+                    List<int> targetpath = Track.GetPath((ISelect)_device);
                     
                     Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
                         ? new Action(() => {
-                            IMultipleChainParent device = ((IMultipleChainParent)Track.TraversePath(path));
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
                             for (int i = after + count; i > after; i--)
-                                device.Remove(i);
+                                targetdevice.Remove(i);
 
                         }) : new Action(() => {
-                            IMultipleChainParent device = ((IMultipleChainParent)Track.TraversePath(path));
-                            List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select device[i]).ToList();
+                            IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                            IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
-                            Chain.Move(umoving, device, before_pos, copy);
+                            List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
+
+                            Chain.Move(umoving, sourcedevice, before_pos, copy);
 
                     }), () => {
-                        IMultipleChainParent device = ((IMultipleChainParent)Track.TraversePath(path));
-                        List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select device[i]).ToList();
+                        IMultipleChainParent sourcedevice = ((IMultipleChainParent)Track.TraversePath(sourcepath));
+                        IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
-                        Chain.Move(rmoving, device, after);
+                        List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
+
+                        Chain.Move(rmoving, targetdevice, after);
                     });
                 }
 
