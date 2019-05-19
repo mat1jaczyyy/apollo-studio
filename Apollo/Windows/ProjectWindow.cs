@@ -296,14 +296,39 @@ namespace Apollo.Windows {
                 source = source.Parent;
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
-            bool result;
+            bool result = Track.Move(moving, Program.Project, after, copy);
 
-            if (source.Name != "DropZoneAfter" || Program.Project.Count == 0) result = Track.Move(moving, Program.Project, copy);
-            else result = Track.Move(moving, Program.Project.Tracks.Last(), copy);
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+                if (after < before)
+                    before_pos += count;
+                
+                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                    ? new Action(() => {
+                        for (int i = after + count; i > after; i--)
+                            Program.Project.Remove(i);
+
+                    }) : new Action(() => {
+                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
+
+                        Track.Move(umoving, Program.Project, before_pos);
+
+                }), () => {
+                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
+
+                    Track.Move(rmoving, Program.Project, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         public async void Copy(int left, int right, bool cut = false) {

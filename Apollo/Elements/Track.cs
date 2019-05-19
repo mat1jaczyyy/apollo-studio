@@ -131,6 +131,10 @@ namespace Apollo.Elements {
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
 
+        public static bool Move(List<Track> source, Project target, int position, bool copy = false) => (position == -1)
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
+
         public static bool Move(List<Track> source, Track target, bool copy = false) {
             if (!copy)
                 for (int i = 0; i < source.Count; i++)
@@ -139,13 +143,15 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy)
-                    Program.Project.Remove(source[i].ParentIndex.Value, false);
+                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
+
+            Program.Project.Window.Selection.Select(moved.First());
+            Program.Project.Window.Selection.Select(moved.Last(), true);
             
             return true;
         }
@@ -157,8 +163,7 @@ namespace Apollo.Elements {
             List<Track> moved = new List<Track>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) 
-                    Program.Project.Remove(source[i].ParentIndex.Value, false);
+                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 

@@ -149,16 +149,40 @@ namespace Apollo.Viewers {
                 source = source.Parent;
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
+
+            int before = moving[0].IParentIndex.Value - 1;
+            int after = _track.ParentIndex.Value;
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
+
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
-            bool result;
-            
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) {
-                if (_track.ParentIndex == 0) result = Track.Move(moving, Program.Project, copy);
-                else result = Track.Move(moving, Program.Project[_track.ParentIndex.Value - 1], copy);
-            } else result = Track.Move(moving, _track, copy);
+            bool result = Track.Move(moving, Program.Project, after, copy);
 
-            if (!result) e.DragEffects = DragDropEffects.None;
+            if (result) {
+                int before_pos = before;
+                int after_pos = moving[0].IParentIndex.Value - 1;
+                int count = moving.Count;
+
+                if (after < before)
+                    before_pos += count;
+                
+                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                    ? new Action(() => {
+                        for (int i = after + count; i > after; i--)
+                            Program.Project.Remove(i);
+
+                    }) : new Action(() => {
+                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
+
+                        Track.Move(umoving, Program.Project, before_pos);
+
+                }), () => {
+                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
+
+                    Track.Move(rmoving, Program.Project, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
