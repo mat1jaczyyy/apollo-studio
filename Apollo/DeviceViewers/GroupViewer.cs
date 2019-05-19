@@ -355,8 +355,10 @@ namespace Apollo.DeviceViewers {
                     ((Group)Track.TraversePath(path)).Remove(right + i + 1);
 
             }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
                 for (int i = 0; i <= right - left; i++)
-                    ((Group)Track.TraversePath(path)).Insert(right + i + 1, _group[left + i].Clone());
+                    group.Insert(right + i + 1, group[left + i].Clone());
             });
 
             for (int i = 0; i <= right - left; i++)
