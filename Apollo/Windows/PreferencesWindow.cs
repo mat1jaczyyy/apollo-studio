@@ -43,6 +43,8 @@ namespace Apollo.Windows {
 
             Preferences.Window = this;
 
+            this.Get<TextBlock>("Version").Text += Program.Version;
+
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
 

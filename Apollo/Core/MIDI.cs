@@ -28,7 +28,7 @@ namespace Apollo.Core {
         private static object locker = new object();
 
         public static void Rescan(object sender, EventArgs e) {
-            lock(locker) {
+            lock (locker) {
                 bool updated = false;
 
                 foreach (var input in MidiDeviceManager.Default.InputDevices) {
