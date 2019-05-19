@@ -926,12 +926,16 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Frame Pasted", () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Pattern)Track.TraversePath(path)).Remove(right + i + 1);
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    pattern.Remove(right + i + 1);
 
             }, () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Pattern)Track.TraversePath(path)).Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
+                    pattern.Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -944,8 +948,10 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Frame Duplicated", () => {
-                for (int i = 0; i <= right - left; i++)
-                    ((Pattern)Track.TraversePath(path)).Remove(right + i + 1);
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                for (int i = right - left; i >= 0; i--)
+                    pattern.Remove(right + i + 1);
 
             }, () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
@@ -968,12 +974,16 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Frame Deleted", () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
                 for (int i = left; i <= right; i++)
-                    ((Pattern)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+                    pattern.Insert(i, u[i - left].Clone());
 
             }, () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
                 for (int i = right; i >= left; i--)
-                    ((Pattern)Track.TraversePath(path)).Remove(i);
+                    pattern.Remove(i);
             });
 
             for (int i = right; i >= left; i--)

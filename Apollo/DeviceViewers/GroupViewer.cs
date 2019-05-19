@@ -335,12 +335,16 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Pasted", () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Group)Track.TraversePath(path)).Remove(right + i + 1);
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    group.Remove(right + i + 1);
 
             }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Group)Track.TraversePath(path)).Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                    group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -351,8 +355,10 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Duplicated", () => {
-                for (int i = 0; i <= right - left; i++)
-                    ((Group)Track.TraversePath(path)).Remove(right + i + 1);
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = right - left; i >= 0; i--)
+                    group.Remove(right + i + 1);
 
             }, () => {
                 Group group = ((Group)Track.TraversePath(path));
@@ -371,12 +377,16 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Deleted", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
                 for (int i = left; i <= right; i++)
-                    ((Group)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+                    group.Insert(i, u[i - left].Clone());
 
             }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
                 for (int i = right; i >= left; i--)
-                    ((Group)Track.TraversePath(path)).Remove(i);
+                    group.Remove(i);
             });
 
             for (int i = right; i >= left; i--)

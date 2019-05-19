@@ -350,7 +350,7 @@ namespace Apollo.Windows {
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
 
             Program.Project.Undo.Add($"Track Pasted", () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     Program.Project.Remove(right + i + 1);
 
             }, () => {
@@ -364,7 +364,7 @@ namespace Apollo.Windows {
 
         public void Duplicate(int left, int right) {
             Program.Project.Undo.Add($"Track Duplicated", () => {
-                for (int i = 0; i <= right - left; i++)
+                for (int i = right - left; i >= 0; i--)
                     Program.Project.Remove(right + i + 1);
 
             }, () => {

@@ -360,12 +360,16 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_multi);
 
             Program.Project.Undo.Add($"Chain Pasted", () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Multi)Track.TraversePath(path)).Remove(right + i + 1);
+                Multi multi = ((Multi)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    multi.Remove(right + i + 1);
 
             }, () => {
+                Multi multi = ((Multi)Track.TraversePath(path));
+
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    ((Multi)Track.TraversePath(path)).Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                    multi.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -376,8 +380,10 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_multi);
 
             Program.Project.Undo.Add($"Chain Duplicated", () => {
-                for (int i = 0; i <= right - left; i++)
-                    ((Multi)Track.TraversePath(path)).Remove(right + i + 1);
+                Multi multi = ((Multi)Track.TraversePath(path));
+
+                for (int i = right - left; i >= 0; i--)
+                    multi.Remove(right + i + 1);
 
             }, () => {
                 Multi multi = ((Multi)Track.TraversePath(path));
@@ -396,12 +402,16 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_multi);
 
             Program.Project.Undo.Add($"Chain Deleted", () => {
+                Multi multi = ((Multi)Track.TraversePath(path));
+
                 for (int i = left; i <= right; i++)
-                    ((Multi)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+                    multi.Insert(i, u[i - left].Clone());
 
             }, () => {
+                Multi multi = ((Multi)Track.TraversePath(path));
+
                 for (int i = right; i >= left; i--)
-                    ((Multi)Track.TraversePath(path)).Remove(i);
+                    multi.Remove(i);
             });
 
             for (int i = right; i >= left; i--)
