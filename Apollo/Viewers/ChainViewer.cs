@@ -220,42 +220,131 @@ namespace Apollo.Viewers {
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Pasted", () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Chain)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Chain)Track.TraversePath(path)).Insert(right + i + 1, ((Device)paste.Contents[i]).Clone());
+            });
+
             for (int i = 0; i < paste.Contents.Count; i++)
-                Device_Insert(right + i + 1, (Device)paste.Contents[i]);
+                _chain.Insert(right + i + 1, ((Device)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Duplicated", () => {
+                for (int i = 0; i <= right - left; i++)
+                    ((Chain)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = 0; i <= right - left; i++)
+                    chain.Insert(right + i + 1, chain[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
-                Device_Insert(right + i + 1, _chain.Devices[left + i].Clone());
+                _chain.Insert(right + i + 1, _chain[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            List<Device> u = (from i in Enumerable.Range(left, right - left + 1) select _chain[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Deleted", () => {
+                for (int i = left; i <= right; i++)
+                    ((Chain)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+
+            }, () => {
+                for (int i = right; i >= left; i--)
+                    ((Chain)Track.TraversePath(path)).Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Device_Remove(i);
+                _chain.Remove(i);
         }
 
         public void Group(int left, int right) {
             Chain init = new Chain();
 
             for (int i = left; i <= right; i++)
-                init.Add(_chain.Devices[i]);
-            
-            for (int i = right; i >= left; i--) {
-                Contents_Remove(i);
-                _chain.Remove(i, false);
-            }
+                init.Add(_chain.Devices[i].Clone());
 
-            Device_Insert(left, new Group(new List<Chain>() {init}));
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Grouped", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                chain.Remove(left);
+
+                for (int i = left; i <= right; i++)
+                    chain.Insert(i, init[i - left].Clone());
+                
+                Track track = Track.Get(chain);
+                track?.Window?.Selection.Select(chain[left]);
+                track?.Window?.Selection.Select(chain[right], true);
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+                
+                for (int i = right; i >= left; i--)
+                    chain.Remove(i);
+                
+                chain.Insert(left, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
+            });
+            
+            for (int i = right; i >= left; i--)
+                _chain.Remove(i);
+
+            _chain.Insert(left, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
         }
 
         public void Ungroup(int index) {
-            List<Device> init = ((Group)_chain.Devices[index])[0].Devices;
+            List<Device> init = (from i in ((Group)_chain.Devices[index])[0].Devices select i.Clone()).ToList();
 
-            Contents_Remove(index);
-            _chain.Remove(index, false);
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Ungrouped", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = index + init.Count - 1; i >= index; i--)
+                    chain.Remove(i);
+                
+                Chain group = new Chain();
+
+                for (int i = 0; i < init.Count; i++)
+                    group.Add(init[i].Clone());
+                
+                chain.Insert(index, new Group(new List<Chain>() {group}) {Expanded = 0});
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+                
+                chain.Remove(index);
+            
+                for (int i = 0; i < init.Count; i++)
+                    chain.Insert(index + i, init[i].Clone());
+                    
+                Track track = Track.Get(chain);
+                track?.Window?.Selection.Select(chain[index]);
+                track?.Window?.Selection.Select(chain[index + init.Count - 1], true);
+            });
+
+            _chain.Remove(index);
             
             for (int i = 0; i < init.Count; i++)
-                Device_Insert(index + i, init[i]);
+                _chain.Insert(index + i, init[i].Clone());
+
+            Track _track = Track.Get(_chain);
+            _track?.Window?.Selection.Select(_chain[index]);
+            _track?.Window?.Selection.Select(_chain[index + init.Count - 1], true);
         }
 
         public void Rename(int left, int right) => throw new InvalidOperationException("A Device cannot be renamed.");
