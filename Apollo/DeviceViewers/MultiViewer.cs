@@ -170,7 +170,7 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Chain_Action(string action) => Chain_Action(action, false);
-        private void Chain_Action(string action, bool right) => Track.Get(_multi).Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
+        private void Chain_Action(string action, bool right) => Track.Get(_multi)?.Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
 
         private void ChainContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();

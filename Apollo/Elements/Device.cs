@@ -64,8 +64,8 @@ namespace Apollo.Elements {
             }
 
             Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
+            track?.Window?.Selection.Select(moved.First());
+            track?.Window?.Selection.Select(moved.Last(), true);
             
             return true;
         }

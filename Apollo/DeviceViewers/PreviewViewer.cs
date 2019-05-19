@@ -33,7 +33,7 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
         }
 
-        private void PadChanged(int index, bool state) => _preview.MIDIEnter(new Signal(Track.Get(_preview).Launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
+        private void PadChanged(int index, bool state) => _preview.MIDIEnter(new Signal(Track.Get(_preview)?.Launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
         private void PadPressed(int index) => PadChanged(index, true);
         private void PadReleased(int index) => PadChanged(index, false);
 

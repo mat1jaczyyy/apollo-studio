@@ -44,8 +44,17 @@ namespace Apollo.Elements {
             }
         }
 
-        public static Track Get(Device device) => (device.Parent.Parent.GetType() == typeof(Track))? (Track)device.Parent.Parent : Get((Device)device.Parent.Parent);
-        public static Track Get(Chain chain) => (chain.Parent.GetType() == typeof(Track))? (Track)chain.Parent : Get((Device)chain.Parent);
+        public static Track Get(Device device) => (device.Parent?.Parent != null)
+            ? ((device.Parent?.Parent.GetType() == typeof(Track))
+                ? (Track)device.Parent?.Parent
+                : Get((Device)device.Parent?.Parent)
+            ) : null;
+
+        public static Track Get(Chain chain) => (chain.Parent != null)
+            ? ((chain.Parent.GetType() == typeof(Track))
+                ? (Track)chain.Parent
+                : Get((Device)chain.Parent)
+            ) : null;
 
         public static List<int> GetPath(ISelect child) {
             List<int> path = new List<int>();

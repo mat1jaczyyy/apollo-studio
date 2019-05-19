@@ -61,7 +61,7 @@ namespace Apollo.Devices {
 
             SpecificViewer?.Contents_Insert(index, Chains[index]);
             
-            Track.Get(this).Window?.Selection.Select(Chains[index]);
+            Track.Get(this)?.Window?.Selection.Select(Chains[index]);
             SpecificViewer?.Expand(index);
         }
 
@@ -73,11 +73,11 @@ namespace Apollo.Devices {
             Reroute();
             
             if (index < Chains.Count)
-                Track.Get(this).Window?.Selection.Select(Chains[index]);
+                Track.Get(this)?.Window?.Selection.Select(Chains[index]);
             else if (Chains.Count > 0)
-                Track.Get(this).Window?.Selection.Select(Chains.Last());
+                Track.Get(this)?.Window?.Selection.Select(Chains.Last());
             else
-                Track.Get(this).Window?.Selection.Select(null);
+                Track.Get(this)?.Window?.Selection.Select(null);
         }
 
         public int? Expanded { get; set; }

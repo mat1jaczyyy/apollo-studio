@@ -112,7 +112,7 @@ namespace Apollo.Elements {
 
             Viewer?.Contents_Insert(index, Devices[index]);
 
-            Track.Get(this).Window?.Selection.Select(Devices[index]);
+            Track.Get(this)?.Window?.Selection.Select(Devices[index]);
         }
         
         public void Add(Device device) => Insert(Devices.Count, device);
@@ -165,8 +165,8 @@ namespace Apollo.Elements {
             }
 
             Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
+            track?.Window?.Selection.Select(moved.First());
+            track?.Window?.Selection.Select(moved.Last(), true);
 
             ((IMultipleChainParent)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
             
