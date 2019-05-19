@@ -215,7 +215,7 @@ namespace Apollo.DeviceViewers {
                     int after_pos = moving[0].IParentIndex.Value - 1;
                     int count = moving.Count;
 
-                    if (after < before)
+                    if (source_parent == _multi && after < before)
                         before_pos += count;
                     
                     List<int> sourcepath = Track.GetPath((ISelect)source_parent);
