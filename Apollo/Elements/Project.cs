@@ -87,8 +87,10 @@ namespace Apollo.Elements {
 
             string[] file = FilePath.Split(Path.DirectorySeparatorChar);
 
-            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
+            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
                 File.WriteAllBytes(FilePath, Encoder.Encode(this).ToArray());
+                Undo.SavePosition();
+            }
         }
 
         public delegate void TrackCountChangedEventHandler(int value);

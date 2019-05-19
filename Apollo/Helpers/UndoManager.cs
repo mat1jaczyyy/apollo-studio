@@ -32,9 +32,24 @@ namespace Apollo.Helpers {
             get => _position;
             private set {
                 _position = value;
-                PositionChanged?.Invoke(_position);
+
+                PositionChanged?.Invoke(Position);
+                SavedChanged?.Invoke(Saved);
             }
         }
+        
+        public delegate void SavedChangedEventHandler(bool saved);
+        public event SavedChangedEventHandler SavedChanged;
+
+        private int _saved = 0;
+        public bool Saved {
+            get => _saved == Position;
+        }
+
+        public void SavePosition() {
+            _saved = Position;
+            SavedChanged?.Invoke(Saved);
+        } 
 
         public void Add(string desc, Action undo, Action redo) {
             for (int i = History.Count - 1; i > Position; i--)

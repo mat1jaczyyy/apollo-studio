@@ -1,9 +1,13 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.SaveButton">
+  
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="CanvasBrush" />
+  </UserControl.Resources>
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
+    <Path Fill="{DynamicResource CanvasBrush}"
           Data="M 0,0 L 0,16 16,16 16,4 12,0 Z" />
     <Path Fill="{DynamicResource ThemeBorderMidBrush}"
           Data="M 1,1 L 1,4 11,4 11,1 Z" />

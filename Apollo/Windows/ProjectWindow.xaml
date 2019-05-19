@@ -20,9 +20,9 @@
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
           <Components:PreferencesButton />
+          <Components:SaveButton />
           <Components:UndoButton />
           <Components:RedoButton />
-          <Components:SaveButton />
         </StackPanel>
 
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
