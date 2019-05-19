@@ -121,7 +121,7 @@ namespace Apollo.Devices {
 
         private void Reset() => current = -1;
 
-        public int? Expanded;
+        public int? Expanded { get; set; }
 
         public Multi(Chain preprocess = null, List<Chain> init = null, MultiType mode = MultiType.Forward, int? expanded = null): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();

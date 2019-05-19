@@ -145,6 +145,10 @@ namespace Apollo.Elements {
             MIDIExit = null;
         }
 
+        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) => (position == -1)
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
+
         public static bool Move(List<Chain> source, Chain target, bool copy = false) {
             if (!copy)
                 for (int i = 0; i < source.Count; i++)
@@ -153,14 +157,10 @@ namespace Apollo.Elements {
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
-                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                ((IMultipleChainParent)target.Parent).SpecificViewer.Contents_Insert(target.ParentIndex.Value + i + 1, moved.Last());
                 ((IMultipleChainParent)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
@@ -180,14 +180,10 @@ namespace Apollo.Elements {
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) {
-                    ((IMultipleChainParent)source[i].Parent).SpecificViewer.Contents_Remove(source[i].ParentIndex.Value);
-                    ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-                }
+                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                target.SpecificViewer.Contents_Insert(i, moved.Last());
                 target.Insert(i, moved.Last());
             }
 

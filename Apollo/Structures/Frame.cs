@@ -88,8 +88,8 @@ namespace Apollo.Structures {
         }
 
         public static bool Move(List<Frame> source, Pattern target, int position, bool copy = false) => (position == -1)
-            ? Frame.Move(source, target, copy)
-            : Frame.Move(source, target[position], copy);
+            ? Move(source, target, copy)
+            : Move(source, target[position], copy);
 
         public static bool Move(List<Frame> source, Frame target, bool copy = false) {
             if (!copy) {

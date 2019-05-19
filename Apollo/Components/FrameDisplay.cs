@@ -155,7 +155,7 @@ namespace Apollo.Components {
                     Pattern pattern = ((Pattern)Track.TraversePath(path));
                     List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select pattern[i]).ToList();
 
-                    Frame.Move(rmoving, pattern, after, true);
+                    Frame.Move(rmoving, pattern, after, copy);
                 });
             
             } else e.DragEffects = DragDropEffects.None;

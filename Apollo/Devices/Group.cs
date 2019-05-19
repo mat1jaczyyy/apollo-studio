@@ -80,7 +80,7 @@ namespace Apollo.Devices {
                 Track.Get(this).Window?.Selection.Select(null);
         }
 
-        public int? Expanded;
+        public int? Expanded { get; set; }
 
         public Group(List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
