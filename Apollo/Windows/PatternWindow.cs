@@ -923,22 +923,61 @@ namespace Apollo.Windows {
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             
+            List<int> path = Track.GetPath(_pattern);
+
+            Program.Project.Undo.Add($"Frame Pasted", () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Pattern)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Pattern)Track.TraversePath(path)).Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
+            });
+
             for (int i = 0; i < paste.Contents.Count; i++)
-                Frame_Insert(right + i + 1, (Frame)paste.Contents[i]);
+                _pattern.Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
             if (Locked) return;
 
+            List<int> path = Track.GetPath(_pattern);
+
+            Program.Project.Undo.Add($"Frame Duplicated", () => {
+                for (int i = 0; i <= right - left; i++)
+                    ((Pattern)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                for (int i = 0; i <= right - left; i++)
+                    pattern.Insert(right + i + 1, pattern[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
-                Frame_Insert(right + i + 1, _pattern[left + i].Clone());
+                _pattern.Insert(right + i + 1, _pattern[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
             if (Locked) return;
 
+            if (_pattern.Count - (right - left + 1) == 0) return;
+
+            List<Frame> u = (from i in Enumerable.Range(left, right - left + 1) select _pattern[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_pattern);
+
+            Program.Project.Undo.Add($"Frame Deleted", () => {
+                for (int i = left; i <= right; i++)
+                    ((Pattern)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+
+            }, () => {
+                for (int i = right; i >= left; i--)
+                    ((Pattern)Track.TraversePath(path)).Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Frame_Remove(i);
+                _pattern.Remove(i);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Frame cannot be grouped.");
