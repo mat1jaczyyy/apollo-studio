@@ -331,19 +331,54 @@ namespace Apollo.DeviceViewers {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
             Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Pasted", () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Group)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    ((Group)Track.TraversePath(path)).Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+            });
+
             for (int i = 0; i < paste.Contents.Count; i++)
-                Chain_Insert(right + i + 1, (Chain)paste.Contents[i]);
+                _group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
         }
 
         public void Duplicate(int left, int right) {
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Duplicated", () => {
+                for (int i = 0; i <= right - left; i++)
+                    ((Group)Track.TraversePath(path)).Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i <= right - left; i++)
+                    ((Group)Track.TraversePath(path)).Insert(right + i + 1, _group[left + i].Clone());
+            });
+
             for (int i = 0; i <= right - left; i++)
-                Chain_Insert(right + i + 1, _group[left + i].Clone());
+                _group.Insert(right + i + 1, _group[left + i].Clone());
         }
 
         public void Delete(int left, int right) {
+            List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Deleted", () => {
+                for (int i = left; i <= right; i++)
+                    ((Group)Track.TraversePath(path)).Insert(i, u[i - left].Clone());
+
+            }, () => {
+                for (int i = right; i >= left; i--)
+                    ((Group)Track.TraversePath(path)).Remove(i);
+            });
+
             for (int i = right; i >= left; i--)
-                Chain_Remove(i);
+                _group.Remove(i);
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");
