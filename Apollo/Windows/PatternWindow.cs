@@ -378,7 +378,7 @@ namespace Apollo.Windows {
                 ? new Color(0)
                 : ColorPicker.Color;
             
-            old = _pattern[_pattern.Expanded].Screen.ToArray();
+            old = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
     
         private void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
@@ -409,17 +409,17 @@ namespace Apollo.Windows {
             Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
 
-        private void PadFinished(int index) {
+        private void PadFinished(int _) {
             if (!old.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
-                Color[] u = old.ToArray();
-                Color[] r = _pattern[_pattern.Expanded].Screen.ToArray();
-                int i = _pattern.Expanded;
+                Color[] u = old;
+                Color[] r = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
+                int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {i} Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[i].Screen = u.ToArray();
+                Program.Project.Undo.Add($"Pattern Frame {index} Changed", () => {
+                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[i].Screen = r.ToArray();
+                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
                 });
             }
         }
