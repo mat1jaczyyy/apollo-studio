@@ -52,6 +52,8 @@ namespace Apollo.Core {
         }
 
         static void Dispose() {
+            if (!Initialized) return;
+
             lock (locker) {
                 courier.Stop();
 
