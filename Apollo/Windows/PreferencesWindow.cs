@@ -17,7 +17,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, EnableGestures;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, EnableGestures, DiscordPresence, DiscordFilename;
         Slider FadeSmoothness;
         Controls Contents;
 
@@ -43,6 +43,8 @@ namespace Apollo.Windows {
 
             Preferences.Window = this;
 
+            this.Get<TextBlock>("Version").Text += Program.Version;
+
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
 
@@ -64,6 +66,12 @@ namespace Apollo.Windows {
 
             EnableGestures = this.Get<CheckBox>("EnableGestures");
             EnableGestures.IsChecked = Preferences.EnableGestures;
+
+            DiscordPresence = this.Get<CheckBox>("DiscordPresence");
+            DiscordPresence.IsChecked = Preferences.DiscordPresence;
+
+            DiscordFilename = this.Get<CheckBox>("DiscordFilename");
+            DiscordFilename.IsChecked = Preferences.DiscordFilename;
 
             Contents = this.Get<StackPanel>("Contents").Children;
             UpdatePorts();
@@ -95,7 +103,11 @@ namespace Apollo.Windows {
 
         private void EnableGestures_Changed(object sender, EventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
 
-        public void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
+        private void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
+
+        private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
+
+        private void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

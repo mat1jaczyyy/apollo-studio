@@ -5,7 +5,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="320" MinWidth="320" MaxWidth="320"
-        Height="540" MinHeight="540" MaxHeight="540" 
+        Height="570" MinHeight="570" MaxHeight="570"
         Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -18,7 +18,7 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Margin="10 5">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" Margin="10 5">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
@@ -63,8 +63,16 @@
           </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / Alpha Build 16" />
+        <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <StackPanel Spacing="5">
+            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
+            <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
+            <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display current File Name</CheckBox>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="6" Margin="10" HorizontalAlignment="Center">
+          <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>
       </Grid>

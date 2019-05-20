@@ -15,6 +15,8 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     class Program {
+        public static readonly string Version = "Beta Build 1";
+
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
@@ -89,6 +91,8 @@ namespace Apollo.Core {
             MIDI.Start();
 
             Log("MIDI Ready");
+
+            if (Preferences.DiscordPresence) Discord.Set(true);
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }

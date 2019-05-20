@@ -86,6 +86,26 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _DiscordPresence = false;
+        public static bool DiscordPresence {
+            get => _DiscordPresence;
+            set {
+                _DiscordPresence = value;
+                Discord.Set(DiscordPresence);
+                Save();
+            }
+        }
+
+        private static bool _DiscordFilename = false;
+        public static bool DiscordFilename {
+            get => _DiscordFilename;
+            set {
+                _DiscordFilename = value;
+                Discord.Set(DiscordPresence);
+                Save();
+            }
+        }
+
         public static void Save() {
             try {
                 File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
