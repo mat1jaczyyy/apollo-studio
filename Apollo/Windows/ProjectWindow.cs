@@ -27,7 +27,7 @@ namespace Apollo.Windows {
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void UpdateTitle() => TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FilePath;
+        private void UpdateTitle() => Title = TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
         private void UpdatePage() => Page.RawValue = Program.Project.Page;
         private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);

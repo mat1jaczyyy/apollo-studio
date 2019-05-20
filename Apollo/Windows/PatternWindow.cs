@@ -90,7 +90,7 @@ namespace Apollo.Windows {
         private void UpdateTitle(int index) => UpdateTitle(index, _track.Name);
         private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         private void UpdateTitle(int index, string name)
-            => TitleText.Text = $"Editing Pattern - {name.Replace("#", (index + 1).ToString())}";
+            => Title = TitleText.Text = $"Editing Pattern - {name.Replace("#", (index + 1).ToString())}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 

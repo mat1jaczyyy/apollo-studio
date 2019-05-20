@@ -3,7 +3,7 @@
         x:Class="Apollo.Windows.PatternWindow"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Pattern" WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="780" MinWidth="780" MaxWidth="780"
         Height="520" MinHeight="520" MaxHeight="520"
