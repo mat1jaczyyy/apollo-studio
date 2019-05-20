@@ -343,18 +343,20 @@ namespace Apollo.Windows {
             } else if (e.Key == Key.Insert) HandleGesture(1, 1);
             else if (e.Key == Key.Delete) HandleGesture(-1, -1);
 
-            if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
-                this.Focus();
-                return;
-            }
+            else {
+                if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                    this.Focus();
+                    return;
+                }
 
-            if (e.Key == Key.Up || e.Key == Key.Left) {
-                Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-                Frame_Select(Selection.Start.IParentIndex.Value);
+                if (e.Key == Key.Up || e.Key == Key.Left) {
+                    Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                    Frame_Select(Selection.Start.IParentIndex.Value);
 
-            } else if (e.Key == Key.Down || e.Key == Key.Right) {
-                Selection.Move(true, e.Modifiers == InputModifiers.Shift);
-                Frame_Select(Selection.Start.IParentIndex.Value);
+                } else if (e.Key == Key.Down || e.Key == Key.Right) {
+                    Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                    Frame_Select(Selection.Start.IParentIndex.Value);
+                }
             }
         }
 
