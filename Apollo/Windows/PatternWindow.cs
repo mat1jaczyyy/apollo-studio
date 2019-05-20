@@ -410,6 +410,8 @@ namespace Apollo.Windows {
         }
 
         private void PadFinished(int _) {
+            if (old == null) return;
+
             if (!old.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
                 Color[] u = old;
                 Color[] r = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
@@ -422,6 +424,8 @@ namespace Apollo.Windows {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
                 });
             }
+
+            old = null;
         }
 
         public void SetGrid(int index, Frame frame) {
