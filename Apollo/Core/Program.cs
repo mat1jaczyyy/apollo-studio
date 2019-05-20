@@ -92,7 +92,7 @@ namespace Apollo.Core {
 
             Log("MIDI Ready");
 
-            Discord.Init();
+            if (Preferences.DiscordPresence) Discord.Set(true);
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }

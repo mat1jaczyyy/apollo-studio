@@ -53,6 +53,10 @@ namespace Apollo.Elements {
             }
         }
 
+        public string FileName {
+            get => Path.GetFileNameWithoutExtension(FilePath);
+        }
+
         public delegate void PageChangedEventHandler();
         public event PageChangedEventHandler PageChanged;
 

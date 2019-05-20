@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 
 using DiscordRPC;
 
@@ -16,8 +15,13 @@ namespace Apollo.Core {
 
         static Discord() => courier.Elapsed += Refresh;
 
-        public static void Init() {
-            if (Initialized) new InvalidOperationException("Discord Refresh is already running");
+        public static void Set(bool state) {
+            if (state) Init();
+            else Dispose();
+        }
+
+        static void Init() {
+            if (Initialized) return;
 
             Presence = new DiscordRpcClient("579791801527959592");
             Presence.Initialize();
@@ -28,7 +32,7 @@ namespace Apollo.Core {
             courier.Start();
         }
 
-        public static void Refresh(object sender = null, EventArgs e = null) {
+        static void Refresh(object sender = null, EventArgs e = null) {
             lock (locker) {
                 if (Initialized) {
                     RichPresence Info = new RichPresence() {
@@ -39,19 +43,20 @@ namespace Apollo.Core {
                         }
                     };
 
-                    if (Program.Project != null)
-                        Info.State = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Path.GetFileNameWithoutExtension(Program.Project.FilePath));
+                    if (Preferences.DiscordFilename && Program.Project != null)
+                        Info.State = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Program.Project.FileName);
 
                     Presence.SetPresence(Info);
                 }
             }
         }
 
-        public static void Dispose() {
+        static void Dispose() {
             lock (locker) {
                 courier.Stop();
 
                 Initialized = false;
+                Presence.ClearPresence();
                 Presence.Dispose();
             }
         }
