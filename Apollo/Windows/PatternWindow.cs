@@ -168,10 +168,8 @@ namespace Apollo.Windows {
             PlaybackMode.SelectedItem = _pattern.Mode;
 
             Choke = this.Get<Dial>("Choke");
-            if (_pattern.Choke != null) {
-                Choke.Enabled = true;
-                Choke.RawValue = _pattern.Choke.Value;
-            }
+            Choke.Enabled = _pattern.ChokeEnabled;
+            Choke.RawValue = _pattern.Choke;
 
             Import = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
@@ -638,29 +636,21 @@ namespace Apollo.Windows {
 
         private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) {
-                bool u = Choke.Enabled;
-                bool r = !Choke.Enabled;
+                bool u = _pattern.ChokeEnabled;
+                bool r = !_pattern.ChokeEnabled;
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Choke Changed", () => {
-                    Pattern pattern = ((Pattern)Track.TraversePath(path));
-                    if (pattern.Window != null) {
-                        pattern.Window.Choke.Enabled = u;
-                        if (!pattern.Window.Choke.Enabled) pattern.Choke = null;
-                    }
-
+                    ((Pattern)Track.TraversePath(path)).ChokeEnabled = u;
                 }, () => {
-                    Pattern pattern = ((Pattern)Track.TraversePath(path));
-                    if (pattern.Window != null) {
-                        pattern.Window.Choke.Enabled = r;
-                        if (!pattern.Window.Choke.Enabled) pattern.Choke = null;
-                    }
+                    ((Pattern)Track.TraversePath(path)).ChokeEnabled = r;
                 });
 
-                Choke.Enabled = !Choke.Enabled;
-                if (!Choke.Enabled) _pattern.Choke = null;
+                _pattern.ChokeEnabled = !_pattern.ChokeEnabled;
             }
         }
+
+        public void SetChokeEnabled(bool choke) => Choke.Enabled = choke;
 
         private void Choke_Changed(double value, double? old) {
             if (old != null) {

@@ -197,16 +197,25 @@ namespace Apollo.Binary {
                     Decode(reader, version)
                 );
             
-            else if (t == typeof(Pattern))
-                return new Pattern(
-                    reader.ReadDecimal(),
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList(),
-                    (Pattern.PlaybackType)reader.ReadInt32(),
-                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
-                    reader.ReadInt32()
-                );
+            else if (t == typeof(Pattern)) {
+                decimal gate = reader.ReadDecimal();
+                List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
+                Pattern.PlaybackType mode = (Pattern.PlaybackType)reader.ReadInt32();
+                bool chokeenabled = reader.ReadBoolean();
+
+                int choke = 8;
+                if (version <= 0) {
+                    if (chokeenabled)
+                        choke = reader.ReadInt32();
+                } else {
+                    choke = reader.ReadInt32();
+                }
+
+                int expanded = reader.ReadInt32();
+
+                return new Pattern(gate, frames, mode, chokeenabled, choke, expanded);
             
-            else if (t == typeof(Preview))
+            } else if (t == typeof(Preview))
                 return new Preview();
             
             else if (t == typeof(Rotate))

@@ -116,30 +116,43 @@ namespace Apollo.Devices {
 
         public PlaybackType GetPlaybackType() => _mode;
 
-        private int? _choke;
-        public int? Choke {
+        private bool _chokeenabled;
+        public bool ChokeEnabled {
+            get => _chokeenabled;
+            set {
+                if (_chokeenabled != value) {
+                    _chokeenabled = value;
+
+                    Window?.SetChokeEnabled(_chokeenabled);
+                }
+            }
+        }
+
+        private int _choke;
+        public int Choke {
             get => _choke;
             set {
                 if (_choke != value) {
                     _choke = value;
 
-                    if (Choke != null) Window?.SetChoke(_choke.Value);
+                    Window?.SetChoke(_choke);
                 }
             }
         }
 
         bool choked;
         
-        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, Choke, Expanded);
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Expanded);
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, int? choke = null, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 8, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
             Frames = frames;
             _mode = mode;
+            ChokeEnabled = chokeenabled;
             Choke = choke;
             Expanded = expanded;
 
@@ -257,8 +270,8 @@ namespace Apollo.Devices {
                     if ((_mode == PlaybackType.Mono && lit) || _mode == PlaybackType.Loop) Stop(n);
 
                     if (lit) {
-                        if (Choke != null) {
-                            Choked.Invoke(this, Choke.Value);
+                        if (ChokeEnabled) {
+                            Choked.Invoke(this, Choke);
                             choked = false;
                         }
 

@@ -253,9 +253,8 @@ namespace Apollo.Binary {
             
             writer.Write((int)o.GetPlaybackType());
             
-            writer.Write(o.Choke.HasValue);
-            if (o.Choke.HasValue)
-                writer.Write(o.Choke.Value);
+            writer.Write(o.ChokeEnabled);
+            writer.Write(o.Choke);
 
             writer.Write(o.Expanded);
         }
