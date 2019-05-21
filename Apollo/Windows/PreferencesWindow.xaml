@@ -4,8 +4,8 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="320" MinWidth="320" MaxWidth="320"
-        Height="570" MinHeight="570" MaxHeight="570"
+        Width="350" MinWidth="350" MaxWidth="350"
+        Height="600" MinHeight="600" MaxHeight="600"
         Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -55,12 +55,12 @@
         </Border>
 
         <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel>
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
               <StackPanel x:Name="Contents" />
             </ScrollViewer>
-          </StackPanel>
+          </Grid>
         </Border>
 
         <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
