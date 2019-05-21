@@ -45,6 +45,8 @@ namespace Apollo.DeviceViewers {
         private void PadPressed(int index) => Grid.SetColor(index, GetColor(_filter[LaunchpadGrid.GridToSignal(index)] = drawingState));
 
         private void PadFinished(int index) {
+            if (old == null) return;
+
             bool[] u = old.ToArray();
             bool[] r = _filter.Filter.ToArray();
             List<int> path = Track.GetPath(_filter);
@@ -54,6 +56,8 @@ namespace Apollo.DeviceViewers {
             }, () => {
                 ((KeyFilter)Track.TraversePath(path)).Filter = r.ToArray();
             });
+
+            old = null;
         }
 
         public void Set(bool[] filter) {
