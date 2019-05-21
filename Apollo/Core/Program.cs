@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +8,7 @@ using Avalonia.Logging.Serilog;
 
 using RtMidi.Core;
 
+using Apollo.Binary;
 using Apollo.Elements;
 using Apollo.Windows;
 
@@ -77,6 +79,15 @@ namespace Apollo.Core {
         }
 
         static void Main(string[] args) {
+            AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
+                string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}crashdump-{DateTimeOffset.Now.ToUnixTimeSeconds()}-";
+
+                File.WriteAllText(FilePath + "exception.log", e.ExceptionObject.ToString());
+
+                if (Project != null)
+                    File.WriteAllBytes(FilePath + "project.approj", Encoder.Encode(Project).ToArray());
+            };
+
             logTimer.Start();
 
             foreach (string arg in args) {
