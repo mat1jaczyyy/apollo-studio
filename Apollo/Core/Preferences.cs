@@ -86,7 +86,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _DiscordPresence = false;
+        private static bool _DiscordPresence = true;
         public static bool DiscordPresence {
             get => _DiscordPresence;
             set {

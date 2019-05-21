@@ -41,7 +41,14 @@ namespace Apollo.Binary {
                     Preferences.FadeSmoothness = reader.ReadDouble();
                     Preferences.CopyPreviousFrame = reader.ReadBoolean();
                     Preferences.EnableGestures = reader.ReadBoolean();
-                    Preferences.DiscordPresence = reader.ReadBoolean();
+
+                    if (version <= 0) {
+                        Preferences.DiscordPresence = true;
+                        reader.ReadBoolean();
+                    } else {
+                        Preferences.DiscordPresence = reader.ReadBoolean();
+                    }
+                    
                     Preferences.DiscordFilename = reader.ReadBoolean();
 
                     ColorHistory.Set(
