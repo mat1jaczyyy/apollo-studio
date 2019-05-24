@@ -67,7 +67,7 @@ namespace Apollo.Helpers {
 
             if (!File.Exists(path)) return false;
             
-            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open))) {
+            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read))) {
                 if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'h', 'd'}) || // Header Identifier
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x06}) || // Header size
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x01})) // Single track file

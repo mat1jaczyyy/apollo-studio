@@ -59,7 +59,7 @@ namespace Apollo.Windows {
             if (result.Length > 0) {
                 Project loaded;
 
-                using (FileStream file = File.Open(result[0], FileMode.Open))
+                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                     loaded = Decoder.Decode(file, typeof(Project));
                 
                 loaded.FilePath = result[0];

@@ -110,11 +110,11 @@ namespace Apollo.Core {
             try {
                 File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
             } catch (IOException) {}
-        } 
+        }
 
         static Preferences() {
             if (File.Exists(FilePath)) 
-                using (FileStream file = File.Open(FilePath, FileMode.Open))
+                using (FileStream file = File.Open(FilePath, FileMode.Open, FileAccess.Read))
                     Decoder.Decode(file, typeof(Preferences));
 
             Save();
