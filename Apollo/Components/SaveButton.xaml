@@ -3,6 +3,11 @@
              x:Class="Apollo.Components.SaveButton">
   
   <UserControl.Resources>
+    <ContextMenu x:Key="SaveContextMenu" Cursor="Arrow">
+      <MenuItem Header="Save as..." />
+      <MenuItem Header="Save a copy..." />
+    </ContextMenu>
+
     <SolidColorBrush x:Key="CanvasBrush" />
   </UserControl.Resources>
 

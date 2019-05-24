@@ -71,30 +71,37 @@ namespace Apollo.Elements {
             }
         }
 
-        public async void Save(Window sender) {
-            if (FilePath == "") {
-                SaveFileDialog sfd = new SaveFileDialog() {
-                    Filters = new List<FileDialogFilter>() {
-                        new FileDialogFilter() {
-                            Extensions = new List<string>() {
-                                "approj"
-                            },
-                            Name = "Apollo Project"
-                        }
+        private SaveFileDialog CreateSaveFileDialog() => new SaveFileDialog() {
+            Filters = new List<FileDialogFilter>() {
+                new FileDialogFilter() {
+                    Extensions = new List<string>() {
+                        "approj"
                     },
-                    Title = "Save Project"
-                };
+                    Name = "Apollo Project"
+                }
+            },
+            Title = "Save Project"
+        };
 
-                string result = await sfd.ShowAsync(sender);
-                if (result != null) FilePath = result;
-            }
-
-            string[] file = FilePath.Split(Path.DirectorySeparatorChar);
+        private void WriteFile(string path) {
+            string[] file = path.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                File.WriteAllBytes(FilePath, Encoder.Encode(this).ToArray());
+                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
                 Undo.SavePosition();
             }
+        }
+
+        public void Save(Window sender) {
+            if (FilePath == "") Save(sender, true);
+            else WriteFile(FilePath);
+        }
+
+        public async void Save(Window sender, bool store) {
+            SaveFileDialog sfd = CreateSaveFileDialog();
+            string result = await sfd.ShowAsync(sender);
+
+            if (result != null) WriteFile(store? (FilePath = result) : result);
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
