@@ -41,7 +41,7 @@ namespace Apollo.Helpers {
         public delegate void SavedChangedEventHandler(bool saved);
         public event SavedChangedEventHandler SavedChanged;
 
-        private int _saved = 0;
+        private int? _saved = null;
         public bool Saved {
             get => _saved == Position;
         }
@@ -49,7 +49,7 @@ namespace Apollo.Helpers {
         public void SavePosition() {
             _saved = Position;
             SavedChanged?.Invoke(Saved);
-        } 
+        }
 
         public void Add(string desc, Action undo, Action redo) {
             for (int i = History.Count - 1; i > Position; i--)
