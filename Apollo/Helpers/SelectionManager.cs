@@ -113,7 +113,9 @@ namespace Apollo.Helpers {
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
         }
 
-        public bool ActionKey(KeyEventArgs e) {
+        public bool HandleKey(KeyEventArgs e) {
+            if (Start == null) return true;
+
             if (e.Modifiers == InputModifiers.Control) {
                 if (e.Key == Key.X) Action("Cut");
                 else if (e.Key == Key.C) Action("Copy");

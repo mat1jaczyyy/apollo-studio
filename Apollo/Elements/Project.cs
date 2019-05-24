@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 
 using Avalonia.Controls;
+using Avalonia.Input;
 
 using Apollo.Binary;
 using Apollo.Core;
@@ -154,6 +155,20 @@ namespace Apollo.Elements {
             FilePath = path;
 
             Reroute();
+        }
+        
+        public bool HandleKey(Window sender, KeyEventArgs e) {
+            if (e.Modifiers == InputModifiers.Control) {
+                if (e.Key == Key.S) Save(sender);
+                else return false;
+
+            } else if (e.Modifiers == (InputModifiers.Control | InputModifiers.Shift)) {
+                if (e.Key == Key.S) Save(sender, true);
+                else return false;
+            
+            } else return false;
+
+            return true;
         }
 
         public void Dispose() {

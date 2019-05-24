@@ -342,7 +342,7 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Delete) HandleGesture(-1, -1);
 
             else {
-                if (Program.Project.Undo.HandleKey(e) || Selection.Start == null || Selection.ActionKey(e)) {
+                if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                     this.Focus();
                     return;
                 }
