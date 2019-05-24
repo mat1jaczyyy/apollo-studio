@@ -18,8 +18,21 @@ namespace Apollo.Elements {
 
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
+
         public LaunchpadType Type { get; private set; } = LaunchpadType.Unknown;
-        public InputType InputFormat = InputType.XY;
+
+        private InputType _format;
+        public InputType InputFormat {
+            get => _format;
+            set {
+                if (_format != value) {
+                    _format = value;
+                    
+                    Preferences.Save();
+                }
+            }
+        }
+
 
         public string Name { get; private set; }
         public bool Available { get; private set; }
@@ -121,11 +134,12 @@ namespace Apollo.Elements {
             Output.Send(in Inquiry);
         }
 
-        public Launchpad(string name) {
+        public Launchpad(string name, InputType format = InputType.DrumRack) {
             for (int i = 0; i < 100; i++)
                 screen[i] = new Pixel() {MIDIExit = Send};
             
             Name = name;
+            _format = format;
             Available = false;
         }
 

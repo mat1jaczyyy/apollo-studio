@@ -51,6 +51,10 @@ namespace Apollo.Binary {
                 writer.Write(count);
                 for (int i = 0; i < count; i++)
                     Encode(writer, ColorHistory.GetColor(i));
+                
+                writer.Write(MIDI.Devices.Count);
+                for (int i = 0; i < MIDI.Devices.Count; i++)
+                    Encode(writer, MIDI.Devices[i]);
             }
 
             return output;
@@ -103,7 +107,13 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Launchpad o) {
             EncodeID(writer, typeof(Launchpad));
 
-            writer.Write((o == null)? "" : o.Name);
+            if (o == null)
+                writer.Write("");
+            else {
+                writer.Write(o.Name);
+                writer.Write((int)o.InputFormat);
+            }
+
         }
 
         private static void Encode(BinaryWriter writer, Group o) {

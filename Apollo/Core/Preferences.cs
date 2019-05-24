@@ -118,6 +118,8 @@ namespace Apollo.Core {
                     Decoder.Decode(file, typeof(Preferences));
 
             Save();
+
+            MIDI.DevicesUpdated += Save;
         }
     }
 }

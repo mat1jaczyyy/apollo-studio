@@ -17,7 +17,7 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Beta Build 2";
+        public static readonly string Version = "Beta Build 3";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
@@ -88,6 +88,8 @@ namespace Apollo.Core {
                     File.WriteAllBytes(FilePath + "project.approj", Encoder.Encode(Project).ToArray());
             };
 
+            if (Preferences.DiscordPresence) Discord.Set(true);
+
             logTimer.Start();
 
             foreach (string arg in args) {
@@ -102,8 +104,6 @@ namespace Apollo.Core {
             MIDI.Start();
 
             Log("MIDI Ready");
-
-            if (Preferences.DiscordPresence) Discord.Set(true);
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }

@@ -55,6 +55,9 @@ namespace Apollo.Binary {
                         (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
                     );
 
+                    if (version >= 2)
+                        MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
+
                 } catch (Exception) {
                     Program.Log("Error reading Preferences");
                     return null;
@@ -90,13 +93,16 @@ namespace Apollo.Binary {
             
             else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
-                
                 if (name == "") return null;
 
+                Launchpad.InputType format = Launchpad.InputType.DrumRack;
+                if (version >= 2) format = (Launchpad.InputType)reader.ReadInt32();
+
                 foreach (Launchpad lp in MIDI.Devices)
-                    if (lp.Name == name) return lp;
+                    if (lp.Name == name)
+                        return lp;
                 
-                return new Launchpad(name);
+                return new Launchpad(name, format);
 
             } else if (t == typeof(Group))
                 return new Group(

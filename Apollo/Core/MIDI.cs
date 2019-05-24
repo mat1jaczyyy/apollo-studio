@@ -13,7 +13,18 @@ namespace Apollo.Core {
 
         public static void DoneIdentifying() => DevicesUpdated?.Invoke();
 
-        public static List<Launchpad> Devices = new List<Launchpad>();
+        private static List<Launchpad> _devices = new List<Launchpad>();
+        public static List<Launchpad> Devices {
+            get => _devices;
+            set {
+                if (_devices != value) {
+                    _devices = value;
+                    
+                    DevicesUpdated?.Invoke();
+                }
+            }
+        }
+        
         private static Courier courier = new Courier() { Interval = 100 };
         private static bool started = false;
 
