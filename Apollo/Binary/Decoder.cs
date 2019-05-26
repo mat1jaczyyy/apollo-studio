@@ -283,15 +283,24 @@ namespace Apollo.Binary {
                     reader.ReadByte()
                 );
             
-            else if (t == typeof(Frame))
+            else if (t == typeof(Frame)) {
+                Time time;
+                if (version <= 2) {
+                    time = new Time(
+                        reader.ReadBoolean(),
+                        Decode(reader, version),
+                        reader.ReadInt32()
+                    );
+                } else {
+                    time = Decode(reader, version);
+                }
+
                 return new Frame(
-                    reader.ReadBoolean(),
-                    Decode(reader, version),
-                    reader.ReadInt32(),
+                    time,
                     (from i in Enumerable.Range(0, 100) select (Color)Decode(reader, version)).ToArray()
                 );
             
-            else if (t == typeof(Length))
+            } else if (t == typeof(Length))
                 return new Length(
                     reader.ReadInt32()
                 );

@@ -295,9 +295,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Frame o) {
             EncodeID(writer, typeof(Frame));
 
-            writer.Write(o.Mode);
-            Encode(writer, o.Length);
-            writer.Write(o.Time);
+            Encode(writer, o.Time);
 
             for (int i = 0; i < 100; i++)
                 Encode(writer, o.Screen[i]);

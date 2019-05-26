@@ -213,7 +213,7 @@ namespace Apollo.Devices {
                         decimal time = 0;
 
                         for (int i = 0; i < Frames.Count; i++) {
-                            time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
+                            time += Frames[i].Time * _gate;
                             FireCourier(n, time);
                         }
                     }
@@ -284,7 +284,7 @@ namespace Apollo.Devices {
                         if (_mode == PlaybackType.Poly) poly.Add(info);
 
                         for (int i = 0; i < Frames.Count; i++) {
-                            time += (Frames[i].Mode? (int)Frames[i].Length : Frames[i].Time) * _gate;
+                            time += Frames[i].Time * _gate;
                             if (_mode == PlaybackType.Poly) FireCourier(info, time);
                             else FireCourier(n, time);
                         }

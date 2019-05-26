@@ -247,11 +247,7 @@ namespace Apollo.Windows {
         private void Frame_Insert(int index) {
             Frame reference = _pattern[Math.Max(0, index - 1)];
 
-            Frame_Insert(index, new Frame(
-                reference.Mode,
-                reference.Length.Clone(),
-                reference.Time
-            ));
+            Frame_Insert(index, new Frame(reference.Time.Clone()));
         }
 
         private void Frame_Insert(int index, Frame frame) {
@@ -303,9 +299,9 @@ namespace Apollo.Windows {
 
             ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
             
-            Duration.UsingSteps = _pattern[_pattern.Expanded].Mode;
-            Duration.Length = _pattern[_pattern.Expanded].Length;
-            Duration.RawValue = _pattern[_pattern.Expanded].Time;
+            Duration.UsingSteps = _pattern[_pattern.Expanded].Time.Mode;
+            Duration.Length = _pattern[_pattern.Expanded].Time.Length;
+            Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
             Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
@@ -538,13 +534,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time = u;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Free = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time = r;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Free = r;
                 });
             }
 
-            _pattern[_pattern.Expanded].Time = (int)value;
+            _pattern[_pattern.Expanded].Time.Free = (int)value;
         }
 
         public void SetDurationValue(int index, int value) {
@@ -560,13 +556,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Length.Step = u;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Length.Step = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Length.Step = r;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Length.Step = r;
                 });
             }
 
-            _pattern[_pattern.Expanded].Length.Step = value;
+            _pattern[_pattern.Expanded].Time.Length.Step = value;
         }
 
         public void SetDurationStep(int index, int value) {
@@ -582,13 +578,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Switched", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Mode = u;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Mode = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Mode = r;
+                    ((Pattern)Track.TraversePath(path))[index].Time.Mode = r;
                 });
             }
 
-            _pattern[_pattern.Expanded].Mode = value;
+            _pattern[_pattern.Expanded].Time.Mode = value;
         }
 
         public void SetDurationMode(int index, bool value) {
@@ -754,7 +750,7 @@ namespace Apollo.Windows {
             decimal time = 0;
 
             for (int i = 0; i < _pattern.Count; i++) {
-                time += (_pattern[i].Mode? (int)_pattern[i].Length : _pattern[i].Time) * _pattern.Gate;
+                time += _pattern[i].Time * _pattern.Gate;
                 FireCourier(time);
             }
         }

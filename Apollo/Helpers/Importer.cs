@@ -84,7 +84,7 @@ namespace Apollo.Helpers {
                 while (reader.BaseStream.Position < end) {
                     int delta = MIDIReadVariableLength(reader);
                     if (delta > 0) {
-                        ret.Last().Time = (int)((double)delta * 2500 / Program.Project.BPM);
+                        ret.Last().Time = new Time(false, null, delta * 2500 / Program.Project.BPM);
                         ret.Add(new Frame());
                     }
                     
@@ -155,7 +155,7 @@ namespace Apollo.Helpers {
                     if (codec.GetPixels(info, frame.GetPixels(), new SKCodecOptions(i)) == SKCodecResult.Success) {
                         frame = frame.Resize(targetInfo, SKFilterQuality.High);
 
-                        ret.Add(new Frame(false, null, codec.FrameInfo[i].Duration));
+                        ret.Add(new Frame(new Time(false, null, codec.FrameInfo[i].Duration)));
 
                         for (int x = 0; x <= 9; x++) {
                             for (int y = 0; y <= 9; y++) {

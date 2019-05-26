@@ -46,5 +46,7 @@ namespace Apollo.Structures {
         public static implicit operator int(Time x) => x.Mode? (int)x.Length : x.Free;
         public static implicit operator double(Time x) => x.Mode? (double)x.Length : x.Free;
         public static implicit operator decimal(Time x) => x.Mode? x.Length : x.Free;
+        
+        public override string ToString() => Mode? Length.ToString() : $"{Free}ms";
     }
 }

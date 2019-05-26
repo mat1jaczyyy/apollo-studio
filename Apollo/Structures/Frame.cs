@@ -36,55 +36,54 @@ namespace Apollo.Structures {
         public Pattern Parent;
         public int? ParentIndex;
 
-        private int _time;
-        public int Time {
+        private Time _time;
+        public Time Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000 && _time != value) {
-                    _time = value;
+                if (_time != null) {
+                    _time.FreeChanged -= FreeChanged;
+                    _time.ModeChanged -= ModeChanged;
+                    _time.StepChanged -= StepChanged;
+                }
 
-                    Parent?.Window?.SetDurationValue(ParentIndex.Value, Time);
-                    if (Info != null) Info.Viewer.Time.Text = TimeString;
+                _time = value;
+
+                if (_time != null) {
+                    _time.Minimum = 10;
+                    _time.Maximum = 30000;
+
+                    _time.FreeChanged += FreeChanged;
+                    _time.ModeChanged += ModeChanged;
+                    _time.StepChanged += StepChanged;
                 }
             }
         }
 
-        private bool _mode; // true uses Length
-        public bool Mode {
-            get => _mode;
-            set {
-                if (_mode != value) {
-                    _mode = value;
-                    
-                    Parent?.Window?.SetDurationMode(ParentIndex.Value, Mode);
-                    if (Info != null) Info.Viewer.Time.Text = TimeString;
-                }
-            }
+        private void FreeChanged(int value) {
+            Parent?.Window?.SetDurationValue(ParentIndex.Value, Time.Free);
+            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
         }
 
-        public Length Length;
-
-        private void LengthChanged() {
-            Parent?.Window?.SetDurationStep(ParentIndex.Value, Length.Step);
-            if (Info != null) Info.Viewer.Time.Text = TimeString;
+        private void ModeChanged(bool value) {
+            Parent?.Window?.SetDurationMode(ParentIndex.Value, Time.Mode);
+            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
         }
 
-        public string TimeString => Mode? Length.ToString() : $"{Time}ms";
+        private void StepChanged(int value) {
+            Parent?.Window?.SetDurationStep(ParentIndex.Value, Time.Length.Step);
+            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
+        }
 
-        public Frame Clone() => new Frame(Mode, Length.Clone(), Time, (from i in Screen select i.Clone()).ToArray());
+        public Frame Clone() => new Frame(Time.Clone(), (from i in Screen select i.Clone()).ToArray());
 
-        public Frame(bool mode = false, Length length = null, int time = 1000, Color[] screen = null) {
+        public Frame(Time time = null, Color[] screen = null) {
             if (screen == null || screen.Length != 100) {
                 screen = new Color[100];
                 for (int i = 0; i < 100; i++) screen[i] = new Color(0);
             }
 
-            Mode = mode;
-            Time = time;
-            Length = length?? new Length();
+            Time = time?? new Time();
             Screen = screen;
-
-            Length.Changed += LengthChanged;
         }
 
         public static bool Move(List<Frame> source, Pattern target, int position, bool copy = false) => (position == -1)
