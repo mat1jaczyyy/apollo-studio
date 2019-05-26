@@ -45,9 +45,9 @@ namespace Apollo.DeviceViewers {
             _copy = copy;
 
             Rate = this.Get<Dial>("Rate");
-            Rate.UsingSteps = _copy.Mode;
-            Rate.Length = _copy.Length;
-            Rate.RawValue = _copy.Rate;
+            Rate.UsingSteps = _copy.Time.Mode;
+            Rate.Length = _copy.Time.Length;
+            Rate.RawValue = _copy.Time.Free;
 
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_copy.Gate * 100;
@@ -75,13 +75,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Changed", () => {
-                    ((Copy)Track.TraversePath(path)).Rate = u;
+                    ((Copy)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Rate = r;
+                    ((Copy)Track.TraversePath(path)).Time.Free = r;
                 });
             }
 
-            _copy.Rate = (int)value;
+            _copy.Time.Free = (int)value;
         }
 
         public void SetRateValue(int rate) => Rate.RawValue = rate;
@@ -93,13 +93,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Switched", () => {
-                    ((Copy)Track.TraversePath(path)).Mode = u;
+                    ((Copy)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Mode = r;
+                    ((Copy)Track.TraversePath(path)).Time.Mode = r;
                 });
             }
 
-            _copy.Mode = value;
+            _copy.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Rate.UsingSteps = mode;
@@ -111,9 +111,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Changed", () => {
-                    ((Copy)Track.TraversePath(path)).Length.Step = u;
+                    ((Copy)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Length.Step = r;
+                    ((Copy)Track.TraversePath(path)).Time.Length.Step = r;
                 });
             }
         }

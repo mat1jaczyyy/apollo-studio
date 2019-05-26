@@ -110,11 +110,20 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()? (int?)reader.ReadInt32() : null
                 );
             
-            else if (t == typeof(Copy))
+            else if (t == typeof(Copy)) {
+                Time time;
+                if (version <= 2) {
+                    time = new Time(
+                        reader.ReadBoolean(),
+                        Decode(reader, version),
+                        reader.ReadInt32()
+                    );
+                } else {
+                    time = Decode(reader, version);
+                }
+
                 return new Copy(
-                    reader.ReadBoolean(),
-                    Decode(reader, version),
-                    reader.ReadInt32(),
+                    time,
                     reader.ReadDecimal(),
                     (Copy.CopyType)reader.ReadInt32(),
                     (Copy.GridType)reader.ReadInt32(),

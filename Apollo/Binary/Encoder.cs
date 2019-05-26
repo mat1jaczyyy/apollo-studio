@@ -131,9 +131,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Copy o) {
             EncodeID(writer, typeof(Copy));
 
-            writer.Write(o.Mode);
-            Encode(writer, o.Length);
-            writer.Write(o.Rate);
+            Encode(writer, o.Time);
             writer.Write(o.Gate);
 
             writer.Write((int)o.GetCopyMode());

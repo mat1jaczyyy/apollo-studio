@@ -41,34 +41,39 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
         }
 
-        private int _rate;
-        public int Rate {
-            get => _rate;
+        private Time _time;
+        public Time Time {
+            get => _time;
             set {
-                if (10 <= value && value <= 5000 && _rate != value) {
-                    _rate = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateValue(Rate);
-                }  
-            }
-        }
+                if (_time != null) {
+                    _time.FreeChanged -= FreeChanged;
+                    _time.ModeChanged -= ModeChanged;
+                    _time.StepChanged -= StepChanged;
+                }
 
-        private bool _mode; // true uses Length
-        public bool Mode {
-            get => _mode;
-            set {
-                if (_mode != value) {
-                    _mode = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetMode(Mode);
+                _time = value;
+
+                if (_time != null) {
+                    _time.Minimum = 10;
+                    _time.Maximum = 5000;
+
+                    _time.FreeChanged += FreeChanged;
+                    _time.ModeChanged += ModeChanged;
+                    _time.StepChanged += StepChanged;
                 }
             }
         }
 
-        public Length Length;
+        private void FreeChanged(int value) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateValue(value);
+        }
 
-        private void LengthChanged() {
-            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(Length.Step);
+        private void ModeChanged(bool value) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetMode(value);
+        }
+
+        private void StepChanged(int value) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
 
         private decimal _gate;
@@ -144,13 +149,10 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
 
-        public override Device Clone() => new Copy(Mode, Length.Clone(), _rate, _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList());
+        public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList());
 
-        public Copy(bool mode = false, Length length = null, int rate = 500, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
-            Mode = mode;
-            Rate = rate;
-            Length = length?? new Length();
-            Length.Changed += LengthChanged;
+        public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+            Time = time?? new Time(false, null, 500);
             Gate = gate;
             _copymode = copymode;
             _gridmode = gridmode;
@@ -267,7 +269,7 @@ namespace Apollo.Devices {
 
                 if (buffer.ContainsKey(n)) {
                     MIDIExit?.Invoke(m);
-                    FireCourier((original, offsets), (Mode? (int)Length : _rate) * _gate);
+                    FireCourier((original, offsets), _time * _gate);
                 } else {
                     timers[n].Dispose();
                     timers.Remove(n, out Courier _);
@@ -280,7 +282,7 @@ namespace Apollo.Devices {
             int py = n.Index / 10;
 
             List<int> validOffsets = new List<int>() {n.Index};
-            int time = 0;
+            int t = 0;
 
             for (int i = 0; i < Offsets.Count; i++) {
                 if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result)) {
@@ -296,7 +298,7 @@ namespace Apollo.Devices {
                         Signal m = n.Clone();
                         m.Index = (byte)result;
 
-                        FireCourier(m, (Mode? (int)Length : _rate) * _gate * (i + 1));
+                        FireCourier(m, _time * _gate * (i + 1));
                     }
                 }
 
@@ -319,12 +321,12 @@ namespace Apollo.Devices {
                         points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
                     
                     foreach ((int ix, int iy) in points) {
-                        time++;
+                        t++;
                         
                         if (Validate(ix, iy, out int iresult)) {
                             Signal m = n.Clone();
                             m.Index = (byte)iresult;
-                            FireCourier(m, (Mode? (int)Length : _rate) * _gate * time);
+                            FireCourier(m, _time * _gate * t);
                         }
                     }
                 }
