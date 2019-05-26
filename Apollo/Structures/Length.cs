@@ -29,6 +29,8 @@ namespace Apollo.Structures {
 
         public Length(int step = 5) => Step = step;
 
+        public static implicit operator int(Length x) => (int)(x.Value * 240000 / Program.Project.BPM);
+        public static implicit operator double(Length x) => (double)(x.Value * 240000 / Program.Project.BPM);
         public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
 
         public override string ToString() => Steps[_value];

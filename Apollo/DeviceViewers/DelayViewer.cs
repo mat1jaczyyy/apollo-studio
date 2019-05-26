@@ -22,9 +22,9 @@ namespace Apollo.DeviceViewers {
 
             _delay = delay;
             Duration = this.Get<Dial>("Duration");
-            Duration.UsingSteps = _delay.Mode;
-            Duration.Length = _delay.Length;
-            Duration.RawValue = _delay.Time;
+            Duration.UsingSteps = _delay.Time.Mode;
+            Duration.Length = _delay.Time.Length;
+            Duration.RawValue = _delay.Time.Free;
 
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_delay.Gate * 100;
@@ -37,13 +37,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Changed", () => {
-                    ((Delay)Track.TraversePath(path)).Time = u;
+                    ((Delay)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Time = r;
+                    ((Delay)Track.TraversePath(path)).Time.Free = r;
                 });
             }
 
-            _delay.Time = (int)value;
+            _delay.Time.Free = (int)value;
         }
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
@@ -55,13 +55,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Switched", () => {
-                    ((Delay)Track.TraversePath(path)).Mode = u;
+                    ((Delay)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Mode = r;
+                    ((Delay)Track.TraversePath(path)).Time.Mode = r;
                 });
             }
 
-            _delay.Mode = value;
+            _delay.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
@@ -73,9 +73,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Changed", () => {
-                    ((Delay)Track.TraversePath(path)).Length.Step = u;
+                    ((Delay)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Length.Step = r;
+                    ((Delay)Track.TraversePath(path)).Time.Length.Step = r;
                 });
             }
         }

@@ -148,9 +148,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Delay o) {
             EncodeID(writer, typeof(Delay));
 
-            writer.Write(o.Mode);
-            Encode(writer, o.Length);
-            writer.Write(o.Time);
+            Encode(writer, o.Time);
             writer.Write(o.Gate);
         }
 

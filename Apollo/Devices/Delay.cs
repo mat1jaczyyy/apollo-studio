@@ -8,34 +8,39 @@ namespace Apollo.Devices {
     public class Delay: Device {
         public static readonly new string DeviceIdentifier = "delay";
 
-        private int _time;
-        public int Time {
+        private Time _time;
+        public Time Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000 && _time != value) {
-                    _time = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetDurationValue(Time);
-                }  
-            }
-        }
+                if (_time != null) {
+                    _time.FreeChanged -= FreeChanged;
+                    _time.ModeChanged -= ModeChanged;
+                    _time.StepChanged -= StepChanged;
+                }
 
-        private bool _mode; // true uses Length
-        public bool Mode {
-            get => _mode;
-            set {
-                if (_mode != value) {
-                    _mode = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetMode(Mode);
+                _time = value;
+
+                if (_time != null) {
+                    _time.Minimum = 10;
+                    _time.Maximum = 30000;
+
+                    _time.FreeChanged += FreeChanged;
+                    _time.ModeChanged += ModeChanged;
+                    _time.StepChanged += StepChanged;
                 }
             }
         }
 
-        public Length Length;
+        private void FreeChanged(int value) {
+            if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetDurationValue(value);
+        }
 
-        private void LengthChanged() {
-            if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetDurationStep(Length.Step);
+        private void ModeChanged(bool value) {
+            if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetMode(value);
+        }
+
+        private void StepChanged(int value) {
+            if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
         private decimal _gate;
@@ -50,15 +55,11 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Delay(Mode, Length.Clone(), _time, _gate);
+        public override Device Clone() => new Delay(_time.Clone(), _gate);
 
-        public Delay(bool mode = false, Length length = null, int time = 1000, decimal gate = 1): base(DeviceIdentifier) {
-            Mode = mode;
-            Time = time;
-            Length = length?? new Length();
+        public Delay(Time time = null, decimal gate = 1): base(DeviceIdentifier) {
+            Time = time?? new Time();
             Gate = gate;
-
-            Length.Changed += LengthChanged;
         }
 
         private void Tick(object sender, EventArgs e) {
@@ -72,7 +73,7 @@ namespace Apollo.Devices {
             Courier courier = new Courier() {
                 Info = n.Clone(),
                 AutoReset = false,
-                Interval = (double)((Mode? (int)Length : _time) * _gate),
+                Interval = (double)(_time * _gate),
             };
             courier.Elapsed += Tick;
             courier.Start();

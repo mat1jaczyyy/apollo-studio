@@ -122,13 +122,23 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
                 );
             
-            else if (t == typeof(Delay))
+            } else if (t == typeof(Delay)) {
+                Time time;
+                if (version <= 2) {
+                    time = new Time(
+                        reader.ReadBoolean(),
+                        Decode(reader, version),
+                        reader.ReadInt32()
+                    );
+                } else {
+                    time = Decode(reader, version);
+                }
+
                 return new Delay(
-                    reader.ReadBoolean(),
-                    Decode(reader, version),
-                    reader.ReadInt32(),
+                    time,
                     reader.ReadDecimal()
                 );
+            }
             
             else if (t == typeof(Fade)) {
                 int count;
