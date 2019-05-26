@@ -264,6 +264,13 @@ namespace Apollo.Binary {
                     reader.ReadInt32(),
                     reader.ReadInt32()
                 );
+            
+            else if (t == typeof(Time))
+                return new Time(
+                    reader.ReadBoolean(),
+                    Decode(reader, version),
+                    reader.ReadInt32()
+                );
 
             return null;
         }

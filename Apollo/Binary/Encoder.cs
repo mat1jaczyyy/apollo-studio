@@ -323,5 +323,13 @@ namespace Apollo.Binary {
             writer.Write(o.X);
             writer.Write(o.Y);
         }
+
+        private static void Encode(BinaryWriter writer, Time o) {
+            EncodeID(writer, typeof(Time));
+
+            writer.Write(o.Mode);
+            Encode(writer, o.Length);
+            writer.Write(o.Free);
+        }
     }
 }
