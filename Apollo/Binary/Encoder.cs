@@ -175,9 +175,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Hold o) {
             EncodeID(writer, typeof(Hold));
 
-            writer.Write(o.Mode);
-            Encode(writer, o.Length);
-            writer.Write(o.Time);
+            Encode(writer, o.Time);
             writer.Write(o.Gate);
 
             writer.Write(o.Infinite);

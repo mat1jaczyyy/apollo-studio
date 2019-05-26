@@ -176,17 +176,26 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
             
-            else if (t == typeof(Hold))
+            else if (t == typeof(Hold)) {
+                Time time;
+                if (version <= 2) {
+                    time = new Time(
+                        reader.ReadBoolean(),
+                        Decode(reader, version),
+                        reader.ReadInt32()
+                    );
+                } else {
+                    time = Decode(reader, version);
+                }
+
                 return new Hold(
-                    reader.ReadBoolean(),
-                    Decode(reader, version),
-                    reader.ReadInt32(),
+                    time,
                     reader.ReadDecimal(),
                     reader.ReadBoolean(),
                     reader.ReadBoolean()
                 );
             
-            else if (t == typeof(KeyFilter))
+            } else if (t == typeof(KeyFilter))
                 return new KeyFilter(
                     (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );

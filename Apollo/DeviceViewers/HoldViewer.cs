@@ -26,9 +26,9 @@ namespace Apollo.DeviceViewers {
             _hold = hold;
 
             Duration = this.Get<Dial>("Duration");
-            Duration.UsingSteps = _hold.Mode;
-            Duration.Length = _hold.Length;
-            Duration.RawValue = _hold.Time;
+            Duration.UsingSteps = _hold.Time.Mode;
+            Duration.Length = _hold.Time.Length;
+            Duration.RawValue = _hold.Time.Free;
 
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_hold.Gate * 100;
@@ -48,13 +48,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Changed", () => {
-                    ((Hold)Track.TraversePath(path)).Time = u;
+                    ((Hold)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Time = r;
+                    ((Hold)Track.TraversePath(path)).Time.Free = r;
                 });
             }
 
-            _hold.Time = (int)value;
+            _hold.Time.Free = (int)value;
         }
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
@@ -66,13 +66,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Switched", () => {
-                    ((Hold)Track.TraversePath(path)).Mode = u;
+                    ((Hold)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Mode = r;
+                    ((Hold)Track.TraversePath(path)).Time.Mode = r;
                 });
             }
 
-            _hold.Mode = value;
+            _hold.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
@@ -84,9 +84,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Changed", () => {
-                    ((Hold)Track.TraversePath(path)).Length.Step = u;
+                    ((Hold)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Length.Step = r;
+                    ((Hold)Track.TraversePath(path)).Time.Length.Step = r;
                 });
             }
         }
