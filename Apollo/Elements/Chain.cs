@@ -150,9 +150,8 @@ namespace Apollo.Elements {
             : Move(source, target[position], copy);
 
         public static bool Move(List<Chain> source, Chain target, bool copy = false) {
-            if (!copy)
-                for (int i = 0; i < source.Count; i++)
-                    if (source[i] == target) return false;
+            if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
+                return false;
             
             List<Chain> moved = new List<Chain>();
 
@@ -174,8 +173,8 @@ namespace Apollo.Elements {
         }
 
         public static bool Move(List<Chain> source, IMultipleChainParent target, bool copy = false) {
-            if (!copy)
-                if (target.Count > 0 && source[0] == target[0]) return false;
+            if (!copy && target.Count > 0 && source[0] == target[0])
+                return false;
             
             List<Chain> moved = new List<Chain>();
 
