@@ -40,7 +40,7 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Hue_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;
                 List<int> path = Track.GetPath(_tone);
@@ -58,7 +58,7 @@ namespace Apollo.DeviceViewers {
         public void SetHue(double value) => Hue.RawValue = value;
 
         private void SaturationHigh_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
@@ -76,7 +76,7 @@ namespace Apollo.DeviceViewers {
         public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
 
         private void SaturationLow_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
@@ -94,7 +94,7 @@ namespace Apollo.DeviceViewers {
         public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
 
         private void ValueHigh_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
@@ -112,7 +112,7 @@ namespace Apollo.DeviceViewers {
         public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
 
         private void ValueLow_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);

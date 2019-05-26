@@ -69,7 +69,7 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Rate_ValueChanged(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
                 List<int> path = Track.GetPath(_copy);
@@ -87,7 +87,7 @@ namespace Apollo.DeviceViewers {
         public void SetRateValue(int rate) => Rate.RawValue = rate;
 
         private void Rate_ModeChanged(bool value, bool? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
                 List<int> path = Track.GetPath(_copy);
@@ -105,7 +105,7 @@ namespace Apollo.DeviceViewers {
         public void SetMode(bool mode) => Rate.UsingSteps = mode;
 
         private void Rate_StepChanged(int value, int? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
                 List<int> path = Track.GetPath(_copy);
@@ -121,7 +121,7 @@ namespace Apollo.DeviceViewers {
         public void SetRateStep(int rate) => Rate.DrawArcAuto();
 
         private void Gate_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_copy);

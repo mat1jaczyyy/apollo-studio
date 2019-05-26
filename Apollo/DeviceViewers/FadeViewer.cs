@@ -215,7 +215,7 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Duration_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
                 List<int> path = Track.GetPath(_fade);
@@ -233,7 +233,7 @@ namespace Apollo.DeviceViewers {
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
         private void Duration_ModeChanged(bool value, bool? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
                 List<int> path = Track.GetPath(_fade);
@@ -251,7 +251,7 @@ namespace Apollo.DeviceViewers {
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
         private void Duration_StepChanged(int value, int? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
                 List<int> path = Track.GetPath(_fade);
@@ -267,7 +267,7 @@ namespace Apollo.DeviceViewers {
         public void SetDurationStep(int duration) => Duration.DrawArcAuto();
 
         private void Gate_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_fade);

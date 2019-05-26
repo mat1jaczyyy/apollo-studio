@@ -295,12 +295,8 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Device.Capture(null);
 
-                if (UsingSteps) {
-                    if (oldStep != Length.Step)
-                        StepChanged?.Invoke(Length.Step, oldStep);
-
-                } else if (oldValue != RawValue)
-                    ValueChanged?.Invoke(RawValue, oldValue);
+                if (UsingSteps) StepChanged?.Invoke(Length.Step, oldStep);
+                else ValueChanged?.Invoke(RawValue, oldValue);
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
@@ -393,8 +389,7 @@ namespace Apollo.Components {
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
 
-            if (oldValue != RawValue)
-                ValueChanged?.Invoke(_raw, oldValue);
+            ValueChanged?.Invoke(_raw, oldValue);
         }
 
         private void Input_KeyDown(object sender, KeyEventArgs e) {

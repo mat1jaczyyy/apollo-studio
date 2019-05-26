@@ -537,7 +537,7 @@ namespace Apollo.Windows {
                 int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {index} Duration Changed", () => {
+                Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
                     ((Pattern)Track.TraversePath(path))[index].Time = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path))[index].Time = r;
@@ -559,7 +559,7 @@ namespace Apollo.Windows {
                 int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {index} Duration Changed", () => {
+                Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
                     ((Pattern)Track.TraversePath(path))[index].Length.Step = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path))[index].Length.Step = r;
@@ -581,7 +581,7 @@ namespace Apollo.Windows {
                 int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {index} Duration Switched", () => {
+                Program.Project.Undo.Add($"Pattern Frame Duration Switched", () => {
                     ((Pattern)Track.TraversePath(path))[index].Mode = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path))[index].Mode = r;
@@ -597,7 +597,7 @@ namespace Apollo.Windows {
         }
 
         private void Gate_Changed(double value, double? old) {
-            if (old != null) {
+            if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_pattern);
