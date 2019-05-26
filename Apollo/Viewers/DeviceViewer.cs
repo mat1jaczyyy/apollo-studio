@@ -166,8 +166,14 @@ namespace Apollo.Viewers {
             if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter")
+            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
 

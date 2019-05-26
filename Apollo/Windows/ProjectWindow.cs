@@ -292,8 +292,14 @@ namespace Apollo.Windows {
             if (!e.Data.Contains("track")) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "TrackAdd")
+            while (source.Name != "DropZoneAfter" && source.Name != "TrackAdd") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
 

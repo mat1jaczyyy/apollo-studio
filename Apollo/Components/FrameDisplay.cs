@@ -115,8 +115,14 @@ namespace Apollo.Components {
             if (!e.Data.Contains("frame")) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZone" && source.Name != "DropZoneAfter")
+            while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
 

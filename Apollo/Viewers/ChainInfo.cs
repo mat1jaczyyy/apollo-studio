@@ -127,8 +127,14 @@ namespace Apollo.Viewers {
             e.Handled = true;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZone" && source.Name != "DropZoneAfter")
+            while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
             bool result;

@@ -196,8 +196,14 @@ namespace Apollo.DeviceViewers {
             e.Handled = true;
             
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "ChainAdd")
+            while (source.Name != "DropZoneAfter" && source.Name != "ChainAdd") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
             bool result;

@@ -145,8 +145,14 @@ namespace Apollo.Viewers {
             if (!e.Data.Contains("track")) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZone" && source.Name != "DropZoneAfter")
+            while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
                 source = source.Parent;
+                
+                if (source == this) {
+                    e.Handled = false;
+                    return;
+                }
+            }
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
 
