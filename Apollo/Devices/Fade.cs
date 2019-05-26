@@ -50,36 +50,42 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
-        private int _time;
-        public int Time {
+        private Time _time;
+        public Time Time {
             get => _time;
             set {
-                if (10 <= value && value <= 30000 && _time != value) {
-                    _time = value;
-                    Generate();
-                    
-                    if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationValue(Time);
-                }  
-            }
-        }
+                if (_time != null) {
+                    _time.FreeChanged -= FreeChanged;
+                    _time.ModeChanged -= ModeChanged;
+                    _time.StepChanged -= StepChanged;
+                }
 
-        private bool _mode; // true uses Length
-        public bool Mode {
-            get => _mode;
-            set {
-                if (_mode != value) {
-                    _mode = value;
-                    Generate();
-                    
-                    if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetMode(Mode);
+                _time = value;
+
+                if (_time != null) {
+                    _time.Minimum = 10;
+                    _time.Maximum = 30000;
+
+                    _time.FreeChanged += FreeChanged;
+                    _time.ModeChanged += ModeChanged;
+                    _time.StepChanged += StepChanged;
                 }
             }
         }
 
-        public Length Length;
+        private void FreeChanged(int value) {
+            Generate();
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationValue(value);
+        }
 
-        private void LengthChanged() {
-            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(Length.Step);
+        private void ModeChanged(bool value) {
+            Generate();
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetMode(value);
+        }
+
+        private void StepChanged(int value) {
+            Generate();
+            if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
         private decimal _gate;
@@ -158,12 +164,12 @@ namespace Apollo.Devices {
                 if (_cutoffs[j + 1] == i) j++;
 
                 if (j < _colors.Count - 1) {
-                    double time = (double)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * (Mode? (int)Length : _time) * _gate);
+                    double time = (double)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate);
                     if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
                 }
             }
 
-            fade.Add(new FadeInfo(_steps.Last(), (double)((Mode? (int)Length : _time) * _gate)));
+            fade.Add(new FadeInfo(_steps.Last(), (double)(_time * _gate)));
             
             Generated?.Invoke();
         }
@@ -172,7 +178,7 @@ namespace Apollo.Devices {
             get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(Mode, Length.Clone(), _time, _gate, _playmode, (from i in _colors select i.Clone()).ToList(), _positions.ToList());
+        public override Device Clone() => new Fade(_time.Clone(), _gate, _playmode, (from i in _colors select i.Clone()).ToList(), _positions.ToList());
 
         public void Insert(int index, Color color, decimal position) {
             _colors.Insert(index, color);
@@ -197,22 +203,17 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(bool mode = false, Length length = null, int time = 1000, decimal gate = 1, PlaybackType playmode = PlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
-            Mode = mode;
-            Time = time;
-            Length = length?? new Length();
+        public Fade(Time time = null, decimal gate = 1, PlaybackType playmode = PlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
+            Time = time?? new Time();
             Gate = gate;
             _playmode = playmode;
-
-            Length.Changed += LengthChanged;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<decimal>() {0, 1};
 
             if (Program.Project == null) Program.ProjectLoaded += Generate;
             else Generate();
-            
-            Length.Changed += Generate;
+
             Preferences.FadeSmoothnessChanged += Generate;
         }
 

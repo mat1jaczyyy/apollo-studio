@@ -71,9 +71,9 @@ namespace Apollo.DeviceViewers {
             PlaybackMode.SelectedItem = _fade.PlayMode;
 
             Duration = this.Get<Dial>("Duration");
-            Duration.UsingSteps = _fade.Mode;
-            Duration.Length = _fade.Length;
-            Duration.RawValue = _fade.Time;
+            Duration.UsingSteps = _fade.Time.Mode;
+            Duration.Length = _fade.Time.Length;
+            Duration.RawValue = _fade.Time.Free;
 
             Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_fade.Gate * 100;
@@ -221,13 +221,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed", () => {
-                    ((Fade)Track.TraversePath(path)).Time = u;
+                    ((Fade)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time = r;
+                    ((Fade)Track.TraversePath(path)).Time.Free = r;
                 });
             }
 
-            _fade.Time = (int)value;
+            _fade.Time.Free = (int)value;
         }
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
@@ -239,13 +239,13 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Switched", () => {
-                    ((Fade)Track.TraversePath(path)).Mode = u;
+                    ((Fade)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Mode = r;
+                    ((Fade)Track.TraversePath(path)).Time.Mode = r;
                 });
             }
 
-            _fade.Mode = value;
+            _fade.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
@@ -257,9 +257,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed", () => {
-                    ((Fade)Track.TraversePath(path)).Length.Step = u;
+                    ((Fade)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Length.Step = r;
+                    ((Fade)Track.TraversePath(path)).Time.Length.Step = r;
                 });
             }
         }

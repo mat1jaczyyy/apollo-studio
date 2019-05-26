@@ -153,9 +153,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Fade o) {
             EncodeID(writer, typeof(Fade));
 
-            writer.Write(o.Mode);
-            Encode(writer, o.Length);
-            writer.Write(o.Time);
+            Encode(writer, o.Time);
             writer.Write(o.Gate);
             writer.Write((int)o.GetPlaybackType());
 

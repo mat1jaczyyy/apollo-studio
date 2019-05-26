@@ -150,11 +150,20 @@ namespace Apollo.Binary {
             }
             
             else if (t == typeof(Fade)) {
+                Time time;
+                if (version <= 2) {
+                    time = new Time(
+                        reader.ReadBoolean(),
+                        Decode(reader, version),
+                        reader.ReadInt32()
+                    );
+                } else {
+                    time = Decode(reader, version);
+                }
+
                 int count;
                 return new Fade(
-                    reader.ReadBoolean(),
-                    Decode(reader, version),
-                    reader.ReadInt32(),
+                    time,
                     reader.ReadDecimal(),
                     (Fade.PlaybackType)reader.ReadInt32(),
                     (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList(),
