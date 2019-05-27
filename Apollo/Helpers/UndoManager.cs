@@ -20,6 +20,8 @@ namespace Apollo.Helpers {
             }
         }
 
+        private object locker = new object();
+
         public List<UndoEntry> History = new List<UndoEntry>() {
             new UndoEntry("Initial State")
         };
@@ -60,15 +62,17 @@ namespace Apollo.Helpers {
         }
 
         public void Select(int index) {
-            if (index < Position)
-                for (int i = Position; i > index; i--)
-                    History[i].Undo.Invoke();
-            
-            else if (index > Position)
-                for (int i = Position + 1; i <= index; i++)
-                    History[i].Redo.Invoke();
-            
-            Position = index;
+            lock (locker) {
+                if (index < Position)
+                    for (int i = Position; i > index; i--)
+                        History[i].Undo.Invoke();
+                
+                else if (index > Position)
+                    for (int i = Position + 1; i <= index; i++)
+                        History[i].Redo.Invoke();
+                
+                Position = index;
+            }
         }
 
         public void Undo() => Select(Math.Max(0, Position - 1));
