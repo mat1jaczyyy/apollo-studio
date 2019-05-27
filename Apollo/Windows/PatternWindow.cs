@@ -684,7 +684,24 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Invert(object sender, RoutedEventArgs e) {
+            List<ISelect> selection = Selection.Selection;
+
+            int left = selection.First().IParentIndex.Value;
+            int right = selection.Last().IParentIndex.Value;
+
+            List<int> path = Track.GetPath(_pattern);
+
+            Action ur = () => {
+                Pattern pattern = (Pattern)Track.TraversePath(path);
+
+                for (int i = left; i <= right; i++)
+                    pattern[i].Screen = pattern[i].Screen.Reverse().ToArray();
+            };
+
+            Program.Project.Undo.Add($"Pattern Frames Inverted", ur, ur);
             
+            for (int i = left; i <= right; i++)
+                _pattern[i].Screen = _pattern[i].Screen.Reverse().ToArray();
         }
 
         private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
