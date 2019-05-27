@@ -68,7 +68,7 @@ namespace Apollo.Windows {
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Choke;
-        Button Import, Play, Fire;
+        Button Import, Play, Fire, Reverse, Invert;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -80,7 +80,25 @@ namespace Apollo.Windows {
             get => _locked;
             set {
                 _locked = value;
-                PortSelector.IsEnabled = UndoButton.IsEnabled = RedoButton.IsEnabled = Duration.Enabled = Gate.Enabled = Import.IsEnabled = Play.IsEnabled = Fire.IsEnabled = ColorPicker.IsEnabled = ColorHistory.IsEnabled = !_locked;
+
+                UndoButton.IsEnabled =
+                RedoButton.IsEnabled =
+                Import.IsEnabled =
+                Choke.Enabled =
+                Choke.IsEnabled =
+                Gate.Enabled =
+                PlaybackMode.IsEnabled =
+                Play.IsEnabled =
+                Fire.IsEnabled =
+                PortSelector.IsEnabled =
+                ColorPicker.IsEnabled =
+                ColorHistory.IsEnabled =
+                Duration.Enabled =
+                Duration.IsEnabled =
+                Reverse.IsEnabled =
+                Invert.IsEnabled = !_locked;
+
+                if (!_locked) Choke.Enabled = _pattern.ChokeEnabled;
             }
         }
 
@@ -175,6 +193,9 @@ namespace Apollo.Windows {
             Play = this.Get<Button>("Play");
             Fire = this.Get<Button>("Fire");
 
+            Reverse = this.Get<Button>("Reverse");
+            Invert = this.Get<Button>("Invert");
+
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(FrameContextMenu_Click));
 
@@ -245,6 +266,8 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Insert(int index) {
+            if (Locked) return;
+
             Frame reference = _pattern[Math.Max(0, index - 1)];
 
             Frame_Insert(index, new Frame(reference.Time.Clone()));
@@ -443,20 +466,22 @@ namespace Apollo.Windows {
                 else Frame_Select(_pattern.Expanded + 1);
 
             } else if (x == 0 && y == 1) { // Up
+                if (Locked) return;
                 origin = -1;
                 historyShowing = Locked = true;
                 RenderHistory();
                 
             } else if (x == 0 && y == -1) { // Down
+                if (Locked) return;
                 PadStarted(-1);
                 PadPressed(-1);
                 PadFinished(-1);
                 
             } else if (x == -1 && y == 1) // Up-Left
-                PatternPlay(null, null);
+                PatternPlay(Play, null);
                 
             else if (x == 1 && y == -1) // Down-Right
-                PatternFire(null, null);
+                PatternFire(Fire, null);
                 
             else if (x == 1 && y == 1) // Up-Right
                 Frame_Insert(_pattern.Expanded + 1);
@@ -518,7 +543,7 @@ namespace Apollo.Windows {
                     int x = gesturePoint % 10 - origin % 10;
                     int y = gesturePoint / 10 - origin / 10;
 
-                    if (!Locked) Dispatcher.UIThread.InvokeAsync(() => { HandleGesture(x, y); });
+                    Dispatcher.UIThread.InvokeAsync(() => { HandleGesture(x, y); });
 
                     gestureUsed = true;
                     gesturePoint = -1;
@@ -816,14 +841,7 @@ namespace Apollo.Windows {
                     if (_launchpad != null) PlayExit = Launchpad.Send;
                     else PlayExit = null;
 
-                    Dispatcher.UIThread.InvokeAsync(() => {
-                        Locked = false;
-
-                        Editor.RenderFrame(_pattern[_pattern.Expanded]);
-                    });
-
-                    for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                        Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+                    PatternFinish();
                 }
 
                 PlayTimers.Remove(courier);
@@ -834,12 +852,12 @@ namespace Apollo.Windows {
         private object PlayLocker = new object();
         private List<Courier> PlayTimers = new List<Courier>();
 
-        private void PatternStop() {
+        private void PatternStop(bool send = true) {
             lock (PlayLocker) {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
                 
-                if (PlayIndex < _pattern.Count)
+                if (send && PlayIndex < _pattern.Count)
                     for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
                         if (_pattern[PlayIndex].Screen[i].Lit)
                             PlayColor(i, new Color(0));
@@ -850,14 +868,32 @@ namespace Apollo.Windows {
         }
 
         private void PatternPlay(object sender, RoutedEventArgs e) {
-            if (Locked) return;
+            if (Locked) {
+                PatternStop();
+                PatternFinish();
+
+                return;
+            }
+
             Locked = true;
 
-            PatternStop();
+            Button button = (Button)sender;
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                button.IsEnabled = true;
+                button.Content = "Stop";
+            });
+            
+            PatternStop(false);
+
+            foreach (Launchpad lp in MIDI.Devices)
+                if (lp.Available && lp.Type != Launchpad.LaunchpadType.Unknown)
+                    lp.Clear();
+
             Editor.RenderFrame(_pattern[0]);
 
             for (int i = 0; i < _pattern[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
+                PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
 
             decimal time = 0;
 
@@ -868,10 +904,25 @@ namespace Apollo.Windows {
         }
 
         private void PatternFire(object sender, RoutedEventArgs e) {
-            if (Locked) return;
-
             PlayExit = _pattern.MIDIExit;
             PatternPlay(sender, e);
+        }
+
+        private void PatternFinish() {
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Locked = false;
+
+                Editor.RenderFrame(_pattern[_pattern.Expanded]);
+
+                Play.Content = "Play";
+                Fire.Content = "Fire";
+            });
+
+            if (_launchpad != null) PlayExit = Launchpad.Send;
+            else PlayExit = null;
+
+            for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
+                Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
         private static void ImportFrames(Pattern pattern, List<Frame> frames, decimal gate) {

@@ -157,7 +157,7 @@ namespace Apollo.Components {
         }
 
         private void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            if (main_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = false;
                 e.Device.Capture(null);
 
@@ -202,7 +202,7 @@ namespace Apollo.Components {
         }
 
         private void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            if (hue_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = false;
                 e.Device.Capture(null);
                 
