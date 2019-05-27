@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 
 using Apollo.Core;
 using Apollo.Devices;
@@ -112,8 +113,30 @@ namespace Apollo.Windows {
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
-        
+
         private void Minimize() => WindowState = WindowState.Minimized;
+        
+        private void Expand(IPointerDevice e) {
+            Point pointerRelative = e.GetPosition(this);
+
+            PixelPoint pointerAbsolute = new PixelPoint(
+                (int)(Position.X + pointerRelative.X),
+                (int)(Position.Y + pointerRelative.Y)
+            );
+
+            Screen result = null;
+
+            foreach (Screen screen in Screens.All)
+                if (screen.Bounds.Contains(pointerAbsolute)) {
+                    result = screen;
+                    break;
+                }
+
+            if (result != null) {
+                Position = new PixelPoint(result.Bounds.X, Position.Y);
+                Width = result.Bounds.Width;
+            }
+        }
 
         private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
 

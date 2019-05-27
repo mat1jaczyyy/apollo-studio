@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="600" MinWidth="180"
+        Width="600" MinWidth="400"
         Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
@@ -26,6 +26,7 @@
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
           <Components:Minimize Clicked="Minimize" />
+          <Components:Expand Clicked="Expand" />
           <Components:Close Clicked="Close" />
         </StackPanel>
       </Grid>

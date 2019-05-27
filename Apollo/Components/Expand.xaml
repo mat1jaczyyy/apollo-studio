@@ -1,0 +1,11 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.Expand">
+
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
+    <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="2"
+          Data="M 14,2 L 2,14" />
+    <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
+          Data="M 1,9 L 7,15 1,15 Z M 15,7 L 9,1 15,1 Z" />
+  </Canvas>
+</UserControl>
