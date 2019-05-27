@@ -9,14 +9,36 @@ namespace Apollo.Structures {
         public delegate void ModeChangedEventHandler(bool mode);
         public event ModeChangedEventHandler ModeChanged;
 
-        public int Minimum = 0, Maximum = int.MaxValue;
+        private int _min = 0;
+        public int Minimum {
+            get => _min;
+            set {
+                _min = value;
+
+                if (_free < _min)
+                    Free = _min;
+            }
+        }
+        
+        private int _max = int.MaxValue;
+        public int Maximum {
+            get => _max;
+            set {
+                _max = value;
+                
+                if (_max < _free)
+                    Free = _max;
+            }
+        }
 
         private int _free;
         public int Free {
             get => _free;
             set {
-                if (Minimum <= value && value <= Maximum && _free != value)
-                    FreeChanged?.Invoke(_free = value);
+                if (Minimum <= value && value <= Maximum && _free != value) {
+                    _free = value;
+                    FreeChanged?.Invoke(_free);
+                }
             }
         }
 
@@ -24,8 +46,10 @@ namespace Apollo.Structures {
         public bool Mode {
             get => _mode;
             set {
-                if (_mode != value)
-                    ModeChanged?.Invoke(_mode = value);
+                if (_mode != value) {
+                    _mode = value;
+                    ModeChanged?.Invoke(_mode);
+                }
             }
         }
 
