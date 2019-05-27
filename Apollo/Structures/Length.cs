@@ -29,6 +29,19 @@ namespace Apollo.Structures {
 
         public Length(int step = 5) => Step = step;
 
+        public override bool Equals(object obj) {
+            if (!(obj is Length)) return false;
+            return this == (Length)obj;
+        }
+
+        public static bool operator ==(Length a, Length b) {
+            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            return a.Step == b.Step;
+        }
+        public static bool operator !=(Length a, Length b) => !(a == b);
+
+        public override int GetHashCode() => HashCode.Combine(Step);
+
         public static implicit operator int(Length x) => (int)(x.Value * 240000 / Program.Project.BPM);
         public static implicit operator double(Length x) => (double)(x.Value * 240000 / Program.Project.BPM);
         public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;

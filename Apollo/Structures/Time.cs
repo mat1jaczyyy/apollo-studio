@@ -1,3 +1,5 @@
+using System;
+
 namespace Apollo.Structures {
     public class Time {
         public delegate void ValueChangedEventHandler(int free);
@@ -42,6 +44,19 @@ namespace Apollo.Structures {
 
             Length.Changed += LengthChanged;
         }
+
+        public override bool Equals(object obj) {
+            if (!(obj is Time)) return false;
+            return this == (Time)obj;
+        }
+
+        public static bool operator ==(Time a, Time b) {
+            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            return a.Mode == b.Mode && a.Length == b.Length && a.Free == b.Free;
+        }
+        public static bool operator !=(Time a, Time b) => !(a == b);
+
+        public override int GetHashCode() => HashCode.Combine(Mode, Length, Free);
 
         public static implicit operator int(Time x) => x.Mode? (int)x.Length : x.Free;
         public static implicit operator double(Time x) => x.Mode? (double)x.Length : x.Free;

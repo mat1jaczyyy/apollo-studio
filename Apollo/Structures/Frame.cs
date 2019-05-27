@@ -55,6 +55,10 @@ namespace Apollo.Structures {
                     _time.FreeChanged += FreeChanged;
                     _time.ModeChanged += ModeChanged;
                     _time.StepChanged += StepChanged;
+
+                    FreeChanged(_time.Free);
+                    ModeChanged(_time.Mode);
+                    StepChanged(_time.Length.Step);
                 }
             }
         }

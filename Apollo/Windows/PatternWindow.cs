@@ -367,14 +367,14 @@ namespace Apollo.Windows {
         }
 
         Color drawingState;
-        Color[] old;
+        Color[] oldScreen;
         
         private void PadStarted(int index) {
             drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
                 ? new Color(0)
                 : ColorPicker.Color;
             
-            old = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
+            oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
     
         private void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
@@ -406,10 +406,10 @@ namespace Apollo.Windows {
         }
 
         private void PadFinished(int _) {
-            if (old == null) return;
+            if (oldScreen == null) return;
 
-            if (!old.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
-                Color[] u = old;
+            if (!oldScreen.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
+                Color[] u = oldScreen;
                 Color[] r = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
                 int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
@@ -421,7 +421,7 @@ namespace Apollo.Windows {
                 });
             }
 
-            old = null;
+            oldScreen = null;
         }
 
         public void SetGrid(int index, Frame frame) {
@@ -526,21 +526,47 @@ namespace Apollo.Windows {
             }
         }
 
+        List<Time> oldTime;
+
+        private void Duration_Started() {
+            oldTime = new List<Time>();
+
+            foreach (Frame frame in Selection.Selection)
+                oldTime.Add(frame.Time.Clone());
+        }
+
         private void Duration_Changed(double value, double? old) {
-            if (old != null) {
-                int u = (int)old.Value;
+            if (oldTime == null) return;
+
+            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+                int left = Selection.Selection[0].IParentIndex.Value;
+
+                List<Time> u = oldTime.ToList();
                 int r = (int)value;
-                int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Free = u;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++)
+                        pattern[left + i].Time = u[i].Clone();
+                    
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Free = r;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++) {
+                        pattern[left + i].Time.Free = r;
+                        pattern[left + i].Time.Mode = false;
+                    }
                 });
+
+                oldTime = null;
             }
 
-            _pattern[_pattern.Expanded].Time.Free = (int)value;
+            foreach (Frame frame in Selection.Selection) {
+                frame.Time.Free = (int)value;
+                frame.Time.Mode = false;
+            }
         }
 
         public void SetDurationValue(int index, int value) {
@@ -549,20 +575,37 @@ namespace Apollo.Windows {
         }
 
         private void Duration_StepChanged(int value, int? old) {
-            if (old != null) {
-                int u = old.Value;
+            if (oldTime == null) return;
+
+            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+                int left = Selection.Selection[0].IParentIndex.Value;
+
+                List<Time> u = oldTime.ToList();
                 int r = value;
-                int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Length.Step = u;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++)
+                        pattern[left + i].Time = u[i].Clone();
+                    
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Length.Step = r;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++) {
+                        pattern[left + i].Time.Length.Step = r;
+                        pattern[left + i].Time.Mode = true;
+                    }
                 });
+
+                oldTime = null;
             }
 
-            _pattern[_pattern.Expanded].Time.Length.Step = value;
+            foreach (Frame frame in Selection.Selection) {
+                frame.Time.Length.Step = value;
+                frame.Time.Mode = true;
+            }
         }
 
         public void SetDurationStep(int index, int value) {
@@ -571,20 +614,33 @@ namespace Apollo.Windows {
         }
 
         private void Duration_ModeChanged(bool value, bool? old) {
-            if (old != null) {
-                bool u = old.Value;
+            if (oldTime == null) return;
+
+            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+                int left = Selection.Selection[0].IParentIndex.Value;
+
+                List<Time> u = oldTime.ToList();
                 bool r = value;
-                int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame Duration Switched", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Mode = u;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++)
+                        pattern[left + i].Time = u[i].Clone();
+                    
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Time.Mode = r;
+                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    
+                    for (int i = 0; i < u.Count; i++)
+                        pattern[left + i].Time.Mode = r;
                 });
+
+                oldTime = null;
             }
 
-            _pattern[_pattern.Expanded].Time.Mode = value;
+            foreach (Frame frame in Selection.Selection)
+                frame.Time.Mode = value;
         }
 
         public void SetDurationMode(int index, bool value) {

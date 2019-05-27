@@ -16,6 +16,9 @@ namespace Apollo.Components {
     public class Dial: UserControl {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+        public delegate void DialStartedEventHandler();
+        public event DialStartedEventHandler Started;
+
         public delegate void DialValueChangedEventHandler(double NewValue, double? OldValue);
         public event DialValueChangedEventHandler ValueChanged;
 
@@ -284,6 +287,8 @@ namespace Apollo.Components {
                 if (UsingSteps) oldStep = Length.Step;
                 else oldValue = RawValue;
 
+                Started?.Invoke();
+
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
             }
         }
@@ -301,7 +306,10 @@ namespace Apollo.Components {
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
             } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) {
+                Started?.Invoke();
+                
                 UsingSteps = !UsingSteps;
+                
                 ModeChanged?.Invoke(UsingSteps, !UsingSteps);
             }
         }
@@ -378,6 +386,8 @@ namespace Apollo.Components {
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
                 Input.Focus();
+
+                Started?.Invoke();
 
                 e.Handled = true;
             }
