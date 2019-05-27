@@ -649,7 +649,38 @@ namespace Apollo.Windows {
         }
 
         private void Frame_Reverse(object sender, RoutedEventArgs e) {
+            List<ISelect> selection = Selection.Selection;
 
+            int left = selection.First().IParentIndex.Value;
+            int right = selection.Last().IParentIndex.Value;
+
+            if (left == right) return;
+
+            List<int> path = Track.GetPath(_pattern);
+
+            Action ur = () => {
+                Pattern pattern = (Pattern)Track.TraversePath(path);
+
+                for (int i = left; i < right; i++) {
+                    Frame frame = pattern[right];
+                    pattern.Remove(right);
+                    pattern.Insert(i, frame);
+                }
+
+                Selection.Select(pattern[left]);
+                Selection.Select(pattern[right], true);
+            };
+
+            Program.Project.Undo.Add($"Pattern Frames Reversed", ur, ur);
+
+            for (int i = left; i < right; i++) {
+                Frame frame = _pattern[right];
+                _pattern.Remove(right);
+                _pattern.Insert(i, frame);
+            }
+
+            Selection.Select(_pattern[left]);
+            Selection.Select(_pattern[right], true);
         }
 
         private void Frame_Invert(object sender, RoutedEventArgs e) {
