@@ -417,7 +417,7 @@ namespace Apollo.Windows {
                 Program.Project.Undo.Add($"Pattern Frame {index} Changed", () => {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
+                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in r select i.Clone()).ToArray();
                 });
             }
 
@@ -648,23 +648,13 @@ namespace Apollo.Windows {
                 Duration.UsingSteps = value;
         }
 
-        private void Gate_Changed(double value, double? old) {
-            if (old != null && old != value) {
-                decimal u = (decimal)(old.Value / 100);
-                decimal r = (decimal)(value / 100);
-                List<int> path = Track.GetPath(_pattern);
+        private void Frame_Reverse(object sender, RoutedEventArgs e) {
 
-                Program.Project.Undo.Add($"Pattern Gate Changed", () => {
-                    ((Pattern)Track.TraversePath(path)).Gate = u;
-                }, () => {
-                    ((Pattern)Track.TraversePath(path)).Gate = r;
-                });
-            }
-
-            _pattern.Gate = (decimal)(value / 100);
         }
 
-        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+        private void Frame_Invert(object sender, RoutedEventArgs e) {
+            
+        }
 
         private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
             string selected = (string)PlaybackMode.SelectedItem;
@@ -721,6 +711,24 @@ namespace Apollo.Windows {
         }
 
         public void SetChoke(int choke) => Choke.RawValue = choke;
+
+        private void Gate_Changed(double value, double? old) {
+            if (old != null && old != value) {
+                decimal u = (decimal)(old.Value / 100);
+                decimal r = (decimal)(value / 100);
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Gate Changed", () => {
+                    ((Pattern)Track.TraversePath(path)).Gate = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Gate = r;
+                });
+            }
+
+            _pattern.Gate = (decimal)(value / 100);
+        }
+
+        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {
