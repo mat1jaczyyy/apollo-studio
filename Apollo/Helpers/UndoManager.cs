@@ -40,6 +40,8 @@ namespace Apollo.Helpers {
 
                 PositionChanged?.Invoke(Position);
                 SavedChanged?.Invoke(Saved);
+
+                Window?.HighlightPosition(Position);
             }
         }
         
@@ -57,10 +59,14 @@ namespace Apollo.Helpers {
         }
 
         public void Add(string desc, Action undo, Action redo) {
-            for (int i = History.Count - 1; i > Position; i--)
+            for (int i = History.Count - 1; i > Position; i--) {
                 History.RemoveAt(i);
+                Window?.Contents_Remove(i);
+            }
             
             History.Add(new UndoEntry(desc, undo, redo));
+            Window?.Contents_Insert(History.Count - 1, History.Last());
+
             Position = History.Count - 1;
         }
 

@@ -6,7 +6,7 @@
         Title="Undo History" Icon="/Resources/WindowIcon.png"
         Width="250" MinWidth="250" MaxWidth="250"
         Height="180" MinHeight="100"
-        Opened="Loaded" Closing="Unloaded"
+        Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
 
   <Grid>
@@ -25,7 +25,7 @@
       </Grid>
       
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-        <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" x:Name="ScrollViewer">
           <StackPanel x:Name="Contents" />
         </ScrollViewer>
       </Border>

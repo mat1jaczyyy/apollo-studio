@@ -1,24 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Threading;
+using Avalonia.Visuals;
 
-using Apollo.Binary;
-using Apollo.Components;
 using Apollo.Core;
-using Apollo.Elements;
-using Apollo.Helpers;
 using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;
-using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class UndoWindow: Window {
@@ -26,10 +17,13 @@ namespace Apollo.Windows {
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
-        Controls Contents;
+        ScrollViewer ScrollViewer;
+        StackPanel Contents;
 
-        public void Contents_Insert(int index, UndoEntry entry) => Contents.Insert(index, new TextBlock() { Text = entry.Description });
-        public void Contents_Remove(int index) => Contents.RemoveAt(index);
+        int current = 0;
+
+        public void Contents_Insert(int index, UndoEntry entry) => Contents.Children.Insert(index, new TextBlock() { Text = entry.Description });
+        public void Contents_Remove(int index) => Contents.Children.RemoveAt(index);
         
         public UndoWindow() {
             InitializeComponent();
@@ -40,20 +34,28 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
-            Contents = this.Get<StackPanel>("Contents").Children;
+            ScrollViewer = this.Get<ScrollViewer>("ScrollViewer");
+            ScrollViewer.LayoutUpdated += Layout_Updated;
+
+            Contents = this.Get<StackPanel>("Contents");
 
             for (int i = 0; i < Program.Project.Undo.History.Count; i++)
                 Contents_Insert(i, Program.Project.Undo.History[i]);
-        }
-        
-        private void Loaded(object sender, EventArgs e) {
             
+            HighlightPosition(Program.Project.Undo.Position);
         }
+
+        private void Layout_Updated(object sender, EventArgs e) => ScrollViewer.Offset = ScrollViewer.Offset.WithY(Contents.Bounds.Height);
 
         private void Unloaded(object sender, EventArgs e) {
             Program.Project.Undo.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+        }
+
+        public void HighlightPosition(int index) {
+            ((TextBlock)(Contents.Children[current])).Background = SolidColorBrush.Parse("Transparent");
+            ((TextBlock)(Contents.Children[current = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
