@@ -85,14 +85,18 @@ namespace Apollo.Elements {
             Title = "Save Project"
         };
 
-        private void WriteFile(Window sender, string path) {
+        private void WriteFile(Window sender, string path = null, bool store = true) {
+            if (path == null) path = FilePath;
+
             string[] file = path.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
                 try {
                     File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+
                     Undo.SavePosition();
-                    
+                    if (store) FilePath = path;
+
                 } catch (UnauthorizedAccessException e) {
                     ErrorWindow.Create(
                         $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
@@ -105,14 +109,14 @@ namespace Apollo.Elements {
 
         public void Save(Window sender) {
             if (FilePath == "") Save(sender, true);
-            else WriteFile(sender, FilePath);
+            else WriteFile(sender);
         }
 
         public async void Save(Window sender, bool store) {
             SaveFileDialog sfd = CreateSaveFileDialog();
             string result = await sfd.ShowAsync(sender);
 
-            if (result != null) WriteFile(sender, store? (FilePath = result) : result);
+            if (result != null) WriteFile(sender, result, store);
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
