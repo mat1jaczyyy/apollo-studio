@@ -21,6 +21,7 @@ namespace Apollo.Windows {
         ScrollViewer ScrollViewer;
         StackPanel Contents;
 
+        int saved = 0;
         int current = 0;
 
         public void Contents_Insert(int index, UndoEntry entry) {
@@ -30,6 +31,7 @@ namespace Apollo.Windows {
 
             Contents.Children.Insert(index, viewer);
         }
+
         public void Contents_Remove(int index) => Contents.Children.RemoveAt(index);
         
         public UndoWindow() {
@@ -49,6 +51,8 @@ namespace Apollo.Windows {
             for (int i = 0; i < Program.Project.Undo.History.Count; i++)
                 Contents_Insert(i, Program.Project.Undo.History[i]);
             
+            Program.Project.Undo.SavedPositionChanged += HighlightSaved;
+
             HighlightPosition(Program.Project.Undo.Position);
         }
 
@@ -60,11 +64,24 @@ namespace Apollo.Windows {
             Program.Project.Undo.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            Program.Project.Undo.SavedPositionChanged -= HighlightSaved;
+        }
+
+        public void HighlightSaved(int index) {
+            if (saved != current)
+                ((UndoEntryInfo)(Contents.Children[saved])).Background = SolidColorBrush.Parse("Transparent");
+
+            if (index != current)
+                ((UndoEntryInfo)(Contents.Children[saved = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeControlHigherBrush");
         }
 
         public void HighlightPosition(int index) {
             ((UndoEntryInfo)(Contents.Children[current])).Background = SolidColorBrush.Parse("Transparent");
             ((UndoEntryInfo)(Contents.Children[current = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+        
+            if (Program.Project.Undo.SavedPosition.HasValue)
+                HighlightSaved(Program.Project.Undo.SavedPosition.Value);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {

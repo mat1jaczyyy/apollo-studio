@@ -47,15 +47,22 @@ namespace Apollo.Helpers {
         
         public delegate void SavedChangedEventHandler(bool saved);
         public event SavedChangedEventHandler SavedChanged;
+        public event PositionChangedEventHandler SavedPositionChanged;
 
         private int? _saved = null;
+        public int? SavedPosition {
+            get => _saved;
+        }
+
         public bool Saved {
             get => _saved == Position;
         }
 
         public void SavePosition() {
             _saved = Position;
+
             SavedChanged?.Invoke(Saved);
+            SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
         public void Add(string desc, Action undo, Action redo) {
