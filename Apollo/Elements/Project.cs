@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -84,25 +85,34 @@ namespace Apollo.Elements {
             Title = "Save Project"
         };
 
-        private void WriteFile(string path) {
+        private void WriteFile(Window sender, string path) {
             string[] file = path.Split(Path.DirectorySeparatorChar);
 
             if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
-                Undo.SavePosition();
+                try {
+                    File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+                    Undo.SavePosition();
+                    
+                } catch (UnauthorizedAccessException e) {
+                    ErrorWindow.Create(
+                        $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
+                        "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                        sender
+                    );
+                }
             }
         }
 
         public void Save(Window sender) {
             if (FilePath == "") Save(sender, true);
-            else WriteFile(FilePath);
+            else WriteFile(sender, FilePath);
         }
 
         public async void Save(Window sender, bool store) {
             SaveFileDialog sfd = CreateSaveFileDialog();
             string result = await sfd.ShowAsync(sender);
 
-            if (result != null) WriteFile(store? (FilePath = result) : result);
+            if (result != null) WriteFile(sender, store? (FilePath = result) : result);
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
