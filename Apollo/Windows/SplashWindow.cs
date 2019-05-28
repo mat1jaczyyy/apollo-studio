@@ -63,6 +63,7 @@ namespace Apollo.Windows {
                     loaded = Decoder.Decode(file, typeof(Project));
                 
                 loaded.FilePath = result[0];
+                loaded.Undo.SavePosition();
 
                 if (loaded != null) {
                     Program.Project = loaded;
