@@ -22,6 +22,8 @@ namespace Apollo.Viewers {
             this.Get<TextBlock>("Description").Text = _entry.Description;
         }
 
-        private void Click(object sender, PointerPressedEventArgs e) => Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
+        private void Click(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left)) Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
+        }
     }
 }
