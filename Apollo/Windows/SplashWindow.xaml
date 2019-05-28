@@ -19,13 +19,6 @@
       <Image Grid.Row="1" Source="/Resources/SplashImage.png" />
 
       <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
-        <Grid.Styles>
-          <Style Selector="Button">
-            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
-            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />
-          </Style>
-        </Grid.Styles>
-
         <Button Grid.Column="0" Margin="0 0 5 0" Content="New Project" Click="New" />
         <Button Grid.Column="1" Margin="5 0 0 0" Content="Open Project" Click="Open" />
       </Grid>
