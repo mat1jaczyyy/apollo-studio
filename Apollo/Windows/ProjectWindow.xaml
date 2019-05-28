@@ -38,9 +38,9 @@
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
         <Grid RowDefinitions="*,Auto">
           <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 15 5">
-            <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
               <Grid RowDefinitions="Auto,*" x:Name="Layout">
-                <StackPanel Grid.Row="0" x:Name="Contents">
+                <StackPanel Grid.Row="0" MaxWidth="328" x:Name="Contents">
                   <Components:TrackAdd AlwaysShowing="true" TrackAdded="Track_InsertStart" TrackAction="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
                 </StackPanel>
 

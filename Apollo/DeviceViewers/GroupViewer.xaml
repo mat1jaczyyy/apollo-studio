@@ -9,9 +9,9 @@
     </ContextMenu>
   </UserControl.Resources>
 
-  <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+  <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
     <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
-      <StackPanel Grid.Row="0" x:Name="Contents">
+      <StackPanel Grid.Row="0" MinWidth="105" MaxWidth="105" x:Name="Contents">
         <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
       </StackPanel>
 
