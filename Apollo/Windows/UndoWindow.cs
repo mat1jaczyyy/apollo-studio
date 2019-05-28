@@ -10,6 +10,7 @@ using Avalonia.Visuals;
 
 using Apollo.Core;
 using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;
+using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class UndoWindow: Window {
@@ -22,7 +23,13 @@ namespace Apollo.Windows {
 
         int current = 0;
 
-        public void Contents_Insert(int index, UndoEntry entry) => Contents.Children.Insert(index, new TextBlock() { Text = entry.Description });
+        public void Contents_Insert(int index, UndoEntry entry) {
+            UndoEntryInfo viewer = new UndoEntryInfo(entry);
+
+            viewer.Selected += UndoEntry_Select;
+
+            Contents.Children.Insert(index, viewer);
+        }
         public void Contents_Remove(int index) => Contents.Children.RemoveAt(index);
         
         public UndoWindow() {
@@ -47,6 +54,8 @@ namespace Apollo.Windows {
 
         private void Layout_Updated(object sender, EventArgs e) => ScrollViewer.Offset = ScrollViewer.Offset.WithY(Contents.Bounds.Height);
 
+        private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
+
         private void Unloaded(object sender, EventArgs e) {
             Program.Project.Undo.Window = null;
 
@@ -54,8 +63,8 @@ namespace Apollo.Windows {
         }
 
         public void HighlightPosition(int index) {
-            ((TextBlock)(Contents.Children[current])).Background = SolidColorBrush.Parse("Transparent");
-            ((TextBlock)(Contents.Children[current = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+            ((UndoEntryInfo)(Contents.Children[current])).Background = SolidColorBrush.Parse("Transparent");
+            ((UndoEntryInfo)(Contents.Children[current = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
