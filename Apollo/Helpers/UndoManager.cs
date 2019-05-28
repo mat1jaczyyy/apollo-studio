@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia.Input;
 
 using Apollo.Core;
+using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public class UndoManager {
@@ -19,6 +20,8 @@ namespace Apollo.Helpers {
                 Redo = redo?? (() => {});
             }
         }
+
+        public UndoWindow Window;
 
         private object locker = new object();
 

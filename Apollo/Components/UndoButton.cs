@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 using Apollo.Core;
+using Apollo.Windows;
 
 namespace Apollo.Components {
     public class UndoButton: UserControl {
@@ -26,6 +27,7 @@ namespace Apollo.Components {
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Program.Project.Undo.Undo();
+            else if (e.MouseButton == MouseButton.Right) UndoWindow.Create((Window)this.GetVisualRoot());
         }
     }
 }

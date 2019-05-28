@@ -186,6 +186,8 @@ namespace Apollo.Elements {
         }
 
         public void Dispose() {
+            Undo.Window?.Close();
+
             foreach (Track track in Tracks)
                 track.Dispose();
             
