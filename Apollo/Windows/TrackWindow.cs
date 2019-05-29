@@ -23,11 +23,11 @@ namespace Apollo.Windows {
         Grid Root;
         TextBlock TitleText;
         
-        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.Name);
-        private void UpdateTitle(int index) => UpdateTitle(index, _track.Name);
+        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
+        private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         private void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = $"{name.Replace("#", (index + 1).ToString())}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
+            => Title = TitleText.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 

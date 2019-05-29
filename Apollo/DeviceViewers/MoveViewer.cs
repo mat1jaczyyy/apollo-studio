@@ -50,7 +50,7 @@ namespace Apollo.DeviceViewers {
 
                 List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Offset Changed", () => {
+                Program.Project.Undo.Add($"Move Offset Changed to {rx},{ry}", () => {
                     Move move = ((Move)Track.TraversePath(path));
                     move.Offset.X = ux;
                     move.Offset.Y = uy;
@@ -76,7 +76,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Grid Changed", () => {
+                Program.Project.Undo.Add($"Move Grid Changed to {selected}", () => {
                     ((Move)Track.TraversePath(path)).GridMode = u;
                 }, () => {
                     ((Move)Track.TraversePath(path)).GridMode = r;
@@ -96,7 +96,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Wrap Changed", () => {
+                Program.Project.Undo.Add($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
                     ((Move)Track.TraversePath(path)).Wrap = u;
                 }, () => {
                     ((Move)Track.TraversePath(path)).Wrap = r;

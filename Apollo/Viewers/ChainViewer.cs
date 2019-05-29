@@ -98,7 +98,7 @@ namespace Apollo.Viewers {
             Device r = device.Clone();
             List<int> path = Track.GetPath(_chain);
 
-            Program.Project.Undo.Add($"Device Added", () => {
+            Program.Project.Undo.Add($"Device ({r.GetType().ToString().Split(".").Last()}) Inserted", () => {
                 ((Chain)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Chain)Track.TraversePath(path)).Insert(index, r.Clone());
@@ -111,7 +111,7 @@ namespace Apollo.Viewers {
             Device u = _chain[index].Clone();
             List<int> path = Track.GetPath(_chain);
 
-            Program.Project.Undo.Add($"Device Deleted", () => {
+            Program.Project.Undo.Add($"Device ({u.GetType().ToString().Split(".").Last()}) Removed", () => {
                 ((Chain)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Chain)Track.TraversePath(path)).Remove(index);
@@ -181,7 +181,7 @@ namespace Apollo.Viewers {
                 List<int> sourcepath = Track.GetPath(source_parent);
                 List<int> targetpath = Track.GetPath(_chain);
                 
-                Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 
@@ -270,7 +270,7 @@ namespace Apollo.Viewers {
 
             List<int> path = Track.GetPath(_chain);
 
-            Program.Project.Undo.Add($"Device Deleted", () => {
+            Program.Project.Undo.Add($"Device Removed", () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
 
                 for (int i = left; i <= right; i++)

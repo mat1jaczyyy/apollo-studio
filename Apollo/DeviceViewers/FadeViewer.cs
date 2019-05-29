@@ -123,7 +123,7 @@ namespace Apollo.DeviceViewers {
 
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Color Added", () => {
+                Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
                     ((Fade)Track.TraversePath(path)).Remove(index);
                 }, () => {
                     ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos);
@@ -140,7 +140,7 @@ namespace Apollo.DeviceViewers {
             decimal up = _fade.GetPosition(index);
             List<int> path = Track.GetPath(_fade);
 
-            Program.Project.Undo.Add($"Fade Color Added", () => {
+            Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () => {
                 ((Fade)Track.TraversePath(path)).Insert(index, uc, up);
             }, () => {
                 ((Fade)Track.TraversePath(path)).Remove(index);
@@ -167,7 +167,7 @@ namespace Apollo.DeviceViewers {
                 double u = x - total.Value;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Color Moved", () => {
+                Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
                     ((Fade)Track.TraversePath(path)).SetPosition(i, (decimal)u / 186);
                 }, () => {
                     ((Fade)Track.TraversePath(path)).SetPosition(i, pos);
@@ -189,7 +189,7 @@ namespace Apollo.DeviceViewers {
                     int index = current.Value;
                     List<int> path = Track.GetPath(_fade);
 
-                    Program.Project.Undo.Add($"Fade Color {current} Changed", () => {
+                    Program.Project.Undo.Add($"Fade Color {current + 1} Changed to {r.ToHex()}", () => {
                         ((Fade)Track.TraversePath(path)).SetColor(index, u.Clone());
                     }, () => {
                         ((Fade)Track.TraversePath(path)).SetColor(index, r.Clone());
@@ -220,7 +220,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Duration Changed", () => {
+                Program.Project.Undo.Add($"Fade Duration Changed to {r}{Duration.Unit}", () => {
                     ((Fade)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).Time.Free = r;
@@ -238,7 +238,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Duration Switched", () => {
+                Program.Project.Undo.Add($"Fade Duration Switched to {(r? "Steps" : "Free")}", () => {
                     ((Fade)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).Time.Mode = r;
@@ -256,7 +256,7 @@ namespace Apollo.DeviceViewers {
                 int r = value;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Duration Changed", () => {
+                Program.Project.Undo.Add($"Fade Duration Changed to {Length.Steps[r]}", () => {
                     ((Fade)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).Time.Length.Step = r;
@@ -272,7 +272,7 @@ namespace Apollo.DeviceViewers {
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Gate Changed", () => {
+                Program.Project.Undo.Add($"Fade Gate Changed to {value}{Gate.Unit}", () => {
                     ((Fade)Track.TraversePath(path)).Gate = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).Gate = r;
@@ -292,7 +292,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Playback Mode Changed", () => {
+                Program.Project.Undo.Add($"Fade Playback Mode Changed to {selected}", () => {
                     ((Fade)Track.TraversePath(path)).PlayMode = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).PlayMode = r;

@@ -38,10 +38,10 @@ namespace Apollo.Viewers {
         ContextMenu ChainContextMenu;
         TextBox Input;
 
-        private void UpdateText() => UpdateText(_chain.ParentIndex.Value, _chain.Name);
-        private void UpdateText(int index) => UpdateText(index, _chain.Name);
+        private void UpdateText() => UpdateText(_chain.ParentIndex.Value, _chain.ProcessedName);
+        private void UpdateText(int index) => UpdateText(index, _chain.ProcessedName);
         private void UpdateText(string name) => UpdateText(_chain.ParentIndex.Value, name);
-        private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
+        private void UpdateText(int index, string name) => NameText.Text = name;
         
         private void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -160,7 +160,7 @@ namespace Apollo.Viewers {
                     List<int> sourcepath = Track.GetPath((ISelect)source_parent);
                     List<int> targetpath = Track.GetPath((ISelect)_device);
                     
-                    Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
+                    Program.Project.Undo.Add($"Chain {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
@@ -216,7 +216,7 @@ namespace Apollo.Viewers {
                     List<int> sourcepath = Track.GetPath(source_chain);
                     List<int> targetpath = Track.GetPath(target_chain);
                     
-                    Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                    Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 
@@ -309,7 +309,7 @@ namespace Apollo.Viewers {
                 List<string> u = (from i in Input_Clean select i).ToList();
                 List<int> path = Track.GetPath(_chain);
 
-                Program.Project.Undo.Add($"Chain Renamed", () => {
+                Program.Project.Undo.Add($"Chain Renamed to {Input.Text}", () => {
                     Chain chain = ((Chain)Track.TraversePath(path));
                     IMultipleChainParent parent = (IMultipleChainParent)chain.Parent;
 

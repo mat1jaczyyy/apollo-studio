@@ -104,6 +104,10 @@ namespace Apollo.Elements {
             }
         }
 
+        public string ProcessedName {
+            get => _name.Replace("#", (ParentIndex + 1).ToString());
+        }
+
         public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name);
 
         public void Insert(int index, Device device) {

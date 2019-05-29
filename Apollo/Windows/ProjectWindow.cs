@@ -126,7 +126,7 @@ namespace Apollo.Windows {
         private void Track_Insert(int index, Track track) {
             Track r = track.Clone();
 
-            Program.Project.Undo.Add($"Track Added", () => {
+            Program.Project.Undo.Add($"Track {index + 1} Inserted", () => {
                 Program.Project.Remove(index);
             }, () => {
                 Program.Project.Insert(index, r.Clone());
@@ -139,7 +139,7 @@ namespace Apollo.Windows {
             Track ut = Program.Project[index].Clone();
             Launchpad ul = Program.Project[index].Launchpad;
 
-            Program.Project.Undo.Add($"Track Deleted", () => {
+            Program.Project.Undo.Add($"{Program.Project[index].ProcessedName} Removed", () => {
                 Track restored = ut.Clone();
                 restored.Launchpad = ul;
                 Program.Project.Insert(index, restored);
@@ -218,7 +218,7 @@ namespace Apollo.Windows {
                 int u = BPM_Clean;
                 int r = BPM_Clean = Program.Project.BPM;
 
-                Program.Project.Undo.Add($"BPM Changed", () => {
+                Program.Project.Undo.Add($"BPM Changed to {r}", () => {
                     Program.Project.BPM = u;
                 }, () => {
                     Program.Project.BPM = r;
@@ -318,7 +318,7 @@ namespace Apollo.Windows {
                 if (after < before)
                     before_pos += count;
                 
-                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                Program.Project.Undo.Add($"Track {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         for (int i = after + count; i > after; i--)
                             Program.Project.Remove(i);
@@ -385,7 +385,7 @@ namespace Apollo.Windows {
         public void Delete(int left, int right) {
             List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
 
-            Program.Project.Undo.Add($"Track Deleted", () => {
+            Program.Project.Undo.Add($"Track Removed", () => {
                 for (int i = left; i <= right; i++)
                     Program.Project.Insert(i, u[i - left].Clone());
 

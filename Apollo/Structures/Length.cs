@@ -7,7 +7,7 @@ namespace Apollo.Structures {
         public delegate void ChangedEventHandler();
         public event ChangedEventHandler Changed;
 
-        private static string[] Steps = new string[]
+        public static string[] Steps = new string[]
             {"1/128", "1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1"};
 
         private int _value;

@@ -147,7 +147,7 @@ namespace Apollo.DeviceViewers {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_multi);
 
-            Program.Project.Undo.Add($"Chain Added", () => {
+            Program.Project.Undo.Add($"Multi Chain {index + 1} Inserted", () => {
                 ((Multi)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Multi)Track.TraversePath(path)).Insert(index, r.Clone());
@@ -160,7 +160,7 @@ namespace Apollo.DeviceViewers {
             Chain u = _multi[index].Clone();
             List<int> path = Track.GetPath(_multi);
 
-            Program.Project.Undo.Add($"Chain Deleted", () => {
+            Program.Project.Undo.Add($"Multi {_multi[index].ProcessedName} Removed", () => {
                 ((Multi)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Multi)Track.TraversePath(path)).Remove(index);
@@ -227,7 +227,7 @@ namespace Apollo.DeviceViewers {
                     List<int> sourcepath = Track.GetPath((ISelect)source_parent);
                     List<int> targetpath = Track.GetPath((ISelect)_multi);
                     
-                    Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
+                    Program.Project.Undo.Add($"Chain {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
@@ -282,7 +282,7 @@ namespace Apollo.DeviceViewers {
                     List<int> sourcepath = Track.GetPath(source_chain);
                     List<int> targetpath = Track.GetPath(target_chain);
                     
-                    Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                    Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 
@@ -333,7 +333,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_multi);
 
-                Program.Project.Undo.Add($"Multi Direction Changed", () => {
+                Program.Project.Undo.Add($"Direction Changed to {selected}", () => {
                     ((Multi)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Multi)Track.TraversePath(path)).Mode = r;
@@ -407,7 +407,7 @@ namespace Apollo.DeviceViewers {
 
             List<int> path = Track.GetPath(_multi);
 
-            Program.Project.Undo.Add($"Chain Deleted", () => {
+            Program.Project.Undo.Add($"Chain Removed", () => {
                 Multi multi = ((Multi)Track.TraversePath(path));
 
                 for (int i = left; i <= right; i++)

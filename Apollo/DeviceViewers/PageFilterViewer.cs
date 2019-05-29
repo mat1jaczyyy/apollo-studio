@@ -41,7 +41,7 @@ namespace Apollo.DeviceViewers {
             bool r = !_filter[index];
             List<int> path = Track.GetPath(_filter);
 
-            Program.Project.Undo.Add($"PageFilter Changed", () => {
+            Program.Project.Undo.Add($"PageFilter {index + 1} Changed to {(r? "Allowed" : "Blocked")}", () => {
                 ((PageFilter)Track.TraversePath(path))[index] = u;
             }, () => {
                 ((PageFilter)Track.TraversePath(path))[index] = r;

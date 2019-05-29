@@ -147,7 +147,7 @@ namespace Apollo.Components {
                 List<int> sourcepath = Track.GetPath(source_parent);
                 List<int> targetpath = Track.GetPath(_pattern);
                 
-                Program.Project.Undo.Add(copy? $"Frame Copied" : $"Frame Moved", copy
+                Program.Project.Undo.Add(copy? $"Pattern Frame Copied" : $"Pattern Frame Moved", copy
                     ? new Action(() => {
                         Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
 

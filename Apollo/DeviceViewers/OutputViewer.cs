@@ -44,7 +44,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value - 1;
                 List<int> path = Track.GetPath(_output);
 
-                Program.Project.Undo.Add($"Output Target Changed", () => {
+                Program.Project.Undo.Add($"Output Target Changed to {r + 1}{Target.Unit}", () => {
                     ((Output)Track.TraversePath(path)).Target = u;
                 }, () => {
                     ((Output)Track.TraversePath(path)).Target = r;

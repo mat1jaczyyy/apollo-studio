@@ -32,7 +32,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_layer);
 
-                Program.Project.Undo.Add($"Layer Target Changed", () => {
+                Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
                     ((Layer)Track.TraversePath(path)).Target = u;
                 }, () => {
                     ((Layer)Track.TraversePath(path)).Target = r;

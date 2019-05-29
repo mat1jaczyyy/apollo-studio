@@ -38,7 +38,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Orientation Changed", () => {
+                Program.Project.Undo.Add($"Flip Orientation Changed to {selected}", () => {
                     ((Flip)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Flip)Track.TraversePath(path)).Mode = r;
@@ -58,7 +58,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Bypass Changed", () => {
+                Program.Project.Undo.Add($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", () => {
                     ((Flip)Track.TraversePath(path)).Bypass = u;
                 }, () => {
                     ((Flip)Track.TraversePath(path)).Bypass = r;

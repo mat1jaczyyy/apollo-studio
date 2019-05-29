@@ -32,7 +32,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_pageswitch);
 
-                Program.Project.Undo.Add($"PageSwitch Target Changed", () => {
+                Program.Project.Undo.Add($"PageSwitch Target Changed to {r}{Target.Unit}", () => {
                     ((PageSwitch)Track.TraversePath(path)).Target = u;
                 }, () => {
                     ((PageSwitch)Track.TraversePath(path)).Target = r;

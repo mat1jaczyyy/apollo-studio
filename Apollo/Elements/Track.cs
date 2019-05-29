@@ -113,6 +113,10 @@ namespace Apollo.Elements {
             }
         }
 
+        public string ProcessedName {
+            get => _name.Replace("#", (ParentIndex + 1).ToString());
+        }
+
         public Track Clone() => new Track(Chain.Clone(), null, Name);
 
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {

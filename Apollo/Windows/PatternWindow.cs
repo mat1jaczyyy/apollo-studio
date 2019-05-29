@@ -104,11 +104,11 @@ namespace Apollo.Windows {
 
         Action<Signal> PlayExit;
         
-        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.Name);
-        private void UpdateTitle(int index) => UpdateTitle(index, _track.Name);
+        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
+        private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         private void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = $"Editing Pattern - {name.Replace("#", (index + 1).ToString())}";
+            => Title = TitleText.Text = $"Editing Pattern - {name}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -285,7 +285,7 @@ namespace Apollo.Windows {
             Frame r = frame.Clone();
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Frame Added", () => {
+            Program.Project.Undo.Add($"Pattern Frame {index + 1} Inserted", () => {
                 ((Pattern)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Pattern)Track.TraversePath(path)).Insert(index, r.Clone());
@@ -304,7 +304,7 @@ namespace Apollo.Windows {
             Frame u = _pattern[index].Clone();
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Frame Deleted", () => {
+            Program.Project.Undo.Add($"Pattern Frame {index + 1} Removed", () => {
                 ((Pattern)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Pattern)Track.TraversePath(path)).Remove(index);
@@ -437,7 +437,7 @@ namespace Apollo.Windows {
                 int index = _pattern.Expanded;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {index} Changed", () => {
+                Program.Project.Undo.Add($"Pattern Frame {index + 1} Changed", () => {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
                 }, () => {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in r select i.Clone()).ToArray();
@@ -570,7 +570,7 @@ namespace Apollo.Windows {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
+                Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {r}{Duration.Unit}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
                     
                     for (int i = 0; i < u.Count; i++)
@@ -609,7 +609,7 @@ namespace Apollo.Windows {
                 int r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame Duration Changed", () => {
+                Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {Length.Steps[r]}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
                     
                     for (int i = 0; i < u.Count; i++)
@@ -648,7 +648,7 @@ namespace Apollo.Windows {
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame Duration Switched", () => {
+                Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Switched to {(r? "Steps" : "Free")}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
                     
                     for (int i = 0; i < u.Count; i++)
@@ -737,7 +737,7 @@ namespace Apollo.Windows {
                 string r = selected;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Playback Mode Changed", () => {
+                Program.Project.Undo.Add($"Pattern Playback Mode Changed to {selected}", () => {
                     ((Pattern)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Mode = r;
@@ -755,7 +755,7 @@ namespace Apollo.Windows {
                 bool r = !_pattern.ChokeEnabled;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Choke Changed", () => {
+                Program.Project.Undo.Add($"Pattern Choke {(r? "Enabled" : "Disabled")}", () => {
                     ((Pattern)Track.TraversePath(path)).ChokeEnabled = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).ChokeEnabled = r;
@@ -773,7 +773,7 @@ namespace Apollo.Windows {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Choke Changed", () => {
+                Program.Project.Undo.Add($"Pattern Choke Changed to {r}{Choke.Unit}", () => {
                     ((Pattern)Track.TraversePath(path)).Choke = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Choke = r;
@@ -791,7 +791,7 @@ namespace Apollo.Windows {
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Gate Changed", () => {
+                Program.Project.Undo.Add($"Pattern Gate Changed to {value}{Gate.Unit}", () => {
                     ((Pattern)Track.TraversePath(path)).Gate = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Gate = r;
@@ -951,7 +951,7 @@ namespace Apollo.Windows {
             decimal rg = 1;
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Pattern File Imported", () => {
+            Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
                 ImportFrames((Pattern)Track.TraversePath(path), uf.ToList(), ug);
             }, () => {
                 ImportFrames((Pattern)Track.TraversePath(path), rf.ToList(), rg);
@@ -1035,7 +1035,7 @@ namespace Apollo.Windows {
                 List<int> sourcepath = Track.GetPath(source_parent);
                 List<int> targetpath = Track.GetPath(_pattern);
                 
-                Program.Project.Undo.Add(copy? $"Frame Copied" : $"Frame Moved", copy
+                Program.Project.Undo.Add($"Pattern Frame {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
 
@@ -1086,7 +1086,7 @@ namespace Apollo.Windows {
             
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Frame Pasted", () => {
+            Program.Project.Undo.Add($"Pattern Frame Pasted", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
@@ -1108,7 +1108,7 @@ namespace Apollo.Windows {
 
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Frame Duplicated", () => {
+            Program.Project.Undo.Add($"Pattern Frame Duplicated", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 for (int i = right - left; i >= 0; i--)
@@ -1134,7 +1134,7 @@ namespace Apollo.Windows {
 
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Frame Deleted", () => {
+            Program.Project.Undo.Add($"Pattern Frame Removed", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 for (int i = left; i <= right; i++)

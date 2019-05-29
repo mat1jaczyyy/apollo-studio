@@ -45,7 +45,7 @@ namespace Apollo.DeviceViewers {
                 double r = value;
                 List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Hue Changed", () => {
+                Program.Project.Undo.Add($"Tone Hue Changed to {r}{Hue.Unit}", () => {
                     ((Tone)Track.TraversePath(path)).Hue = u;
                 }, () => {
                     ((Tone)Track.TraversePath(path)).Hue = r;
@@ -63,7 +63,7 @@ namespace Apollo.DeviceViewers {
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Sat Hi Changed", () => {
+                Program.Project.Undo.Add($"Tone Sat Hi Changed to {r}{SaturationHigh.Unit}", () => {
                     ((Tone)Track.TraversePath(path)).SaturationHigh = u;
                 }, () => {
                     ((Tone)Track.TraversePath(path)).SaturationHigh = r;
@@ -81,7 +81,7 @@ namespace Apollo.DeviceViewers {
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Sat Lo Changed", () => {
+                Program.Project.Undo.Add($"Tone Sat Lo Changed to {r}{SaturationLow.Unit}", () => {
                     ((Tone)Track.TraversePath(path)).SaturationLow = u;
                 }, () => {
                     ((Tone)Track.TraversePath(path)).SaturationLow = r;
@@ -99,7 +99,7 @@ namespace Apollo.DeviceViewers {
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Val Hi Changed", () => {
+                Program.Project.Undo.Add($"Tone Val Hi Changed to {r}{ValueHigh.Unit}", () => {
                     ((Tone)Track.TraversePath(path)).ValueHigh = u;
                 }, () => {
                     ((Tone)Track.TraversePath(path)).ValueHigh = r;
@@ -117,7 +117,7 @@ namespace Apollo.DeviceViewers {
                 double r = value / 100;
                 List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Val Lo Changed", () => {
+                Program.Project.Undo.Add($"Tone Val Lo Changed to {r}{ValueLow.Unit}", () => {
                     ((Tone)Track.TraversePath(path)).ValueLow = u;
                 }, () => {
                     ((Tone)Track.TraversePath(path)).ValueLow = r;

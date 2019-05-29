@@ -199,7 +199,7 @@ namespace Apollo.Viewers {
                 List<int> sourcepath = Track.GetPath(source_parent);
                 List<int> targetpath = Track.GetPath(_chain);
                 
-                Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 

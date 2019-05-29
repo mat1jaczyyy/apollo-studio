@@ -33,7 +33,7 @@ namespace Apollo.DeviceViewers {
                 Color r = color.Clone();
                 List<int> path = Track.GetPath(_paint);
 
-                Program.Project.Undo.Add($"Paint Color Changed", () => {
+                Program.Project.Undo.Add($"Paint Color Changed to {r.ToHex()}", () => {
                     ((Paint)Track.TraversePath(path)).Color = u.Clone();
                 }, () => {
                     ((Paint)Track.TraversePath(path)).Color = r.Clone();

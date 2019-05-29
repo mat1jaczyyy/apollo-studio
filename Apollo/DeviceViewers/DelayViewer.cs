@@ -7,6 +7,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
     public class DelayViewer: UserControl {
@@ -36,7 +37,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Changed", () => {
+                Program.Project.Undo.Add($"Delay Duration Changed to {r}{Duration.Unit}", () => {
                     ((Delay)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
                     ((Delay)Track.TraversePath(path)).Time.Free = r;
@@ -54,7 +55,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Switched", () => {
+                Program.Project.Undo.Add($"Delay Duration Switched to {(r? "Steps" : "Free")}", () => {
                     ((Delay)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
                     ((Delay)Track.TraversePath(path)).Time.Mode = r;
@@ -72,7 +73,7 @@ namespace Apollo.DeviceViewers {
                 int r = value;
                 List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Changed", () => {
+                Program.Project.Undo.Add($"Delay Duration Changed to {Length.Steps[r]}", () => {
                     ((Delay)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
                     ((Delay)Track.TraversePath(path)).Time.Length.Step = r;
@@ -88,7 +89,7 @@ namespace Apollo.DeviceViewers {
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Gate Changed", () => {
+                Program.Project.Undo.Add($"Delay Gate Changed to {value}{Gate.Unit}", () => {
                     ((Delay)Track.TraversePath(path)).Gate = u;
                 }, () => {
                     ((Delay)Track.TraversePath(path)).Gate = r;

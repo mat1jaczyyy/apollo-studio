@@ -49,7 +49,7 @@ namespace Apollo.Components {
 
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Offset {index} Changed", () => {
+                Program.Project.Undo.Add($"Copy Offset {index + 1} Changed to {rx},{ry}", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].X = ux;
                     copy.Offsets[index].Y = uy;

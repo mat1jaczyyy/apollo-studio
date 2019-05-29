@@ -74,7 +74,7 @@ namespace Apollo.DeviceViewers {
                 int r = (int)value;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Rate Changed", () => {
+                Program.Project.Undo.Add($"Copy Rate Changed to {r}{Rate.Unit}", () => {
                     ((Copy)Track.TraversePath(path)).Time.Free = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).Time.Free = r;
@@ -92,7 +92,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Rate Switched", () => {
+                Program.Project.Undo.Add($"Copy Rate Switched to {(r? "Steps" : "Free")}", () => {
                     ((Copy)Track.TraversePath(path)).Time.Mode = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).Time.Mode = r;
@@ -110,7 +110,7 @@ namespace Apollo.DeviceViewers {
                 int r = value;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Rate Changed", () => {
+                Program.Project.Undo.Add($"Copy Rate Changed to {Length.Steps[r]}", () => {
                     ((Copy)Track.TraversePath(path)).Time.Length.Step = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).Time.Length.Step = r;
@@ -126,7 +126,7 @@ namespace Apollo.DeviceViewers {
                 decimal r = (decimal)(value / 100);
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Gate Changed", () => {
+                Program.Project.Undo.Add($"Copy Gate Changed to {value}{Gate.Unit}", () => {
                     ((Copy)Track.TraversePath(path)).Gate = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).Gate = r;
@@ -146,7 +146,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Mode Changed", () => {
+                Program.Project.Undo.Add($"Copy Mode Changed to {r}", () => {
                     ((Copy)Track.TraversePath(path)).CopyMode = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).CopyMode = r;
@@ -168,7 +168,7 @@ namespace Apollo.DeviceViewers {
                 string r = selected;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Grid Changed", () => {
+                Program.Project.Undo.Add($"Copy Grid Changed to {r}", () => {
                     ((Copy)Track.TraversePath(path)).GridMode = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).GridMode = r;
@@ -188,7 +188,7 @@ namespace Apollo.DeviceViewers {
                 bool r = value;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Wrap Changed", () => {
+                Program.Project.Undo.Add($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
                     ((Copy)Track.TraversePath(path)).Wrap = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).Wrap = r;
@@ -205,7 +205,7 @@ namespace Apollo.DeviceViewers {
         private void Offset_Insert(int index) {
             List<int> path = Track.GetPath(_copy);
 
-            Program.Project.Undo.Add($"Copy Offset Added", () => {
+            Program.Project.Undo.Add($"Copy Offset {index + 1} Inserted", () => {
                 ((Copy)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Copy)Track.TraversePath(path)).Insert(index);
@@ -218,7 +218,7 @@ namespace Apollo.DeviceViewers {
             Offset u = _copy.Offsets[index].Clone();
             List<int> path = Track.GetPath(_copy);
 
-            Program.Project.Undo.Add($"Copy Offset Deleted", () => {
+            Program.Project.Undo.Add($"Copy Offset {index + 1} Removed", () => {
                 ((Copy)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Copy)Track.TraversePath(path)).Remove(index);

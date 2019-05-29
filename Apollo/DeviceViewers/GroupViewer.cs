@@ -142,7 +142,7 @@ namespace Apollo.DeviceViewers {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Added", () => {
+            Program.Project.Undo.Add($"Group Chain {index + 1} Inserted", () => {
                 ((Group)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Group)Track.TraversePath(path)).Insert(index, r.Clone());
@@ -155,7 +155,7 @@ namespace Apollo.DeviceViewers {
             Chain u = _group[index].Clone();
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Deleted", () => {
+            Program.Project.Undo.Add($"Group {_group[index].ProcessedName} Removed", () => {
                 ((Group)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Group)Track.TraversePath(path)).Remove(index);
@@ -222,7 +222,7 @@ namespace Apollo.DeviceViewers {
                     List<int> sourcepath = Track.GetPath((ISelect)source_parent);
                     List<int> targetpath = Track.GetPath((ISelect)_group);
                     
-                    Program.Project.Undo.Add(copy? $"Chain Copied" : $"Chain Moved", copy
+                    Program.Project.Undo.Add($"Chain {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             IMultipleChainParent targetdevice = ((IMultipleChainParent)Track.TraversePath(targetpath));
 
@@ -277,7 +277,7 @@ namespace Apollo.DeviceViewers {
                     List<int> sourcepath = Track.GetPath(source_chain);
                     List<int> targetpath = Track.GetPath(target_chain);
                     
-                    Program.Project.Undo.Add(copy? $"Device Copied" : $"Device Moved", copy
+                    Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
                             Chain targetchain = ((Chain)Track.TraversePath(targetpath));
 
@@ -382,7 +382,7 @@ namespace Apollo.DeviceViewers {
 
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Deleted", () => {
+            Program.Project.Undo.Add($"Chain Removed", () => {
                 Group group = ((Group)Track.TraversePath(path));
 
                 for (int i = left; i <= right; i++)

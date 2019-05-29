@@ -36,10 +36,10 @@ namespace Apollo.Viewers {
         ContextMenu TrackContextMenu;
         TextBox Input;
         
-        private void UpdateText() => UpdateText(_track.ParentIndex.Value, _track.Name);
-        private void UpdateText(int index) => UpdateText(index, _track.Name);
+        private void UpdateText() => UpdateText(_track.ParentIndex.Value, _track.ProcessedName);
+        private void UpdateText(int index) => UpdateText(index, _track.ProcessedName);
         private void UpdateText(string name) => UpdateText(_track.ParentIndex.Value, name);
-        private void UpdateText(int index, string name) => NameText.Text = name.Replace("#", (index + 1).ToString());
+        private void UpdateText(int index, string name) => NameText.Text = name;
 
         public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
@@ -172,7 +172,7 @@ namespace Apollo.Viewers {
                 if (after < before)
                     before_pos += count;
                 
-                Program.Project.Undo.Add(copy? $"Track Copied" : $"Track Moved", copy
+                Program.Project.Undo.Add($"Track {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         for (int i = after + count; i > after; i--)
                             Program.Project.Remove(i);
@@ -202,7 +202,7 @@ namespace Apollo.Viewers {
                 Launchpad r = selected;
                 int path = _track.ParentIndex.Value;
 
-                Program.Project.Undo.Add($"Track {_track.ParentIndex} Launchpad Changed", () => {
+                Program.Project.Undo.Add($"{_track.ProcessedName} Launchpad Changed to {selected.Name}", () => {
                     Program.Project[path].Launchpad = u;
                 }, () => {
                     Program.Project[path].Launchpad = r;
@@ -258,7 +258,7 @@ namespace Apollo.Viewers {
                 int right = Input_Right;
                 List<string> u = (from i in Input_Clean select i).ToList();
 
-                Program.Project.Undo.Add($"Track Renamed", () => {
+                Program.Project.Undo.Add($"Track Renamed to {Input.Text}", () => {
                     for (int i = left; i <= right; i++)
                         Program.Project[i].Name = u[i - left];
 
