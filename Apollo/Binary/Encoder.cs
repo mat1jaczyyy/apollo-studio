@@ -258,6 +258,8 @@ namespace Apollo.Binary {
             writer.Write(o.ChokeEnabled);
             writer.Write(o.Choke);
 
+            writer.Write(o.Infinite);
+
             writer.Write(o.Expanded);
         }
 

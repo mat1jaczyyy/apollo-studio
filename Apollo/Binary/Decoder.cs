@@ -254,9 +254,13 @@ namespace Apollo.Binary {
                     choke = reader.ReadInt32();
                 }
 
+                bool infinite = false;
+                if (version >= 3)
+                    infinite = reader.ReadBoolean();
+
                 int expanded = reader.ReadInt32();
 
-                return new Pattern(gate, frames, mode, chokeenabled, choke, expanded);
+                return new Pattern(gate, frames, mode, chokeenabled, choke, infinite, expanded);
             
             } else if (t == typeof(Preview))
                 return new Preview();

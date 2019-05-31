@@ -141,12 +141,24 @@ namespace Apollo.Devices {
         }
 
         bool choked;
+
+        private bool _infinite;
+        public bool Infinite {
+            get => _infinite;
+            set {
+                if (_infinite != value) {
+                    _infinite = value;
+
+                    // Window?.SetInfinite(_infinite);
+                }
+            }
+        }
         
-        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Expanded);
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Infinite, Expanded);
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 8, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 8, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
@@ -154,6 +166,7 @@ namespace Apollo.Devices {
             _mode = mode;
             ChokeEnabled = chokeenabled;
             Choke = choke;
+            Infinite = infinite;
             Expanded = expanded;
 
             Choked += HandleChoke;
@@ -200,13 +213,14 @@ namespace Apollo.Devices {
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[_indexes[n]].Screen[i].Clone(), n.Layer, n.MultiTarget));
 
                     } else if (_mode == PlaybackType.Mono) {
-                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                            if (Frames.Last().Screen[i].Lit)
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
+                        if (!Infinite)
+                            for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                                if (Frames.Last().Screen[i].Lit)
+                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
 
                     } else if (_mode == PlaybackType.Loop) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i] != Frames[_indexes[n] - 1].Screen[i])
+                            if (Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[_indexes[n] - 1].Screen[i])
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Layer, n.MultiTarget));
 
                         _indexes[n] = 0;
@@ -230,9 +244,10 @@ namespace Apollo.Devices {
                             if (Frames[info.index].Screen[i] != Frames[info.index - 1].Screen[i])
                                 MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, Frames[info.index].Screen[i].Clone(), info.n.Layer, info.n.MultiTarget));
                     } else {
-                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                            if (Frames.Last().Screen[i].Lit)
-                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Layer, info.n.MultiTarget));
+                        if (!Infinite)
+                            for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                                if (Frames.Last().Screen[i].Lit)
+                                    MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Layer, info.n.MultiTarget));
                         
                         poly.Remove(info);
                     }
@@ -248,7 +263,7 @@ namespace Apollo.Devices {
                     for (int i = 0; i < _timers[n].Count; i++)
                         _timers[n][i].Dispose();
                 
-                if (_indexes.ContainsKey(n) && _indexes[n] < Frames.Count)
+                if (_indexes.ContainsKey(n) && _indexes[n] < Frames.Count - Convert.ToInt32(Infinite))
                     for (int i = 0; i < Frames[_indexes[n]].Screen.Length; i++)
                         if (Frames[_indexes[n]].Screen[i].Lit)
                             MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Layer, n.MultiTarget));
