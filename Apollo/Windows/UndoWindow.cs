@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.Visuals;
 
 using Apollo.Core;
@@ -30,6 +31,8 @@ namespace Apollo.Windows {
             viewer.Selected += UndoEntry_Select;
 
             Contents.Children.Insert(index, viewer);
+            
+            Dispatcher.UIThread.Post(() => ScrollViewer.Offset = ScrollViewer.Offset.WithY(Contents.Bounds.Height), DispatcherPriority.Background);
         }
 
         public void Contents_Remove(int index) => Contents.Children.RemoveAt(index);
@@ -44,7 +47,6 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             ScrollViewer = this.Get<ScrollViewer>("ScrollViewer");
-            ScrollViewer.LayoutUpdated += Layout_Updated;
 
             Contents = this.Get<StackPanel>("Contents");
 
@@ -55,8 +57,6 @@ namespace Apollo.Windows {
 
             HighlightPosition(Program.Project.Undo.Position);
         }
-
-        private void Layout_Updated(object sender, EventArgs e) => ScrollViewer.Offset = ScrollViewer.Offset.WithY(Contents.Bounds.Height);
 
         private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
 
