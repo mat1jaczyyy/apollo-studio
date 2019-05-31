@@ -70,6 +70,8 @@
                   <sys:String>Loop</sys:String>
                 </ComboBox>
               </Border>
+              
+              <CheckBox HorizontalAlignment="Center" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
 
               <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Play" x:Name="Play" Click="PatternPlay" />

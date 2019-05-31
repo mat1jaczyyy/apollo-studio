@@ -149,7 +149,7 @@ namespace Apollo.Devices {
                 if (_infinite != value) {
                     _infinite = value;
 
-                    // Window?.SetInfinite(_infinite);
+                    Window?.SetInfinite(_infinite);
                 }
             }
         }

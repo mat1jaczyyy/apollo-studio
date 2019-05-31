@@ -69,6 +69,7 @@ namespace Apollo.Windows {
         ColorHistory ColorHistory;
         Dial Duration, Gate, Choke;
         Button Import, Play, Fire, Reverse, Invert;
+        CheckBox Infinite;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -184,6 +185,9 @@ namespace Apollo.Windows {
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             PlaybackMode.SelectedItem = _pattern.Mode;
+
+            Infinite = this.Get<CheckBox>("Infinite");
+            Infinite.IsChecked = _pattern.Infinite;
 
             Choke = this.Get<Dial>("Choke");
             Choke.Enabled = _pattern.ChokeEnabled;
@@ -550,6 +554,26 @@ namespace Apollo.Windows {
                 }
             }
         }
+
+        private void Infinite_Changed(object sender, EventArgs e) {
+            bool value = Infinite.IsChecked.Value;
+
+            if (_pattern.Infinite != value) {
+                bool u = _pattern.Infinite;
+                bool r = value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    ((Pattern)Track.TraversePath(path)).Infinite = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Infinite = r;
+                });
+
+                _pattern.Infinite = value;
+            }
+        }
+
+        public void SetInfinite(bool value) => Infinite.IsChecked = value;
 
         List<Time> oldTime;
 
