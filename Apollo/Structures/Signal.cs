@@ -47,6 +47,6 @@ namespace Apollo.Structures {
         
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Layer, MultiTarget);
 
-        public override string ToString() => $"{Source.Name} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
+        public override string ToString() => $"{((Source == null)? "null" : Source.Name )} -> {Index} @ {Layer} & {MultiTarget} = {Color}";
     }
 }
