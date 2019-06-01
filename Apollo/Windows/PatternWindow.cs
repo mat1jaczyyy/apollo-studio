@@ -136,7 +136,10 @@ namespace Apollo.Windows {
         }
 
         public void Contents_Insert(int index, Frame frame, bool ignoreExpanded = false) {
-            if (Contents.Count > 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
+            if (Contents.Count > 1) {
+                ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
+                ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().Time.ToString();
+            }
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
@@ -146,6 +149,8 @@ namespace Apollo.Windows {
 
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
+
+            ((FrameDisplay)Contents[_pattern.Count]).Viewer.Time.Text = _pattern.Frames.Last().ToString();
 
             if (!ignoreExpanded && index <= _pattern.Expanded) _pattern.Expanded++;
         }
@@ -158,6 +163,8 @@ namespace Apollo.Windows {
             Contents.RemoveAt(index + 1);
 
             SetAlwaysShowing();
+
+            ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().ToString();
 
             if (Contents.Count == 2) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
@@ -334,7 +341,7 @@ namespace Apollo.Windows {
             Duration.Length = _pattern[_pattern.Expanded].Time.Length;
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
-            SetInfinite(_pattern.Infinite);
+            Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
 
             Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
@@ -581,12 +588,10 @@ namespace Apollo.Windows {
 
         public void SetInfinite(bool value) {
             Infinite.IsChecked = value;
-            
-            if (value && _pattern.Expanded == _pattern.Count - 1) {
-                Duration.Enabled = false;
-                Duration.SetText("Infinite");
 
-            } else Duration.Enabled = true;
+            ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().ToString();
+
+            Duration.Enabled = !(value && _pattern.Expanded == _pattern.Count - 1);
         } 
 
         List<Time> oldTime;

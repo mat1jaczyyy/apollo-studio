@@ -20,7 +20,7 @@ namespace Apollo.Components {
             set {
                 _frame = value;
                 Launchpad.RenderFrame(_frame);
-                Time.Text = _frame.Time.ToString();
+                Time.Text = _frame.ToString();
             }
         }
 

@@ -65,17 +65,17 @@ namespace Apollo.Structures {
 
         private void FreeChanged(int value) {
             Parent?.Window?.SetDurationValue(ParentIndex.Value, Time.Free);
-            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
+            if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
         private void ModeChanged(bool value) {
             Parent?.Window?.SetDurationMode(ParentIndex.Value, Time.Mode);
-            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
+            if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
         private void StepChanged(int value) {
             Parent?.Window?.SetDurationStep(ParentIndex.Value, Time.Length.Step);
-            if (Info != null) Info.Viewer.Time.Text = Time.ToString();
+            if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
         public Frame Clone() => new Frame(Time.Clone(), (from i in Screen select i.Clone()).ToArray());
@@ -138,5 +138,7 @@ namespace Apollo.Structures {
             
             return true;
         }
+
+        public override string ToString() => (Parent.Infinite && ParentIndex.Value == Parent.Count - 1)? "Infinite" : Time.ToString();
     }
 }
