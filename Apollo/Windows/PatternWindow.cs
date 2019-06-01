@@ -89,6 +89,7 @@ namespace Apollo.Windows {
                 Choke.IsEnabled =
                 Gate.Enabled =
                 PlaybackMode.IsEnabled =
+                Infinite.IsEnabled =
                 Play.IsEnabled =
                 Fire.IsEnabled =
                 PortSelector.IsEnabled =
@@ -99,7 +100,10 @@ namespace Apollo.Windows {
                 Reverse.IsEnabled =
                 Invert.IsEnabled = !_locked;
 
-                if (!_locked) Choke.Enabled = _pattern.ChokeEnabled;
+                if (!_locked) {
+                    Choke.Enabled = _pattern.ChokeEnabled;
+                    Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
+                }
             }
         }
 
@@ -329,6 +333,8 @@ namespace Apollo.Windows {
             Duration.UsingSteps = _pattern[_pattern.Expanded].Time.Mode;
             Duration.Length = _pattern[_pattern.Expanded].Time.Length;
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
+
+            SetInfinite(_pattern.Infinite);
 
             Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
@@ -573,7 +579,15 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetInfinite(bool value) => Infinite.IsChecked = value;
+        public void SetInfinite(bool value) {
+            Infinite.IsChecked = value;
+            
+            if (value && _pattern.Expanded == _pattern.Count - 1) {
+                Duration.Enabled = false;
+                Duration.SetText("Infinite");
+
+            } else Duration.Enabled = true;
+        } 
 
         List<Time> oldTime;
 
