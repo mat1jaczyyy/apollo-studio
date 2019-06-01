@@ -33,8 +33,6 @@ namespace Apollo.Components {
         TextBlock TitleText, Display;
         TextBox Input;
 
-        public void SetText(string text) => Display.Text = text;
-
         private const double width = 43, height = 39;
         private const double radius = 18, stroke = 7;
         private const double strokeHalf = stroke / 2;
@@ -135,6 +133,16 @@ namespace Apollo.Components {
             }
         }
 
+        private string _disabledtext = "Disabled";
+        public string DisabledText {
+            get => _disabledtext;
+            set {
+                _disabledtext = value;
+                
+                if (!Enabled) Display.Text = value;
+            }
+        }
+
         private bool _centered = false;
         public bool Centered {
             get => _centered;
@@ -222,7 +230,7 @@ namespace Apollo.Components {
             Arc.StrokeThickness = stroke * _scale;
             if (!overrideBase) {
                 Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
-                if (Enabled) Display.Text = ValueString;
+                Display.Text = Enabled? ValueString : DisabledText;
             }
             
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
