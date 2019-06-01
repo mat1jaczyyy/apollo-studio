@@ -1,3 +1,5 @@
+using System;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -18,12 +20,28 @@ namespace Apollo.Devices {
             }
         }
 
+        Signal.BlendingType _mode;
+        public string Mode {
+            get => _mode.ToString();
+            set {
+                _mode = Enum.Parse<Signal.BlendingType>(value);
+
+                if (Viewer?.SpecificViewer != null) ((LayerViewer)Viewer.SpecificViewer).SetMode(Mode);
+            }
+        }
+
+        public Signal.BlendingType GetBlendingMode() => _mode;
+
         public override Device Clone() => new Layer(Target);
 
-        public Layer(int target = 0): base(DeviceIdentifier) => Target = target;
+        public Layer(int target = 0, Signal.BlendingType blending = Signal.BlendingType.Normal): base(DeviceIdentifier) {
+            Target = target;
+            _mode = blending;
+        }
 
         public override void MIDIEnter(Signal n) {
             n.Layer = Target;
+            n.BlendingMode = _mode;
 
             MIDIExit?.Invoke(n);
         }
