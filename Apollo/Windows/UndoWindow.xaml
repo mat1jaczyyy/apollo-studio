@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         WindowStartupLocation="CenterOwner"
         Title="Undo History" Icon="/Resources/WindowIcon.png"
-        Width="250" MinWidth="250" MaxWidth="250"
+        Width="280" MinWidth="280" MaxWidth="280"
         Height="180" MinHeight="100"
         Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
