@@ -78,6 +78,8 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated += HandlePorts;
         }
 
+        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+
         private void Unloaded(object sender, EventArgs e) {
             Preferences.Window = null;
 

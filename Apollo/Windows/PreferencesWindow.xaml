@@ -6,7 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="350" MinWidth="350" MaxWidth="350"
         Height="600" MinHeight="600" MaxHeight="600"
-        Closing="Unloaded">
+        Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">

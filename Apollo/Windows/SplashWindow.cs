@@ -27,6 +27,8 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
         }
+
+        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
         
         private void Unloaded(object sender, EventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;

@@ -104,6 +104,8 @@ namespace Apollo.Windows {
         public void Expand(int? index) {}
         
         private void Loaded(object sender, EventArgs e) {
+            Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+            
             Program.Project.PathChanged += UpdateTitle;
             UpdateTitle();
 

@@ -27,6 +27,8 @@ namespace Apollo.Windows {
         }
 
         private void Loaded(object sender, EventArgs e) {
+            Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+
             foreach (Window window in Application.Current.Windows)
                 if (window != this)
                     window.IsVisible = false;

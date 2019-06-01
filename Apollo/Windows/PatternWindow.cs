@@ -245,6 +245,8 @@ namespace Apollo.Windows {
         }
 
         private void Loaded(object sender, EventArgs e) {
+            Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+
             _track.ParentIndexChanged += UpdateTitle;
             _track.NameChanged += UpdateTitle;
             UpdateTitle();

@@ -58,7 +58,7 @@ namespace Apollo.Windows {
             HighlightPosition(Program.Project.Undo.Position);
         }
 
-        private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
+        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
         private void Unloaded(object sender, EventArgs e) {
             Program.Project.Undo.Window = null;
@@ -67,6 +67,8 @@ namespace Apollo.Windows {
 
             Program.Project.Undo.SavedPositionChanged -= HighlightSaved;
         }
+
+        private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
 
         public void HighlightSaved(int index) {
             if (saved != current)
