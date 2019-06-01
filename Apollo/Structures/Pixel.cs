@@ -6,7 +6,8 @@ namespace Apollo.Structures {
         public Action<Signal> MIDIExit = null;
         
         private SortedList<int, Signal> _signals = new SortedList<int, Signal>();
-        private int? _highest = null;
+        private Color state = new Color(0);
+
         private object locker = new object();
 
         public Pixel() {}
@@ -15,40 +16,26 @@ namespace Apollo.Structures {
             lock (locker) {
                 int layer = -n.Layer;
 
-                if (_signals.ContainsKey(layer)) {
-                    if (n.Color.Lit) {
-                        _signals[layer] = n.Clone();
-                        
-                        if (layer == _highest)
-                            MIDIExit?.Invoke(n.Clone());
+                if (n.Color.Lit) _signals[layer] = n.Clone();
+                else if (_signals.ContainsKey(layer)) _signals.Remove(layer);
+                else return;
 
-                    } else {
-                        _signals.Remove(layer);
+                Color newState = new Color(0);
 
-                        if (layer == _highest) {
-                            if (_signals.Count == 0) {
-                                _highest = null;
+                for (int i = 0; i < _signals.Count; i++) {
+                    Signal signal = _signals.Values[i];
 
-                                MIDIExit?.Invoke(n.Clone());
+                    if (signal.BlendingMode == Signal.BlendingType.Mask) break;
 
-                            } else {
-                                _highest = _signals.Keys[0];
+                    newState.Mix(signal.Color);
 
-                                MIDIExit?.Invoke(_signals[(int)_highest].Clone());
-                            }
-                        }
-                    }
+                    if (signal.BlendingMode == Signal.BlendingType.Normal) break;
+                }
                 
-                } else {
-                    if (n.Color.Lit) {
-                        _signals[layer] = n.Clone();
-
-                        if (!_highest.HasValue || layer < _highest) {
-                            _highest = layer;
-
-                            MIDIExit?.Invoke(n.Clone());
-                        }
-                    }
+                if (newState != state) {
+                    Signal m = n.Clone();
+                    m.Color = state = newState;
+                    MIDIExit?.Invoke(m);
                 }
             }
         }
