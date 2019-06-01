@@ -15,7 +15,9 @@ namespace Apollo.DeviceViewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Layer _layer;
+        
         Dial Target;
+        ComboBox BlendingMode;
 
         public LayerViewer(Layer layer) {
             InitializeComponent();
@@ -24,6 +26,9 @@ namespace Apollo.DeviceViewers {
             
             Target = this.Get<Dial>("Target");
             Target.RawValue = _layer.Target;
+
+            BlendingMode = this.Get<ComboBox>("BlendingMode");
+            BlendingMode.SelectedItem = _layer.Mode;
         }
 
         private void Target_Changed(double value, double? old) {
@@ -43,5 +48,25 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
+
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+            string selected = (string)BlendingMode.SelectedItem;
+
+            if (_layer.Mode != selected) {
+                string u = _layer.Mode;
+                string r = selected;
+                List<int> path = Track.GetPath(_layer);
+
+                Program.Project.Undo.Add($"Layer Blending Changed to {selected}", () => {
+                    ((Layer)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Layer)Track.TraversePath(path)).Mode = r;
+                });
+
+                _layer.Mode = selected;
+            }
+        }
+
+        public void SetMode(string mode) => BlendingMode.SelectedItem = mode;
     }
 }
