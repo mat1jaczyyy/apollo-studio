@@ -17,20 +17,8 @@ using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
-    public class DeviceViewer: UserControl, IDeviceViewer {
+    public class CollapsedDeviceViewer: UserControl, IDeviceViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-
-        public static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
-            foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
-                if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
-                    if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi")
-                        return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
-                    
-                    return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device});
-                }
-
-            return null;
-        }
 
         public event DeviceAddedEventHandler DeviceAdded;
         public event DeviceRemovedEventHandler DeviceRemoved;
@@ -39,10 +27,10 @@ namespace Apollo.Viewers {
         Device _device;
         bool selected = false;
 
-        public IControl SpecificViewer { get; private set; }
+        public IControl SpecificViewer { get => null; }
 
         public StackPanel Root;
-        public Border Border, Header;
+        public Border Header;
         public DeviceAdd DeviceAdd { get; private set; }
 
         Grid Draggable;
@@ -50,20 +38,6 @@ namespace Apollo.Viewers {
 
         private void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
-
-            if (Root.Children[0].GetType() == typeof(DeviceHead)) {
-                DeviceHead target = ((DeviceHead)Root.Children[0]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
-            }
-
-            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail)) {
-                DeviceTail target = ((DeviceTail)Root.Children[Root.Children.Count - 2]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
-            }
 
             if (IsArrangeValid) Header.Background = brush;
             else this.Resources["TitleBrush"] = brush;
@@ -79,7 +53,7 @@ namespace Apollo.Viewers {
             selected = false;
         }
 
-        public DeviceViewer(Device device) {
+        public CollapsedDeviceViewer(Device device) {
             InitializeComponent();
 
             this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
@@ -89,7 +63,6 @@ namespace Apollo.Viewers {
 
             Root = this.Get<StackPanel>("Root");
 
-            Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
             Deselect();
             
@@ -104,11 +77,6 @@ namespace Apollo.Viewers {
             Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
-
-            SpecificViewer = GetSpecificViewer(this, _device);
-
-            if (SpecificViewer != null)
-                this.Get<Grid>("Contents").Children.Add(SpecificViewer);
         }
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);

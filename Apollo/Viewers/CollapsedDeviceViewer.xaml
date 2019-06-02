@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Viewers.CollapsedDeviceViewer"
+             xmlns:Components="clr-namespace:Apollo.Components">
+  
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="TitleBrush" />
+    
+    <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Duplicate" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+      <MenuItem Header="Group" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="GroupContextMenu" Cursor="Arrow">
+      <MenuItem Header="Cut" />
+      <MenuItem Header="Copy" />
+      <MenuItem Header="Duplicate" />
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Delete" />
+      <MenuItem Header="Group" />
+      <MenuItem Header="Ungroup" />
+    </ContextMenu>
+  </UserControl.Resources>
+  
+  <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">
+    <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="1" CornerRadius="5" DragDrop.AllowDrop="true" x:Name="Header">
+      <Grid Background="Transparent" PointerPressed="Drag" x:Name="Draggable">
+        <LayoutTransformControl>
+          <LayoutTransformControl.LayoutTransform>
+            <RotateTransform Angle="270" />
+          </LayoutTransformControl.LayoutTransform>
+
+          <Grid Margin="0 2 0 0">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" x:Name="Title" />
+          </Grid>
+        </LayoutTransformControl>
+      </Grid>
+    </Border>
+
+    <Components:DeviceAdd DeviceAdded="Device_Add" DeviceAction="Device_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+  </StackPanel>
+</UserControl>

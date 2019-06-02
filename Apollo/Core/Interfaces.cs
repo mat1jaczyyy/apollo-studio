@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
 
+using Avalonia.Controls;
+
+using Apollo.Components;
 using Apollo.Elements;
 using Apollo.Viewers;
 
@@ -23,6 +27,19 @@ namespace Apollo.Core {
         void Contents_Remove(int index);
 
         void Expand(int? index);
+    }
+    
+    public delegate void DeviceAddedEventHandler(int index, Type device);
+    public delegate void DeviceRemovedEventHandler(int index);
+    public delegate void DeviceCollapsedEventHandler(int index);
+
+    public interface IDeviceViewer: IControl, ISelectViewer {
+        event DeviceAddedEventHandler DeviceAdded;
+        event DeviceRemovedEventHandler DeviceRemoved;
+        event DeviceCollapsedEventHandler DeviceCollapsed;
+
+        DeviceAdd DeviceAdd { get; }
+        IControl SpecificViewer { get; }
     }
 
     public interface ISelect {

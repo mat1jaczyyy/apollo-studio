@@ -40,15 +40,16 @@ namespace Apollo.Viewers {
             DeviceAdd.AlwaysShowing = Contents.Count == 1;
 
             for (int i = 1; i < Contents.Count; i++)
-                ((DeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;
+                ((IDeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;
 
-            if (Contents.Count > 1 && RootChain) ((DeviceViewer)Contents.Last()).DeviceAdd.AlwaysShowing = true;
+            if (Contents.Count > 1 && RootChain) ((IDeviceViewer)Contents.Last()).DeviceAdd.AlwaysShowing = true;
         }
 
         public void Contents_Insert(int index, Device device) {
-            DeviceViewer viewer = new DeviceViewer(device);
+            IDeviceViewer viewer = device.Collapsed? (IDeviceViewer)new CollapsedDeviceViewer(device) : new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
             viewer.DeviceRemoved += Device_Remove;
+            viewer.DeviceCollapsed += Device_Collapsed;
 
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
@@ -118,6 +119,13 @@ namespace Apollo.Viewers {
             });
 
             _chain.Remove(index);
+        }
+
+        private void Device_Collapsed(int index) {
+            Contents_Remove(index);
+            Contents_Insert(index, _chain[index]);
+            
+            Track.Get(_chain[index]).Window?.Selection.Select(_chain[index]);
         }
 
         private void Device_Action(string action) => Device_Action(action, false);
