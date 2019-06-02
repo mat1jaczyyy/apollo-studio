@@ -44,6 +44,7 @@ namespace Apollo.Viewers {
         public Border Border, Header;
         public DeviceAdd DeviceAdd { get; private set; }
 
+        TextBlock TitleText;
         Grid Draggable;
         ContextMenu DeviceContextMenu, GroupContextMenu;
 
@@ -81,7 +82,8 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
-            this.Get<TextBlock>("Title").Text = device.GetType().ToString().Split(".").Last();
+            TitleText = this.Get<TextBlock>("Title");
+            TitleText.Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
             _device.Viewer = this;
@@ -108,6 +110,14 @@ namespace Apollo.Viewers {
 
             if (SpecificViewer != null)
                 this.Get<Grid>("Contents").Children.Add(SpecificViewer);
+            
+            SetEnabled(_device.Enabled);
+        }
+
+        public void SetEnabled(bool value) {
+            Border.Background = (IBrush)Application.Current.Styles.FindResource(value? "ThemeControlHighBrush" : "ThemeControlMidBrush");
+            Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(value? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
+            TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(value? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
         }
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);

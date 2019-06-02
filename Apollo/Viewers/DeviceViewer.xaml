@@ -13,6 +13,7 @@
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
       <MenuItem Header="Group" />
+      <MenuItem Header="Mute" />
     </ContextMenu>
 
     <ContextMenu x:Key="GroupContextMenu" Cursor="Arrow">
@@ -23,11 +24,12 @@
       <MenuItem Header="Delete" />
       <MenuItem Header="Group" />
       <MenuItem Header="Ungroup" />
+      <MenuItem Header="Mute" />
     </ContextMenu>
   </UserControl.Resources>
 
   <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">
-    <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="5" x:Name="Border">
+    <Border BorderThickness="1" CornerRadius="5" x:Name="Border">
       <Grid RowDefinitions="Auto,*">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="0 0 0 1" CornerRadius="5 5 0 0" x:Name="Header">
           <Grid Margin="5 4" Background="Transparent" x:Name="Draggable" PointerPressed="Drag">

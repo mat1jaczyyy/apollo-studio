@@ -384,8 +384,8 @@ namespace Apollo.Windows {
         }
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");
-
         public void Ungroup(int index) => throw new InvalidOperationException("A Track cannot be ungrouped.");
+        public void Mute(int left, int right) => throw new InvalidOperationException("A Track cannot be muted.");
 
         public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
     }

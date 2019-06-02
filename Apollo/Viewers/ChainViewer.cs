@@ -356,6 +356,29 @@ namespace Apollo.Viewers {
             _track?.Window?.Selection.Select(_chain[index]);
             _track?.Window?.Selection.Select(_chain[index + init.Count - 1], true);
         }
+        
+        public void Mute(int left, int right) {
+            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _chain[i].Enabled).ToList();
+            bool r = !_chain[left].Enabled;
+
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Muted", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    chain[i].Enabled = u[i - left];
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    chain[i].Enabled = r;
+            });
+
+            for (int i = left; i <= right; i++)
+                _chain[i].Enabled = r;
+        }
 
         public void Rename(int left, int right) => throw new InvalidOperationException("A Device cannot be renamed.");
     }

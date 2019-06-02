@@ -32,7 +32,18 @@ namespace Apollo.Elements {
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
         public bool Collapsed = false;
-        public bool Enabled = true;
+        
+        private bool _enabled = true;
+        public bool Enabled {
+            get => _enabled;
+            set {
+                if (_enabled != value) {
+                    _enabled = value;
+
+                    Viewer?.SetEnabled(Enabled);
+                }
+            }
+        }
 
         public abstract Device Clone();
         

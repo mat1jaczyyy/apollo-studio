@@ -110,6 +110,7 @@ namespace Apollo.Helpers {
             else if (action == "Delete") parent.IViewer?.Delete(left, right);
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
+            else if (action == "Mute") parent.IViewer?.Mute(left, right);
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
         }
 
@@ -123,6 +124,7 @@ namespace Apollo.Helpers {
                 else if (e.Key == Key.V) Action("Paste");
                 else if (e.Key == Key.G) Action("Group");
                 else if (e.Key == Key.U) Action("Ungroup");
+                else if (e.Key == Key.M) Action("Mute");
                 else if (e.Key == Key.R) Action("Rename");
                 else if (e.Key == Key.A) SelectAll();
                 else return false;

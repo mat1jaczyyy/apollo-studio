@@ -38,6 +38,8 @@ namespace Apollo.Core {
 
         DeviceAdd DeviceAdd { get; }
         IControl SpecificViewer { get; }
+
+        void SetEnabled(bool value);
     }
 
     public interface ISelect {
@@ -70,6 +72,7 @@ namespace Apollo.Core {
         void Delete(int left, int right);
         void Group(int left, int right);
         void Ungroup(int left);
+        void Mute(int left, int right);
         void Rename(int left, int right);
     }
 }
