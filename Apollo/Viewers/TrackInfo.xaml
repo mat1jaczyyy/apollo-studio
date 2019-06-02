@@ -18,17 +18,15 @@
 
   <StackPanel VerticalAlignment="Stretch">
     <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource BackgroundBrush}" BorderThickness="1" CornerRadius="5" DragDrop.AllowDrop="true" x:Name="DropZone">
-      <Grid ColumnDefinitions="Auto,*,Auto" Margin="5 5" MinHeight="24">
-        <Components:Remove Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" Removed="Track_Remove" />
-
-        <Grid Grid.Column="1" Margin="0 0 5 0" Background="Transparent" VerticalAlignment="Stretch" x:Name="Draggable" PointerPressed="Drag">
+      <Grid ColumnDefinitions="*,Auto" Margin="5 5" MinHeight="24">
+        <Grid Grid.Column="0" Margin="5 0" Background="Transparent" VerticalAlignment="Stretch" x:Name="Draggable" PointerPressed="Drag">
           <TextBlock VerticalAlignment="Center" x:Name="Name" />
 
           <TextBox Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" VerticalAlignment="Center" Padding="1" x:Name="Input"
                LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
         </Grid>
         
-        <ComboBox Grid.Column="2" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
+        <ComboBox Grid.Column="1" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
       </Grid>
     </Border>
 

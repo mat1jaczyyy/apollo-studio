@@ -51,7 +51,6 @@ namespace Apollo.DeviceViewers {
         public void Contents_Insert(int index, Chain chain) {
             ChainInfo viewer = new ChainInfo(chain);
             viewer.ChainAdded += Chain_Insert;
-            viewer.ChainRemoved += Chain_Remove;
             viewer.ChainExpanded += Expand;
             chain.Info = viewer;
 

@@ -21,7 +21,6 @@ namespace Apollo.Viewers {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public event DeviceAddedEventHandler DeviceAdded;
-        public event DeviceRemovedEventHandler DeviceRemoved;
         public event DeviceCollapsedEventHandler DeviceCollapsed;
         
         Device _device;
@@ -80,8 +79,6 @@ namespace Apollo.Viewers {
         }
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
-
-        private void Device_Remove() => DeviceRemoved?.Invoke(_device.ParentIndex.Value);
 
         private void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 

@@ -30,12 +30,10 @@ namespace Apollo.Core {
     }
     
     public delegate void DeviceAddedEventHandler(int index, Type device);
-    public delegate void DeviceRemovedEventHandler(int index);
     public delegate void DeviceCollapsedEventHandler(int index);
 
     public interface IDeviceViewer: IControl, ISelectViewer {
         event DeviceAddedEventHandler DeviceAdded;
-        event DeviceRemovedEventHandler DeviceRemoved;
         event DeviceCollapsedEventHandler DeviceCollapsed;
 
         DeviceAdd DeviceAdd { get; }

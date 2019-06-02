@@ -20,9 +20,8 @@ namespace Apollo.Viewers {
     public class TrackInfo: UserControl, ISelectViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void TrackInfoEventHandler(int index);
-        public event TrackInfoEventHandler TrackAdded;
-        public event TrackInfoEventHandler TrackRemoved;
+        public delegate void TrackAddedEventHandler(int index);
+        public event TrackAddedEventHandler TrackAdded;
         
         Track _track;
         bool selected = false;
@@ -192,7 +191,6 @@ namespace Apollo.Viewers {
         }
 
         private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
-        private void Track_Remove() => TrackRemoved?.Invoke(_track.ParentIndex.Value);
 
         private void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;

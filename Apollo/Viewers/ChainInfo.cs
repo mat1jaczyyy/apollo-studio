@@ -20,9 +20,8 @@ namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void ChainInfoEventHandler(int index);
-        public event ChainInfoEventHandler ChainAdded;
-        public event ChainInfoEventHandler ChainRemoved;
+        public delegate void ChainAddedEventHandler(int index);
+        public event ChainAddedEventHandler ChainAdded;
 
         public delegate void ChainExpandedEventHandler(int? index);
         public event ChainExpandedEventHandler ChainExpanded;
@@ -260,7 +259,6 @@ namespace Apollo.Viewers {
         }
         
         private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
-        private void Chain_Remove() => ChainRemoved?.Invoke(_chain.ParentIndex.Value);
 
         int Input_Left, Input_Right;
         List<string> Input_Clean;

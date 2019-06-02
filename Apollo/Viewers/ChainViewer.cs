@@ -48,7 +48,6 @@ namespace Apollo.Viewers {
         public void Contents_Insert(int index, Device device) {
             IDeviceViewer viewer = device.Collapsed? (IDeviceViewer)new CollapsedDeviceViewer(device) : new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
-            viewer.DeviceRemoved += Device_Remove;
             viewer.DeviceCollapsed += Device_Collapsed;
 
             Contents.Insert(index + 1, viewer);
@@ -106,19 +105,6 @@ namespace Apollo.Viewers {
             });
             
             _chain.Insert(index, device);
-        }
-
-        private void Device_Remove(int index) {
-            Device u = _chain[index].Clone();
-            List<int> path = Track.GetPath(_chain);
-
-            Program.Project.Undo.Add($"Device ({u.GetType().ToString().Split(".").Last()}) Removed", () => {
-                ((Chain)Track.TraversePath(path)).Insert(index, u.Clone());
-            }, () => {
-                ((Chain)Track.TraversePath(path)).Remove(index);
-            });
-
-            _chain.Remove(index);
         }
 
         private void Device_Collapsed(int index) {
