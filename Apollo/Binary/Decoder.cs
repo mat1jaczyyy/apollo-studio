@@ -88,10 +88,18 @@ namespace Apollo.Binary {
                     reader.ReadString()
                 );
             
-            else if (t == typeof(Device))
-                return Decode(reader, version);
+            else if (t == typeof(Device)) {
+                bool collapsed = false;
+                if (version >= 5) {
+                    collapsed = reader.ReadBoolean();
+                }
+
+                Device ret = (Device)Decode(reader, version);
+                ret.Collapsed = collapsed;
+
+                return ret;
             
-            else if (t == typeof(Launchpad)) {
+            } else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
                 if (name == "") return null;
 

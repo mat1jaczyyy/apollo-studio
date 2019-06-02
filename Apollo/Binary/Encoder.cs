@@ -101,6 +101,8 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Device o) {
             EncodeID(writer, typeof(Device));
 
+            writer.Write(o.Collapsed);
+
             Encode(writer, (dynamic)o);
         }
 

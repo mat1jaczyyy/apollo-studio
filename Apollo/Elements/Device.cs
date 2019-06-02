@@ -31,6 +31,8 @@ namespace Apollo.Elements {
         public int? ParentIndex;
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
+        public bool Collapsed = false;
+
         public abstract Device Clone();
         
         protected Device(string device) => DeviceIdentifier = device;
