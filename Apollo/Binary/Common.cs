@@ -9,7 +9,7 @@ using Apollo.Structures;
 
 namespace Apollo.Binary {
     public static class Common {
-        public const int version = 4;
+        public const int version = 5;
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),

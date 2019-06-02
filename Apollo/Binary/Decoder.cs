@@ -200,12 +200,20 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
 
-            else if (t == typeof(Layer))
+            else if (t == typeof(Layer)) {
+                int target = reader.ReadInt32();
+
+                Signal.BlendingType blending = Signal.BlendingType.Normal;
+                if (version >= 5) {
+                    blending = (Signal.BlendingType)reader.ReadInt32();
+                }
+
                 return new Layer(
-                    reader.ReadInt32()
+                    target,
+                    blending
                 );
-            
-            else if (t == typeof(Move))
+
+            } else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
                     (Move.GridType)reader.ReadInt32(),
