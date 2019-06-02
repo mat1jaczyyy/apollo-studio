@@ -138,7 +138,7 @@ namespace Apollo.Windows {
         public void Contents_Insert(int index, Frame frame, bool ignoreExpanded = false) {
             if (Contents.Count > 1) {
                 ((FrameDisplay)Contents[1]).Remove.Opacity = 1;
-                ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().Time.ToString();
+                ((FrameDisplay)Contents[Contents.Count - 1]).Viewer.Time.Text = _pattern.Frames[Contents.Count - 2].Time.ToString();
             }
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
@@ -150,7 +150,7 @@ namespace Apollo.Windows {
             Contents.Insert(index + 1, viewer);
             SetAlwaysShowing();
 
-            ((FrameDisplay)Contents[_pattern.Count]).Viewer.Time.Text = _pattern.Frames.Last().ToString();
+            ((FrameDisplay)Contents[Contents.Count - 1]).Viewer.Time.Text = _pattern.Frames[Contents.Count - 2].ToString();
 
             if (!ignoreExpanded && index <= _pattern.Expanded) _pattern.Expanded++;
         }
