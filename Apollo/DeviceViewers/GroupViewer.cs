@@ -96,7 +96,7 @@ namespace Apollo.DeviceViewers {
 
         private void Expand_Insert(int index) {
             _root.Insert(1, new ChainViewer(_group[index], true));
-            _root.Insert(2, new DeviceTail(_parent));
+            _root.Insert(2, new DeviceTail(_group, _parent));
 
             _parent.Border.CornerRadius = new CornerRadius(5, 0, 0, 5);
             _parent.Header.CornerRadius = new CornerRadius(5, 0, 0, 0);

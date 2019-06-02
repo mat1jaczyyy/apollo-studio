@@ -82,7 +82,7 @@ namespace Apollo.DeviceViewers {
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
 
             _root = _parent.Root.Children;
-            _root.Insert(0, new DeviceHead(parent));
+            _root.Insert(0, new DeviceHead(_multi, parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
             MultiMode = this.Get<ComboBox>("MultiMode");
@@ -108,7 +108,7 @@ namespace Apollo.DeviceViewers {
 
         private void Expand_Insert(int index) {
             _root.Insert(3, new ChainViewer(_multi[index], true));
-            _root.Insert(4, new DeviceTail(_parent));
+            _root.Insert(4, new DeviceTail(_multi, _parent));
 
             _parent.Border.CornerRadius = new CornerRadius(0);
             _parent.Header.CornerRadius = new CornerRadius(0);

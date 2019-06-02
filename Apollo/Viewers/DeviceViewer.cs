@@ -111,13 +111,19 @@ namespace Apollo.Viewers {
             if (SpecificViewer != null)
                 this.Get<Grid>("Contents").Children.Add(SpecificViewer);
             
-            SetEnabled(_device.Enabled);
+            SetEnabled();
         }
 
-        public void SetEnabled(bool value) {
-            Border.Background = (IBrush)Application.Current.Styles.FindResource(value? "ThemeControlHighBrush" : "ThemeControlMidBrush");
-            Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(value? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
-            TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(value? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+        public void SetEnabled() {
+            Border.Background = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeControlHighBrush" : "ThemeControlMidBrush");
+            Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
+            TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+
+            if (Root.Children[0].GetType() == typeof(DeviceHead))
+                ((DeviceHead)Root.Children[0]).SetEnabled(_device.Enabled);
+
+            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail))
+                ((DeviceTail)Root.Children[Root.Children.Count - 2]).SetEnabled(_device.Enabled);
         }
 
         private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);

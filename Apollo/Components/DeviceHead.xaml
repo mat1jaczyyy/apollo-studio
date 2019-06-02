@@ -6,7 +6,7 @@
     <SolidColorBrush x:Key="TitleBrush" />
   </UserControl.Resources>
   
-  <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlHighBrush}" BorderThickness="1" CornerRadius="5 0 0 5" x:Name="Border">
+  <Border BorderThickness="1" CornerRadius="5 0 0 5" x:Name="Border">
     <Grid RowDefinitions="Auto,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource TitleBrush}" BorderThickness="0 0 0 1" CornerRadius="5 0 0 0" x:Name="Header">
         <Grid Background="Transparent" PointerPressed="Drag">

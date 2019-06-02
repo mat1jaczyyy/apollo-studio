@@ -40,7 +40,7 @@ namespace Apollo.Elements {
                 if (_enabled != value) {
                     _enabled = value;
 
-                    Viewer?.SetEnabled(Enabled);
+                    Viewer?.SetEnabled();
                 }
             }
         }

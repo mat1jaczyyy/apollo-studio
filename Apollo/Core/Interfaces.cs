@@ -39,7 +39,7 @@ namespace Apollo.Core {
         DeviceAdd DeviceAdd { get; }
         IControl SpecificViewer { get; }
 
-        void SetEnabled(bool value);
+        void SetEnabled();
     }
 
     public interface ISelect {
