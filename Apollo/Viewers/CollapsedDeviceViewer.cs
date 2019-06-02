@@ -136,7 +136,7 @@ namespace Apollo.Viewers {
             if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") {
+            while (source.Name != "DropZoneHead" && source.Name != "Header" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") {
                 source = source.Parent;
                 
                 if (source == this) {
@@ -152,7 +152,7 @@ namespace Apollo.Viewers {
 
             int before = moving[0].IParentIndex.Value - 1;
             int after = _device.ParentIndex.Value;
-            if (source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2)) after--;
+            if (source.Name == "DropZoneHead" || (source.Name == "Header" && e.GetPosition(source).X < source.Bounds.Width / 2)) after--;
 
             bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
 
