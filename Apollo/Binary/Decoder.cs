@@ -263,8 +263,9 @@ namespace Apollo.Binary {
                 }
 
                 bool infinite = false;
-                if (version >= 3)
+                if (version >= 4) {
                     infinite = reader.ReadBoolean();
+                }
 
                 int expanded = reader.ReadInt32();
 
