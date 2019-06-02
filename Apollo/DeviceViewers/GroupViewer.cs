@@ -150,19 +150,6 @@ namespace Apollo.DeviceViewers {
             _group.Insert(index, chain);
         }
 
-        private void Chain_Remove(int index) {
-            Chain u = _group[index].Clone();
-            List<int> path = Track.GetPath(_group);
-
-            Program.Project.Undo.Add($"Group {_group[index].ProcessedName} Removed", () => {
-                ((Group)Track.TraversePath(path)).Insert(index, u.Clone());
-            }, () => {
-                ((Group)Track.TraversePath(path)).Remove(index);
-            });
-
-            _group.Remove(index);
-        }
-
         private void Chain_Action(string action) => Chain_Action(action, false);
         private void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
 

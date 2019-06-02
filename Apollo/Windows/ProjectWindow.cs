@@ -136,22 +136,6 @@ namespace Apollo.Windows {
             Program.Project.Insert(index, track);
         }
 
-        private void Track_Remove(int index) {
-            Track ut = Program.Project[index].Clone();
-            Launchpad ul = Program.Project[index].Launchpad;
-
-            Program.Project.Undo.Add($"{Program.Project[index].ProcessedName} Removed", () => {
-                Track restored = ut.Clone();
-                restored.Launchpad = ul;
-                Program.Project.Insert(index, restored);
-                
-            }, () => {
-                Program.Project.Remove(index);
-            });
-
-            Program.Project.Remove(index);
-        }
-
         private void Window_KeyDown(object sender, KeyEventArgs e) {
             if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                 this.Focus();
