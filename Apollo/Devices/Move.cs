@@ -92,7 +92,7 @@ namespace Apollo.Devices {
             return false;
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (n.Index == 99) {
                 MIDIExit?.Invoke(n);
                 return;

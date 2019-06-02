@@ -91,7 +91,7 @@ namespace Apollo.Devices {
             MIDIExit?.Invoke((Signal)courier.Info);
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (n.Color.Lit ^ Release) {
                 if (!Infinite) {
                     Courier courier = new Courier() {

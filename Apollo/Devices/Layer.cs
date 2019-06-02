@@ -39,7 +39,7 @@ namespace Apollo.Devices {
             _mode = blending;
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             n.Layer = Target;
             n.BlendingMode = _mode;
 

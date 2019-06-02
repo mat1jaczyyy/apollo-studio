@@ -54,7 +54,7 @@ namespace Apollo.Devices {
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             n.Source = Launchpad;
             MIDIExit?.Invoke(n);
         }

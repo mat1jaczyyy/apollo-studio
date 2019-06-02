@@ -277,7 +277,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             int px = n.Index % 10;
             int py = n.Index / 10;
 

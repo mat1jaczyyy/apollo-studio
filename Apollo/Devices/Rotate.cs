@@ -48,7 +48,7 @@ namespace Apollo.Devices {
             Bypass = bypass;
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (Bypass) MIDIExit?.Invoke(n.Clone());
             
             int x = n.Index % 10;

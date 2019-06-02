@@ -32,12 +32,18 @@ namespace Apollo.Elements {
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
         public bool Collapsed = false;
+        public bool Enabled = true;
 
         public abstract Device Clone();
         
         protected Device(string device) => DeviceIdentifier = device;
 
-        public abstract void MIDIEnter(Signal n);
+        public abstract void MIDIProcess(Signal n);
+
+        public void MIDIEnter(Signal n) {
+            if (Enabled) MIDIProcess(n);
+            else MIDIExit?.Invoke(n);
+        }
 
         public bool Disposed { get; private set; } = false;
 

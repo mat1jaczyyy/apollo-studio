@@ -94,8 +94,14 @@ namespace Apollo.Binary {
                     collapsed = reader.ReadBoolean();
                 }
 
+                bool enabled = false;
+                if (version >= 5) {
+                    enabled = reader.ReadBoolean();
+                }
+
                 Device ret = (Device)Decode(reader, version);
                 ret.Collapsed = collapsed;
+                ret.Enabled = enabled;
 
                 return ret;
             

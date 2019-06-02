@@ -91,7 +91,7 @@ namespace Apollo.Devices {
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (Chains.Count == 0) ChainExit(n);
 
             foreach (Chain chain in Chains)

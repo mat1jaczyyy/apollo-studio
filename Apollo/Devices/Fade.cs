@@ -274,7 +274,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (_colors.Count > 0) {
                 bool lit = n.Color.Lit;
                 n.Color = new Color();

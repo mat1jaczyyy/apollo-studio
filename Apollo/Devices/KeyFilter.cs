@@ -35,7 +35,7 @@ namespace Apollo.Devices {
             _filter = init;
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (_filter[n.Index])
                 MIDIExit?.Invoke(n);
         }

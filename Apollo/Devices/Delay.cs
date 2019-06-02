@@ -69,7 +69,7 @@ namespace Apollo.Devices {
             MIDIExit?.Invoke((Signal)courier.Info);
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             Courier courier = new Courier() {
                 Info = n.Clone(),
                 AutoReset = false,

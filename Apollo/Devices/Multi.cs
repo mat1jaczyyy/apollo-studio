@@ -139,7 +139,7 @@ namespace Apollo.Devices {
 
         private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
             n.Color = new Color();
 

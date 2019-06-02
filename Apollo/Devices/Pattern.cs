@@ -273,7 +273,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             if (Frames.Count > 0) {
                 bool lit = n.Color.Lit;
                 n.Index = 11;

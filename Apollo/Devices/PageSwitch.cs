@@ -23,7 +23,7 @@ namespace Apollo.Devices {
 
         public PageSwitch(int target = 1): base(DeviceIdentifier) => Target = target;
 
-        public override void MIDIEnter(Signal n) {
+        public override void MIDIProcess(Signal n) {
             Program.Project.Page = Target;
             MIDIExit?.Invoke(n);
         }
