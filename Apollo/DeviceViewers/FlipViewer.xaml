@@ -5,7 +5,7 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
 
-  <StackPanel VerticalAlignment="Center" Spacing="5">
+  <StackPanel VerticalAlignment="Center" Spacing="5" Width="90">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="FlipMode" SelectionChanged="Mode_Changed">
         <sys:String>Horizontal</sys:String>
