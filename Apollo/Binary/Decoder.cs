@@ -219,7 +219,13 @@ namespace Apollo.Binary {
 
                 Signal.BlendingType blending = Signal.BlendingType.Normal;
                 if (version >= 5) {
-                    blending = (Signal.BlendingType)reader.ReadInt32();
+                    if (version == 5) {
+                        blending = (Signal.BlendingType)reader.ReadInt32();
+                        if ((int)blending == 2) blending = Signal.BlendingType.Mask;
+
+                    } else {
+                        blending = (Signal.BlendingType)reader.ReadInt32();
+                    }
                 }
 
                 return new Layer(

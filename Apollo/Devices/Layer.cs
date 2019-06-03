@@ -32,7 +32,7 @@ namespace Apollo.Devices {
 
         public Signal.BlendingType GetBlendingMode() => _mode;
 
-        public override Device Clone() => new Layer(Target) {
+        public override Device Clone() => new Layer(Target, _mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };

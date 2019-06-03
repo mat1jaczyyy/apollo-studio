@@ -13,7 +13,8 @@
 
     <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="BlendingMode" SelectionChanged="Mode_Changed">
       <sys:String>Normal</sys:String>
-      <sys:String>Mix</sys:String>
+      <sys:String>Screen</sys:String>
+      <sys:String>Multiply</sys:String>
       <sys:String>Mask</sys:String>
     </ComboBox>
   </StackPanel>
