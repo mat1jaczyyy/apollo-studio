@@ -20,7 +20,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new KeyFilter(_filter.ToArray());
+        public override Device Clone() => new KeyFilter(_filter.ToArray()) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public bool this[int index] {
             get => _filter[index];

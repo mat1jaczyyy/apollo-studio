@@ -154,7 +154,10 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Infinite, Expanded);
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Infinite, Expanded) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public int Expanded;
 

@@ -11,7 +11,10 @@ namespace Apollo.Devices {
 
         private bool[] _filter;
 
-        public override Device Clone() => new PageFilter(_filter.ToArray());
+        public override Device Clone() => new PageFilter(_filter.ToArray()) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public bool this[int index] {
             get => _filter[index];

@@ -75,7 +75,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Hold(_time, _gate, Infinite, Release);
+        public override Device Clone() => new Hold(_time, _gate, Infinite, Release) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Hold(Time time = null, decimal gate = 1, bool infinite = false, bool release = false): base(DeviceIdentifier) {
             Time = time?? new Time();

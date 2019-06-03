@@ -18,7 +18,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Paint(Color.Clone());
+        public override Device Clone() => new Paint(Color.Clone()) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Paint(Color color = null): base(DeviceIdentifier) => Color = color?? new Color(63);
 

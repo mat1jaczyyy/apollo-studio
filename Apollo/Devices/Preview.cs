@@ -7,7 +7,10 @@ namespace Apollo.Devices {
 
         private Pixel[] screen = new Pixel[100];
 
-        public override Device Clone() => new Preview();
+        public override Device Clone() => new Preview() {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Preview(): base(DeviceIdentifier) {
             for (int i = 0; i < 100; i++)

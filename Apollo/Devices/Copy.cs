@@ -149,7 +149,10 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList());
+        public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Time = time?? new Time(false, null, 500);

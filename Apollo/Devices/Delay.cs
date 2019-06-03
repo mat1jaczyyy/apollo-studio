@@ -55,7 +55,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Delay(_time.Clone(), _gate);
+        public override Device Clone() => new Delay(_time.Clone(), _gate) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Delay(Time time = null, decimal gate = 1): base(DeviceIdentifier) {
             Time = time?? new Time();

@@ -19,7 +19,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new PageSwitch(Target);
+        public override Device Clone() => new PageSwitch(Target) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public PageSwitch(int target = 1): base(DeviceIdentifier) => Target = target;
 

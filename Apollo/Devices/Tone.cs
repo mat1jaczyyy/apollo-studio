@@ -63,7 +63,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Tone(Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow);
+        public override Device Clone() => new Tone(Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public Tone(double hue = 0, double saturation_high = 1, double saturation_low = 0, double value_high = 1, double value_low = 0): base(DeviceIdentifier) {
             Hue = hue;

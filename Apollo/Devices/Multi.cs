@@ -92,7 +92,10 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), _mode, Expanded);
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), _mode, Expanded) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
 
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
