@@ -237,10 +237,10 @@ namespace Apollo.Binary {
                 writer.Write(o[i]);
         }
 
-        private static void Encode(BinaryWriter writer, PageSwitch o) {
-            EncodeID(writer, typeof(PageSwitch));
+        private static void Encode(BinaryWriter writer, Switch o) {
+            EncodeID(writer, typeof(Switch));
 
-            writer.Write(o.Target);
+            writer.Write(o.Page);
         }
 
         private static void Encode(BinaryWriter writer, Paint o) {

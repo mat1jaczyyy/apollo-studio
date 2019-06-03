@@ -258,8 +258,8 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
             
-            else if (t == typeof(PageSwitch))
-                return new PageSwitch(
+            else if (t == typeof(Switch))
+                return new Switch(
                     reader.ReadInt32()
                 );
             

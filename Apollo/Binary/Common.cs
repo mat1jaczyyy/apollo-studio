@@ -33,7 +33,7 @@ namespace Apollo.Binary {
             typeof(Multi),
             typeof(Output),
             typeof(PageFilter),
-            typeof(PageSwitch),
+            typeof(Switch),
             typeof(Paint),
             typeof(Pattern),
             typeof(Preview),

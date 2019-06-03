@@ -16,11 +16,11 @@
       <MenuItem Header="Multi" />
       <MenuItem Header="Output" />
       <MenuItem Header="PageFilter" />
-      <MenuItem Header="PageSwitch" />
       <MenuItem Header="Paint" />
       <MenuItem Header="Pattern" />
       <MenuItem Header="Preview" />
       <MenuItem Header="Rotate" />
+      <MenuItem Header="Switch" />
       <MenuItem Header="Tone" />
     </ContextMenu>
 
