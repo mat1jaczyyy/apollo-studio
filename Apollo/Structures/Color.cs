@@ -51,10 +51,16 @@ namespace Apollo.Structures {
             Blue = blue;
         }
 
-        public void Mix(Color other) {
-            Red = (byte)(63 - (double)(63 - Red) * (63 - other.Red) / 63);
-            Green = (byte)(63 - (double)(63 - Green) * (63 - other.Green) / 63);
-            Blue = (byte)(63 - (double)(63 - Blue) * (63 - other.Blue) / 63);
+        public void Mix(Color other, bool multiply) {
+            if (multiply) {
+                Red = (byte)((double)Red * other.Red / 63);
+                Green = (byte)((double)Green * other.Green / 63);
+                Blue = (byte)((double)Blue * other.Blue / 63);
+            } else {
+                Red = (byte)(63 - (double)(63 - Red) * (63 - other.Red) / 63);
+                Green = (byte)(63 - (double)(63 - Green) * (63 - other.Green) / 63);
+                Blue = (byte)(63 - (double)(63 - Blue) * (63 - other.Blue) / 63);
+            }
         }
 
         public (double, double, double) ToHSV() {

@@ -7,7 +7,8 @@ namespace Apollo.Structures {
     public class Signal {
         public enum BlendingType {
             Normal,
-            Mix,
+            Screen,
+            Multiply,
             Mask
         }
 

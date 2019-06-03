@@ -5,7 +5,10 @@ namespace Apollo.Structures {
     public class Pixel {
         public Action<Signal> MIDIExit = null;
         
-        private SortedList<int, Signal> _signals = new SortedList<int, Signal>();
+        private SortedList<int, Signal> _signals = new SortedList<int, Signal>() {
+            [10000] = new Signal(null, 11, new Color(0))
+        };
+        
         private Color state = new Color(0);
 
         private object locker = new object();
@@ -27,7 +30,7 @@ namespace Apollo.Structures {
 
                     if (signal.BlendingMode == Signal.BlendingType.Mask) break;
 
-                    newState.Mix(signal.Color);
+                    newState.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == Signal.BlendingType.Multiply));
 
                     if (signal.BlendingMode == Signal.BlendingType.Normal) break;
                 }
