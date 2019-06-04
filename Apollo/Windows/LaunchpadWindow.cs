@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -35,6 +37,15 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
+        }
+
+        private void Unloaded(object sender, EventArgs e) {
+            _launchpad.Window = null;
+
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            if (_launchpad.GetType() == typeof(VirtualLaunchpad))
+                MIDI.Disconnect(_launchpad);
         }
 
         private void PadChanged(int index, bool state) => _launchpad.HandleMessage(new Signal(_launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));

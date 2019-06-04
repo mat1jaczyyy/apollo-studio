@@ -5,7 +5,8 @@
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="200" MinWidth="200"
-        Height="226" MinHeight="226">
+        Height="226" MinHeight="226"
+        Closing="Unloaded">
 
   <Grid>
     <Grid RowDefinitions="Auto,*">

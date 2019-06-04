@@ -37,6 +37,7 @@ namespace Apollo.Core {
             started = true;
         }
 
+        private static object locker = new object();
         private static bool updated = false;
 
         public static void Update() {
@@ -49,31 +50,57 @@ namespace Apollo.Core {
         }
 
         public static Launchpad Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
-            Launchpad ret;
+            lock (locker) {
+                Launchpad ret = null;
 
-            if (input == null || output == null) {
-                Devices.Add(ret = new VirtualLaunchpad());
+                if (input == null || output == null) {
+                    for (int i = 1; true; i++) {
+                        string name = $"Virtual Launchpad {i}";
+
+                        ret = Devices.Find((lp) => lp.Name == name);
+                        if (ret != null) {
+                            if (!ret.Available) {
+                                ret.Connect(null, null);
+                                updated = true;
+                                return ret;
+                            }
+
+                        } else {
+                            Devices.Add(ret = new VirtualLaunchpad(name));
+                            ret.Connect(null, null);
+                            updated = true;
+                            return ret;
+                        }
+                    }
+                }
+
+                foreach (Launchpad device in Devices) {
+                    if (device.Name == input.Name) {
+                        if (!device.Available)
+                            device.Connect(input, output);
+                        
+                        ret = device;
+                        updated |= !device.Available;
+                        return ret;
+                    }
+                }
+
+                Devices.Add(ret = new Launchpad(input, output));
                 updated = true;
                 return ret;
             }
-
-            foreach (Launchpad device in Devices) {
-                if (device.Name == input.Name) {
-                    if (!device.Available)
-                        device.Connect(input, output);
-                    
-                    ret = device;
-                    updated |= !device.Available;
-                    return ret;
-                }
-            }
-
-            Devices.Add(ret = new Launchpad(input, output));
-            updated = true;
-            return ret;
         }
 
-        private static object locker = new object();
+        public static void Disconnect(Launchpad lp) {
+            lock (locker) {
+                if (lp.GetType() != typeof(VirtualLaunchpad))
+                    foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices)
+                        if (lp.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) return;
+
+                lp.Disconnect();
+                updated = true;
+            }
+        }
 
         public static void Rescan(object sender, EventArgs e) {
             lock (locker) {
@@ -82,23 +109,9 @@ namespace Apollo.Core {
                         if (input.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", ""))
                             Connect(input, output);
 
-                foreach (Launchpad device in Devices) {
-                    if (device.GetType() != typeof(VirtualLaunchpad) && device.Available) {
-                        bool justDisconnected = true;
-
-                        foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices) {
-                            if (device.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) {
-                                justDisconnected = false;
-                                break;
-                            }
-                        }
-
-                        if (justDisconnected) {
-                            device.Disconnect();
-                            updated = true;
-                        }
-                    }
-                }
+                foreach (Launchpad device in Devices)
+                    if (device.GetType() != typeof(VirtualLaunchpad) && device.Available)
+                        Disconnect(device);
 
                 Program.Log($"Rescan");
 

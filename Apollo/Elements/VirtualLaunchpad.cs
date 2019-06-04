@@ -21,23 +21,25 @@ namespace Apollo.Elements {
             Send(new Signal(this, 99, new Color(0)));
         }
 
-        public VirtualLaunchpad(string name = "") {
+        public VirtualLaunchpad(string name) {
             Type = LaunchpadType.PRO;
 
             if (name == "") {
-                int i = 1;
-                do {
-                    name = $"Virtual Launchpad {i++}";
-                } while (MIDI.Devices.Select((lp) => lp.Name).Contains(name));
             }
+
             Name = name;
-            
+        }
+
+        public override void Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
             Available = true;
 
             Program.Log($"MIDI Created {Name}");
         }
+        
+        public override void Disconnect() {
+            Program.Log($"MIDI Disconnected {Name}");
 
-        public override void Connect(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) => new InvalidOperationException("A Virtual Launchpad holds no reference to MIDI ports.");
-        public override void Disconnect() => new InvalidOperationException("A Virtual Launchpad holds no reference to MIDI ports.");
+            Available = false;
+        }
     }
 }
