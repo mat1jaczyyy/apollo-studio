@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using RtMidi.Core;
+using RtMidi.Core.Devices.Infos;
 
 using Apollo.Elements;
 using Apollo.Structures;
@@ -36,42 +37,48 @@ namespace Apollo.Core {
             started = true;
         }
 
+        private static bool updated = false;
+
+        private static void Update() {
+            updated = false;
+            DevicesUpdated?.Invoke();
+        }
+
+        public static void Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
+            if (input == null || output == null) {
+                Devices.Add(new VirtualLaunchpad());
+                updated = true;
+                return;
+            }
+
+            foreach (Launchpad device in Devices) {
+                if (device.Name == input.Name) {
+                    if (!device.Available)
+                        device.Connect(input, output);
+                    
+                    updated |= !device.Available;
+                    return;
+                }
+            }
+
+            Devices.Add(new Launchpad(input, output));
+            updated = true;
+        }
+
         private static object locker = new object();
 
         public static void Rescan(object sender, EventArgs e) {
             lock (locker) {
-                bool updated = false;
-
-                foreach (var input in MidiDeviceManager.Default.InputDevices) {
-                    foreach (var output in MidiDeviceManager.Default.OutputDevices) {
-                        if (input.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) {
-                            bool justConnected = true;
-
-                            foreach (Launchpad device in Devices) {
-                                if (device.Name == input.Name) {
-                                    if (!device.Available) {
-                                        device.Connect(input, output);
-                                        updated = true;
-                                    }
-                                    
-                                    justConnected = false;
-                                    break;
-                                }
-                            }
-
-                            if (justConnected) {
-                                Devices.Add(new Launchpad(input, output));
-                                updated = true;
-                            }
-                        }
-                    }
-                }
+                foreach (IMidiInputDeviceInfo input in MidiDeviceManager.Default.InputDevices)
+                    foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices)
+                        if (input.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", ""))
+                            Connect(input, output);
 
                 foreach (Launchpad device in Devices) {
                     if (device.Available) {
                         bool justDisconnected = true;
 
-                        foreach (var output in MidiDeviceManager.Default.OutputDevices) {
+                        foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices) {
                             if (device.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) {
                                 justDisconnected = false;
                                 break;
@@ -87,7 +94,7 @@ namespace Apollo.Core {
 
                 Program.Log($"Rescan");
 
-                if (updated) DevicesUpdated?.Invoke();
+                if (updated) Update();
             }
         }
     }

@@ -24,10 +24,10 @@ namespace Apollo.Windows {
         private void UpdateTopmost(bool value) => Topmost = value;
 
         private void UpdatePorts() {
-            Contents.Clear();
-            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new LaunchpadInfo(i))) {
-                Contents.Add(control);
-            }
+            for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
+
+            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new LaunchpadInfo(i)))
+                Contents.Insert(Contents.Count - 1, control);
         }
 
         private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
@@ -110,6 +110,10 @@ namespace Apollo.Windows {
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 
         private void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
+
+        private void Launchpad_Add() {
+            MIDI.Connect();
+        }
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

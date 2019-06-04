@@ -19,7 +19,7 @@ namespace Apollo.Elements {
         private IMidiInputDevice Input;
         private IMidiOutputDevice Output;
 
-        public LaunchpadType Type { get; private set; } = LaunchpadType.Unknown;
+        public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
         private InputType _format;
         public InputType InputFormat {
@@ -34,13 +34,18 @@ namespace Apollo.Elements {
         }
 
 
-        public string Name { get; private set; }
-        public bool Available { get; private set; }
+        public string Name { get; protected set; }
+        public bool Available { get; protected set; }
 
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
-        private Pixel[] screen = new Pixel[100];
+        protected Pixel[] screen = new Pixel[100];
+
+        protected void CreateScreen() {
+            for (int i = 0; i < 100; i++)
+                screen[i] = new Pixel() {MIDIExit = Send};
+        }
 
         public enum LaunchpadType {
             MK2, PRO, CFW, Unknown
@@ -99,7 +104,7 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public void Send(Signal n) {
+        public virtual void Send(Signal n) {
             int offset = 0;
             if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
 
@@ -107,15 +112,16 @@ namespace Apollo.Elements {
                 Program.Log($"OUT <- {n.ToString()}");
         }
 
-        public void Clear() {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = Send};
+        public virtual void Clear() {
+            CreateScreen();
 
             SysExSend(new byte[] {0x0E, 0x00});
             Send(new Signal(this, 99, new Color(0)));
         }
 
         public void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);
+
+        public Launchpad() => CreateScreen();
 
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
             Input = input.CreateDevice();
@@ -135,15 +141,14 @@ namespace Apollo.Elements {
         }
 
         public Launchpad(string name, InputType format = InputType.DrumRack) {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = Send};
+            CreateScreen();
             
             Name = name;
             _format = format;
             Available = false;
         }
 
-        public void Connect(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
+        public virtual void Connect(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
             Input = input.CreateDevice();
             Output = output.CreateDevice();
 
@@ -166,7 +171,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public void Disconnect() {
+        public virtual void Disconnect() {
             if (Input.IsOpen) Input.Close();
             Input.Dispose();
 
@@ -178,7 +183,7 @@ namespace Apollo.Elements {
             Available = false;
         }
 
-        private void HandleMessage(Signal n) {
+        protected void HandleMessage(Signal n) {
             if (Available) {
                 Program.Log($"IN  -> {n.ToString()}");
 

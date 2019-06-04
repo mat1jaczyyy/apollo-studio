@@ -58,7 +58,9 @@
           <Grid RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-              <StackPanel x:Name="Contents" />
+              <StackPanel x:Name="Contents">
+                <Components:VerticalAdd AlwaysShowing="true" Added="Launchpad_Add" />
+              </StackPanel>
             </ScrollViewer>
           </Grid>
         </Border>
