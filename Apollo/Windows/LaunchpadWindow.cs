@@ -33,6 +33,8 @@ namespace Apollo.Windows {
 
             _launchpad = launchpad;
 
+            Title = this.Get<TextBlock>("Title").Text = _launchpad.Name;
+
             Grid = this.Get<LaunchpadGrid>("Grid");
 
             for (int i = 0; i < 100; i++)
