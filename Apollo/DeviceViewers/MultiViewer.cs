@@ -347,7 +347,21 @@ namespace Apollo.DeviceViewers {
         public async void Paste(int right) {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
-            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            if (b64 == null) return;
+            
+            Copyable paste;
+            try {
+                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            } catch (Exception) {
+                return;
+            }
+
+            List<Chain> pasted;
+            try {
+                pasted = paste.Contents.Cast<Chain>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
             
             List<int> path = Track.GetPath(_multi);
 
@@ -361,11 +375,11 @@ namespace Apollo.DeviceViewers {
                 Multi multi = ((Multi)Track.TraversePath(path));
 
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    multi.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                    multi.Insert(right + i + 1, pasted[i].Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
-                _multi.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                _multi.Insert(right + i + 1, pasted[i].Clone());
         }
 
         public void Duplicate(int left, int right) {

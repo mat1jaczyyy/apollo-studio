@@ -322,7 +322,21 @@ namespace Apollo.DeviceViewers {
         public async void Paste(int right) {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
-            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            if (b64 == null) return;
+            
+            Copyable paste;
+            try {
+                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            } catch (Exception) {
+                return;
+            }
+
+            List<Chain> pasted;
+            try {
+                pasted = paste.Contents.Cast<Chain>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
 
             List<int> path = Track.GetPath(_group);
 
@@ -336,11 +350,11 @@ namespace Apollo.DeviceViewers {
                 Group group = ((Group)Track.TraversePath(path));
 
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                    group.Insert(right + i + 1, pasted[i].Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
-                _group.Insert(right + i + 1, ((Chain)paste.Contents[i]).Clone());
+                _group.Insert(right + i + 1, pasted[i].Clone());
         }
 
         public void Duplicate(int left, int right) {

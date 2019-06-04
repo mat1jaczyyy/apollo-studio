@@ -1127,7 +1127,21 @@ namespace Apollo.Windows {
 
             string b64 = await Application.Current.Clipboard.GetTextAsync();
             
-            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            if (b64 == null) return;
+            
+            Copyable paste;
+            try {
+                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            } catch (Exception) {
+                return;
+            }
+
+            List<Frame> pasted;
+            try {
+                pasted = paste.Contents.Cast<Frame>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
             
             List<int> path = Track.GetPath(_pattern);
 
@@ -1141,11 +1155,11 @@ namespace Apollo.Windows {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    pattern.Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
+                    pattern.Insert(right + i + 1, pasted[i].Clone());
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
-                _pattern.Insert(right + i + 1, ((Frame)paste.Contents[i]).Clone());
+                _pattern.Insert(right + i + 1, pasted[i].Clone());
         }
 
         public void Duplicate(int left, int right) {

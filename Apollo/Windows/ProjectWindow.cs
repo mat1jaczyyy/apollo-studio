@@ -337,8 +337,22 @@ namespace Apollo.Windows {
 
         public async void Paste(int right) {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
+
+            if (b64 == null) return;
             
-            Copyable paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            Copyable paste;
+            try {
+                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+            } catch (Exception) {
+                return;
+            }
+
+            List<Track> pasted;
+            try {
+                pasted = paste.Contents.Cast<Track>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
 
             Program.Project.Undo.Add($"Track Pasted", () => {
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
@@ -346,11 +360,11 @@ namespace Apollo.Windows {
 
             }, () => {
                 for (int i = 0; i < paste.Contents.Count; i++)
-                    Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
+                    Program.Project.Insert(right + i + 1, pasted[i].Clone());
             });
             
             for (int i = 0; i < paste.Contents.Count; i++)
-                Program.Project.Insert(right + i + 1, ((Track)paste.Contents[i]).Clone());
+                Program.Project.Insert(right + i + 1, pasted[i].Clone());
         }
 
         public void Duplicate(int left, int right) {
