@@ -13,6 +13,7 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
+      <MenuItem Header="Mute" />
     </ContextMenu>
   </UserControl.Resources>
 

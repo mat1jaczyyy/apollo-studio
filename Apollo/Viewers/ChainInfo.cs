@@ -81,7 +81,11 @@ namespace Apollo.Viewers {
 
             Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+
+            SetEnabled();
         }
+
+        public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
         private void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
 

@@ -401,7 +401,29 @@ namespace Apollo.DeviceViewers {
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");
         public void Ungroup(int index) => throw new InvalidOperationException("A Chain cannot be ungrouped.");
-        public void Mute(int left, int right) => throw new InvalidOperationException("A Chain cannot be muted.");
+        
+        public void Mute(int left, int right) {
+            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Enabled).ToList();
+            bool r = !_group[left].Enabled;
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Muted", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    group[i].Enabled = u[i - left];
+
+            }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    group[i].Enabled = r;
+            });
+
+            for (int i = left; i <= right; i++)
+                _group[i].Enabled = r;
+        }
         
         public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
     }
