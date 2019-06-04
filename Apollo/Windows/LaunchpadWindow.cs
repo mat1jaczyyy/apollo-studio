@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using SolidColorBrush = Avalonia.Media.SolidColorBrush;
@@ -43,6 +44,19 @@ namespace Apollo.Windows {
         public void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
+
+        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+
+        private void Minimize() => WindowState = WindowState.Minimized;
+
+        private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
+        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        private void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
+        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        private void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
+        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        private void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
 
         public static void Create(Launchpad launchpad, Window owner) {
             if (launchpad.Window == null) {
