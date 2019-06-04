@@ -5,13 +5,13 @@ using RtMidi.Core.Devices.Infos;
 
 using Apollo.Core;
 using Apollo.Structures;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public override void Send(Signal n) {
             Program.Log($"OUT <- {n.ToString()}");
-
-            // TODO
+            Window?.SignalRender(n);
         }
 
         public override void Clear() {

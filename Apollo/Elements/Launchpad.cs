@@ -11,6 +11,7 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
+        public LaunchpadWindow Window;
         public PatternWindow PatternWindow;
 
         public delegate void MultiResetHandler();
@@ -32,7 +33,6 @@ namespace Apollo.Elements {
                 }
             }
         }
-
 
         public string Name { get; protected set; }
         public bool Available { get; protected set; }
@@ -108,8 +108,10 @@ namespace Apollo.Elements {
             int offset = 0;
             if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
 
-            if (SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue}))
+            if (SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue})) {
                 Program.Log($"OUT <- {n.ToString()}");
+                Window?.SignalRender(n);
+            }
         }
 
         public virtual void Clear() {
@@ -183,7 +185,7 @@ namespace Apollo.Elements {
             Available = false;
         }
 
-        protected void HandleMessage(Signal n) {
+        public void HandleMessage(Signal n) {
             if (Available) {
                 Program.Log($"IN  -> {n.ToString()}");
 

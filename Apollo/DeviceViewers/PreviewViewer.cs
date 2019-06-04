@@ -19,13 +19,11 @@ namespace Apollo.DeviceViewers {
         Preview _preview;
         LaunchpadGrid Grid;
 
-        private SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
-
         public PreviewViewer(Preview preview) {
             InitializeComponent();
 
             _preview = preview;
-            _preview.SignalExited += HandleRender;
+            _preview.SignalExited += SignalRender;
 
             Grid = this.Get<LaunchpadGrid>("Grid");
 
@@ -37,8 +35,8 @@ namespace Apollo.DeviceViewers {
         private void PadPressed(int index) => PadChanged(index, true);
         private void PadReleased(int index) => PadChanged(index, false);
 
-        private void SignalRender(Signal n) => Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
-
-        private void HandleRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => { SignalRender(n); });
+        private void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+            Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        });
     }
 }

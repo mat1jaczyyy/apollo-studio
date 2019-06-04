@@ -40,15 +40,19 @@ namespace Apollo.Core {
         private static bool updated = false;
 
         private static void Update() {
-            updated = false;
-            DevicesUpdated?.Invoke();
+            if (updated) {
+                updated = false;
+                DevicesUpdated?.Invoke();
+            }
         }
 
-        public static void Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
+        public static Launchpad Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
+            Launchpad ret;
+
             if (input == null || output == null) {
-                Devices.Add(new VirtualLaunchpad());
+                Devices.Add(ret = new VirtualLaunchpad());
                 updated = true;
-                return;
+                return ret;
             }
 
             foreach (Launchpad device in Devices) {
@@ -56,13 +60,15 @@ namespace Apollo.Core {
                     if (!device.Available)
                         device.Connect(input, output);
                     
+                    ret = device;
                     updated |= !device.Available;
-                    return;
+                    return ret;
                 }
             }
 
-            Devices.Add(new Launchpad(input, output));
+            Devices.Add(ret = new Launchpad(input, output));
             updated = true;
+            return ret;
         }
 
         private static object locker = new object();
@@ -75,7 +81,7 @@ namespace Apollo.Core {
                             Connect(input, output);
 
                 foreach (Launchpad device in Devices) {
-                    if (device.Available) {
+                    if (device.GetType() != typeof(VirtualLaunchpad) && device.Available) {
                         bool justDisconnected = true;
 
                         foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices) {
