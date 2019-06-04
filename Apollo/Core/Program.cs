@@ -75,6 +75,9 @@ namespace Apollo.Core {
             
             } else if (type == typeof(SplashWindow)) {
                 Preferences.Window?.Close();
+                
+                foreach (Launchpad lp in MIDI.Devices)
+                    lp.Window?.Close();
             }
         }
 
