@@ -82,13 +82,21 @@ namespace Apollo.Binary {
                     reader.ReadString()
                 );
             
-            else if (t == typeof(Chain))
-                return new Chain(
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList(),
-                    reader.ReadString()
-                );
-            
-            else if (t == typeof(Device)) {
+            else if (t == typeof(Chain)) {
+                List<Device> devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList();
+                string name = reader.ReadString();
+
+                bool enabled = true;
+                if (version >= 6) {
+                    enabled = reader.ReadBoolean();
+                }
+
+                Chain ret = new Chain(devices, name);
+                ret.Enabled = enabled;
+
+                return ret;
+
+            } else if (t == typeof(Device)) {
                 bool collapsed = false;
                 if (version >= 5) {
                     collapsed = reader.ReadBoolean();

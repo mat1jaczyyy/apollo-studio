@@ -97,6 +97,7 @@ namespace Apollo.Binary {
                 Encode(writer, o[i]);
             
             writer.Write(o.Name);
+            writer.Write(o.Enabled);
         }
 
         private static void Encode(BinaryWriter writer, Device o) {

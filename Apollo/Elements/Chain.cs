@@ -108,7 +108,21 @@ namespace Apollo.Elements {
             get => _name.Replace("#", (ParentIndex + 1).ToString());
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name);
+        private bool _enabled = true;
+        public bool Enabled {
+            get => _enabled;
+            set {
+                if (_enabled != value) {
+                    _enabled = value;
+
+                    Info?.SetEnabled();
+                }
+            }
+        }
+
+        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name) {
+            Enabled = Enabled
+        };
 
         public void Insert(int index, Device device) {
             Devices.Insert(index, device);
@@ -142,7 +156,9 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public void MIDIEnter(Signal n) => _chainenter?.Invoke(n);
+        public void MIDIEnter(Signal n) {
+            if (Enabled) _chainenter?.Invoke(n);
+        }
 
         public void Dispose() {
             foreach (Device device in Devices) device.Dispose();
