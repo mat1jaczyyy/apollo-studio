@@ -24,7 +24,12 @@ namespace Apollo.Elements {
         public VirtualLaunchpad(string name = "") {
             Type = LaunchpadType.PRO;
 
-            if (name == "") name = $"Virtual Launchpad {MIDI.Devices.Count((lp) => lp.GetType() == typeof(VirtualLaunchpad)) + 1}";
+            if (name == "") {
+                int i = 1;
+                do {
+                    name = $"Virtual Launchpad {i++}";
+                } while (MIDI.Devices.Select((lp) => lp.Name).Contains(name));
+            }
             Name = name;
             
             Available = true;

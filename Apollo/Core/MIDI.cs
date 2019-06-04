@@ -39,10 +39,12 @@ namespace Apollo.Core {
 
         private static bool updated = false;
 
-        private static void Update() {
-            if (updated) {
-                updated = false;
-                DevicesUpdated?.Invoke();
+        public static void Update() {
+            lock (locker) {
+                if (updated) {
+                    updated = false;
+                    DevicesUpdated?.Invoke();
+                }
             }
         }
 

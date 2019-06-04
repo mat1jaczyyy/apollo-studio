@@ -111,7 +111,10 @@ namespace Apollo.Windows {
 
         private void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
-        private void Launchpad_Add() => LaunchpadWindow.Create(MIDI.Connect(), this);
+        private void Launchpad_Add() {
+            LaunchpadWindow.Create(MIDI.Connect(), this);
+            MIDI.Update();
+        }
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {
