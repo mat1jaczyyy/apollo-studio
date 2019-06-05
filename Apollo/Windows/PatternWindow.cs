@@ -68,7 +68,7 @@ namespace Apollo.Windows {
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Choke;
-        Button Import, Play, Fire, Reverse, Invert;
+        Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Infinite;
 
         int origin = -1;
@@ -84,7 +84,7 @@ namespace Apollo.Windows {
 
                 UndoButton.IsEnabled =
                 RedoButton.IsEnabled =
-                Import.IsEnabled =
+                ImportButton.IsEnabled =
                 Choke.Enabled =
                 Choke.IsEnabled =
                 Gate.Enabled =
@@ -204,7 +204,7 @@ namespace Apollo.Windows {
             Choke.Enabled = _pattern.ChokeEnabled;
             Choke.RawValue = _pattern.Choke;
 
-            Import = this.Get<Button>("Import");
+            ImportButton = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
             Fire = this.Get<Button>("Fire");
 
@@ -1214,6 +1214,8 @@ namespace Apollo.Windows {
         public void Ungroup(int index) => throw new InvalidOperationException("A Frame cannot be ungrouped.");
         public void Mute(int left, int right) => throw new InvalidOperationException("A Frame cannot be muted.");
         public void Rename(int left, int right) => throw new InvalidOperationException("A Frame cannot be renamed.");
+        public void Export(int left, int right) => throw new InvalidOperationException("A Frame cannot be exported.");
+        public void Import(int right) => throw new InvalidOperationException("A Frame cannot be imported.");
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 

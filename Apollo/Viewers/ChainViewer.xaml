@@ -6,10 +6,12 @@
   <UserControl.Resources>
     <ContextMenu x:Key="DeviceContextMenuBefore" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
 
     <ContextMenu x:Key="DeviceContextMenuAfter" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
 

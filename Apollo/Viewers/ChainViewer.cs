@@ -17,6 +17,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class ChainViewer: UserControl, ISelectParentViewer {
@@ -395,5 +396,49 @@ namespace Apollo.Viewers {
         }
 
         public void Rename(int left, int right) => throw new InvalidOperationException("A Device cannot be renamed.");
+
+        public async void Export(int left, int right) {
+            Window sender = Track.Get(_chain).Window;
+
+            SaveFileDialog sfd = new SaveFileDialog() {
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "apdev"
+                        },
+                        Name = "Apollo Device Preset"
+                    }
+                },
+                Title = "Export Device Preset"
+            };
+            
+            string result = await sfd.ShowAsync(sender);
+
+            if (result != null) {
+                string[] file = result.Split(Path.DirectorySeparatorChar);
+
+                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+                    Copyable copy = new Copyable();
+                    
+                    for (int i = left; i <= right; i++)
+                        copy.Contents.Add(_chain[i]);
+
+                    try {
+                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
+
+                    } catch (UnauthorizedAccessException e) {
+                        ErrorWindow.Create(
+                            $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
+                            "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                            sender
+                        );
+                    }
+                }
+            }
+        }
+        
+        public void Import(int right) {
+
+        }
     }
 }

@@ -26,6 +26,7 @@
 
     <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
 

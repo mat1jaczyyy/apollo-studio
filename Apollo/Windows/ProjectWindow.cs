@@ -402,5 +402,8 @@ namespace Apollo.Windows {
         public void Mute(int left, int right) => throw new InvalidOperationException("A Track cannot be muted.");
 
         public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
+
+        public void Export(int left, int right) => throw new InvalidOperationException("A Track cannot be exported.");
+        public void Import(int right) => throw new InvalidOperationException("A Track cannot be imported.");
     }
 }

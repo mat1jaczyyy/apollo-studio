@@ -112,6 +112,8 @@ namespace Apollo.Helpers {
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
             else if (action == "Mute") parent.IViewer?.Mute(left, right);
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
+            else if (action == "Export") parent.IViewer?.Export(left, right);
+            else if (action == "Import") parent.IViewer?.Import(right);
         }
 
         public bool HandleKey(KeyEventArgs e) {
@@ -126,6 +128,8 @@ namespace Apollo.Helpers {
                 else if (e.Key == Key.U) Action("Ungroup");
                 else if (e.Key == Key.M) Action("Mute");
                 else if (e.Key == Key.R) Action("Rename");
+                else if (e.Key == Key.E) Action("Export");
+                else if (e.Key == Key.I) Action("Import");
                 else if (e.Key == Key.A) SelectAll();
                 else return false;
 

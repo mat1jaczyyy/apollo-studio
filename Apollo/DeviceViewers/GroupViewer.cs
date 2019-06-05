@@ -426,5 +426,8 @@ namespace Apollo.DeviceViewers {
         }
         
         public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
+
+        public void Export(int left, int right) => throw new InvalidOperationException("A Chain cannot be exported.");
+        public void Import(int right) => throw new InvalidOperationException("A Chain cannot be imported.");
     }
 }

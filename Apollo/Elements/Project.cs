@@ -73,18 +73,6 @@ namespace Apollo.Elements {
             }
         }
 
-        private SaveFileDialog CreateSaveFileDialog() => new SaveFileDialog() {
-            Filters = new List<FileDialogFilter>() {
-                new FileDialogFilter() {
-                    Extensions = new List<string>() {
-                        "approj"
-                    },
-                    Name = "Apollo Project"
-                }
-            },
-            Title = "Save Project"
-        };
-
         private void WriteFile(Window sender, string path = null, bool store = true) {
             if (path == null) path = FilePath;
 
@@ -113,7 +101,18 @@ namespace Apollo.Elements {
         }
 
         public async void Save(Window sender, bool store) {
-            SaveFileDialog sfd = CreateSaveFileDialog();
+            SaveFileDialog sfd = new SaveFileDialog() {
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "approj"
+                        },
+                        Name = "Apollo Project"
+                    }
+                },
+                Title = "Save Project"
+            };
+            
             string result = await sfd.ShowAsync(sender);
 
             if (result != null) WriteFile(sender, result, store);
