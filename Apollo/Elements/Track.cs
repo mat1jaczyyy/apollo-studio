@@ -95,6 +95,7 @@ namespace Apollo.Elements {
             set {
                 if (_launchpad != null) _launchpad.Receive -= MIDIEnter;
 
+                if (value == null) value = MIDI.NoOutput;
                 _launchpad = value;
 
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;

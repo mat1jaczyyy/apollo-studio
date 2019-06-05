@@ -112,13 +112,12 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Launchpad o) {
             EncodeID(writer, typeof(Launchpad));
 
-            if (o == null)
+            if (o == MIDI.NoOutput)
                 writer.Write("");
             else {
                 writer.Write(o.Name);
                 writer.Write((int)o.InputFormat);
             }
-
         }
 
         private static void Encode(BinaryWriter writer, Group o) {

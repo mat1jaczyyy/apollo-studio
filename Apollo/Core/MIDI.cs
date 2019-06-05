@@ -25,12 +25,17 @@ namespace Apollo.Core {
                 }
             }
         }
+
+        public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output");
         
         private static Courier courier = new Courier() { Interval = 100 };
         private static bool started = false;
 
         public static void Start() {
             if (started) new InvalidOperationException("MIDI Rescan Timer is already running");
+
+            if (!NoOutput.Available)
+                NoOutput.Connect(null, null);
 
             courier.Elapsed += Rescan;
             courier.Start();
@@ -76,11 +81,12 @@ namespace Apollo.Core {
 
                 foreach (Launchpad device in Devices) {
                     if (device.Name == input.Name) {
+                        ret = device;
+                        updated |= !device.Available;
+
                         if (!device.Available)
                             device.Connect(input, output);
                         
-                        ret = device;
-                        updated |= !device.Available;
                         return ret;
                     }
                 }

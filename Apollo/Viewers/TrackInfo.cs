@@ -43,6 +43,7 @@ namespace Apollo.Viewers {
         public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
             if (_track.Launchpad != null && (!_track.Launchpad.Available || _track.Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(_track.Launchpad);
+            ports.Add(MIDI.NoOutput);
 
             PortSelector.Items = ports;
             PortSelector.SelectedIndex = -1;

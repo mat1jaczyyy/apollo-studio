@@ -23,10 +23,6 @@ namespace Apollo.Elements {
 
         public VirtualLaunchpad(string name) {
             Type = LaunchpadType.PRO;
-
-            if (name == "") {
-            }
-
             Name = name;
         }
 

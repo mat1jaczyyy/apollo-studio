@@ -115,7 +115,7 @@ namespace Apollo.Binary {
             
             } else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
-                if (name == "") return null;
+                if (name == "") return MIDI.NoOutput;
 
                 Launchpad.InputType format = Launchpad.InputType.DrumRack;
                 if (version >= 2) format = (Launchpad.InputType)reader.ReadInt32();

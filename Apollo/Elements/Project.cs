@@ -167,6 +167,8 @@ namespace Apollo.Elements {
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             FilePath = path;
 
+            if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
+
             Reroute();
         }
         
