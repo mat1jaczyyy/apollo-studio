@@ -31,7 +31,7 @@
           </StackPanel>
         </Border>
         
-        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="5 0">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="5 5 5 0">
           <Components:Dial Grid.Column="0" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="10" Maximum="5000" Exponent="3.348186161" Round="0" Unit="ms" DisabledText="Unused" AllowSteps="true"
                            ValueChanged="Rate_ValueChanged" ModeChanged="Rate_ModeChanged" StepChanged="Rate_StepChanged" />
         
