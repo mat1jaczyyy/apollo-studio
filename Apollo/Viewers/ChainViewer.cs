@@ -203,6 +203,33 @@ namespace Apollo.Viewers {
             } else e.DragEffects = DragDropEffects.None;
         }
 
+        public void Copyable_Insert(Copyable paste, int right, bool imported) {
+            List<Device> pasted;
+            try {
+                pasted = paste.Contents.Cast<Device>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
+            
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device {(imported? "Imported" : "Pasted")}", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i  >= 0; i--)
+                    chain.Remove(right + i + 1);
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    chain.Insert(right + i + 1, pasted[i].Clone());
+            });
+
+            for (int i = 0; i < paste.Contents.Count; i++)
+                _chain.Insert(right + i + 1, pasted[i].Clone());
+        }
+
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
@@ -228,34 +255,7 @@ namespace Apollo.Viewers {
                 return;
             }
 
-            Paste(paste, right, false);
-        }
-
-        public void Paste(Copyable paste, int right, bool imported) {
-            List<Device> pasted;
-            try {
-                pasted = paste.Contents.Cast<Device>().ToList();
-            } catch (InvalidCastException) {
-                return;
-            }
-            
-            List<int> path = Track.GetPath(_chain);
-
-            Program.Project.Undo.Add($"Device {(imported? "Imported" : "Pasted")}", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
-
-                for (int i = paste.Contents.Count - 1; i  >= 0; i--)
-                    chain.Remove(right + i + 1);
-
-            }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
-
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    chain.Insert(right + i + 1, pasted[i].Clone());
-            });
-
-            for (int i = 0; i < paste.Contents.Count; i++)
-                _chain.Insert(right + i + 1, pasted[i].Clone());
+            Copyable_Insert(paste, right, false);
         }
 
         public void Duplicate(int left, int right) {
@@ -463,7 +463,7 @@ namespace Apollo.Viewers {
                 using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                     loaded = Decoder.Decode(file, typeof(Copyable));
                 
-                Paste(loaded, right, true);
+                Copyable_Insert(loaded, right, true);
             }
         }
     }
