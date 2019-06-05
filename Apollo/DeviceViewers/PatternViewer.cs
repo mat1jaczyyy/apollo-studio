@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Devices;
@@ -20,6 +19,6 @@ namespace Apollo.DeviceViewers {
             _pattern = pattern;
         }
 
-        private void Edit(object sender, RoutedEventArgs e) => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
+        private void Pattern_Popout() => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
     }
 }
