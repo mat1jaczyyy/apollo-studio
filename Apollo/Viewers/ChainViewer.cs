@@ -228,6 +228,10 @@ namespace Apollo.Viewers {
                 return;
             }
 
+            Paste(paste, right, false);
+        }
+
+        public void Paste(Copyable paste, int right, bool imported) {
             List<Device> pasted;
             try {
                 pasted = paste.Contents.Cast<Device>().ToList();
@@ -237,7 +241,7 @@ namespace Apollo.Viewers {
             
             List<int> path = Track.GetPath(_chain);
 
-            Program.Project.Undo.Add($"Device Pasted", () => {
+            Program.Project.Undo.Add($"Device {(imported? "Imported" : "Pasted")}", () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i  >= 0; i--)
@@ -437,8 +441,30 @@ namespace Apollo.Viewers {
             }
         }
         
-        public void Import(int right) {
+        public async void Import(int right) {
+            OpenFileDialog ofd = new OpenFileDialog() {
+                AllowMultiple = false,
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "apdev"
+                        },
+                        Name = "Apollo Device Preset"
+                    }
+                },
+                Title = "Import Device Preset"
+            };
 
+            string[] result = await ofd.ShowAsync(Track.Get(_chain).Window);
+
+            if (result.Length > 0) {
+                Copyable loaded;
+
+                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
+                    loaded = Decoder.Decode(file, typeof(Copyable));
+                
+                Paste(loaded, right, true);
+            }
         }
     }
 }
