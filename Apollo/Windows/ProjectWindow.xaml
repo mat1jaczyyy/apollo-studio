@@ -12,6 +12,7 @@
   <Window.Resources>
     <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </Window.Resources>
 

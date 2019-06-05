@@ -399,7 +399,23 @@ namespace Apollo.Windows {
 
         public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");
         public void Ungroup(int index) => throw new InvalidOperationException("A Track cannot be ungrouped.");
-        public void Mute(int left, int right) => throw new InvalidOperationException("A Track cannot be muted.");
+        
+        public void Mute(int left, int right) {
+            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Enabled).ToList();
+            bool r = !Program.Project[left].Enabled;
+
+            Program.Project.Undo.Add($"Track Muted", () => {
+                for (int i = left; i <= right; i++)
+                    Program.Project[i].Enabled = u[i - left];
+
+            }, () => {
+                for (int i = left; i <= right; i++)
+                    Program.Project[i].Enabled = r;
+            });
+
+            for (int i = left; i <= right; i++)
+                Program.Project[i].Enabled = r;
+        }
 
         public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
 

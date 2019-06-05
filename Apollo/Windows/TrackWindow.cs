@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Platform;
 
 using Apollo.Core;
@@ -55,6 +56,8 @@ namespace Apollo.Windows {
             Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
 
             this.Get<ScrollViewer>("Contents").Content = chainViewer;
+
+            SetEnabled();
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -77,6 +80,8 @@ namespace Apollo.Windows {
 
             Program.WindowClose(this);
         }
+
+        public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
 
         private bool InMultiPreprocess() => Selection.Start is Device &&
             Selection.Start.IParent is ISelect &&

@@ -97,7 +97,11 @@ namespace Apollo.Viewers {
 
             Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+
+            SetEnabled();
         }
+
+        public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
         
         private void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
 

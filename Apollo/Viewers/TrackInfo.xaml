@@ -13,6 +13,9 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
+      <MenuItem Header="Mute" />
+      <MenuItem Header="Export" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
 

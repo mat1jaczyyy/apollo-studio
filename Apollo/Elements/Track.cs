@@ -117,6 +117,19 @@ namespace Apollo.Elements {
             get => _name.Replace("#", (ParentIndex + 1).ToString());
         }
 
+        private bool _enabled = true;
+        public bool Enabled {
+            get => _enabled;
+            set {
+                if (_enabled != value) {
+                    _enabled = value;
+
+                    Info?.SetEnabled();
+                    Window?.SetEnabled();
+                }
+            }
+        }
+
         public Track Clone() => new Track(Chain.Clone(), null, Name);
 
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
@@ -130,7 +143,9 @@ namespace Apollo.Elements {
 
         private void ChainExit(Signal n) => n.Source?.Render(n);
 
-        private void MIDIEnter(Signal n) => Chain?.MIDIEnter(n);
+        private void MIDIEnter(Signal n) {
+            if (Enabled) Chain?.MIDIEnter(n);
+        }
 
         public void Dispose() {
             Disposing?.Invoke();
