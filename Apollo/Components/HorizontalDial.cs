@@ -78,29 +78,40 @@ namespace Apollo.Components {
             }
         }
 
+        private bool _valuechanging = false;
         private double _value = 0.5;
         public double Value {
             get => _value;
             set {
                 value = Math.Max(0, Math.Min(1, value));
-                if (value != _value) {
+                if (!_valuechanging && value != _value) {
+                    _valuechanging = true;
+
                     _value = value;
                     RawValue = ToRawValue(_value);
                     DrawArcValue();
+
+                    _valuechanging = false;
                 }
             }
         }
 
+        private bool _rawchanging = false;
         private double _raw = 50;
         public double RawValue {
             get => _raw;
             set {
                 value = Math.Round(Math.Max(_min, Math.Min(_max, value)) * Math.Pow(10, _round), 0) / Math.Pow(10, _round);
-                if (_raw != value) {
+                if (!_rawchanging && _raw != value) {
+                    _rawchanging = true;
+
                     _raw = value;
                     Value = ToValue(_raw);
                     Display.Text = ValueString;
+
                     ValueChanged?.Invoke(_raw);
+
+                    _rawchanging = false;
                 }
             }
         }
