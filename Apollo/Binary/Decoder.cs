@@ -40,6 +40,11 @@ namespace Apollo.Binary {
                     Preferences.AutoCreatePageFilter = reader.ReadBoolean();
                     Preferences.FadeSmoothness = reader.ReadDouble();
                     Preferences.CopyPreviousFrame = reader.ReadBoolean();
+
+                    if (version >= 7) {
+                        Preferences.CaptureLaunchpad = reader.ReadBoolean();
+                    }
+                    
                     Preferences.EnableGestures = reader.ReadBoolean();
 
                     if (version <= 0) {

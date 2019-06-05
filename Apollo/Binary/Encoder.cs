@@ -43,6 +43,7 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.AutoCreatePageFilter);
                 writer.Write(Preferences.FadeSmoothnessSlider);
                 writer.Write(Preferences.CopyPreviousFrame);
+                writer.Write(Preferences.CaptureLaunchpad);
                 writer.Write(Preferences.EnableGestures);
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);

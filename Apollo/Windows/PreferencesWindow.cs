@@ -17,7 +17,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, EnableGestures, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
         Slider FadeSmoothness;
         Controls Contents;
 
@@ -64,6 +64,9 @@ namespace Apollo.Windows {
             CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
             CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
 
+            CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
+            CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
+
             EnableGestures = this.Get<CheckBox>("EnableGestures");
             EnableGestures.IsChecked = Preferences.EnableGestures;
 
@@ -100,6 +103,8 @@ namespace Apollo.Windows {
         private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
 
         private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
+
+        private void CaptureLaunchpad_Changed(object sender, EventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 
         private void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
 

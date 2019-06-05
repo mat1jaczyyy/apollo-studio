@@ -5,7 +5,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="350" MinWidth="350" MaxWidth="350"
-        Height="600" MinHeight="600" MaxHeight="600"
+        Height="630" MinHeight="630" MaxHeight="630"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -38,7 +38,8 @@
         <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
-            <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Auto copy previous frame when adding a new one</CheckBox>
+            <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
+            <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
             <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
             <Button Background="{DynamicResource ThemeControlHighBrush}"  HorizontalAlignment="Center" Content="Clear Color History" Click="ClearColorHistory" />
           </StackPanel>
@@ -69,7 +70,7 @@
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
             <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
-            <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display current File Name</CheckBox>
+            <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
           </StackPanel>
         </Border>
 

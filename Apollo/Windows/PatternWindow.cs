@@ -225,7 +225,7 @@ namespace Apollo.Windows {
             
             if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
 
-            Launchpad = _track.Launchpad;
+            Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 
             PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();

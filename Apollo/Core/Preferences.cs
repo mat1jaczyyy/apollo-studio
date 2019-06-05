@@ -77,6 +77,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _CaptureLaunchpad = false;
+        public static bool CaptureLaunchpad {
+            get => _CaptureLaunchpad;
+            set {
+                _CaptureLaunchpad = value;
+                Save();
+            }
+        }
+
         private static bool _EnableGestures = false;
         public static bool EnableGestures {
             get => _EnableGestures;
