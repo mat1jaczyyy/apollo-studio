@@ -33,7 +33,7 @@
   </UserControl.Resources>
   
   <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">
-    <Border Background="{DynamicResource TitleBrush}" BorderThickness="1" CornerRadius="5" DragDrop.AllowDrop="true" x:Name="Header">
+    <Border Background="{DynamicResource TitleBrush}" BorderThickness="1" CornerRadius="5" DragDrop.AllowDrop="true" x:Name="Contents">
       <Grid Background="Transparent" PointerPressed="Drag" x:Name="Draggable">
         <LayoutTransformControl>
           <LayoutTransformControl.LayoutTransform>

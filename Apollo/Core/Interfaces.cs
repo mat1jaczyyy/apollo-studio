@@ -28,19 +28,6 @@ namespace Apollo.Core {
 
         void Expand(int? index);
     }
-    
-    public delegate void DeviceAddedEventHandler(int index, Type device);
-    public delegate void DeviceCollapsedEventHandler(int index);
-
-    public interface IDeviceViewer: IControl, ISelectViewer {
-        event DeviceAddedEventHandler DeviceAdded;
-        event DeviceCollapsedEventHandler DeviceCollapsed;
-
-        DeviceAdd DeviceAdd { get; }
-        IControl SpecificViewer { get; }
-
-        void SetEnabled();
-    }
 
     public interface ISelect {
         ISelectViewer IInfo { get; }

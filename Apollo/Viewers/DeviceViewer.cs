@@ -17,10 +17,10 @@ using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
-    public class DeviceViewer: UserControl, IDeviceViewer {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+    public class DeviceViewer: UserControl, ISelectViewer {
+        protected virtual void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
+        private static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
             foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
                     if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi")
@@ -32,23 +32,26 @@ namespace Apollo.Viewers {
             return null;
         }
 
+        public delegate void DeviceAddedEventHandler(int index, Type device);
         public event DeviceAddedEventHandler DeviceAdded;
+
+        public delegate void DeviceCollapsedEventHandler(int index);
         public event DeviceCollapsedEventHandler DeviceCollapsed;
         
-        Device _device;
-        bool selected = false;
+        protected Device _device;
+        protected bool selected = false;
 
-        public IControl SpecificViewer { get; private set; }
+        public IControl SpecificViewer { get; protected set; }
 
         public StackPanel Root;
         public Border Border, Header;
-        public DeviceAdd DeviceAdd { get; private set; }
+        public DeviceAdd DeviceAdd { get; protected set; }
 
-        TextBlock TitleText;
-        Grid Draggable;
-        ContextMenu DeviceContextMenu, GroupContextMenu;
+        protected TextBlock TitleText;
+        protected Grid Draggable;
+        protected ContextMenu DeviceContextMenu, GroupContextMenu;
 
-        private void ApplyHeaderBrush(string resource) {
+        protected virtual void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
 
             if (Root.Children[0].GetType() == typeof(DeviceHead)) {
@@ -78,6 +81,8 @@ namespace Apollo.Viewers {
             ApplyHeaderBrush("ThemeControlLowBrush");
             selected = false;
         }
+
+        public DeviceViewer() => InitializeComponent();
 
         public DeviceViewer(Device device) {
             InitializeComponent();
@@ -114,7 +119,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        public void SetEnabled() {
+        public virtual void SetEnabled() {
             Border.Background = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeControlHighBrush" : "ThemeControlMidBrush");
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
             TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
@@ -126,11 +131,11 @@ namespace Apollo.Viewers {
                 ((DeviceTail)Root.Children[Root.Children.Count - 2]).SetEnabled(_device.Enabled);
         }
 
-        private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
+        protected void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
 
-        private void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
+        protected void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
-        private void ContextMenu_Click(object sender, EventArgs e) {
+        protected void ContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 

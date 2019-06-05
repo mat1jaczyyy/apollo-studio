@@ -25,7 +25,7 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
 
-        public IDeviceViewer Viewer { get; set; }
+        public DeviceViewer Viewer { get; set; }
         
         public Chain Parent;
         public int? ParentIndex;

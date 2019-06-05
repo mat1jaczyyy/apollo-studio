@@ -1,61 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.VisualTree;
 
 using Apollo.Components;
-using Apollo.Core;
-using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
-    public class CollapsedDeviceViewer: UserControl, IDeviceViewer {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+    public class CollapsedDeviceViewer: DeviceViewer {
+        protected override void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public event DeviceAddedEventHandler DeviceAdded;
-        public event DeviceCollapsedEventHandler DeviceCollapsed;
-        
-        Device _device;
-        bool selected = false;
-
-        public IControl SpecificViewer { get => null; }
-
-        public StackPanel Root;
-        public Border Header;
-        public DeviceAdd DeviceAdd { get; private set; }
-
-        TextBlock TitleText;
-        Grid Draggable;
-        ContextMenu DeviceContextMenu, GroupContextMenu;
-
-        private void ApplyHeaderBrush(string resource) {
+        protected override void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
 
             if (IsArrangeValid) Header.Background = brush;
             else this.Resources["TitleBrush"] = brush;
         }
 
-        public void Select() {
-            ApplyHeaderBrush("ThemeAccentBrush2");
-            selected = true;
-        }
-
-        public void Deselect() {
-            ApplyHeaderBrush("ThemeControlLowBrush");
-            selected = false;
-        }
-
         public CollapsedDeviceViewer(Device device) {
-            InitializeComponent();
-
             TitleText = this.Get<TextBlock>("Title");
             TitleText.Text = device.GetType().ToString().Split(".").Last();
 
@@ -64,7 +30,7 @@ namespace Apollo.Viewers {
 
             Root = this.Get<StackPanel>("Root");
 
-            Header = this.Get<Border>("Header");
+            Header = this.Get<Border>("Contents");
             Deselect();
             
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
@@ -82,124 +48,9 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        public void SetEnabled() {
+        public override void SetEnabled() {
             Header.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
             TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
-        }
-
-        private void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
-
-        private void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
-
-        private void ContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Track.Get(_device)?.Window?.Selection.Action((string)((MenuItem)item).Header);
-        }
-
-        private void Select(PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Track.Get(_device)?.Window?.Selection.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
-        }
-
-        public async void Drag(object sender, PointerPressedEventArgs e) {
-            if (!selected) Select(e);
-
-            DataObject dragData = new DataObject();
-            dragData.Set("device", Track.Get(_device)?.Window?.Selection.Selection);
-
-            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
-
-            if (result == DragDropEffects.None) {
-                if (selected) Select(e);
-                
-                if (e.MouseButton == MouseButton.Right) {
-                    ContextMenu menu = DeviceContextMenu;
-                    List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
-
-                    if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
-                        menu = GroupContextMenu;
-
-                    menu.Open(Draggable);
-                
-                } else if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
-                    _device.Collapsed = !_device.Collapsed;
-                    DeviceCollapsed?.Invoke(_device.ParentIndex.Value);
-                }
-            }
-        }
-
-        public void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
-        }
-
-        public void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
-
-            if (!e.Data.Contains("device")) return;
-
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneHead" && source.Name != "Header" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
-
-            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
-
-            Chain source_parent = moving[0].Parent;
-            Chain _chain = _device.Parent;
-
-            int before = moving[0].IParentIndex.Value - 1;
-            int after = _device.ParentIndex.Value;
-            if (source.Name == "DropZoneHead" || (source.Name == "Header" && e.GetPosition(source).X < source.Bounds.Width / 2)) after--;
-
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
-
-            bool result = Device.Move(moving, _chain, after, copy);
-
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (source_parent == _chain && after < before)
-                    before_pos += count;
-                
-                List<int> sourcepath = Track.GetPath(source_parent);
-                List<int> targetpath = Track.GetPath(_chain);
-                
-                Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
-
-                        for (int i = after + count; i > after; i--)
-                            targetchain.Remove(i);
-
-                    }) : new Action(() => {
-                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
-
-                        List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
-
-                        Device.Move(umoving, sourcechain, before_pos);
-
-                }), () => {
-                    Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                    Chain targetchain = ((Chain)Track.TraversePath(targetpath));
-
-                    List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
-
-                    Device.Move(rmoving, targetchain, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
         }
     }
 }

@@ -41,13 +41,13 @@ namespace Apollo.Viewers {
             DeviceAdd.AlwaysShowing = Contents.Count == 1;
 
             for (int i = 1; i < Contents.Count; i++)
-                ((IDeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;
+                ((DeviceViewer)Contents[i]).DeviceAdd.AlwaysShowing = false;
 
-            if (Contents.Count > 1 && RootChain) ((IDeviceViewer)Contents.Last()).DeviceAdd.AlwaysShowing = true;
+            if (Contents.Count > 1 && RootChain) ((DeviceViewer)Contents.Last()).DeviceAdd.AlwaysShowing = true;
         }
 
         public void Contents_Insert(int index, Device device) {
-            IDeviceViewer viewer = device.Collapsed? (IDeviceViewer)new CollapsedDeviceViewer(device) : new DeviceViewer(device);
+            DeviceViewer viewer = device.Collapsed? (DeviceViewer)new CollapsedDeviceViewer(device) : new DeviceViewer(device);
             viewer.DeviceAdded += Device_Insert;
             viewer.DeviceCollapsed += Device_Collapsed;
 
