@@ -18,6 +18,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Viewers;
+using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
     public class GroupViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
@@ -306,6 +307,33 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
+        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+            List<Chain> pasted;
+            try {
+                pasted = paste.Contents.Cast<Chain>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
+
+            List<int> path = Track.GetPath(_group);
+
+            Program.Project.Undo.Add($"Chain Pasted", () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    group.Remove(right + i + 1);
+
+            }, () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    group.Insert(right + i + 1, pasted[i].Clone());
+            });
+
+            for (int i = 0; i < paste.Contents.Count; i++)
+                _group.Insert(right + i + 1, pasted[i].Clone());
+        }
+
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
@@ -331,30 +359,7 @@ namespace Apollo.DeviceViewers {
                 return;
             }
 
-            List<Chain> pasted;
-            try {
-                pasted = paste.Contents.Cast<Chain>().ToList();
-            } catch (InvalidCastException) {
-                return;
-            }
-
-            List<int> path = Track.GetPath(_group);
-
-            Program.Project.Undo.Add($"Chain Pasted", () => {
-                Group group = ((Group)Track.TraversePath(path));
-
-                for (int i = paste.Contents.Count - 1; i >= 0; i--)
-                    group.Remove(right + i + 1);
-
-            }, () => {
-                Group group = ((Group)Track.TraversePath(path));
-
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    group.Insert(right + i + 1, pasted[i].Clone());
-            });
-
-            for (int i = 0; i < paste.Contents.Count; i++)
-                _group.Insert(right + i + 1, pasted[i].Clone());
+            Copyable_Insert(paste, right, false);
         }
 
         public void Duplicate(int left, int right) {
@@ -427,7 +432,70 @@ namespace Apollo.DeviceViewers {
         
         public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
 
-        public void Export(int left, int right) => throw new InvalidOperationException("A Chain cannot be exported.");
-        public void Import(int right) => throw new InvalidOperationException("A Chain cannot be imported.");
+        public async void Export(int left, int right) {
+            Window sender = Track.Get(_group).Window;
+
+            SaveFileDialog sfd = new SaveFileDialog() {
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "apchn"
+                        },
+                        Name = "Apollo Chain Preset"
+                    }
+                },
+                Title = "Export Chain Preset"
+            };
+            
+            string result = await sfd.ShowAsync(sender);
+
+            if (result != null) {
+                string[] file = result.Split(Path.DirectorySeparatorChar);
+
+                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+                    Copyable copy = new Copyable();
+                    
+                    for (int i = left; i <= right; i++)
+                        copy.Contents.Add(_group[i]);
+
+                    try {
+                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
+
+                    } catch (UnauthorizedAccessException e) {
+                        ErrorWindow.Create(
+                            $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
+                            "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                            sender
+                        );
+                    }
+                }
+            }
+        }
+        
+        public async void Import(int right) {
+            OpenFileDialog ofd = new OpenFileDialog() {
+                AllowMultiple = false,
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "apchn"
+                        },
+                        Name = "Apollo Chain Preset"
+                    }
+                },
+                Title = "Import Chain Preset"
+            };
+
+            string[] result = await ofd.ShowAsync(Track.Get(_group).Window);
+
+            if (result.Length > 0) {
+                Copyable loaded;
+
+                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
+                    loaded = Decoder.Decode(file, typeof(Copyable));
+                
+                Copyable_Insert(loaded, right, true);
+            }
+        }
     }
 }

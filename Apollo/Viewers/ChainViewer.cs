@@ -203,7 +203,7 @@ namespace Apollo.Viewers {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        public void Copyable_Insert(Copyable paste, int right, bool imported) {
+        private void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Device> pasted;
             try {
                 pasted = paste.Contents.Cast<Device>().ToList();

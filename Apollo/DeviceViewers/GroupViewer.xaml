@@ -6,6 +6,7 @@
   <UserControl.Resources>
     <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
 
