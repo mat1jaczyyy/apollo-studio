@@ -342,7 +342,7 @@ namespace Apollo.DeviceViewers {
             
             List<int> path = Track.GetPath(_multi);
 
-            Program.Project.Undo.Add($"Chain Pasted", () => {
+            Program.Project.Undo.Add($"Chain {(imported? "Imported" : "Pasted")}", () => {
                 Multi multi = ((Multi)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)

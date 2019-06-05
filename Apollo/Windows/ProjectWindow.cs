@@ -322,6 +322,27 @@ namespace Apollo.Windows {
             } else e.DragEffects = DragDropEffects.None;
         }
 
+        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+            List<Track> pasted;
+            try {
+                pasted = paste.Contents.Cast<Track>().ToList();
+            } catch (InvalidCastException) {
+                return;
+            }
+
+            Program.Project.Undo.Add($"Track {(imported? "Imported" : "Pasted")}", () => {
+                for (int i = paste.Contents.Count - 1; i >= 0; i--)
+                    Program.Project.Remove(right + i + 1);
+
+            }, () => {
+                for (int i = 0; i < paste.Contents.Count; i++)
+                    Program.Project.Insert(right + i + 1, pasted[i].Clone());
+            });
+            
+            for (int i = 0; i < paste.Contents.Count; i++)
+                Program.Project.Insert(right + i + 1, pasted[i].Clone());
+        }
+
         public async void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
@@ -347,24 +368,7 @@ namespace Apollo.Windows {
                 return;
             }
 
-            List<Track> pasted;
-            try {
-                pasted = paste.Contents.Cast<Track>().ToList();
-            } catch (InvalidCastException) {
-                return;
-            }
-
-            Program.Project.Undo.Add($"Track Pasted", () => {
-                for (int i = paste.Contents.Count - 1; i >= 0; i--)
-                    Program.Project.Remove(right + i + 1);
-
-            }, () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    Program.Project.Insert(right + i + 1, pasted[i].Clone());
-            });
-            
-            for (int i = 0; i < paste.Contents.Count; i++)
-                Program.Project.Insert(right + i + 1, pasted[i].Clone());
+            Copyable_Insert(paste, right, false);
         }
 
         public void Duplicate(int left, int right) {
@@ -419,7 +423,68 @@ namespace Apollo.Windows {
 
         public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
 
-        public void Export(int left, int right) => throw new InvalidOperationException("A Track cannot be exported.");
-        public void Import(int right) => throw new InvalidOperationException("A Track cannot be imported.");
+        public async void Export(int left, int right) {
+            SaveFileDialog sfd = new SaveFileDialog() {
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "aptrk"
+                        },
+                        Name = "Apollo Track Preset"
+                    }
+                },
+                Title = "Export Track Preset"
+            };
+            
+            string result = await sfd.ShowAsync(this);
+
+            if (result != null) {
+                string[] file = result.Split(Path.DirectorySeparatorChar);
+
+                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+                    Copyable copy = new Copyable();
+                    
+                    for (int i = left; i <= right; i++)
+                        copy.Contents.Add(Program.Project[i]);
+
+                    try {
+                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
+
+                    } catch (UnauthorizedAccessException e) {
+                        ErrorWindow.Create(
+                            $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
+                            "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                            this
+                        );
+                    }
+                }
+            }
+        }
+        
+        public async void Import(int right) {
+            OpenFileDialog ofd = new OpenFileDialog() {
+                AllowMultiple = false,
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "aptrk"
+                        },
+                        Name = "Apollo Track Preset"
+                    }
+                },
+                Title = "Import Track Preset"
+            };
+
+            string[] result = await ofd.ShowAsync(this);
+
+            if (result.Length > 0) {
+                Copyable loaded;
+
+                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
+                    loaded = Decoder.Decode(file, typeof(Copyable));
+                
+                Copyable_Insert(loaded, right, true);
+            }
+        }
     }
 }

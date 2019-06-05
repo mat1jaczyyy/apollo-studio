@@ -317,7 +317,7 @@ namespace Apollo.DeviceViewers {
 
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Pasted", () => {
+            Program.Project.Undo.Add($"Chain {(imported? "Imported" : "Pasted")}", () => {
                 Group group = ((Group)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)

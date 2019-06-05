@@ -5,6 +5,7 @@
   <UserControl.Resources>
     <ContextMenu x:Key="ActionContextMenu" Cursor="Arrow">
       <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
   
