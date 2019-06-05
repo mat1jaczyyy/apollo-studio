@@ -42,7 +42,7 @@ namespace Apollo.Windows {
 
                 _launchpad = value;
 
-                if (_launchpad != null) {
+                if (_launchpad != null && _launchpad != MIDI.NoOutput) {
                     _launchpad.PatternWindow?.Close();
                     _launchpad.PatternWindow = this;
                     _launchpad.Clear();
@@ -120,6 +120,7 @@ namespace Apollo.Windows {
         private void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
             if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(Launchpad);
+            ports.Add(MIDI.NoOutput);
 
             PortSelector.Items = ports;
             PortSelector.SelectedIndex = -1;
