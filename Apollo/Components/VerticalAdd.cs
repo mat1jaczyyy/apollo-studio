@@ -19,7 +19,25 @@ namespace Apollo.Components {
         Grid Root;
         Canvas Icon;
 
-        ContextMenu ActionContextMenu;
+        public enum AvailableActions {
+            None, Paste, PasteAndImport
+        }
+
+        private AvailableActions _actions = AvailableActions.None;
+        public AvailableActions Actions {
+            get => _actions;
+            set {
+                if (value != _actions) {
+                    _actions = value;
+
+                    if (_actions == AvailableActions.None) ActionContextMenu = null;
+                    else if (_actions == AvailableActions.Paste) ActionContextMenu = (ContextMenu)this.Resources["PasteContextMenu"];
+                    else if (_actions == AvailableActions.PasteAndImport) ActionContextMenu = ((ContextMenu)this.Resources["PasteAndImportContextMenu"]);
+                }
+            }
+        }
+
+        ContextMenu ActionContextMenu = null;
 
         private bool _always;
         public bool AlwaysShowing {
@@ -37,9 +55,9 @@ namespace Apollo.Components {
             
             Root = this.Get<Grid>("Root");
             Icon = this.Get<Canvas>("Icon");
-
-            ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];
-            ActionContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
+            
+            ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
+            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
         }
 
         private void ActionContextMenu_Click(object sender, EventArgs e) {
@@ -52,7 +70,7 @@ namespace Apollo.Components {
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Added?.Invoke();
-            else if (e.MouseButton == MouseButton.Right) ActionContextMenu.Open(Icon);
+            else if (e.MouseButton == MouseButton.Right) ActionContextMenu?.Open(Icon);
             e.Handled = true;
         }
     }

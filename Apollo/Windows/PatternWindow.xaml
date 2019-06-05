@@ -45,7 +45,7 @@
           <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible">
             <Grid RowDefinitions="Auto,*">
               <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
-                <Components:VerticalAdd Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
+                <Components:VerticalAdd Actions="Paste" Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
               </StackPanel>
               
               <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Frame_AfterClick" />

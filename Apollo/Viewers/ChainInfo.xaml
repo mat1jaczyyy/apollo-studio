@@ -27,6 +27,6 @@
                LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
     </Grid>
 
-    <Components:VerticalAdd Added="Chain_Add" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+    <Components:VerticalAdd Added="Chain_Add" Actions="PasteAndImport" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

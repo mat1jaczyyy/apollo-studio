@@ -3,8 +3,13 @@
              x:Class="Apollo.Components.VerticalAdd">
 
   <UserControl.Resources>
-    <ContextMenu x:Key="ActionContextMenu" Cursor="Arrow">
+    <ContextMenu x:Key="PasteContextMenu" Cursor="Arrow">
       <MenuItem Header="Paste" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="PasteAndImportContextMenu" Cursor="Arrow">
+      <MenuItem Header="Paste" />
+      <MenuItem Header="Import" />
     </ContextMenu>
   </UserControl.Resources>
 

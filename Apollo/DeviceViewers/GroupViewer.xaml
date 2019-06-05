@@ -12,7 +12,7 @@
   <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
     <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
       <StackPanel Grid.Row="0" MinWidth="105" MaxWidth="105" x:Name="Contents">
-        <Components:VerticalAdd AlwaysShowing="true" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
+        <Components:VerticalAdd AlwaysShowing="true" Actions="PasteAndImport" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
       </StackPanel>
 
       <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
