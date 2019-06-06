@@ -4,20 +4,20 @@
        xmlns:sys="clr-namespace:System;assembly=mscorlib">
   
   <Style.Resources>
-    <Color x:Key="ThemeBackgroundColor">#FFDBDBDB</Color>
-    <Color x:Key="ThemeBorderLowColor">#FFA0A0A0</Color>
-    <Color x:Key="ThemeBorderMidColor">#FFA7A7A7</Color>
+    <Color x:Key="ThemeBackgroundColor">#FFD6D6D6</Color>
+    <Color x:Key="ThemeBorderLowColor">#FF979797</Color>
+    <Color x:Key="ThemeBorderMidColor">#FFA0A0A0</Color>
     <Color x:Key="ThemeBorderHighColor">#FFAEAEAE</Color>
-    <Color x:Key="ThemeControlLowColor">#FFC7C7C7</Color>
-    <Color x:Key="ThemeControlMidColor">#FFDBDBDB</Color>
+    <Color x:Key="ThemeControlLowColor">#FFC1C1C1</Color>
+    <Color x:Key="ThemeControlMidColor">#FFD6D6D6</Color>
     <Color x:Key="ThemeControlHighColor">#FFE5E5E5</Color>
-    <Color x:Key="ThemeControlHigherColor">#FFF0F0F0</Color>
+    <Color x:Key="ThemeControlHigherColor">#FFF3F3F3</Color>
     <Color x:Key="ThemeControlDarkenColor">#20FFFFFF</Color>
     <Color x:Key="ThemeControlHighlightLowColor">#FF575757</Color>
     <Color x:Key="ThemeControlHighlightMidColor">#FF7D7D7D</Color>
     <Color x:Key="ThemeControlHighlightHighColor">#FFAFAFAF</Color>
     <Color x:Key="ThemeForegroundColor">#FF232323</Color>
-    <Color x:Key="ThemeForegroundLowColor">#FF505050</Color>
+    <Color x:Key="ThemeForegroundLowColor">#FF707070</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"></SolidColorBrush>
