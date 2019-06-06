@@ -1,14 +1,9 @@
 <Style xmlns="https://github.com/avaloniaui"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       x:Class="Apollo.Themes.ThemeDark"
+       x:Class="Apollo.Themes.Dark"
        xmlns:sys="clr-namespace:System;assembly=mscorlib">
   
   <Style.Resources>
-    <Color x:Key="ThemeAccentColor">#FF0288D1</Color>
-    <Color x:Key="ThemeAccentColor2">#990288D1</Color>
-    <Color x:Key="ThemeAccentColor3">#660288D1</Color>
-    <Color x:Key="ThemeAccentColor4">#330288D1</Color>
-
     <Color x:Key="ThemeBackgroundColor">#FF171717</Color>
     <Color x:Key="ThemeBorderLowColor">#FF070707</Color>
     <Color x:Key="ThemeBorderMidColor">#FF0B0B0B</Color>
@@ -23,11 +18,6 @@
     <Color x:Key="ThemeControlHighlightHighColor">#FF505050</Color>
     <Color x:Key="ThemeForegroundColor">#FFDCDCDC</Color>
     <Color x:Key="ThemeForegroundLowColor">#FF404040</Color>
-    <Color x:Key="ThemeExtraColor">#FFD04A02</Color>
-
-    <Color x:Key="HighlightColor">#FF119EDA</Color>
-    <Color x:Key="ErrorColor">#FFFF0000</Color>
-    <Color x:Key="ErrorLowColor">#10FF0000</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"></SolidColorBrush>
@@ -43,23 +33,5 @@
     <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="{DynamicResource ThemeControlHighlightHighColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="{DynamicResource ThemeForegroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="{DynamicResource ThemeForegroundLowColor}"></SolidColorBrush>
-
-    <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource HighlightColor}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ThemeAccentBrush" Color="{DynamicResource ThemeAccentColor}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ThemeAccentBrush2" Color="{DynamicResource ThemeAccentColor2}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ThemeAccentBrush3" Color="{DynamicResource ThemeAccentColor3}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ThemeAccentBrush4" Color="{DynamicResource ThemeAccentColor4}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ThemeExtraBrush" Color="{DynamicResource ThemeExtraColor}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource ErrorColor}"></SolidColorBrush>
-    <SolidColorBrush x:Key="ErrorLowBrush" Color="{DynamicResource ErrorLowColor}"></SolidColorBrush>
-
-    <Thickness x:Key="ThemeBorderThickness">1,1,1,1</Thickness>
-    <sys:Double x:Key="ThemeDisabledOpacity">0.5</sys:Double>
-
-    <sys:Double x:Key="FontSizeSmall">10</sys:Double>
-    <sys:Double x:Key="FontSizeNormal">12</sys:Double>
-    <sys:Double x:Key="FontSizeLarge">16</sys:Double>
-
-    <sys:Double x:Key="ScrollBarThickness">10</sys:Double>
   </Style.Resources>
 </Style>
