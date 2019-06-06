@@ -8,7 +8,6 @@
 
   <Application.Styles>
     <StyleInclude Source="resm:Avalonia.Themes.Default.DefaultTheme.xaml?assembly=Avalonia.Themes.Default" />
-    <StyleInclude Source="/Core/Theme.xaml" />
 
     <Style Selector="Window">
       <Setter Property="HasSystemDecorations" Value="false" />
@@ -41,6 +40,10 @@
 
     <Style Selector="CheckBox:pointerover /template/ Border#border">
       <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+
+    <Style Selector="RadioButton:pointerover /template/ Ellipse#border">
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}"/>
     </Style>
 
     <Style Selector="ComboBox">
