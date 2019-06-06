@@ -10,6 +10,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 
 using Apollo.Binary;
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 
@@ -28,6 +29,7 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
+            this.Get<PreferencesButton>("PreferencesButton").Fill = Background;
             this.Get<Image>("SplashImage").Source = new Bitmap((string)Application.Current.Styles.FindResource("SplashImage"));
         }
 

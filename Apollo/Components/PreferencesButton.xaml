@@ -5,7 +5,7 @@
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
     <Path Fill="{DynamicResource ThemeButtonEnabledBrush}"
           Data="M 4.75,2.4 L 11.25,2.4 14.4,8 11.25,13.6 4.75,13.6 1.6,8 Z" />
-    <Ellipse Fill="{DynamicResource ThemeBorderMidBrush}"
+    <Ellipse x:Name="Hole"
           Canvas.Left="5" Canvas.Top="5" Width="6" Height="6" />
 
     <Path Fill="{DynamicResource ThemeButtonEnabledBrush}"

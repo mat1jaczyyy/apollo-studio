@@ -7,6 +7,7 @@
     <sys:String x:Key="SplashImage">Resources/SplashWhite.png</sys:String>
 
     <Color x:Key="ThemeBackgroundColor">#FF191919</Color>
+    <Color x:Key="ThemeSplashColor">#FF0A0A0A</Color>
     <Color x:Key="ThemeBorderLowColor">#FF040404</Color>
     <Color x:Key="ThemeBorderMidColor">#FF0A0A0A</Color>
     <Color x:Key="ThemeBorderHighColor">#FF101010</Color>
@@ -23,6 +24,7 @@
     <Color x:Key="ThemeButtonDisabledColor">#FF242424</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemeSplashBrush" Color="{DynamicResource ThemeSplashColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{DynamicResource ThemeBorderMidColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="{DynamicResource ThemeBorderHighColor}"></SolidColorBrush>
