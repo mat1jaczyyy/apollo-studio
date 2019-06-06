@@ -3,9 +3,9 @@
         x:Class="Apollo.Windows.PreferencesWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner"
+        CanResize="false" SizeToContent="Height"
         Icon="/Resources/WindowIcon.png"
-        Width="350" MinWidth="350" MaxWidth="350"
-        Height="750" MinHeight="750" MaxHeight="750"
+        Width="700" MinWidth="700" MaxWidth="700"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -18,76 +18,80 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" Margin="10 5">
-        <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
-            <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
-            <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
-            <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
-            <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create PageFilter in new Group Chain</CheckBox>
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
-            <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
-            <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
-            <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
-            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
-            <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
-            <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
-            <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
-            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
-            <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="Fade Smoothness" />
-              <Slider Width="100" Minimum="0" Maximum="1" x:Name="FadeSmoothness" />
-            </StackPanel>
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <Grid RowDefinitions="Auto,*">
-            <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-              <StackPanel x:Name="Contents">
-                <Components:VerticalAdd AlwaysShowing="true" Added="Launchpad_Add" />
+      <Grid ColumnDefinitions="*,*" Margin="10 5"> 
+        <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto" Margin="0 0 10 0">
+            <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
+              <StackPanel Spacing="5">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
+                <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
+                <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
               </StackPanel>
-            </ScrollViewer>
+            </Border>
+
+            <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+              <StackPanel Spacing="5">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
+                <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
+                <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create PageFilter in new Group Chain</CheckBox>
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+              <StackPanel Spacing="5">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
+                <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
+                <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
+                <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
+                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
+              </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Row="3" Margin="0 5" Spacing="5">
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
+              <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
+              <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
+              <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
+              <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
+            </StackPanel>
           </Grid>
         </Border>
 
-        <Border Grid.Row="6" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-          <StackPanel Spacing="5">
-            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
-            <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
-            <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
-          </StackPanel>
-        </Border>
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto" Margin="10 0 0 0">
+          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
+            <StackPanel Spacing="5">
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Fade Smoothness" />
+                <Slider Width="100" Minimum="0" Maximum="1" x:Name="FadeSmoothness" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
 
-        <StackPanel Grid.Row="7" Margin="10" HorizontalAlignment="Center">
-          <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-          <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
-        </StackPanel>
+          <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+            <Grid RowDefinitions="Auto,*">
+              <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
+              <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+                <StackPanel x:Name="Contents">
+                  <Components:VerticalAdd AlwaysShowing="true" Added="Launchpad_Add" />
+                </StackPanel>
+              </ScrollViewer>
+            </Grid>
+          </Border>
+
+          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+            <StackPanel Spacing="5">
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
+              <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
+              <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
+            </StackPanel>
+          </Border>
+
+          <StackPanel Grid.Row="3" Margin="10" HorizontalAlignment="Center">
+            <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
+            <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
+          </StackPanel>
+        </Grid>
       </Grid>
     </Border>
   </Grid>
