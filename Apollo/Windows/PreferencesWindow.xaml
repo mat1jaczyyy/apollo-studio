@@ -70,7 +70,7 @@
 
           <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" />
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" x:Name="ThemeHeader" />
               <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
               <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
             </StackPanel>

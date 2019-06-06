@@ -169,9 +169,19 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Dark_Changed(object sender, EventArgs e) => Preferences.Theme = Preferences.Themes.Dark;
+        private void Dark_Changed(object sender, EventArgs e) {
+            if (Preferences.Theme != Preferences.Themes.Dark)
+                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You need to restart Apollo to apply this change.";
 
-        private void Light_Changed(object sender, EventArgs e) => Preferences.Theme = Preferences.Themes.Light;
+            Preferences.Theme = Preferences.Themes.Dark;
+        }
+
+        private void Light_Changed(object sender, EventArgs e) {
+            if (Preferences.Theme != Preferences.Themes.Light)
+                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
+            
+            Preferences.Theme = Preferences.Themes.Light;
+        }
 
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 
