@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia;
@@ -11,6 +13,7 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -18,6 +21,7 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
+        RadioButton Monochrome, NovationPalette, CustomPalette;
         Slider FadeSmoothness;
         Controls Contents;
 
@@ -70,6 +74,16 @@ namespace Apollo.Windows {
             EnableGestures = this.Get<CheckBox>("EnableGestures");
             EnableGestures.IsChecked = Preferences.EnableGestures;
 
+            Monochrome = this.Get<RadioButton>("Monochrome");
+            Monochrome.IsChecked = Preferences.ImportPalette == Preferences.Palettes.Monochrome;
+
+            NovationPalette = this.Get<RadioButton>("NovationPalette");
+            NovationPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.NovationPalette;
+
+            CustomPalette = this.Get<RadioButton>("CustomPalette");
+            CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
+            CustomPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.CustomPalette;
+
             DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
 
@@ -111,6 +125,43 @@ namespace Apollo.Windows {
         private void EnableGestures_Changed(object sender, EventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
 
         private void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
+
+        private void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.Monochrome;
+
+        private void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.NovationPalette;
+
+        private void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.CustomPalette;
+
+        private async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
+            OpenFileDialog ofd = new OpenFileDialog() {
+                AllowMultiple = false,
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "*"
+                        },
+                        Name = "Retina Palette File"
+                    }
+                },
+                Title = "Select Retina Palette"
+            };
+
+            string[] result = await ofd.ShowAsync(this);
+
+            if (result.Length > 0) {
+                Palette loaded;
+
+                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
+                    loaded = Palette.Decode(file);
+                
+                if (loaded != null) {
+                    Preferences.CustomPalette = loaded;
+                    CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
+                    CustomPalette.IsChecked = true;
+                    Preferences.ImportPalette = Preferences.Palettes.CustomPalette;
+                }
+            }
+        }
 
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 

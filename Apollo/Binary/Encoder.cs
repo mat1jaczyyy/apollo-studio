@@ -45,6 +45,12 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.CopyPreviousFrame);
                 writer.Write(Preferences.CaptureLaunchpad);
                 writer.Write(Preferences.EnableGestures);
+                writer.Write(Preferences.PaletteName);
+
+                for (int i = 0; i < 128; i++)
+                    Encode(writer, Preferences.CustomPalette.BackingArray[i]);
+
+                writer.Write((int)Preferences.ImportPalette);
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);
 

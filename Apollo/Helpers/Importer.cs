@@ -10,6 +10,8 @@ using SkiaSharp;
 
 namespace Apollo.Helpers {
     public class Importer {
+        public static Palette Palette = Palette.NovationPalette;
+
         private static int MIDIReadVariableLength(BinaryReader reader) {
             int ret = 0;
             for (int i = 0; i < 4; i++) {
@@ -93,7 +95,7 @@ namespace Apollo.Helpers {
                     switch (type >> 4) {                        
                         case 0x9: // Note on
                             byte index = Converter.DRtoXY(reader.ReadByte());
-                            ret.Last().Screen[index] = new Color((byte)(reader.ReadByte() >> 1));
+                            ret.Last().Screen[index] = Palette.GetColor(reader.ReadByte());
                             break;
                         
                         case 0x7: // Channel Mode

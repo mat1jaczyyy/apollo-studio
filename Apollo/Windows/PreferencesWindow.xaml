@@ -5,7 +5,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="350" MinWidth="350" MaxWidth="350"
-        Height="630" MinHeight="630" MaxHeight="630"
+        Height="750" MinHeight="750" MaxHeight="750"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -18,7 +18,7 @@
     </Grid>
     
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" Margin="10 5">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" Margin="10 5">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
@@ -41,11 +41,21 @@
             <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
             <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
             <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
-            <Button Background="{DynamicResource ThemeControlHighBrush}"  HorizontalAlignment="Center" Content="Clear Color History" Click="ClearColorHistory" />
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
           </StackPanel>
         </Border>
 
         <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <StackPanel Spacing="5">
+            <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
+            <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
+            <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
+            <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
             <StackPanel Orientation="Horizontal" Spacing="10">
@@ -55,7 +65,7 @@
           </StackPanel>
         </Border>
 
-        <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+        <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <Grid RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
@@ -66,7 +76,7 @@
           </Grid>
         </Border>
 
-        <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+        <Border Grid.Row="6" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
           <StackPanel Spacing="5">
             <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
             <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
@@ -74,7 +84,7 @@
           </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="6" Margin="10" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="7" Margin="10" HorizontalAlignment="Center">
           <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
           <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
         </StackPanel>

@@ -47,6 +47,12 @@ namespace Apollo.Binary {
                     
                     Preferences.EnableGestures = reader.ReadBoolean();
 
+                    if (version >= 7) {
+                        Preferences.PaletteName = reader.ReadString();
+                        Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
+                        Preferences.ImportPalette = (Preferences.Palettes)reader.ReadInt32();
+                    }
+
                     if (version <= 0) {
                         Preferences.DiscordPresence = true;
                         reader.ReadBoolean();

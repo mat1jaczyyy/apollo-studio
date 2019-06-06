@@ -2,6 +2,7 @@
 using System.IO;
 
 using Apollo.Binary;
+using Apollo.Helpers;
 using Apollo.Windows;
 
 namespace Apollo.Core {
@@ -12,6 +13,10 @@ namespace Apollo.Core {
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
+
+        public enum Palettes {
+            Monochrome, NovationPalette, CustomPalette
+        }
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;
@@ -91,6 +96,38 @@ namespace Apollo.Core {
             get => _EnableGestures;
             set {
                 _EnableGestures = value;
+                Save();
+            }
+        }
+
+        private static string _PaletteName = "mat1jaczyyyPalette";
+        public static string PaletteName {
+            get => _PaletteName;
+            set {
+                _PaletteName = value;
+                Save();
+            }
+        }
+
+        private static Palette _CustomPalette = Palette.mat1jaczyyyPalette;
+        public static Palette CustomPalette {
+            get => _CustomPalette;
+            set {
+                _CustomPalette = value;
+                Save();
+            }
+        }
+
+        private static Palettes _ImportPalette = Palettes.NovationPalette;
+        public static Palettes ImportPalette {
+            get => _ImportPalette;
+            set {
+                _ImportPalette = value;
+
+                if (_ImportPalette == Palettes.Monochrome) Importer.Palette = Palette.Monochrome;
+                else if (_ImportPalette == Palettes.NovationPalette) Importer.Palette = Palette.NovationPalette;
+                else if (_ImportPalette == Palettes.CustomPalette) Importer.Palette = CustomPalette;
+
                 Save();
             }
         }
