@@ -21,7 +21,7 @@ namespace Apollo.Windows {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
-        RadioButton Monochrome, NovationPalette, CustomPalette;
+        RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
         Controls Contents;
 
@@ -83,6 +83,12 @@ namespace Apollo.Windows {
             CustomPalette = this.Get<RadioButton>("CustomPalette");
             CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
             CustomPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.CustomPalette;
+
+            Dark = this.Get<RadioButton>("Dark");
+            Dark.IsChecked = Preferences.Theme == Preferences.Themes.Dark;
+
+            Light = this.Get<RadioButton>("Light");
+            Light.IsChecked = Preferences.Theme == Preferences.Themes.Light;
 
             DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
@@ -162,6 +168,10 @@ namespace Apollo.Windows {
                 }
             }
         }
+
+        private void Dark_Changed(object sender, EventArgs e) => Preferences.Theme = Preferences.Themes.Dark;
+
+        private void Light_Changed(object sender, EventArgs e) => Preferences.Theme = Preferences.Themes.Light;
 
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 

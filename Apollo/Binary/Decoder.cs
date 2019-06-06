@@ -51,6 +51,8 @@ namespace Apollo.Binary {
                         Preferences.PaletteName = reader.ReadString();
                         Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
                         Preferences.ImportPalette = (Preferences.Palettes)reader.ReadInt32();
+
+                        Preferences.Theme = (Preferences.Themes)reader.ReadInt32();
                     }
 
                     if (version <= 0) {

@@ -18,6 +18,10 @@ namespace Apollo.Core {
             Monochrome, NovationPalette, CustomPalette
         }
 
+        public enum Themes {
+            Dark, Light
+        }
+
         public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;
         public static bool AlwaysOnTop {
@@ -128,6 +132,15 @@ namespace Apollo.Core {
                 else if (_ImportPalette == Palettes.NovationPalette) Importer.Palette = Palette.NovationPalette;
                 else if (_ImportPalette == Palettes.CustomPalette) Importer.Palette = CustomPalette;
 
+                Save();
+            }
+        }
+
+        private static Themes _Theme = Themes.Dark;
+        public static Themes Theme {
+            get => _Theme;
+            set {
+                _Theme = value;
                 Save();
             }
         }
