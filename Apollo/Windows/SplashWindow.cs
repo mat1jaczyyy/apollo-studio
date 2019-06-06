@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 
 using Apollo.Binary;
 using Apollo.Core;
@@ -26,6 +27,8 @@ namespace Apollo.Windows {
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
+
+            this.Get<Image>("SplashImage").Source = new Bitmap((string)Application.Current.Styles.FindResource("SplashImage"));
         }
 
         private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));

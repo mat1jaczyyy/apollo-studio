@@ -4,6 +4,8 @@
        xmlns:sys="clr-namespace:System;assembly=mscorlib">
   
   <Style.Resources>
+    <sys:String x:Key="SplashImage">Resources/SplashBlack.png</sys:String>
+
     <Color x:Key="ThemeBackgroundColor">#FFD6D6D6</Color>
     <Color x:Key="ThemeBorderLowColor">#FF979797</Color>
     <Color x:Key="ThemeBorderMidColor">#FFA0A0A0</Color>
