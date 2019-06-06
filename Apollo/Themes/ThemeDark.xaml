@@ -1,6 +1,6 @@
 <Style xmlns="https://github.com/avaloniaui"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       x:Class="Apollo.Core.ThemeLight"
+       x:Class="Apollo.Themes.ThemeDark"
        xmlns:sys="clr-namespace:System;assembly=mscorlib">
   
   <Style.Resources>
@@ -9,20 +9,20 @@
     <Color x:Key="ThemeAccentColor3">#660288D1</Color>
     <Color x:Key="ThemeAccentColor4">#330288D1</Color>
 
-    <Color x:Key="ThemeBackgroundColor">#FFDBDBDB</Color>
-    <Color x:Key="ThemeBorderLowColor">#FFB0B0B0</Color>
-    <Color x:Key="ThemeBorderMidColor">#FFB7B7B7</Color>
-    <Color x:Key="ThemeBorderHighColor">#FFBEBEBE</Color>
-    <Color x:Key="ThemeControlLowColor">#FFC7C7C7</Color>
-    <Color x:Key="ThemeControlMidColor">#FFDBDBDB</Color>
-    <Color x:Key="ThemeControlHighColor">#FFE5E5E5</Color>
-    <Color x:Key="ThemeControlHigherColor">#FFF0F0F0</Color>
-    <Color x:Key="ThemeControlDarkenColor">#20FFFFFF</Color>
-    <Color x:Key="ThemeControlHighlightLowColor">#FF575757</Color>
-    <Color x:Key="ThemeControlHighlightMidColor">#FF7D7D7D</Color>
-    <Color x:Key="ThemeControlHighlightHighColor">#FFAFAFAF</Color>
-    <Color x:Key="ThemeForegroundColor">#FF232323</Color>
-    <Color x:Key="ThemeForegroundLowColor">#FF505050</Color>
+    <Color x:Key="ThemeBackgroundColor">#FF171717</Color>
+    <Color x:Key="ThemeBorderLowColor">#FF070707</Color>
+    <Color x:Key="ThemeBorderMidColor">#FF0B0B0B</Color>
+    <Color x:Key="ThemeBorderHighColor">#FF101010</Color>
+    <Color x:Key="ThemeControlLowColor">#FF111111</Color>
+    <Color x:Key="ThemeControlMidColor">#FF171717</Color>
+    <Color x:Key="ThemeControlHighColor">#FF1C1C1C</Color>
+    <Color x:Key="ThemeControlHigherColor">#FF222222</Color>
+    <Color x:Key="ThemeControlDarkenColor">#20000000</Color>
+    <Color x:Key="ThemeControlHighlightLowColor">#FFA8A8A8</Color>
+    <Color x:Key="ThemeControlHighlightMidColor">#FF828282</Color>
+    <Color x:Key="ThemeControlHighlightHighColor">#FF505050</Color>
+    <Color x:Key="ThemeForegroundColor">#FFDCDCDC</Color>
+    <Color x:Key="ThemeForegroundLowColor">#FF404040</Color>
     <Color x:Key="ThemeExtraColor">#FFD04A02</Color>
 
     <Color x:Key="HighlightColor">#FF119EDA</Color>
