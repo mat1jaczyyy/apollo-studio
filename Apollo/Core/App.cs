@@ -10,7 +10,7 @@ namespace Apollo.Core {
             AvaloniaXamlLoader.Load(this);
 
             StyleInclude dark = new StyleInclude(new Uri("resm:Styles?assembly=Apollo")) {
-                Source = new Uri("avares://Apollo/Themes/Light.xaml")
+                Source = new Uri("avares://Apollo/Themes/Dark.xaml")
             };
 
             Styles.Add(dark);
