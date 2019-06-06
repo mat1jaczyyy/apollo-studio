@@ -18,8 +18,8 @@ namespace Apollo.Components {
 
         private void Update_Saved(bool saved) =>
             this.Resources["CanvasBrush"] = (SolidColorBrush)Application.Current.Styles.FindResource(saved
-                ? "ThemeControlHighBrush"
-                : "ThemeForegroundLowBrush"
+                ? "ThemeButtonDisabledBrush"
+                : "ThemeButtonEnabledBrush"
             );
 
         public SaveButton() {

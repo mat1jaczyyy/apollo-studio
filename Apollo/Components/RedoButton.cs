@@ -14,8 +14,8 @@ namespace Apollo.Components {
 
         private void Update_Position(int position) =>
             this.Resources["CanvasBrush"] = (SolidColorBrush)Application.Current.Styles.FindResource((position == Program.Project.Undo.History.Count - 1)
-                ? "ThemeControlHighBrush"
-                : "ThemeForegroundLowBrush"
+                ? "ThemeButtonDisabledBrush"
+                : "ThemeButtonEnabledBrush"
             );
 
         public RedoButton() {

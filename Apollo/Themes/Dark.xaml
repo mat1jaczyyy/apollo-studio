@@ -18,6 +18,8 @@
     <Color x:Key="ThemeControlHighlightHighColor">#FF505050</Color>
     <Color x:Key="ThemeForegroundColor">#FFDCDCDC</Color>
     <Color x:Key="ThemeForegroundLowColor">#FF404040</Color>
+    <Color x:Key="ThemeButtonEnabledColor">#FF404040</Color>
+    <Color x:Key="ThemeButtonDisabledColor">#FF1C1C1C</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"></SolidColorBrush>
@@ -33,5 +35,7 @@
     <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="{DynamicResource ThemeControlHighlightHighColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="{DynamicResource ThemeForegroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="{DynamicResource ThemeForegroundLowColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemeButtonEnabledBrush" Color="{DynamicResource ThemeButtonEnabledColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemeButtonDisabledBrush" Color="{DynamicResource ThemeButtonDisabledColor}"></SolidColorBrush>
   </Style.Resources>
 </Style>

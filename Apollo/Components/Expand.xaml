@@ -3,9 +3,9 @@
              x:Class="Apollo.Components.Expand">
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="1.5"
+    <Path Stroke="{DynamicResource ThemeButtonEnabledBrush}" StrokeThickness="1.5"
           Data="M 14,2 L 2,14" />
-    <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
+    <Path Fill="{DynamicResource ThemeButtonEnabledBrush}"
           Data="M 1,9 L 7,15 1,15 Z M 15,7 L 9,1 15,1 Z" />
   </Canvas>
 </UserControl>

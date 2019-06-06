@@ -3,9 +3,9 @@
              x:Class="Apollo.Components.LargePopout">
 
   <Canvas Width="30" Height="30" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Stroke="{DynamicResource ThemeForegroundLowBrush}" StrokeThickness="4"
+    <Path Stroke="{DynamicResource ThemeButtonEnabledBrush}" StrokeThickness="4"
           Data="M 2,15 L 2,2 28,2 28,28 15,28 M 2,28 L 16,14" />
-    <Path Fill="{DynamicResource ThemeForegroundLowBrush}"
+    <Path Fill="{DynamicResource ThemeButtonEnabledBrush}"
           Data="M 8,8 L 22,8 22,22 Z" />
   </Canvas>
 </UserControl>

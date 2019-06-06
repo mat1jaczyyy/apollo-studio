@@ -32,19 +32,19 @@
     </Style>
 
     <Style Selector="Button:pointerover /template/ ContentPresenter">
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeButtonEnabledBrush}"/>
     </Style>
 
     <Style Selector="Button:pressed  /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource ThemeButtonEnabledBrush}"/>
     </Style>
 
     <Style Selector="CheckBox:pointerover /template/ Border#border">
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeButtonEnabledBrush}"/>
     </Style>
 
     <Style Selector="RadioButton:pointerover /template/ Ellipse#border">
-      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+      <Setter Property="Stroke" Value="{DynamicResource ThemeButtonEnabledBrush}"/>
     </Style>
 
     <Style Selector="ComboBox">
