@@ -115,7 +115,7 @@ namespace Apollo.Binary {
                     collapsed = reader.ReadBoolean();
                 }
 
-                bool enabled = false;
+                bool enabled = true;
                 if (version >= 5) {
                     enabled = reader.ReadBoolean();
                 }
