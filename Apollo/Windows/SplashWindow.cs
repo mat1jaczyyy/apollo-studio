@@ -16,7 +16,11 @@ using Apollo.Elements;
 
 namespace Apollo.Windows {
     public class SplashWindow: Window {
+        private static Image SplashImage = (Image)Application.Current.Styles.FindResource("SplashImage");
+
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+        Grid Root;
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -30,12 +34,16 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             this.Get<PreferencesButton>("PreferencesButton").Fill = Background;
-            this.Get<Image>("SplashImage").Source = new Bitmap((string)Application.Current.Styles.FindResource("SplashImage"));
+            
+            Root = this.Get<Grid>("Root");
+            Root.Children.Add(SplashImage);
         }
 
         private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
         
         private void Unloaded(object sender, EventArgs e) {
+            Root.Children.Remove(SplashImage);
+            
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Program.WindowClose(this);

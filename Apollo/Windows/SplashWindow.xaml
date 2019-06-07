@@ -9,14 +9,12 @@
         Opened="Loaded" Closing="Unloaded">
 
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*,Auto" x:Name="Root">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
         <Components:PreferencesButton Grid.Column="0" Margin="5 5" x:Name="PreferencesButton" />
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow" />
         <Components:Close Grid.Column="2" Margin="5 5" Clicked="Close" />
       </Grid>
-
-      <Image Grid.Row="1" x:Name="SplashImage" />
 
       <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
         <Button Grid.Column="0" Margin="0 0 5 0" Content="New Project" Click="New" />

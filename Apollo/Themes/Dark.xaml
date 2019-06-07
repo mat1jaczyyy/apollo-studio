@@ -4,7 +4,7 @@
        xmlns:sys="clr-namespace:System;assembly=mscorlib">
   
   <Style.Resources>
-    <sys:String x:Key="SplashImage">Resources/SplashWhite.png</sys:String>
+    <Image Grid.Row="1" Source="/Resources/SplashWhite.png" x:Key="SplashImage" />
 
     <Color x:Key="ThemeBackgroundColor">#FF191919</Color>
     <Color x:Key="ThemeSplashColor">#FF0A0A0A</Color>

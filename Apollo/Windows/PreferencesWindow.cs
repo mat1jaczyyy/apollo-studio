@@ -171,7 +171,7 @@ namespace Apollo.Windows {
 
         private void Dark_Changed(object sender, EventArgs e) {
             if (Preferences.Theme != Preferences.Themes.Dark)
-                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You need to restart Apollo to apply this change.";
+                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
 
             Preferences.Theme = Preferences.Themes.Dark;
         }
