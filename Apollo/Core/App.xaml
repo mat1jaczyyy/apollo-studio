@@ -8,7 +8,7 @@
 
   <Application.Styles>
     <StyleInclude Source="resm:Avalonia.Themes.Default.DefaultTheme.xaml?assembly=Avalonia.Themes.Default" />
-    <StyleInclude Source="/Themes/Common.xaml" />
+    <StyleInclude Source="avares://Apollo/Themes/Common.xaml" />
 
     <Style Selector="Window">
       <Setter Property="HasSystemDecorations" Value="false" />
