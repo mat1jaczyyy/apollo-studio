@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Runtime.ExceptionServices;
 
+using Avalonia.Threading;
+
 using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
@@ -179,6 +181,8 @@ namespace Apollo.Elements {
 
             if (Output.IsOpen) Output.Close();
             Output.Dispose();
+
+            Dispatcher.UIThread.InvokeAsync(() => Window?.Close());
 
             Program.Log($"MIDI Disconnected {Name}");
 
