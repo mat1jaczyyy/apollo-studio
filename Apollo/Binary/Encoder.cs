@@ -15,9 +15,7 @@ namespace Apollo.Binary {
             writer.Write(Common.version);
         }
 
-        private static void EncodeID(BinaryWriter writer, Type type) {
-            writer.Write((byte)Array.IndexOf(Common.id, type));
-        }
+        private static void EncodeID(BinaryWriter writer, Type type) => writer.Write((byte)Array.IndexOf(Common.id, type));
 
         public static MemoryStream Encode(object o) {
             MemoryStream output = new MemoryStream();

@@ -473,6 +473,8 @@ namespace Apollo.DeviceViewers {
         }
         
         public async void Import(int right) {
+            Window sender = Track.Get(_group).Window;
+
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {
@@ -486,13 +488,24 @@ namespace Apollo.DeviceViewers {
                 Title = "Import Chain Preset"
             };
 
-            string[] result = await ofd.ShowAsync(Track.Get(_group).Window);
+            string[] result = await ofd.ShowAsync(sender);
 
             if (result.Length > 0) {
                 Copyable loaded;
 
                 using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                    loaded = Decoder.Decode(file, typeof(Copyable));
+                    try {
+                        loaded = Decoder.Decode(file, typeof(Copyable));
+
+                    } catch {
+                        ErrorWindow.Create(
+                            $"An error occurred while reading the file.\n\n" +
+                            "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
+                            sender
+                        );
+
+                        return;
+                    }
                 
                 Copyable_Insert(loaded, right, true);
             }

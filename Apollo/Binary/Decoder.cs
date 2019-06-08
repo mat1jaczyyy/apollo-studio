@@ -13,24 +13,20 @@ using Apollo.Structures;
 
 namespace Apollo.Binary {
     public static class Decoder {
-        private static bool DecodeHeader(BinaryReader reader) {
-            return reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
-        }
+        private static bool DecodeHeader(BinaryReader reader) => reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
 
-        private static Type DecodeID(BinaryReader reader) {
-            return Common.id[(reader.ReadByte())];
-        }
+        private static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
         public static dynamic Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
-                DecodeHeader(reader);
+                if (!DecodeHeader(reader)) return new InvalidDataException();
                 return Decode(reader, reader.ReadInt32(), ensure, true);
             }
         }
         
         private static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
             Type t = DecodeID(reader);
-            if (ensure != null && ensure != t) return null;
+            if (ensure != null && ensure != t) return new InvalidDataException();
 
             if (t == typeof(Preferences) && root) {
                 try {
@@ -71,7 +67,7 @@ namespace Apollo.Binary {
                     if (version >= 2)
                         MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
 
-                } catch (Exception) {
+                } catch {
                     Program.Log("Error reading Preferences");
                     return null;
                 }
@@ -372,7 +368,7 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
 
-            return null;
+            return new InvalidDataException();
         }
     }
 }

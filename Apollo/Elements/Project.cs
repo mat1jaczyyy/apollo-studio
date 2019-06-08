@@ -82,16 +82,18 @@ namespace Apollo.Elements {
                 try {
                     File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
-                    Undo.SavePosition();
-                    if (store) FilePath = path;
-
                 } catch (UnauthorizedAccessException e) {
                     ErrorWindow.Create(
                         $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
                         "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
                         sender
                     );
+
+                    return;
                 }
+
+                Undo.SavePosition();
+                if (store) FilePath = path;
             }
         }
 
