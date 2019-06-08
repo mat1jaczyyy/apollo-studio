@@ -39,7 +39,14 @@ namespace Apollo.Windows {
             Root.Children.Add(SplashImage);
         }
 
-        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+        private void Loaded(object sender, EventArgs e) {
+            Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+
+            if (Program.Args?.Length > 0)
+                ReadFile(Program.Args[0]);
+            
+            Program.Args = null;
+        }
         
         private void Unloaded(object sender, EventArgs e) {
             Root.Children.Remove(SplashImage);
@@ -53,6 +60,32 @@ namespace Apollo.Windows {
             Program.Project?.Dispose();
             Program.Project = new Project();
             ProjectWindow.Create(this);
+            Close();
+        }
+
+        public void ReadFile(string path) {
+            Project loaded;
+
+            using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                try {
+                    loaded = Decoder.Decode(file, typeof(Project));
+
+                } catch {
+                    ErrorWindow.Create(
+                        $"An error occurred while reading the file.\n\n" +
+                        "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
+                        this
+                    );
+
+                    return;
+                }
+
+            loaded.FilePath = path;
+            loaded.Undo.SavePosition();
+
+            Program.Project = loaded;
+            ProjectWindow.Create(this);
+
             Close();
         }
 
@@ -71,31 +104,9 @@ namespace Apollo.Windows {
             };
 
             string[] result = await ofd.ShowAsync(this);
-            if (result.Length > 0) {
-                Project loaded;
 
-                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                    try {
-                        loaded = Decoder.Decode(file, typeof(Project));
-
-                    } catch {
-                        ErrorWindow.Create(
-                            $"An error occurred while reading the file.\n\n" +
-                            "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
-                            this
-                        );
-
-                        return;
-                    }
-
-                loaded.FilePath = result[0];
-                loaded.Undo.SavePosition();
-
-                Program.Project = loaded;
-                ProjectWindow.Create(this);
-
-                Close();
-            }
+            if (result.Length > 0)
+                ReadFile(result[0]);
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

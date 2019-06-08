@@ -24,13 +24,8 @@ namespace Apollo.Core {
                 .UsePlatformDetect()
                 .LogToDebug();
         
-        public static bool log = false;
         static Stopwatch logTimer = new Stopwatch();
-
-        public static void Log(string text) {
-            if (log)
-                Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
-        }
+        public static void Log(string text) => Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
 
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
@@ -81,6 +76,8 @@ namespace Apollo.Core {
             }
         }
 
+        public static string[] Args;
+
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}crashdump-{DateTimeOffset.Now.ToUnixTimeSeconds()}-";
@@ -91,22 +88,13 @@ namespace Apollo.Core {
                     File.WriteAllBytes(FilePath + "project.approj", Encoder.Encode(Project).ToArray());
             };
 
-            if (Preferences.DiscordPresence) Discord.Set(true);
-
             logTimer.Start();
 
-            foreach (string arg in args) {
-                /*if (arg.Equals("--log")) {
-                    log = true;
-                }*/
-            }
-            
-            foreach (var api in MidiDeviceManager.Default.GetAvailableMidiApis())
-                Log($"MIDI API: {api}");
+            Args = args;
+
+            if (Preferences.DiscordPresence) Discord.Set(true);
 
             MIDI.Start();
-
-            Log("MIDI Ready");
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }
