@@ -261,8 +261,8 @@ namespace Apollo.Binary {
                 return new Multi(
                     Decode(reader, version),
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
-                    (Multi.MultiType)reader.ReadInt32(),
-                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null
+                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
+                    (Multi.MultiType)reader.ReadInt32()
                 );
             
             else if (t == typeof(Output))

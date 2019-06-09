@@ -92,7 +92,7 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), _mode, Expanded) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, _mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -126,14 +126,14 @@ namespace Apollo.Devices {
 
         public int? Expanded { get; set; }
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, MultiType mode = MultiType.Forward, int? expanded = null): base(DeviceIdentifier) {
+        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base(DeviceIdentifier) {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
-
-            _mode = mode;
             
             Expanded = expanded;
+
+            _mode = mode;
             
             Launchpad.MultiReset += Reset;
 
