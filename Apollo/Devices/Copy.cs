@@ -155,7 +155,7 @@ namespace Apollo.Devices {
         };
 
         public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
-            Time = time?? new Time(false, null, 500);
+            Time = time?? new Time(true, null, 500);
             Gate = gate;
             _copymode = copymode;
             _gridmode = gridmode;

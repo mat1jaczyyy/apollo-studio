@@ -61,7 +61,7 @@ namespace Apollo.Structures {
             Maximum = Maximum
         };
 
-        public Time(bool mode = false, Length length = null, int free = 1000) {
+        public Time(bool mode = true, Length length = null, int free = 1000) {
             _free = free;
             _mode = mode;
             Length = length?? new Length();
