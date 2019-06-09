@@ -84,14 +84,22 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList()
                 );
             
-            else if (t == typeof(Track))
-                return new Track(
-                    (Chain)Decode(reader, version),
-                    (Launchpad)Decode(reader, version),
-                    reader.ReadString()
-                );
+            else if (t == typeof(Track)) {
+                Chain chain = (Chain)Decode(reader, version);
+                Launchpad lp = (Launchpad)Decode(reader, version);
+                string name = reader.ReadString();
+
+                bool enabled = true;
+                if (version >= 8) {
+                    enabled = reader.ReadBoolean();
+                }
+
+                Track ret = new Track(chain, lp, name);
+                ret.Enabled = enabled;
+
+                return ret;
             
-            else if (t == typeof(Chain)) {
+            } else if (t == typeof(Chain)) {
                 List<Device> devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList();
                 string name = reader.ReadString();
 
