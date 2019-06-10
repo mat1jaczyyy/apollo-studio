@@ -1,18 +1,31 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 
 using Apollo.Windows;
 
 namespace Apollo.Components {
-    public class ProjectButton: UserControl {
+    public class ProjectButton: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public ProjectButton() => InitializeComponent();
+        Path Path;
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) ProjectWindow.Create((Window)this.GetVisualRoot());
+        protected override IBrush Fill {
+            get => Path.Fill;
+            set => Path.Fill = value;
         }
+
+        public ProjectButton() {
+            InitializeComponent();
+
+            Path = this.Get<Path>("Path");
+
+            base.MouseLeave(this, null);
+        }
+
+        protected override void Click(InputModifiers e) => ProjectWindow.Create((Window)this.GetVisualRoot());
     }
 }

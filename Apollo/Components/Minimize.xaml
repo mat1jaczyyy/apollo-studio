@@ -2,8 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Minimize">
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Stroke="{DynamicResource ThemeButtonEnabledBrush}" StrokeThickness="2"
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
+          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+    <Path StrokeThickness="2" x:Name="Path"
           Data="M 2,5 L 8,11 14,5" />
   </Canvas>
 </UserControl>

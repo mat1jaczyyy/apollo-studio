@@ -1,18 +1,26 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 namespace Apollo.Components {
-    public class Minimize: UserControl {
+    public class Minimize: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void ClickedEventHandler();
-        public event ClickedEventHandler Clicked;
+        Path Path;
 
-        public Minimize() => InitializeComponent();
+        protected override IBrush Fill {
+            get => Path.Stroke;
+            set => Path.Stroke = value;
+        }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Clicked?.Invoke();
+        public Minimize() {
+            InitializeComponent();
+
+            Path = this.Get<Path>("Path");
+
+            base.MouseLeave(this, null);
         }
     }
 }

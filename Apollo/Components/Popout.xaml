@@ -2,10 +2,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Popout">
 
-  <Canvas Width="12" Height="12" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Stroke="{DynamicResource ThemeButtonEnabledBrush}" StrokeThickness="1.5"
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="Brush" />
+  </UserControl.Resources>
+
+  <Canvas Width="12" Height="12" Background="Transparent" x:Name="Icon"
+          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+    <Path Stroke="{DynamicResource Brush}" StrokeThickness="1.5"
           Data="M 1,6 L 1,1 11,1 11,11 6,11 M 1,11 L 7,5" />
-    <Path Fill="{DynamicResource ThemeButtonEnabledBrush}"
+    <Path Fill="{DynamicResource Brush}"
           Data="M 3,3 L 9,3 9,9 Z" />
   </Canvas>
 </UserControl>

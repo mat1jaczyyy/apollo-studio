@@ -1,20 +1,21 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-
-using Apollo.Windows;
+using Avalonia.Media;
 
 namespace Apollo.Components {
-    public class LargePopout: UserControl {
+    public class LargePopout: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void ClickedEventHandler();
-        public event ClickedEventHandler Clicked;
+        protected override IBrush Fill {
+            get => (IBrush)this.Resources["Brush"];
+            set => this.Resources["Brush"] = value;
+        }
 
-        public LargePopout() => InitializeComponent();
+        public LargePopout() {
+            InitializeComponent();
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Clicked?.Invoke();
+            base.MouseLeave(this, null);
         }
     }
 }
