@@ -11,31 +11,53 @@ namespace Apollo.Components {
 
         protected abstract IBrush Fill { get; set; }
 
+        protected bool AllowRightClick = false;
+
+        private bool _enabled = true;
+        protected bool Enabled {
+            get => _enabled;
+            set {
+                _enabled = value;
+
+                mouseHeld = false;
+
+                Fill = (IBrush)Application.Current.Styles.FindResource(Enabled
+                    ? (mouseOver
+                        ? "ThemeButtonOverBrush"
+                        : "ThemeButtonEnabledBrush"
+                    ) : "ThemeButtonDisabledBrush"
+                );
+            }
+        }
+
         private bool mouseHeld = false;
+        private bool mouseOver = false;
 
         protected void MouseEnter(object sender, PointerEventArgs e) {
-            Fill = (IBrush)Application.Current.Styles.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");
+            if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");
+            mouseOver = true;
         }
 
         protected void MouseLeave(object sender, PointerEventArgs e) {
-            Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonEnabledBrush");
-            mouseHeld = false;
+            if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonEnabledBrush");
+            mouseHeld = mouseOver = false;
         }
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) {
+            if (e.MouseButton == MouseButton.Left || (AllowRightClick && e.MouseButton == MouseButton.Right)) {
                 mouseHeld = true;
 
-                Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonDownBrush");
+                if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonDownBrush");
             }
         }
 
         protected void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (mouseHeld && e.MouseButton == MouseButton.Left) {
+            if (mouseHeld && (e.MouseButton == MouseButton.Left || (AllowRightClick && e.MouseButton == MouseButton.Right))) {
                 mouseHeld = false;
 
                 MouseEnter(sender, null);
-                Click(e);
+
+                if (Enabled) Click(e);
             }
         }
 
