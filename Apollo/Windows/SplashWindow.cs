@@ -33,7 +33,7 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
-            this.Get<PreferencesButton>("PreferencesButton").Fill = Background;
+            this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
             
             Root = this.Get<Grid>("Root");
             Root.Children.Add(SplashImage);

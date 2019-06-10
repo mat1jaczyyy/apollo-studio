@@ -9,25 +9,30 @@ using Avalonia.VisualTree;
 using Apollo.Windows;
 
 namespace Apollo.Components {
-    public class PreferencesButton: UserControl {
+    public class PreferencesButton: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         Ellipse Hole;
 
-        public IBrush Fill {
+        public IBrush HoleFill {
             get => Hole.Fill;
             set => Hole.Fill = value;
+        }
+
+        protected override IBrush Fill {
+            get => (IBrush)this.Resources["Brush"];
+            set => this.Resources["Brush"] = value;
         }
 
         public PreferencesButton() {
             InitializeComponent();
 
+            base.MouseLeave(this, null);
+
             Hole = this.Get<Ellipse>("Hole");
             Hole.Fill = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeBorderMidBrush");
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) PreferencesWindow.Create((Window)this.GetVisualRoot());
-        }
+        protected override void Click() => PreferencesWindow.Create((Window)this.GetVisualRoot());
     }
 }
