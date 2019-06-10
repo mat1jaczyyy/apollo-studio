@@ -93,11 +93,10 @@ namespace Apollo.Binary {
                     enabled = reader.ReadBoolean();
                 }
 
-                Track ret = new Track(chain, lp, name);
-                ret.Enabled = enabled;
+                return new Track(chain, lp, name) {
+                    Enabled = enabled
+                };
 
-                return ret;
-            
             } else if (t == typeof(Chain)) {
                 List<Device> devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Device)Decode(reader, version)).ToList();
                 string name = reader.ReadString();
@@ -107,10 +106,9 @@ namespace Apollo.Binary {
                     enabled = reader.ReadBoolean();
                 }
 
-                Chain ret = new Chain(devices, name);
-                ret.Enabled = enabled;
-
-                return ret;
+                return new Chain(devices, name) {
+                    Enabled = enabled
+                };
 
             } else if (t == typeof(Device)) {
                 bool collapsed = false;
