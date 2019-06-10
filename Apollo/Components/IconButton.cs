@@ -35,10 +35,10 @@ namespace Apollo.Components {
                 mouseHeld = false;
 
                 MouseEnter(sender, null);
-                Click(e.InputModifiers);
+                Click(e);
             }
         }
 
-        protected virtual void Click(InputModifiers e) => Clicked?.Invoke();
+        protected virtual void Click(PointerReleasedEventArgs e) => Clicked?.Invoke();
     }
 }

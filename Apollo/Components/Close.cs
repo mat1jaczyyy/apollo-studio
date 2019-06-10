@@ -26,6 +26,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(InputModifiers e) => Clicked?.Invoke(e == InputModifiers.Control);
+        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == InputModifiers.Control);
     }
 }
