@@ -35,7 +35,7 @@ namespace Apollo.Structures {
         }
 
         public static bool operator ==(Length a, Length b) {
-            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            if (a is null || b is null) return ReferenceEquals(a, b);
             return a.Step == b.Step;
         }
         public static bool operator !=(Length a, Length b) => !(a == b);

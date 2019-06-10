@@ -75,7 +75,7 @@ namespace Apollo.Structures {
         }
 
         public static bool operator ==(Time a, Time b) {
-            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            if (a is null || b is null) return object.ReferenceEquals(a, b);
             return a.Mode == b.Mode && a.Length == b.Length && a.Free == b.Free;
         }
         public static bool operator !=(Time a, Time b) => !(a == b);

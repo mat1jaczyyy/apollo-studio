@@ -118,7 +118,7 @@ namespace Apollo.Structures {
         }
 
         public static bool operator ==(Color a, Color b) {
-            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null)) return object.ReferenceEquals(a, b);
+            if (a is null || b is null) return ReferenceEquals(a, b);
             return a.Red == b.Red && a.Green == b.Green && a.Blue == b.Blue;
         }
         public static bool operator !=(Color a, Color b) => !(a == b);
