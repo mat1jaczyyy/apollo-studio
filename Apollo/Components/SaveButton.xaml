@@ -7,12 +7,11 @@
       <MenuItem Header="Save as..." />
       <MenuItem Header="Save a copy..." />
     </ContextMenu>
-
-    <SolidColorBrush x:Key="CanvasBrush" />
   </UserControl.Resources>
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerReleased="Click">
-    <Path Fill="{DynamicResource CanvasBrush}"
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
+          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+    <Path x:Name="Path"
           Data="M 0,0 L 0,16 16,16 16,4 12,0 Z" />
     <Path Fill="{DynamicResource ThemeBorderMidBrush}"
           Data="M 1,1 L 1,4 11,4 11,1 Z" />

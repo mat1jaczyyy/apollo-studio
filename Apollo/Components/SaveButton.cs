@@ -2,6 +2,7 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -11,19 +12,27 @@ using Avalonia.VisualTree;
 using Apollo.Core;
 
 namespace Apollo.Components {
-    public class SaveButton: UserControl {
+    public class SaveButton: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         ContextMenu SaveContextMenu;
 
-        private void Update_Saved(bool saved) =>
-            this.Resources["CanvasBrush"] = (SolidColorBrush)Application.Current.Styles.FindResource(saved
-                ? "ThemeButtonDisabledBrush"
-                : "ThemeButtonEnabledBrush"
-            );
+        private void Update_Saved(bool saved) => Enabled = !saved;
+
+        Path Path;
+
+        protected override IBrush Fill {
+            get => Path.Fill;
+            set => Path.Fill = value;
+        }
 
         public SaveButton() {
             InitializeComponent();
+
+            Path = this.Get<Path>("Path");
+
+            AllowRightClick = true;
+            base.MouseLeave(this, null);
 
             SaveContextMenu = (ContextMenu)this.Resources["SaveContextMenu"];
             SaveContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(SaveContextMenu_Click));
@@ -49,7 +58,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        protected override void Click(PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Program.Project.Save((Window)this.GetVisualRoot());
             else if (e.MouseButton == MouseButton.Right) SaveContextMenu.Open(this);
         }
