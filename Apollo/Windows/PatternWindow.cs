@@ -729,7 +729,7 @@ namespace Apollo.Windows {
 
             List<int> path = Track.GetPath(_pattern);
 
-            Action ur = () => {
+            void ur() {
                 Pattern pattern = (Pattern)Track.TraversePath(path);
 
                 for (int i = left; i < right; i++) {
@@ -740,7 +740,7 @@ namespace Apollo.Windows {
 
                 Selection.Select(pattern[left]);
                 Selection.Select(pattern[right], true);
-            };
+            }
 
             Program.Project.Undo.Add($"Pattern Frames Reversed", ur, ur);
 
@@ -762,12 +762,12 @@ namespace Apollo.Windows {
 
             List<int> path = Track.GetPath(_pattern);
 
-            Action ur = () => {
+            void ur() {
                 Pattern pattern = (Pattern)Track.TraversePath(path);
 
                 for (int i = left; i <= right; i++)
                     pattern[i].Screen = pattern[i].Screen.Reverse().ToArray();
-            };
+            }
 
             Program.Project.Undo.Add($"Pattern Frames Inverted", ur, ur);
             
