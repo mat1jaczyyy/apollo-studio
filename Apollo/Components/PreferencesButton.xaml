@@ -6,7 +6,8 @@
     <SolidColorBrush x:Key="Brush" />
   </UserControl.Resources>
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon" PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
+          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Path Fill="{DynamicResource Brush}"
           Data="M 4.75,2.4 L 11.25,2.4 14.4,8 11.25,13.6 4.75,13.6 1.6,8 Z" />
     <Ellipse x:Name="Hole"
