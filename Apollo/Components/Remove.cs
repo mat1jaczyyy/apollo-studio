@@ -1,18 +1,26 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 
 namespace Apollo.Components {
-    public class Remove: UserControl {
+    public class Remove: IconButton {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public delegate void RemovedEventHandler();
-        public event RemovedEventHandler Removed;
-        
-        public Remove() => InitializeComponent();
+        Path Path;
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Removed?.Invoke();
+        protected override IBrush Fill {
+            get => Path.Stroke;
+            set => Path.Stroke = value;
+        }
+        
+        public Remove() {
+            InitializeComponent();
+
+            Path = this.Get<Path>("Path");
+
+            base.MouseLeave(this, null);
         }
     }
 }
