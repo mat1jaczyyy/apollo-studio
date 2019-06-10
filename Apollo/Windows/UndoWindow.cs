@@ -3,11 +3,9 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Avalonia.Visuals;
 
 using Apollo.Core;
 using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;

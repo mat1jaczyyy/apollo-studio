@@ -4,7 +4,6 @@ using System.Linq;
 
 using Avalonia.Input;
 
-using Apollo.Core;
 using Apollo.Windows;
 
 namespace Apollo.Helpers {

@@ -6,8 +6,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Logging.Serilog;
 
-using RtMidi.Core;
-
 using Apollo.Binary;
 using Apollo.Elements;
 using Apollo.Windows;

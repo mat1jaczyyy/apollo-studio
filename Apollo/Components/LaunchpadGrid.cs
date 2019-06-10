@@ -7,7 +7,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using AvaloniaColor = Avalonia.Media.Color;
 using Avalonia.Input;
 
 using Apollo.Structures;
