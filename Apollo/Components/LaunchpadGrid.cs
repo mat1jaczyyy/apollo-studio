@@ -152,9 +152,7 @@ namespace Apollo.Components {
             if (mouseHeld) {
                 IInputElement _over = Root.InputHitTest(e.Device.GetPosition(Root));
 
-                if (_over is Shape) {
-                    Shape over = (Shape)_over;
-                    
+                if (_over is Shape over) {
                     if (mouseOver == null) MouseEnter(over, e.InputModifiers);
                     else if (mouseOver != over) {
                         MouseLeave(mouseOver);
