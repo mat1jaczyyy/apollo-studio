@@ -36,6 +36,18 @@ namespace Apollo.Elements {
             }
         }
 
+        private RotationType _rotation = RotationType.D0;
+        public RotationType Rotation {
+            get => _rotation;
+            set {
+                if (_rotation != value) {
+                    _rotation = value;
+                    
+                    Preferences.Save();
+                }
+            }
+        }
+
         public string Name { get; protected set; }
         public bool Available { get; protected set; }
 
@@ -55,6 +67,13 @@ namespace Apollo.Elements {
 
         public enum InputType {
             XY, DrumRack
+        }
+
+        public enum RotationType {
+            D0,
+            D90,
+            D180,
+            D270
         }
 
         private readonly static SysExMessage Inquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
@@ -107,13 +126,24 @@ namespace Apollo.Elements {
         }
 
         public virtual void Send(Signal n) {
+            if (!Available || Type == LaunchpadType.Unknown) return;
+
+            Window?.SignalRender(n.Clone());
+
+            if (Rotation == RotationType.D90) {
+                n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+
+            } else if (Rotation == RotationType.D180) {
+                n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+
+            } else if (Rotation == RotationType.D270) {
+                n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+            }
+
             int offset = 0;
             if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
 
-            if (SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue})) {
-                Program.Log($"OUT <- {n.ToString()}");
-                Window?.SignalRender(n);
-            }
+            SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue});
         }
 
         public virtual void Clear() {
@@ -191,7 +221,15 @@ namespace Apollo.Elements {
 
         public void HandleMessage(Signal n) {
             if (Available) {
-                Program.Log($"IN  -> {n.ToString()}");
+                if (Rotation == RotationType.D90) {
+                    n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+
+                } else if (Rotation == RotationType.D180) {
+                    n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+
+                } else if (Rotation == RotationType.D270) {
+                    n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+                }
 
                 if (PatternWindow == null) Receive?.Invoke(n);
                 else PatternWindow.MIDIEnter(n);

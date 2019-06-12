@@ -6,7 +6,7 @@
         Title="Preferences" WindowStartupLocation="CenterOwner"
         CanResize="false" SizeToContent="Height"
         Icon="/Resources/WindowIcon.png"
-        Width="650" MinWidth="650" MaxWidth="650"
+        Width="750" MinWidth="750" MaxWidth="750"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">

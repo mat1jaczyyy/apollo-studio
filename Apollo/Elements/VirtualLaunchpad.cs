@@ -5,10 +5,7 @@ using Apollo.Structures;
 
 namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
-        public override void Send(Signal n) {
-            Program.Log($"OUT <- {n.ToString()}");
-            Window?.SignalRender(n);
-        }
+        public override void Send(Signal n) => Window?.SignalRender(n);
 
         public override void Clear() {
             for (int i = 0; i < 100; i++)
