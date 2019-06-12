@@ -134,15 +134,19 @@ namespace Apollo.Structures {
 
         public SolidColorBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
         public SolidColorBrush ToScreenBrush() {
-            double max = new byte[] {_r, _g, _b}.Max() / 63.0;
+            double fr = Math.Pow(_r / 63.0, 1 / 4.5);
+            double fg = Math.Pow(_g / 63.0, 1 / 4.5);
+            double fb = Math.Pow(_b / 63.0, 1 / 4.5);
+
+            double max = new double[] {fr, fg, fb}.Max();
 
             AvaloniaColor bg = (AvaloniaColor)Application.Current.Styles.FindResource("ThemeForegroundLowColor");
 
             return new SolidColorBrush(new AvaloniaColor(
                 255,
-                (byte)(_r * (255 / 63.0) * max + bg.R * (1 - max)),
-                (byte)(_g * (255 / 63.0) * max + bg.G * (1 - max)),
-                (byte)(_b * (255 / 63.0) * max + bg.B * (1 - max))
+                (byte)(fr * 255 * max + bg.R * (1 - max)),
+                (byte)(fg * 255 * max + bg.G * (1 - max)),
+                (byte)(fb * 255 * max + bg.B * (1 - max))
             ));
         }
 
