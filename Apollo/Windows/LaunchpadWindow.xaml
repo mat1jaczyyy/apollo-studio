@@ -19,6 +19,7 @@
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
           <Components:Minimize Clicked="Minimize" />
+          <Components:Expand Clicked="Maximize" />
           <Components:Close Clicked="Close" />
         </StackPanel>
       </Grid>

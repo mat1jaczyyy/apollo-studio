@@ -68,6 +68,11 @@ namespace Apollo.Windows {
 
         private void Minimize() => WindowState = WindowState.Minimized;
 
+        private void Maximize(IPointerDevice e) {
+            WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
+            Topmost = Preferences.AlwaysOnTop;
+        }
+
         private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
         private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
         private void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
