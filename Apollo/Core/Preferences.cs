@@ -44,6 +44,17 @@ namespace Apollo.Core {
             }
         }
 
+        public static event CheckBoxChanged PhantomChanged;
+        private static bool _Phantom = true;
+        public static bool Phantom {
+            get => _Phantom;
+            set {
+                _Phantom = value;
+                PhantomChanged?.Invoke(_Phantom);
+                Save();
+            }
+        }
+
         private static bool _AutoCreateKeyFilter = true;
         public static bool AutoCreateKeyFilter {
             get => _AutoCreateKeyFilter;

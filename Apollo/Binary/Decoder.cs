@@ -31,6 +31,11 @@ namespace Apollo.Binary {
                 try {
                     Preferences.AlwaysOnTop = reader.ReadBoolean();
                     Preferences.CenterTrackContents = reader.ReadBoolean();
+
+                    if (version >= 9) {
+                        Preferences.Phantom = reader.ReadBoolean();
+                    }
+
                     Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
                     Preferences.AutoCreatePageFilter = reader.ReadBoolean();
                     Preferences.FadeSmoothness = reader.ReadDouble();
