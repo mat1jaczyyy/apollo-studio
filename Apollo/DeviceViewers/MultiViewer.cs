@@ -431,7 +431,29 @@ namespace Apollo.DeviceViewers {
 
         public void Group(int left, int right) {}
         public void Ungroup(int index) {}
-        public void Mute(int left, int right) {}
+        
+        public void Mute(int left, int right) {
+            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _multi[i].Enabled).ToList();
+            bool r = !_multi[left].Enabled;
+
+            List<int> path = Track.GetPath(_multi);
+
+            Program.Project.Undo.Add($"Chain Muted", () => {
+                Multi multi = ((Multi)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    multi[i].Enabled = u[i - left];
+
+            }, () => {
+                Multi multi = ((Multi)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    multi[i].Enabled = r;
+            });
+
+            for (int i = left; i <= right; i++)
+                _multi[i].Enabled = r;
+        }
 
         public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
 
