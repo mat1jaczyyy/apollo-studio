@@ -37,10 +37,13 @@ namespace Apollo.Components {
             if (index == 0 || index == 9 || index == 90 || index == 99) return;
 
             if (index == -1) ModeLight.Fill = color;
+            else if (LowQuality) ((Path)Grid.Children[index]).Fill = color;
             else ((Path)Grid.Children[index]).Stroke = Preferences.Phantom? color : ((Path)Grid.Children[index]).Fill = color;
         }
 
         private void Update_Phantom(bool value) {
+            if (LowQuality) return;
+
             for (int i = 0; i < 100; i++) {
                 if (i == 0 || i == 9 || i == 90 || i == 99) continue;
 
@@ -56,8 +59,8 @@ namespace Apollo.Components {
                 if (value != _scale) {
                     _scale = value;
 
-                    this.Resources["PadSquareSize"] = 15 * Scale;
-                    this.Resources["PadCircleSize"] = 11 * Scale;
+                    this.Resources["PadSize"] = 15 * Scale;
+                    if (!LowQuality) this.Resources["PadThickness"] = 1 * Scale;
                     this.Resources["PadCut1"] = 3 * Scale;
                     this.Resources["PadCut2"] = 12 * Scale;
                     this.Resources["ModeWidth"] = 4 * Scale;
@@ -77,6 +80,7 @@ namespace Apollo.Components {
                 if (value != _lowQuality) {
                     _lowQuality = value;
 
+                    this.Resources["PadThickness"] = LowQuality? 0 : 1 * Scale;
                     ModeLight.Opacity = Convert.ToInt32(!LowQuality);
                     
                     DrawPath();
@@ -86,30 +90,33 @@ namespace Apollo.Components {
 
         private readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
 
-        public Geometry SquareGeometry => Geometry.Parse(String.Format("M 1,1 L 1,{0} {0},{0} {0},1 Z",
-            ((double)this.Resources["PadSquareSize"] - 1).ToString(CultureInfo.InvariantCulture)
+        public Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
+            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
         ));
 
-        public Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},1 A {1},{1} 180 1 1 {0},{2} A {1},{1} 180 1 1 {0},1 Z",
-            ((double)this.Resources["PadCircleSize"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCircleSize"] / 2 - 1).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCircleSize"] - 1).ToString(CultureInfo.InvariantCulture)
+        public Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},{1} A {2},{2} 180 1 1 {0},{3} A {2},{2} 180 1 1 {0},{1} Z",
+            ((double)this.Resources["PadSize"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadSize"] / 8 + (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadSize"] * 3 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadSize"] * 7 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
         ));
 
         public Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
-            ((double)this.Resources["PadSquareSize"] - 1).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCut1"] + 1).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCut2"] - 1).ToString(CultureInfo.InvariantCulture)
+            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadCut1"] + (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadCut2"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
+            ((double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
         ));
 
         public void DrawPath() {
             this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
             this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
 
-            TopLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{0} {2},{0} {0},{2} {0},1 Z");
-            TopRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{2} {1},{0} {0},{0} {0},1 Z");
-            BottomLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{0} {0},{0} {0},{1} {2},1 Z");
-            BottomRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,{1} L 1,{0} {0},{0} {0},1 {1},1 Z");
+            TopLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
+            TopRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
+            BottomLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
+            BottomRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
         public LaunchpadGrid() {

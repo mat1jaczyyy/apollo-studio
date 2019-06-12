@@ -5,8 +5,8 @@
              xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals">
 
   <UserControl.Resources>
-    <sys:Double x:Key="PadSquareSize">15</sys:Double>
-    <sys:Double x:Key="PadCircleSize">11</sys:Double>
+    <sys:Double x:Key="PadSize">15</sys:Double>
+    <sys:Double x:Key="PadThickness">1</sys:Double>
     <sys:Double x:Key="PadCut1">3</sys:Double>
     <sys:Double x:Key="PadCut2">12</sys:Double>
     <sys:Double x:Key="ModeWidth">4</sys:Double>
@@ -26,7 +26,7 @@
 
       <Style Selector="Path.square, Path.circle, Path.corner">
         <Setter Property="Fill" Value="Transparent" />
-        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
         <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
         <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
       </Style>
@@ -35,9 +35,9 @@
     <Viewbox Stretch="None">
       <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
         <UniformGrid.Styles>
-          <Style Selector="Path.square, Path.corner, Path.empty">
-            <Setter Property="Width" Value="{DynamicResource PadSquareSize}" />
-            <Setter Property="Height" Value="{DynamicResource PadSquareSize}" />
+          <Style Selector="Path">
+            <Setter Property="Width" Value="{DynamicResource PadSize}" />
+            <Setter Property="Height" Value="{DynamicResource PadSize}" />
           </Style>
 
           <Style Selector="Path.square">
@@ -45,8 +45,6 @@
           </Style>
 
           <Style Selector="Path.circle">
-            <Setter Property="Width" Value="{DynamicResource PadCircleSize}" />
-            <Setter Property="Height" Value="{DynamicResource PadCircleSize}" />
             <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
           </Style>
 
