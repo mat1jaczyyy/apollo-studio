@@ -37,6 +37,8 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
+            
+            Grid.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
         private void Unloaded(object sender, EventArgs e) {
@@ -46,6 +48,12 @@ namespace Apollo.Windows {
 
             if (_launchpad.GetType() == typeof(VirtualLaunchpad))
                 MIDI.Disconnect(_launchpad);
+        }
+
+        public void Bounds_Updated(Rect bounds) {
+            if (bounds.IsEmpty) return;
+
+            Grid.Scale = Math.Min(bounds.Width, bounds.Height) / 200;
         }
 
         private void PadChanged(int index, bool state) => _launchpad.HandleMessage(new Signal(_launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
