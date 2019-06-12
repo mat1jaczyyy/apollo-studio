@@ -401,8 +401,8 @@ namespace Apollo.Windows {
                 Program.Project.Remove(i);
         }
 
-        public void Group(int left, int right) => throw new InvalidOperationException("A Track cannot be grouped.");
-        public void Ungroup(int index) => throw new InvalidOperationException("A Track cannot be ungrouped.");
+        public void Group(int left, int right) {}
+        public void Ungroup(int index) {}
         
         public void Mute(int left, int right) {
             List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Enabled).ToList();

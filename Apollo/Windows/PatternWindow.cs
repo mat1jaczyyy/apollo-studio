@@ -1211,12 +1211,12 @@ namespace Apollo.Windows {
                 _pattern.Remove(i);
         }
 
-        public void Group(int left, int right) => throw new InvalidOperationException("A Frame cannot be grouped.");
-        public void Ungroup(int index) => throw new InvalidOperationException("A Frame cannot be ungrouped.");
-        public void Mute(int left, int right) => throw new InvalidOperationException("A Frame cannot be muted.");
-        public void Rename(int left, int right) => throw new InvalidOperationException("A Frame cannot be renamed.");
-        public void Export(int left, int right) => throw new InvalidOperationException("A Frame cannot be exported.");
-        public void Import(int right) => throw new InvalidOperationException("A Frame cannot be imported.");
+        public void Group(int left, int right) {}
+        public void Ungroup(int index) {}
+        public void Mute(int left, int right) {}
+        public void Rename(int left, int right) {}
+        public void Export(int left, int right) {}
+        public void Import(int right) {}
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 

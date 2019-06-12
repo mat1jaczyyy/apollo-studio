@@ -399,7 +399,7 @@ namespace Apollo.Viewers {
                 _chain[i].Enabled = r;
         }
 
-        public void Rename(int left, int right) => throw new InvalidOperationException("A Device cannot be renamed.");
+        public void Rename(int left, int right) {}
 
         public async void Export(int left, int right) {
             Window sender = Track.Get(_chain).Window;

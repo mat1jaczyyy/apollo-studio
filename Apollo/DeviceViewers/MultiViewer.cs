@@ -429,9 +429,9 @@ namespace Apollo.DeviceViewers {
                 _multi.Remove(i);
         }
 
-        public void Group(int left, int right) => throw new InvalidOperationException("A Chain cannot be grouped.");
-        public void Ungroup(int index) => throw new InvalidOperationException("A Chain cannot be ungrouped.");
-        public void Mute(int left, int right) => throw new InvalidOperationException("A Chain cannot be muted.");
+        public void Group(int left, int right) {}
+        public void Ungroup(int index) {}
+        public void Mute(int left, int right) {}
 
         public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
 
