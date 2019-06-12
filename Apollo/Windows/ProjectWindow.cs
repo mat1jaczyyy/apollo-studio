@@ -386,12 +386,16 @@ namespace Apollo.Windows {
         }
 
         public void Delete(int left, int right) {
-            List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
 
             Program.Project.Undo.Add($"Track Removed", () => {
-                for (int i = left; i <= right; i++)
-                    Program.Project.Insert(i, u[i - left].Clone());
-
+                for (int i = left; i <= right; i++) {
+                    Track restored = ut[i - left].Clone();
+                    restored.Launchpad = ul[i - left];
+                    Program.Project.Insert(i, restored);
+                }
+                
             }, () => {
                 for (int i = right; i >= left; i--)
                     Program.Project.Remove(i);
