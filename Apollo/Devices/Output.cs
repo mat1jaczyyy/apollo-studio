@@ -1,6 +1,12 @@
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -33,6 +39,22 @@ namespace Apollo.Devices {
         }
 
         private void IndexRemoved() {
+            bool redoing = false;
+
+            foreach (StackFrame call in new StackTrace().GetFrames()) {
+                MethodBase method = call.GetMethod();
+                if (redoing = method.DeclaringType == typeof(UndoManager) && method.Name == "Select") break;
+            }
+
+            if (!redoing) {
+                int u = Target;
+                List<int> path = Track.GetPath(this);
+
+                Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => {
+                    ((Output)Track.TraversePath(path)).Target = u;
+                };
+            }
+
             Target = Track.Get(this).ParentIndex.Value;
             TargetChanged?.Invoke(_target);
         }

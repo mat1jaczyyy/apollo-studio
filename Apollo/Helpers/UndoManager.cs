@@ -9,9 +9,9 @@ using Apollo.Windows;
 namespace Apollo.Helpers {
     public class UndoManager {
         public class UndoEntry {
-            public readonly string Description;
-            public readonly Action Undo;
-            public readonly Action Redo;
+            public string Description;
+            public Action Undo;
+            public Action Redo;
 
             public UndoEntry(string desc, Action undo = null, Action redo = null) {
                 Description = desc;
