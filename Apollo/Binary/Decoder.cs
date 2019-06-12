@@ -143,8 +143,11 @@ namespace Apollo.Binary {
                 if (version >= 9) rotation = (Launchpad.RotationType)reader.ReadInt32();
 
                 foreach (Launchpad lp in MIDI.Devices)
-                    if (lp.Name == name)
+                    if (lp.Name == name) {
+                        lp.InputFormat = format;
+                        lp.Rotation = rotation;
                         return lp;
+                    }
                 
                 return new Launchpad(name, format, rotation);
 

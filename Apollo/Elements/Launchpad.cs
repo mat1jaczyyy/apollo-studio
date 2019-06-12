@@ -24,7 +24,7 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        private InputType _format;
+        private InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
             set {
