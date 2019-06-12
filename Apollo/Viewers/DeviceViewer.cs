@@ -119,6 +119,11 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            SpecificViewer = null;
+            _device.Viewer = null;
+        }
+
         public virtual void SetEnabled() {
             Border.Background = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeControlHighBrush" : "ThemeControlMidBrush");
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");

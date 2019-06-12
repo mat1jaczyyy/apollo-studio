@@ -90,6 +90,8 @@ namespace Apollo.Viewers {
             }
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _chain.Viewer = null;
+
         public void Expand(int? index) {}
 
         private void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
