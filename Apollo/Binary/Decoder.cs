@@ -33,7 +33,7 @@ namespace Apollo.Binary {
                     Preferences.CenterTrackContents = reader.ReadBoolean();
 
                     if (version >= 9) {
-                        Preferences.Phantom = reader.ReadBoolean();
+                        Preferences.LaunchpadStyle = (Preferences.LaunchpadStyles)reader.ReadInt32();
                     }
 
                     Preferences.AutoCreateKeyFilter = reader.ReadBoolean();

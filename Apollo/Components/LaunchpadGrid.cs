@@ -33,21 +33,35 @@ namespace Apollo.Components {
         public static int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
         public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
+        private bool IsPhantom(int index) {
+            if (Preferences.LaunchpadStyle == Preferences.LaunchpadStyles.Stock) {
+                int x = index % 10;
+                int y = index / 10;
+
+                if (x == 0 || x == 9 || y == 0 || y == 9) return true;
+            }
+
+            return Preferences.LaunchpadStyle == Preferences.LaunchpadStyles.Phantom;
+        }
+
         public void SetColor(int index, SolidColorBrush color) {
             if (index == 0 || index == 9 || index == 90 || index == 99) return;
 
             if (index == -1) ModeLight.Fill = color;
             else if (LowQuality) ((Path)Grid.Children[index]).Fill = color;
-            else ((Path)Grid.Children[index]).Stroke = Preferences.Phantom? color : ((Path)Grid.Children[index]).Fill = color;
+            else {
+
+                ((Path)Grid.Children[index]).Stroke = IsPhantom(index)? color : ((Path)Grid.Children[index]).Fill = color;
+            }
         }
 
-        private void Update_Phantom(bool value) {
+        private void Update_LaunchpadStyle() {
             if (LowQuality) return;
 
             for (int i = 0; i < 100; i++) {
                 if (i == 0 || i == 9 || i == 90 || i == 99) continue;
 
-                ((Path)Grid.Children[i]).Fill = value? SolidColorBrush.Parse("Transparent") : ((Path)Grid.Children[i]).Stroke;
+                ((Path)Grid.Children[i]).Fill = IsPhantom(i)? SolidColorBrush.Parse("Transparent") : ((Path)Grid.Children[i]).Stroke;
             }
         }
 
@@ -132,7 +146,7 @@ namespace Apollo.Components {
 
             ModeLight = this.Get<Rectangle>("ModeLight");
 
-            Preferences.PhantomChanged += Update_Phantom;
+            Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
         }
 
         private void LayoutChanged(object sender, EventArgs e) => DrawPath();

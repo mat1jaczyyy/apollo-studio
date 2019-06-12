@@ -37,7 +37,7 @@ namespace Apollo.Binary {
 
                 writer.Write(Preferences.AlwaysOnTop);
                 writer.Write(Preferences.CenterTrackContents);
-                writer.Write(Preferences.Phantom);
+                writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Preferences.AutoCreateKeyFilter);
                 writer.Write(Preferences.AutoCreatePageFilter);
                 writer.Write(Preferences.FadeSmoothnessSlider);

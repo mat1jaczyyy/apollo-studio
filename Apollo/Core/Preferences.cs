@@ -13,6 +13,7 @@ namespace Apollo.Core {
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
+        public delegate void Changed();
 
         public enum Palettes {
             Monochrome, NovationPalette, CustomPalette
@@ -20,6 +21,10 @@ namespace Apollo.Core {
 
         public enum Themes {
             Dark, Light
+        }
+
+        public enum LaunchpadStyles {
+            Stock, Phantom, Sanded
         }
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
@@ -44,13 +49,13 @@ namespace Apollo.Core {
             }
         }
 
-        public static event CheckBoxChanged PhantomChanged;
-        private static bool _Phantom = true;
-        public static bool Phantom {
-            get => _Phantom;
+        public static event Changed LaunchpadStyleChanged;
+        private static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
+        public static LaunchpadStyles LaunchpadStyle {
+            get => _LaunchpadStyle;
             set {
-                _Phantom = value;
-                PhantomChanged?.Invoke(_Phantom);
+                _LaunchpadStyle = value;
+                LaunchpadStyleChanged?.Invoke();
                 Save();
             }
         }

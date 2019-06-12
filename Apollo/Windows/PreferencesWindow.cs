@@ -20,7 +20,8 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, Phantom, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
+        ComboBox LaunchpadStyle;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
         Controls Contents;
@@ -55,8 +56,8 @@ namespace Apollo.Windows {
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
 
-            Phantom = this.Get<CheckBox>("Phantom");
-            Phantom.IsChecked = Preferences.Phantom;
+            LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
+            LaunchpadStyle.SelectedItem = Preferences.LaunchpadStyle.ToString();
 
             AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
@@ -121,7 +122,7 @@ namespace Apollo.Windows {
 
         private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        private void Phantom_Changed(object sender, EventArgs e) => Preferences.Phantom = Phantom.IsChecked.Value;
+        private void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = Enum.Parse<Preferences.LaunchpadStyles>((string)LaunchpadStyle.SelectedItem);
 
         private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
