@@ -217,7 +217,7 @@ namespace Apollo.Elements {
                 case LaunchpadType.MK2:
                     if (104 <= e.Control && e.Control <= 111)
                         HandleMessage(new Signal(
-                            InputFormat,
+                            InputType.XY,
                             this,
                             (byte)(e.Control - 13),
                             new Color((byte)(e.Value >> 1))
@@ -232,7 +232,7 @@ namespace Apollo.Elements {
                     }
 
                     HandleMessage(new Signal(
-                        InputFormat,
+                        InputType.XY,
                         this,
                         (byte)e.Control,
                         new Color((byte)(e.Value >> 1))
