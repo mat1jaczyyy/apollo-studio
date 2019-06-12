@@ -126,6 +126,7 @@ namespace Apollo.Binary {
             else {
                 writer.Write(o.Name);
                 writer.Write((int)o.InputFormat);
+                writer.Write((int)o.Rotation);
             }
         }
 

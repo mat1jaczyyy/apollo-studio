@@ -139,11 +139,14 @@ namespace Apollo.Binary {
                 Launchpad.InputType format = Launchpad.InputType.DrumRack;
                 if (version >= 2) format = (Launchpad.InputType)reader.ReadInt32();
 
+                Launchpad.RotationType rotation = Launchpad.RotationType.D0;
+                if (version >= 9) rotation = (Launchpad.RotationType)reader.ReadInt32();
+
                 foreach (Launchpad lp in MIDI.Devices)
                     if (lp.Name == name)
                         return lp;
                 
-                return new Launchpad(name, format);
+                return new Launchpad(name, format, rotation);
 
             } else if (t == typeof(Group))
                 return new Group(

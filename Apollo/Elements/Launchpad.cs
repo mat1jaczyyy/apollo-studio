@@ -174,11 +174,13 @@ namespace Apollo.Elements {
             Output.Send(in Inquiry);
         }
 
-        public Launchpad(string name, InputType format = InputType.DrumRack) {
+        public Launchpad(string name, InputType format = InputType.DrumRack, RotationType rotation = RotationType.D0) {
             CreateScreen();
             
             Name = name;
             _format = format;
+            _rotation = rotation;
+
             Available = false;
         }
 
