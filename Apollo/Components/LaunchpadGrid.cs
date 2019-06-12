@@ -40,6 +40,14 @@ namespace Apollo.Components {
             else ((Path)Grid.Children[index]).Stroke = Preferences.Phantom? color : ((Path)Grid.Children[index]).Fill = color;
         }
 
+        private void Update_Phantom(bool value) {
+            for (int i = 0; i < 100; i++) {
+                if (i == 0 || i == 9 || i == 90 || i == 99) continue;
+
+                ((Path)Grid.Children[i]).Fill = value? SolidColorBrush.Parse("Transparent") : ((Path)Grid.Children[i]).Stroke;
+            }
+        }
+
         private double _scale = 1;
         public double Scale {
             get => _scale;
@@ -76,32 +84,32 @@ namespace Apollo.Components {
             }
         }
 
-        private const string LowQualityPadData = "M 0,0 L 0,{0} {0},{0} {0},0 Z";
+        private readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
 
-        public string FormatSquare(string format) => String.Format(format,
-            ((double)this.Resources["PadSquareSize"] + (LowQuality? 0.5 : 0) - 1).ToString(CultureInfo.InvariantCulture)
-        );
+        public Geometry SquareGeometry => Geometry.Parse(String.Format("M 1,1 L 1,{0} {0},{0} {0},1 Z",
+            ((double)this.Resources["PadSquareSize"] - 1).ToString(CultureInfo.InvariantCulture)
+        ));
 
-        public string FormatCircle(string format) => String.Format(format,
+        public Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},1 A {1},{1} 180 1 1 {0},{2} A {1},{1} 180 1 1 {0},1 Z",
             ((double)this.Resources["PadCircleSize"] / 2).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCircleSize"] / 2 - 1).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCircleSize"] - 1).ToString(CultureInfo.InvariantCulture)
-        );
+        ));
 
-        public string FormatCorner(string format) => String.Format(format,
-            ((double)this.Resources["PadSquareSize"] + (LowQuality? 0.5 : 0) - 1).ToString(CultureInfo.InvariantCulture),
+        public Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
+            ((double)this.Resources["PadSquareSize"] - 1).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut1"] + 1).ToString(CultureInfo.InvariantCulture),
             ((double)this.Resources["PadCut2"] - 1).ToString(CultureInfo.InvariantCulture)
-        );
+        ));
 
         public void DrawPath() {
-            this.Resources["SquareGeometry"] = Geometry.Parse(FormatSquare(LowQuality? LowQualityPadData : "M 1,1 L 1,{0} {0},{0} {0},1 Z"));
-            this.Resources["CircleGeometry"] = Geometry.Parse(FormatCircle(LowQuality? LowQualityPadData : "M {0},1 A {1},{1} 180 1 1 {0},{2} A {1},{1} 180 1 1 {0},1 Z"));
+            this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
+            this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
 
-            TopLeft.Data = Geometry.Parse(FormatCorner(LowQuality? LowQualityPadData : "M 1,1 L 1,{0} {2},{0} {0},{2} {0},1 Z"));
-            TopRight.Data = Geometry.Parse(FormatCorner(LowQuality? LowQualityPadData : "M 1,1 L 1,{2} {1},{0} {0},{0} {0},1 Z"));
-            BottomLeft.Data = Geometry.Parse(FormatCorner(LowQuality? LowQualityPadData : "M 1,1 L 1,{0} {0},{0} {0},{1} {2},1 Z"));
-            BottomRight.Data = Geometry.Parse(FormatCorner(LowQuality? LowQualityPadData : "M 1,{1} L 1,{0} {0},{0} {0},1 {1},1 Z"));
+            TopLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{0} {2},{0} {0},{2} {0},1 Z");
+            TopRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{2} {1},{0} {0},{0} {0},1 Z");
+            BottomLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,1 L 1,{0} {0},{0} {0},{1} {2},1 Z");
+            BottomRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M 1,{1} L 1,{0} {0},{0} {0},1 {1},1 Z");
         }
 
         public LaunchpadGrid() {
@@ -116,6 +124,8 @@ namespace Apollo.Components {
             BottomRight = this.Get<Path>("BottomRight");
 
             ModeLight = this.Get<Rectangle>("ModeLight");
+
+            Preferences.PhantomChanged += Update_Phantom;
         }
 
         private void LayoutChanged(object sender, EventArgs e) => DrawPath();
