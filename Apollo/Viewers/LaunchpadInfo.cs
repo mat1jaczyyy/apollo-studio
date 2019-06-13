@@ -45,7 +45,7 @@ namespace Apollo.Viewers {
             
             _launchpad = launchpad;
 
-            this.Get<TextBlock>("Name").Text = _launchpad.Name;
+            this.Get<TextBlock>("Name").Text = _launchpad.Name.Trim();
 
             Popout = this.Get<Popout>("Popout");
 
@@ -58,14 +58,19 @@ namespace Apollo.Viewers {
             TargetPortSelector = this.Get<ComboBox>("TargetPortSelector");
 
             if (_launchpad.GetType() != typeof(Launchpad)) {
-                Popout.IsEnabled = Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
-                Popout.Opacity = Popout.Width = Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
+                Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
+                Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
+            }
+
+            if (_launchpad.GetType() == typeof(VirtualLaunchpad)) {
+                Popout.IsEnabled = false;
+                Popout.Opacity = Popout.Width = 0;
             }
 
             if (_launchpad.GetType() == typeof(AbletonLaunchpad)) {
                 TargetPortSelector.IsEnabled = true;
                 TargetPortSelector.Opacity = 1;
-                
+
                 UpdatePorts();
                 MIDI.DevicesUpdated += HandlePorts;
             }

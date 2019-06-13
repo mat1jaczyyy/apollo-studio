@@ -3,11 +3,11 @@
              x:Class="Apollo.Viewers.LaunchpadInfo"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid>
-    <Grid ColumnDefinitions="Auto,*,Auto,93" VerticalAlignment="Center" Margin="5 0">
+  <Grid Margin="5 0">
+    <Grid ColumnDefinitions="Auto,*,Auto,93" VerticalAlignment="Center">
       <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Name="Name" />
 
-      <Components:Popout Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
+      <Components:Popout Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
 
       <ComboBox Grid.Column="2" VerticalAlignment="Center" BorderThickness="0" x:Name="Rotation" SelectionChanged="Rotation_Changed">
         <ComboBoxItem>0°</ComboBoxItem>
