@@ -230,17 +230,18 @@ namespace Apollo.Elements {
             Available = false;
         }
 
-        public void HandleMessage(Signal n) {
+        public void HandleMessage(Signal n, bool rotated = false) {
             if (Available) {
-                if (Rotation == RotationType.D90) {
-                    n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+                if (!rotated)
+                    if (Rotation == RotationType.D90) {
+                        n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-                } else if (Rotation == RotationType.D180) {
-                    n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+                    } else if (Rotation == RotationType.D180) {
+                        n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
 
-                } else if (Rotation == RotationType.D270) {
-                    n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
-                }
+                    } else if (Rotation == RotationType.D270) {
+                        n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+                    }
 
                 if (PatternWindow == null) Receive?.Invoke(n);
                 else PatternWindow.MIDIEnter(n);
