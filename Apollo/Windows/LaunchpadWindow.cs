@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Windows {
@@ -56,7 +57,15 @@ namespace Apollo.Windows {
             Grid.Scale = Math.Min(bounds.Width, bounds.Height) / 200;
         }
 
-        private void PadChanged(int index, bool state) => _launchpad.HandleMessage(new Signal(_launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
+        private void PadChanged(int index, bool state) {
+            Signal n = new Signal(_launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0)));
+
+            if (_launchpad is AbletonLaunchpad abletonLaunchpad)
+                AbletonConnector.Send(abletonLaunchpad, n);
+
+            _launchpad.HandleMessage(n);
+        }
+
         private void PadPressed(int index) => PadChanged(index, true);
         private void PadReleased(int index) => PadChanged(index, false);
 

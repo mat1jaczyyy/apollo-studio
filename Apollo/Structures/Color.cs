@@ -37,6 +37,10 @@ namespace Apollo.Structures {
             get => _r != 0 || _g != 0 || _b != 0;
         }
 
+        public byte Max {
+            get => new byte[] {_r, _g, _b}.Max();
+        }
+
         public Color Clone() => new Color(_r, _g, _b);
 
         public Color(byte bright = 63) {
