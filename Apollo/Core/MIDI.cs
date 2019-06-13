@@ -84,7 +84,7 @@ namespace Apollo.Core {
                 Launchpad ret = null;
             
                 for (int i = 1; true; i++) {
-                    string name = $"From Ableton Live {i}";
+                    string name = $"Ableton Connector {i}";
 
                     ret = Devices.Find((lp) => lp.Name == name);
                     if (ret != null) {
