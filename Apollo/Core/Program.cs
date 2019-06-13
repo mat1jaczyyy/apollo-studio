@@ -8,6 +8,7 @@ using Avalonia.Logging.Serilog;
 
 using Apollo.Binary;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Windows;
 
 // Suppresses readonly suggestion
@@ -87,6 +88,11 @@ namespace Apollo.Core {
             };
 
             logTimer.Start();
+
+            if (!AbletonConnector.Connected) {
+                // error
+                return;
+            }
 
             Args = args;
 
