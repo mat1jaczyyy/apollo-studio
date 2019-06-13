@@ -54,30 +54,59 @@ namespace Apollo.Core {
             }
         }
 
+        public static VirtualLaunchpad ConnectVirtual() {
+            lock (locker) {
+                Launchpad ret = null;
+            
+                for (int i = 1; true; i++) {
+                    string name = $"Virtual Launchpad {i}";
+
+                    ret = Devices.Find((lp) => lp.Name == name);
+                    if (ret != null) {
+                        if (ret is VirtualLaunchpad vlp && !vlp.Available) {
+                            vlp.Connect(null, null);
+                            updated = true;
+                            return vlp;
+                        }
+
+                    } else {
+                        Devices.Add(ret = new VirtualLaunchpad(name));
+                        ret.Connect(null, null);
+                        updated = true;
+                        return (VirtualLaunchpad)ret;
+                    }
+                }
+            }
+        }
+
+        public static AbletonLaunchpad ConnectAbleton() {
+            lock (locker) {
+                Launchpad ret = null;
+            
+                for (int i = 1; true; i++) {
+                    string name = $"From Ableton Live {i}";
+
+                    ret = Devices.Find((lp) => lp.Name == name);
+                    if (ret != null) {
+                        if (ret is AbletonLaunchpad alp && !alp.Available) {
+                            alp.Connect(null, null);
+                            updated = true;
+                            return alp;
+                        }
+
+                    } else {
+                        Devices.Add(ret = new AbletonLaunchpad(name));
+                        ret.Connect(null, null);
+                        updated = true;
+                        return (AbletonLaunchpad)ret;
+                    }
+                }
+            }
+        }
+
         public static Launchpad Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
             lock (locker) {
                 Launchpad ret = null;
-
-                if (input == null || output == null) {
-                    for (int i = 1; true; i++) {
-                        string name = $"Virtual Launchpad {i}";
-
-                        ret = Devices.Find((lp) => lp.Name == name);
-                        if (ret != null) {
-                            if (!ret.Available) {
-                                ret.Connect(null, null);
-                                updated = true;
-                                return ret;
-                            }
-
-                        } else {
-                            Devices.Add(ret = new VirtualLaunchpad(name));
-                            ret.Connect(null, null);
-                            updated = true;
-                            return ret;
-                        }
-                    }
-                }
 
                 foreach (Launchpad device in Devices) {
                     if (device.Name == input.Name) {
@@ -116,7 +145,7 @@ namespace Apollo.Core {
                             Connect(input, output);
 
                 foreach (Launchpad device in Devices)
-                    if (device.GetType() != typeof(VirtualLaunchpad) && device.Available)
+                    if (device.GetType() == typeof(Launchpad) && device.Available)
                         Disconnect(device);
 
                 Program.Log($"Rescan");

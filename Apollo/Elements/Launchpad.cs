@@ -153,7 +153,7 @@ namespace Apollo.Elements {
             Send(new Signal(this, 99, new Color(0)));
         }
 
-        public void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);
+        public virtual void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);
 
         public Launchpad() => CreateScreen();
 
@@ -238,7 +238,7 @@ namespace Apollo.Elements {
             }
         }
 
-        private void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(
+        public void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(
             InputFormat,
             this,
             (byte)e.Key,
