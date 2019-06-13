@@ -25,8 +25,6 @@ namespace Apollo.Helpers {
             connection.BeginReceive(new AsyncCallback(Receive), connection);
 
             if (source.Address.Equals(localhost)) {
-                Program.Log($"{source} => {string.Join(", ", message)}");
-
                 if (!portMap.ContainsKey(source))
                     portMap[source] = MIDI.ConnectAbleton();
 
