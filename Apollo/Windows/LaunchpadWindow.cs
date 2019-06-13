@@ -64,13 +64,23 @@ namespace Apollo.Windows {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        private void MoveWindow(object sender, PointerPressedEventArgs e) {
+            if (e.ClickCount == 2) Maximize(null);
+            else BeginMoveDrag();
+
+            Topmost = false;
+            Topmost = Preferences.AlwaysOnTop;
+            Activate();
+        }
 
         private void Minimize() => WindowState = WindowState.Minimized;
 
         private void Maximize(IPointerDevice e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
+
+            Topmost = false;
             Topmost = Preferences.AlwaysOnTop;
+            Activate();
         }
 
         private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
