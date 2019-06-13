@@ -189,6 +189,7 @@ namespace Apollo.Windows {
             RedoButton = this.Get<RedoButton>("RedoButton");
 
             Editor = this.Get<LaunchpadGrid>("Editor");
+            Editor.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
 
             Duration = this.Get<Dial>("Duration");
             
@@ -272,6 +273,12 @@ namespace Apollo.Windows {
             ColorHistory.HistoryChanged -= RenderHistory;
 
             Program.WindowClose(this);
+        }
+
+        public void Bounds_Updated(Rect bounds) {
+            if (bounds.IsEmpty) return;
+
+            Editor.Scale = Math.Min(bounds.Width, bounds.Height) / 189.6;
         }
 
         private void Port_Changed(object sender, SelectionChangedEventArgs e) {
@@ -1223,6 +1230,20 @@ namespace Apollo.Windows {
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         
         private void Minimize() => WindowState = WindowState.Minimized;
+
+        private void Maximize(IPointerDevice e) {
+            WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
+            Topmost = Preferences.AlwaysOnTop;
+        }
+
+        private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
+        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        private void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
+        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        private void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
+        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        private void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
 
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {

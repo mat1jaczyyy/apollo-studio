@@ -5,8 +5,8 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="780" MinWidth="780" MaxWidth="780"
-        Height="520" MinHeight="520" MaxHeight="520"
+        Width="810" MinWidth="810"
+        Height="520" MinHeight="520"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
@@ -16,101 +16,123 @@
     </ContextMenu>
   </Window.Resources>
 
-  <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:PreferencesButton />
-        <Components:SaveButton />
-        <Components:UndoButton x:Name="UndoButton" />
-        <Components:RedoButton x:Name="RedoButton" />
-      </StackPanel>
+  <Grid>
+    <Grid RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:PreferencesButton />
+          <Components:SaveButton />
+          <Components:UndoButton x:Name="UndoButton" />
+          <Components:RedoButton x:Name="RedoButton" />
+        </StackPanel>
 
-      <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
-        <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+        <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">
+          <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
+        </Grid>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:Minimize Clicked="Minimize" />
+          <Components:Expand Clicked="Maximize" />
+          <Components:Close Clicked="Close" />
+        </StackPanel>
       </Grid>
 
-      <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
-        <Components:Minimize Clicked="Minimize" />
-        <Components:Close Clicked="Close" />
-      </StackPanel>
-    </Grid>
-
-    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid ColumnDefinitions="2*,8*,3*">
-        <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto">
-          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-            <Button Margin="7" Content="Import" x:Name="Import" Click="ImportDialog" />
-          </Border>
-
-          <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible">
-            <Grid RowDefinitions="Auto,*">
-              <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
-                <Components:VerticalAdd Actions="Paste" Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
-              </StackPanel>
-              
-              <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Frame_AfterClick" />
-            </Grid>
-          </ScrollViewer>
-        
-          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-            <StackPanel Margin="7" HorizontalAlignment="Stretch" Spacing="5">
-              <Grid ColumnDefinitions="*,*">
-                <Components:Dial Grid.Column="0" x:Name="Choke" Title="Choke" Minimum="1" Maximum="16" RawValue="8" Scale="0.7" Enabled="false"
-                                  PointerReleased="Choke_MouseUp" ValueChanged="Choke_Changed" />
-                
-                <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Scale="0.7" Unit="%"
-                                  ValueChanged="Gate_Changed" />
-              </Grid>
-
-              <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-                <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="1" x:Name="PlaybackMode"
-                          SelectionChanged="PlaybackMode_Changed">
-                  <sys:String>Mono</sys:String>
-                  <sys:String>Poly</sys:String>
-                  <sys:String>Loop</sys:String>
-                </ComboBox>
-              </Border>
-              
-              <CheckBox HorizontalAlignment="Center" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
-
-              <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Play" x:Name="Play" Click="PatternPlay" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Fire" x:Name="Fire" Click="PatternFire" />
-              </Grid>
-            </StackPanel>
-          </Border>
-        </Grid>
-        
-        <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-          <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" PadFinished="PadFinished" />
-        </Border>
-        
-        <Border Grid.Column="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-          <Grid RowDefinitions="Auto,*,Auto,Auto">
-            <ComboBox Grid.Row="0" Margin="7" HorizontalAlignment="Right" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
-          
-            <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-              <Components:ColorPicker Margin="7" x:Name="ColorPicker" ColorChanged="ColorPicker_Changed" />
+      <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
+        <Grid ColumnDefinitions="125,*,190">
+          <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto">
+            <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+              <Button Margin="7" Content="Import" x:Name="Import" Click="ImportDialog" />
             </Border>
 
-            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-              <Components:ColorHistory Margin="7" x:Name="ColorHistory" ColorChanged="ColorHistory_Changed" />
-            </Border>
-
-            <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-              <Grid Margin="7"  ColumnDefinitions="*,*">
-                <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Scale="0.8" Unit="ms" DisabledText="Infinite" AllowSteps="true"
-                                 Started="Duration_Started" ValueChanged="Duration_Changed" StepChanged="Duration_StepChanged" ModeChanged="Duration_ModeChanged" />
-                
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10 0" Spacing="5">
-                  <Button Content="Reverse" x:Name="Reverse" Click="Frame_Reverse" />
-                  <Button Content="Invert" x:Name="Invert" Click="Frame_Invert" />
+            <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible">
+              <Grid RowDefinitions="Auto,*">
+                <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
+                  <Components:VerticalAdd Actions="Paste" Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
                 </StackPanel>
+                
+                <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Frame_AfterClick" />
               </Grid>
+            </ScrollViewer>
+          
+            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+              <StackPanel Margin="7" HorizontalAlignment="Stretch" Spacing="5">
+                <Grid ColumnDefinitions="*,*">
+                  <Components:Dial Grid.Column="0" x:Name="Choke" Title="Choke" Minimum="1" Maximum="16" RawValue="8" Scale="0.7" Enabled="false"
+                                   PointerReleased="Choke_MouseUp" ValueChanged="Choke_Changed" />
+                  
+                  <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Scale="0.7" Unit="%"
+                                   ValueChanged="Gate_Changed" />
+                </Grid>
+
+                <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                  <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="1" x:Name="PlaybackMode"
+                            SelectionChanged="PlaybackMode_Changed">
+                    <sys:String>Mono</sys:String>
+                    <sys:String>Poly</sys:String>
+                    <sys:String>Loop</sys:String>
+                  </ComboBox>
+                </Border>
+                
+                <CheckBox HorizontalAlignment="Center" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
+
+                <Grid ColumnDefinitions="*,*">
+                  <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Play" x:Name="Play" Click="PatternPlay" />
+                  <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Fire" x:Name="Fire" Click="PatternFire" />
+                </Grid>
+              </StackPanel>
             </Border>
           </Grid>
-        </Border>
-      </Grid>
-    </Border>
+          
+          <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
+            <Components:LaunchpadGrid Grid.Column="1" Margin="7" Scale="2.5" x:Name="Editor" PadStarted="PadStarted" PadModsPressed="PadPressed" PadFinished="PadFinished" />
+          </Border>
+          
+          <Border Grid.Column="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
+            <Grid RowDefinitions="Auto,*,Auto,Auto">
+              <ComboBox Grid.Row="0" Margin="7" HorizontalAlignment="Right" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
+            
+              <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                <Components:ColorPicker Margin="7" x:Name="ColorPicker" ColorChanged="ColorPicker_Changed" />
+              </Border>
+
+              <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                <Components:ColorHistory Margin="7" x:Name="ColorHistory" ColorChanged="ColorHistory_Changed" />
+              </Border>
+
+              <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+                <Grid Margin="7"  ColumnDefinitions="*,*">
+                  <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Scale="0.8" Unit="ms" DisabledText="Infinite" AllowSteps="true"
+                                   Started="Duration_Started" ValueChanged="Duration_Changed" StepChanged="Duration_StepChanged" ModeChanged="Duration_ModeChanged" />
+                  
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10 0" Spacing="5">
+                    <Button Content="Reverse" x:Name="Reverse" Click="Frame_Reverse" />
+                    <Button Content="Invert" x:Name="Invert" Click="Frame_Invert" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </Grid>
+          </Border>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="Auto,*,Auto">
+      <Grid.Styles>
+        <Style Selector="Canvas">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="HorizontalAlignment" Value="Stretch" />
+          <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+      </Grid.Styles>
+
+      <Canvas Grid.Row="0" Grid.Column="0" Width="4" Height="4" Cursor="TopLeftCorner" PointerPressed="ResizeNorthWest" />
+      <Canvas Grid.Row="0" Grid.Column="1" Height="4" Cursor="SizeNorthSouth" PointerPressed="ResizeNorth" />
+      <Canvas Grid.Row="0" Grid.Column="2" Width="4" Height="4" Cursor="TopRightCorner" PointerPressed="ResizeNorthEast" />
+      <Canvas Grid.Row="1" Grid.Column="0" Width="4" Cursor="SizeWestEast" PointerPressed="ResizeWest" />
+      <Canvas Grid.Row="1" Grid.Column="2" Width="4" Cursor="SizeWestEast" PointerPressed="ResizeEast" />
+      <Canvas Grid.Row="2" Grid.Column="0" Width="4" Height="4" Cursor="BottomLeftCorner" PointerPressed="ResizeSouthWest" />
+      <Canvas Grid.Row="2" Grid.Column="1" Height="4" Cursor="SizeNorthSouth" PointerPressed="ResizeSouth" />
+      <Canvas Grid.Row="2" Grid.Column="2" Width="4" Height="4" Cursor="BottomRightCorner" PointerPressed="ResizeSouthEast" />
+    </Grid>
   </Grid>
 </Window>
