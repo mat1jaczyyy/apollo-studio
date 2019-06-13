@@ -90,7 +90,10 @@ namespace Apollo.Core {
             logTimer.Start();
 
             if (!AbletonConnector.Connected) {
-                // error
+                BuildAvaloniaApp().Start((app, _) => app.Run(new ErrorWindow(
+                    $"Another instance of Apollo Studio is currently running.\n\n" +
+                    "Please close other instances of Apollo Studio before launching Apollo Studio."
+                )), args);
                 return;
             }
 
