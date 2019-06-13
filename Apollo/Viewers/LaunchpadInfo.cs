@@ -1,8 +1,14 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 using Apollo.Components;
+using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Windows;
 
@@ -13,7 +19,26 @@ namespace Apollo.Viewers {
         Launchpad _launchpad;
 
         Popout Popout;
-        ComboBox Rotation, InputFormatSelector;
+        ComboBox Rotation, InputFormatSelector, TargetPortSelector;
+
+        public void UpdatePorts() {
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown && i.GetType() != typeof(AbletonLaunchpad) select i).ToList();
+
+            Launchpad target = null;
+
+            if (_launchpad is AbletonLaunchpad abletonLaunchpad) {
+                target = abletonLaunchpad.Target;
+                if (target != null && (!target.Available || target.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(target);
+            }
+
+            ports.Add(MIDI.NoOutput);
+
+            TargetPortSelector.Items = ports;
+            TargetPortSelector.SelectedIndex = -1;
+            TargetPortSelector.SelectedItem = target;
+        }
+
+        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public LaunchpadInfo(Launchpad launchpad) {
             InitializeComponent();
@@ -30,9 +55,19 @@ namespace Apollo.Viewers {
             InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
             InputFormatSelector.SelectedIndex = (int)_launchpad.InputFormat;
 
-            if (_launchpad.GetType() == typeof(VirtualLaunchpad)) {
+            TargetPortSelector = this.Get<ComboBox>("TargetPortSelector");
+
+            if (_launchpad.GetType() != typeof(Launchpad)) {
                 Popout.IsEnabled = Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
                 Popout.Opacity = Popout.Width = Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
+            }
+
+            if (_launchpad.GetType() == typeof(AbletonLaunchpad)) {
+                TargetPortSelector.IsEnabled = true;
+                TargetPortSelector.Opacity = 1;
+                
+                UpdatePorts();
+                MIDI.DevicesUpdated += HandlePorts;
             }
         }
 
@@ -41,5 +76,12 @@ namespace Apollo.Viewers {
         private void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (Launchpad.RotationType)Rotation.SelectedIndex;
 
         private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (Launchpad.InputType)InputFormatSelector.SelectedIndex;
+
+        private void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
+            Launchpad selected = (Launchpad)TargetPortSelector.SelectedItem;
+
+            if (_launchpad is AbletonLaunchpad abletonLaunchpad && selected != null && abletonLaunchpad.Target != selected)
+                abletonLaunchpad.Target = selected;
+        }
     }
 }

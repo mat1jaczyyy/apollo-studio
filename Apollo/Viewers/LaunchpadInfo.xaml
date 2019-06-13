@@ -3,23 +3,29 @@
              x:Class="Apollo.Viewers.LaunchpadInfo"
              xmlns:Components="clr-namespace:Apollo.Components">
   
-  <Grid ColumnDefinitions="Auto,*,Auto,93" VerticalAlignment="Center" Margin="5 0">
-    <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Name="Name" />
+  <Grid>
+    <Grid ColumnDefinitions="Auto,*,Auto,93" VerticalAlignment="Center" Margin="5 0">
+      <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Name="Name" />
 
-    <Components:Popout Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
+      <Components:Popout Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
 
-    <ComboBox Grid.Column="2" VerticalAlignment="Center" BorderThickness="0" x:Name="Rotation" SelectionChanged="Rotation_Changed">
-      <ComboBoxItem>0°</ComboBoxItem>
-      <ComboBoxItem>90°</ComboBoxItem>
-      <ComboBoxItem>180°</ComboBoxItem>
-      <ComboBoxItem>270°</ComboBoxItem>
-    </ComboBox>
-
-    <StackPanel Grid.Column="3">
-      <ComboBox VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" x:Name="InputFormatSelector" SelectionChanged="InputFormat_Changed">
-        <ComboBoxItem>XY Layout</ComboBoxItem>
-        <ComboBoxItem>Drum Rack</ComboBoxItem>
+      <ComboBox Grid.Column="2" VerticalAlignment="Center" BorderThickness="0" x:Name="Rotation" SelectionChanged="Rotation_Changed">
+        <ComboBoxItem>0°</ComboBoxItem>
+        <ComboBoxItem>90°</ComboBoxItem>
+        <ComboBoxItem>180°</ComboBoxItem>
+        <ComboBoxItem>270°</ComboBoxItem>
       </ComboBox>
+
+      <StackPanel Grid.Column="3">
+        <ComboBox VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" x:Name="InputFormatSelector" SelectionChanged="InputFormat_Changed">
+          <ComboBoxItem>XY Layout</ComboBoxItem>
+          <ComboBoxItem>Drum Rack</ComboBoxItem>
+        </ComboBox>
+      </StackPanel>
+    </Grid>
+
+    <StackPanel ZIndex="-1">
+      <ComboBox Opacity="0" VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
     </StackPanel>
   </Grid>
 </UserControl>

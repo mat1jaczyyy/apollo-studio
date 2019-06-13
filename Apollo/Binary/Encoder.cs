@@ -61,7 +61,7 @@ namespace Apollo.Binary {
                 
                 writer.Write(MIDI.Devices.Count);
                 for (int i = 0; i < MIDI.Devices.Count; i++)
-                    if (MIDI.Devices[i].GetType() != typeof(VirtualLaunchpad))
+                    if (MIDI.Devices[i].GetType() == typeof(Launchpad))
                         Encode(writer, MIDI.Devices[i]);
             }
 
