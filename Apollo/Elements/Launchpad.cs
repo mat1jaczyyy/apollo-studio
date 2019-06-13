@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 
@@ -15,6 +16,8 @@ namespace Apollo.Elements {
     public class Launchpad {
         public LaunchpadWindow Window;
         public PatternWindow PatternWindow;
+
+        public List<AbletonLaunchpad> AbletonLaunchpads = new List<AbletonLaunchpad>();
 
         public delegate void MultiResetHandler();
         public static event MultiResetHandler MultiReset;
@@ -37,7 +40,7 @@ namespace Apollo.Elements {
         }
 
         private RotationType _rotation = RotationType.D0;
-        public RotationType Rotation {
+        public virtual RotationType Rotation {
             get => _rotation;
             set {
                 if (_rotation != value) {
@@ -53,6 +56,8 @@ namespace Apollo.Elements {
 
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
+
+        protected void InvokeReceive(Signal n) => Receive?.Invoke(n);
 
         protected Pixel[] screen = new Pixel[100];
 
@@ -128,7 +133,11 @@ namespace Apollo.Elements {
         public virtual void Send(Signal n) {
             if (!Available || Type == LaunchpadType.Unknown) return;
 
-            Window?.SignalRender(n.Clone());
+            Signal m = n.Clone();
+            Window?.SignalRender(m);
+
+            foreach (AbletonLaunchpad alp in AbletonLaunchpads)
+                alp.Window?.SignalRender(m);
 
             if (Rotation == RotationType.D90) {
                 n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
