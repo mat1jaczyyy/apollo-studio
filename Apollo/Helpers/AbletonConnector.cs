@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
@@ -26,7 +27,7 @@ namespace Apollo.Helpers {
 
             if (source.Address.Equals(localhost)) {
                 if (!portMap.ContainsKey(source))
-                    portMap[source] = MIDI.ConnectAbleton();
+                    connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton()).Name.Substring(18))}, 2, source);
 
                 if (message[0] < 128) {
                     NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
