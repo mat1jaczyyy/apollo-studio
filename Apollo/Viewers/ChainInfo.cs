@@ -36,10 +36,7 @@ namespace Apollo.Viewers {
         ContextMenu ChainContextMenu;
         TextBox Input;
 
-        private void UpdateText() => UpdateText(_chain.ParentIndex.Value, _chain.ProcessedName);
-        private void UpdateText(int index) => UpdateText(index, _chain.ProcessedName);
-        private void UpdateText(string name) => UpdateText(_chain.ParentIndex.Value, name);
-        private void UpdateText(int index, string name) => NameText.Text = name;
+        private void UpdateText() => NameText.Text = _chain.ProcessedName;
         
         private void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -67,7 +64,6 @@ namespace Apollo.Viewers {
             NameText = this.Get<TextBlock>("Name");
             UpdateText();
             _chain.ParentIndexChanged += UpdateText;
-            _chain.NameChanged += UpdateText;
 
             ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
@@ -338,6 +334,8 @@ namespace Apollo.Viewers {
         }
 
         public void SetName(string name) {
+            UpdateText();
+
             if (Input_Ignore) return;
 
             Input_Ignore = true;

@@ -37,12 +37,9 @@ namespace Apollo.Elements {
 
         public IChainParent Parent = null;
 
-        public delegate void ParentIndexChangedEventHandler(int index);
+        public delegate void ParentIndexChangedEventHandler();
         public event ParentIndexChangedEventHandler ParentIndexChanged;
         public void ClearParentIndexChanged() => ParentIndexChanged = null;
-
-        public delegate void NameChangedEventHandler(string name);
-        public event NameChangedEventHandler NameChanged;
 
         private int? _ParentIndex;
         public int? ParentIndex {
@@ -50,7 +47,7 @@ namespace Apollo.Elements {
             set {
                 if (_ParentIndex != value) {
                     _ParentIndex = value;
-                    ParentIndexChanged?.Invoke(_ParentIndex.Value);
+                    ParentIndexChanged?.Invoke();
                 }
             }
         }
@@ -99,13 +96,18 @@ namespace Apollo.Elements {
             get => _name;
             set {
                 _name = value;
-                NameChanged?.Invoke(_name);
                 Info?.SetName(_name);
             }
         }
 
         public string ProcessedName {
-            get => _name.Replace("#", (ParentIndex + 1).ToString());
+            get {
+                string ret = "";
+                for (int i = 0; i < _name.Length; i++)
+                    ret += (_name[i] == '#' && (i == 0 || _name[i - 1] == ' ') && (i == _name.Length - 1 || _name[i + 1] == ' '))? (ParentIndex + 1).ToString() : _name[i].ToString();
+
+                return ret;
+            } 
         }
 
         private bool _enabled = true;

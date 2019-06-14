@@ -35,10 +35,7 @@ namespace Apollo.Viewers {
         ContextMenu TrackContextMenu;
         TextBox Input;
         
-        private void UpdateText() => UpdateText(_track.ParentIndex.Value, _track.ProcessedName);
-        private void UpdateText(int index) => UpdateText(index, _track.ProcessedName);
-        private void UpdateText(string name) => UpdateText(_track.ParentIndex.Value, name);
-        private void UpdateText(int index, string name) => NameText.Text = name;
+        private void UpdateText(int index) => NameText.Text = _track.ProcessedName;
 
         public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
@@ -75,9 +72,8 @@ namespace Apollo.Viewers {
             _track = track;
 
             NameText = this.Get<TextBlock>("Name");
-            UpdateText();
+            UpdateText(0);
             _track.ParentIndexChanged += UpdateText;
-            _track.NameChanged += UpdateText;
 
             Draggable = this.Get<Grid>("Draggable");
 
@@ -279,6 +275,8 @@ namespace Apollo.Viewers {
         }
 
         public void SetName(string name) {
+            UpdateText(0);
+
             if (Input_Ignore) return;
 
             Input_Ignore = true;

@@ -109,13 +109,19 @@ namespace Apollo.Elements {
             get => _name;
             set {
                 _name = value;
-                NameChanged?.Invoke(_name);
+                NameChanged?.Invoke(ProcessedName);
                 Info?.SetName(_name);
             }
         }
 
         public string ProcessedName {
-            get => _name.Replace("#", (ParentIndex + 1).ToString());
+            get {
+                string ret = "";
+                for (int i = 0; i < _name.Length; i++)
+                    ret += (_name[i] == '#' && (i == 0 || _name[i - 1] == ' ') && (i == _name.Length - 1 || _name[i + 1] == ' '))? (ParentIndex + 1).ToString() : _name[i].ToString();
+
+                return ret;
+            }
         }
 
         private bool _enabled = true;
