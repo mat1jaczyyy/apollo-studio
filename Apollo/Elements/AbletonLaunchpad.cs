@@ -1,3 +1,5 @@
+using Avalonia.Threading;
+
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
@@ -46,6 +48,8 @@ namespace Apollo.Elements {
         
         public override void Disconnect() {
             Program.Log($"MIDI Disconnected {Name}");
+
+            Dispatcher.UIThread.InvokeAsync(() => Window?.Close());
 
             Available = false;
         }
