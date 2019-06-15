@@ -235,15 +235,17 @@ namespace Apollo.Components {
         private string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         private void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
-            double x_start = (radius * (Math.Cos((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
-            double y_start = (radius * (-Math.Sin((_centered && !overrideBase)? angle_center: angle_start) + 1) + strokeHalf) * _scale;
+            double angle_starting = (_centered && !overrideBase)? angle_center: angle_start;
+
+            double x_start = (radius * (Math.Cos(angle_starting) + 1) + strokeHalf) * _scale;
+            double y_start = (radius * (-Math.Sin(angle_starting) + 1) + strokeHalf) * _scale;
             
-            double angle_point = angle_start - Math.Abs(angle_end - angle_start) * value;
+            double angle_point = angle_start - Math.Abs(angle_end - angle_start) * (_centered && !overrideBase? value : (1 - (1 - value) * 0.98));
 
             double x_end = (radius * (Math.Cos(angle_point) + 1) + strokeHalf) * _scale;
             double y_end = (radius * (-Math.Sin(angle_point) + 1) + strokeHalf) * _scale;
 
-            double angle = (((_centered && !overrideBase)? angle_center: angle_start) - angle_point) / Math.PI * 180;
+            double angle = (angle_starting - angle_point) / Math.PI * 180;
 
             int large = Convert.ToInt32(angle > 180);
             int direction = Convert.ToInt32(angle > 0);
