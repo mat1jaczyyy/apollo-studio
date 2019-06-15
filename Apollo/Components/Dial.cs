@@ -152,6 +152,17 @@ namespace Apollo.Components {
                 if (!Enabled) Display.Text = value;
             }
         }
+        
+        private bool _displaydisabledtext = true;
+        public bool DisplayDisabledText {
+            get => _displaydisabledtext;
+            set {
+                _displaydisabledtext = value;
+
+                this.Focus();
+                DrawArcAuto();
+            }
+        }
 
         private bool _centered = false;
         public bool Centered {
@@ -240,7 +251,7 @@ namespace Apollo.Components {
             Arc.StrokeThickness = stroke * _scale;
             if (!overrideBase) {
                 Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
-                Display.Text = Enabled? ValueString : DisabledText;
+                Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
             }
             
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
