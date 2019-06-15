@@ -126,7 +126,6 @@ namespace Apollo.Helpers {
                 else if (e.Key == Key.V) Action("Paste");
                 else if (e.Key == Key.G) Action("Group");
                 else if (e.Key == Key.U) Action("Ungroup");
-                else if (e.Key == Key.M) Action("Mute");
                 else if (e.Key == Key.R) Action("Rename");
                 else if (e.Key == Key.E) Action("Export");
                 else if (e.Key == Key.I) Action("Import");
@@ -135,6 +134,7 @@ namespace Apollo.Helpers {
 
             } else {
                 if (e.Key == Key.Delete) Action("Delete");
+                else if (e.Key == Key.D0 || e.Key == Key.NumPad0) Action("Mute");
                 else return false;
             }
 
