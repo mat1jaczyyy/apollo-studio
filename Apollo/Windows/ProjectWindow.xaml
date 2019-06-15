@@ -24,6 +24,7 @@
           <Components:SaveButton />
           <Components:UndoButton />
           <Components:RedoButton />
+          <Components:ClearButton Clicked="Clear" />
         </StackPanel>
 
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow">

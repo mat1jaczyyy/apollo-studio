@@ -4,6 +4,7 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
 using Apollo.Core;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Elements {
@@ -29,7 +30,20 @@ namespace Apollo.Elements {
 
         public override void Send(Signal n) {}
 
-        public override void Clear() => Target?.Clear();
+        public override void Clear() {
+            if (!Available) return;
+            
+            Target?.Clear();
+
+            Signal n = new Signal(this, 0, new Color(0));
+
+            for (int i = 0; i < 100; i++) {
+                n.Index = (byte)i;
+                Window?.SignalRender(n);
+            }
+
+            AbletonConnector.Send(this, n);
+        }
 
         public override void Render(Signal n) => Target?.Render(n);
 

@@ -73,6 +73,8 @@ namespace Apollo.Windows {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
+        private void Clear() => _launchpad.Clear();
+
         private void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Maximize(null);
             else BeginMoveDrag();

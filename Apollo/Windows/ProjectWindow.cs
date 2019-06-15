@@ -222,6 +222,11 @@ namespace Apollo.Windows {
             this.Focus();
         }
 
+        private void Clear() {
+            foreach (Launchpad lp in MIDI.Devices)
+                lp.Clear();
+        }
+
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

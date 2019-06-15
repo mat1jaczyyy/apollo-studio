@@ -156,10 +156,19 @@ namespace Apollo.Elements {
         }
 
         public virtual void Clear() {
+            if (!Available) return;
+
             CreateScreen();
 
+            Signal n = new Signal(this, 0, new Color(0));
+
+            for (int i = 0; i < 100; i++) {
+                n.Index = (byte)i;
+                Window?.SignalRender(n);
+            }
+
             SysExSend(new byte[] {0x0E, 0x00});
-            Send(new Signal(this, 99, new Color(0)));
+            Send(n);
         }
 
         public virtual void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);

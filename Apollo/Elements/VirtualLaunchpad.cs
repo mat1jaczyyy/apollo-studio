@@ -8,10 +8,18 @@ namespace Apollo.Elements {
         public override void Send(Signal n) => Window?.SignalRender(n);
 
         public override void Clear() {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = Send};
+            if (!Available) return;
+            
+            CreateScreen();
 
-            Send(new Signal(this, 99, new Color(0)));
+            Signal n = new Signal(this, 0, new Color(0));
+
+            for (int i = 0; i < 100; i++) {
+                n.Index = (byte)i;
+                Window?.SignalRender(n);
+            }
+
+            Send(n);
         }
 
         public VirtualLaunchpad(string name) {
