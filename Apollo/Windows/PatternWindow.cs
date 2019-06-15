@@ -82,6 +82,10 @@ namespace Apollo.Windows {
             set {
                 _locked = value;
 
+                if (Choke.Enabled) Choke.DisplayDisabledText = false;
+                if (Gate.Enabled) Gate.DisplayDisabledText = false;
+                if (Duration.Enabled) Duration.DisplayDisabledText = false;
+
                 UndoButton.IsEnabled =
                 RedoButton.IsEnabled =
                 ImportButton.IsEnabled =
@@ -103,6 +107,8 @@ namespace Apollo.Windows {
                 if (!_locked) {
                     Choke.Enabled = _pattern.ChokeEnabled;
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
+
+                    Choke.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
             }
         }
