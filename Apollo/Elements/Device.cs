@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Structures;
 using Apollo.Viewers;
 
@@ -78,6 +79,9 @@ namespace Apollo.Elements {
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
+                if (moved.Last() is Pattern pattern)
+                    pattern.Window?.Close();
+
                 target.Parent.Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
@@ -98,6 +102,9 @@ namespace Apollo.Elements {
                 if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
+
+                if (moved.Last() is Pattern pattern)
+                    pattern.Window?.Close();
 
                 target.Insert(i, moved.Last());
             }
