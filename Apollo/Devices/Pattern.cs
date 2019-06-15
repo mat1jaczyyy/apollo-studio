@@ -43,6 +43,8 @@ namespace Apollo.Devices {
                 Frames[i].Parent = this;
                 Frames[i].ParentIndex = i;
             }
+            
+            Window?.SetInfinite(Infinite);
         }
 
         public Frame this[int index] {

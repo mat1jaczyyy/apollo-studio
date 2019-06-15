@@ -165,8 +165,6 @@ namespace Apollo.Windows {
 
             SetAlwaysShowing();
 
-            ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().ToString();
-
             if (Contents.Count == 2) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
 
