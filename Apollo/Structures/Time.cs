@@ -2,9 +2,11 @@ using System;
 
 namespace Apollo.Structures {
     public class Time {
-        public delegate void ValueChangedEventHandler(int free);
-        public event ValueChangedEventHandler FreeChanged;
-        public event ValueChangedEventHandler StepChanged;
+        public delegate void FreeChangedEventHandler(int free);
+        public event FreeChangedEventHandler FreeChanged;
+        
+        public delegate void StepChangedEventHandler(Length step);
+        public event StepChangedEventHandler StepChanged;
 
         public delegate void ModeChangedEventHandler(bool mode);
         public event ModeChangedEventHandler ModeChanged;
@@ -54,7 +56,7 @@ namespace Apollo.Structures {
         }
 
         public Length Length;
-        private void LengthChanged() => StepChanged?.Invoke(Length.Step);
+        private void LengthChanged() => StepChanged?.Invoke(Length);
 
         public Time Clone() => new Time(_mode, Length.Clone(), _free) {
             Minimum = Minimum,

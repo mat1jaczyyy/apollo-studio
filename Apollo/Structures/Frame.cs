@@ -58,7 +58,7 @@ namespace Apollo.Structures {
 
                     FreeChanged(_time.Free);
                     ModeChanged(_time.Mode);
-                    StepChanged(_time.Length.Step);
+                    StepChanged(_time.Length);
                 }
             }
         }
@@ -73,8 +73,8 @@ namespace Apollo.Structures {
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
-        private void StepChanged(int value) {
-            Parent?.Window?.SetDurationStep(ParentIndex.Value, Time.Length.Step);
+        private void StepChanged(Length value) {
+            Parent?.Window?.SetDurationStep(ParentIndex.Value, Time.Length);
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 

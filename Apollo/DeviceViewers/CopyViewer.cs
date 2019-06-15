@@ -118,7 +118,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetRateStep(int rate) => Rate.DrawArcAuto();
+        public void SetRateStep(Length rate) => Rate.Length = rate;
 
         private void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {

@@ -39,7 +39,7 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetMode(value);
         }
 
-        private void StepChanged(int value) {
+        private void StepChanged(Length value) {
             if (Viewer?.SpecificViewer != null) ((DelayViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 

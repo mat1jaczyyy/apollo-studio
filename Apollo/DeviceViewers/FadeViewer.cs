@@ -264,7 +264,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetDurationStep(int duration) => Duration.DrawArcAuto();
+        public void SetDurationStep(Length duration) => Duration.Length = duration;
 
         private void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {

@@ -690,9 +690,9 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetDurationStep(int index, int value) {
+        public void SetDurationStep(int index, Length value) {
             if (_pattern.Expanded == index)
-                Duration.DrawArcAuto();
+                Duration.Length = value;
         }
 
         private void Duration_ModeChanged(bool value, bool? old) {

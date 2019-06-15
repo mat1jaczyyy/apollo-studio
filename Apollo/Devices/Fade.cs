@@ -83,7 +83,7 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetMode(value);
         }
 
-        private void StepChanged(int value) {
+        private void StepChanged(Length value) {
             Generate();
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
