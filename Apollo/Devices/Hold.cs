@@ -98,7 +98,7 @@ namespace Apollo.Devices {
             if (n.Color.Lit ^ Release) {
                 if (!Infinite) {
                     Courier courier = new Courier() {
-                        Info = new Signal(Track.Get(this)?.Launchpad, n.Index, new Color(0), n.Layer),
+                        Info = new Signal(Track.Get(this)?.Launchpad, n.Index, new Color(0), n.Layer, n.Page, n.BlendingMode, n.MultiTarget),
                         AutoReset = false,
                         Interval = (double)(_time * _gate),
                     };
