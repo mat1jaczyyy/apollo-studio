@@ -75,7 +75,7 @@ namespace Apollo.Helpers {
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x01})) // Single track file
                     return false;
                 
-                reader.ReadBytes(2); // Skip BPM info (usually 0x00, 0x60 = 120BPM)
+                double beatsize = (reader.ReadByte() << 8) + reader.ReadByte();
 
                 if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'r', 'k'})) // Track start
                     return false;
@@ -86,7 +86,7 @@ namespace Apollo.Helpers {
                 while (reader.BaseStream.Position < end) {
                     int delta = MIDIReadVariableLength(reader);
                     if (delta > 0) {
-                        ret.Last().Time = new Time(false, null, delta * 2500 / Program.Project.BPM);
+                        ret.Last().Time = new Time(false, null, (int)(delta * 60000 / beatsize / Program.Project.BPM));
                         ret.Add(new Frame());
                     }
                     
