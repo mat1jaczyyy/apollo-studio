@@ -998,9 +998,15 @@ namespace Apollo.Windows {
         }
 
         private void ImportFile(string filepath) {
-            if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) &&
-                !Importer.FramesFromImage(filepath, out frames))
+            if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) && !Importer.FramesFromImage(filepath, out frames)) {
+                ErrorWindow.Create(
+                    $"An error occurred while reading the file.\n\n" +
+                    "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
+                    this
+                );
+                
                 return;
+            }
 
             List<Frame> uf = _pattern.Frames.ToList();
             decimal ug = _pattern.Gate;
