@@ -416,6 +416,9 @@ namespace Apollo.Components {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
                 oldValue = RawValue;
 
+                Input.SelectionStart = 0;
+                Input.SelectionEnd = Input.Text.Length;
+
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
                 Input.Focus();

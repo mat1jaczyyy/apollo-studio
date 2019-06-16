@@ -199,6 +199,9 @@ namespace Apollo.Components {
                 InputX.Text = X.ToString(CultureInfo.InvariantCulture);
                 InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
 
+                InputX.SelectionStart = 0;
+                InputX.SelectionEnd = InputX.Text.Length;
+
                 Display.Opacity = 0;
                 Display.IsHitTestVisible = false;
 

@@ -310,6 +310,9 @@ namespace Apollo.Components {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
+                Input.SelectionStart = 0;
+                Input.SelectionEnd = Input.Text.Length;
+
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
                 Input.Focus();
