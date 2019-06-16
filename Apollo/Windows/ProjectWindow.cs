@@ -137,10 +137,8 @@ namespace Apollo.Windows {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
-                this.Focus();
+            if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
-            }
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
