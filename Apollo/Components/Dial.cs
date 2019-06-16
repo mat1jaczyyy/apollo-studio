@@ -28,21 +28,21 @@ namespace Apollo.Components {
         public delegate void DialModeChangedEventHandler(bool NewValue, bool? OldValue);
         public event DialModeChangedEventHandler ModeChanged;
 
-        Canvas ArcCanvas;
-        Path ArcBase, Arc;
-        TextBlock TitleText, Display;
-        TextBox Input;
+        protected Canvas ArcCanvas;
+        protected Path ArcBase, Arc;
+        protected TextBlock TitleText, Display;
+        protected TextBox Input;
 
-        private const double width = 43, height = 39;
-        private const double radius = 18, stroke = 7;
-        private const double strokeHalf = stroke / 2;
+        protected const double width = 43, height = 39;
+        protected const double radius = 18, stroke = 7;
+        protected const double strokeHalf = stroke / 2;
 
-        private const double angle_start = 4 * Math.PI / 3;
-        private const double angle_end = -1 * Math.PI / 3;
-        private const double angle_center = Math.PI / 2;
+        protected const double angle_start = 4 * Math.PI / 3;
+        protected const double angle_end = -1 * Math.PI / 3;
+        protected const double angle_center = Math.PI / 2;
 
-        private double ToValue(double rawValue) => Math.Pow((rawValue - _min) / (_max - _min), 1 / _exp);
-        private double ToRawValue(double value) => _min + (_max - _min) * Math.Pow(value, _exp);
+        protected double ToValue(double rawValue) => Math.Pow((rawValue - _min) / (_max - _min), 1 / _exp);
+        protected double ToRawValue(double value) => _min + (_max - _min) * Math.Pow(value, _exp);
 
         private double _min = 0;
         public double Minimum {
@@ -55,8 +55,8 @@ namespace Apollo.Components {
             }
         }
 
-        private double _max = 100;
-        public double Maximum {
+        protected double _max = 100;
+        public virtual double Maximum {
             get => _max;
             set {
                 if (_max != value) {
@@ -268,7 +268,7 @@ namespace Apollo.Components {
             ));
         }
 
-        private void DrawArcBase() => DrawArc(ArcBase, 1, true);
+        protected void DrawArcBase() => DrawArc(ArcBase, 1, true);
 
         private void DrawArcValue() {
             if (!UsingSteps) DrawArc(Arc, _value, false);
@@ -286,6 +286,8 @@ namespace Apollo.Components {
         public Dial() {
             InitializeComponent();
 
+            if (this.GetType() != typeof(Dial)) return;
+
             ArcCanvas = this.Get<Canvas>("ArcCanvas");
             ArcBase = this.Get<Path>("ArcBase");
             Arc = this.Get<Path>("Arc");
@@ -299,14 +301,14 @@ namespace Apollo.Components {
             DrawArcBase();
         }
 
-        private void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
+        protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
 
         private bool mouseHeld = false;
         private double oldValue;
         private int oldStep;
         private double lastY;
 
-        private void MouseDown(object sender, PointerPressedEventArgs e) {
+        protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
                 if (e.ClickCount == 2) {
                     DisplayPressed(sender, e);
@@ -326,7 +328,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+        protected void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (!Enabled) return;
             
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
@@ -347,7 +349,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseMove(object sender, PointerEventArgs e) {
+        protected void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld && Enabled) {
                 double Y = e.GetPosition(ArcCanvas).Y;
 
@@ -369,7 +371,7 @@ namespace Apollo.Components {
 
         private Action Input_Update;
 
-        private void Input_Changed(string text) {
+        protected void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
@@ -411,7 +413,7 @@ namespace Apollo.Components {
             });
         }
 
-        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+        protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && !UsingSteps && Enabled) {
                 Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
                 oldValue = RawValue;
@@ -429,7 +431,7 @@ namespace Apollo.Components {
             }
         }
         
-        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+        protected void Input_LostFocus(object sender, RoutedEventArgs e) {
             Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
 
             Input.Opacity = 0;
@@ -438,15 +440,15 @@ namespace Apollo.Components {
             ValueChanged?.Invoke(_raw, oldValue);
         }
 
-        private void Input_KeyDown(object sender, KeyEventArgs e) {
+        protected void Input_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        protected void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        protected void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

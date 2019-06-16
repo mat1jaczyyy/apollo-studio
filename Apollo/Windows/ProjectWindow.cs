@@ -147,7 +147,7 @@ namespace Apollo.Windows {
                     TrackWindow.Create((Track)i, this);
         }
 
-        private void Page_Changed(double value) => Program.Project.Page = (int)value;
+        private void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
 
         private Action BPM_Update;
         private bool BPM_Dirty = false;
