@@ -105,7 +105,7 @@ namespace Apollo.Windows {
                 if (!(InMultiPreprocess() && Selection.Start.IParentIndex.Value == 0))
                     Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             
-            }else if (e.Key == Key.Right) {
+            } else if (e.Key == Key.Right) {
                 if (InMultiPreprocess() && Selection.Start.IParentIndex.Value == Selection.Start.IParent.IChildren.Count - 1)
                     Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.Modifiers == InputModifiers.Shift);
 

@@ -193,8 +193,13 @@ namespace Apollo.Windows {
         }
         
         private void BPM_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Return) this.Focus();
+            if (e.Key == Key.Return) 
+                this.Focus();
+
+            e.Key = Key.None;
         }
+
+        private void BPM_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
         private void BPM_Unfocus(object sender, RoutedEventArgs e) {
             if (BPM_Clean != Program.Project.BPM) {

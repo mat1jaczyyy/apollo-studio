@@ -58,7 +58,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock VerticalAlignment="Center" Text="BPM: " />
               <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
-                       KeyDown="BPM_KeyDown" LostFocus="BPM_Unfocus" />
+                       KeyDown="BPM_KeyDown" KeyUp="BPM_KeyUp" LostFocus="BPM_Unfocus" />
             </StackPanel>
           </Grid>
         </Grid>

@@ -329,10 +329,10 @@ namespace Apollo.Components {
             if (e.Key == Key.Return)
                 this.Focus();
 
-            e.Handled = true;
+            e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Handled = true;
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
         private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
