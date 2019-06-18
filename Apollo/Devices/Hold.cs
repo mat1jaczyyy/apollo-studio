@@ -95,10 +95,10 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-            if (n.Color.Lit ^ Release) {
+            if (n.Color.Lit != Release) {
                 if (!Infinite) {
                     Courier courier = new Courier() {
-                        Info = new Signal(Track.Get(this)?.Launchpad, n.Index, new Color(0), n.Layer, n.Page, n.BlendingMode, n.MultiTarget),
+                        Info = new Signal(Track.Get(this)?.Launchpad, n.Index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget),
                         AutoReset = false,
                         Interval = (double)(_time * _gate),
                     };
