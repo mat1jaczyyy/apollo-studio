@@ -87,19 +87,23 @@ namespace Apollo.Helpers {
                     int delta = MIDIReadVariableLength(reader);
                     if (delta > 0) {
                         ret.Last().Time = new Time(false, null, (int)(delta * 60000 / beatsize / Program.Project.BPM));
-                        ret.Add(new Frame());
+                        ret.Add(ret.Last().Clone());
                     }
                     
                     byte type = reader.ReadByte();
 
-                    switch (type >> 4) {                        
+                    switch (type >> 4) {
+                        case 0x8: // Note off
+                            byte index = Converter.DRtoXY(reader.ReadBytes(2)[0]);
+                            ret.Last().Screen[index] = Palette.GetColor(0);
+                            break;
+
                         case 0x9: // Note on
-                            byte index = Converter.DRtoXY(reader.ReadByte());
+                            index = Converter.DRtoXY(reader.ReadByte());
                             ret.Last().Screen[index] = Palette.GetColor(reader.ReadByte());
                             break;
                         
                         case 0x7: // Channel Mode
-                        case 0x8: // Note off
                         case 0xA: // Poly Aftertouch
                         case 0xB: // CC
                         case 0xE: // Pitch Wheel
