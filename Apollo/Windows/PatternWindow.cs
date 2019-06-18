@@ -385,11 +385,11 @@ namespace Apollo.Windows {
             if (Locked) return;
 
             if (e.Key == Key.Enter) {
-                if (e.Modifiers == InputModifiers.Shift) HandleGesture(1, -1);
-                else HandleGesture(-1, 1);
+                if (e.Modifiers == InputModifiers.Shift) PatternFire(Play, null);
+                else PatternPlay(Play, null);
             
-            } else if (e.Key == Key.Insert) HandleGesture(1, 1);
-            else if (e.Key == Key.Delete) HandleGesture(-1, -1);
+            } else if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
+            else if (e.Key == Key.Delete || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
                 if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
@@ -397,13 +397,16 @@ namespace Apollo.Windows {
                     return;
                 }
 
+                bool shift = e.Modifiers == InputModifiers.Shift;
+
                 if (e.Key == Key.Up || e.Key == Key.Left) {
-                    Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-                    Frame_Select(Selection.Start.IParentIndex.Value);
+                    if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
+                    else Frame_Insert(0);
+                    
 
                 } else if (e.Key == Key.Down || e.Key == Key.Right) {
-                    Selection.Move(true, e.Modifiers == InputModifiers.Shift);
-                    Frame_Select(Selection.Start.IParentIndex.Value);
+                    if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
+                    else Frame_Insert(_pattern.Count);
                 }
             }
         }

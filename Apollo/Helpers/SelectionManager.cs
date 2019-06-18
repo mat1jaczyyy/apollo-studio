@@ -56,19 +56,25 @@ namespace Apollo.Helpers {
             Select(target.IChildren.Last(), true);
         }
 
-        public void Move(bool right, bool shift = false) {
+        public bool Move(bool right, bool shift = false) {
             ISelect target = (shift? (End?? Start) : Start);
-            if (target == null) return;
+            if (target == null) return false;
 
-            if (right) {
-                target = target.IParent.IChildren[Math.Min(target.IParent.IChildren.Count - 1, target.IParentIndex.Value + 1)];
+            try {
+                if (right) {
+                    target = target.IParent.IChildren[target.IParentIndex.Value + 1];
 
-            } else {
-                if (target.IParentIndex.Value == 0 && target.IParent is ISelect && !target.IParent.IRoot) target = (ISelect)target.IParent;
-                else target = target.IParent.IChildren[Math.Max(0, target.IParentIndex.Value - 1)];
+                } else {
+                    if (target.IParentIndex.Value == 0 && target.IParent is ISelect && !target.IParent.IRoot) target = (ISelect)target.IParent;
+                    else target = target.IParent.IChildren[target.IParentIndex.Value - 1];
+                }
+
+            } catch (ArgumentOutOfRangeException) {
+                return false;
             }
 
             Select(target, shift);
+            return true;
         }
 
         public void Expand() {
