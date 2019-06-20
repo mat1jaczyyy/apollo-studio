@@ -7,6 +7,7 @@
         CanResize="false" SizeToContent="Height"
         Icon="/Resources/WindowIcon.png"
         Width="750" MinWidth="750" MaxWidth="750"
+        Height="538" MinHeight="538" MaxHeight="538"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
