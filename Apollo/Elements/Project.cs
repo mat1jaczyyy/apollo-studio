@@ -73,7 +73,7 @@ namespace Apollo.Elements {
             }
         }
 
-        private void WriteFile(Window sender, string path = null, bool store = true) {
+        public void WriteFile(Window sender, string path = null, bool store = true) {
             if (path == null) path = FilePath;
 
             if (Directory.Exists(Path.GetDirectoryName(path))) {
@@ -90,9 +90,8 @@ namespace Apollo.Elements {
                     return;
                 }
 
-                Undo.SavePosition();
-
                 if (store) {
+                    Undo.SavePosition();
                     FilePath = path;
 
                     if (Preferences.Backup) {

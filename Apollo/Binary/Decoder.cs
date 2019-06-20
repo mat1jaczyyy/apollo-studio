@@ -57,6 +57,7 @@ namespace Apollo.Binary {
 
                     if (version >= 10) {
                         Preferences.Backup = reader.ReadBoolean();
+                        Preferences.Autosave = reader.ReadBoolean();
                     }
 
                     if (version <= 0) {

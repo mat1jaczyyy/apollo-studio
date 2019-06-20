@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -9,6 +10,7 @@ using Avalonia.Logging.Serilog;
 using Apollo.Binary;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Structures;
 using Apollo.Windows;
 
 // Suppresses readonly suggestion
@@ -102,6 +104,21 @@ namespace Apollo.Core {
             if (Preferences.DiscordPresence) Discord.Set(true);
 
             MIDI.Start();
+            
+            Courier autosave = new Courier() { Interval = 180000 };
+            autosave.Elapsed += (_, __) => {
+                if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
+                    string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                    Program.Project.WriteFile(
+                        Application.Current.MainWindow,
+                        Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
+                        false
+                    );
+                }
+            };
+            autosave.Start();
 
             BuildAvaloniaApp().Start<SplashWindow>();
         }

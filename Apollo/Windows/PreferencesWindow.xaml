@@ -79,6 +79,7 @@
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Saving" />
               <CheckBox Click="Backup_Changed" x:Name="Backup">Create a Backup when saving</CheckBox>
+              <CheckBox Click="Autosave_Changed" x:Name="Autosave">Autosave every 3 minutes</CheckBox>
             </StackPanel>
           </Border>
 
