@@ -84,8 +84,8 @@ namespace Apollo.Windows {
                 HighlightSaved(Program.Project.Undo.SavedPosition.Value);
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
+        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
                 this.Focus();
                 return;
             }

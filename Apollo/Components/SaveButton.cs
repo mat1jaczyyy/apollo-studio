@@ -40,25 +40,25 @@ namespace Apollo.Components {
             Update_Saved(Program.Project.Undo.Saved);
         }
 
-        private void SaveContextMenu_Click(object sender, EventArgs e) {
+        private async void SaveContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem)) {
                 switch (((MenuItem)item).Header) {
                     case "Save as...":
-                        Program.Project.Save((Window)this.GetVisualRoot(), true);
+                        await Program.Project.Save((Window)this.GetVisualRoot(), true);
                         break;
 
                     case "Save a copy...":
-                        Program.Project.Save((Window)this.GetVisualRoot(), false);
+                        await Program.Project.Save((Window)this.GetVisualRoot(), false);
                         break;
                 }
             }
         }
 
-        protected override void Click(PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Program.Project.Save((Window)this.GetVisualRoot());
+        protected override async void Click(PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left) await Program.Project.Save((Window)this.GetVisualRoot());
             else if (e.MouseButton == MouseButton.Right) SaveContextMenu.Open(this);
         }
     }

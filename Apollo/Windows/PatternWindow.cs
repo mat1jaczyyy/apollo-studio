@@ -381,7 +381,7 @@ namespace Apollo.Windows {
             e.Handled = true;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e) {
+        private async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (Locked) return;
 
             if (e.Key == Key.Enter) {
@@ -392,7 +392,7 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Delete || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
-                if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                     this.Focus();
                     return;
                 }

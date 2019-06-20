@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -112,7 +113,7 @@ namespace Apollo.Windows {
             UpdatePage();
         }
 
-        private void Unloaded(object sender, EventArgs e) {
+        private void Unloaded(object sender, CancelEventArgs e) {
             Program.Project.Window = null;
 
             Program.Project.PathChanged -= UpdateTitle;
@@ -136,8 +137,8 @@ namespace Apollo.Windows {
             Program.Project.Insert(index, track);
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
@@ -236,9 +237,21 @@ namespace Apollo.Windows {
         
         private void Minimize() => WindowState = WindowState.Minimized;
 
-        private void CheckClose(bool force) {
-            if (force) foreach (Track track in Program.Project.Tracks) track.Window?.Close();
-            Close();
+        private async void CheckClose(bool force) {
+            if (force || Program.Project.Tracks.FirstOrDefault(i => i.Window != null) == null) {
+                string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
+                    "You have unsaved changes. Do you want to save before closing?\n",
+                    new string[] {"Yes", "No", "Cancel"}, this
+                );
+
+                if (result == "No" || (result == "Yes" && await Program.Project.Save(this))) {
+                    if (force)
+                        foreach (Track track in Program.Project.Tracks) track.Window?.Close();
+
+                    Close();
+                }
+                
+            } else Close();
         }
 
         private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);

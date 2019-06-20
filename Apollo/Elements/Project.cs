@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.IO;
+using System.Threading.Tasks;
 
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -73,46 +74,48 @@ namespace Apollo.Elements {
             }
         }
 
-        public async void WriteFile(Window sender, string path = null, bool store = true, bool error = true) {
+        public async Task<bool> WriteFile(Window sender, string path = null, bool store = true, bool error = true) {
             if (path == null) path = FilePath;
 
-            if (Directory.Exists(Path.GetDirectoryName(path))) {
-                try {
-                    File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+            if (!Directory.Exists(Path.GetDirectoryName(path))) return false;
 
-                } catch (UnauthorizedAccessException) {
-                    if (error) await MessageWindow.Create(
-                        $"An error occurred while writing the file.\n\n" +
-                        "You may not have sufficient privileges to write to the destination folder,\n" +
-                        "or the current file already exists but cannot be overwritten.",
-                        null, sender
-                    );
+            try {
+                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
-                    return;
-                }
+            } catch (UnauthorizedAccessException) {
+                if (error) await MessageWindow.Create(
+                    $"An error occurred while writing the file.\n\n" +
+                    "You may not have sufficient privileges to write to the destination folder, or\n" +
+                    "the current file already exists but cannot be overwritten.",
+                    null, sender
+                );
 
-                if (store) {
-                    Undo.SavePosition();
-                    FilePath = path;
+                return false;
+            }
 
-                    if (Preferences.Backup) {
-                        string dir = Path.Combine(Path.GetDirectoryName(FilePath), $"{FileName} Backups");
-                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            if (store) {
+                Undo.SavePosition();
+                FilePath = path;
 
-                        File.Copy(FilePath, Path.Join(dir, $"{FileName} Backup {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"));
-                    }
+                if (Preferences.Backup) {
+                    string dir = Path.Combine(Path.GetDirectoryName(FilePath), $"{FileName} Backups");
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                    File.Copy(FilePath, Path.Join(dir, $"{FileName} Backup {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"));
                 }
             }
+
+            return true;
         }
 
-        public void Save(Window sender) {
-            if (Undo.Saved) return;
+        public async Task<bool> Save(Window sender) {
+            if (Undo.Saved) return false;
 
-            if (FilePath == "") Save(sender, true);
-            else WriteFile(sender);
+            if (FilePath == "") return await Save(sender, true);
+            else return await WriteFile(sender);
         }
 
-        public async void Save(Window sender, bool store) {
+        public async Task<bool> Save(Window sender, bool store) {
             SaveFileDialog sfd = new SaveFileDialog() {
                 Filters = new List<FileDialogFilter>() {
                     new FileDialogFilter() {
@@ -127,7 +130,9 @@ namespace Apollo.Elements {
             
             string result = await sfd.ShowAsync(sender);
 
-            if (result != null) WriteFile(sender, result, store);
+            if (result != null) return await WriteFile(sender, result, store);
+            
+            return false;
         }
 
         public delegate void TrackCountChangedEventHandler(int value);
@@ -184,13 +189,13 @@ namespace Apollo.Elements {
             Reroute();
         }
         
-        public bool HandleKey(Window sender, KeyEventArgs e) {
+        public async Task<bool> HandleKey(Window sender, KeyEventArgs e) {
             if (e.Modifiers == InputModifiers.Control) {
-                if (e.Key == Key.S) Save(sender);
+                if (e.Key == Key.S) await Save(sender);
                 else return false;
 
             } else if (e.Modifiers == (InputModifiers.Control | InputModifiers.Shift)) {
-                if (e.Key == Key.S) Save(sender, true);
+                if (e.Key == Key.S) await Save(sender, true);
                 else return false;
             
             } else return false;
