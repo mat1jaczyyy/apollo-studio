@@ -108,14 +108,16 @@ namespace Apollo.Core {
             Courier autosave = new Courier() { Interval = 180000 };
             autosave.Elapsed += (_, __) => {
                 if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
-                    string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
-                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                    try {
+                        string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
+                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-                    Program.Project.WriteFile(
-                        Application.Current.MainWindow,
-                        Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
-                        false
-                    );
+                        Program.Project.WriteFile(
+                            Application.Current.MainWindow,
+                            Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
+                            false, false
+                        );
+                    } catch {}
                 }
             };
             autosave.Start();
