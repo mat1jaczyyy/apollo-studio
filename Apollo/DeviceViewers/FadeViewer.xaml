@@ -30,9 +30,9 @@
       </Border>
 
       <StackPanel Grid.Row="1" Margin="0 5 0 0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-        <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
+        <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
                          ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
-        <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Exponent="2.0108883161" Round="0" Unit="%"
+        <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%"
                          ValueChanged="Gate_Changed" />
       </StackPanel>
     </Grid>

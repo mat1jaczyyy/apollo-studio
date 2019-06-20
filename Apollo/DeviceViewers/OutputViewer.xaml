@@ -4,6 +4,6 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5">
   
-  <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="2" Exponent="1" Round="0" Unit=""
+  <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="2" Default="1" Exponent="1" Round="0" Unit=""
                    ValueChanged="Target_Changed" />
 </UserControl>

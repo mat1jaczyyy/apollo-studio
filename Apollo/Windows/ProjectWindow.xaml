@@ -52,9 +52,9 @@
           </Border>
 
           <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="10 5">
-            <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Exponent="1" Round="0" Unit="" Scale="0.4"
+            <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" Scale="0.4"
                                        ValueChanged="Page_Changed" />
-         
+          
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock VerticalAlignment="Center" Text="BPM: " />
               <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"

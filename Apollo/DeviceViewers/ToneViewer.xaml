@@ -6,23 +6,23 @@
   
   <StackPanel Orientation="Horizontal" Spacing="10">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
-      <Components:Dial Margin="0 0 10 0" x:Name="Hue" Title="Hue ±" Minimum="-180" Maximum="180" Round="0" Unit="°" Centered="true"
+      <Components:Dial Margin="0 0 10 0" x:Name="Hue" Title="Hue ±" Minimum="-180" Maximum="180" Default="0" Round="0" Unit="°" Centered="true"
                        ValueChanged="Hue_Changed" />
     </Border>
 
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
       <Grid RowDefinitions="*,*" Margin="0 0 10 0">
-        <Components:Dial Grid.Row="0" x:Name="SaturationHigh" Title="Sat Hi" Minimum="0" Maximum="100" Round="0" Unit="%"
+        <Components:Dial Grid.Row="0" x:Name="SaturationHigh" Title="Sat Hi" Minimum="0" Maximum="100" Default="100" Round="0" Unit="%"
                          ValueChanged="SaturationHigh_Changed" />
-        <Components:Dial Grid.Row="1" x:Name="SaturationLow" Title="Sat Lo" Minimum="0" Maximum="100" Round="0" Unit="%"
+        <Components:Dial Grid.Row="1" x:Name="SaturationLow" Title="Sat Lo" Minimum="0" Maximum="100" Default="0" Round="0" Unit="%"
                          ValueChanged="SaturationLow_Changed" />
       </Grid>
     </Border>
       
     <Grid RowDefinitions="*,*">
-      <Components:Dial Grid.Row="0" x:Name="ValueHigh" Title="Val Hi" Minimum="0" Maximum="100" Round="0" Unit="%"
+      <Components:Dial Grid.Row="0" x:Name="ValueHigh" Title="Val Hi" Minimum="0" Maximum="100" Default="100" Round="0" Unit="%"
                        ValueChanged="ValueHigh_Changed" />
-      <Components:Dial Grid.Row="1" x:Name="ValueLow" Title="Val Lo" Minimum="0" Maximum="100" Round="0" Unit="%"
+      <Components:Dial Grid.Row="1" x:Name="ValueLow" Title="Val Lo" Minimum="0" Maximum="100" Default="0" Round="0" Unit="%"
                        ValueChanged="ValueLow_Changed" />
     </Grid>
   </StackPanel>

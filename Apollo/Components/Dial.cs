@@ -125,13 +125,17 @@ namespace Apollo.Components {
                 }
             }
         }
+        
+        private double _default = 50;
+        public double Default {
+            get => _default;
+            set => _default = Math.Round(Math.Max(_min, Math.Min(_max, value)) * Math.Pow(10, _round), 0) / Math.Pow(10, _round);
+        }
 
         private string _title = "Dial";
         public string Title {
             get => _title;
-            set {
-                TitleText.Text = _title = value;
-            }
+            set => TitleText.Text = _title = value;
         }
 
         private string _unit = "";
@@ -310,6 +314,12 @@ namespace Apollo.Components {
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
+                if (e.InputModifiers.HasFlag(InputModifiers.Control)) {
+                    if (UsingSteps) Length.Step = 5;
+                    else RawValue = Default;
+                    return;
+                }
+                
                 if (e.ClickCount == 2) {
                     DisplayPressed(sender, e);
                     return;
