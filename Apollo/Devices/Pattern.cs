@@ -163,7 +163,7 @@ namespace Apollo.Devices {
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 8, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 1, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
