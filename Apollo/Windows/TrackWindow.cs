@@ -20,6 +20,7 @@ namespace Apollo.Windows {
 
         Track _track;
 
+        ScrollViewer Contents;
         Grid Root;
         TextBlock TitleText;
         
@@ -49,12 +50,14 @@ namespace Apollo.Windows {
             TitleText = this.Get<TextBlock>("Title");
 
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
+            chainViewer.PointerWheelChanged += Track_Scroll;
 
             Root = chainViewer.Get<Grid>("Layout");
             UpdateContentAlignment(Preferences.CenterTrackContents);
             Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
 
-            this.Get<ScrollViewer>("Contents").Content = chainViewer;
+            Contents = this.Get<ScrollViewer>("Contents");
+            Contents.Content = chainViewer;
 
             SetEnabled();
         }
@@ -81,6 +84,8 @@ namespace Apollo.Windows {
         }
 
         public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
+
+        private void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
         private bool InMultiPreprocess() => Selection.Start is Device &&
             Selection.Start.IParent is ISelect &&
