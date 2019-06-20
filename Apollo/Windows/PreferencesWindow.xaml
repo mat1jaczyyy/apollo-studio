@@ -21,8 +21,16 @@
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid ColumnDefinitions="*,*" Margin="10 5"> 
         <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
-          <Grid RowDefinitions="Auto,Auto,Auto,Auto" Margin="0 0 10 0">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0 0 10 0">
             <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
+              <StackPanel Spacing="5">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" x:Name="ThemeHeader" />
+                <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
+                <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
               <StackPanel Spacing="5">
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
                 <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
@@ -38,7 +46,7 @@
               </StackPanel>
             </Border>
 
-            <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
               <StackPanel Spacing="5">
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
                 <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
@@ -46,7 +54,7 @@
               </StackPanel>
             </Border>
 
-            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+            <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
               <StackPanel Spacing="5">
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
                 <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
@@ -56,7 +64,7 @@
               </StackPanel>
             </Border>
 
-            <StackPanel Grid.Row="3" Margin="0 5" Spacing="5">
+            <StackPanel Grid.Row="4" Margin="0 5" Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
               <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
               <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
@@ -66,16 +74,8 @@
           </Grid>
         </Border>
 
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="10 0 0 0">
-          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" x:Name="ThemeHeader" />
-              <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
-              <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
-            </StackPanel>
-          </Border>
-
-          <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="10 0 0 0">
+          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Saving" />
               <CheckBox Click="Backup_Changed" x:Name="Backup">Create a Backup when saving</CheckBox>
@@ -83,7 +83,7 @@
             </StackPanel>
           </Border>
 
-          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
+          <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
               <StackPanel Margin="5 0" Orientation="Horizontal" Spacing="10">
@@ -93,7 +93,7 @@
             </StackPanel>
           </Border>
           
-          <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <Grid RowDefinitions="Auto,*">
               <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
               <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
@@ -104,7 +104,7 @@
             </Grid>
           </Border>
 
-          <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
               <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
@@ -112,7 +112,7 @@
             </StackPanel>
           </Border>
 
-          <StackPanel Grid.Row="5" Margin="10" HorizontalAlignment="Center">
+          <StackPanel Grid.Row="4" Margin="10" HorizontalAlignment="Center">
             <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
             <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
           </StackPanel>
