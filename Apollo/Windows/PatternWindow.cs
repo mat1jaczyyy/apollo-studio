@@ -1153,7 +1153,7 @@ namespace Apollo.Windows {
             
             Copyable paste;
             try {
-                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             } catch (Exception) {
                 return;
             }

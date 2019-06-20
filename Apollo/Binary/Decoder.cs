@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -9,6 +10,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Windows;
 
 namespace Apollo.Binary {
     public static class Decoder {
@@ -16,10 +18,32 @@ namespace Apollo.Binary {
 
         private static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
-        public static dynamic Decode(Stream input, Type ensure) {
+        public static async Task<dynamic> Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
                 if (!DecodeHeader(reader)) return new InvalidDataException();
-                return Decode(reader, reader.ReadInt32(), ensure, true);
+
+                int version = reader.ReadInt32();
+
+                if (version >= Common.version && await MessageWindow.Create(
+                    "The content you're attempting to read was created with a newer version of\n" +
+                    "Apollo Studio, which might result in it not loading correctly.\n\n" +
+                    "Are you sure you want to proceed?",
+                    new string[] { "Yes", "No" }, null
+                ) == "No") return new InvalidDataException();
+
+                return Decode(reader, version, ensure, true);
+            }
+        }
+
+        public static dynamic DecodeBlock(Stream input, Type ensure) {
+            using (BinaryReader reader = new BinaryReader(input)) {
+                if (!DecodeHeader(reader)) return new InvalidDataException();
+
+                int version = reader.ReadInt32();
+
+                if (version >= Common.version) return new InvalidDataException();
+
+                return Decode(reader, version, ensure, true);
             }
         }
         
@@ -75,6 +99,8 @@ namespace Apollo.Binary {
 
                     if (version >= 2)
                         MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
+                    
+                    return null;
 
                 } catch {
                     Program.Log("Error reading Preferences");
@@ -199,9 +225,9 @@ namespace Apollo.Binary {
                     time,
                     reader.ReadDecimal()
                 );
-            }
             
-            else if (t == typeof(Fade)) {
+            
+            } else if (t == typeof(Fade)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(

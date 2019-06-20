@@ -206,9 +206,9 @@ namespace Apollo.Core {
         }
 
         static Preferences() {
-            if (File.Exists(FilePath)) 
+            if (File.Exists(FilePath))
                 using (FileStream file = File.Open(FilePath, FileMode.Open, FileAccess.Read))
-                    Decoder.Decode(file, typeof(Preferences));
+                    Decoder.DecodeBlock(file, typeof(Preferences));
 
             Save();
 

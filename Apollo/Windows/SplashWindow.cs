@@ -67,7 +67,7 @@ namespace Apollo.Windows {
 
             using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
                 try {
-                    loaded = Decoder.Decode(file, typeof(Project));
+                    loaded = await Decoder.Decode(file, typeof(Project));
 
                 } catch {
                     await MessageWindow.Create(

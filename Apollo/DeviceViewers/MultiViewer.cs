@@ -379,7 +379,7 @@ namespace Apollo.DeviceViewers {
             
             Copyable paste;
             try {
-                paste = Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
+                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
             } catch (Exception) {
                 return;
             }
@@ -521,7 +521,7 @@ namespace Apollo.DeviceViewers {
 
                 using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                     try {
-                        loaded = Decoder.Decode(file, typeof(Copyable));
+                        loaded = await Decoder.Decode(file, typeof(Copyable));
 
                     } catch {
                         await MessageWindow.Create(
