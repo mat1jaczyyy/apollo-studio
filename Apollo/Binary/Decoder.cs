@@ -24,7 +24,7 @@ namespace Apollo.Binary {
 
                 int version = reader.ReadInt32();
 
-                if (version >= Common.version && await MessageWindow.Create(
+                if (version > Common.version && await MessageWindow.Create(
                     "The content you're attempting to read was created with a newer version of\n" +
                     "Apollo Studio, which might result in it not loading correctly.\n\n" +
                     "Are you sure you want to proceed?",
@@ -41,7 +41,7 @@ namespace Apollo.Binary {
 
                 int version = reader.ReadInt32();
 
-                if (version >= Common.version) return new InvalidDataException();
+                if (version > Common.version) return new InvalidDataException();
 
                 return Decode(reader, version, ensure, true);
             }
