@@ -62,7 +62,7 @@ namespace Apollo.Windows {
             Close();
         }
 
-        public void ReadFile(string path) {
+        public async void ReadFile(string path) {
             Project loaded;
 
             using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
@@ -70,11 +70,11 @@ namespace Apollo.Windows {
                     loaded = Decoder.Decode(file, typeof(Project));
 
                 } catch {
-                    ErrorWindow.Create(
+                    await MessageWindow.Create(
                         $"An error occurred while reading the file.\n\n" +
                         "You may not have sufficient privileges to read from the destination folder, or\n" +
                         "the file you're attempting to read is invalid.",
-                        this
+                        null, this
                     );
 
                     return;

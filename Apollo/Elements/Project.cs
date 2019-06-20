@@ -73,7 +73,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public void WriteFile(Window sender, string path = null, bool store = true) {
+        public async void WriteFile(Window sender, string path = null, bool store = true) {
             if (path == null) path = FilePath;
 
             if (Directory.Exists(Path.GetDirectoryName(path))) {
@@ -81,11 +81,11 @@ namespace Apollo.Elements {
                     File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
                 } catch (UnauthorizedAccessException) {
-                    ErrorWindow.Create(
+                    await MessageWindow.Create(
                         $"An error occurred while writing the file.\n\n" +
                         "You may not have sufficient privileges to write to the destination folder,\n" +
                         "or the current file already exists but cannot be overwritten.",
-                        sender
+                        null, sender
                     );
 
                     return;
