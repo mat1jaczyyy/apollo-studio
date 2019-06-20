@@ -55,6 +55,10 @@ namespace Apollo.Binary {
                         Preferences.Theme = (Preferences.Themes)reader.ReadInt32();
                     }
 
+                    if (version >= 10) {
+                        Preferences.Backup = reader.ReadBoolean();
+                    }
+
                     if (version <= 0) {
                         Preferences.DiscordPresence = true;
                         reader.ReadBoolean();

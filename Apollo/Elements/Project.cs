@@ -95,10 +95,12 @@ namespace Apollo.Elements {
                 if (store) {
                     FilePath = path;
 
-                    string dir = Path.Combine(Path.GetDirectoryName(FilePath), $"{FileName} Backups");
-                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                    if (Preferences.Backup) {
+                        string dir = Path.Combine(Path.GetDirectoryName(FilePath), $"{FileName} Backups");
+                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-                    File.Copy(FilePath, Path.Join(dir, $"{FileName} Backup {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"));
+                        File.Copy(FilePath, Path.Join(dir, $"{FileName} Backup {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"));
+                    }
                 }
             }
         }

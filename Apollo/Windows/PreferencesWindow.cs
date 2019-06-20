@@ -20,7 +20,7 @@ namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, DiscordPresence, DiscordFilename;
         ComboBox LaunchpadStyle;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
@@ -93,6 +93,9 @@ namespace Apollo.Windows {
 
             Light = this.Get<RadioButton>("Light");
             Light.IsChecked = Preferences.Theme == Preferences.Themes.Light;
+
+            Backup = this.Get<CheckBox>("Backup");
+            Backup.IsChecked = Preferences.Backup;
 
             DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
@@ -188,6 +191,8 @@ namespace Apollo.Windows {
             
             Preferences.Theme = Preferences.Themes.Light;
         }
+
+        private void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 

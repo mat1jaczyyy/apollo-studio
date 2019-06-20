@@ -51,6 +51,7 @@ namespace Apollo.Binary {
 
                 writer.Write((int)Preferences.ImportPalette);
                 writer.Write((int)Preferences.Theme);
+                writer.Write(Preferences.Backup);
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);
 

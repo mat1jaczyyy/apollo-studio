@@ -161,6 +161,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _Backup = true;
+        public static bool Backup {
+            get => _Backup;
+            set {
+                _Backup = value;
+                Save();
+            }
+        }
+
         private static bool _DiscordPresence = true;
         public static bool DiscordPresence {
             get => _DiscordPresence;
