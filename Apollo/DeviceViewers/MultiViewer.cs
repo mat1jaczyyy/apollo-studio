@@ -486,10 +486,11 @@ namespace Apollo.DeviceViewers {
                     try {
                         File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
 
-                    } catch (UnauthorizedAccessException e) {
+                    } catch (UnauthorizedAccessException) {
                         ErrorWindow.Create(
-                            $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
-                            "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                            $"An error occurred while writing the file.\n\n" +
+                            "You may not have sufficient privileges to write to the destination folder, or\n" +
+                            "the current file already exists but cannot be overwritten.",
                             sender
                         );
                     }
@@ -525,7 +526,8 @@ namespace Apollo.DeviceViewers {
                     } catch {
                         ErrorWindow.Create(
                             $"An error occurred while reading the file.\n\n" +
-                            "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
+                            "You may not have sufficient privileges to read from the destination folder, or\n" +
+                            "the file you're attempting to read is invalid.",
                             sender
                         );
 

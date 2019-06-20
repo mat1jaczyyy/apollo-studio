@@ -1004,7 +1004,8 @@ namespace Apollo.Windows {
             if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) && !Importer.FramesFromImage(filepath, out frames)) {
                 ErrorWindow.Create(
                     $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or the file you're attempting to read is invalid.",
+                    "You may not have sufficient privileges to read from the destination folder, or\n" +
+                    "the file you're attempting to read is invalid.",
                     this
                 );
                 

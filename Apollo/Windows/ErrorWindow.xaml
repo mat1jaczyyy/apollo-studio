@@ -21,7 +21,7 @@
 
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
         <StackPanel Margin="30 10" Spacing="10">
-          <TextBlock TextWrapping="Wrap" x:Name="Message" />
+          <TextBlock x:Name="Message" />
 
           <Button HorizontalAlignment="Right" Width="70" Content="OK" Click="Close" />
         </StackPanel>

@@ -80,10 +80,11 @@ namespace Apollo.Elements {
                 try {
                     File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
-                } catch (UnauthorizedAccessException e) {
+                } catch (UnauthorizedAccessException) {
                     ErrorWindow.Create(
-                        $"An error occurred while writing the file to disk:\n\n{e.Message}\n\n" +
-                        "You may not have sufficient privileges to write to the destination folder, or the current file already exists but cannot be overwritten.",
+                        $"An error occurred while writing the file.\n\n" +
+                        "You may not have sufficient privileges to write to the destination folder,\n" +
+                        "or the current file already exists but cannot be overwritten.",
                         sender
                     );
 
