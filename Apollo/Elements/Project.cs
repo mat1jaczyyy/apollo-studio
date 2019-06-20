@@ -76,9 +76,7 @@ namespace Apollo.Elements {
         private void WriteFile(Window sender, string path = null, bool store = true) {
             if (path == null) path = FilePath;
 
-            string[] file = path.Split(Path.DirectorySeparatorChar);
-
-            if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
+            if (Directory.Exists(Path.GetDirectoryName(path))) {
                 try {
                     File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
@@ -93,11 +91,21 @@ namespace Apollo.Elements {
                 }
 
                 Undo.SavePosition();
-                if (store) FilePath = path;
+
+                if (store) {
+                    FilePath = path;
+
+                    string dir = Path.Combine(Path.GetDirectoryName(FilePath), $"{FileName} Backups");
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                    File.Copy(FilePath, Path.Join(dir, $"{FileName} Backup {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"));
+                }
             }
         }
 
         public void Save(Window sender) {
+            if (Undo.Saved) return;
+
             if (FilePath == "") Save(sender, true);
             else WriteFile(sender);
         }
