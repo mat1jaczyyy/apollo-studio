@@ -98,6 +98,18 @@ namespace Apollo.Devices {
             }
         }
 
+        private class PolyInfo {
+            public Signal n;
+            public int index = 0;
+            public object locker = new object();
+            public List<int> offsets;
+
+            public PolyInfo(Signal init_n, List<int> init_offsets) {
+                n = init_n;
+                offsets = init_offsets;
+            }
+        }
+
         public string CopyMode {
             get {
                 if (_copymode == CopyType.Static) return "Static";
@@ -148,6 +160,7 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
+        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
@@ -214,6 +227,16 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
+        private void FireCourier(PolyInfo info, decimal time) {
+            Courier courier = new Courier() {
+                Info = info,
+                AutoReset = false,
+                Interval = (double)time,
+            };
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
         private void FireCourier((Signal n, List<int>) info, decimal time) {
             Courier courier = timers[info.n] = new Courier() {
                 Info = info,
@@ -232,9 +255,19 @@ namespace Apollo.Devices {
 
             Type infoType = courier.Info.GetType();
             
-            if (infoType == typeof(Signal))
-                MIDIExit?.Invoke((Signal)courier.Info);
-            else if (infoType == typeof((Signal, List<int>))) {
+            if ((_copymode == CopyType.Animate || _copymode == CopyType.Interpolate) && infoType == typeof(PolyInfo)) {
+                PolyInfo info = (PolyInfo)courier.Info;
+
+                lock (info.locker) {
+                    if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
+                        Signal m = info.n.Clone();
+                        m.Index = (byte)info.offsets[info.index];
+                        MIDIExit?.Invoke(m);
+                        
+                    } else poly.Remove(info);
+                }
+
+            } else if (_copymode == CopyType.RandomLoop && infoType == typeof((Signal, List<int>))) {
                 (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
                 HandleRandomLoop(n, offsets);
             }
@@ -285,25 +318,11 @@ namespace Apollo.Devices {
             int py = n.Index / 10;
 
             List<int> validOffsets = new List<int>() {n.Index};
-            int t = 0;
+            List<int> interpolatedOffsets = new List<int>() {n.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
-                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result)) {
+                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result))
                     validOffsets.Add(result);
-
-                    if (_copymode == CopyType.Static) {
-                        Signal m = n.Clone();
-                        m.Index = (byte)result;
-
-                        MIDIExit?.Invoke(m);
-
-                    } else if (_copymode == CopyType.Animate) {
-                        Signal m = n.Clone();
-                        m.Index = (byte)result;
-
-                        FireCourier(m, _time * _gate * (i + 1));
-                    }
-                }
 
                 if (_copymode == CopyType.Interpolate) {
                     List<(int X, int Y)> points = new List<(int, int)>();
@@ -323,22 +342,40 @@ namespace Apollo.Devices {
                     else for (int j = 1; j <= ay; j++)
                         points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
                     
-                    foreach ((int ix, int iy) in points) {
-                        t++;
-                        
-                        if (Validate(ix, iy, out int iresult)) {
-                            Signal m = n.Clone();
-                            m.Index = (byte)iresult;
-                            FireCourier(m, _time * _gate * t);
-                        }
-                    }
+                    foreach ((int ix, int iy) in points)
+                        interpolatedOffsets.Add(Validate(ix, iy, out int iresult)? iresult : -1);
                 }
 
                 px = x;
                 py = y;
             }
 
-            if (_copymode == CopyType.RandomSingle) {
+            if (_copymode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
+
+            if (_copymode == CopyType.Static) {
+                MIDIExit?.Invoke(n);
+
+                for (int i = 1; i < validOffsets.Count; i++) {
+                    Signal m = n.Clone();
+                    m.Index = (byte)validOffsets[i];
+
+                    MIDIExit?.Invoke(m);
+                }
+
+            } else if (_copymode == CopyType.Animate || _copymode == CopyType.Interpolate) {
+                if (!locker.ContainsKey(n)) locker[n] = new object();
+                
+                lock (locker[n]) {
+                    MIDIExit?.Invoke(n.Clone());
+                    
+                    PolyInfo info = new PolyInfo(n, validOffsets);
+                    poly.Add(info);
+
+                    for (int i = 1; i < validOffsets.Count; i++)
+                        FireCourier(info, _time * _gate * i);
+                }
+
+            } else if (_copymode == CopyType.RandomSingle) {
                 Signal m = n.Clone();
                 n.Color = new Color();
 
@@ -354,8 +391,6 @@ namespace Apollo.Devices {
                 MIDIExit?.Invoke(m);
 
             } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
-            
-            else MIDIExit?.Invoke(n);
         }
     }
 }
