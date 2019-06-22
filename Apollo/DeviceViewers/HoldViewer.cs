@@ -15,7 +15,14 @@ namespace Apollo.DeviceViewers {
     public class HoldViewer: UserControl {
         public static readonly string DeviceIdentifier = "hold";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Duration = this.Get<Dial>("Duration");
+            Gate = this.Get<Dial>("Gate");
+            Infinite = this.Get<CheckBox>("Infinite");
+            Release = this.Get<CheckBox>("Release");
+        }
         
         Hold _hold;
 
@@ -27,19 +34,15 @@ namespace Apollo.DeviceViewers {
 
             _hold = hold;
 
-            Duration = this.Get<Dial>("Duration");
             Duration.UsingSteps = _hold.Time.Mode;
             Duration.Length = _hold.Time.Length;
             Duration.RawValue = _hold.Time.Free;
 
-            Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_hold.Gate * 100;
 
-            Infinite = this.Get<CheckBox>("Infinite");
             Infinite.IsChecked = _hold.Infinite;
             Infinite_Changed(null, EventArgs.Empty); // required to set Dial Enabled properties
 
-            Release = this.Get<CheckBox>("Release");
             Release.IsChecked = _hold.Release;
         }
 

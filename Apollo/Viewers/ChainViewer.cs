@@ -25,7 +25,15 @@ namespace Apollo.Viewers {
             get => null;
         }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            DropZoneBefore = this.Get<Grid>("DropZoneBefore");
+            DropZoneAfter = this.Get<Grid>("DropZoneAfter");
+
+            Contents = this.Get<StackPanel>("Contents").Children;
+            DeviceAdd = this.Get<DeviceAdd>("DeviceAdd");
+        }
         
         Chain _chain;
 
@@ -65,9 +73,6 @@ namespace Apollo.Viewers {
 
             _chain = chain;
             _chain.Viewer = this;
-
-            DropZoneBefore = this.Get<Grid>("DropZoneBefore");
-            DropZoneAfter = this.Get<Grid>("DropZoneAfter");
             
             DeviceContextMenuBefore = (ContextMenu)this.Resources["DeviceContextMenuBefore"];
             DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
@@ -77,9 +82,6 @@ namespace Apollo.Viewers {
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
-
-            Contents = this.Get<StackPanel>("Contents").Children;
-            DeviceAdd = this.Get<DeviceAdd>("DeviceAdd");
 
             for (int i = 0; i < _chain.Count; i++)
                 Contents_Insert(i, _chain[i]);

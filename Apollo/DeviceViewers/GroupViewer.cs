@@ -28,7 +28,12 @@ namespace Apollo.DeviceViewers {
             get => _group.Expanded;
         }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Contents = this.Get<StackPanel>("Contents").Children;
+            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
+        }
         
         Group _group;
         DeviceViewer _parent;
@@ -83,9 +88,6 @@ namespace Apollo.DeviceViewers {
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
-
-            Contents = this.Get<StackPanel>("Contents").Children;
-            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
             
             for (int i = 0; i < _group.Count; i++) {
                 _group[i].ClearParentIndexChanged();

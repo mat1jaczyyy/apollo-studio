@@ -11,7 +11,11 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class CopyOffset: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            _viewer = this.Get<MoveDial>("Offset");
+        }
 
         public delegate void OffsetEventHandler(int index);
         public event OffsetEventHandler OffsetAdded;
@@ -27,7 +31,6 @@ namespace Apollo.Components {
             _offset = offset;
             _copy = copy;
 
-            _viewer = this.Get<MoveDial>("Offset");
             _viewer.X = _offset.X;
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;

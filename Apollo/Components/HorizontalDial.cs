@@ -8,7 +8,18 @@ using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class HorizontalDial: Dial {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            ArcCanvas = this.Get<Canvas>("ArcCanvas");
+            ArcBase = this.Get<Path>("ArcBase");
+            Arc = this.Get<Path>("Arc");
+
+            Display = this.Get<TextBlock>("Display");
+            TitleText = this.Get<TextBlock>("Title");
+
+            Input = this.Get<TextBox>("Input");
+        }
 
         public override double Maximum {
             get => _max;
@@ -24,14 +35,6 @@ namespace Apollo.Components {
         }
 
         public HorizontalDial() {
-            ArcCanvas = this.Get<Canvas>("ArcCanvas");
-            ArcBase = this.Get<Path>("ArcBase");
-            Arc = this.Get<Path>("Arc");
-
-            Display = this.Get<TextBlock>("Display");
-            TitleText = this.Get<TextBlock>("Title");
-
-            Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             DrawArcBase();

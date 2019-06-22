@@ -7,7 +7,12 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class FrameThumbnail: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Launchpad = this.Get<LaunchpadGrid>("Launchpad");
+            Time = this.Get<TextBlock>("Time");
+        }
 
         public delegate void ClickedEventHandler();
         public event ClickedEventHandler Clicked;
@@ -27,9 +32,6 @@ namespace Apollo.Components {
 
         public FrameThumbnail() {
             InitializeComponent();
-
-            Launchpad = this.Get<LaunchpadGrid>("Launchpad");
-            Time = this.Get<TextBlock>("Time");
 
             Launchpad.RenderFrame(_frame);
         }

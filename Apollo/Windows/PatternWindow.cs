@@ -26,7 +26,34 @@ namespace Apollo.Windows {
             get => _pattern.Expanded;
         }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            TitleText = this.Get<TextBlock>("Title");
+            UndoButton = this.Get<UndoButton>("UndoButton");
+            RedoButton = this.Get<RedoButton>("RedoButton");
+
+            Editor = this.Get<LaunchpadGrid>("Editor");
+
+            Duration = this.Get<Dial>("Duration");
+            Gate = this.Get<Dial>("Gate");
+            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
+            Infinite = this.Get<CheckBox>("Infinite");
+            Choke = this.Get<Dial>("Choke");
+
+            ImportButton = this.Get<Button>("Import");
+            Play = this.Get<Button>("Play");
+            Fire = this.Get<Button>("Fire");
+
+            Reverse = this.Get<Button>("Reverse");
+            Invert = this.Get<Button>("Invert");
+
+            Contents = this.Get<StackPanel>("Frames").Children;
+            PortSelector = this.Get<ComboBox>("PortSelector");
+
+            ColorPicker = this.Get<ColorPicker>("ColorPicker");
+            ColorHistory = this.Get<ColorHistory>("ColorHistory");
+        }
 
         Pattern _pattern;
         Track _track;
@@ -188,42 +215,22 @@ namespace Apollo.Windows {
             _pattern = pattern;
             _track = Track.Get(_pattern);
 
-            TitleText = this.Get<TextBlock>("Title");
-            UndoButton = this.Get<UndoButton>("UndoButton");
-            RedoButton = this.Get<RedoButton>("RedoButton");
-
-            Editor = this.Get<LaunchpadGrid>("Editor");
             Editor.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
 
-            Duration = this.Get<Dial>("Duration");
-            
-            Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_pattern.Gate * 100;
 
-            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             PlaybackMode.SelectedItem = _pattern.Mode;
 
-            Infinite = this.Get<CheckBox>("Infinite");
             Infinite.IsChecked = _pattern.Infinite;
 
-            Choke = this.Get<Dial>("Choke");
             Choke.Enabled = _pattern.ChokeEnabled;
             Choke.RawValue = _pattern.Choke;
-
-            ImportButton = this.Get<Button>("Import");
-            Play = this.Get<Button>("Play");
-            Fire = this.Get<Button>("Fire");
-
-            Reverse = this.Get<Button>("Reverse");
-            Invert = this.Get<Button>("Invert");
 
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
 
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
-
-            Contents = this.Get<StackPanel>("Frames").Children;
 
             for (int i = 0; i < _pattern.Count; i++)
                 Contents_Insert(i, _pattern[i], true);
@@ -232,12 +239,8 @@ namespace Apollo.Windows {
 
             Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 
-            PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
-
-            ColorPicker = this.Get<ColorPicker>("ColorPicker");
-            ColorHistory = this.Get<ColorHistory>("ColorHistory");
 
             ColorPicker.SetColor(ColorHistory.GetColor(0)?? new Color());
             ColorHistory.Select(ColorPicker.Color.Clone(), true);

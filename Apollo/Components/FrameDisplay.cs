@@ -19,7 +19,16 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class FrameDisplay: UserControl, ISelectViewer {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Root = this.Get<StackPanel>("DropZone");
+
+            Viewer = this.Get<FrameThumbnail>("Draggable");
+            
+            Remove = this.Get<Remove>("Remove");
+            FrameAdd = this.Get<VerticalAdd>("DropZoneAfter");
+        }
 
         public delegate void FrameEventHandler(int index);
         public event FrameEventHandler FrameAdded;
@@ -55,13 +64,7 @@ namespace Apollo.Components {
 
             _pattern = pattern;
 
-            Root = this.Get<StackPanel>("DropZone");
-
-            Viewer = this.Get<FrameThumbnail>("Draggable");
             Viewer.Frame = frame;
-            
-            Remove = this.Get<Remove>("Remove");
-            FrameAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);

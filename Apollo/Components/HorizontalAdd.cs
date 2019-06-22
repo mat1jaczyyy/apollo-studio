@@ -5,7 +5,11 @@ using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class HorizontalAdd: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Root = this.Get<Grid>("Root");
+        }
 
         public delegate void AddedEventHandler();
         public event AddedEventHandler Added;
@@ -23,11 +27,7 @@ namespace Apollo.Components {
             }
         }
 
-        public HorizontalAdd() {
-            InitializeComponent();
-            
-            Root = this.Get<Grid>("Root");
-        }
+        public HorizontalAdd() => InitializeComponent();
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Added = null;
 

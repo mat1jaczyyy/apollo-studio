@@ -18,7 +18,18 @@ namespace Apollo.DeviceViewers {
     public class FadeViewer: UserControl {
         public static readonly string DeviceIdentifier = "fade";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            canvas = this.Get<Canvas>("Canvas");
+            PickerContainer = this.Get<Grid>("PickerContainer");
+            Picker = this.Get<ColorPicker>("Picker");
+            Gradient = this.Get<LinearGradientBrush>("Gradient");
+
+            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
+            Duration = this.Get<Dial>("Duration");
+            Gate = this.Get<Dial>("Gate");
+        }
         
         Fade _fade;
         
@@ -62,21 +73,13 @@ namespace Apollo.DeviceViewers {
 
             _fade = fade;
             _fade.Generated += Gradient_Generate;
-            
-            canvas = this.Get<Canvas>("Canvas");
-            PickerContainer = this.Get<Grid>("PickerContainer");
-            Picker = this.Get<ColorPicker>("Picker");
-            Gradient = this.Get<LinearGradientBrush>("Gradient");
 
-            PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             PlaybackMode.SelectedItem = _fade.PlayMode;
 
-            Duration = this.Get<Dial>("Duration");
             Duration.UsingSteps = _fade.Time.Mode;
             Duration.Length = _fade.Time.Length;
             Duration.RawValue = _fade.Time.Free;
 
-            Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_fade.Gate * 100;
             
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));

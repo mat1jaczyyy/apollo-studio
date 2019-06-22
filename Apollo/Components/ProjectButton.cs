@@ -9,7 +9,11 @@ using Apollo.Windows;
 
 namespace Apollo.Components {
     public class ProjectButton: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Path = this.Get<Path>("Path");
+        }
 
         Path Path;
 
@@ -20,8 +24,6 @@ namespace Apollo.Components {
 
         public ProjectButton() {
             InitializeComponent();
-
-            Path = this.Get<Path>("Path");
 
             base.MouseLeave(this, null);
         }

@@ -10,7 +10,11 @@ using Apollo.Windows;
 
 namespace Apollo.Components {
     public class PreferencesButton: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+   
+            Hole = this.Get<Ellipse>("Hole");
+        }
 
         Ellipse Hole;
 
@@ -29,7 +33,6 @@ namespace Apollo.Components {
 
             base.MouseLeave(this, null);
 
-            Hole = this.Get<Ellipse>("Hole");
             Hole.Fill = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeBorderMidBrush");
         }
 

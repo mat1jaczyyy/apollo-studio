@@ -7,7 +7,11 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Close: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Path = this.Get<Path>("Path");
+        }
 
         public new delegate void ClickedEventHandler(bool force);
         public new event ClickedEventHandler Clicked;
@@ -21,8 +25,6 @@ namespace Apollo.Components {
 
         public Close() {
             InitializeComponent();
-
-            Path = this.Get<Path>("Path");
 
             base.MouseLeave(this, null);
         }

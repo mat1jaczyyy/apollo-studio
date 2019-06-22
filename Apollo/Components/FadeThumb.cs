@@ -8,7 +8,11 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class FadeThumb: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Base = this.Get<Thumb>("Thumb");
+        }
 
         public delegate void MovedEventHandler(FadeThumb sender, double change, double? total);
         public event MovedEventHandler Moved;
@@ -27,7 +31,6 @@ namespace Apollo.Components {
         public FadeThumb() {
             InitializeComponent();
             
-            Base = this.Get<Thumb>("Thumb");
             Base.AddHandler(InputElement.PointerPressedEvent, MouseDown, RoutingStrategies.Tunnel);
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
         }

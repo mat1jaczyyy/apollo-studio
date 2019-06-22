@@ -13,7 +13,12 @@ namespace Apollo.DeviceViewers {
     public class RotateViewer: UserControl {
         public static readonly string DeviceIdentifier = "rotate";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            RotateMode = this.Get<ComboBox>("RotateMode");
+            Bypass = this.Get<CheckBox>("Bypass");
+        }
         
         Rotate _rotate;
         ComboBox RotateMode;
@@ -24,10 +29,7 @@ namespace Apollo.DeviceViewers {
 
             _rotate = rotate;
 
-            RotateMode = this.Get<ComboBox>("RotateMode");
             RotateMode.SelectedItem = _rotate.Mode;
-            
-            Bypass = this.Get<CheckBox>("Bypass");
             Bypass.IsChecked = _rotate.Bypass;
         }
 

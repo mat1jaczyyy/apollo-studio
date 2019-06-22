@@ -9,7 +9,12 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class VerticalAdd: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Root = this.Get<Grid>("Root");
+            Icon = this.Get<Canvas>("Icon");
+        }
 
         public delegate void AddedEventHandler();
         public event AddedEventHandler Added;
@@ -53,9 +58,6 @@ namespace Apollo.Components {
         
         public VerticalAdd() {
             InitializeComponent();
-            
-            Root = this.Get<Grid>("Root");
-            Icon = this.Get<Canvas>("Icon");
 
             ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
             ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);

@@ -17,7 +17,15 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Root = this.Get<Grid>("DropZone");
+            ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
+            NameText = this.Get<TextBlock>("Name");
+            Draggable = this.Get<Grid>("Draggable");
+            Input = this.Get<TextBox>("Input");
+        }
 
         public delegate void ChainAddedEventHandler(int index);
         public event ChainAddedEventHandler ChainAdded;
@@ -58,23 +66,17 @@ namespace Apollo.Viewers {
             
             _chain = chain;
 
-            Root = this.Get<Grid>("DropZone");
             Deselect();
 
-            NameText = this.Get<TextBlock>("Name");
             UpdateText();
             _chain.ParentIndexChanged += UpdateText;
-
-            ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
             ChainContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
-            Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
-            Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();

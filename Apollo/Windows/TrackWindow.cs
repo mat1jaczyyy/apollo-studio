@@ -16,7 +16,12 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class TrackWindow: Window {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            TitleText = this.Get<TextBlock>("Title");
+            Contents = this.Get<ScrollViewer>("Contents");
+        }
 
         Track _track;
 
@@ -47,8 +52,6 @@ namespace Apollo.Windows {
 
             _track = track;
 
-            TitleText = this.Get<TextBlock>("Title");
-
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
             chainViewer.PointerWheelChanged += Track_Scroll;
 
@@ -56,7 +59,6 @@ namespace Apollo.Windows {
             UpdateContentAlignment(Preferences.CenterTrackContents);
             Preferences.CenterTrackContentsChanged += UpdateContentAlignment;
 
-            Contents = this.Get<ScrollViewer>("Contents");
             Contents.Content = chainViewer;
 
             SetEnabled();

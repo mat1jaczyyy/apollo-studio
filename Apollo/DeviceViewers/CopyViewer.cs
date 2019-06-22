@@ -15,7 +15,18 @@ namespace Apollo.DeviceViewers {
     public class CopyViewer: UserControl {
         public static readonly string DeviceIdentifier = "copy";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Rate = this.Get<Dial>("Rate");
+            Gate = this.Get<Dial>("Gate");
+            CopyMode = this.Get<ComboBox>("CopyMode");
+            GridMode = this.Get<ComboBox>("GridMode");
+            Wrap = this.Get<CheckBox>("Wrap");
+            
+            Contents = this.Get<StackPanel>("Contents").Children;
+            OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
+        }
         
         Copy _copy;
 
@@ -45,25 +56,17 @@ namespace Apollo.DeviceViewers {
 
             _copy = copy;
 
-            Rate = this.Get<Dial>("Rate");
             Rate.UsingSteps = _copy.Time.Mode;
             Rate.Length = _copy.Time.Length;
             Rate.RawValue = _copy.Time.Free;
 
-            Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_copy.Gate * 100;
 
-            CopyMode = this.Get<ComboBox>("CopyMode");
             CopyMode.SelectedItem = _copy.CopyMode;
 
-            GridMode = this.Get<ComboBox>("GridMode");
             GridMode.SelectedItem = _copy.GridMode;
 
-            Wrap = this.Get<CheckBox>("Wrap");
             Wrap.IsChecked = _copy.Wrap;
-
-            Contents = this.Get<StackPanel>("Contents").Children;
-            OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
 
             for (int i = 0; i < _copy.Offsets.Count; i++)
                 Contents_Insert(i, _copy.Offsets[i]);

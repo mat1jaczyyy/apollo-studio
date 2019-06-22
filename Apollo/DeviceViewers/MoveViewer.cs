@@ -14,7 +14,13 @@ namespace Apollo.DeviceViewers {
     public class MoveViewer: UserControl {
         public static readonly string DeviceIdentifier = "move";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Offset = this.Get<MoveDial>("Offset");
+            GridMode = this.Get<ComboBox>("GridMode");
+            Wrap = this.Get<CheckBox>("Wrap");
+        }
         
         Move _move;
 
@@ -27,15 +33,12 @@ namespace Apollo.DeviceViewers {
 
             _move = move;
 
-            Offset = this.Get<MoveDial>("Offset");
             Offset.X = _move.Offset.X;
             Offset.Y = _move.Offset.Y;
             Offset.Changed += Offset_Changed;
 
-            GridMode = this.Get<ComboBox>("GridMode");
             GridMode.SelectedItem = _move.GridMode;
 
-            Wrap = this.Get<CheckBox>("Wrap");
             Wrap.IsChecked = _move.Wrap;
         }
 

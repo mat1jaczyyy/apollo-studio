@@ -9,7 +9,12 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class TrackAdd: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Root = this.Get<Grid>("Root");
+            Icon = this.Get<Canvas>("Icon");
+        }
 
         public delegate void TrackAddedEventHandler();
         public event TrackAddedEventHandler TrackAdded;
@@ -35,9 +40,6 @@ namespace Apollo.Components {
 
         public TrackAdd() {
             InitializeComponent();
-            
-            Root = this.Get<Grid>("Root");
-            Icon = this.Get<Canvas>("Icon");
 
             ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];
             ActionContextMenu.AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);

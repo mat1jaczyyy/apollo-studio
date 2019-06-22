@@ -13,7 +13,15 @@ namespace Apollo.DeviceViewers {
     public class ToneViewer: UserControl {
         public static readonly string DeviceIdentifier = "tone";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Hue = this.Get<Dial>("Hue");
+            SaturationHigh = this.Get<Dial>("SaturationHigh");
+            SaturationLow = this.Get<Dial>("SaturationLow");
+            ValueHigh = this.Get<Dial>("ValueHigh");
+            ValueLow = this.Get<Dial>("ValueLow");
+        }
         
         Tone _tone;
 
@@ -24,19 +32,10 @@ namespace Apollo.DeviceViewers {
 
             _tone = tone;
 
-            Hue = this.Get<Dial>("Hue");
             Hue.RawValue = _tone.Hue;
-
-            SaturationHigh = this.Get<Dial>("SaturationHigh");
             SaturationHigh.RawValue = _tone.SaturationHigh * 100;
-            
-            SaturationLow = this.Get<Dial>("SaturationLow");
             SaturationLow.RawValue = _tone.SaturationLow * 100;
-            
-            ValueHigh = this.Get<Dial>("ValueHigh");
             ValueHigh.RawValue = _tone.ValueHigh * 100;
-            
-            ValueLow = this.Get<Dial>("ValueLow");
             ValueLow.RawValue = _tone.ValueLow * 100;
         }
 

@@ -14,7 +14,19 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class LaunchpadGrid: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Root = this.Get<StackPanel>("Root");
+            Grid = this.Get<UniformGrid>("LaunchpadGrid");
+
+            TopLeft = this.Get<Path>("TopLeft");
+            TopRight = this.Get<Path>("TopRight");
+            BottomLeft = this.Get<Path>("BottomLeft");
+            BottomRight = this.Get<Path>("BottomRight");
+
+            ModeLight = this.Get<Rectangle>("ModeLight");
+        }
         
         StackPanel Root;
         UniformGrid Grid;
@@ -135,16 +147,6 @@ namespace Apollo.Components {
 
         public LaunchpadGrid() {
             InitializeComponent();
-
-            Root = this.Get<StackPanel>("Root");
-            Grid = this.Get<UniformGrid>("LaunchpadGrid");
-
-            TopLeft = this.Get<Path>("TopLeft");
-            TopRight = this.Get<Path>("TopRight");
-            BottomLeft = this.Get<Path>("BottomLeft");
-            BottomRight = this.Get<Path>("BottomRight");
-
-            ModeLight = this.Get<Rectangle>("ModeLight");
 
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
         }

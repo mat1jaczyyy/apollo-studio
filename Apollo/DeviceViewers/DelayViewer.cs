@@ -14,7 +14,12 @@ namespace Apollo.DeviceViewers {
     public class DelayViewer: UserControl {
         public static readonly string DeviceIdentifier = "delay";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Duration = this.Get<Dial>("Duration");
+            Gate = this.Get<Dial>("Gate");
+        }
         
         Delay _delay;
         Dial Duration, Gate;
@@ -23,12 +28,11 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _delay = delay;
-            Duration = this.Get<Dial>("Duration");
+            
             Duration.UsingSteps = _delay.Time.Mode;
             Duration.Length = _delay.Time.Length;
             Duration.RawValue = _delay.Time.Free;
 
-            Gate = this.Get<Dial>("Gate");
             Gate.RawValue = (double)_delay.Gate * 100;
         }
 

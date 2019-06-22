@@ -28,7 +28,14 @@ namespace Apollo.DeviceViewers {
             get => _multi.Expanded;
         }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            MultiMode = this.Get<ComboBox>("MultiMode");
+            
+            Contents = this.Get<StackPanel>("Contents").Children;
+            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
+        }
         
         Multi _multi;
         DeviceViewer _parent;
@@ -86,7 +93,6 @@ namespace Apollo.DeviceViewers {
             _root.Insert(0, new DeviceHead(_multi, parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
-            MultiMode = this.Get<ComboBox>("MultiMode");
             MultiMode.SelectedItem = _multi.Mode;
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
@@ -94,10 +100,6 @@ namespace Apollo.DeviceViewers {
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
-
-            Contents = this.Get<StackPanel>("Contents").Children;
-            
-            ChainAdd = this.Get<VerticalAdd>("ChainAdd");
             
             for (int i = 0; i < _multi.Count; i++) {
                 _multi[i].ClearParentIndexChanged();

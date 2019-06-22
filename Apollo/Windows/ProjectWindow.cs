@@ -26,7 +26,16 @@ namespace Apollo.Windows {
             get => null;
         }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            TitleText = this.Get<TextBlock>("Title");
+            Contents = this.Get<StackPanel>("Contents").Children;
+            TrackAdd = this.Get<TrackAdd>("TrackAdd");
+
+            BPM = this.Get<TextBox>("BPM");
+            Page = this.Get<HorizontalDial>("Page");
+        }
 
         private void UpdateTitle() => Title = TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
@@ -78,26 +87,18 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
-            TitleText = this.Get<TextBlock>("Title");
-
             TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
             TrackContextMenu.AddHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
-            Contents = this.Get<StackPanel>("Contents").Children;
-            TrackAdd = this.Get<TrackAdd>("TrackAdd");
-
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
             
-            BPM = this.Get<TextBox>("BPM");
             BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
-
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
-            Page = this.Get<HorizontalDial>("Page");
             Page.RawValue = Program.Project.Page;
         }
         

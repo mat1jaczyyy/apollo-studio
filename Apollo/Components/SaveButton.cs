@@ -13,7 +13,11 @@ using Apollo.Core;
 
 namespace Apollo.Components {
     public class SaveButton: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Path = this.Get<Path>("Path");
+        }
 
         ContextMenu SaveContextMenu;
 
@@ -28,8 +32,6 @@ namespace Apollo.Components {
 
         public SaveButton() {
             InitializeComponent();
-
-            Path = this.Get<Path>("Path");
 
             AllowRightClick = true;
             base.MouseLeave(this, null);

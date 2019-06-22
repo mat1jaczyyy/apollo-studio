@@ -12,7 +12,16 @@ using Apollo.Elements;
 
 namespace Apollo.Viewers {
     public class CollapsedDeviceViewer: DeviceViewer {
-        protected override void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        protected override void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Root = this.Get<StackPanel>("Root");
+            Header = this.Get<Border>("Contents");
+            
+            Draggable = this.Get<Grid>("Draggable");
+            DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
+            TitleText = this.Get<TextBlock>("Title");
+        }
 
         protected override void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -22,18 +31,11 @@ namespace Apollo.Viewers {
         }
 
         public CollapsedDeviceViewer(Device device) {
-            TitleText = this.Get<TextBlock>("Title");
             TitleText.Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
             _device.Viewer = this;
-
-            Root = this.Get<StackPanel>("Root");
-
-            Header = this.Get<Border>("Contents");
             Deselect();
-            
-            DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
 
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
@@ -41,7 +43,6 @@ namespace Apollo.Viewers {
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             
-            Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 

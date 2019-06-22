@@ -13,7 +13,12 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class UndoWindow: Window {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            ScrollViewer = this.Get<ScrollViewer>("ScrollViewer");
+            Contents = this.Get<StackPanel>("Contents");
+        }
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -43,10 +48,6 @@ namespace Apollo.Windows {
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
-
-            ScrollViewer = this.Get<ScrollViewer>("ScrollViewer");
-
-            Contents = this.Get<StackPanel>("Contents");
 
             for (int i = 0; i < Program.Project.Undo.History.Count; i++)
                 Contents_Insert(i, Program.Project.Undo.History[i]);

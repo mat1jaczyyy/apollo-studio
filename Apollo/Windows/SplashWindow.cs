@@ -17,7 +17,11 @@ namespace Apollo.Windows {
     public class SplashWindow: Window {
         private static Image SplashImage = (Image)Application.Current.Styles.FindResource("SplashImage");
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Root = this.Get<Grid>("Root");
+        }
 
         Grid Root;
 
@@ -34,7 +38,6 @@ namespace Apollo.Windows {
 
             this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
             
-            Root = this.Get<Grid>("Root");
             Root.Children.Add(SplashImage);
         }
 

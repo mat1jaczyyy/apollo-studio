@@ -18,7 +18,37 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class PreferencesWindow: Window {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
+            CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
+            LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
+
+            AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
+            AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
+
+            FadeSmoothness = this.Get<Slider>("FadeSmoothness");
+
+            CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
+            CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
+            EnableGestures = this.Get<CheckBox>("EnableGestures");
+
+            Monochrome = this.Get<RadioButton>("Monochrome");
+            NovationPalette = this.Get<RadioButton>("NovationPalette");
+            CustomPalette = this.Get<RadioButton>("CustomPalette");
+
+            Dark = this.Get<RadioButton>("Dark");
+            Light = this.Get<RadioButton>("Light");
+
+            Backup = this.Get<CheckBox>("Backup");
+            Autosave = this.Get<CheckBox>("Autosave");
+
+            DiscordPresence = this.Get<CheckBox>("DiscordPresence");
+            DiscordFilename = this.Get<CheckBox>("DiscordFilename");
+
+            Contents = this.Get<StackPanel>("Contents").Children;
+        }
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, DiscordPresence, DiscordFilename;
         ComboBox LaunchpadStyle;
@@ -50,63 +80,34 @@ namespace Apollo.Windows {
 
             this.Get<TextBlock>("Version").Text += Program.Version;
 
-            AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
-
-            CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
-
-            LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadStyle.SelectedItem = Preferences.LaunchpadStyle.ToString();
 
-            AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
-
-            AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
 
-            FadeSmoothness = this.Get<Slider>("FadeSmoothness");
             FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
             FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
 
-            CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
             CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
-
-            CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
             CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
-
-            EnableGestures = this.Get<CheckBox>("EnableGestures");
             EnableGestures.IsChecked = Preferences.EnableGestures;
 
-            Monochrome = this.Get<RadioButton>("Monochrome");
             Monochrome.IsChecked = Preferences.ImportPalette == Preferences.Palettes.Monochrome;
-
-            NovationPalette = this.Get<RadioButton>("NovationPalette");
             NovationPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.NovationPalette;
-
-            CustomPalette = this.Get<RadioButton>("CustomPalette");
             CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
             CustomPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.CustomPalette;
 
-            Dark = this.Get<RadioButton>("Dark");
             Dark.IsChecked = Preferences.Theme == Preferences.Themes.Dark;
-
-            Light = this.Get<RadioButton>("Light");
             Light.IsChecked = Preferences.Theme == Preferences.Themes.Light;
 
-            Backup = this.Get<CheckBox>("Backup");
             Backup.IsChecked = Preferences.Backup;
-
-            Autosave = this.Get<CheckBox>("Autosave");
             Autosave.IsChecked = Preferences.Autosave;
 
-            DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
-
-            DiscordFilename = this.Get<CheckBox>("DiscordFilename");
             DiscordFilename.IsChecked = Preferences.DiscordFilename;
 
-            Contents = this.Get<StackPanel>("Contents").Children;
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
         }

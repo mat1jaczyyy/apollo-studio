@@ -14,7 +14,11 @@ namespace Apollo.DeviceViewers {
     public class PaintViewer: UserControl {
         public static readonly string DeviceIdentifier = "paint";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Picker = this.Get<ColorPicker>("Picker");
+        }
         
         Paint _paint;
         ColorPicker Picker;
@@ -24,7 +28,6 @@ namespace Apollo.DeviceViewers {
 
             _paint = paint;
 
-            Picker = this.Get<ColorPicker>("Picker");
             Picker.SetColor(_paint.Color);
         }
 

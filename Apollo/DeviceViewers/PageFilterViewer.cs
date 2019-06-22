@@ -16,7 +16,11 @@ namespace Apollo.DeviceViewers {
     public class PageFilterViewer: UserControl {
         public static readonly string DeviceIdentifier = "pagefilter";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            PagesGrid = this.Get<UniformGrid>("PagesGrid");
+        }
         
         PageFilter _filter;
         UniformGrid PagesGrid;
@@ -27,8 +31,6 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _filter = filter;
-
-            PagesGrid = this.Get<UniformGrid>("PagesGrid");
 
             for (int i = 0; i < PagesGrid.Children.Count; i++)
                 Set((Rectangle)PagesGrid.Children[i], _filter[i]);

@@ -16,7 +16,21 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class ColorPicker: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Preview = this.Get<Ellipse>("Color");
+
+            MainCanvas = this.Get<Canvas>("MainCanvas");
+            HueCanvas = this.Get<Canvas>("HueCanvas");
+
+            MainThumb = this.Get<Thumb>("MainThumb");
+            HueThumb = this.Get<Thumb>("HueThumb");
+
+            MainColor = this.Get<GradientStop>("MainColor");
+            
+            Hex = this.Get<TextBox>("Hex");
+        }
         
         public delegate void ColorChangedEventHandler(Color value, Color old);
         public event ColorChangedEventHandler ColorChanged;
@@ -47,22 +61,11 @@ namespace Apollo.Components {
 
         public ColorPicker() {
             InitializeComponent();
-            
-            Preview = this.Get<Ellipse>("Color");
-
-            MainCanvas = this.Get<Canvas>("MainCanvas");
-            HueCanvas = this.Get<Canvas>("HueCanvas");
 
             MainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
             HueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
 
-            MainThumb = this.Get<Thumb>("MainThumb");
-            HueThumb = this.Get<Thumb>("HueThumb");
-
-            MainColor = this.Get<GradientStop>("MainColor");
-
             hexValidation = true;
-            Hex = this.Get<TextBox>("Hex");
             Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
 

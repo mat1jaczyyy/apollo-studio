@@ -18,7 +18,17 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class TrackInfo: UserControl, ISelectViewer {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            NameText = this.Get<TextBlock>("Name");
+            Draggable = this.Get<Grid>("Draggable");
+
+            PortSelector = this.Get<ComboBox>("PortSelector");
+            DropZone = this.Get<Border>("DropZone");
+            TrackAdd = this.Get<TrackAdd>("DropZoneAfter");
+            Input = this.Get<TextBox>("Input");
+        }
 
         public delegate void TrackAddedEventHandler(int index);
         public event TrackAddedEventHandler TrackAdded;
@@ -71,28 +81,20 @@ namespace Apollo.Viewers {
             
             _track = track;
 
-            NameText = this.Get<TextBlock>("Name");
             UpdateText(0);
             _track.ParentIndexChanged += UpdateText;
 
-            Draggable = this.Get<Grid>("Draggable");
-
-            PortSelector = this.Get<ComboBox>("PortSelector");
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
-
-            TrackAdd = this.Get<TrackAdd>("DropZoneAfter");
 
             TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
             TrackContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
-            DropZone = this.Get<Border>("DropZone");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             
             Deselect();
 
-            Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();

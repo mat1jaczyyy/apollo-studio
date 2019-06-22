@@ -6,7 +6,11 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Minimize: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Path = this.Get<Path>("Path");
+        }
 
         Path Path;
 
@@ -17,8 +21,6 @@ namespace Apollo.Components {
 
         public Minimize() {
             InitializeComponent();
-
-            Path = this.Get<Path>("Path");
 
             base.MouseLeave(this, null);
         }

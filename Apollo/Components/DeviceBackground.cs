@@ -3,8 +3,6 @@ using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class DeviceBackground: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-        
-        public DeviceBackground() => InitializeComponent();
+        public DeviceBackground() => AvaloniaXamlLoader.Load(this);
     }
 }

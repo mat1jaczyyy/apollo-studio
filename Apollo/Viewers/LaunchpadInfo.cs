@@ -15,7 +15,14 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class LaunchpadInfo: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Popout = this.Get<Popout>("Popout");
+            Rotation = this.Get<ComboBox>("Rotation");
+            InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
+            TargetPortSelector = this.Get<ComboBox>("TargetPortSelector");
+        }
         
         Launchpad _launchpad;
 
@@ -48,15 +55,8 @@ namespace Apollo.Viewers {
 
             this.Get<TextBlock>("Name").Text = _launchpad.Name.Trim();
 
-            Popout = this.Get<Popout>("Popout");
-
-            Rotation = this.Get<ComboBox>("Rotation");
             Rotation.SelectedIndex = (int)_launchpad.Rotation;
-
-            InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
             InputFormatSelector.SelectedIndex = (int)_launchpad.InputFormat;
-
-            TargetPortSelector = this.Get<ComboBox>("TargetPortSelector");
 
             if (_launchpad.GetType() != typeof(Launchpad)) {
                 Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;

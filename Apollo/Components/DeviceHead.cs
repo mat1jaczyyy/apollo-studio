@@ -9,7 +9,12 @@ using Apollo.Viewers;
 
 namespace Apollo.Components {
     public class DeviceHead: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Border = this.Get<Border>("Border");
+            Header = this.Get<Border>("Header");
+        }
 
         DeviceViewer Owner;
         public Border Border, Header;
@@ -18,9 +23,6 @@ namespace Apollo.Components {
             InitializeComponent();
 
             Owner = ownerviewer;
-
-            Border = this.Get<Border>("Border");
-            Header = this.Get<Border>("Header");
 
             this.Resources["TitleBrush"] = Owner.Header.Background?? Owner.Resources["TitleBrush"];
 

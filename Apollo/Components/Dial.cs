@@ -14,7 +14,18 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class Dial: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            ArcCanvas = this.Get<Canvas>("ArcCanvas");
+            ArcBase = this.Get<Path>("ArcBase");
+            Arc = this.Get<Path>("Arc");
+
+            Display = this.Get<TextBlock>("Display");
+            TitleText = this.Get<TextBlock>("Title");
+
+            Input = this.Get<TextBox>("Input");
+        }
 
         public delegate void DialStartedEventHandler();
         public event DialStartedEventHandler Started;
@@ -292,14 +303,6 @@ namespace Apollo.Components {
 
             if (this.GetType() != typeof(Dial)) return;
 
-            ArcCanvas = this.Get<Canvas>("ArcCanvas");
-            ArcBase = this.Get<Path>("ArcBase");
-            Arc = this.Get<Path>("Arc");
-
-            Display = this.Get<TextBlock>("Display");
-            TitleText = this.Get<TextBlock>("Title");
-
-            Input = this.Get<TextBox>("Input");
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             DrawArcBase();

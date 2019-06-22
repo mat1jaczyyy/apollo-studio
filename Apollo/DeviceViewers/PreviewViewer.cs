@@ -12,7 +12,11 @@ namespace Apollo.DeviceViewers {
     public class PreviewViewer: UserControl {
         public static readonly string DeviceIdentifier = "preview";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Grid = this.Get<LaunchpadGrid>("Grid");
+        }
         
         Preview _preview;
         LaunchpadGrid Grid;
@@ -22,8 +26,6 @@ namespace Apollo.DeviceViewers {
 
             _preview = preview;
             _preview.SignalExited += SignalRender;
-
-            Grid = this.Get<LaunchpadGrid>("Grid");
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());

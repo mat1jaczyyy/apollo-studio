@@ -18,7 +18,17 @@ using Apollo.Elements;
 
 namespace Apollo.Viewers {
     public class DeviceViewer: UserControl, ISelectViewer {
-        protected virtual void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        protected virtual void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            TitleText = this.Get<TextBlock>("Title");
+            Root = this.Get<StackPanel>("Root");
+            Border = this.Get<Border>("Border");
+            Header = this.Get<Border>("Header");
+            
+            DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
+            Draggable = this.Get<Grid>("Draggable");
+        }
 
         private static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
             foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
@@ -92,19 +102,11 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
-            TitleText = this.Get<TextBlock>("Title");
             TitleText.Text = device.GetType().ToString().Split(".").Last();
 
             _device = device;
             _device.Viewer = this;
-
-            Root = this.Get<StackPanel>("Root");
-
-            Border = this.Get<Border>("Border");
-            Header = this.Get<Border>("Header");
             Deselect();
-            
-            DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
 
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
@@ -112,7 +114,6 @@ namespace Apollo.Viewers {
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             
-            Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 

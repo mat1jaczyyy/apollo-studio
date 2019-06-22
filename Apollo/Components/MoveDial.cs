@@ -12,7 +12,20 @@ using Avalonia.Threading;
 
 namespace Apollo.Components {
     public class MoveDial: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            PlaneCanvas = this.Get<Canvas>("PlaneCanvas");
+            XRect = this.Get<Rectangle>("XRect");
+            YRect = this.Get<Rectangle>("YRect");
+            Point = this.Get<Rectangle>("Point");
+
+            Display = this.Get<TextBlock>("Display");
+            TitleText = this.Get<TextBlock>("Title");
+
+            InputX = this.Get<TextBox>("InputX");
+            InputY = this.Get<TextBox>("InputY");
+        }
 
         public delegate void MoveDialChangedEventHandler(int x, int y, int? old_x, int? old_y);
         public event MoveDialChangedEventHandler Changed;
@@ -80,19 +93,9 @@ namespace Apollo.Components {
         public MoveDial() {
             InitializeComponent();
 
-            PlaneCanvas = this.Get<Canvas>("PlaneCanvas");
-            XRect = this.Get<Rectangle>("XRect");
-            YRect = this.Get<Rectangle>("YRect");
-            Point = this.Get<Rectangle>("Point");
-
-            Display = this.Get<TextBlock>("Display");
-            TitleText = this.Get<TextBlock>("Title");
-
-            InputX = this.Get<TextBox>("InputX");
             InputX.GetObservable(TextBox.TextProperty).Subscribe(InputX_Changed);
             InputX.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
 
-            InputY = this.Get<TextBox>("InputY");
             InputY.GetObservable(TextBox.TextProperty).Subscribe(InputY_Changed);
             InputY.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
 

@@ -14,7 +14,11 @@ using Apollo.Structures;
 
 namespace Apollo.Windows {
     public class LaunchpadWindow: Window {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Grid = this.Get<LaunchpadGrid>("Grid");
+        }
 
         Launchpad _launchpad;
         LaunchpadGrid Grid;
@@ -33,8 +37,6 @@ namespace Apollo.Windows {
             _launchpad = launchpad;
 
             Title = this.Get<TextBlock>("Title").Text = _launchpad.Name;
-
-            Grid = this.Get<LaunchpadGrid>("Grid");
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());

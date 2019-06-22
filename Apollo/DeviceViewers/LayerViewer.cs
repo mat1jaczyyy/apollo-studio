@@ -13,7 +13,12 @@ namespace Apollo.DeviceViewers {
     public class LayerViewer: UserControl {
         public static readonly string DeviceIdentifier = "layer";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Target = this.Get<Dial>("Target");
+            BlendingMode = this.Get<ComboBox>("BlendingMode");
+        }
         
         Layer _layer;
         
@@ -25,10 +30,7 @@ namespace Apollo.DeviceViewers {
 
             _layer = layer;
             
-            Target = this.Get<Dial>("Target");
             Target.RawValue = _layer.Target;
-
-            BlendingMode = this.Get<ComboBox>("BlendingMode");
             BlendingMode.SelectedItem = _layer.Mode;
         }
 

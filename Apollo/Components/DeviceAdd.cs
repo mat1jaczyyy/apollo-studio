@@ -10,7 +10,15 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class DeviceAdd: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Root = this.Get<Grid>("Root");
+            Icon = this.Get<Canvas>("Icon");
+
+            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
+            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
+        }
 
         public delegate void DeviceAddedEventHandler(Type device);
         public event DeviceAddedEventHandler DeviceAdded;
@@ -36,12 +44,6 @@ namespace Apollo.Components {
 
         public DeviceAdd() {
             InitializeComponent();
-
-            Root = this.Get<Grid>("Root");
-            Icon = this.Get<Canvas>("Icon");
-
-            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             
             AddContextMenu.AddHandler(MenuItem.ClickEvent, AddContextMenu_Click);
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent,  DeviceContextMenu_Click);

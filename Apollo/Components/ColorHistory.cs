@@ -14,8 +14,6 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class ColorHistory: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-
         public delegate void HistoryChangedEventHandler();
         public static event HistoryChangedEventHandler HistoryChanged;
 
@@ -45,6 +43,12 @@ namespace Apollo.Components {
         }
         
         static ColorHistory() => HistoryChanged += Preferences.Save;
+
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Grid = this.Get<UniformGrid>("Grid");
+        }
 
         public delegate void ColorChangedEventHandler(Color value);
         public event ColorChangedEventHandler ColorChanged;
@@ -148,8 +152,6 @@ namespace Apollo.Components {
 
         public ColorHistory() {
             InitializeComponent();
-
-            Grid = this.Get<UniformGrid>("Grid");
 
             HistoryChanged += Draw;
             Draw();

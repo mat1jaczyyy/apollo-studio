@@ -13,7 +13,11 @@ namespace Apollo.DeviceViewers {
     public class OutputViewer: UserControl {
         public static readonly string DeviceIdentifier = "output";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+            
+            Target = this.Get<Dial>("Target");
+        }
         
         Output _output;
         Dial Target;
@@ -34,7 +38,6 @@ namespace Apollo.DeviceViewers {
             _output.TargetChanged += Update_Target;
             Program.Project.TrackCountChanged += Update_Maximum;
 
-            Target = this.Get<Dial>("Target");
             Update_Maximum(Program.Project.Tracks.Count);
             Update_Target(_output.Target);
         }

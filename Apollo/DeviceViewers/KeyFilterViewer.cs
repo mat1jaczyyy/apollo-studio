@@ -15,7 +15,11 @@ namespace Apollo.DeviceViewers {
     public class KeyFilterViewer: UserControl {
         public static readonly string DeviceIdentifier = "keyfilter";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent() {
+            AvaloniaXamlLoader.Load(this);
+
+            Grid = this.Get<LaunchpadGrid>("Grid");
+        }
         
         KeyFilter _filter;
         LaunchpadGrid Grid;
@@ -26,8 +30,6 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _filter = filter;
-
-            Grid = this.Get<LaunchpadGrid>("Grid");
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(_filter[i]));
