@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -34,10 +35,18 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
 
             SaveContextMenu = (ContextMenu)this.Resources["SaveContextMenu"];
-            SaveContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(SaveContextMenu_Click));
+            SaveContextMenu.AddHandler(MenuItem.ClickEvent, SaveContextMenu_Click);
 
             Program.Project.Undo.SavedChanged += Update_Saved;
             Update_Saved(Program.Project.Undo.Saved);
+        }
+
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.Unloaded(sender, e);
+            Program.Project.Undo.SavedChanged -= Update_Saved;
+            
+            SaveContextMenu.RemoveHandler(MenuItem.ClickEvent, SaveContextMenu_Click);
+            SaveContextMenu = null;
         }
 
         private async void SaveContextMenu_Click(object sender, EventArgs e) {

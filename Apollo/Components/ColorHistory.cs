@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
@@ -152,6 +153,11 @@ namespace Apollo.Components {
 
             HistoryChanged += Draw;
             Draw();
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            ColorChanged = null;
+            HistoryChanged -= Draw;
         }
 
         private void Clicked(object sender, PointerReleasedEventArgs e) => Input(Grid.Children.IndexOf((IControl)sender));

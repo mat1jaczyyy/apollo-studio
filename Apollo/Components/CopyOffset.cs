@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -30,6 +31,15 @@ namespace Apollo.Components {
             _viewer.X = _offset.X;
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            OffsetAdded = null;
+            OffsetRemoved = null;
+
+            _offset = null;
+            _copy = null;
+            _viewer = null;
         }
 
         private void Offset_Add() => OffsetAdded?.Invoke(_copy.Offsets.IndexOf(_offset) + 1);

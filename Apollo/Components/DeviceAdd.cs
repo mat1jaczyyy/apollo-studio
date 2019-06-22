@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -42,8 +43,18 @@ namespace Apollo.Components {
             AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             
-            AddContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(AddContextMenu_Click));
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+            AddContextMenu.AddHandler(MenuItem.ClickEvent, AddContextMenu_Click);
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent,  DeviceContextMenu_Click);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            DeviceAdded = null;
+            DeviceAction = null;
+
+            AddContextMenu.RemoveHandler(MenuItem.ClickEvent, AddContextMenu_Click);
+            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
+
+            AddContextMenu = DeviceContextMenu = null;
         }
 
         private void AddContextMenu_Click(object sender, EventArgs e) {

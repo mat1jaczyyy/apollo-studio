@@ -1,4 +1,5 @@
-﻿using Avalonia.Input;
+﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -18,6 +19,11 @@ namespace Apollo.Components {
             InitializeComponent();
 
             base.MouseLeave(this, null);
+        }
+
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.Unloaded(sender, e);
+            Clicked = null;
         }
 
         protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.Device);

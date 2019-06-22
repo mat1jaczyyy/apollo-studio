@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.FrameThumbnail"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Cursor="Hand">
+             Cursor="Hand"
+             DetachedFromVisualTree="Unloaded">
 
   <StackPanel Spacing="2" Background="Transparent" Orientation="Horizontal" PointerReleased="Click">
     <Components:LaunchpadGrid VerticalAlignment="Center" Margin="0 3 0 0" Scale="0.05" LowQuality="true" x:Name="Launchpad" />

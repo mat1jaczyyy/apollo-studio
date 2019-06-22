@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.LaunchpadGrid"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals">
+             xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals"
+             DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
     <sys:Double x:Key="PadSize">15</sys:Double>

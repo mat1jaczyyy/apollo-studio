@@ -38,14 +38,29 @@ namespace Apollo.Viewers {
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
             
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
-            GroupContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             
             Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             SetEnabled();
+        }
+
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.ResetEvents();
+
+            SpecificViewer = null;
+            _device.Viewer = null;
+            _device = null;
+
+            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            DeviceContextMenu = GroupContextMenu = null;
+            
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
         }
 
         public override void SetEnabled() {

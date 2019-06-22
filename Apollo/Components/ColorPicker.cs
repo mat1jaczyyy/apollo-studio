@@ -66,6 +66,8 @@ namespace Apollo.Components {
             Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => ColorChanged = null;
+
         public void Bounds_Updated(Rect bounds) {
             if (!bounds.IsEmpty) InitCanvas();
         }

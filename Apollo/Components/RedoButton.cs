@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -26,6 +27,11 @@ namespace Apollo.Components {
 
             Program.Project.Undo.PositionChanged += Update_Position;
             Update_Position(Program.Project.Undo.Position);
+        }
+
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.Unloaded(sender, e);
+            Program.Project.Undo.PositionChanged -= Update_Position;
         }
 
         protected override void Click(PointerReleasedEventArgs e) {

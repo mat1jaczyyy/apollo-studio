@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -55,9 +56,18 @@ namespace Apollo.Components {
             
             Root = this.Get<Grid>("Root");
             Icon = this.Get<Canvas>("Icon");
-            
-            ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
-            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
+
+            ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Added = null;
+            Action = null;
+
+            ((ContextMenu)this.Resources["PasteContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+            ActionContextMenu = null;
         }
 
         private void ActionContextMenu_Click(object sender, EventArgs e) {

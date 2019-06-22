@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
@@ -27,6 +28,8 @@ namespace Apollo.Components {
             
             Root = this.Get<Grid>("Root");
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Added = null;
 
         private void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) Added?.Invoke();

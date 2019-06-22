@@ -64,10 +64,23 @@ namespace Apollo.Components {
             FrameAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            FrameContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            FrameAdded = null;
+            FrameRemoved = null;
+            FrameSelected = null;
+            Viewer = null;
+
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+
+            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            FrameContextMenu = null;
         }
 
         private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);

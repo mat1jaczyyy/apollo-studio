@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -29,6 +30,15 @@ namespace Apollo.Components {
             Base = this.Get<Thumb>("Thumb");
             Base.AddHandler(InputElement.PointerPressedEvent, MouseDown, RoutingStrategies.Tunnel);
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Moved = null;
+            Focused = null;
+            Deleted = null;
+
+            Base.RemoveHandler(InputElement.PointerPressedEvent, MouseDown);
+            Base.RemoveHandler(InputElement.PointerReleasedEvent, MouseUp);
         }
 
         bool dragged = false;

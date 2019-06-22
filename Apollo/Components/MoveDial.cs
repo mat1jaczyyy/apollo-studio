@@ -101,6 +101,8 @@ namespace Apollo.Components {
             DrawPoint();
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Changed = null;
+
         private bool mouseHeld = false;
         private int old_x, old_y;
         private double lastX, lastY;

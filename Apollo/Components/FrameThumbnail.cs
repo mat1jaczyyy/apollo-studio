@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
@@ -31,6 +32,12 @@ namespace Apollo.Components {
             Time = this.Get<TextBlock>("Time");
 
             Launchpad.RenderFrame(_frame);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Clicked = null;
+
+            _frame = null;
         }
 
         private void Click(object sender, PointerReleasedEventArgs e) {

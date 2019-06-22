@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.VerticalAdd">
+             x:Class="Apollo.Components.VerticalAdd"
+             DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
     <ContextMenu x:Key="PasteContextMenu" Cursor="Arrow">

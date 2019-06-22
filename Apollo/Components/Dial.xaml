@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.Dial">
+             x:Class="Apollo.Components.Dial"
+             DetachedFromVisualTree="Unloaded">
 
   <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center" LayoutUpdated="LayoutChanged">
     <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />

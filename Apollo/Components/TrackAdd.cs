@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -39,7 +40,15 @@ namespace Apollo.Components {
             Icon = this.Get<Canvas>("Icon");
 
             ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];
-            ActionContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ActionContextMenu_Click));
+            ActionContextMenu.AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            TrackAdded = null;
+            TrackAction = null;
+
+            ActionContextMenu.RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+            ActionContextMenu = null;
         }
 
         private void ActionContextMenu_Click(object sender, EventArgs e) {

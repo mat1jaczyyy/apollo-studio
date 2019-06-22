@@ -305,6 +305,15 @@ namespace Apollo.Components {
             DrawArcBase();
         }
 
+        protected void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Started = null;
+            ValueChanged = null;
+            StepChanged = null;
+            ModeChanged = null;
+
+            _length = null;
+        }
+
         protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
 
         private bool mouseHeld = false;

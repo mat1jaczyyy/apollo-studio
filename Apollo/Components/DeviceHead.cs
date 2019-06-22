@@ -30,6 +30,13 @@ namespace Apollo.Components {
             SetEnabled(owner.Enabled);
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Owner = null;
+
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+        }
+
         public void SetEnabled(bool value) {
             Border.Background = (IBrush)Application.Current.Styles.FindResource(value? "ThemeControlHighBrush" : "ThemeControlMidBrush");
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(value? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");

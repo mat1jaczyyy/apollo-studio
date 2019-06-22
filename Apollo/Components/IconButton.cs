@@ -29,6 +29,8 @@ namespace Apollo.Components {
             }
         }
 
+        protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Clicked = null;
+
         private bool mouseHeld = false;
         private bool mouseOver = false;
 

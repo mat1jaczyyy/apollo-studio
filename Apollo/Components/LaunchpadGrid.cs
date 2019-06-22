@@ -149,6 +149,16 @@ namespace Apollo.Components {
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            PadStarted = null;
+            PadFinished = null;
+            PadPressed = null;
+            PadReleased = null;
+            PadModsPressed = null;
+
+            Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
+        }
+
         private void LayoutChanged(object sender, EventArgs e) => DrawPath();
 
         public void RenderFrame(Frame frame) {

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -24,6 +25,11 @@ namespace Apollo.Components {
             Path = this.Get<Path>("Path");
 
             base.MouseLeave(this, null);
+        }
+
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.Unloaded(sender, e);
+            Clicked = null;
         }
 
         protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == InputModifiers.Control);
