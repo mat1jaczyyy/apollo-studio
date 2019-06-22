@@ -28,18 +28,29 @@ namespace Apollo.Core {
 
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output");
         
-        private static Courier courier = new Courier() { Interval = 100 };
+        private static Courier courier;
         private static bool started = false;
 
         public static void Start() {
-            if (started) new InvalidOperationException("MIDI Rescan Timer is already running");
+            if (started) return;
 
             if (!NoOutput.Available)
                 NoOutput.Connect(null, null);
 
+            courier = new Courier() { Interval = 100 };
             courier.Elapsed += Rescan;
             courier.Start();
             started = true;
+        }
+
+        public static void Stop() {
+            if (!started) return;
+
+            if (!NoOutput.Available)
+                NoOutput.Connect(null, null);
+
+            courier.Dispose();
+            started = false;
         }
 
         private static object locker = new object();

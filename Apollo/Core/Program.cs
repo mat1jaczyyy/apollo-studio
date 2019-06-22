@@ -123,6 +123,12 @@ namespace Apollo.Core {
             autosave.Start();
 
             BuildAvaloniaApp().Start<SplashWindow>();
+
+            autosave.Dispose();
+            MIDI.Stop();
+            Discord.Set(false);
+            AbletonConnector.Dispose();
+            logTimer.Stop();
         }
     }
 }
