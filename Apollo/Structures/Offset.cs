@@ -31,5 +31,7 @@ namespace Apollo.Structures {
             X = x;
             Y = y;
         }
+
+        public void Dispose() => Changed = null;
     }
 }

@@ -47,5 +47,7 @@ namespace Apollo.Structures {
         public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
 
         public override string ToString() => Steps[_value];
+
+        public void Dispose() => Changed = null;
     }
 }

@@ -140,5 +140,12 @@ namespace Apollo.Structures {
         }
 
         public override string ToString() => (Parent.Infinite && ParentIndex.Value == Parent.Count - 1)? "Infinite" : Time.ToString();
+
+        public void Dispose() {
+            Time.Dispose();
+            Info = null;
+            Parent = null;
+            ParentIndex = null;
+        }
     }
 }
