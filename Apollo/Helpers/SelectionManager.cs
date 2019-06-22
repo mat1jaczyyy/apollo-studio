@@ -146,5 +146,7 @@ namespace Apollo.Helpers {
 
             return true;
         }
+
+        public void Dispose() => Start = End = null;
     }
 }

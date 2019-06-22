@@ -107,5 +107,16 @@ namespace Apollo.Helpers {
 
             return true;
         }
+
+        public void Dispose() {
+            Window?.Close();
+            Window = null;
+
+            PositionChanged = null;
+            SavedChanged = null;
+            SavedPositionChanged = null;
+
+            History = null;
+        }
     }
 }
