@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -46,6 +47,8 @@ namespace Apollo.DeviceViewers {
 
             _delay.Time.Free = (int)value;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 

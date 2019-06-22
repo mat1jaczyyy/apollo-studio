@@ -33,6 +33,8 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(_filter[i]));
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+
         bool drawingState;
         bool[] old;
         

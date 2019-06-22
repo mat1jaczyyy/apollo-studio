@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -89,6 +90,8 @@ namespace Apollo.DeviceViewers {
 
             Gradient_Generate();
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _fade = null;
 
         public void Expand(int? index) {
             if (current != null) {

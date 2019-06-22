@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -29,6 +30,8 @@ namespace Apollo.DeviceViewers {
             Bypass = this.Get<CheckBox>("Bypass");
             Bypass.IsChecked = _flip.Bypass;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             string selected = (string)FlipMode.SelectedItem;

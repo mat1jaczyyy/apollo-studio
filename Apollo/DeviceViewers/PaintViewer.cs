@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -26,6 +27,8 @@ namespace Apollo.DeviceViewers {
             Picker = this.Get<ColorPicker>("Picker");
             Picker.SetColor(_paint.Color);
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
         
         private void Color_Changed(Color color, Color old) {
             if (old != null) {

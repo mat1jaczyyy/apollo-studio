@@ -34,6 +34,8 @@ namespace Apollo.DeviceViewers {
                 Set((Rectangle)PagesGrid.Children[i], _filter[i]);
         }
 
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+
         private void Clicked(object sender, PointerReleasedEventArgs e) {
             int index = PagesGrid.Children.IndexOf((IControl)sender);
 

@@ -90,7 +90,7 @@ namespace Apollo.DeviceViewers {
             MultiMode.SelectedItem = _multi.Mode;
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
-            ChainContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ChainContextMenu_Click));
+            ChainContextMenu.AddHandler(MenuItem.ClickEvent, ChainContextMenu_Click);
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -105,6 +105,18 @@ namespace Apollo.DeviceViewers {
             }
 
             if (_multi.Expanded != null) Expand_Insert(multi.Expanded.Value);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+
+            ChainContextMenu.RemoveHandler(MenuItem.ClickEvent, ChainContextMenu_Click);
+            ChainContextMenu = null;
+
+            _multi = null;
+            _parent = null;
+            _root = null;
         }
 
         private void Expand_Insert(int index) {

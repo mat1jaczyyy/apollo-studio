@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -36,6 +37,13 @@ namespace Apollo.DeviceViewers {
             Target = this.Get<Dial>("Target");
             Update_Maximum(Program.Project.Tracks.Count);
             Update_Target(_output.Target);
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            _output.TargetChanged -= Update_Target;
+            Program.Project.TrackCountChanged -= Update_Maximum;
+
+            _output = null;
         }
 
         private void Target_Changed(double value, double? old) {

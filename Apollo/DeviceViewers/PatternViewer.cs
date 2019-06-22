@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Devices;
@@ -18,6 +19,8 @@ namespace Apollo.DeviceViewers {
 
             _pattern = pattern;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _pattern = null;
 
         private void Pattern_Popout() => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
     }

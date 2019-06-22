@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -38,6 +39,8 @@ namespace Apollo.DeviceViewers {
             ValueLow = this.Get<Dial>("ValueLow");
             ValueLow.RawValue = _tone.ValueLow * 100;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
 
         private void Hue_Changed(double value, double? old) {
             if (old != null && old != value) {

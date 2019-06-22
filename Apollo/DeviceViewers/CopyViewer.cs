@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -67,6 +68,8 @@ namespace Apollo.DeviceViewers {
             for (int i = 0; i < _copy.Offsets.Count; i++)
                 Contents_Insert(i, _copy.Offsets[i]);
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
 
         private void Rate_ValueChanged(double value, double? old) {
             if (old != null && old != value) {

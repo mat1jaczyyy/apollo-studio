@@ -3,7 +3,8 @@
              x:Class="Apollo.DeviceViewers.CopyViewer"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
   
   <Grid ColumnDefinitions="118,Auto">
     <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">

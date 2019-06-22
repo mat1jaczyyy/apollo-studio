@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -41,6 +42,8 @@ namespace Apollo.DeviceViewers {
             Release = this.Get<CheckBox>("Release");
             Release.IsChecked = _hold.Release;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _hold = null;
 
         private void Duration_Changed(double value, double? old) {
             if (old != null && old != value) {

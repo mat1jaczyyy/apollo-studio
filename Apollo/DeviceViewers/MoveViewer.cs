@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -36,6 +37,12 @@ namespace Apollo.DeviceViewers {
 
             Wrap = this.Get<CheckBox>("Wrap");
             Wrap.IsChecked = _move.Wrap;
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Offset.Changed -= Offset_Changed;
+
+            _move = null;
         }
 
         private void Offset_Changed(int x, int y, int? old_x, int? old_y) {

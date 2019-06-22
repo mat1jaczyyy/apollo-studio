@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.KeyFilterViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
 
   <Components:LaunchpadGrid x:Name="Grid" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished" />
 </UserControl>

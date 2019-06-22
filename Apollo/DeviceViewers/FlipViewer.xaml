@@ -3,7 +3,8 @@
              x:Class="Apollo.DeviceViewers.FlipViewer"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
 
   <StackPanel VerticalAlignment="Center" Spacing="5" Width="90">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">

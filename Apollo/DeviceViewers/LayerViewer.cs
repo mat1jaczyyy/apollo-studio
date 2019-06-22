@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -30,6 +31,8 @@ namespace Apollo.DeviceViewers {
             BlendingMode = this.Get<ComboBox>("BlendingMode");
             BlendingMode.SelectedItem = _layer.Mode;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
 
         private void Target_Changed(double value, double? old) {
             if (old != null && old != value) {

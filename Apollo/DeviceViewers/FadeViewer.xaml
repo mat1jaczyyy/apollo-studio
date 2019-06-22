@@ -3,7 +3,8 @@
              x:Class="Apollo.DeviceViewers.FadeViewer"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
 
   <Grid ColumnDefinitions="Auto,Auto">
     <Grid Grid.Column="0" RowDefinitions="*,*">

@@ -3,7 +3,8 @@
              x:Class="Apollo.DeviceViewers.MoveViewer"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
 
   <Grid RowDefinitions="*,Auto">
     <Components:MoveDial Grid.Row="0" x:Name="Offset" Title="Offset" />

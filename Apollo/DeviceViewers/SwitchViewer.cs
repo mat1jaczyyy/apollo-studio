@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -25,6 +26,8 @@ namespace Apollo.DeviceViewers {
             Page = this.Get<Dial>("Page");
             Page.RawValue = _switch.Page;
         }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
         private void Page_Changed(double value, double? old) {
             if (old != null && old != value) {

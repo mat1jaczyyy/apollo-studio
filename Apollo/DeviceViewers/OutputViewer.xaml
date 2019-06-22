@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.OutputViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
-             Margin="10 5">
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
   
   <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="2" Default="1" Exponent="1" Round="0" Unit=""
                    ValueChanged="Target_Changed" />
