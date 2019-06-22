@@ -101,7 +101,12 @@ namespace Apollo.Components {
             DrawPoint();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Changed = null;
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Changed = null;
+
+            InputX.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
+            InputY.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
+        }
 
         private bool mouseHeld = false;
         private int old_x, old_y;
