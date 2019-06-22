@@ -392,5 +392,11 @@ namespace Apollo.Devices {
 
             } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }
+
+        public override void Dispose() {
+            foreach (Offset offset in Offsets) offset.Dispose();
+            Time.Dispose();
+            base.Dispose();
+        }
     }
 }

@@ -27,5 +27,10 @@ namespace Apollo.Devices {
             MIDIExit?.Invoke(n);
             screen[m.Index].MIDIEnter(m);
         }
+
+        public override void Dispose() {
+            SignalExited = null;
+            base.Dispose();
+        }
     }
 }

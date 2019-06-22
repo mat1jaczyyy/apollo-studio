@@ -110,5 +110,10 @@ namespace Apollo.Devices {
                 MIDIExit?.Invoke(n);
             }
         }
+
+        public override void Dispose() {
+            Time.Dispose();
+            base.Dispose();
+        }
     }
 }

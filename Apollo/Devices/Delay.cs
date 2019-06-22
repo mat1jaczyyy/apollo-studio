@@ -81,5 +81,10 @@ namespace Apollo.Devices {
             courier.Elapsed += Tick;
             courier.Start();
         }
+
+        public override void Dispose() {
+            Time.Dispose();
+            base.Dispose();
+        }
     }
 }

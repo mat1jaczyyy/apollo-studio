@@ -337,6 +337,8 @@ namespace Apollo.Devices {
             Window?.Close();
             Window = null;
 
+            Choked = null;
+            foreach (Frame frame in Frames) frame.Dispose();
             base.Dispose();
         }
     }

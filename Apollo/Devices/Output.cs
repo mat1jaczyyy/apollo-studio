@@ -83,5 +83,13 @@ namespace Apollo.Devices {
             n.Source = Launchpad;
             MIDIExit?.Invoke(n);
         }
+
+        public override void Dispose() {
+            TargetChanged = null;
+            Program.Project.Tracks[_target].ParentIndexChanged -= IndexChanged;
+            Program.Project.Tracks[_target].Disposing -= IndexRemoved;
+
+            base.Dispose();
+        }
     }
 }

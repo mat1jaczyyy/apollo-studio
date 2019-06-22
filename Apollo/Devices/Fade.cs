@@ -298,5 +298,10 @@ namespace Apollo.Devices {
                 }
             }
         }
+
+        public override void Dispose() {
+            Time.Dispose();
+            base.Dispose();
+        }
     }
 }
