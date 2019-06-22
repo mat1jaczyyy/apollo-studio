@@ -73,12 +73,17 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             _track.Window = null;
+            _track.ParentIndexChanged -= UpdateTitle;
+            _track.NameChanged -= UpdateTitle;
+            _track = null;
+
+            ((ChainViewer)Contents.Content).PointerWheelChanged -= Track_Scroll;
             
             Program.Project.PathChanged -= UpdateTitle;
-            _track.ParentIndexChanged -= UpdateTitle;
-            _track.NameChanged += UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
+
+            Selection.Dispose();
 
             Program.WindowClose(this);
         }

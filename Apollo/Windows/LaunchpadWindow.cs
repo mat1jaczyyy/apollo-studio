@@ -49,6 +49,8 @@ namespace Apollo.Windows {
 
             if (_launchpad.GetType() == typeof(VirtualLaunchpad))
                 MIDI.Disconnect(_launchpad);
+            
+            _launchpad = null;
         }
 
         public void Bounds_Updated(Rect bounds) {

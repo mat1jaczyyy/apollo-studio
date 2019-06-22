@@ -218,10 +218,10 @@ namespace Apollo.Windows {
             Invert = this.Get<Button>("Invert");
 
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(FrameContextMenu_Click));
+            FrameContextMenu.AddHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
 
-            AddHandler(DragDrop.DragOverEvent, DragOver);
-            AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            this.AddHandler(DragDrop.DropEvent, Drop);
 
             Contents = this.Get<StackPanel>("Frames").Children;
 
@@ -246,10 +246,6 @@ namespace Apollo.Windows {
             Selection.Select(_pattern[_pattern.Expanded]);
         }
 
-        public void Expand(int? index) {
-            if (index != null) Frame_Select(index.Value);
-        }
-
         private void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
@@ -264,16 +260,30 @@ namespace Apollo.Windows {
             Locked = false;
 
             _pattern.Window = null;
+            _pattern = null;
 
             if (Launchpad != null) {
                 Launchpad.PatternWindow = null;
                 Launchpad.Clear();
             }
+
+            _launchpad = null;
+
+            MIDI.DevicesUpdated -= HandlePorts;
+
+            Selection.Dispose();
             
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
-            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+            _track = null;
 
+            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
+            FrameContextMenu = null;
+
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+
+            Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             ColorHistory.HistoryChanged -= RenderHistory;
 
             Program.WindowClose(this);
@@ -292,6 +302,10 @@ namespace Apollo.Windows {
                 Launchpad = selected;
                 UpdatePorts();
             }
+        }
+
+        public void Expand(int? index) {
+            if (index != null) Frame_Select(index.Value);
         }
 
         private void Frame_Insert(int index) {

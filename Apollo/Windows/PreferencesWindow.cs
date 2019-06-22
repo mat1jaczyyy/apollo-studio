@@ -116,6 +116,8 @@ namespace Apollo.Windows {
         private void Unloaded(object sender, EventArgs e) {
             Preferences.Window = null;
 
+            MIDI.DevicesUpdated -= HandlePorts;
+
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
 

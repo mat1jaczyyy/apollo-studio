@@ -81,7 +81,7 @@ namespace Apollo.Windows {
             TitleText = this.Get<TextBlock>("Title");
 
             TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
-            TrackContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(TrackContextMenu_Click));
+            TrackContextMenu.AddHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -117,7 +117,16 @@ namespace Apollo.Windows {
             Program.Project.Window = null;
 
             Program.Project.PathChanged -= UpdateTitle;
+            Program.Project.PageChanged -= HandlePage;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            Selection.Dispose();
+            
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+
+            TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
+            TrackContextMenu = null;
 
             Program.WindowClose(this);
         }
