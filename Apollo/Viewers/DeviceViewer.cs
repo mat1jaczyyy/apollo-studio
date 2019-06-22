@@ -37,6 +37,11 @@ namespace Apollo.Viewers {
 
         public delegate void DeviceCollapsedEventHandler(int index);
         public event DeviceCollapsedEventHandler DeviceCollapsed;
+
+        protected void ResetEvents() {
+            DeviceAdded = null;
+            DeviceCollapsed = null;
+        }
         
         protected Device _device;
         protected bool selected = false;
@@ -104,8 +109,8 @@ namespace Apollo.Viewers {
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
             
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
-            GroupContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             
             Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -119,9 +124,19 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            ResetEvents();
+
             SpecificViewer = null;
             _device.Viewer = null;
+            _device = null;
+
+            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            DeviceContextMenu = GroupContextMenu = null;
+            
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
         }
 
         public virtual void SetEnabled() {

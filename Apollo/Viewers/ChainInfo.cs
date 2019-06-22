@@ -68,7 +68,7 @@ namespace Apollo.Viewers {
             ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
-            ChainContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            ChainContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
             Draggable = this.Get<Grid>("Draggable");
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -78,6 +78,21 @@ namespace Apollo.Viewers {
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            ChainAdded = null;
+            ChainExpanded = null;
+
+            _chain.ParentIndexChanged -= UpdateText;
+            _chain.Info = null;
+            _chain = null;
+
+            ChainContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            ChainContextMenu = null;
+
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
         }
 
         public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");

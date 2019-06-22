@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -74,6 +75,13 @@ namespace Apollo.Viewers {
                 UpdatePorts();
                 MIDI.DevicesUpdated += HandlePorts;
             }
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            if (_launchpad.GetType() == typeof(AbletonLaunchpad))
+                MIDI.DevicesUpdated -= HandlePorts;
+            
+            _launchpad = null;
         }
 
         private void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());

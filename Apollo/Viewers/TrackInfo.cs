@@ -84,7 +84,7 @@ namespace Apollo.Viewers {
             TrackAdd = this.Get<TrackAdd>("DropZoneAfter");
 
             TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
-            TrackContextMenu.AddHandler(MenuItem.ClickEvent, new EventHandler(ContextMenu_Click));
+            TrackContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
             DropZone = this.Get<Border>("DropZone");
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -96,6 +96,22 @@ namespace Apollo.Viewers {
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            TrackAdded = null;
+            
+            MIDI.DevicesUpdated -= HandlePorts;
+
+            _track.ParentIndexChanged -= UpdateText;
+            _track.Info = null;
+            _track = null;
+
+            TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            TrackContextMenu = null;
+
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
         }
 
         public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");

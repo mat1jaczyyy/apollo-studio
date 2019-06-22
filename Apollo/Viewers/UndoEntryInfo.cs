@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
@@ -20,6 +21,11 @@ namespace Apollo.Viewers {
             _entry = entry;
 
             this.Get<TextBlock>("Description").Text = _entry.Description;
+        }
+
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Selected = null;
+            _entry = null;
         }
 
         private void Click(object sender, PointerPressedEventArgs e) {

@@ -70,10 +70,10 @@ namespace Apollo.Viewers {
             DropZoneAfter = this.Get<Grid>("DropZoneAfter");
             
             DeviceContextMenuBefore = (ContextMenu)this.Resources["DeviceContextMenuBefore"];
-            DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+            DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
             
             DeviceContextMenuAfter = (ContextMenu)this.Resources["DeviceContextMenuAfter"];
-            DeviceContextMenuAfter.AddHandler(MenuItem.ClickEvent, new EventHandler(DeviceContextMenu_Click));
+            DeviceContextMenuAfter.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -90,7 +90,17 @@ namespace Apollo.Viewers {
             }
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _chain.Viewer = null;
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            _chain.Viewer = null;
+            _chain = null;
+
+            DeviceContextMenuBefore.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
+            DeviceContextMenuAfter.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
+            DeviceContextMenuBefore = DeviceContextMenuAfter = null;
+            
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+        }
 
         public void Expand(int? index) {}
 
