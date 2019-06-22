@@ -91,7 +91,10 @@ namespace Apollo.DeviceViewers {
             Gradient_Generate();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _fade = null;
+        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            _fade.Generated -= Gradient_Generate;
+            _fade = null;
+        }
 
         public void Expand(int? index) {
             if (current != null) {

@@ -300,6 +300,7 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            Generated = null;
             Time.Dispose();
             base.Dispose();
         }
