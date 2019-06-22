@@ -156,9 +156,14 @@ namespace Apollo.Elements {
 
         public void Dispose() {
             Disposing?.Invoke();
+            Disposing = null;
+            NameChanged = null;
+            ParentIndexChanged = null;
 
             Window?.Close();
             Window = null;
+            Info = null;
+            _ParentIndex = null;
             
             Chain?.Dispose();
             Chain = null;

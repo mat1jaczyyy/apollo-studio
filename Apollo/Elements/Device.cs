@@ -62,6 +62,9 @@ namespace Apollo.Elements {
         public virtual void Dispose() {
             MIDIExit = null;
             Disposed = true;
+            Viewer = null;
+            Parent = null;
+            ParentIndex = null;
         }
 
         public static bool Move(List<Device> source, Chain target, int position, bool copy = false) => (position == -1)

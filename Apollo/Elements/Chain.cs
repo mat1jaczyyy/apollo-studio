@@ -163,8 +163,13 @@ namespace Apollo.Elements {
         }
 
         public void Dispose() {
+            ParentIndexChanged = null;
             foreach (Device device in Devices) device.Dispose();
             MIDIExit = null;
+            Info = null;
+            Viewer = null;
+            Parent = null;
+            _ParentIndex = null;
         }
 
         public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) => (position == -1)

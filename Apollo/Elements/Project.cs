@@ -204,13 +204,17 @@ namespace Apollo.Elements {
         }
 
         public void Dispose() {
-            Undo.Window?.Close();
+            Undo?.Dispose();
+            Undo = null;
 
-            foreach (Track track in Tracks)
-                track.Dispose();
-            
-            foreach (Launchpad launchpad in MIDI.Devices)
-                launchpad.Clear();
+            PageChanged = null;
+            PathChanged = null;
+            TrackCountChanged = null;
+
+            Window = null;
+
+            foreach (Track track in Tracks) track.Dispose();
+            foreach (Launchpad launchpad in MIDI.Devices) launchpad.Clear();
         }
     }
 }
