@@ -53,6 +53,7 @@ namespace Apollo.Devices {
         private void HandleChoke(Choke sender, int index) {
             if (Target == index && sender != this && !choked) {
                 choked = true;
+                Chain.MIDIEnter(new StopSignal());
                 
                 lock (locker) {
                     foreach (Signal i in signals.Values) {

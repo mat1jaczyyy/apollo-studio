@@ -71,4 +71,8 @@ namespace Apollo.Structures {
         
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Page, Layer, BlendingMode, MultiTarget);
     }
+
+    public class StopSignal: Signal {
+        public StopSignal(): base(null) {}
+    }
 }

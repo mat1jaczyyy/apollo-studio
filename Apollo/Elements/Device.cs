@@ -53,9 +53,16 @@ namespace Apollo.Elements {
         public abstract void MIDIProcess(Signal n);
 
         public void MIDIEnter(Signal n) {
-            if (Enabled) MIDIProcess(n);
-            else MIDIExit?.Invoke(n);
+            if (n is StopSignal) Stop();
+            else if (Enabled) {
+                MIDIProcess(n);
+                return;
+            }
+            
+            MIDIExit?.Invoke(n);
         }
+
+        public virtual void Stop() {}
 
         public bool Disposed { get; private set; } = false;
 
