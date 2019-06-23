@@ -11,12 +11,8 @@ using Apollo.Elements;
 using Apollo.Viewers;
 
 namespace Apollo.DeviceViewers {
-    public class ChokeViewer: UserControl, ISelectParentViewer {
+    public class ChokeViewer: UserControl {
         public static readonly string DeviceIdentifier = "choke";
-
-        public int? IExpanded {
-            get => 0;
-        }
 
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
@@ -43,8 +39,6 @@ namespace Apollo.DeviceViewers {
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
-        
-        public void Expand(int? index) {}
 
         private void Target_Changed(double value, double? old) {
             if (old != null && old != value) {
@@ -63,16 +57,5 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
-
-        public void Copy(int left, int right, bool cut = false) {}
-        public void Paste(int right) {}
-        public void Duplicate(int left, int right) {}
-        public void Delete(int left, int right) {}
-        public void Group(int left, int right) {}
-        public void Ungroup(int index) {}
-        public void Mute(int left, int right) {}
-        public void Rename(int left, int right) {}
-        public void Export(int left, int right) {}
-        public void Import(int right) {}
     }
 }

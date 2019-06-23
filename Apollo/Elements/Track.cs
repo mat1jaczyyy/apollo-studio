@@ -68,7 +68,9 @@ namespace Apollo.Elements {
 
                 if (last.GetType() == typeof(Track)) break;
                 
-                last = (ISelect)last.IParent;
+                last = (last.GetType() == typeof(Chain) && ((Chain)last).Parent.GetType() == typeof(Choke))
+                    ? (ISelect)((Chain)last).Parent
+                    : (ISelect)last.IParent;
             }
 
             return path;

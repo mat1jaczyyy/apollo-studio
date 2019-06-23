@@ -94,6 +94,10 @@ namespace Apollo.Windows {
 
         private void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
+        private bool InChoke() => Selection.Start is Device &&
+            Selection.Start.IParent is Chain &&
+            ((Chain)Selection.Start.IParent).Parent?.GetType() == typeof(Choke);
+
         private bool InMultiPreprocess() => Selection.Start is Device &&
             Selection.Start.IParent is ISelect &&
             ((ISelect)Selection.Start.IParent).IParentIndex == null &&
@@ -114,16 +118,42 @@ namespace Apollo.Windows {
                     Selection.Select(((Multi)Selection.Start.IParent).Preprocess.Devices.Last());
 
             } else if (e.Key == Key.Left) {
-                if (!(InMultiPreprocess() && Selection.Start.IParentIndex.Value == 0))
-                    Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                ISelect left = Selection.Selection.First();
+
+                if (left.IParentIndex.Value == 0) {
+                    if (InChoke()) {
+                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.Modifiers == InputModifiers.Shift);
+                        return;
+
+                    } else if (InMultiPreprocess()) return;
+                }
+                
+                Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             
             } else if (e.Key == Key.Right) {
-                if (InMultiPreprocess() && Selection.Start.IParentIndex.Value == Selection.Start.IParent.IChildren.Count - 1)
-                    Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.Modifiers == InputModifiers.Shift);
+                ISelect right = Selection.Selection.Last();
 
-                else Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                if (right.IParentIndex.Value == right.IParent.IChildren.Count - 1) {
+                    if (InChoke()) {
+                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.Modifiers == InputModifiers.Shift);
+                        e.Modifiers = InputModifiers.None;
 
-            } else if (e.Key == Key.Down) Selection.MoveChild();
+                    } else if (InMultiPreprocess()) {
+                        Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.Modifiers == InputModifiers.Shift);
+                        return;
+                    }
+                }
+                
+                Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+
+            } else if (e.Key == Key.Down) {
+                if (Selection.Start.GetType() == typeof(Choke)) {
+                    Chain chain = ((Choke)Selection.Start).Chain;
+                    if (chain.Count > 0) Selection.Select(chain[0]);
+                    return;
+                }
+                Selection.MoveChild();
+            }
         }
 
         private void Clear() => _track.Launchpad.Clear();

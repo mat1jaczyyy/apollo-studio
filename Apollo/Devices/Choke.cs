@@ -8,20 +8,8 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Choke: Device, IChainParent, ISelectParent {
+    public class Choke: Device, IChainParent {
         public static readonly new string DeviceIdentifier = "choke";
-
-        public ISelectParentViewer IViewer {
-            get => (ISelectParentViewer)Viewer.SpecificViewer;
-        }
-
-        public List<ISelect> IChildren {
-            get => new List<ISelect>() {Chain};
-        }
-
-        public bool IRoot {
-            get => false;
-        }
         
         private int _target = 1;
         public int Target {
