@@ -66,6 +66,8 @@ namespace Apollo.Devices {
         }
 
         private void Tick(object sender, EventArgs e) {
+            if (Disposed) return;
+            
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
             

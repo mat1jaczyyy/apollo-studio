@@ -391,6 +391,12 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            buffer.Clear();
+            locker.Clear();
+            
+            foreach (Courier i in timers.Values) i.Dispose();
+            timers.Clear();
+
             foreach (Offset offset in Offsets) offset.Dispose();
             Time.Dispose();
             base.Dispose();

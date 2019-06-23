@@ -46,9 +46,9 @@ namespace Apollo.Devices {
             }
         }
         
-        private ConcurrentDictionary<Signal, int> _indexes = new ConcurrentDictionary<Signal, int>();
+        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        private ConcurrentDictionary<Signal, List<Courier>> _timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        private ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
         private Time _time;
         public Time Time {
@@ -223,7 +223,7 @@ namespace Apollo.Devices {
         private void FireCourier(Signal n, double time) {
             Courier courier;
 
-            _timers[n].Add(courier = new Courier() {
+            timers[n].Add(courier = new Courier() {
                 Info = n,
                 AutoReset = false,
                 Interval = time,
@@ -233,6 +233,8 @@ namespace Apollo.Devices {
         }
 
         private void Tick(object sender, EventArgs e) {
+            if (Disposed) return;
+
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
 
@@ -240,18 +242,18 @@ namespace Apollo.Devices {
                 Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
-                    if (_playmode == PlaybackType.Loop && !_timers[n].Contains(courier)) return;
+                    if (_playmode == PlaybackType.Loop && !timers[n].Contains(courier)) return;
 
-                    if (++_indexes[n] == fade.Count - 1 && _playmode == PlaybackType.Loop) {
+                    if (++buffer[n] == fade.Count - 1 && _playmode == PlaybackType.Loop) {
                         Stop(n);
                         
                         for (int i = 1; i < fade.Count; i++)
                             FireCourier(n, fade[i].Time);
                     }
                     
-                    if (_indexes[n] < fade.Count) {
+                    if (buffer[n] < fade.Count) {
                         Signal m = n.Clone();
-                        m.Color = fade[_indexes[n]].Color.Clone();
+                        m.Color = fade[buffer[n]].Color.Clone();
                         MIDIExit?.Invoke(m);
                     }
                 }
@@ -262,18 +264,18 @@ namespace Apollo.Devices {
             if (!locker.ContainsKey(n)) locker[n] = new object();
 
             lock (locker[n]) {
-                if (_timers.ContainsKey(n))
-                    for (int i = 0; i < _timers[n].Count; i++)
-                        _timers[n][i].Dispose();
+                if (timers.ContainsKey(n))
+                    for (int i = 0; i < timers[n].Count; i++)
+                        timers[n][i].Dispose();
                 
-                if (_playmode == PlaybackType.Loop && _indexes.ContainsKey(n) && _indexes[n] < fade.Count - 1) {
+                if (_playmode == PlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
                     Signal m = n.Clone();
                     m.Color = fade.Last().Color.Clone();
                     MIDIExit?.Invoke(m);
                 }
 
-                _timers[n] = new List<Courier>();
-                _indexes[n] = 0;
+                timers[n] = new List<Courier>();
+                buffer[n] = 0;
             }
         }
 
@@ -300,8 +302,16 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
-            Generated = null;
+            buffer.Clear();
+            locker.Clear();
+            
+            foreach (List<Courier> i in timers.Values) {
+                foreach (Courier j in i) j.Dispose();
+                i.Clear();
+            }
+            timers.Clear();
 
+            Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
 
             Time.Dispose();

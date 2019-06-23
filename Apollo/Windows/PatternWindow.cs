@@ -261,6 +261,9 @@ namespace Apollo.Windows {
 
         private void Unloaded(object sender, EventArgs e) {
             Locked = false;
+            
+            foreach (Courier i in PlayTimers) i.Dispose();
+            PlayTimers.Clear();
 
             _pattern.Window = null;
             _pattern = null;
@@ -899,7 +902,7 @@ namespace Apollo.Windows {
         }
 
         private void Tick(object sender, EventArgs e) {
-            if (!Locked) return;
+            if (_pattern.Disposed || !Locked) return;
 
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
