@@ -103,6 +103,7 @@ namespace Apollo.Devices {
             public int index = 0;
             public object locker = new object();
             public List<int> offsets;
+            public List<Courier> timers = new List<Courier>();
 
             public PolyInfo(Signal init_n, List<int> init_offsets) {
                 n = init_n;
@@ -127,6 +128,8 @@ namespace Apollo.Devices {
                 else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
 
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetCopyMode(CopyMode);
+
+                Stop();
             }
         }
 
@@ -160,6 +163,7 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
+        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
@@ -216,22 +220,13 @@ namespace Apollo.Devices {
             return false;
         }
 
-        private void FireCourier(Signal n, decimal time) {
-            Courier courier = new Courier() {
-                Info = n,
-                AutoReset = false,
-                Interval = (double)time
-            };
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
-
         private void FireCourier(PolyInfo info, decimal time) {
             Courier courier = new Courier() {
                 Info = info,
                 AutoReset = false,
                 Interval = (double)time,
             };
+            info.timers.Add(courier);
             courier.Elapsed += Tick;
             courier.Start();
         }
@@ -262,6 +257,9 @@ namespace Apollo.Devices {
                         Signal m = info.n.Clone();
                         m.Index = (byte)info.offsets[info.index];
                         MIDIExit?.Invoke(m);
+
+                        if (info.index == info.offsets.Count - 1)
+                            poly.Remove(info);
                     }
                 }
 
@@ -367,6 +365,7 @@ namespace Apollo.Devices {
                     MIDIExit?.Invoke(n.Clone());
                     
                     PolyInfo info = new PolyInfo(n, validOffsets);
+                    poly.Add(info);
 
                     for (int i = 1; i < validOffsets.Count; i++)
                         FireCourier(info, _time * _gate * i);
@@ -390,12 +389,22 @@ namespace Apollo.Devices {
             } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }
 
-        public override void Dispose() {
+        public override void Stop() {
             buffer.Clear();
             locker.Clear();
             
             foreach (Courier i in timers.Values) i.Dispose();
             timers.Clear();
+
+            foreach (PolyInfo info in poly) {
+                foreach (Courier i in info.timers) i.Dispose();
+                info.timers.Clear();
+            }
+            poly.Clear();
+        }
+
+        public override void Dispose() {
+            Stop();
 
             foreach (Offset offset in Offsets) offset.Dispose();
             Time.Dispose();
