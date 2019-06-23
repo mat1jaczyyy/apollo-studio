@@ -96,7 +96,6 @@ namespace Apollo.Structures {
             ModeChanged = null;
 
             Length.Dispose();
-            Length = null;
         }
     }
 }
