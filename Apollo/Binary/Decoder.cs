@@ -344,6 +344,11 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Pattern)) {
+                int repeats = 1;
+                if (version >= 11) {
+                    repeats = reader.ReadInt32();
+                }
+
                 decimal gate = reader.ReadDecimal();
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
                 Pattern.PlaybackType mode = (Pattern.PlaybackType)reader.ReadInt32();
@@ -369,7 +374,7 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = new Pattern(gate, frames, mode, infinite, expanded);
+                Pattern ret = new Pattern(repeats, gate, frames, mode, infinite, expanded);
 
                 if (chokeenabled) {
                     return new Choke(choke, new Chain(new List<Device>() {ret}));

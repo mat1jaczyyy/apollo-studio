@@ -273,6 +273,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Pattern o) {
             EncodeID(writer, typeof(Pattern));
 
+            writer.Write(o.Repeats);
             writer.Write(o.Gate);
             
             writer.Write(o.Frames.Count);
@@ -280,7 +281,6 @@ namespace Apollo.Binary {
                 Encode(writer, o.Frames[i]);
             
             writer.Write((int)o.GetPlaybackType());
-
             writer.Write(o.Infinite);
 
             writer.Write(o.Expanded);

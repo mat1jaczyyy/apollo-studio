@@ -18,7 +18,7 @@ namespace Apollo.Devices {
         public int Target {
             get => _target;
             set {
-                if (1 <= value && value <= 16) {
+                if (_target != value && 1 <= value && value <= 16) {
                    _target = value;
 
                    if (Viewer?.SpecificViewer != null) ((ChokeViewer)Viewer.SpecificViewer).SetTarget(Target);

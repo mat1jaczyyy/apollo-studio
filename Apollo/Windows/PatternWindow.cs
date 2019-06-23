@@ -37,6 +37,8 @@ namespace Apollo.Windows {
 
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
+            Repeats = this.Get<Dial>("Repeats");
+
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
 
@@ -93,7 +95,7 @@ namespace Apollo.Windows {
         ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate;
+        Dial Duration, Gate, Repeats;
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Infinite;
 
@@ -108,12 +110,14 @@ namespace Apollo.Windows {
             set {
                 _locked = value;
 
+                if (Repeats.Enabled) Repeats.DisplayDisabledText = false;
                 if (Gate.Enabled) Gate.DisplayDisabledText = false;
                 if (Duration.Enabled) Duration.DisplayDisabledText = false;
 
                 UndoButton.IsEnabled =
                 RedoButton.IsEnabled =
                 ImportButton.IsEnabled =
+                Repeats.Enabled =
                 Gate.Enabled =
                 PlaybackMode.IsEnabled =
                 Infinite.IsEnabled =
@@ -129,7 +133,10 @@ namespace Apollo.Windows {
 
                 if (!_locked) {
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-                    Duration.DisplayDisabledText = Gate.DisplayDisabledText = true;
+                    Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
+                    Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
+
+                    Repeats.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
             }
         }
@@ -211,6 +218,7 @@ namespace Apollo.Windows {
 
             Editor.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
 
+            Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = (double)_pattern.Gate * 100;
 
             PlaybackMode.SelectedItem = _pattern.Mode;
@@ -367,6 +375,8 @@ namespace Apollo.Windows {
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
             Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
+            Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
 
             Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
@@ -620,7 +630,8 @@ namespace Apollo.Windows {
             ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().ToString();
 
             Duration.Enabled = !(value && _pattern.Expanded == _pattern.Count - 1);
-        } 
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
+        }
 
         List<Time> oldTime;
 
@@ -818,7 +829,12 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetPlaybackMode(string mode) => PlaybackMode.SelectedItem = mode;
+        public void SetPlaybackMode(string mode) {
+            PlaybackMode.SelectedItem = mode;
+
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
+            Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
+        }
 
         private void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
@@ -837,6 +853,24 @@ namespace Apollo.Windows {
         }
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+
+        private void Repeats_Changed(double value, double? old) {
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Repeats Changed to {value}{Repeats.Unit}", () => {
+                    ((Pattern)Track.TraversePath(path)).Repeats = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Repeats = r;
+                });
+            }
+
+            _pattern.Repeats = (int)value;
+        }
+
+        public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
 
         private void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {

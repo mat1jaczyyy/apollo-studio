@@ -57,6 +57,9 @@
             <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
               <StackPanel Margin="7" HorizontalAlignment="Stretch" Spacing="5">
                 <Grid ColumnDefinitions="*,*">
+                  <Components:Dial Grid.Column="0" x:Name="Repeats" Title="Repeats" Minimum="1" Maximum="32" Default="1" Exponent="2.1468413883" Scale="0.7" Unit="" DisabledText="1"
+                                   ValueChanged="Repeats_Changed" />
+
                   <Components:Dial Grid.Column="1" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Scale="0.7" Unit="%"
                                    ValueChanged="Gate_Changed" />
                 </Grid>
