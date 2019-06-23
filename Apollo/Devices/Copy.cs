@@ -350,7 +350,7 @@ namespace Apollo.Devices {
             if (_copymode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
 
             if (_copymode == CopyType.Static) {
-                MIDIExit?.Invoke(n);
+                MIDIExit?.Invoke(n.Clone());
 
                 for (int i = 1; i < validOffsets.Count; i++) {
                     Signal m = n.Clone();

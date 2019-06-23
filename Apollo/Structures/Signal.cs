@@ -70,6 +70,8 @@ namespace Apollo.Structures {
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
         public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Page, Layer, BlendingMode, MultiTarget);
+        
+        public override string ToString() => $"{((Source == null)? "null" : Source.Name )} -> {Index} @ {Layer} + {BlendingMode} & {MultiTarget} = {Color}";
     }
 
     public class StopSignal: Signal {
