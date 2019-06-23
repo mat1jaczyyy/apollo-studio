@@ -301,6 +301,9 @@ namespace Apollo.Devices {
 
         public override void Dispose() {
             Generated = null;
+
+            Preferences.FadeSmoothnessChanged -= Generate;
+
             Time.Dispose();
             base.Dispose();
         }
