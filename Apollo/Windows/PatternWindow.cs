@@ -39,7 +39,6 @@ namespace Apollo.Windows {
             Gate = this.Get<Dial>("Gate");
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
-            Choke = this.Get<Dial>("Choke");
 
             ImportButton = this.Get<Button>("Import");
             Play = this.Get<Button>("Play");
@@ -94,7 +93,7 @@ namespace Apollo.Windows {
         ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate, Choke;
+        Dial Duration, Gate;
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Infinite;
 
@@ -109,15 +108,12 @@ namespace Apollo.Windows {
             set {
                 _locked = value;
 
-                if (Choke.Enabled) Choke.DisplayDisabledText = false;
                 if (Gate.Enabled) Gate.DisplayDisabledText = false;
                 if (Duration.Enabled) Duration.DisplayDisabledText = false;
 
                 UndoButton.IsEnabled =
                 RedoButton.IsEnabled =
                 ImportButton.IsEnabled =
-                Choke.Enabled =
-                Choke.IsEnabled =
                 Gate.Enabled =
                 PlaybackMode.IsEnabled =
                 Infinite.IsEnabled =
@@ -132,10 +128,8 @@ namespace Apollo.Windows {
                 Invert.IsEnabled = !_locked;
 
                 if (!_locked) {
-                    Choke.Enabled = _pattern.ChokeEnabled;
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-
-                    Choke.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
+                    Duration.DisplayDisabledText = Gate.DisplayDisabledText = true;
                 }
             }
         }
@@ -222,9 +216,6 @@ namespace Apollo.Windows {
             PlaybackMode.SelectedItem = _pattern.Mode;
 
             Infinite.IsChecked = _pattern.Infinite;
-
-            Choke.Enabled = _pattern.ChokeEnabled;
-            Choke.RawValue = _pattern.Choke;
 
             FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
             FrameContextMenu.AddHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
@@ -828,42 +819,6 @@ namespace Apollo.Windows {
         }
 
         public void SetPlaybackMode(string mode) => PlaybackMode.SelectedItem = mode;
-
-        private void Choke_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right) {
-                bool u = _pattern.ChokeEnabled;
-                bool r = !_pattern.ChokeEnabled;
-                List<int> path = Track.GetPath(_pattern);
-
-                Program.Project.Undo.Add($"Pattern Choke {(r? "Enabled" : "Disabled")}", () => {
-                    ((Pattern)Track.TraversePath(path)).ChokeEnabled = u;
-                }, () => {
-                    ((Pattern)Track.TraversePath(path)).ChokeEnabled = r;
-                });
-
-                _pattern.ChokeEnabled = !_pattern.ChokeEnabled;
-            }
-        }
-
-        public void SetChokeEnabled(bool choke) => Choke.Enabled = choke;
-
-        private void Choke_Changed(double value, double? old) {
-            if (old != null) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_pattern);
-
-                Program.Project.Undo.Add($"Pattern Choke Changed to {r}{Choke.Unit}", () => {
-                    ((Pattern)Track.TraversePath(path)).Choke = u;
-                }, () => {
-                    ((Pattern)Track.TraversePath(path)).Choke = r;
-                });
-            }
-
-            _pattern.Choke = (int)value;
-        }
-
-        public void SetChoke(int choke) => Choke.RawValue = choke;
 
         private void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {

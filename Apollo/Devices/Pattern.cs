@@ -24,9 +24,6 @@ namespace Apollo.Devices {
             get => true;
         }
 
-        public delegate void ChokedEventHandler(Pattern sender, int index);
-        public static event ChokedEventHandler Choked;
-
         public PatternWindow Window;
 
         private List<Frame> _frames;
@@ -78,7 +75,6 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         private decimal _gate;
         public decimal Gate {
@@ -118,32 +114,6 @@ namespace Apollo.Devices {
 
         public PlaybackType GetPlaybackType() => _mode;
 
-        private bool _chokeenabled;
-        public bool ChokeEnabled {
-            get => _chokeenabled;
-            set {
-                if (_chokeenabled != value) {
-                    _chokeenabled = value;
-
-                    Window?.SetChokeEnabled(_chokeenabled);
-                }
-            }
-        }
-
-        private int _choke;
-        public int Choke {
-            get => _choke;
-            set {
-                if (_choke != value) {
-                    _choke = value;
-
-                    Window?.SetChoke(_choke);
-                }
-            }
-        }
-
-        bool choked;
-
         private bool _infinite;
         public bool Infinite {
             get => _infinite;
@@ -156,25 +126,22 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, ChokeEnabled, Choke, Infinite, Expanded) {
+        public override Device Clone() => new Pattern(Gate, (from i in Frames select i.Clone()).ToList(), _mode, Infinite, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public int Expanded;
 
-        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool chokeenabled = false, int choke = 1, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Gate = gate;
             Frames = frames;
             _mode = mode;
-            ChokeEnabled = chokeenabled;
-            Choke = choke;
             Infinite = infinite;
             Expanded = expanded;
 
-            Choked += HandleChoke;
             Reroute();
         }
 
@@ -201,7 +168,7 @@ namespace Apollo.Devices {
         }
 
         private void Tick(object sender, EventArgs e) {
-            if (Disposed || choked) return;
+            if (Disposed) return;
 
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
@@ -253,8 +220,6 @@ namespace Apollo.Devices {
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit)
                                     MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
-                        
-                        poly.Remove(info);
                     }
                 }
             }
@@ -290,18 +255,12 @@ namespace Apollo.Devices {
                     if ((_mode == PlaybackType.Mono && lit) || _mode == PlaybackType.Loop) Stop(n);
 
                     if (lit) {
-                        if (ChokeEnabled) {
-                            Choked.Invoke(this, Choke);
-                            choked = false;
-                        }
-
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if (Frames[0].Screen[i].Lit)
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
                         
                         decimal time = 0;
                         PolyInfo info = new PolyInfo(n);
-                        if (_mode == PlaybackType.Poly) poly.Add(info);
 
                         for (int i = 0; i < Frames.Count; i++) {
                             time += Frames[i].Time * _gate;
@@ -309,26 +268,6 @@ namespace Apollo.Devices {
                             else FireCourier(n, time);
                         }
                     }
-                }
-            }
-        }
-
-        private void HandleChoke(Pattern sender, int index) {
-            if (Choke == index && sender != this) {
-                choked = true;
-
-                foreach ((Signal n, List<Courier> i) in timers)
-                    if (i.Count > 0) Stop(n);
-                
-                foreach (PolyInfo info in poly) {
-                    lock (locker[info.n]) {
-                        if (info.index < Frames.Count)
-                            for (int i = 0; i < Frames[info.index].Screen.Length; i++)
-                                if (Frames[info.index].Screen[i].Lit)
-                                    MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
-                    }
-
-                    poly = new HashSet<PolyInfo>();
                 }
             }
         }
@@ -342,13 +281,10 @@ namespace Apollo.Devices {
                 i.Clear();
             }
             timers.Clear();
-            
-            poly.Clear();
 
             Window?.Close();
             Window = null;
 
-            Choked = null;
             foreach (Frame frame in Frames) frame.Dispose();
             base.Dispose();
         }

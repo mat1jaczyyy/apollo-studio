@@ -273,9 +273,6 @@ namespace Apollo.Binary {
                 Encode(writer, o.Frames[i]);
             
             writer.Write((int)o.GetPlaybackType());
-            
-            writer.Write(o.ChokeEnabled);
-            writer.Write(o.Choke);
 
             writer.Write(o.Infinite);
 

@@ -341,14 +341,19 @@ namespace Apollo.Binary {
                 decimal gate = reader.ReadDecimal();
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
                 Pattern.PlaybackType mode = (Pattern.PlaybackType)reader.ReadInt32();
-                bool chokeenabled = reader.ReadBoolean();
 
+                bool chokeenabled = false;
                 int choke = 8;
-                if (version <= 0) {
-                    if (chokeenabled)
+
+                if (version <= 10) {
+                    chokeenabled = reader.ReadBoolean();
+
+                    if (version <= 0) {
+                        if (chokeenabled)
+                            choke = reader.ReadInt32();
+                    } else {
                         choke = reader.ReadInt32();
-                } else {
-                    choke = reader.ReadInt32();
+                    }
                 }
 
                 bool infinite = false;
@@ -358,7 +363,13 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                return new Pattern(gate, frames, mode, chokeenabled, choke, infinite, expanded);
+                Pattern ret = new Pattern(gate, frames, mode, infinite, expanded);
+
+                if (chokeenabled) {
+                    return new Choke(choke, new Chain(new List<Device>() {ret}));
+                }
+
+                return ret;
             
             } else if (t == typeof(Preview))
                 return new Preview();
