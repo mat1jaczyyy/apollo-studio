@@ -221,12 +221,13 @@ namespace Apollo.Devices {
         }
 
         private void FireCourier(PolyInfo info, decimal time) {
-            Courier courier = new Courier() {
+            Courier courier;
+
+            info.timers.Add(courier = new Courier() {
                 Info = info,
                 AutoReset = false,
                 Interval = (double)time,
-            };
-            info.timers.Add(courier);
+            });
             courier.Elapsed += Tick;
             courier.Start();
         }
@@ -389,7 +390,7 @@ namespace Apollo.Devices {
             } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }
 
-        public override void Stop() {
+        protected override void Stop() {
             buffer.Clear();
             locker.Clear();
             

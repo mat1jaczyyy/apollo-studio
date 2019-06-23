@@ -75,6 +75,7 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         private decimal _gate;
         public decimal Gate {
@@ -92,6 +93,7 @@ namespace Apollo.Devices {
             public Signal n;
             public int index = 0;
             public object locker = new object();
+            public List<Courier> timers = new List<Courier>();
 
             public PolyInfo(Signal init) => n = init;
         }
@@ -109,6 +111,8 @@ namespace Apollo.Devices {
                 _mode = Enum.Parse<PlaybackType>(value);
 
                 Window?.SetPlaybackMode(Mode);
+
+                Stop();
             }
         }
 
@@ -158,11 +162,13 @@ namespace Apollo.Devices {
         }
 
         private void FireCourier(PolyInfo info, decimal time) {
-            Courier courier = new Courier() {
+            Courier courier;
+
+            info.timers.Add(courier = new Courier() {
                 Info = info,
                 AutoReset = false,
                 Interval = (double)time,
-            };
+            });
             courier.Elapsed += Tick;
             courier.Start();
         }
@@ -216,6 +222,8 @@ namespace Apollo.Devices {
                             if (Frames[info.index].Screen[i] != Frames[info.index - 1].Screen[i])
                                 MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, Frames[info.index].Screen[i].Clone(), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
                     } else {
+                        poly.Remove(info);
+
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit)
@@ -261,6 +269,7 @@ namespace Apollo.Devices {
                         
                         decimal time = 0;
                         PolyInfo info = new PolyInfo(n);
+                        poly.Add(info);
 
                         for (int i = 0; i < Frames.Count; i++) {
                             time += Frames[i].Time * _gate;
@@ -272,7 +281,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void Dispose() {
+        protected override void Stop() {
             buffer.Clear();
             locker.Clear();
             
@@ -281,6 +290,15 @@ namespace Apollo.Devices {
                 i.Clear();
             }
             timers.Clear();
+
+            foreach (PolyInfo info in poly) {
+                foreach (Courier i in info.timers) i.Dispose();
+                info.timers.Clear();
+            }
+            poly.Clear();
+        }
+
+        public override void Dispose() {
 
             Window?.Close();
             Window = null;

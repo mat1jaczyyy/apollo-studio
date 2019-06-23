@@ -301,7 +301,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void Stop() {
+        protected override void Stop() {
             buffer.Clear();
             locker.Clear();
             

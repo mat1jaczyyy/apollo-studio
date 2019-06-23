@@ -62,7 +62,7 @@ namespace Apollo.Elements {
             MIDIExit?.Invoke(n);
         }
 
-        public virtual void Stop() {}
+        protected virtual void Stop() {}
 
         public bool Disposed { get; private set; } = false;
 
