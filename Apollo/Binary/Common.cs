@@ -43,7 +43,9 @@ namespace Apollo.Binary {
             typeof(Frame),
             typeof(Length),
             typeof(Offset),
-            typeof(Time)
+            typeof(Time),
+
+            typeof(Choke)
         };
     }
 }

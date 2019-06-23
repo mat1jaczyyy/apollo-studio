@@ -145,6 +145,13 @@ namespace Apollo.Binary {
                 writer.Write(o.Expanded.Value);
         }
 
+        private static void Encode(BinaryWriter writer, Choke o) {
+            EncodeID(writer, typeof(Choke));
+
+            writer.Write(o.Target);
+            Encode(writer, o.Chain);
+        }
+
         private static void Encode(BinaryWriter writer, Copy o) {
             EncodeID(writer, typeof(Copy));
 

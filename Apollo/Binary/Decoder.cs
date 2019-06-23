@@ -192,7 +192,13 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
                     reader.ReadBoolean()? (int?)reader.ReadInt32() : null
                 );
-            
+
+            else if (t == typeof(Choke))
+                return new Choke(
+                    reader.ReadInt32(),
+                    (Chain)Decode(reader, version)
+                );
+
             else if (t == typeof(Copy)) {
                 Time time;
                 if (version <= 2) {
