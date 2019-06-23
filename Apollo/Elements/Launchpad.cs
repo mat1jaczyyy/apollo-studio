@@ -59,12 +59,9 @@ namespace Apollo.Elements {
 
         protected void InvokeReceive(Signal n) => Receive?.Invoke(n);
 
-        protected Pixel[] screen = new Pixel[100];
+        protected Screen screen;
 
-        protected void CreateScreen() {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = Send};
-        }
+        protected void CreateScreen() => screen = new Screen() { ScreenExit = Send };
 
         public enum LaunchpadType {
             MK2, PRO, CFW, Unknown
@@ -171,7 +168,7 @@ namespace Apollo.Elements {
             Send(n);
         }
 
-        public virtual void Render(Signal n) => screen[n.Index]?.MIDIEnter(n);
+        public virtual void Render(Signal n) => screen?.MIDIEnter(n);
 
         public Launchpad() => CreateScreen();
 

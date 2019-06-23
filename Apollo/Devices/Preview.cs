@@ -5,17 +5,14 @@ namespace Apollo.Devices {
     public class Preview: Device {
         public static readonly new string DeviceIdentifier = "preview";
 
-        private Pixel[] screen = new Pixel[100];
+        private Screen screen;
 
         public override Device Clone() => new Preview() {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Preview(): base(DeviceIdentifier) {
-            for (int i = 0; i < 100; i++)
-                screen[i] = new Pixel() {MIDIExit = PreviewExit};
-        }
+        public Preview(): base(DeviceIdentifier) => screen = new Screen() { ScreenExit = PreviewExit };
 
         public delegate void SignalExitedEventHandler(Signal n);
         public event SignalExitedEventHandler SignalExited;
@@ -25,7 +22,7 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
             MIDIExit?.Invoke(n);
-            screen[m.Index].MIDIEnter(m);
+            screen.MIDIEnter(m);
         }
 
         public override void Dispose() {
