@@ -271,8 +271,13 @@ namespace Apollo.Components {
         }
         
         private void Hex_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Return) this.Focus();
+            if (e.Key == Key.Return)
+                this.Focus();
+            
+            e.Key = Key.None;
         }
+        
+        private void Hex_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
         private void Hex_Unfocus(object sender, RoutedEventArgs e) {
             if (oldColor != Color)
