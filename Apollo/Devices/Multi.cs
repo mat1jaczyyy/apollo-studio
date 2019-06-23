@@ -108,18 +108,18 @@ namespace Apollo.Devices {
         }
 
         public void Remove(int index, bool dispose = true) {
+            if (index < Chains.Count - 1)
+                Track.Get(this)?.Window?.Selection.Select(Chains[index + 1]);
+            else if (Chains.Count > 1)
+                Track.Get(this)?.Window?.Selection.Select(Chains[Chains.Count - 2]);
+            else
+                Track.Get(this)?.Window?.Selection.Select(null);
+
             SpecificViewer?.Contents_Remove(index);
 
             if (dispose) Chains[index].Dispose();
             Chains.RemoveAt(index);
             Reroute();
-            
-            if (index < Chains.Count)
-                Track.Get(this)?.Window?.Selection.Select(Chains[index]);
-            else if (Chains.Count > 0)
-                Track.Get(this)?.Window?.Selection.Select(Chains.Last());
-            else
-                Track.Get(this)?.Window?.Selection.Select(null);
         }
 
         private void Reset() => current = -1;

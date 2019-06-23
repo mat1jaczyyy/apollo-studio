@@ -138,18 +138,18 @@ namespace Apollo.Elements {
         public void Add(Device device) => Insert(Devices.Count, device);
 
         public void Remove(int index, bool dispose = true) {
+            if (index < Devices.Count - 1)
+                Track.Get(this).Window?.Selection.Select(Devices[index + 1]);
+            else if (Devices.Count > 1)
+                Track.Get(this).Window?.Selection.Select(Devices[Devices.Count - 2]);
+            else
+                Track.Get(this).Window?.Selection.Select(null);
+
             Viewer?.Contents_Remove(index);
 
             if (dispose) Devices[index].Dispose();
             Devices.RemoveAt(index);
             Reroute();
-
-            if (index < Devices.Count)
-                Track.Get(this).Window?.Selection.Select(Devices[index]);
-            else if (Devices.Count > 0)
-                Track.Get(this).Window?.Selection.Select(Devices.Last());
-            else
-                Track.Get(this).Window?.Selection.Select(null);
         }
 
         public Chain(List<Device> init = null, string name = "Chain #") {

@@ -30,7 +30,7 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index]);
         }
 
-        public void Remove(int index, bool dispose = true) {
+        public void Remove(int index) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Remove(index);
 
             Offsets[index].Changed -= OffsetChanged;

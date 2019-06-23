@@ -163,19 +163,19 @@ namespace Apollo.Elements {
         }
 
         public void Remove(int index, bool dispose = true) {
+            if (index < Tracks.Count - 1)
+                Window?.Selection.Select(Tracks[index + 1]);
+            else if (Tracks.Count > 1)
+                Window?.Selection.Select(Tracks[Tracks.Count - 2]);
+            else
+                Window?.Selection.Select(null);
+
             Window?.Contents_Remove(index);
             Tracks[index].Window?.Close();
 
             if (dispose) Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
-            
-            if (index < Tracks.Count)
-                Window?.Selection.Select(Tracks[index]);
-            else if (Tracks.Count > 0)
-                Window?.Selection.Select(Tracks.Last());
-            else
-                Window?.Selection.Select(null);
         }
 
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
