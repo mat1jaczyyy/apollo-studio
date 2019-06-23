@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 using Apollo.Core;
@@ -47,19 +47,21 @@ namespace Apollo.Devices {
         }
 
         bool choked = true;
-        
-        Dictionary<(int, int), Signal> signals = new Dictionary<(int, int), Signal>();
+        object locker = new object();
+        ConcurrentDictionary<(int, int), Signal> signals = new ConcurrentDictionary<(int, int), Signal>();
 
         private void HandleChoke(Choke sender, int index) {
             if (Target == index && sender != this && !choked) {
                 choked = true;
                 
-                foreach (Signal i in signals.Values) {
-                    i.Color = new Color(0);
-                    MIDIExit?.Invoke(i);
-                }
+                lock (locker) {
+                    foreach (Signal i in signals.Values) {
+                        i.Color = new Color(0);
+                        MIDIExit?.Invoke(i);
+                    }
 
-                signals = new Dictionary<(int, int), Signal>();
+                    signals = new ConcurrentDictionary<(int, int), Signal>();
+                }
             }
         }
 
@@ -79,9 +81,11 @@ namespace Apollo.Devices {
             if (!choked) {
                 MIDIExit?.Invoke(n.Clone());
                 
-                (int, int) index = (n.Index, -n.Layer);
-                if (n.Color.Lit) signals[index] = n.Clone();
-                else if (signals.ContainsKey(index)) signals.Remove(index);
+                lock (locker) {
+                    (int, int) index = (n.Index, -n.Layer);
+                    if (n.Color.Lit) signals[index] = n.Clone();
+                    else if (signals.ContainsKey(index)) signals.TryRemove(index, out Signal _);
+                }
             }
         }
 
