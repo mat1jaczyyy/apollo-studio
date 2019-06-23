@@ -10,6 +10,9 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class Choke: Device, IChainParent {
         public static readonly new string DeviceIdentifier = "choke";
+
+        public delegate void ChokedEventHandler(Choke sender, int index);
+        public static event ChokedEventHandler Choked;
         
         private int _target = 1;
         public int Target {
@@ -43,6 +46,23 @@ namespace Apollo.Devices {
             }
         }
 
+        bool choked = true;
+        
+        Dictionary<(int, int), Signal> signals = new Dictionary<(int, int), Signal>();
+
+        private void HandleChoke(Choke sender, int index) {
+            if (Target == index && sender != this && !choked) {
+                choked = true;
+                
+                foreach (Signal i in signals.Values) {
+                    i.Color = new Color(0);
+                    MIDIExit?.Invoke(i);
+                }
+
+                signals = new Dictionary<(int, int), Signal>();
+            }
+        }
+
         public override Device Clone() => new Choke(Target, Chain.Clone()) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -51,15 +71,32 @@ namespace Apollo.Devices {
         public Choke(int target = 1, Chain chain = null): base(DeviceIdentifier) {
             Target = target;
             Chain = chain?? new Chain();
+
+            Choked += HandleChoke;
         }
 
-        private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
+        private void ChainExit(Signal n) {
+            if (!choked) {
+                MIDIExit?.Invoke(n.Clone());
+                
+                (int, int) index = (n.Index, -n.Layer);
+                if (n.Color.Lit) signals[index] = n.Clone();
+                else if (signals.ContainsKey(index)) signals.Remove(index);
+            }
+        }
 
         public override void MIDIProcess(Signal n) {
-            Chain.MIDIEnter(n.Clone());
+            if (choked && n.Color.Lit) {
+                Choked?.Invoke(this, Target);
+                choked = false;
+            }
+
+            if (!choked) Chain.MIDIEnter(n.Clone());
         }
 
         public override void Dispose() {
+            Choked -= HandleChoke;
+
             Chain.Dispose();
             base.Dispose();
         }
