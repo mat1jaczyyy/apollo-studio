@@ -75,7 +75,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Hold(_time, _gate, Infinite, Release) {
+        public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
