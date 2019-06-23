@@ -301,7 +301,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override void Dispose() {
+        public override void Stop() {
             buffer.Clear();
             locker.Clear();
             
@@ -310,7 +310,9 @@ namespace Apollo.Devices {
                 i.Clear();
             }
             timers.Clear();
+        }
 
+        public override void Dispose() {
             Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
 
