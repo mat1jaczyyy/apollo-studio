@@ -27,6 +27,7 @@ namespace Apollo.Windows {
 
             AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
+            AutoCreatePattern = this.Get<CheckBox>("AutoCreatePattern");
 
             FadeSmoothness = this.Get<Slider>("FadeSmoothness");
 
@@ -50,7 +51,7 @@ namespace Apollo.Windows {
             Contents = this.Get<StackPanel>("Contents").Children;
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, DiscordPresence, DiscordFilename;
         ComboBox LaunchpadStyle;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
@@ -86,6 +87,7 @@ namespace Apollo.Windows {
 
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
+            AutoCreatePattern.IsChecked = Preferences.AutoCreatePattern;
 
             FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
             FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
@@ -136,6 +138,8 @@ namespace Apollo.Windows {
         private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
         private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
+
+        private void AutoCreatePattern_Changed(object sender, EventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
         private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
 

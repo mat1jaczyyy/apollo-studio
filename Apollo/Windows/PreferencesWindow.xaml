@@ -7,7 +7,7 @@
         CanResize="false" SizeToContent="Height"
         Icon="/Resources/WindowIcon.png"
         Width="750" MinWidth="750" MaxWidth="750"
-        Height="538" MinHeight="538" MaxHeight="538"
+        Height="561" MinHeight="561" MaxHeight="561"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -52,6 +52,7 @@
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
                 <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
                 <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create PageFilter in new Group Chain</CheckBox>
+                <CheckBox Click="AutoCreatePattern_Changed" x:Name="AutoCreatePattern">Auto create Pattern in new Group Chain</CheckBox>
               </StackPanel>
             </Border>
 

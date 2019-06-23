@@ -78,6 +78,15 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _AutoCreatePattern = false;
+        public static bool AutoCreatePattern {
+            get => _AutoCreatePattern;
+            set {
+                _AutoCreatePattern = value;
+                Save();
+            }
+        }
+
         public static event SmoothnessChanged FadeSmoothnessChanged;
         public static double FadeSmoothnessSlider { get; private set; } = 1;
         private static double _FadeSmoothness;

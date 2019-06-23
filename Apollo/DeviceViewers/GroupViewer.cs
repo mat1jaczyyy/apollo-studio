@@ -146,6 +146,7 @@ namespace Apollo.DeviceViewers {
             Chain chain = new Chain();
             if (Preferences.AutoCreatePageFilter) chain.Add(new PageFilter());
             if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
+            if (Preferences.AutoCreatePattern) chain.Add(new Pattern());
 
             Chain_Insert(index, chain);
         }

@@ -62,6 +62,11 @@ namespace Apollo.Binary {
 
                     Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
                     Preferences.AutoCreatePageFilter = reader.ReadBoolean();
+
+                    if (version >= 11) {
+                        Preferences.AutoCreatePattern = reader.ReadBoolean();
+                    }
+
                     Preferences.FadeSmoothness = reader.ReadDouble();
                     Preferences.CopyPreviousFrame = reader.ReadBoolean();
 

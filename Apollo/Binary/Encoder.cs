@@ -40,6 +40,7 @@ namespace Apollo.Binary {
                 writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Preferences.AutoCreateKeyFilter);
                 writer.Write(Preferences.AutoCreatePageFilter);
+                writer.Write(Preferences.AutoCreatePattern);
                 writer.Write(Preferences.FadeSmoothnessSlider);
                 writer.Write(Preferences.CopyPreviousFrame);
                 writer.Write(Preferences.CaptureLaunchpad);
