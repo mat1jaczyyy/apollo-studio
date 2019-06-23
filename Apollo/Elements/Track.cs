@@ -56,6 +56,23 @@ namespace Apollo.Elements {
                 : Get((Device)chain.Parent)
             ) : null;
 
+        public static bool PathContains(ISelect child, List<ISelect> search) {
+            ISelect last = child;
+
+            while (true) {
+                if (last.GetType() == typeof(Chain) && ((Chain)last).IRoot)
+                    last = (ISelect)((Chain)last).Parent;
+
+                if (search.Contains(last)) return true;
+
+                if (last.GetType() == typeof(Track)) return false;
+                
+                last = (last.GetType() == typeof(Chain) && ((Chain)last).Parent.GetType() == typeof(Choke))
+                    ? (ISelect)((Chain)last).Parent
+                    : (ISelect)last.IParent;
+            }
+        }
+
         public static List<int> GetPath(ISelect child) {
             List<int> path = new List<int>();
             ISelect last = child;

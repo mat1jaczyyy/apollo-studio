@@ -262,13 +262,13 @@ namespace Apollo.DeviceViewers {
                 int before = moving[0].IParentIndex.Value - 1;
                 int after = -1;
 
-                int? remove = null;
+                int remove = 0;
 
                 if (source.Name != "DropZoneAfter") {
-                    _multi.Insert((remove = 0).Value);
+                    _multi.Insert(remove = 0);
                     target_chain = _multi[0];
                 } else {
-                    _multi.Insert((remove = _multi.Count).Value);
+                    _multi.Insert(remove = _multi.Count);
                     target_chain = _multi.Chains.Last();
                 }
 
@@ -290,8 +290,7 @@ namespace Apollo.DeviceViewers {
                             for (int i = after + count; i > after; i--)
                                 targetchain.Remove(i);
                             
-                            if (remove != null)
-                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+                            ((IMultipleChainParent)targetchain.Parent).Remove(remove);
 
                         }) : new Action(() => {
                             Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
@@ -301,25 +300,22 @@ namespace Apollo.DeviceViewers {
 
                             Device.Move(umoving, sourcechain, before_pos);
 
-                            if (remove != null)
-                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+                            ((IMultipleChainParent)targetchain.Parent).Remove(remove);
 
                     }), () => {
                         Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
                         Chain targetchain;
 
-                        if (remove != null) {
-                            IMultipleChainParent target = ((IMultipleChainParent)Track.TraversePath(targetpath.Skip(1).ToList()));
-                            target.Insert(remove.Value);
-                            targetchain = target[remove.Value];
-                        
-                        } else targetchain = ((Chain)Track.TraversePath(targetpath));
+                        IMultipleChainParent target = ((IMultipleChainParent)Track.TraversePath(targetpath.Skip(1).ToList()));
+                        target.Insert(remove);
+                        targetchain = target[remove];
 
                         List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
 
                         Device.Move(rmoving, targetchain, after, copy);
                     });
-                }
+
+                } else _multi.Remove(remove);
 
             } else return;
 

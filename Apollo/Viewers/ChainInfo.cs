@@ -267,7 +267,8 @@ namespace Apollo.Viewers {
 
                         Device.Move(rmoving, targetchain, after, copy);
                     });
-                }
+
+                } else if (remove != null) ((IMultipleChainParent)_chain.Parent).Remove(remove.Value);
 
             } else return;
 

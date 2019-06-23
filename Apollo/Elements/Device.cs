@@ -74,9 +74,13 @@ namespace Apollo.Elements {
             ParentIndex = null;
         }
 
-        public static bool Move(List<Device> source, Chain target, int position, bool copy = false) => (position == -1)
-            ? Move(source, target, copy)
-            : Move(source, target[position], copy);
+        public static bool Move(List<Device> source, Chain target, int position, bool copy = false) {
+            if (!copy && Track.PathContains(target, source.Select(i => (ISelect)i).ToList())) return false;
+
+            return (position == -1)
+                ? Move(source, target, copy)
+                : Move(source, target[position], copy);
+        }
 
         public static bool Move(List<Device> source, Device target, bool copy = false) {
             if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))

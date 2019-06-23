@@ -172,9 +172,13 @@ namespace Apollo.Elements {
             _ParentIndex = null;
         }
 
-        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) => (position == -1)
-            ? Move(source, target, copy)
-            : Move(source, target[position], copy);
+        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) {
+            if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
+
+            return (position == -1)
+                ? Move(source, target, copy)
+                : Move(source, target[position], copy);
+        }
 
         public static bool Move(List<Chain> source, Chain target, bool copy = false) {
             if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
