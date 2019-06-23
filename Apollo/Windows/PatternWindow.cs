@@ -361,6 +361,8 @@ namespace Apollo.Windows {
             _pattern.Remove(index);
         }
 
+        public bool Draw = true;
+
         public void Frame_Select(int index) {
             if (Locked) return;
 
@@ -378,10 +380,12 @@ namespace Apollo.Windows {
             Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
             Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
 
-            Editor.RenderFrame(_pattern[_pattern.Expanded]);
+            if (Draw) {
+                Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
-            for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+                for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
+                    Launchpad?.Send(new Signal(Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+            }
         }
 
         private void Frame_Action(string action) => Frame_Action(action, false);
@@ -763,10 +767,14 @@ namespace Apollo.Windows {
 
             if (left == right) return;
 
+            int expanded = _pattern.Expanded;
+
             List<int> path = Track.GetPath(_pattern);
 
             void ur() {
                 Pattern pattern = (Pattern)Track.TraversePath(path);
+
+                if (pattern.Window != null) pattern.Window.Draw = false;
 
                 for (int i = left; i < right; i++) {
                     Frame frame = pattern[right];
@@ -774,11 +782,18 @@ namespace Apollo.Windows {
                     pattern.Insert(i, frame);
                 }
 
-                Selection.Select(pattern[left]);
-                Selection.Select(pattern[right], true);
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(expanded);
+                    pattern.Window.Selection.Select(pattern[left]);
+                    pattern.Window.Selection.Select(pattern[right], true);
+                }
             }
 
             Program.Project.Undo.Add($"Pattern Frames Reversed", ur, ur);
+
+            Draw = false;
 
             for (int i = left; i < right; i++) {
                 Frame frame = _pattern[right];
@@ -786,6 +801,9 @@ namespace Apollo.Windows {
                 _pattern.Insert(i, frame);
             }
 
+            Draw = true;
+
+            Frame_Select(expanded);
             Selection.Select(_pattern[left]);
             Selection.Select(_pattern[right], true);
         }
@@ -1179,18 +1197,40 @@ namespace Apollo.Windows {
             Program.Project.Undo.Add($"Pattern Frame Pasted", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     pattern.Remove(right + i + 1);
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
 
             }, () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = 0; i < paste.Contents.Count; i++)
                     pattern.Insert(right + i + 1, pasted[i].Clone());
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
             });
+
+            Draw = false;
 
             for (int i = 0; i < paste.Contents.Count; i++)
                 _pattern.Insert(right + i + 1, pasted[i].Clone());
+
+            Draw = true;
+
+            Frame_Select(_pattern.Expanded);
         }
 
         public void Duplicate(int left, int right) {
@@ -1201,18 +1241,40 @@ namespace Apollo.Windows {
             Program.Project.Undo.Add($"Pattern Frame Duplicated", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = right - left; i >= 0; i--)
                     pattern.Remove(right + i + 1);
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
 
             }, () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = 0; i <= right - left; i++)
                     pattern.Insert(right + i + 1, pattern[left + i].Clone());
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
             });
+
+            Draw = false;
 
             for (int i = 0; i <= right - left; i++)
                 _pattern.Insert(right + i + 1, _pattern[left + i].Clone());
+
+            Draw = true;
+
+            Frame_Select(_pattern.Expanded);
         }
 
         public void Delete(int left, int right) {
@@ -1227,18 +1289,40 @@ namespace Apollo.Windows {
             Program.Project.Undo.Add($"Pattern Frame Removed", () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = left; i <= right; i++)
                     pattern.Insert(i, u[i - left].Clone());
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
 
             }, () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
                 for (int i = right; i >= left; i--)
                     pattern.Remove(i);
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
             });
+
+            Draw = false;
 
             for (int i = right; i >= left; i--)
                 _pattern.Remove(i);
+
+            Draw = true;
+
+            Frame_Select(_pattern.Expanded);
         }
 
         public void Group(int left, int right) {}
