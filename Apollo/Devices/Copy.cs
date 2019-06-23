@@ -160,7 +160,6 @@ namespace Apollo.Devices {
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
-        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
@@ -263,8 +262,7 @@ namespace Apollo.Devices {
                         Signal m = info.n.Clone();
                         m.Index = (byte)info.offsets[info.index];
                         MIDIExit?.Invoke(m);
-                        
-                    } else poly.Remove(info);
+                    }
                 }
 
             } else if (_copymode == CopyType.RandomLoop && infoType == typeof((Signal, List<int>))) {
@@ -369,7 +367,6 @@ namespace Apollo.Devices {
                     MIDIExit?.Invoke(n.Clone());
                     
                     PolyInfo info = new PolyInfo(n, validOffsets);
-                    poly.Add(info);
 
                     for (int i = 1; i < validOffsets.Count; i++)
                         FireCourier(info, _time * _gate * i);
