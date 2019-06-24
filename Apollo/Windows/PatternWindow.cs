@@ -1012,9 +1012,12 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
-        private static void ImportFrames(Pattern pattern, List<Frame> frames, decimal gate) {
-            pattern.Frames = frames;
+        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, Pattern.PlaybackType mode, bool infinite) {
+            pattern.Repeats = repeats;
             pattern.Gate = gate;
+            pattern.Frames = frames;
+            pattern.Mode = mode.ToString();
+            pattern.Infinite = infinite;
 
             while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
             pattern.Expanded = 0;
@@ -1039,19 +1042,27 @@ namespace Apollo.Windows {
                 return;
             }
 
-            List<Frame> uf = _pattern.Frames.ToList();
+            int ur = _pattern.Repeats;
             decimal ug = _pattern.Gate;
-            List<Frame> rf = frames.ToList();
+            List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
+            Pattern.PlaybackType um = _pattern.GetPlaybackType();
+            bool ui = _pattern.Infinite;
+
+            int rr = 1;
             decimal rg = 1;
+            List<Frame> rf = frames.Select(i => i.Clone()).ToList();
+            Pattern.PlaybackType rm = Pattern.PlaybackType.Mono;
+            bool ri = false;
+
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames((Pattern)Track.TraversePath(path), uf.ToList(), ug);
+                ImportFrames((Pattern)Track.TraversePath(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui);
             }, () => {
-                ImportFrames((Pattern)Track.TraversePath(path), rf.ToList(), rg);
+                ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri);
             });
 
-            ImportFrames(_pattern, frames, 1);
+            ImportFrames(_pattern, 1, 1, frames, Pattern.PlaybackType.Mono, false);
         }
 
         private async void ImportDialog(object sender, RoutedEventArgs e) {
