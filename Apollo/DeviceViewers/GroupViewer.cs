@@ -505,20 +505,20 @@ namespace Apollo.DeviceViewers {
             if (result.Length > 0) {
                 Copyable loaded;
 
-                using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                    try {
+                try {
+                    using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                         loaded = await Decoder.Decode(file, typeof(Copyable));
 
-                    } catch {
-                        await MessageWindow.Create(
-                            $"An error occurred while reading the file.\n\n" +
-                            "You may not have sufficient privileges to read from the destination folder, or\n" +
-                            "the file you're attempting to read is invalid.",
-                            null, sender
-                        );
+                } catch {
+                    await MessageWindow.Create(
+                        $"An error occurred while reading the file.\n\n" +
+                        "You may not have sufficient privileges to read from the destination folder, or\n" +
+                        "the file you're attempting to read is invalid.",
+                        null, sender
+                    );
 
-                        return;
-                    }
+                    return;
+                }
                 
                 Copyable_Insert(loaded, right, true);
             }
