@@ -16,6 +16,22 @@ namespace Apollo.Structures {
 
             public Pixel() {}
 
+            public Color GetColor() {
+                Color ret = new Color(0);
+
+                for (int i = 0; i < _signals.Count; i++) {
+                    Signal signal = _signals.Values[i];
+
+                    if (signal.BlendingMode == Signal.BlendingType.Mask) break;
+
+                    ret.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == Signal.BlendingType.Multiply));
+
+                    if (signal.BlendingMode == Signal.BlendingType.Normal) break;
+                }
+
+                return ret;
+            }
+
             public void MIDIEnter(Signal n) {
                 lock (locker) {
                     int layer = -n.Layer;
@@ -24,17 +40,7 @@ namespace Apollo.Structures {
                     else if (_signals.ContainsKey(layer)) _signals.Remove(layer);
                     else return;
 
-                    Color newState = new Color(0);
-
-                    for (int i = 0; i < _signals.Count; i++) {
-                        Signal signal = _signals.Values[i];
-
-                        if (signal.BlendingMode == Signal.BlendingType.Mask) break;
-
-                        newState.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == Signal.BlendingType.Multiply));
-
-                        if (signal.BlendingMode == Signal.BlendingType.Normal) break;
-                    }
+                    Color newState = GetColor();
                     
                     if (newState != state) {
                         Signal m = n.Clone();
@@ -53,6 +59,8 @@ namespace Apollo.Structures {
             for (int i = 0; i < 100; i++)
                 _screen[i] = new Pixel() { Exit = (n) => ScreenExit?.Invoke(n) };
         }
+
+        public Color GetColor(int index) => _screen[index].GetColor();
 
         public void MIDIEnter(Signal n) => _screen[n.Index].MIDIEnter(n);
     }

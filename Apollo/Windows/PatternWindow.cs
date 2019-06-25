@@ -58,6 +58,8 @@ namespace Apollo.Windows {
 
         Pattern _pattern;
         Track _track;
+
+        public Pattern Device { get => _pattern; }
         
         Launchpad _launchpad;
         private Launchpad Launchpad {

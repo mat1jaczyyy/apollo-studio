@@ -39,7 +39,7 @@ namespace Apollo.Windows {
             Title = this.Get<TextBlock>("Title").Text = _launchpad.Name;
 
             for (int i = 0; i < 100; i++)
-                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), launchpad.GetColor(i).ToScreenBrush());
             
             Grid.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }

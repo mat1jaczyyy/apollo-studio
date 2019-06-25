@@ -63,6 +63,10 @@ namespace Apollo.Elements {
 
         protected void CreateScreen() => screen = new Screen() { ScreenExit = Send };
 
+        public Color GetColor(int index) => (PatternWindow == null)
+            ? screen.GetColor(index)
+            : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
+
         public enum LaunchpadType {
             MK2, PRO, CFW, Unknown
         }
