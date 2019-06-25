@@ -152,8 +152,8 @@ namespace Apollo.Elements {
             SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue});
         }
 
-        public virtual void Clear() {
-            if (!Available) return;
+        public virtual void Clear(bool manual = false) {
+            if (!Available || (manual && PatternWindow != null)) return;
 
             CreateScreen();
 
@@ -161,7 +161,7 @@ namespace Apollo.Elements {
 
             for (int i = 0; i < 100; i++) {
                 n.Index = (byte)i;
-                Window?.SignalRender(n);
+                Window?.SignalRender(n.Clone());
             }
 
             SysExSend(new byte[] {0x0E, 0x00});

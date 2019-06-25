@@ -7,8 +7,8 @@ namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public override void Send(Signal n) => Window?.SignalRender(n);
 
-        public override void Clear() {
-            if (!Available) return;
+        public override void Clear(bool manual = false) {
+            if (!Available || (manual && PatternWindow != null)) return;
             
             CreateScreen();
 

@@ -30,10 +30,10 @@ namespace Apollo.Elements {
 
         public override void Send(Signal n) {}
 
-        public override void Clear() {
-            if (!Available) return;
+        public override void Clear(bool manual = false) {
+            if (!Available || (manual && PatternWindow != null)) return;
             
-            Target?.Clear();
+            Target?.Clear(manual);
 
             Signal n = new Signal(this, 0, new Color(0));
 
