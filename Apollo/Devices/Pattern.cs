@@ -142,15 +142,37 @@ namespace Apollo.Devices {
             }
         }
         private int AdjustedRepeats => (_mode == PlaybackType.Loop || _infinite)? 1 : Repeats;
+
+        private int? _root;
+        public int? RootKey {
+            get => _root;
+            set {
+                if (_root != value) {
+                    _root = value;
+
+                    Window?.SetRootKey(_root);
+                }
+            }
+        }
+
+        private bool _wrap;
+        public bool Wrap {
+            get => _wrap;
+            set {
+                _wrap = value;
+
+                Window?.SetWrap(Wrap);
+            }
+        }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, (from i in Frames select i.Clone()).ToList(), _mode, Infinite, Expanded) {
+        public override Device Clone() => new Pattern(Repeats, Gate, (from i in Frames select i.Clone()).ToList(), _mode, Infinite, RootKey, Wrap, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public int Expanded;
 
-        public Pattern(int repeats = 1, decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(int repeats = 1, decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base(DeviceIdentifier) {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Repeats = repeats;
@@ -158,9 +180,37 @@ namespace Apollo.Devices {
             Frames = frames;
             _mode = mode;
             Infinite = infinite;
+            RootKey = root;
             Expanded = expanded;
 
             Reroute();
+        }
+
+        private bool ApplyRootKey(int index, int trigger, out int result) {
+            if (RootKey == null) {
+                result = index;
+                return true;
+            }
+
+            int x = index % 10 + trigger % 10 - RootKey.Value % 10;
+            int y = index / 10 + trigger / 10 - RootKey.Value / 10;
+
+            if (Wrap) {
+                x = (x + 10) % 10;
+                y = (y + 10) % 10;
+            }
+
+            result = y * 10 + x;
+
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+                return true;
+            
+            if (y == -1 && 4 <= x && x <= 5) {
+                result = 99;
+                return true;
+            }
+             
+            return false;
         }
 
         private void FireCourier(Signal n, decimal time) {
@@ -201,19 +251,19 @@ namespace Apollo.Devices {
                 lock (locker[n]) {
                     if (++buffer[n] < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
-                            if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i])
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[buffer[n] % Frames.Count].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                            if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
+                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
                     } else if (_mode == PlaybackType.Mono) {
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                                if (Frames.Last().Screen[i].Lit)
-                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                                if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
+                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
                     } else if (_mode == PlaybackType.Loop) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i])
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                            if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
                         buffer[n] = 0;
                         decimal time = 0;
@@ -233,15 +283,15 @@ namespace Apollo.Devices {
                 lock (info.locker) {
                     if (++info.index < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
-                            if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i])
-                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, Frames[info.index % Frames.Count].Screen[i].Clone(), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
+                            if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
+                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)index, Frames[info.index % Frames.Count].Screen[i].Clone(), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
                     } else {
                         poly.Remove(info);
 
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                                if (Frames.Last().Screen[i].Lit)
-                                    MIDIExit?.Invoke(new Signal(info.n.Source, (byte)i, new Color(0), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
+                                if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
+                                    MIDIExit?.Invoke(new Signal(info.n.Source, (byte)index, new Color(0), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.MultiTarget));
                     }
                 }
             }
@@ -255,10 +305,18 @@ namespace Apollo.Devices {
                     for (int i = 0; i < timers[n].Count; i++)
                         timers[n][i].Dispose();
                 
-                if (buffer.ContainsKey(n) && buffer[n] < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite))
-                    for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
-                        if (Frames[buffer[n] % Frames.Count].Screen[i].Lit)
-                            MIDIExit?.Invoke(new Signal(n.Source, (byte)i, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                if (buffer.ContainsKey(n)) {
+                    if (buffer[n] < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite)) {
+                        int originalIndex = buffer.Keys.First(x => x == n).Index;
+
+                        for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
+                            if (Frames[buffer[n] % Frames.Count].Screen[i].Lit && ApplyRootKey(i, originalIndex, out int index))
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                    }
+
+                    buffer.Remove(n, out int _);
+                }
+                    
 
                 timers[n] = new List<Courier>();
                 buffer[n] = 0;
@@ -268,7 +326,7 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (Frames.Count > 0) {
                 bool lit = n.Color.Lit;
-                n.Index = 11;
+                n.HashIndex = false;
                 n.Color = new Color();
 
                 if (!locker.ContainsKey(n)) locker[n] = new object();
@@ -278,8 +336,8 @@ namespace Apollo.Devices {
 
                     if (lit) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i].Lit)
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)i, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
+                            if (Frames[0].Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
+                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
                         
                         decimal time = 0;
                         PolyInfo info = new PolyInfo(n);
@@ -313,6 +371,7 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            Stop();
 
             Window?.Close();
             Window = null;

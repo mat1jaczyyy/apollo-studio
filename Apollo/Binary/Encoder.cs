@@ -284,6 +284,10 @@ namespace Apollo.Binary {
             writer.Write((int)o.GetPlaybackType());
             writer.Write(o.Infinite);
 
+            writer.Write(o.RootKey.HasValue);
+            if (o.RootKey.HasValue)
+                writer.Write(o.RootKey.Value);
+
             writer.Write(o.Expanded);
         }
 

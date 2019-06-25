@@ -20,6 +20,7 @@ namespace Apollo.Structures {
         public int Layer;
         public BlendingType BlendingMode;
         public int? MultiTarget;
+        public bool HashIndex = true;
 
         public byte Index {
             get => _index;
@@ -39,7 +40,9 @@ namespace Apollo.Structures {
             }
         }
 
-        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Page, Layer, BlendingMode, MultiTarget);
+        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Page, Layer, BlendingMode, MultiTarget) {
+            HashIndex = HashIndex
+        };
 
         public Signal(Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int? multiTarget = null) {
             Source = source;
@@ -66,10 +69,10 @@ namespace Apollo.Structures {
             return this == (Signal)obj;
         }
 
-        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && a.Index == b.Index && a.Color == b.Color && a.Page == b.Page && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.MultiTarget == b.MultiTarget;
+        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && ((a.HashIndex && b.HashIndex)? a.Index == b.Index : true) && a.Color == b.Color && a.Page == b.Page && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.MultiTarget == b.MultiTarget;
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
-        public override int GetHashCode() => HashCode.Combine(Source, Index, Color, Page, Layer, BlendingMode, MultiTarget);
+        public override int GetHashCode() => HashCode.Combine(Source, HashIndex? Index : 11, Color, Page, Layer, BlendingMode, MultiTarget);
         
         public override string ToString() => $"{((Source == null)? "null" : Source.Name )} -> {Index} @ {Layer} + {BlendingMode} & {MultiTarget} = {Color}";
     }

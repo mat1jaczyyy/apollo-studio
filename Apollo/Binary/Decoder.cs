@@ -376,9 +376,19 @@ namespace Apollo.Binary {
                     infinite = reader.ReadBoolean();
                 }
 
+                int? rootkey = null;
+                if (version >= 12) {
+                    rootkey = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+                }
+
+                bool wrap = false;
+                if (version >= 12) {
+                    wrap = reader.ReadBoolean();
+                }
+
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = new Pattern(repeats, gate, frames, mode, infinite, expanded);
+                Pattern ret = new Pattern(repeats, gate, frames, mode, infinite, rootkey, wrap, expanded);
 
                 if (chokeenabled) {
                     return new Choke(choke, new Chain(new List<Device>() {ret}));
