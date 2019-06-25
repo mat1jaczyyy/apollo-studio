@@ -43,15 +43,17 @@ namespace Apollo.Helpers {
                 Window?.HighlightPosition(Position);
             }
         }
-        
-        public delegate void SavedChangedEventHandler(bool saved);
-        public event SavedChangedEventHandler SavedChanged;
-        public event PositionChangedEventHandler SavedPositionChanged;
+
+        public delegate void SavedPositionChangedEventHandler(int? position);
+        public event SavedPositionChangedEventHandler SavedPositionChanged;
 
         private int? _saved = null;
         public int? SavedPosition {
             get => _saved;
         }
+        
+        public delegate void SavedChangedEventHandler(bool saved);
+        public event SavedChangedEventHandler SavedChanged;
 
         public bool Saved {
             get => _saved == Position;
@@ -92,6 +94,28 @@ namespace Apollo.Helpers {
 
         public void Undo() => Select(Math.Max(0, Position - 1));
         public void Redo() => Select(Math.Min(History.Count - 1, Position + 1));
+
+        public void Clear() {
+            lock (locker) {
+                _saved = (SavedPosition == Position)? (int?)0 : null;
+
+                Position = 0;
+                SavedPositionChanged?.Invoke(SavedPosition);
+
+                if (Window != null)
+                    for (int i = History.Count - 1; i >= 0; i--)
+                        Window.Contents_Remove(i);
+
+                History = new List<UndoEntry>() {
+                    new UndoEntry("Undo History Cleared")
+                };
+
+                Window?.Contents_Insert(0, History[0]);
+
+                Position = 0;
+                SavedPositionChanged?.Invoke(SavedPosition);
+            }
+        }
 
         public bool HandleKey(KeyEventArgs e) {
             if (e.Modifiers == InputModifiers.Control) {

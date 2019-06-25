@@ -25,7 +25,7 @@ namespace Apollo.Windows {
         ScrollViewer ScrollViewer;
         StackPanel Contents;
 
-        int saved = 0;
+        int? saved = null;
         int current = 0;
 
         public void Contents_Insert(int index, UndoEntry entry) {
@@ -69,12 +69,12 @@ namespace Apollo.Windows {
 
         private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
 
-        public void HighlightSaved(int index) {
-            if (saved != current)
-                ((UndoEntryInfo)(Contents.Children[saved])).Background = SolidColorBrush.Parse("Transparent");
+        public void HighlightSaved(int? index) {
+            if (saved.HasValue && saved != current)
+                ((UndoEntryInfo)(Contents.Children[saved.Value])).Background = SolidColorBrush.Parse("Transparent");
 
-            if (index != current)
-                ((UndoEntryInfo)(Contents.Children[saved = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeControlHigherBrush");
+            if ((saved = index).HasValue && index != current)
+                ((UndoEntryInfo)(Contents.Children[saved.Value])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeControlHigherBrush");
         }
 
         public void HighlightPosition(int index) {
