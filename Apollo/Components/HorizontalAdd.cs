@@ -1,24 +1,17 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
-    public class HorizontalAdd: UserControl {
+    public class HorizontalAdd: AddButton {
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+            Path = this.Get<Path>("Path");
         }
 
-        public delegate void AddedEventHandler();
-        public event AddedEventHandler Added;
-
-        Grid Root;
-
-        private bool _always;
-        public bool AlwaysShowing {
-            get => _always;
+        public override bool AlwaysShowing {
             set {
                 if (value != _always) {
                     _always = value;
@@ -27,12 +20,10 @@ namespace Apollo.Components {
             }
         }
 
-        public HorizontalAdd() => InitializeComponent();
-
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Added = null;
-
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Added?.Invoke();
+        public HorizontalAdd() {
+            InitializeComponent();
+            
+            base.MouseLeave(this, null);
         }
     }
 }

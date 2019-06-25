@@ -30,9 +30,10 @@
     </Style>
   </UserControl.Styles>
 
-  <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible" PointerReleased="Click">
+  <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible"
+        PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="12" Height="12" Background="Transparent" ClipToBounds="true" x:Name="Icon">
-      <Path Stroke="{DynamicResource ThemeForegroundBrush}" StrokeThickness="2"
+      <Path StrokeThickness="2" x:Name="Path"
             Data="M 0,6 L 12,6 M 6,0 L 6,12" />
     </Canvas>
   </Grid>

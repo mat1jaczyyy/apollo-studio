@@ -64,7 +64,7 @@ namespace Apollo.Windows {
 
         public void Contents_Insert(int index, Track track) {
             TrackInfo viewer = new TrackInfo(track);
-            viewer.TrackAdded += Track_Insert;
+            viewer.Added += Track_Insert;
             track.Info = viewer;
 
             Contents.Insert(index + 1, viewer);

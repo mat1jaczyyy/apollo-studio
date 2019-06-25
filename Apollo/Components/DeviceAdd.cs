@@ -3,37 +3,33 @@ using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 
 namespace Apollo.Components {
-    public class DeviceAdd: UserControl {
+    public class DeviceAdd: AddButton {
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<Grid>("Root");
+            Path = this.Get<Path>("Path");
             Icon = this.Get<Canvas>("Icon");
-
-            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
         }
 
-        public delegate void DeviceAddedEventHandler(Type device);
-        public event DeviceAddedEventHandler DeviceAdded;
+        public new delegate void AddedEventHandler(Type device);
+        public new event AddedEventHandler Added;
 
-        public delegate void DeviceActionEventHandler(string action);
-        public event DeviceActionEventHandler DeviceAction;
+        public delegate void ActionEventHandler(string action);
+        public event ActionEventHandler Action;
 
-        Grid Root;
         Canvas Icon;
 
         ContextMenu AddContextMenu, DeviceContextMenu;
 
-        private bool _always;
-        public bool AlwaysShowing {
-            get => _always;
+        public override bool AlwaysShowing {
             set {
                 if (value != _always) {
                     _always = value;
@@ -44,19 +40,27 @@ namespace Apollo.Components {
 
         public DeviceAdd() {
             InitializeComponent();
-            
+
+            AllowRightClick = true;
+            base.MouseLeave(this, null);
+
+            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
             AddContextMenu.AddHandler(MenuItem.ClickEvent, AddContextMenu_Click);
+
+            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent,  DeviceContextMenu_Click);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            DeviceAdded = null;
-            DeviceAction = null;
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Added = null;
+            Action = null;
 
             AddContextMenu.RemoveHandler(MenuItem.ClickEvent, AddContextMenu_Click);
             DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
 
             AddContextMenu = DeviceContextMenu = null;
+
+            base.Unloaded(sender, e);
         }
 
         private void AddContextMenu_Click(object sender, EventArgs e) {
@@ -64,7 +68,7 @@ namespace Apollo.Components {
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))
-                DeviceAdded?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{(string)((MenuItem)item).Header}"));
+                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{(string)((MenuItem)item).Header}"));
         }
 
         private void DeviceContextMenu_Click(object sender, EventArgs e) {
@@ -72,13 +76,12 @@ namespace Apollo.Components {
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))
-                DeviceAction?.Invoke((string)((MenuItem)item).Header);
+                Action?.Invoke((string)((MenuItem)item).Header);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        protected override void Click(PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Left) AddContextMenu.Open(Icon);
             else if (e.MouseButton == MouseButton.Right) DeviceContextMenu.Open(Icon);
-            e.Handled = true;
         }
     }
 }

@@ -43,7 +43,7 @@
             <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
               <Grid RowDefinitions="Auto,*" x:Name="Layout">
                 <StackPanel Grid.Row="0" MaxWidth="328" x:Name="Contents">
-                  <Components:TrackAdd AlwaysShowing="true" TrackAdded="Track_InsertStart" TrackAction="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
+                  <Components:TrackAdd AlwaysShowing="true" Added="Track_InsertStart" Action="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
                 </StackPanel>
 
                 <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />

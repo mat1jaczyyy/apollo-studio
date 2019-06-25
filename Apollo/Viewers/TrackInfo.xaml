@@ -34,6 +34,6 @@
       </Grid>
     </Border>
 
-    <Components:TrackAdd TrackAdded="Track_Add" TrackAction="Track_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+    <Components:TrackAdd Added="Track_Add" Action="Track_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

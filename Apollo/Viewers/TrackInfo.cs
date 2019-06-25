@@ -30,8 +30,8 @@ namespace Apollo.Viewers {
             Input = this.Get<TextBox>("Input");
         }
 
-        public delegate void TrackAddedEventHandler(int index);
-        public event TrackAddedEventHandler TrackAdded;
+        public delegate void AddedEventHandler(int index);
+        public event AddedEventHandler Added;
         
         Track _track;
         bool selected = false;
@@ -101,7 +101,7 @@ namespace Apollo.Viewers {
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            TrackAdded = null;
+            Added = null;
             
             MIDI.DevicesUpdated -= HandlePorts;
 
@@ -209,7 +209,7 @@ namespace Apollo.Viewers {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        private void Track_Add() => TrackAdded?.Invoke(_track.ParentIndex.Value + 1);
+        private void Track_Add() => Added?.Invoke(_track.ParentIndex.Value + 1);
 
         private void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;

@@ -2,27 +2,25 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 
 namespace Apollo.Components {
-    public class VerticalAdd: UserControl {
+    public class VerticalAdd: AddButton {
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+            Path = this.Get<Path>("Path");
             Icon = this.Get<Canvas>("Icon");
         }
-
-        public delegate void AddedEventHandler();
-        public event AddedEventHandler Added;
         
         public delegate void ActionEventHandler(string action);
         public event ActionEventHandler Action;
 
-        Grid Root;
         Canvas Icon;
 
         public enum AvailableActions {
@@ -45,9 +43,7 @@ namespace Apollo.Components {
 
         ContextMenu ActionContextMenu = null;
 
-        private bool _always;
-        public bool AlwaysShowing {
-            get => _always;
+        public override bool AlwaysShowing {
             set {
                 if (value != _always) {
                     _always = value;
@@ -59,17 +55,20 @@ namespace Apollo.Components {
         public VerticalAdd() {
             InitializeComponent();
 
+            AllowRightClick = true;
+            base.MouseLeave(this, null);
+
             ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
             ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            Added = null;
-            Action = null;
-
+        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ((ContextMenu)this.Resources["PasteContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
             ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
             ActionContextMenu = null;
+            
+            Action = null;
+            base.Unloaded(sender, e);
         }
 
         private void ActionContextMenu_Click(object sender, EventArgs e) {
@@ -80,10 +79,9 @@ namespace Apollo.Components {
                 Action?.Invoke((string)((MenuItem)item).Header);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Added?.Invoke();
+        protected override void Click(PointerReleasedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left) InvokeAdded();
             else if (e.MouseButton == MouseButton.Right) ActionContextMenu?.Open(Icon);
-            e.Handled = true;
         }
     }
 }

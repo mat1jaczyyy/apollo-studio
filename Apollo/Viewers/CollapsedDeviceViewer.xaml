@@ -48,6 +48,6 @@
       </Grid>
     </Border>
 
-    <Components:DeviceAdd DeviceAdded="Device_Add" DeviceAction="Device_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
+    <Components:DeviceAdd Added="Device_Add" Action="Device_Action" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" />
   </StackPanel>
 </UserControl>

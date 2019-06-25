@@ -42,14 +42,14 @@ namespace Apollo.Viewers {
             return null;
         }
 
-        public delegate void DeviceAddedEventHandler(int index, Type device);
-        public event DeviceAddedEventHandler DeviceAdded;
+        public delegate void AddedEventHandler(int index, Type device);
+        public event AddedEventHandler Added;
 
         public delegate void DeviceCollapsedEventHandler(int index);
         public event DeviceCollapsedEventHandler DeviceCollapsed;
 
         protected void ResetEvents() {
-            DeviceAdded = null;
+            Added = null;
             DeviceCollapsed = null;
         }
         
@@ -152,7 +152,7 @@ namespace Apollo.Viewers {
                 ((DeviceTail)Root.Children[Root.Children.Count - 2]).SetEnabled(_device.Enabled);
         }
 
-        protected void Device_Add(Type device) => DeviceAdded?.Invoke(_device.ParentIndex.Value + 1, device);
+        protected void Device_Add(Type device) => Added?.Invoke(_device.ParentIndex.Value + 1, device);
 
         protected void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
