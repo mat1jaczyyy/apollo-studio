@@ -31,16 +31,14 @@ namespace Apollo.Components {
         protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Added = null;
 
         private bool mouseHeld = false;
-        private bool mouseOver = false;
 
         protected void MouseEnter(object sender, PointerEventArgs e) {
             Fill = (IBrush)Application.Current.Styles.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");
-            mouseOver = true;
         }
 
         protected void MouseLeave(object sender, PointerEventArgs e) {
             Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonEnabledBrush");
-            mouseHeld = mouseOver = false;
+            mouseHeld = false;
         }
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
