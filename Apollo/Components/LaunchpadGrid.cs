@@ -67,6 +67,11 @@ namespace Apollo.Components {
             }
         }
 
+        public void Clear() {
+            SolidColorBrush color = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
+            for (int i = 0; i < 100; i++) SetColor(i, color);
+        }
+
         private void Update_LaunchpadStyle() {
             if (LowQuality) return;
 
@@ -159,6 +164,8 @@ namespace Apollo.Components {
             PadModsPressed = null;
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
+
+            Clear();
         }
 
         private void LayoutChanged(object sender, EventArgs e) => DrawPath();

@@ -34,6 +34,8 @@ namespace Apollo.Windows {
             RedoButton = this.Get<RedoButton>("RedoButton");
 
             Editor = this.Get<LaunchpadGrid>("Editor");
+            RootKey = this.Get<LaunchpadGrid>("RootKey");
+            Wrap = this.Get<CheckBox>("Wrap");
 
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
@@ -92,14 +94,14 @@ namespace Apollo.Windows {
         UndoButton UndoButton;
         RedoButton RedoButton;
         ComboBox PortSelector, PlaybackMode;
-        LaunchpadGrid Editor;
+        LaunchpadGrid Editor, RootKey;
         Controls Contents;
         ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Repeats;
         Button ImportButton, Play, Fire, Reverse, Invert;
-        CheckBox Infinite;
+        CheckBox Wrap, Infinite;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -122,6 +124,7 @@ namespace Apollo.Windows {
                 Repeats.Enabled =
                 Gate.Enabled =
                 PlaybackMode.IsEnabled =
+                Wrap.IsEnabled =
                 Infinite.IsEnabled =
                 Play.IsEnabled =
                 Fire.IsEnabled =
@@ -219,6 +222,9 @@ namespace Apollo.Windows {
             _track = Track.Get(_pattern);
 
             Editor.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+
+            SetRootKey(_pattern.RootKey);
+            Wrap.IsChecked = _pattern.Wrap;
 
             Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = (double)_pattern.Gate * 100;
@@ -892,6 +898,72 @@ namespace Apollo.Windows {
 
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
 
+        int? oldRootKey = -1;
+
+        private void RootKeyStarted(int index) {
+            if (Locked) return;
+
+            oldRootKey = _pattern.RootKey;
+        }
+
+        private void RootKeyPressed(int index) {
+            if (Locked) return;
+
+            int signalIndex = LaunchpadGrid.GridToSignal(index);
+
+            _pattern.RootKey = (signalIndex == _pattern.RootKey)? null : (int?)signalIndex;
+        }
+
+        private void RootKeyFinished(int _) {
+            if (Locked) return;
+
+            if (oldRootKey == -1) return;
+
+            if (oldRootKey != _pattern.RootKey) {
+                int? u = oldRootKey;
+                int? r = _pattern.RootKey;
+                
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Root Key Changed", () => {
+                    ((Pattern)Track.TraversePath(path)).RootKey = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).RootKey = r;
+                });
+            }
+
+            oldRootKey = -1;
+        }
+
+        public void SetRootKey(int? index) {
+            RootKey.Clear();
+
+            if (index != null) RootKey.SetColor(
+                LaunchpadGrid.SignalToGrid(index.Value),
+                (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush")
+            );
+        }
+
+        private void Wrap_Changed(object sender, EventArgs e) {
+            bool value = Wrap.IsChecked.Value;
+
+            if (_pattern.Wrap != value) {
+                bool u = _pattern.Wrap;
+                bool r = value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    ((Pattern)Track.TraversePath(path)).Wrap = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Wrap = r;
+                });
+
+                _pattern.Wrap = value;
+            }
+        }
+
+        public void SetWrap(bool value) => Wrap.IsChecked = value;
+
         private void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {
                 Editor.SetColor(LaunchpadGrid.SignalToGrid(index), color.ToScreenBrush());
@@ -1014,12 +1086,13 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
-        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, Pattern.PlaybackType mode, bool infinite) {
+        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, Pattern.PlaybackType mode, bool infinite, int? root) {
             pattern.Repeats = repeats;
             pattern.Gate = gate;
             pattern.Frames = frames;
             pattern.Mode = mode.ToString();
             pattern.Infinite = infinite;
+            pattern.RootKey = root;
 
             while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
             pattern.Expanded = 0;
@@ -1049,22 +1122,24 @@ namespace Apollo.Windows {
             List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
             Pattern.PlaybackType um = _pattern.GetPlaybackType();
             bool ui = _pattern.Infinite;
+            int? uo = _pattern.RootKey;
 
             int rr = 1;
             decimal rg = 1;
             List<Frame> rf = frames.Select(i => i.Clone()).ToList();
             Pattern.PlaybackType rm = Pattern.PlaybackType.Mono;
             bool ri = false;
+            int? ro = null;
 
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames((Pattern)Track.TraversePath(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui);
+                ImportFrames((Pattern)Track.TraversePath(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
             }, () => {
-                ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri);
+                ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
             });
 
-            ImportFrames(_pattern, 1, 1, frames, Pattern.PlaybackType.Mono, false);
+            ImportFrames(_pattern, 1, 1, frames, Pattern.PlaybackType.Mono, false, null);
         }
 
         private async void ImportDialog(object sender, RoutedEventArgs e) {
