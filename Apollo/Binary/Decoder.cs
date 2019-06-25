@@ -89,6 +89,10 @@ namespace Apollo.Binary {
                         Preferences.Autosave = reader.ReadBoolean();
                     }
 
+                    if (version >= 12) {
+                        Preferences.UndoLimit = reader.ReadBoolean();
+                    }
+
                     if (version <= 0) {
                         Preferences.DiscordPresence = true;
                         reader.ReadBoolean();

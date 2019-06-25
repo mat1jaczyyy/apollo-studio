@@ -26,19 +26,29 @@ namespace Apollo.Windows {
         StackPanel Contents;
 
         int? saved = null;
-        int current = 0;
+        int? current = null;
 
         public void Contents_Insert(int index, UndoEntry entry) {
             UndoEntryInfo viewer = new UndoEntryInfo(entry);
-
             viewer.Selected += UndoEntry_Select;
 
             Contents.Children.Insert(index, viewer);
+
+            if (index <= current) current++;
+            if (index <= saved) saved++;
             
             Dispatcher.UIThread.Post(() => ScrollViewer.Offset = ScrollViewer.Offset.WithY(Contents.Bounds.Height), DispatcherPriority.Background);
         }
 
-        public void Contents_Remove(int index) => Contents.Children.RemoveAt(index);
+        public void Contents_Remove(int index) {
+            Contents.Children.RemoveAt(index);
+
+            if (index < current) current--;
+            else if (index == current) current = null;
+
+            if (index < saved) saved--;
+            else if (index == saved) saved = null;
+        }
         
         public UndoWindow() {
             InitializeComponent();
@@ -78,8 +88,10 @@ namespace Apollo.Windows {
         }
 
         public void HighlightPosition(int index) {
-            ((UndoEntryInfo)(Contents.Children[current])).Background = SolidColorBrush.Parse("Transparent");
-            ((UndoEntryInfo)(Contents.Children[current = index])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+            if (current.HasValue)
+                ((UndoEntryInfo)(Contents.Children[current.Value])).Background = SolidColorBrush.Parse("Transparent");
+            
+            ((UndoEntryInfo)(Contents.Children[(current = index).Value])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
         
             if (Program.Project.Undo.SavedPosition.HasValue)
                 HighlightSaved(Program.Project.Undo.SavedPosition.Value);

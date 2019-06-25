@@ -45,13 +45,15 @@ namespace Apollo.Windows {
             Backup = this.Get<CheckBox>("Backup");
             Autosave = this.Get<CheckBox>("Autosave");
 
+            UndoLimit = this.Get<CheckBox>("UndoLimit");
+
             DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordFilename = this.Get<CheckBox>("DiscordFilename");
 
             Contents = this.Get<StackPanel>("Contents").Children;
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename;
         ComboBox LaunchpadStyle;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
@@ -106,6 +108,8 @@ namespace Apollo.Windows {
 
             Backup.IsChecked = Preferences.Backup;
             Autosave.IsChecked = Preferences.Autosave;
+
+            UndoLimit.IsChecked = Preferences.UndoLimit;
 
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
             DiscordFilename.IsChecked = Preferences.DiscordFilename;
@@ -205,6 +209,8 @@ namespace Apollo.Windows {
         private void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
         private void Autosave_Changed(object sender, EventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
+
+        private void UndoLimit_Changed(object sender, EventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
 
         private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 

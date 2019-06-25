@@ -188,6 +188,17 @@ namespace Apollo.Core {
             }
         }
 
+        private static bool _UndoLimit = true;
+        public static bool UndoLimit {
+            get => _UndoLimit;
+            set {
+                if (_UndoLimit = value)
+                    Program.Project?.Undo.Limit();
+
+                Save();
+            }
+        }
+
         private static bool _DiscordPresence = true;
         public static bool DiscordPresence {
             get => _DiscordPresence;

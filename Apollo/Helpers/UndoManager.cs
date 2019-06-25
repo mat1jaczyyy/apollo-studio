@@ -4,6 +4,7 @@ using System.Linq;
 
 using Avalonia.Input;
 
+using Apollo.Core;
 using Apollo.Windows;
 
 namespace Apollo.Helpers {
@@ -76,6 +77,8 @@ namespace Apollo.Helpers {
             Window?.Contents_Insert(History.Count - 1, History.Last());
 
             Position = History.Count - 1;
+
+            if (Preferences.UndoLimit) Limit();
         }
 
         public void Select(int index) {
@@ -96,23 +99,42 @@ namespace Apollo.Helpers {
         public void Redo() => Select(Math.Min(History.Count - 1, Position + 1));
 
         public void Clear() {
-            lock (locker) {
-                _saved = (SavedPosition == Position)? (int?)0 : null;
+            _saved = (SavedPosition == Position)? (int?)0 : null;
+            SavedPositionChanged?.Invoke(SavedPosition);
 
-                Position = 0;
+            if (Window != null)
+                for (int i = History.Count - 1; i >= 0; i--)
+                    Window.Contents_Remove(i);
+
+            History = new List<UndoEntry>() {
+                new UndoEntry("Undo History Cleared")
+            };
+
+            Window?.Contents_Insert(0, History[0]);
+
+            Position = 0;
+            SavedPositionChanged?.Invoke(SavedPosition);
+        }
+
+        public void Limit() {
+            int remove;
+            if ((remove = History.Count - 150) > 0) {
+                if (_saved != null) {
+                    _saved += -remove;
+                    if (_saved < 0) _saved = null;
+                }
+
+                if (Position < History.Count - 150) Select(History.Count - 150);
+                _position += -remove;
+
                 SavedPositionChanged?.Invoke(SavedPosition);
 
-                if (Window != null)
-                    for (int i = History.Count - 1; i >= 0; i--)
-                        Window.Contents_Remove(i);
+                for (int i = History.Count - 151; i >= 0; i--) {
+                    History.RemoveAt(i);
+                    Window?.Contents_Remove(i);
+                }
 
-                History = new List<UndoEntry>() {
-                    new UndoEntry("Undo History Cleared")
-                };
-
-                Window?.Contents_Insert(0, History[0]);
-
-                Position = 0;
+                Position = Position;
                 SavedPositionChanged?.Invoke(SavedPosition);
             }
         }
