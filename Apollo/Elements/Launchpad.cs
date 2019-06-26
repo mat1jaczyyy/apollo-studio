@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Threading;
+using System.Threading.Tasks;
 
+using Avalonia.Controls;
 using Avalonia.Threading;
 
 using RtMidi.Core.Devices;
@@ -14,6 +17,12 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
+        public enum CFWIncompatibleState {
+            None, Show, Done
+        }
+
+        public static CFWIncompatibleState CFWIncompatible = CFWIncompatibleState.None;
+
         public LaunchpadWindow Window;
         public PatternWindow PatternWindow;
 
@@ -97,7 +106,13 @@ namespace Apollo.Elements {
                         return LaunchpadType.MK2;
                     
                     case 0x51: // Launchpad Pro
-                        return (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w')? LaunchpadType.CFW : LaunchpadType.PRO;
+                        if (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w') {
+                            if (CFWIncompatible == CFWIncompatibleState.None)
+                                CFWIncompatible = CFWIncompatibleState.Show;
+
+                            break;
+                        }
+                        return (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'x')? LaunchpadType.CFW : LaunchpadType.PRO;
                 }
             }
 
@@ -105,8 +120,7 @@ namespace Apollo.Elements {
         }
 
         private void WaitForIdentification(object sender, in SysExMessage e) {
-            Type = AttemptIdentify(e);
-            if (Type != LaunchpadType.Unknown) {
+            if ((Type = AttemptIdentify(e)) != LaunchpadType.Unknown) {
                 Input.SysEx -= WaitForIdentification;
 
                 Clear();
@@ -116,6 +130,14 @@ namespace Apollo.Elements {
                 Input.ControlChange += ControlChange;
 
                 MIDI.DoneIdentifying();
+
+            } else {
+                Task.Run(() => {
+                    Thread.Sleep(1000);
+
+                    if (Available && Type == LaunchpadType.Unknown)
+                        Output.Send(in Inquiry);
+                });
             }
         }
 
@@ -123,7 +145,10 @@ namespace Apollo.Elements {
         private bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
-            SysExMessage msg = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray());
+            if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = 0x6F;
+            else raw = new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray();
+
+            SysExMessage msg = new SysExMessage(raw);
             try {
                 Output.Send(in msg);
             } catch {};
@@ -189,7 +214,7 @@ namespace Apollo.Elements {
 
             Available = true;
 
-            Input.SysEx += WaitForIdentification;            
+            Input.SysEx += WaitForIdentification;
             Output.Send(in Inquiry);
         }
 

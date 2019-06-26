@@ -41,8 +41,20 @@ namespace Apollo.Windows {
             Root.Children.Add(SplashImage);
         }
 
-        private void Loaded(object sender, EventArgs e) {
+        private async void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+
+            if (Launchpad.CFWIncompatible == Launchpad.CFWIncompatibleState.Show) {
+                await MessageWindow.Create(
+                    "One or more connected Launchpad Pros are running an older version of the\n" + 
+                    "performance-optimized custom firmware which is not compatible with\n" +
+                    "Apollo Studio.\n\n" +
+                    "Update these to the latest version of the firmware or switch back to stock\n" +
+                    "firmware to use them with Apollo Studio.",
+                    null, this  
+                );
+                Launchpad.CFWIncompatible = Launchpad.CFWIncompatibleState.Done;
+            }
 
             if (Program.Args?.Length > 0)
                 ReadFile(Program.Args[0]);
