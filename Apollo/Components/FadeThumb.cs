@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class FadeThumb: UserControl {
@@ -46,7 +47,10 @@ namespace Apollo.Components {
 
         bool dragged = false;
 
-        private void DragStarted(object sender, VectorEventArgs e) => dragged = false;
+        private void DragStarted(object sender, VectorEventArgs e) {
+            ((Window)this.GetVisualRoot()).Focus();
+            dragged = false;
+        }
 
         private void DragCompleted(object sender, VectorEventArgs e) {
             if (!dragged) Focused?.Invoke(this);

@@ -10,8 +10,8 @@
     <Grid Grid.Column="0" RowDefinitions="*,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
         <StackPanel Margin="0 7 0 0" VerticalAlignment="Center" Spacing="5">
-          <Canvas Background="Transparent" Width="200" Height="26" x:Name="Canvas">
-            <Rectangle Canvas.Left="7" Canvas.Top="7" Width="186" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1"
+          <Canvas Background="Transparent" Width="214" Height="26" x:Name="Canvas">
+            <Rectangle Canvas.Left="7" Canvas.Top="7" Width="200" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1"
               PointerPressed="Canvas_MouseDown">
               
               <Rectangle.Fill>
@@ -20,13 +20,22 @@
             </Rectangle>
 
             <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" />
-            <Components:FadeThumb Canvas.Left="186" x:Name="ThumbEnd" Focused="Thumb_Focus" />
+            <Components:FadeThumb Canvas.Left="200" x:Name="ThumbEnd" Focused="Thumb_Focus" />
           </Canvas>
 
-          <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="PlaybackMode" SelectionChanged="PlaybackMode_Changed">
-            <sys:String>Mono</sys:String>
-            <sys:String>Loop</sys:String>
-          </ComboBox>
+          <Grid ColumnDefinitions="Auto,*,Auto" Margin="7 0">
+            <TextBlock Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" x:Name="PositionText" />
+
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Display" PointerPressed="DisplayPressed" />
+
+            <TextBox Grid.Column="1" Margin="0 2 0 0" Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" Padding="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="43" x:Name="Input"
+                      LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
+
+            <ComboBox Grid.Column="2" BorderThickness="0" Background="Transparent" VerticalAlignment="Center" x:Name="PlaybackMode" SelectionChanged="PlaybackMode_Changed">
+              <sys:String>Mono</sys:String>
+              <sys:String>Loop</sys:String>
+            </ComboBox>
+          </Grid>
         </StackPanel>
       </Border>
 

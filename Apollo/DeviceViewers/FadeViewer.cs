@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using GradientStop = Avalonia.Media.GradientStop;
+using IBrush = Avalonia.Media.IBrush;
 using LinearGradientBrush = Avalonia.Media.LinearGradientBrush;
+using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -29,12 +34,18 @@ namespace Apollo.DeviceViewers {
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
+
+            PositionText = this.Get<TextBlock>("PositionText");
+            Display = this.Get<TextBlock>("Display");
+            Input = this.Get<TextBox>("Input");
         }
         
         Fade _fade;
         
         Dial Duration, Gate;
         ComboBox PlaybackMode;
+        TextBlock PositionText, Display;
+        TextBox Input;
         Canvas canvas;
         Grid PickerContainer;
         ColorPicker Picker;
@@ -47,7 +58,7 @@ namespace Apollo.DeviceViewers {
         public void Contents_Insert(int index, Color color) {
             FadeThumb thumb = new FadeThumb();
             thumbs.Insert(index, thumb);
-            Canvas.SetLeft(thumb, (double)_fade.GetPosition(index) * 186);
+            Canvas.SetLeft(thumb, (double)_fade.GetPosition(index) * 200);
 
             thumb.Moved += Thumb_Move;
             thumb.Focused += Thumb_Focus;
@@ -91,6 +102,8 @@ namespace Apollo.DeviceViewers {
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
             thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
 
+            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+
             Gradient_Generate();
         }
 
@@ -104,6 +117,9 @@ namespace Apollo.DeviceViewers {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(0);
                 thumbs[current.Value].Unselect();
 
+                PositionText.Text = "";
+                Display.Text = "";
+
                 if (index == current) {
                     current = null;
                     return;
@@ -113,6 +129,11 @@ namespace Apollo.DeviceViewers {
             if (index != null) {
                 PickerContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
                 thumbs[index.Value].Select();
+
+                if (index != 0 && index != _fade.Count - 1) {
+                    PositionText.Text = "Position:";
+                    Display.Text = $"{((double)Math.Round(_fade.GetPosition(index.Value) * 1000) / 10).ToString(CultureInfo.InvariantCulture)}%";
+                }
 
                 Picker.SetColor(_fade.GetColor(index.Value));
             }
@@ -128,7 +149,7 @@ namespace Apollo.DeviceViewers {
                 for (index = 0; index < thumbs.Count; index++)
                     if (x < Canvas.GetLeft(thumbs[index])) break;
                 
-                decimal pos = (decimal)x / 186;
+                decimal pos = (decimal)x / 200;
 
                 List<int> path = Track.GetPath(_fade);
 
@@ -170,14 +191,14 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            decimal pos = (decimal)x / 186;
+            decimal pos = (decimal)x / 200;
 
             if (total != null) {
                 double u = x - total.Value;
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                    ((Fade)Track.TraversePath(path)).SetPosition(i, (decimal)u / 186);
+                    ((Fade)Track.TraversePath(path)).SetPosition(i, (decimal)u / 200);
                 }, () => {
                     ((Fade)Track.TraversePath(path)).SetPosition(i, pos);
                 });
@@ -186,7 +207,12 @@ namespace Apollo.DeviceViewers {
             _fade.SetPosition(i, pos);
         }
 
-        public void SetPosition(int index, decimal position) => Canvas.SetLeft(thumbs[index], (double)position * 186);
+        public void SetPosition(int index, decimal position) {
+            Canvas.SetLeft(thumbs[index], (double)position * 200);
+
+            if (index == current)
+                Display.Text = $"{((double)Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString(CultureInfo.InvariantCulture)}%";
+        }
 
         private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
 
@@ -312,5 +338,93 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetPlaybackMode(string mode) => PlaybackMode.SelectedItem = mode;
+
+        private Action Input_Update;
+
+        private void Input_Changed(string text) {
+            if (text == null) return;
+            if (text == "") return;
+
+            Input_Update = () => { Input.Text = (Math.Round(_fade.GetPosition(current.Value) * 1000) / 10).ToString(CultureInfo.InvariantCulture); };
+
+            if (double.TryParse(text, out double value)) {
+                double min = (double)_fade.GetPosition(current.Value - 1) * 100 + 0.5;
+                double max = (double)_fade.GetPosition(current.Value + 1) * 100 - 0.5;
+
+                if (min <= value && value <= max) {
+                    _fade.SetPosition(current.Value, (decimal)value / 100);
+                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                } else {
+                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                }
+
+                Input_Update += () => {
+                    if (value < 0) text = $"-{text.Substring(1).TrimStart('0')}";
+                    else if (value > 0) text = text.TrimStart('0');
+                    else text = "0";
+
+                    if (value <= 0) text = "0";
+
+                    int upper = (int)Math.Pow(10, ((int)max).ToString(CultureInfo.InvariantCulture).Length) - 1;
+                    if (value > upper) text = upper.ToString(CultureInfo.InvariantCulture);
+                    
+                    Input.Text = text;
+                };
+            }
+
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Input_Update?.Invoke();
+                Input_Update = null;
+            });
+        }
+
+        private double oldValue;
+
+        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+                oldValue = (double)Math.Round(_fade.GetPosition(current.Value) * 1000) / 10;
+                Input.Text = oldValue.ToString(CultureInfo.InvariantCulture);
+
+                Input.SelectionStart = 0;
+                Input.SelectionEnd = Input.Text.Length;
+
+                Input.Opacity = 1;
+                Input.IsHitTestVisible = true;
+                Input.Focus();
+
+                e.Handled = true;
+            }
+        }
+        
+        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+            decimal raw = _fade.GetPosition(current.Value);
+
+            Input.Text = ((double)Math.Round(raw * 1000) / 10).ToString(CultureInfo.InvariantCulture);
+
+            Input.Opacity = 0;
+            Input.IsHitTestVisible = false;
+
+            decimal u = (decimal)oldValue / 100;
+            decimal r = raw;
+            int i = current.Value;
+            List<int> path = Track.GetPath(_fade);
+
+            Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
+                ((Fade)Track.TraversePath(path)).SetPosition(i, u);
+            }, () => {
+                ((Fade)Track.TraversePath(path)).SetPosition(i, r);
+            });
+        }
+
+        private void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Return)
+                this.Focus();
+
+            e.Key = Key.None;
+        }
+
+        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+
+        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }
