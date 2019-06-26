@@ -422,7 +422,7 @@ namespace Apollo.Windows {
                 else PatternPlay(Play, null);
             
             } else if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
-            else if (e.Key == Key.Delete || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
+            else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
                 if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {

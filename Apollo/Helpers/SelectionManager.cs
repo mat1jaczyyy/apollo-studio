@@ -139,7 +139,7 @@ namespace Apollo.Helpers {
                 else return false;
 
             } else {
-                if (e.Key == Key.Delete) Action("Delete");
+                if (e.Key == Key.Delete || e.Key == Key.Back) Action("Delete");
                 else if (e.Key == Key.D0 || e.Key == Key.NumPad0) Action("Mute");
                 else return false;
             }
