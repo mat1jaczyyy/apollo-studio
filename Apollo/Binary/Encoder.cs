@@ -77,7 +77,8 @@ namespace Apollo.Binary {
             
             writer.Write(o.Contents.Count);
             for (int i = 0; i < o.Contents.Count; i++)
-                Encode(writer, (dynamic)o.Contents[i]);
+                if (o.Contents[i] is Device d) Encode(writer, d);
+                else Encode(writer, (dynamic)o.Contents[i]);
         }
 
         private static void Encode(BinaryWriter writer, Project o) {
