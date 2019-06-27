@@ -1103,6 +1103,7 @@ namespace Apollo.Windows {
             if (pattern.Count == 1) ((FrameDisplay)pattern.Window?.Contents[1]).Remove.Opacity = 0;
 
             pattern.Window?.Frame_Select(0);
+            pattern.Window?.Selection.Select(pattern[0]);
         }
 
         private async void ImportFile(string filepath) {
