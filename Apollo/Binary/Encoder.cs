@@ -289,6 +289,8 @@ namespace Apollo.Binary {
             if (o.RootKey.HasValue)
                 writer.Write(o.RootKey.Value);
 
+            writer.Write(o.Wrap);
+
             writer.Write(o.Expanded);
         }
 

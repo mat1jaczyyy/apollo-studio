@@ -382,7 +382,7 @@ namespace Apollo.Binary {
                 }
 
                 bool wrap = false;
-                if (version >= 12) {
+                if (version >= 13) {
                     wrap = reader.ReadBoolean();
                 }
 
