@@ -32,6 +32,11 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
+            TitleCenter = this.Get<TextBlock>("TitleCenter");
+            
+            CenteringLeft = this.Get<StackPanel>("CenteringLeft");
+            CenteringRight = this.Get<StackPanel>("CenteringRight");
+
             UndoButton = this.Get<UndoButton>("UndoButton");
             RedoButton = this.Get<RedoButton>("RedoButton");
 
@@ -92,7 +97,8 @@ namespace Apollo.Windows {
             }
         }
 
-        TextBlock TitleText;
+        TextBlock TitleText, TitleCenter;
+        StackPanel CenteringLeft, CenteringRight;
         UndoButton UndoButton;
         RedoButton RedoButton;
         ComboBox PortSelector, PlaybackMode;
@@ -154,7 +160,7 @@ namespace Apollo.Windows {
         private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         private void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = $"Editing Pattern - {name}";
+            => Title = TitleText.Text = TitleCenter.Text = $"Editing Pattern - {name}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -223,7 +229,7 @@ namespace Apollo.Windows {
             _pattern = pattern;
             _track = Track.Get(_pattern);
 
-            Editor.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            Editor.GetObservable(Visual.BoundsProperty).Subscribe(Editor_Updated);
 
             SetRootKey(_pattern.RootKey);
             Wrap.IsChecked = _pattern.Wrap;
@@ -256,6 +262,12 @@ namespace Apollo.Windows {
             
             Frame_Select(_pattern.Expanded);
             Selection.Select(_pattern[_pattern.Expanded]);
+
+            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -305,6 +317,15 @@ namespace Apollo.Windows {
         }
 
         public void Bounds_Updated(Rect bounds) {
+            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+
+            int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
+
+            TitleText.Opacity = result;
+            TitleCenter.Opacity = 1 - result;
+        }
+
+        public void Editor_Updated(Rect bounds) {
             if (bounds.IsEmpty) return;
 
             Editor.Scale = Math.Min(bounds.Width, bounds.Height) / 189.6;

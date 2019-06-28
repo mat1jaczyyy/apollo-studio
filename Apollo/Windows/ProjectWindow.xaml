@@ -19,7 +19,7 @@
   <Grid>
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5" x:Name="CenteringLeft">
           <Components:PreferencesButton />
           <Components:SaveButton />
           <Components:UndoButton />
@@ -31,12 +31,16 @@
           <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
         </Grid>
 
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5" x:Name="CenteringRight">
           <Components:Minimize Clicked="Minimize" />
           <Components:Close Clicked="CheckClose" />
         </StackPanel>
       </Grid>
       
+      <Grid Grid.Row="0">
+        <TextBlock Margin="0 7" IsHitTestVisible="false" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="TitleCenter" />
+      </Grid>
+
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
         <Grid RowDefinitions="*,Auto">
           <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 15 5">

@@ -21,20 +21,28 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
+            TitleCenter = this.Get<TextBlock>("TitleCenter");
+
+            CenteringLeft = this.Get<StackPanel>("CenteringLeft");
+            CenteringRight = this.Get<StackPanel>("CenteringRight");
+
             Contents = this.Get<ScrollViewer>("Contents");
+
         }
 
         Track _track;
 
         ScrollViewer Contents;
         Grid Root;
-        TextBlock TitleText;
+        
+        TextBlock TitleText, TitleCenter;
+        StackPanel CenteringLeft, CenteringRight;
         
         private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
         private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         private void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
+            => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -63,6 +71,12 @@ namespace Apollo.Windows {
             Contents.Content = chainViewer;
 
             SetEnabled();
+
+            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
         private void Loaded(object sender, EventArgs e) {
@@ -89,6 +103,15 @@ namespace Apollo.Windows {
             Selection.Dispose();
 
             Program.WindowClose(this);
+        }
+        
+        public void Bounds_Updated(Rect bounds) {
+            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+
+            int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
+
+            TitleText.Opacity = result;
+            TitleCenter.Opacity = 1 - result;
         }
 
         public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");

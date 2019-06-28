@@ -31,6 +31,11 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
+            TitleCenter = this.Get<TextBlock>("TitleCenter");
+
+            CenteringLeft = this.Get<StackPanel>("CenteringLeft");
+            CenteringRight = this.Get<StackPanel>("CenteringRight");
+
             Contents = this.Get<StackPanel>("Contents").Children;
             TrackAdd = this.Get<TrackAdd>("TrackAdd");
 
@@ -38,14 +43,8 @@ namespace Apollo.Windows {
             Page = this.Get<HorizontalDial>("Page");
         }
 
-        private void UpdateTitle() => Title = TitleText.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
-
-        private void UpdatePage() => Page.RawValue = Program.Project.Page;
-        private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
-
-        private void UpdateTopmost(bool value) => Topmost = value;
-
-        TextBlock TitleText;
+        TextBlock TitleText, TitleCenter;
+        StackPanel CenteringLeft, CenteringRight;
 
         ContextMenu TrackContextMenu;
         Controls Contents;
@@ -53,6 +52,13 @@ namespace Apollo.Windows {
 
         TextBox BPM;
         HorizontalDial Page;
+
+        private void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
+
+        private void UpdatePage() => Page.RawValue = Program.Project.Page;
+        private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
+
+        private void UpdateTopmost(bool value) => Topmost = value;
         
         private void SetAlwaysShowing() {
             TrackAdd.AlwaysShowing = (Contents.Count == 1);
@@ -101,9 +107,13 @@ namespace Apollo.Windows {
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
             Page.RawValue = Program.Project.Page;
+
+            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
-        
-        public void Expand(int? index) {}
         
         private void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
@@ -132,6 +142,17 @@ namespace Apollo.Windows {
 
             Program.WindowClose(this);
         }
+        
+        public void Bounds_Updated(Rect bounds) {
+            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+
+            int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
+
+            TitleText.Opacity = result;
+            TitleCenter.Opacity = 1 - result;
+        }
+        
+        public void Expand(int? index) {}
 
         private void Track_Insert(int index) => Track_Insert(index, new Track());
         private void Track_InsertStart() => Track_Insert(0);

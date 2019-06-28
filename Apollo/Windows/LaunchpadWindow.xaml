@@ -11,7 +11,7 @@
   <Grid>
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
-        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5" x:Name="CenteringLeft">
           <Components:PreferencesButton />
           <Components:ClearButton />
         </StackPanel>
@@ -20,11 +20,15 @@
           <TextBlock Margin="0 7" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Title" />
         </Grid>
 
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5" x:Name="CenteringRight">
           <Components:Minimize Clicked="Minimize" />
           <Components:Expand Clicked="Maximize" />
           <Components:Close Clicked="Close" />
         </StackPanel>
+      </Grid>
+
+      <Grid Grid.Row="0">
+        <TextBlock Margin="0 7" IsHitTestVisible="false" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="TitleCenter" />
       </Grid>
 
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">

@@ -17,11 +17,20 @@ namespace Apollo.Windows {
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
+            TitleText = this.Get<TextBlock>("Title");
+            TitleCenter = this.Get<TextBlock>("TitleCenter");
+
+            CenteringLeft = this.Get<StackPanel>("CenteringLeft");
+            CenteringRight = this.Get<StackPanel>("CenteringRight");
+
             Grid = this.Get<LaunchpadGrid>("Grid");
         }
 
         Launchpad _launchpad;
         LaunchpadGrid Grid;
+        
+        TextBlock TitleText, TitleCenter;
+        StackPanel CenteringLeft, CenteringRight;
 
         private void UpdateTopmost(bool value) => Topmost = value;
 
@@ -36,12 +45,18 @@ namespace Apollo.Windows {
 
             _launchpad = launchpad;
 
-            Title = this.Get<TextBlock>("Title").Text = _launchpad.Name;
+            Title = TitleText.Text = TitleCenter.Text = _launchpad.Name;
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), launchpad.GetColor(i).ToScreenBrush());
             
-            Grid.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            Grid.GetObservable(Visual.BoundsProperty).Subscribe(Grid_Updated);
+
+            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
         private void Unloaded(object sender, EventArgs e) {
@@ -56,6 +71,15 @@ namespace Apollo.Windows {
         }
 
         public void Bounds_Updated(Rect bounds) {
+            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+
+            int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
+
+            TitleText.Opacity = result;
+            TitleCenter.Opacity = 1 - result;
+        }
+
+        public void Grid_Updated(Rect bounds) {
             if (bounds.IsEmpty) return;
 
             Grid.Scale = Math.Min(bounds.Width, bounds.Height) / 200;
