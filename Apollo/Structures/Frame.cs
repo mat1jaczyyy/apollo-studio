@@ -4,6 +4,7 @@ using System.Linq;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Interfaces;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {

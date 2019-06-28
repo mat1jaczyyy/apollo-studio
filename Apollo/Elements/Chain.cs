@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Core;
+using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Viewers;
 

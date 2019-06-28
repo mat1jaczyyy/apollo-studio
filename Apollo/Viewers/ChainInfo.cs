@@ -13,6 +13,7 @@ using Avalonia.VisualTree;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Interfaces;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {

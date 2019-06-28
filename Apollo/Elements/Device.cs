@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Viewers;
 

@@ -15,6 +15,7 @@ using Avalonia.VisualTree;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Interfaces;
 using Apollo.Structures;
 
 namespace Apollo.Components {

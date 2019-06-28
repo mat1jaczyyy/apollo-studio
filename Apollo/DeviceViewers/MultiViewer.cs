@@ -18,6 +18,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Interfaces;
 using Apollo.Viewers;
 using Apollo.Windows;
 

@@ -15,6 +15,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Interfaces;
 
 namespace Apollo.Viewers {
     public class DeviceViewer: UserControl, ISelectViewer {

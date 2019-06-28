@@ -12,6 +12,7 @@ using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Interfaces;
 using Apollo.Windows;
 
 namespace Apollo.Elements {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Apollo.Elements;
 
-namespace Apollo.Core {
+namespace Apollo.Interfaces {
     public interface IChainParent {}
 
     public interface IMultipleChainParent: IChainParent {

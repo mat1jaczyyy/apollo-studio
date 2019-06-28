@@ -4,7 +4,7 @@ using System.Linq;
 
 using Avalonia.Input;
 
-using Apollo.Core;
+using Apollo.Interfaces;
 
 namespace Apollo.Helpers {
     public class SelectionManager {

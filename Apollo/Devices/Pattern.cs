@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Windows;
 

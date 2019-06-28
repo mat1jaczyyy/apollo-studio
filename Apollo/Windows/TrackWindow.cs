@@ -12,6 +12,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Interfaces;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {

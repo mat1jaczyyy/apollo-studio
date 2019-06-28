@@ -7,6 +7,7 @@ using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Interfaces;
 using Apollo.Structures;
 
 namespace Apollo.Devices {

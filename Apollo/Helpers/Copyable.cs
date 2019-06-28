@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using Apollo.Core;
+using Apollo.Interfaces;
 
 namespace Apollo.Helpers {
     public class Copyable {

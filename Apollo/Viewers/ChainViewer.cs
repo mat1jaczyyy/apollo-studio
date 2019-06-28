@@ -17,6 +17,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Interfaces;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
