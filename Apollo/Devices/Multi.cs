@@ -13,11 +13,11 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "multi";
 
         public IMultipleChainParentViewer SpecificViewer {
-            get => (IMultipleChainParentViewer)Viewer.SpecificViewer;
+            get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
         }
 
         public ISelectParentViewer IViewer {
-            get => (ISelectParentViewer)Viewer.SpecificViewer;
+            get => (ISelectParentViewer)Viewer?.SpecificViewer;
         }
 
         public List<ISelect> IChildren {
@@ -50,25 +50,14 @@ namespace Apollo.Devices {
         }
 
         private MultiType _mode;
-        public string Mode {
-            get {
-                if (_mode == MultiType.Forward) return "Forward";
-                else if (_mode == MultiType.Backward) return "Backward";
-                else if (_mode == MultiType.Random) return "Random";
-                else if (_mode == MultiType.RandomPlus) return "Random+";
-                return null;
-            }
+        public MultiType Mode {
+            get => _mode;
             set {
-                if (value == "Forward") _mode = MultiType.Forward;
-                else if (value == "Backward") _mode = MultiType.Backward;
-                else if (value == "Random") _mode = MultiType.Random;
-                else if (value == "Random+") _mode = MultiType.RandomPlus;
+                _mode = value;
 
                 if (SpecificViewer != null) ((MultiViewer)SpecificViewer).SetMode(Mode);
             }
         }
-
-        public MultiType GetMultiMode() => _mode;
 
         private int current = -1;
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
@@ -92,7 +81,7 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, _mode) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, Mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -133,7 +122,7 @@ namespace Apollo.Devices {
             
             Expanded = expanded;
 
-            _mode = mode;
+            Mode = mode;
             
             Launchpad.MultiReset += Reset;
 
@@ -149,16 +138,16 @@ namespace Apollo.Devices {
             if (!buffer.ContainsKey(n)) {
                 if (!m.Color.Lit) return;
 
-                if (_mode == MultiType.Forward) {
+                if (Mode == MultiType.Forward) {
                     if (++current >= Chains.Count) current = 0;
                 
-                } else if (_mode == MultiType.Backward) {
+                } else if (Mode == MultiType.Backward) {
                     if (--current < 0) current = Chains.Count - 1;
                 
-                } else if (_mode == MultiType.Random || current == -1)
+                } else if (Mode == MultiType.Random || current == -1)
                     current = RNG.Next(Chains.Count);
                 
-                else if (_mode == MultiType.RandomPlus) {
+                else if (Mode == MultiType.RandomPlus) {
                     int old = current;
                     current = RNG.Next(Chains.Count - 1);
                     if (current >= old) current++;

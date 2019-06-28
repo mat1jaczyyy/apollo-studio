@@ -11,6 +11,9 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 
+using CopyType = Apollo.Devices.Copy.CopyType;
+using GridType = Apollo.Devices.Copy.GridType;
+
 namespace Apollo.DeviceViewers {
     public class CopyViewer: UserControl {
         public static readonly string DeviceIdentifier = "copy";
@@ -62,9 +65,8 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = (double)_copy.Gate * 100;
 
-            CopyMode.SelectedItem = _copy.CopyMode;
-
-            GridMode.SelectedItem = _copy.GridMode;
+            CopyMode.SelectedIndex = (int)_copy.CopyMode;
+            GridMode.SelectedIndex = (int)_copy.GridMode;
 
             Wrap.IsChecked = _copy.Wrap;
 
@@ -145,14 +147,14 @@ namespace Apollo.DeviceViewers {
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)CopyMode.SelectedItem;
+            CopyType selected = (Copy.CopyType)CopyMode.SelectedIndex;
 
             if (_copy.CopyMode != selected) {
-                string u = _copy.CopyMode;
-                string r = selected;
+                CopyType u = _copy.CopyMode;
+                CopyType r = selected;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Mode Changed to {r}", () => {
+                Program.Project.Undo.Add($"Copy Mode Changed to {((ComboBoxItem)CopyMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
                     ((Copy)Track.TraversePath(path)).CopyMode = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).CopyMode = r;
@@ -164,17 +166,17 @@ namespace Apollo.DeviceViewers {
             Rate.Enabled = Gate.Enabled = CopyMode.SelectedIndex > 0;
         }
 
-        public void SetCopyMode(string mode) => CopyMode.SelectedItem = mode;
+        public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
 
         private void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)GridMode.SelectedItem;
+            GridType selected = (GridType)GridMode.SelectedIndex;
 
             if (_copy.GridMode != selected) {
-                string u = _copy.GridMode;
-                string r = selected;
+                GridType u = _copy.GridMode;
+                GridType r = selected;
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Grid Changed to {r}", () => {
+                Program.Project.Undo.Add($"Copy Grid Changed to {((ComboBoxItem)GridMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
                     ((Copy)Track.TraversePath(path)).GridMode = u;
                 }, () => {
                     ((Copy)Track.TraversePath(path)).GridMode = r;
@@ -184,7 +186,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetGridMode(string mode) => GridMode.SelectedItem = mode;
+        public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
         private void Wrap_Changed(object sender, EventArgs e) {
             bool value = Wrap.IsChecked.Value;

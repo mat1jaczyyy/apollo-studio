@@ -20,6 +20,8 @@ using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
 
+using PlaybackType = Apollo.Devices.Pattern.PlaybackType;
+
 namespace Apollo.Windows {
     public class PatternWindow: Window, ISelectParentViewer {
         public int? IExpanded {
@@ -138,8 +140,8 @@ namespace Apollo.Windows {
 
                 if (!_locked) {
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-                    Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
-                    Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
+                    Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
+                    Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
                     Repeats.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
@@ -229,7 +231,7 @@ namespace Apollo.Windows {
             Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = (double)_pattern.Gate * 100;
 
-            PlaybackMode.SelectedItem = _pattern.Mode;
+            PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
             Infinite.IsChecked = _pattern.Infinite;
 
@@ -385,8 +387,8 @@ namespace Apollo.Windows {
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
             Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
-            Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
+            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
             if (Draw) {
                 Editor.RenderFrame(_pattern[_pattern.Expanded]);
@@ -642,7 +644,7 @@ namespace Apollo.Windows {
             ((FrameDisplay)Contents.Last()).Viewer.Time.Text = _pattern.Frames.Last().ToString();
 
             Duration.Enabled = !(value && _pattern.Expanded == _pattern.Count - 1);
-            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
         }
 
         List<Time> oldTime;
@@ -838,14 +840,14 @@ namespace Apollo.Windows {
         }
 
         private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)PlaybackMode.SelectedItem;
+            PlaybackType selected = (PlaybackType)PlaybackMode.SelectedIndex;
 
             if (_pattern.Mode != selected) {
-                string u = _pattern.Mode;
-                string r = selected;
+                PlaybackType u = _pattern.Mode;
+                PlaybackType r = selected;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Playback Mode Changed to {selected}", () => {
+                Program.Project.Undo.Add($"Pattern Playback Mode Changed to {r}", () => {
                     ((Pattern)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Mode = r;
@@ -855,11 +857,11 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetPlaybackMode(string mode) {
-            PlaybackMode.SelectedItem = mode;
+        public void SetPlaybackMode(PlaybackType mode) {
+            PlaybackMode.SelectedIndex = (int)mode;
 
-            Repeats.Enabled = !(_pattern.Infinite || _pattern.GetPlaybackType() == Pattern.PlaybackType.Loop);
-            Repeats.DisabledText = (_pattern.GetPlaybackType() == Pattern.PlaybackType.Loop)? "Infinite" : "1";
+            Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
+            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
         }
 
         private void Gate_Changed(double value, double? old) {
@@ -1086,11 +1088,11 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
-        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, Pattern.PlaybackType mode, bool infinite, int? root) {
+        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
             pattern.Repeats = repeats;
             pattern.Gate = gate;
             pattern.Frames = frames;
-            pattern.Mode = mode.ToString();
+            pattern.Mode = mode;
             pattern.Infinite = infinite;
             pattern.RootKey = root;
 
@@ -1121,14 +1123,14 @@ namespace Apollo.Windows {
             int ur = _pattern.Repeats;
             decimal ug = _pattern.Gate;
             List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
-            Pattern.PlaybackType um = _pattern.GetPlaybackType();
+            PlaybackType um = _pattern.Mode;
             bool ui = _pattern.Infinite;
             int? uo = _pattern.RootKey;
 
             int rr = 1;
             decimal rg = 1;
             List<Frame> rf = frames.Select(i => i.Clone()).ToList();
-            Pattern.PlaybackType rm = Pattern.PlaybackType.Mono;
+            PlaybackType rm = PlaybackType.Mono;
             bool ri = false;
             int? ro = null;
 
@@ -1140,7 +1142,7 @@ namespace Apollo.Windows {
                 ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
             });
 
-            ImportFrames(_pattern, 1, 1, frames, Pattern.PlaybackType.Mono, false, null);
+            ImportFrames(_pattern, 1, 1, frames, PlaybackType.Mono, false, null);
         }
 
         private async void ImportDialog(object sender, RoutedEventArgs e) {

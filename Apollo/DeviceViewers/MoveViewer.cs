@@ -10,6 +10,8 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 
+using GridType = Apollo.Devices.Move.GridType;
+
 namespace Apollo.DeviceViewers {
     public class MoveViewer: UserControl {
         public static readonly string DeviceIdentifier = "move";
@@ -37,7 +39,7 @@ namespace Apollo.DeviceViewers {
             Offset.Y = _move.Offset.Y;
             Offset.Changed += Offset_Changed;
 
-            GridMode.SelectedItem = _move.GridMode;
+            GridMode.SelectedIndex = (int)_move.GridMode;
 
             Wrap.IsChecked = _move.Wrap;
         }
@@ -79,14 +81,14 @@ namespace Apollo.DeviceViewers {
         }
         
         private void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)GridMode.SelectedItem;
+            GridType selected = (GridType)GridMode.SelectedIndex;
 
             if (_move.GridMode != selected) {
-                string u = _move.GridMode;
-                string r = selected;
+                GridType u = _move.GridMode;
+                GridType r = selected;
                 List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Grid Changed to {selected}", () => {
+                Program.Project.Undo.Add($"Move Grid Changed to {((ComboBoxItem)GridMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
                     ((Move)Track.TraversePath(path)).GridMode = u;
                 }, () => {
                     ((Move)Track.TraversePath(path)).GridMode = r;
@@ -96,7 +98,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetGridMode(string mode) => GridMode.SelectedItem = mode;
+        public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
         private void Wrap_Changed(object sender, EventArgs e) {
             bool value = Wrap.IsChecked.Value;

@@ -10,14 +10,6 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class Copy: Device {
         public static readonly new string DeviceIdentifier = "copy";
-
-        public enum CopyType {
-            Static,
-            Animate,
-            Interpolate,
-            RandomSingle,
-            RandomLoop
-        }
         
         private Random RNG = new Random();
 
@@ -111,61 +103,47 @@ namespace Apollo.Devices {
             }
         }
 
-        public string CopyMode {
-            get {
-                if (_copymode == CopyType.Static) return "Static";
-                else if (_copymode == CopyType.Animate) return "Animate";
-                else if (_copymode == CopyType.Interpolate) return "Interpolate";
-                else if (_copymode == CopyType.RandomSingle) return "Random Single";
-                else if (_copymode == CopyType.RandomLoop) return "Random Loop";
-                return null;
-            }
-            set {
-                if (value == "Static") _copymode = CopyType.Static;
-                else if (value == "Animate") _copymode = CopyType.Animate;
-                else if (value == "Interpolate") _copymode = CopyType.Interpolate;
-                else if (value == "Random Single") _copymode = CopyType.RandomSingle;
-                else if (value == "Random Loop") _copymode = CopyType.RandomLoop;
+        public enum CopyType {
+            Static,
+            Animate,
+            Interpolate,
+            RandomSingle,
+            RandomLoop
+        }
 
+        private CopyType _copymode;
+        public CopyType CopyMode {
+            get => _copymode;
+            set {
+                _copymode = value;
+                
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetCopyMode(CopyMode);
 
                 Stop();
             }
         }
-
-        CopyType _copymode;
-
-        public CopyType GetCopyMode() => _copymode;
         
         public enum GridType {
             Full,
             Square
         }
 
-        public string GridMode {
-            get {
-                if (_gridmode == GridType.Full) return "10x10";
-                else if (_gridmode == GridType.Square) return "8x8";
-                return null;
-            }
+        private GridType _gridmode;
+        public GridType GridMode {
+            get => _gridmode;
             set {
-                if (value == "10x10") _gridmode = GridType.Full;
-                else if (value == "8x8") _gridmode = GridType.Square;
-
+                _gridmode = value;
+                
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGridMode(GridMode);
             }
         }
-
-        GridType _gridmode;
-        
-        public GridType GetGridMode() => _gridmode;
 
         private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, _copymode, _gridmode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -173,19 +151,19 @@ namespace Apollo.Devices {
         public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
             Time = time?? new Time(true, null, 500);
             Gate = gate;
-            _copymode = copymode;
-            _gridmode = gridmode;
+            CopyMode = copymode;
+            GridMode = gridmode;
             Wrap = wrap;
             Offsets = offsets?? new List<Offset>();
         }
         
-        private int ApplyWrap(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        private int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         private bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
             x = index % 10;
             y = index / 10;
 
-            if (_gridmode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
+            if (GridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
                 result = 0;
                 return false;
             }
@@ -204,7 +182,7 @@ namespace Apollo.Devices {
 
             result = y * 10 + x;
 
-            if (_gridmode == GridType.Full) {
+            if (GridMode == GridType.Full) {
                 if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
                     return true;
                 
@@ -213,7 +191,7 @@ namespace Apollo.Devices {
                     return true;
                 }
 
-            } else if (_gridmode == GridType.Square)
+            } else if (GridMode == GridType.Square)
                 if (1 <= x && x <= 8 && 1 <= y && y <= 8)
                     return true;
              
@@ -250,7 +228,7 @@ namespace Apollo.Devices {
 
             Type infoType = courier.Info.GetType();
             
-            if ((_copymode == CopyType.Animate || _copymode == CopyType.Interpolate) && infoType == typeof(PolyInfo)) {
+            if ((CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) && infoType == typeof(PolyInfo)) {
                 PolyInfo info = (PolyInfo)courier.Info;
 
                 lock (info.locker) {
@@ -264,7 +242,7 @@ namespace Apollo.Devices {
                     }
                 }
 
-            } else if (_copymode == CopyType.RandomLoop && infoType == typeof((Signal, List<int>))) {
+            } else if (CopyMode == CopyType.RandomLoop && infoType == typeof((Signal, List<int>))) {
                 (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
                 HandleRandomLoop(n, offsets);
             }
@@ -321,7 +299,7 @@ namespace Apollo.Devices {
                 if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result))
                     validOffsets.Add(result);
 
-                if (_copymode == CopyType.Interpolate) {
+                if (CopyMode == CopyType.Interpolate) {
                     List<(int X, int Y)> points = new List<(int, int)>();
 
                     int dx = x - px;
@@ -347,9 +325,9 @@ namespace Apollo.Devices {
                 py = y;
             }
 
-            if (_copymode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
+            if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
 
-            if (_copymode == CopyType.Static) {
+            if (CopyMode == CopyType.Static) {
                 MIDIExit?.Invoke(n.Clone());
 
                 for (int i = 1; i < validOffsets.Count; i++) {
@@ -359,7 +337,7 @@ namespace Apollo.Devices {
                     MIDIExit?.Invoke(m);
                 }
 
-            } else if (_copymode == CopyType.Animate || _copymode == CopyType.Interpolate) {
+            } else if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
                 
                 lock (locker[n]) {
@@ -372,7 +350,7 @@ namespace Apollo.Devices {
                         FireCourier(info, _time * _gate * i);
                 }
 
-            } else if (_copymode == CopyType.RandomSingle) {
+            } else if (CopyMode == CopyType.RandomSingle) {
                 Signal m = n.Clone();
                 n.Color = new Color();
 
@@ -387,7 +365,7 @@ namespace Apollo.Devices {
 
                 MIDIExit?.Invoke(m);
 
-            } else if (_copymode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
+            } else if (CopyMode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }
 
         protected override void Stop() {

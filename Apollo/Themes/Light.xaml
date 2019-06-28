@@ -1,7 +1,6 @@
 <Style xmlns="https://github.com/avaloniaui"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       x:Class="Apollo.Themes.Light"
-       xmlns:sys="clr-namespace:System;assembly=mscorlib">
+       x:Class="Apollo.Themes.Light">
   
   <Style.Resources>
     <Image Grid.Row="1" Source="/Resources/SplashBlack.png" x:Key="SplashImage" />

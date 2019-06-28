@@ -105,18 +105,16 @@ namespace Apollo.Devices {
         }
 
         private PlaybackType _mode;
-        public string Mode {
-            get => _mode.ToString();
+        public PlaybackType Mode {
+            get => _mode;
             set {
-                _mode = Enum.Parse<PlaybackType>(value);
+                _mode = value;
 
                 Window?.SetPlaybackMode(Mode);
 
                 Stop();
             }
         }
-
-        public PlaybackType GetPlaybackType() => _mode;
 
         private bool _infinite;
         public bool Infinite {
@@ -141,7 +139,7 @@ namespace Apollo.Devices {
                 }
             }
         }
-        private int AdjustedRepeats => (_mode == PlaybackType.Loop || _infinite)? 1 : Repeats;
+        private int AdjustedRepeats => (Mode == PlaybackType.Loop || _infinite)? 1 : Repeats;
 
         private int? _root;
         public int? RootKey {
@@ -165,7 +163,7 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, (from i in Frames select i.Clone()).ToList(), _mode, Infinite, RootKey, Wrap, Expanded) {
+        public override Device Clone() => new Pattern(Repeats, Gate, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -178,7 +176,7 @@ namespace Apollo.Devices {
             Repeats = repeats;
             Gate = gate;
             Frames = frames;
-            _mode = mode;
+            Mode = mode;
             Infinite = infinite;
             RootKey = root;
             Expanded = expanded;
@@ -254,13 +252,13 @@ namespace Apollo.Devices {
                             if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
                                     MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
-                    } else if (_mode == PlaybackType.Mono) {
+                    } else if (Mode == PlaybackType.Mono) {
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
                                     MIDIExit?.Invoke(new Signal(n.Source, (byte)index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
-                    } else if (_mode == PlaybackType.Loop) {
+                    } else if (Mode == PlaybackType.Loop) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
@@ -332,7 +330,7 @@ namespace Apollo.Devices {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
                 lock (locker[n]) {
-                    if ((_mode == PlaybackType.Mono && lit) || _mode == PlaybackType.Loop) Stop(n);
+                    if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop) Stop(n);
 
                     if (lit) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
@@ -345,7 +343,7 @@ namespace Apollo.Devices {
 
                         for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
                             time += Frames[i % Frames.Count].Time * _gate;
-                            if (_mode == PlaybackType.Poly) FireCourier(info, time);
+                            if (Mode == PlaybackType.Poly) FireCourier(info, time);
                             else FireCourier(n, time);
                         }
                     }

@@ -1,7 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PreferencesWindow"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner"
         CanResize="false" SizeToContent="Height"
@@ -39,9 +38,9 @@
                 <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto">
                   <TextBlock Grid.Column="0" Text="Launchpad Style" />
                   <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
-                    <sys:String>Stock</sys:String>
-                    <sys:String>Phantom</sys:String>
-                    <sys:String>Sanded</sys:String>
+                    <ComboBoxItem>Stock</ComboBoxItem>
+                    <ComboBoxItem>Phantom</ComboBoxItem>
+                    <ComboBoxItem>Sanded</ComboBoxItem>
                   </ComboBox>
                 </Grid>
               </StackPanel>

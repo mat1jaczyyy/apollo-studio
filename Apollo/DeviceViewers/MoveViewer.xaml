@@ -1,7 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.MoveViewer"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
@@ -12,8 +11,8 @@
     <StackPanel Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" Spacing="5">
       <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
         <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
-          <sys:String>10x10</sys:String>
-          <sys:String>8x8</sys:String>
+          <ComboBoxItem>10x10</ComboBoxItem>
+          <ComboBoxItem>8x8</ComboBoxItem>
         </ComboBox>
       </Border>
 

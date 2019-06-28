@@ -160,8 +160,8 @@ namespace Apollo.Binary {
             Encode(writer, o.Time);
             writer.Write(o.Gate);
 
-            writer.Write((int)o.GetCopyMode());
-            writer.Write((int)o.GetGridMode());
+            writer.Write((int)o.CopyMode);
+            writer.Write((int)o.GridMode);
             writer.Write(o.Wrap);
 
             writer.Write(o.Offsets.Count);
@@ -181,7 +181,7 @@ namespace Apollo.Binary {
 
             Encode(writer, o.Time);
             writer.Write(o.Gate);
-            writer.Write((int)o.GetPlaybackType());
+            writer.Write((int)o.PlayMode);
 
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
@@ -194,7 +194,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Flip o) {
             EncodeID(writer, typeof(Flip));
 
-            writer.Write((int)o.GetFlipMode());
+            writer.Write((int)o.Mode);
             writer.Write(o.Bypass);
         }
 
@@ -220,14 +220,14 @@ namespace Apollo.Binary {
 
             writer.Write(o.Target);
 
-            writer.Write((int)o.GetBlendingMode());
+            writer.Write((int)o.BlendingMode);
         }
 
         private static void Encode(BinaryWriter writer, Move o) {
             EncodeID(writer, typeof(Move));
 
             Encode(writer, o.Offset);
-            writer.Write((int)o.GetGridMode());
+            writer.Write((int)o.GridMode);
             writer.Write(o.Wrap);
         }
 
@@ -244,7 +244,7 @@ namespace Apollo.Binary {
             if (o.Expanded.HasValue)
                 writer.Write(o.Expanded.Value);
 
-            writer.Write((int)o.GetMultiMode());
+            writer.Write((int)o.Mode);
         }
 
         private static void Encode(BinaryWriter writer, Output o) {
@@ -282,7 +282,7 @@ namespace Apollo.Binary {
             for (int i = 0; i < o.Frames.Count; i++)
                 Encode(writer, o.Frames[i]);
             
-            writer.Write((int)o.GetPlaybackType());
+            writer.Write((int)o.Mode);
             writer.Write(o.Infinite);
 
             writer.Write(o.RootKey.HasValue);
@@ -301,7 +301,7 @@ namespace Apollo.Binary {
         private static void Encode(BinaryWriter writer, Rotate o) {
             EncodeID(writer, typeof(Rotate));
 
-            writer.Write((int)o.GetRotateMode());
+            writer.Write((int)o.Mode);
             writer.Write(o.Bypass);
         }
 

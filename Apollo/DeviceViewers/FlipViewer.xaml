@@ -1,7 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.FlipViewer"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
@@ -9,10 +8,10 @@
   <StackPanel VerticalAlignment="Center" Spacing="5" Width="90">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="FlipMode" SelectionChanged="Mode_Changed">
-        <sys:String>Horizontal</sys:String>
-        <sys:String>Vertical</sys:String>
-        <sys:String>Diagonal+</sys:String>
-        <sys:String>Diagonal-</sys:String>
+        <ComboBoxItem>Horizontal</ComboBoxItem>
+        <ComboBoxItem>Vertical</ComboBoxItem>
+        <ComboBoxItem>Diagonal+</ComboBoxItem>
+        <ComboBoxItem>Diagonal-</ComboBoxItem>
       </ComboBox>
     </Border>
 

@@ -11,11 +11,11 @@ namespace Apollo.Devices {
         public static readonly new string DeviceIdentifier = "group";
 
         public IMultipleChainParentViewer SpecificViewer {
-            get => (IMultipleChainParentViewer)Viewer.SpecificViewer;
+            get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
         }
 
         public ISelectParentViewer IViewer {
-            get => (ISelectParentViewer)Viewer.SpecificViewer;
+            get => (ISelectParentViewer)Viewer?.SpecificViewer;
         }
 
         public List<ISelect> IChildren {

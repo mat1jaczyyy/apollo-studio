@@ -11,23 +11,15 @@ namespace Apollo.Devices {
             Square
         }
 
-        public string GridMode {
-            get {
-                if (_gridmode == GridType.Full) return "10x10";
-                else if (_gridmode == GridType.Square) return "8x8";
-                return null;
-            }
+        GridType _gridmode;
+        public GridType GridMode {
+            get => _gridmode;
             set {
-                if (value == "10x10") _gridmode = GridType.Full;
-                else if (value == "8x8") _gridmode = GridType.Square;
+                _gridmode = value;
 
                 if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetGridMode(GridMode);
             }
         }
-
-        GridType _gridmode;
-
-        public GridType GetGridMode() => _gridmode;
 
         public Offset Offset;
 
@@ -52,19 +44,19 @@ namespace Apollo.Devices {
 
         public Move(Offset offset = null, GridType gridmode = GridType.Full, bool wrap = false): base(DeviceIdentifier) {
             Offset = offset?? new Offset();
-            _gridmode = gridmode;
+            GridMode = gridmode;
             Wrap = wrap;
 
             Offset.Changed += OffsetChanged;
         }
 
-        private int ApplyWrap(int coord) => (_gridmode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        private int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         private bool ApplyOffset(int index, out int result) {
             int x = index % 10;
             int y = index / 10;
 
-            if (_gridmode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
+            if (GridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
                 result = 0;
                 return false;
             }
@@ -79,7 +71,7 @@ namespace Apollo.Devices {
 
             result = y * 10 + x;
 
-            if (_gridmode == GridType.Full) {
+            if (GridMode == GridType.Full) {
                 if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
                     return true;
                 
@@ -88,7 +80,7 @@ namespace Apollo.Devices {
                     return true;
                 }
 
-            } else if (_gridmode == GridType.Square)
+            } else if (GridMode == GridType.Square)
                 if (1 <= x && x <= 8 && 1 <= y && y <= 8)
                     return true;
              

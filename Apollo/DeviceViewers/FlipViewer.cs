@@ -9,6 +9,8 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 
+using FlipType = Apollo.Devices.Flip.FlipType;
+
 namespace Apollo.DeviceViewers {
     public class FlipViewer: UserControl {
         public static readonly string DeviceIdentifier = "flip";
@@ -29,21 +31,21 @@ namespace Apollo.DeviceViewers {
 
             _flip = flip;
 
-            FlipMode.SelectedItem = _flip.Mode;
+            FlipMode.SelectedIndex = (int)_flip.Mode;
             Bypass.IsChecked = _flip.Bypass;
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)FlipMode.SelectedItem;
+            FlipType selected = (FlipType)FlipMode.SelectedIndex;
 
             if (_flip.Mode != selected) {
-                string u = _flip.Mode;
-                string r = selected;
+                FlipType u = _flip.Mode;
+                FlipType r = selected;
                 List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Orientation Changed to {selected}", () => {
+                Program.Project.Undo.Add($"Flip Orientation Changed to {((ComboBoxItem)FlipMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
                     ((Flip)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Flip)Track.TraversePath(path)).Mode = r;
@@ -53,7 +55,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetMode(string mode) => FlipMode.SelectedItem = mode;
+        public void SetMode(FlipType mode) => FlipMode.SelectedIndex = (int)mode;
 
         private void Bypass_Changed(object sender, EventArgs e) {
             bool value = Bypass.IsChecked.Value;

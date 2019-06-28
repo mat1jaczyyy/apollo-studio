@@ -13,23 +13,14 @@ namespace Apollo.Devices {
         }
 
         RotateType _mode;
-        public string Mode {
-            get {
-                if (_mode == RotateType.D90) return "90°";
-                else if (_mode == RotateType.D180) return "180°";
-                else if (_mode == RotateType.D270) return "270°";
-                return null;
-            }
+        public RotateType Mode {
+            get => _mode;
             set {
-                if (value == "90°") _mode = RotateType.D90;
-                else if (value == "180°") _mode = RotateType.D180;
-                else if (value == "270°") _mode = RotateType.D270;
+                _mode = value;
                 
                 if (Viewer?.SpecificViewer != null) ((RotateViewer)Viewer.SpecificViewer).SetMode(Mode);
             }
         }
-
-        public RotateType GetRotateMode() => _mode;
 
         private bool _bypass;
         public bool Bypass {
@@ -41,26 +32,26 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Rotate(_mode, Bypass) {
+        public override Device Clone() => new Rotate(Mode, Bypass) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base(DeviceIdentifier) {
-            _mode = mode;
+            Mode = mode;
             Bypass = bypass;
         }
 
         public override void MIDIProcess(Signal n) {
             if (Bypass) MIDIExit?.Invoke(n.Clone());
             
-            if (_mode == RotateType.D90) {
+            if (Mode == RotateType.D90) {
                 n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-            } else if (_mode == RotateType.D180) {
+            } else if (Mode == RotateType.D180) {
                 n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
 
-            } else if (_mode == RotateType.D270) {
+            } else if (Mode == RotateType.D270) {
                 n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
             }
 

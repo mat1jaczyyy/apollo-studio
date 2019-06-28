@@ -13,26 +13,15 @@ namespace Apollo.Devices {
             Diagonal2
         }
 
-        FlipType _mode;
-        public string Mode {
-            get {
-                if (_mode == FlipType.Horizontal) return "Horizontal";
-                else if (_mode == FlipType.Vertical) return "Vertical";
-                else if (_mode == FlipType.Diagonal1) return "Diagonal+";
-                else if (_mode == FlipType.Diagonal2) return "Diagonal-";
-                return null;
-            }
+        private FlipType _mode;
+        public FlipType Mode {
+            get => _mode;
             set {
-                if (value == "Horizontal") _mode = FlipType.Horizontal;
-                else if (value == "Vertical") _mode = FlipType.Vertical;
-                else if (value == "Diagonal+") _mode = FlipType.Diagonal1;
-                else if (value == "Diagonal-") _mode = FlipType.Diagonal2;
+                _mode = value;
 
                 if (Viewer?.SpecificViewer != null) ((FlipViewer)Viewer.SpecificViewer).SetMode(Mode);
             }
         }
-
-        public FlipType GetFlipMode() => _mode;
 
         private bool _bypass;
         public bool Bypass {
@@ -44,13 +33,13 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Flip(_mode, Bypass) {
+        public override Device Clone() => new Flip(Mode, Bypass) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base(DeviceIdentifier) {
-            _mode = mode;
+            Mode = mode;
             Bypass = bypass;
         }
 
@@ -60,15 +49,15 @@ namespace Apollo.Devices {
             int x = n.Index % 10;
             int y = n.Index / 10;
 
-            if (_mode == FlipType.Horizontal) x = 9 - x;
-            else if (_mode == FlipType.Vertical) y = 9 - y;
+            if (Mode == FlipType.Horizontal) x = 9 - x;
+            else if (Mode == FlipType.Vertical) y = 9 - y;
 
-            else if (_mode == FlipType.Diagonal1) {
+            else if (Mode == FlipType.Diagonal1) {
                 int temp = x;
                 x = y;
                 y = temp;
             
-            } else if (_mode == FlipType.Diagonal2) {
+            } else if (Mode == FlipType.Diagonal2) {
                 x = 9 - x;
                 y = 9 - y;
 

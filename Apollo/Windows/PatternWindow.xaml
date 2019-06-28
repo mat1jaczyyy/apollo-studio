@@ -1,7 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PatternWindow"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Components="clr-namespace:Apollo.Components"
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
@@ -77,9 +76,9 @@
                 <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
                   <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="1" x:Name="PlaybackMode"
                             SelectionChanged="PlaybackMode_Changed">
-                    <sys:String>Mono</sys:String>
-                    <sys:String>Poly</sys:String>
-                    <sys:String>Loop</sys:String>
+                    <ComboBoxItem>Mono</ComboBoxItem>
+                    <ComboBoxItem>Poly</ComboBoxItem>
+                    <ComboBoxItem>Loop</ComboBoxItem>
                   </ComboBox>
                 </Border>
                 

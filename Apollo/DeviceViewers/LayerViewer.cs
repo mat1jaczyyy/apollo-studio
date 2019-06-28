@@ -9,6 +9,8 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 
+using BlendingType = Apollo.Structures.Signal.BlendingType;
+
 namespace Apollo.DeviceViewers {
     public class LayerViewer: UserControl {
         public static readonly string DeviceIdentifier = "layer";
@@ -31,7 +33,7 @@ namespace Apollo.DeviceViewers {
             _layer = layer;
             
             Target.RawValue = _layer.Target;
-            BlendingMode.SelectedItem = _layer.Mode;
+            BlendingMode.SelectedIndex = (int)_layer.BlendingMode;
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
@@ -55,23 +57,23 @@ namespace Apollo.DeviceViewers {
         public void SetTarget(int value) => Target.RawValue = value;
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)BlendingMode.SelectedItem;
+            BlendingType selected = (BlendingType)BlendingMode.SelectedIndex;
 
-            if (_layer.Mode != selected) {
-                string u = _layer.Mode;
-                string r = selected;
+            if (_layer.BlendingMode != selected) {
+                BlendingType u = _layer.BlendingMode;
+                BlendingType r = selected;
                 List<int> path = Track.GetPath(_layer);
 
-                Program.Project.Undo.Add($"Layer Blending Changed to {selected}", () => {
-                    ((Layer)Track.TraversePath(path)).Mode = u;
+                Program.Project.Undo.Add($"Layer Blending Changed to {r}", () => {
+                    ((Layer)Track.TraversePath(path)).BlendingMode = u;
                 }, () => {
-                    ((Layer)Track.TraversePath(path)).Mode = r;
+                    ((Layer)Track.TraversePath(path)).BlendingMode = r;
                 });
 
-                _layer.Mode = selected;
+                _layer.BlendingMode = selected;
             }
         }
 
-        public void SetMode(string mode) => BlendingMode.SelectedItem = mode;
+        public void SetMode(BlendingType mode) => BlendingMode.SelectedIndex = (int)mode;
     }
 }

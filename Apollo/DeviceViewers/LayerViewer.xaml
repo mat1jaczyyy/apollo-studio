@@ -1,7 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.LayerViewer"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
@@ -13,10 +12,10 @@
     </Border>
 
     <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" x:Name="BlendingMode" SelectionChanged="Mode_Changed">
-      <sys:String>Normal</sys:String>
-      <sys:String>Screen</sys:String>
-      <sys:String>Multiply</sys:String>
-      <sys:String>Mask</sys:String>
+      <ComboBoxItem>Normal</ComboBoxItem>
+      <ComboBoxItem>Screen</ComboBoxItem>
+      <ComboBoxItem>Multiply</ComboBoxItem>
+      <ComboBoxItem>Mask</ComboBoxItem>
     </ComboBox>
   </StackPanel>
 </UserControl>

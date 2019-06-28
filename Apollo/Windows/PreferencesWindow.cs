@@ -16,6 +16,8 @@ using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Viewers;
 
+using LaunchpadStyles = Apollo.Core.Preferences.LaunchpadStyles;
+
 namespace Apollo.Windows {
     public class PreferencesWindow: Window {
         private void InitializeComponent() {
@@ -85,7 +87,7 @@ namespace Apollo.Windows {
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
-            LaunchpadStyle.SelectedItem = Preferences.LaunchpadStyle.ToString();
+            LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
 
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
@@ -137,7 +139,7 @@ namespace Apollo.Windows {
 
         private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        private void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = Enum.Parse<Preferences.LaunchpadStyles>((string)LaunchpadStyle.SelectedItem);
+        private void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
         private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 

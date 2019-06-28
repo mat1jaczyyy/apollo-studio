@@ -20,6 +20,8 @@ using Apollo.Helpers;
 using Apollo.Viewers;
 using Apollo.Windows;
 
+using MultiType = Apollo.Devices.Multi.MultiType;
+
 namespace Apollo.DeviceViewers {
     public class MultiViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
         public static readonly string DeviceIdentifier = "multi";
@@ -93,7 +95,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(0, new DeviceHead(_multi, parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
-            MultiMode.SelectedItem = _multi.Mode;
+            MultiMode.SelectedIndex = (int)_multi.Mode;
 
             ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
             ChainContextMenu.AddHandler(MenuItem.ClickEvent, ChainContextMenu_Click);
@@ -187,6 +189,26 @@ namespace Apollo.DeviceViewers {
 
             e.Handled = true;
         }
+
+        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+            MultiType selected = (MultiType)MultiMode.SelectedIndex;
+
+            if (_multi.Mode != selected) {
+                MultiType u = _multi.Mode;
+                MultiType r = selected;
+                List<int> path = Track.GetPath(_multi);
+
+                Program.Project.Undo.Add($"Direction Changed to {((ComboBoxItem)MultiMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
+                    ((Multi)Track.TraversePath(path)).Mode = u;
+                }, () => {
+                    ((Multi)Track.TraversePath(path)).Mode = r;
+                });
+
+                _multi.Mode = selected;
+            }
+        }
+
+        public void SetMode(MultiType mode) => MultiMode.SelectedIndex = (int)mode;
 
         private void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
@@ -321,26 +343,6 @@ namespace Apollo.DeviceViewers {
 
             if (!result) e.DragEffects = DragDropEffects.None;
         }
-
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)MultiMode.SelectedItem;
-
-            if (_multi.Mode != selected) {
-                string u = _multi.Mode;
-                string r = selected;
-                List<int> path = Track.GetPath(_multi);
-
-                Program.Project.Undo.Add($"Direction Changed to {selected}", () => {
-                    ((Multi)Track.TraversePath(path)).Mode = u;
-                }, () => {
-                    ((Multi)Track.TraversePath(path)).Mode = r;
-                });
-
-                _multi.Mode = selected;
-            }
-        }
-
-        public void SetMode(string mode) => MultiMode.SelectedItem = mode;
 
         private void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Chain> pasted;

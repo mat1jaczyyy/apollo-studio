@@ -9,6 +9,8 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 
+using RotateType = Apollo.Devices.Rotate.RotateType;
+
 namespace Apollo.DeviceViewers {
     public class RotateViewer: UserControl {
         public static readonly string DeviceIdentifier = "rotate";
@@ -29,21 +31,21 @@ namespace Apollo.DeviceViewers {
 
             _rotate = rotate;
 
-            RotateMode.SelectedItem = _rotate.Mode;
+            RotateMode.SelectedIndex = (int)_rotate.Mode;
             Bypass.IsChecked = _rotate.Bypass;
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _rotate = null;
 
         private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)RotateMode.SelectedItem;
+            RotateType selected = (RotateType)RotateMode.SelectedIndex;
 
             if (_rotate.Mode != selected) {
-                string u = _rotate.Mode;
-                string r = selected;
+                RotateType u = _rotate.Mode;
+                RotateType r = selected;
                 List<int> path = Track.GetPath(_rotate);
 
-                Program.Project.Undo.Add($"Rotate Angle Changed to {selected}", () => {
+                Program.Project.Undo.Add($"Rotate Angle Changed to {((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
                     ((Rotate)Track.TraversePath(path)).Mode = u;
                 }, () => {
                     ((Rotate)Track.TraversePath(path)).Mode = r;
@@ -53,7 +55,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetMode(string mode) => RotateMode.SelectedItem = mode;
+        public void SetMode(RotateType mode) => RotateMode.SelectedIndex = (int)mode;
 
         private void Bypass_Changed(object sender, EventArgs e) {
             bool value = Bypass.IsChecked.Value;

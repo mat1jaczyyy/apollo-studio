@@ -19,6 +19,8 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 
+using PlaybackType = Apollo.Devices.Fade.PlaybackType;
+
 namespace Apollo.DeviceViewers {
     public class FadeViewer: UserControl {
         public static readonly string DeviceIdentifier = "fade";
@@ -85,7 +87,7 @@ namespace Apollo.DeviceViewers {
             _fade = fade;
             _fade.Generated += Gradient_Generate;
 
-            PlaybackMode.SelectedItem = _fade.PlayMode;
+            PlaybackMode.SelectedIndex = (int)_fade.PlayMode;
 
             Duration.UsingSteps = _fade.Time.Mode;
             Duration.Length = _fade.Time.Length;
@@ -320,14 +322,14 @@ namespace Apollo.DeviceViewers {
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
-            string selected = (string)PlaybackMode.SelectedItem;
+            PlaybackType selected = (PlaybackType)PlaybackMode.SelectedIndex;
 
             if (_fade.PlayMode != selected) {
-                string u = _fade.PlayMode;
-                string r = selected;
+                PlaybackType u = _fade.PlayMode;
+                PlaybackType r = selected;
                 List<int> path = Track.GetPath(_fade);
 
-                Program.Project.Undo.Add($"Fade Playback Mode Changed to {selected}", () => {
+                Program.Project.Undo.Add($"Fade Playback Mode Changed to {r}", () => {
                     ((Fade)Track.TraversePath(path)).PlayMode = u;
                 }, () => {
                     ((Fade)Track.TraversePath(path)).PlayMode = r;
@@ -337,7 +339,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetPlaybackMode(string mode) => PlaybackMode.SelectedItem = mode;
+        public void SetPlaybackMode(PlaybackType mode) => PlaybackMode.SelectedIndex = (int)mode;
 
         private Action Input_Update;
 
