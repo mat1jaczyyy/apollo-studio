@@ -105,6 +105,8 @@ namespace Apollo.Windows {
 
             if (e.Key == Key.Up) Program.Project.Undo.Undo();
             else if (e.Key == Key.Down) Program.Project.Undo.Redo();
+
+            this.Focus();
         }
 
         private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
