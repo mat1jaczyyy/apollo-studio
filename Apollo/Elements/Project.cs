@@ -10,6 +10,7 @@ using Avalonia.Input;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Windows;
 
@@ -181,7 +182,7 @@ namespace Apollo.Elements {
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
             BPM = bpm;
             Page = page;
-            Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
+            Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             FilePath = path;
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());

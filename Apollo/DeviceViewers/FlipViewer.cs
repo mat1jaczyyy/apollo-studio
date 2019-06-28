@@ -8,8 +8,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-
-using FlipType = Apollo.Devices.Flip.FlipType;
+using Apollo.Enums;
 
 namespace Apollo.DeviceViewers {
     public class FlipViewer: UserControl {

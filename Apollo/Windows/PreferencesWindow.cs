@@ -13,10 +13,9 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Viewers;
-
-using LaunchpadStyles = Apollo.Core.Preferences.LaunchpadStyles;
 
 namespace Apollo.Windows {
     public class PreferencesWindow: Window {
@@ -66,7 +65,7 @@ namespace Apollo.Windows {
         private void UpdatePorts() {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
 
-            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select new LaunchpadInfo(i)))
+            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new LaunchpadInfo(i)))
                 Contents.Insert(Contents.Count - 1, control);
         }
 
@@ -100,13 +99,13 @@ namespace Apollo.Windows {
             CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
             EnableGestures.IsChecked = Preferences.EnableGestures;
 
-            Monochrome.IsChecked = Preferences.ImportPalette == Preferences.Palettes.Monochrome;
-            NovationPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.NovationPalette;
+            Monochrome.IsChecked = Preferences.ImportPalette == Palettes.Monochrome;
+            NovationPalette.IsChecked = Preferences.ImportPalette == Palettes.NovationPalette;
             CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
-            CustomPalette.IsChecked = Preferences.ImportPalette == Preferences.Palettes.CustomPalette;
+            CustomPalette.IsChecked = Preferences.ImportPalette == Palettes.CustomPalette;
 
-            Dark.IsChecked = Preferences.Theme == Preferences.Themes.Dark;
-            Light.IsChecked = Preferences.Theme == Preferences.Themes.Light;
+            Dark.IsChecked = Preferences.Theme == Themes.Dark;
+            Light.IsChecked = Preferences.Theme == Themes.Light;
 
             Backup.IsChecked = Preferences.Backup;
             Autosave.IsChecked = Preferences.Autosave;
@@ -157,11 +156,11 @@ namespace Apollo.Windows {
 
         private void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
 
-        private void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.Monochrome;
+        private void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.Monochrome;
 
-        private void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.NovationPalette;
+        private void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.NovationPalette;
 
-        private void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Preferences.Palettes.CustomPalette;
+        private void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
         private async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -189,23 +188,23 @@ namespace Apollo.Windows {
                     Preferences.CustomPalette = loaded;
                     CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
                     CustomPalette.IsChecked = true;
-                    Preferences.ImportPalette = Preferences.Palettes.CustomPalette;
+                    Preferences.ImportPalette = Palettes.CustomPalette;
                 }
             }
         }
 
         private void Dark_Changed(object sender, EventArgs e) {
-            if (Preferences.Theme != Preferences.Themes.Dark)
+            if (Preferences.Theme != Themes.Dark)
                 this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
 
-            Preferences.Theme = Preferences.Themes.Dark;
+            Preferences.Theme = Themes.Dark;
         }
 
         private void Light_Changed(object sender, EventArgs e) {
-            if (Preferences.Theme != Preferences.Themes.Light)
+            if (Preferences.Theme != Themes.Light)
                 this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
             
-            Preferences.Theme = Preferences.Themes.Light;
+            Preferences.Theme = Themes.Light;
         }
 
         private void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;

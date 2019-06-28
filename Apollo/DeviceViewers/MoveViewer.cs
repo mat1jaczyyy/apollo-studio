@@ -9,8 +9,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-
-using GridType = Apollo.Devices.Move.GridType;
+using Apollo.Enums;
 
 namespace Apollo.DeviceViewers {
     public class MoveViewer: UserControl {

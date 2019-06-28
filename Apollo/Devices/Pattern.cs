@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Windows;
 
@@ -96,12 +97,6 @@ namespace Apollo.Devices {
             public List<Courier> timers = new List<Courier>();
 
             public PolyInfo(Signal init) => n = init;
-        }
-
-        public enum PlaybackType {
-            Mono,
-            Poly,
-            Loop
         }
 
         private PlaybackType _mode;

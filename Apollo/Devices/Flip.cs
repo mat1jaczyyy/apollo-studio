@@ -1,17 +1,11 @@
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Flip: Device {
         public static readonly new string DeviceIdentifier = "flip";
-
-        public enum FlipType {
-            Horizontal,
-            Vertical,
-            Diagonal1,
-            Diagonal2
-        }
 
         private FlipType _mode;
         public FlipType Mode {

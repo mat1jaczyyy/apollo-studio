@@ -17,10 +17,9 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
-
-using PlaybackType = Apollo.Devices.Pattern.PlaybackType;
 
 namespace Apollo.Windows {
     public class PatternWindow: Window, ISelectParentViewer {
@@ -159,8 +158,8 @@ namespace Apollo.Windows {
         private void UpdateTopmost(bool value) => Topmost = value;
 
         private void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown select i).ToList();
-            if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(Launchpad);
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
+            if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == LaunchpadType.Unknown)) ports.Add(Launchpad);
             ports.Add(MIDI.NoOutput);
 
             PortSelector.Items = ports;
@@ -1050,7 +1049,7 @@ namespace Apollo.Windows {
             PatternStop(false);
 
             foreach (Launchpad lp in MIDI.Devices)
-                if (lp.Available && lp.Type != Launchpad.LaunchpadType.Unknown)
+                if (lp.Available && lp.Type != LaunchpadType.Unknown)
                     lp.Clear();
 
             Editor.RenderFrame(_pattern[0]);

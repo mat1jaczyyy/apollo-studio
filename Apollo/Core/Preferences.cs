@@ -2,6 +2,7 @@
 using System.IO;
 
 using Apollo.Binary;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Windows;
 
@@ -14,18 +15,6 @@ namespace Apollo.Core {
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
         public delegate void Changed();
-
-        public enum Palettes {
-            Monochrome, NovationPalette, CustomPalette
-        }
-
-        public enum Themes {
-            Dark, Light
-        }
-
-        public enum LaunchpadStyles {
-            Stock, Phantom, Sanded
-        }
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
         private static bool _AlwaysOnTop = true;

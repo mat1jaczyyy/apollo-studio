@@ -1,16 +1,11 @@
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Rotate: Device {
         public static readonly new string DeviceIdentifier = "rotate";
-
-        public enum RotateType {
-            D90,
-            D180,
-            D270
-        }
 
         RotateType _mode;
         public RotateType Mode {

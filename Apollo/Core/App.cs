@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 
+using Apollo.Enums;
+
 namespace Apollo.Core {
     public class App: Application {
         StyleInclude Dark = new StyleInclude(new Uri("resm:Styles?assembly=Apollo")) {
@@ -17,8 +19,8 @@ namespace Apollo.Core {
         public override void Initialize() {
             AvaloniaXamlLoader.Load(this);
 
-            if (Preferences.Theme == Preferences.Themes.Dark) Styles.Add(Dark);
-            else if (Preferences.Theme == Preferences.Themes.Light) Styles.Add(Light);
+            if (Preferences.Theme == Themes.Dark) Styles.Add(Dark);
+            else if (Preferences.Theme == Themes.Light) Styles.Add(Light);
         }
     }
 }

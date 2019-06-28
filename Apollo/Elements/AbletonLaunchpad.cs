@@ -4,6 +4,7 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
 

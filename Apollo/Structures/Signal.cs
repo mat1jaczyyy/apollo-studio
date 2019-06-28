@@ -2,17 +2,11 @@ using System;
 
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {
-        public enum BlendingType {
-            Normal,
-            Screen,
-            Multiply,
-            Mask
-        }
-
         public Launchpad Source;
         private byte _index = 11;
         private int _page = 1;
@@ -54,9 +48,9 @@ namespace Apollo.Structures {
             MultiTarget = multiTarget;
         }
 
-        public Signal(Launchpad.InputType input, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int? multiTarget = null): this(
+        public Signal(InputType input, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int? multiTarget = null): this(
             source,
-            (input == Launchpad.InputType.DrumRack)? Converter.DRtoXY(index) : index,
+            (input == InputType.DrumRack)? Converter.DRtoXY(index) : index,
             color,
             page,
             layer,

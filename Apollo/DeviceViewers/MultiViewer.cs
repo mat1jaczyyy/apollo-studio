@@ -16,11 +16,10 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Viewers;
 using Apollo.Windows;
-
-using MultiType = Apollo.Devices.Multi.MultiType;
 
 namespace Apollo.DeviceViewers {
     public class MultiViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {

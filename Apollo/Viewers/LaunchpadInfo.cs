@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
@@ -30,13 +31,13 @@ namespace Apollo.Viewers {
         ComboBox Rotation, InputFormatSelector, TargetPortSelector;
 
         public void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != Launchpad.LaunchpadType.Unknown && i.GetType() != typeof(AbletonLaunchpad) select i).ToList();
+            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown && i.GetType() != typeof(AbletonLaunchpad) select i).ToList();
 
             Launchpad target = null;
 
             if (_launchpad is AbletonLaunchpad abletonLaunchpad) {
                 target = abletonLaunchpad.Target;
-                if (target != null && (!target.Available || target.Type == Launchpad.LaunchpadType.Unknown)) ports.Add(target);
+                if (target != null && (!target.Available || target.Type == LaunchpadType.Unknown)) ports.Add(target);
             }
 
             ports.Add(MIDI.NoOutput);
@@ -86,9 +87,9 @@ namespace Apollo.Viewers {
 
         private void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
 
-        private void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (Launchpad.RotationType)Rotation.SelectedIndex;
+        private void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (RotationType)Rotation.SelectedIndex;
 
-        private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (Launchpad.InputType)InputFormatSelector.SelectedIndex;
+        private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (InputType)InputFormatSelector.SelectedIndex;
 
         private void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)TargetPortSelector.SelectedItem;

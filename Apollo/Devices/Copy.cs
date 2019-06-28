@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -103,14 +104,6 @@ namespace Apollo.Devices {
             }
         }
 
-        public enum CopyType {
-            Static,
-            Animate,
-            Interpolate,
-            RandomSingle,
-            RandomLoop
-        }
-
         private CopyType _copymode;
         public CopyType CopyMode {
             get => _copymode;
@@ -121,11 +114,6 @@ namespace Apollo.Devices {
 
                 Stop();
             }
-        }
-        
-        public enum GridType {
-            Full,
-            Square
         }
 
         private GridType _gridmode;

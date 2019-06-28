@@ -17,9 +17,8 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
-
-using PlaybackType = Apollo.Devices.Fade.PlaybackType;
 
 namespace Apollo.DeviceViewers {
     public class FadeViewer: UserControl {
@@ -322,11 +321,11 @@ namespace Apollo.DeviceViewers {
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
-            PlaybackType selected = (PlaybackType)PlaybackMode.SelectedIndex;
+            FadePlaybackType selected = (FadePlaybackType)PlaybackMode.SelectedIndex;
 
             if (_fade.PlayMode != selected) {
-                PlaybackType u = _fade.PlayMode;
-                PlaybackType r = selected;
+                FadePlaybackType u = _fade.PlayMode;
+                FadePlaybackType r = selected;
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Playback Mode Changed to {r}", () => {
@@ -339,7 +338,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetPlaybackMode(PlaybackType mode) => PlaybackMode.SelectedIndex = (int)mode;
+        public void SetPlaybackMode(FadePlaybackType mode) => PlaybackMode.SelectedIndex = (int)mode;
 
         private Action Input_Update;
 

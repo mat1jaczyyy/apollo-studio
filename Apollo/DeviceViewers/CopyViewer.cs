@@ -9,10 +9,8 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
-
-using CopyType = Apollo.Devices.Copy.CopyType;
-using GridType = Apollo.Devices.Copy.GridType;
 
 namespace Apollo.DeviceViewers {
     public class CopyViewer: UserControl {
@@ -147,7 +145,7 @@ namespace Apollo.DeviceViewers {
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
         private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
-            CopyType selected = (Copy.CopyType)CopyMode.SelectedIndex;
+            CopyType selected = (CopyType)CopyMode.SelectedIndex;
 
             if (_copy.CopyMode != selected) {
                 CopyType u = _copy.CopyMode;

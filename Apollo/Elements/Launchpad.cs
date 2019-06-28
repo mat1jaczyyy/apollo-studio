@@ -12,15 +12,12 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
-        public enum CFWIncompatibleState {
-            None, Show, Done
-        }
-
         public static CFWIncompatibleState CFWIncompatible = CFWIncompatibleState.None;
 
         public LaunchpadWindow Window;
@@ -75,21 +72,6 @@ namespace Apollo.Elements {
         public Color GetColor(int index) => (PatternWindow == null)
             ? screen.GetColor(index)
             : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
-
-        public enum LaunchpadType {
-            MK2, PRO, CFW, Unknown
-        }
-
-        public enum InputType {
-            XY, DrumRack
-        }
-
-        public enum RotationType {
-            D0,
-            D90,
-            D180,
-            D270
-        }
 
         private readonly static SysExMessage Inquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
 

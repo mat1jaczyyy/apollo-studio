@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Input;
 
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -46,14 +47,14 @@ namespace Apollo.Components {
         public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
         private bool IsPhantom(int index) {
-            if (Preferences.LaunchpadStyle == Preferences.LaunchpadStyles.Stock) {
+            if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
                 int x = index % 10;
                 int y = index / 10;
 
                 if (x == 0 || x == 9 || y == 0 || y == 9) return true;
             }
 
-            return Preferences.LaunchpadStyle == Preferences.LaunchpadStyles.Phantom;
+            return Preferences.LaunchpadStyle == LaunchpadStyles.Phantom;
         }
 
         public void SetColor(int index, SolidColorBrush color) {

@@ -2,9 +2,8 @@ using System;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
-
-using BlendingType = Apollo.Structures.Signal.BlendingType;
 
 namespace Apollo.Devices {
     public class Layer: Device {

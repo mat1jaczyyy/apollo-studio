@@ -8,8 +8,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-
-using RotateType = Apollo.Devices.Rotate.RotateType;
+using Apollo.Enums;
 
 namespace Apollo.DeviceViewers {
     public class RotateViewer: UserControl {

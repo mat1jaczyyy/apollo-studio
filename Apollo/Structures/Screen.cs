@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Apollo.Enums;
+
 namespace Apollo.Structures {
     public class Screen {
         private class Pixel {
@@ -22,11 +24,11 @@ namespace Apollo.Structures {
                 for (int i = 0; i < _signals.Count; i++) {
                     Signal signal = _signals.Values[i];
 
-                    if (signal.BlendingMode == Signal.BlendingType.Mask) break;
+                    if (signal.BlendingMode == BlendingType.Mask) break;
 
-                    ret.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == Signal.BlendingType.Multiply));
+                    ret.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == BlendingType.Multiply));
 
-                    if (signal.BlendingMode == Signal.BlendingType.Normal) break;
+                    if (signal.BlendingMode == BlendingType.Normal) break;
                 }
 
                 return ret;

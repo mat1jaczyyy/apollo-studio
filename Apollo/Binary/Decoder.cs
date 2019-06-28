@@ -8,6 +8,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
 using Apollo.Windows;
@@ -57,7 +58,7 @@ namespace Apollo.Binary {
                     Preferences.CenterTrackContents = reader.ReadBoolean();
 
                     if (version >= 9) {
-                        Preferences.LaunchpadStyle = (Preferences.LaunchpadStyles)reader.ReadInt32();
+                        Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
                     }
 
                     Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
@@ -79,9 +80,9 @@ namespace Apollo.Binary {
                     if (version >= 7) {
                         Preferences.PaletteName = reader.ReadString();
                         Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
-                        Preferences.ImportPalette = (Preferences.Palettes)reader.ReadInt32();
+                        Preferences.ImportPalette = (Palettes)reader.ReadInt32();
 
-                        Preferences.Theme = (Preferences.Themes)reader.ReadInt32();
+                        Preferences.Theme = (Themes)reader.ReadInt32();
                     }
 
                     if (version >= 10) {
@@ -176,11 +177,11 @@ namespace Apollo.Binary {
                 string name = reader.ReadString();
                 if (name == "") return MIDI.NoOutput;
 
-                Launchpad.InputType format = Launchpad.InputType.DrumRack;
-                if (version >= 2) format = (Launchpad.InputType)reader.ReadInt32();
+                InputType format = InputType.DrumRack;
+                if (version >= 2) format = (InputType)reader.ReadInt32();
 
-                Launchpad.RotationType rotation = Launchpad.RotationType.D0;
-                if (version >= 9) rotation = (Launchpad.RotationType)reader.ReadInt32();
+                RotationType rotation = RotationType.D0;
+                if (version >= 9) rotation = (RotationType)reader.ReadInt32();
 
                 foreach (Launchpad lp in MIDI.Devices)
                     if (lp.Name == name) {
@@ -218,8 +219,8 @@ namespace Apollo.Binary {
                 return new Copy(
                     time,
                     reader.ReadDecimal(),
-                    (Copy.CopyType)reader.ReadInt32(),
-                    (Copy.GridType)reader.ReadInt32(),
+                    (CopyType)reader.ReadInt32(),
+                    (GridType)reader.ReadInt32(),
                     reader.ReadBoolean(),
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
                 );
@@ -258,14 +259,14 @@ namespace Apollo.Binary {
                 return new Fade(
                     time,
                     reader.ReadDecimal(),
-                    (Fade.PlaybackType)reader.ReadInt32(),
+                    (FadePlaybackType)reader.ReadInt32(),
                     (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList(),
                     (from i in Enumerable.Range(0, count) select reader.ReadDecimal()).ToList()
                 );
 
             } else if (t == typeof(Flip))
                 return new Flip(
-                    (Flip.FlipType)reader.ReadInt32(),
+                    (FlipType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
             
@@ -296,14 +297,14 @@ namespace Apollo.Binary {
             else if (t == typeof(Layer)) {
                 int target = reader.ReadInt32();
 
-                Signal.BlendingType blending = Signal.BlendingType.Normal;
+                BlendingType blending = BlendingType.Normal;
                 if (version >= 5) {
                     if (version == 5) {
-                        blending = (Signal.BlendingType)reader.ReadInt32();
-                        if ((int)blending == 2) blending = Signal.BlendingType.Mask;
+                        blending = (BlendingType)reader.ReadInt32();
+                        if ((int)blending == 2) blending = BlendingType.Mask;
 
                     } else {
-                        blending = (Signal.BlendingType)reader.ReadInt32();
+                        blending = (BlendingType)reader.ReadInt32();
                     }
                 }
 
@@ -315,7 +316,7 @@ namespace Apollo.Binary {
             } else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
-                    (Move.GridType)reader.ReadInt32(),
+                    (GridType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
             
@@ -324,7 +325,7 @@ namespace Apollo.Binary {
                     Decode(reader, version),
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
                     reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
-                    (Multi.MultiType)reader.ReadInt32()
+                    (MultiType)reader.ReadInt32()
                 );
             
             else if (t == typeof(Output))
@@ -355,7 +356,7 @@ namespace Apollo.Binary {
 
                 decimal gate = reader.ReadDecimal();
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
-                Pattern.PlaybackType mode = (Pattern.PlaybackType)reader.ReadInt32();
+                PlaybackType mode = (PlaybackType)reader.ReadInt32();
 
                 bool chokeenabled = false;
                 int choke = 8;
@@ -401,7 +402,7 @@ namespace Apollo.Binary {
             
             else if (t == typeof(Rotate))
                 return new Rotate(
-                    (Rotate.RotateType)reader.ReadInt32(),
+                    (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
             

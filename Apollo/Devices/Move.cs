@@ -1,15 +1,11 @@
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Move: Device {
         public static readonly new string DeviceIdentifier = "move";
-
-        public enum GridType {
-            Full,
-            Square
-        }
 
         GridType _gridmode;
         public GridType GridMode {

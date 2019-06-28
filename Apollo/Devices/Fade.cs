@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -101,13 +102,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public enum PlaybackType {
-            Mono,
-            Loop
-        }
-
-        private PlaybackType _mode;
-        public PlaybackType PlayMode {
+        private FadePlaybackType _mode;
+        public FadePlaybackType PlayMode {
             get => _mode;
             set {
                 _mode = value;
@@ -204,7 +200,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(Time time = null, decimal gate = 1, PlaybackType playmode = PlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
+        public Fade(Time time = null, decimal gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
@@ -240,9 +236,9 @@ namespace Apollo.Devices {
                 Signal n = (Signal)courier.Info;
 
                 lock (locker[n]) {
-                    if (PlayMode == PlaybackType.Loop && !timers[n].Contains(courier)) return;
+                    if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(courier)) return;
 
-                    if (++buffer[n] == fade.Count - 1 && PlayMode == PlaybackType.Loop) {
+                    if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
                         Stop(n);
                         
                         for (int i = 1; i < fade.Count; i++)
@@ -266,7 +262,7 @@ namespace Apollo.Devices {
                     for (int i = 0; i < timers[n].Count; i++)
                         timers[n][i].Dispose();
                 
-                if (PlayMode == PlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
+                if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
                     Signal m = n.Clone();
                     m.Color = fade.Last().Color.Clone();
                     MIDIExit?.Invoke(m);
@@ -285,7 +281,7 @@ namespace Apollo.Devices {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
                 lock (locker[n]) {
-                    if ((PlayMode == PlaybackType.Mono && lit) || PlayMode == PlaybackType.Loop) Stop(n);
+                    if ((PlayMode == FadePlaybackType.Mono && lit) || PlayMode == FadePlaybackType.Loop) Stop(n);
 
                     if (lit) {
                         Signal m = n.Clone();

@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -41,13 +42,6 @@ namespace Apollo.Devices {
         public List<Chain> Chains = new List<Chain>();
 
         private Random RNG = new Random();
-        
-        public enum MultiType {
-            Forward,
-            Backward,
-            Random,
-            RandomPlus
-        }
 
         private MultiType _mode;
         public MultiType Mode {

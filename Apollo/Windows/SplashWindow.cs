@@ -12,6 +12,7 @@ using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Enums;
 
 namespace Apollo.Windows {
     public class SplashWindow: Window {
@@ -44,7 +45,7 @@ namespace Apollo.Windows {
         private async void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            if (Launchpad.CFWIncompatible == Launchpad.CFWIncompatibleState.Show) {
+            if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) {
                 await MessageWindow.Create(
                     "One or more connected Launchpad Pros are running an older version of the\n" + 
                     "performance-optimized custom firmware which is not compatible with\n" +
@@ -53,7 +54,7 @@ namespace Apollo.Windows {
                     "firmware to use them with Apollo Studio.",
                     null, this  
                 );
-                Launchpad.CFWIncompatible = Launchpad.CFWIncompatibleState.Done;
+                Launchpad.CFWIncompatible = CFWIncompatibleState.Done;
             }
 
             if (Program.Args?.Length > 0)
