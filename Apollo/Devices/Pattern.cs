@@ -175,6 +175,7 @@ namespace Apollo.Devices {
             Mode = mode;
             Infinite = infinite;
             RootKey = root;
+            Wrap = wrap;
             Expanded = expanded;
 
             Reroute();
