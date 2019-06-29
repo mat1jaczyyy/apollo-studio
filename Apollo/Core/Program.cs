@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -90,6 +92,35 @@ namespace Apollo.Core {
             };
 
             logTimer.Start();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { // USB Driver check
+                IEnumerable<int> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
+                    where Path.GetFileName(j).StartsWith("nvnusbaudio.inf")
+                    select Convert.ToInt32((
+                        from i in File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
+                            where i.StartsWith("DriverVer=")
+                            select i
+                    ).First().Substring(10).Split(',')[1].Split('.')[1])
+                );
+
+                if (a.Count() == 0) {
+                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
+                        $"Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
+                        "computer.\n\n" +
+                        "Please install at least version 2.7 of the driver before launching Apollo Studio."
+                    )), args);
+                    return;
+                }
+
+                if (a.Max() < 7) {
+                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
+                        $"Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
+                        "installed on your computer.\n\n" +
+                        "Please install at least version 2.7 of the driver before launching Apollo Studio."
+                    )), args);
+                    return;
+                }
+            }
 
             if (!AbletonConnector.Connected) {
                 BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(

@@ -22,6 +22,8 @@ namespace Apollo.Windows {
             #if DEBUG
                 this.AttachDevTools();
             #endif
+            
+            if (Owner == null) WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -66,7 +68,6 @@ namespace Apollo.Windows {
 
         public static async Task<string> Create(string message, string[] options, Window owner) {
             MessageWindow window = new MessageWindow(message, options) {Owner = owner};
-            if (owner == null) window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             window.Show();
             window.Owner = null;
