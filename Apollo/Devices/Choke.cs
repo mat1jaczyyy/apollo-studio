@@ -10,8 +10,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Choke: Device, IChainParent {
-        public static readonly new string DeviceIdentifier = "choke";
-
         public delegate void ChokedEventHandler(Choke sender, int index);
         public static event ChokedEventHandler Choked;
         
@@ -72,7 +70,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Choke(int target = 1, Chain chain = null): base(DeviceIdentifier) {
+        public Choke(int target = 1, Chain chain = null): base("choke") {
             Target = target;
             Chain = chain?? new Chain();
 

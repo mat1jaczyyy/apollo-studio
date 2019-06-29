@@ -14,6 +14,7 @@ using Apollo.Viewers;
 namespace Apollo.Elements {
     public abstract class Device: ISelect {
         public readonly string DeviceIdentifier;
+        public readonly string Name;
 
         public ISelectViewer IInfo {
             get => Viewer;
@@ -49,7 +50,10 @@ namespace Apollo.Elements {
 
         public abstract Device Clone();
         
-        protected Device(string device) => DeviceIdentifier = device;
+        protected Device(string identifier, string name = null) {
+            DeviceIdentifier = identifier;
+            Name = name?? this.GetType().ToString().Split(".").Last();
+        }
 
         public abstract void MIDIProcess(Signal n);
 

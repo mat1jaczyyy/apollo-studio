@@ -11,8 +11,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Output: Device {
-        public static readonly new string DeviceIdentifier = "output";
-
         public delegate void TargetChangedEventHandler(int value);
         public event TargetChangedEventHandler TargetChanged;
         
@@ -66,7 +64,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Output(int target = -1): base(DeviceIdentifier) {
+        public Output(int target = -1): base("output") {
             if (target < 0) target = Track.Get(this).ParentIndex.Value;
             _target = target;
 

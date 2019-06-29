@@ -12,8 +12,6 @@ using Apollo.Windows;
 
 namespace Apollo.Devices {
     public class Pattern: Device, ISelectParent {
-        public static readonly new string DeviceIdentifier = "pattern";        
-
         public ISelectParentViewer IViewer {
             get => Window;
         }
@@ -166,7 +164,7 @@ namespace Apollo.Devices {
 
         public int Expanded;
 
-        public Pattern(int repeats = 1, decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base(DeviceIdentifier) {
+        public Pattern(int repeats = 1, decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Repeats = repeats;

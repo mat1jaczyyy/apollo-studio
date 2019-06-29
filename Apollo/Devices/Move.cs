@@ -5,8 +5,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Move: Device {
-        public static readonly new string DeviceIdentifier = "move";
-
         GridType _gridmode;
         public GridType GridMode {
             get => _gridmode;
@@ -38,7 +36,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Move(Offset offset = null, GridType gridmode = GridType.Full, bool wrap = false): base(DeviceIdentifier) {
+        public Move(Offset offset = null, GridType gridmode = GridType.Full, bool wrap = false): base("move") {
             Offset = offset?? new Offset();
             GridMode = gridmode;
             Wrap = wrap;

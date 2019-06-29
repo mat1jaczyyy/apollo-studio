@@ -3,8 +3,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Preview: Device {
-        public static readonly new string DeviceIdentifier = "preview";
-
         private Screen screen;
 
         public override Device Clone() => new Preview() {
@@ -12,7 +10,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Preview(): base(DeviceIdentifier) => screen = new Screen() { ScreenExit = PreviewExit };
+        public Preview(): base("preview") => screen = new Screen() { ScreenExit = PreviewExit };
 
         public delegate void SignalExitedEventHandler(Signal n);
         public event SignalExitedEventHandler SignalExited;

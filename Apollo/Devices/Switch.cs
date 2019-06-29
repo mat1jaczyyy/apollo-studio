@@ -5,8 +5,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Switch: Device {
-        public static readonly new string DeviceIdentifier = "switch";
-
         private int _page = 1;
         public int Page {
             get => _page;
@@ -24,7 +22,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Switch(int page = 1): base(DeviceIdentifier) => Page = page;
+        public Switch(int page = 1): base("switch") => Page = page;
 
         public override void MIDIProcess(Signal n) {
             Program.Project.Page = Page;

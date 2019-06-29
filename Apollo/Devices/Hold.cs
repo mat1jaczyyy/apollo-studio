@@ -6,8 +6,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Hold: Device {
-        public static readonly new string DeviceIdentifier = "hold";
-
         private Time _time;
         public Time Time {
             get => _time;
@@ -80,7 +78,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Hold(Time time = null, decimal gate = 1, bool infinite = false, bool release = false): base(DeviceIdentifier) {
+        public Hold(Time time = null, decimal gate = 1, bool infinite = false, bool release = false): base("hold") {
             Time = time?? new Time();
             Gate = gate;
             Infinite = infinite;

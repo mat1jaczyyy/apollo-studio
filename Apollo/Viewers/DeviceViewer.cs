@@ -103,7 +103,7 @@ namespace Apollo.Viewers {
         public DeviceViewer(Device device) {
             InitializeComponent();
 
-            TitleText.Text = device.GetType().ToString().Split(".").Last();
+            TitleText.Text = device.Name;
 
             _device = device;
             _device.Viewer = this;

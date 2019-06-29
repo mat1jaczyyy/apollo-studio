@@ -11,8 +11,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Fade: Device {
-        public static readonly new string DeviceIdentifier = "fade";
-
         private class FadeInfo {
             public Color Color;
             public double Time;
@@ -200,7 +198,7 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(Time time = null, decimal gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base(DeviceIdentifier) {
+        public Fade(Time time = null, decimal gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base("fade") {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;

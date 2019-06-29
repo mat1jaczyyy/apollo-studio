@@ -6,8 +6,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Delay: Device {
-        public static readonly new string DeviceIdentifier = "delay";
-
         private Time _time;
         public Time Time {
             get => _time;
@@ -60,7 +58,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Delay(Time time = null, decimal gate = 1): base(DeviceIdentifier) {
+        public Delay(Time time = null, decimal gate = 1): base("delay") {
             Time = time?? new Time();
             Gate = gate;
         }

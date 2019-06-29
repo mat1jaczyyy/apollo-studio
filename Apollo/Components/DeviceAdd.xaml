@@ -12,8 +12,8 @@
       </MenuItem>
 
       <MenuItem Header="Filters">
-        <MenuItem Header="PageFilter" />
-        <MenuItem Header="KeyFilter" />
+        <MenuItem Header="Page Filter" />
+        <MenuItem Header="Key Filter" />
         <MenuItem Header="Switch" />
       </MenuItem>
 

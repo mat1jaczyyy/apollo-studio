@@ -9,8 +9,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Group: Device, IMultipleChainParent, ISelectParent {
-        public static readonly new string DeviceIdentifier = "group";
-
         public IMultipleChainParentViewer SpecificViewer {
             get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
         }
@@ -86,7 +84,7 @@ namespace Apollo.Devices {
 
         public int? Expanded { get; set; }
 
-        public Group(List<Chain> init = null, int? expanded = null): base(DeviceIdentifier) {
+        public Group(List<Chain> init = null, int? expanded = null): base("group") {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
             Expanded = expanded;
 

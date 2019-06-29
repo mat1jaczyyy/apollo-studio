@@ -7,8 +7,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class PageFilter: Device {
-        public static readonly new string DeviceIdentifier = "pagefilter";
-
         private bool[] _filter;
 
         public override Device Clone() => new PageFilter(_filter.ToArray()) {
@@ -27,7 +25,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public PageFilter(bool[] init = null): base(DeviceIdentifier) {
+        public PageFilter(bool[] init = null): base("pagefilter", "Page Filter") {
             if (init == null || init.Length != 100) {
                 init = new bool[100];
                 init[Program.Project.Page - 1] = true;

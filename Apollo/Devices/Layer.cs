@@ -7,8 +7,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Layer: Device {
-        public static readonly new string DeviceIdentifier = "layer";
-
         private int _target;
         public int Target {
             get => _target;
@@ -36,7 +34,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Layer(int target = 0, BlendingType blending = BlendingType.Normal): base(DeviceIdentifier) {
+        public Layer(int target = 0, BlendingType blending = BlendingType.Normal): base("layer") {
             Target = target;
             BlendingMode = blending;
         }

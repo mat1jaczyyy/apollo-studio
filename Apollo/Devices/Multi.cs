@@ -12,8 +12,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Multi: Device, IMultipleChainParent, ISelectParent {
-        public static readonly new string DeviceIdentifier = "multi";
-
         public IMultipleChainParentViewer SpecificViewer {
             get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
         }
@@ -110,7 +108,7 @@ namespace Apollo.Devices {
 
         public int? Expanded { get; set; }
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base(DeviceIdentifier) {
+        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);

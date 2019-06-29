@@ -68,7 +68,7 @@ namespace Apollo.Components {
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item.GetType() == typeof(MenuItem))
-                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{(string)((MenuItem)item).Header}"));
+                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{((string)((MenuItem)item).Header).Replace(" ", "")}"));
         }
 
         private void DeviceContextMenu_Click(object sender, EventArgs e) {

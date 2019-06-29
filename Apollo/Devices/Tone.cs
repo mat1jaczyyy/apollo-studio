@@ -4,8 +4,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Tone: Device {
-        public static readonly new string DeviceIdentifier = "tone";
-
         private double _h, _sh, _sl, _vh, _vl;
 
         public double Hue {
@@ -68,7 +66,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Tone(double hue = 0, double saturation_high = 1, double saturation_low = 0, double value_high = 1, double value_low = 0): base(DeviceIdentifier) {
+        public Tone(double hue = 0, double saturation_high = 1, double saturation_low = 0, double value_high = 1, double value_low = 0): base("tone") {
             Hue = hue;
 
             SaturationHigh = saturation_high;

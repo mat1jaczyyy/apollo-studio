@@ -6,8 +6,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class KeyFilter: Device {
-        public static readonly new string DeviceIdentifier = "keyfilter";
-
         private bool[] _filter;
         public bool[] Filter {
             get => _filter;
@@ -33,7 +31,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public KeyFilter(bool[] init = null): base(DeviceIdentifier) {
+        public KeyFilter(bool[] init = null): base("keyfilter", "Key Filter") {
             if (init == null || init.Length != 100) init = new bool[100];
             _filter = init;
         }

@@ -5,8 +5,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Flip: Device {
-        public static readonly new string DeviceIdentifier = "flip";
-
         private FlipType _mode;
         public FlipType Mode {
             get => _mode;
@@ -32,7 +30,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base(DeviceIdentifier) {
+        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base("flip") {
             Mode = mode;
             Bypass = bypass;
         }

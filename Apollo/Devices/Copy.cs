@@ -10,8 +10,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Copy: Device {
-        public static readonly new string DeviceIdentifier = "copy";
-        
         private Random RNG = new Random();
 
         public List<Offset> Offsets;
@@ -136,7 +134,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base(DeviceIdentifier) {
+        public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base("copy") {
             Time = time?? new Time(true, null, 500);
             Gate = gate;
             CopyMode = copymode;

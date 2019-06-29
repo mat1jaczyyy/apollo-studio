@@ -5,8 +5,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Rotate: Device {
-        public static readonly new string DeviceIdentifier = "rotate";
-
         RotateType _mode;
         public RotateType Mode {
             get => _mode;
@@ -32,7 +30,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base(DeviceIdentifier) {
+        public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base("rotate") {
             Mode = mode;
             Bypass = bypass;
         }
