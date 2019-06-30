@@ -30,7 +30,7 @@
       </LayoutTransformControl.LayoutTransform>
 
       <Grid>
-        <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="{DynamicResource PadMargin}" CornerRadius="{DynamicResource CornerRadius}" />
+        <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="{DynamicResource PadMargin}" CornerRadius="{DynamicResource CornerRadius}" x:Name="Back" />
 
         <StackPanel>
           <StackPanel.Styles>

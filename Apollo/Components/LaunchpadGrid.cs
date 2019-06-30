@@ -21,6 +21,7 @@ namespace Apollo.Components {
 
             Root = this.Get<LayoutTransformControl>("Root");
             View = this.Get<Viewbox>("View");
+            Back = this.Get<Border>("Back");
 
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
@@ -28,6 +29,7 @@ namespace Apollo.Components {
         LayoutTransformControl Root;
         Viewbox View;
         Grid Grid;
+        Border Back;
         Path[] Elements;
         Rectangle ModeLight;
 
@@ -159,7 +161,7 @@ namespace Apollo.Components {
 
             for (int i = 0; i < 100; i++) Grid.Children.Add(Elements[i]);
 
-            ModeLight.Opacity = Convert.ToInt32(!LowQuality);
+            ModeLight.Opacity = Back.Opacity = Convert.ToInt32(!LowQuality);
             
             DrawPath();
         }
