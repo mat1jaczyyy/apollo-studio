@@ -62,7 +62,7 @@
                 <StackPanel HorizontalAlignment="Center" Spacing="5">
                   <TextBlock HorizontalAlignment="Center" Text="Root Key" />
 
-                  <Components:LaunchpadGrid Scale="0.5" x:Name="RootKey" PadStarted="RootKeyStarted" PadPressed="RootKeyPressed" PadFinished="RootKeyFinished" />
+                  <Components:LaunchpadGrid Scale="0.5846" x:Name="RootKey" PadStarted="RootKeyStarted" PadPressed="RootKeyPressed" PadFinished="RootKeyFinished" />
                 
                   <CheckBox HorizontalAlignment="Center" x:Name="Wrap" Click="Wrap_Changed">Wrap</CheckBox>
                 </StackPanel>
