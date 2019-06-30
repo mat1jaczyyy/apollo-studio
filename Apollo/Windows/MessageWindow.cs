@@ -53,6 +53,8 @@ namespace Apollo.Windows {
             foreach (Window window in Application.Current.Windows)
                 if (window != this)
                     window.IsVisible = true;
+
+            this.Content = null;
         }
 
         private void Complete(object sender, EventArgs e) {

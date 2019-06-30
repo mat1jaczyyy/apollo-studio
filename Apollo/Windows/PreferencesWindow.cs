@@ -129,6 +129,8 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated -= HandlePorts;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+
+            this.Content = null;
         }
 
         private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

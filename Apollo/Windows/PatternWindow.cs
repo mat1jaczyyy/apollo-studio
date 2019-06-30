@@ -313,6 +313,8 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             ColorHistory.HistoryChanged -= RenderHistory;
 
+            this.Content = null;
+
             Program.WindowClose(this);
         }
 

@@ -68,6 +68,8 @@ namespace Apollo.Windows {
                 MIDI.Disconnect(_launchpad);
             
             _launchpad = null;
+
+            this.Content = null;
         }
 
         public void Bounds_Updated(Rect bounds) {

@@ -75,6 +75,8 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Program.Project.Undo.SavedPositionChanged -= HighlightSaved;
+
+            this.Content = null;
         }
 
         private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);

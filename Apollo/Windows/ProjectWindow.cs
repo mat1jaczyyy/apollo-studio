@@ -140,6 +140,8 @@ namespace Apollo.Windows {
             TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
             TrackContextMenu = null;
 
+            this.Content = null;
+
             Program.WindowClose(this);
         }
         

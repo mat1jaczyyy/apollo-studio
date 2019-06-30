@@ -102,6 +102,8 @@ namespace Apollo.Windows {
 
             Selection.Dispose();
 
+            this.Content = null;
+
             Program.WindowClose(this);
         }
         

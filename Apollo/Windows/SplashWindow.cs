@@ -68,6 +68,8 @@ namespace Apollo.Windows {
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
+            this.Content = null;
+
             Program.WindowClose(this);
         }
 
