@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -73,6 +74,9 @@ namespace Apollo.Devices {
             }
         }
 
+        private ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
+        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -95,19 +99,33 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-            if (n.Color.Lit != Release) {
-                if (!Infinite) {
-                    Courier courier = new Courier() {
-                        Info = new Signal(Track.Get(this)?.Launchpad, n.Index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.MultiTarget),
-                        AutoReset = false,
-                        Interval = (double)(_time * _gate),
-                    };
-                    courier.Elapsed += Tick;
-                    courier.Start();
-                }
+            Color color = n.Color.Clone();
+            n.Color = new Color(0);
+            
+            if (!locker.ContainsKey(n)) locker[n] = new object();
+            
+            lock (locker[n]) {
+                if (color.Lit && Release) buffer[n] = color;
 
-                if (Release) n.Color = new Color();
-                MIDIExit?.Invoke(n);
+                if (color.Lit != Release) {
+                    if (!Infinite) {
+                        Courier courier = new Courier() {
+                            Info = n.Clone(),
+                            AutoReset = false,
+                            Interval = (double)(_time * _gate),
+                        };
+                        courier.Elapsed += Tick;
+                        courier.Start();
+                    }
+
+                    if (Release) {
+                        color = buffer[n];
+                        buffer.TryRemove(n, out Color _);
+                    }
+
+                    n.Color = color;
+                    MIDIExit?.Invoke(n);
+                }
             }
         }
 
