@@ -62,6 +62,10 @@ namespace Apollo.Binary {
                         Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
                     }
 
+                    if (version >= 14) {
+                        Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
+                    }
+
                     Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
                     Preferences.AutoCreatePageFilter = reader.ReadBoolean();
 

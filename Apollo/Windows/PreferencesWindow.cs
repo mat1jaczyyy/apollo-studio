@@ -25,6 +25,7 @@ namespace Apollo.Windows {
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
+            LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
 
             AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
@@ -55,7 +56,7 @@ namespace Apollo.Windows {
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename;
-        ComboBox LaunchpadStyle;
+        ComboBox LaunchpadStyle, LaunchpadGridRotation;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
         Controls Contents;
@@ -87,6 +88,7 @@ namespace Apollo.Windows {
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
+            LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
 
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
@@ -139,6 +141,8 @@ namespace Apollo.Windows {
         private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
         private void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
+
+        private void LaunchpadGridRotation_Changed(object sender, EventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
 
         private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 

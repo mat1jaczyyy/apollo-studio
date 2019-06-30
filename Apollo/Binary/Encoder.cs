@@ -38,23 +38,32 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.AlwaysOnTop);
                 writer.Write(Preferences.CenterTrackContents);
                 writer.Write((int)Preferences.LaunchpadStyle);
+                writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
+
                 writer.Write(Preferences.AutoCreateKeyFilter);
                 writer.Write(Preferences.AutoCreatePageFilter);
                 writer.Write(Preferences.AutoCreatePattern);
+
                 writer.Write(Preferences.FadeSmoothnessSlider);
+
                 writer.Write(Preferences.CopyPreviousFrame);
                 writer.Write(Preferences.CaptureLaunchpad);
                 writer.Write(Preferences.EnableGestures);
+
                 writer.Write(Preferences.PaletteName);
 
                 for (int i = 0; i < 128; i++)
                     Encode(writer, Preferences.CustomPalette.BackingArray[i]);
 
                 writer.Write((int)Preferences.ImportPalette);
+
                 writer.Write((int)Preferences.Theme);
+
                 writer.Write(Preferences.Backup);
                 writer.Write(Preferences.Autosave);
+
                 writer.Write(Preferences.UndoLimit);
+                
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);
 

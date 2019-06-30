@@ -39,9 +39,13 @@
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
                 <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
                 <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-                <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto">
-                  <TextBlock Grid.Column="0" Text="Launchpad Style" />
-                  <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
+                <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" Text="On-screen Launchpad Style" />
+                  <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
+                    <ComboBoxItem>Standard</ComboBoxItem>
+                    <ComboBoxItem>Diagonal</ComboBoxItem>
+                  </ComboBox>
+                  <ComboBox Grid.Column="2" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
                     <ComboBoxItem>Stock</ComboBoxItem>
                     <ComboBoxItem>Phantom</ComboBoxItem>
                     <ComboBoxItem>Sanded</ComboBoxItem>

@@ -49,6 +49,17 @@ namespace Apollo.Core {
             }
         }
 
+        public static event Changed LaunchpadGridRotationChanged;
+        private static bool _LaunchpadGridRotation = false;
+        public static bool LaunchpadGridRotation {
+            get => _LaunchpadGridRotation;
+            set {
+                _LaunchpadGridRotation = value;
+                LaunchpadGridRotationChanged?.Invoke();
+                Save();
+            }
+        }
+
         private static bool _AutoCreateKeyFilter = true;
         public static bool AutoCreateKeyFilter {
             get => _AutoCreateKeyFilter;
