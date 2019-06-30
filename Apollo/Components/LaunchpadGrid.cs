@@ -91,7 +91,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.819 : 1);
+        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
         
         private bool _lowQuality = false;
         public bool LowQuality {
