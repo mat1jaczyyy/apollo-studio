@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Input;
 
+using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
@@ -25,15 +26,18 @@ namespace Apollo.DeviceViewers {
         PageFilter _filter;
         UniformGrid PagesGrid;
 
-        private void Set(Rectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
+        private void Set(PageRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
 
         public PageFilterViewer(PageFilter filter) {
             InitializeComponent();
 
             _filter = filter;
 
-            for (int i = 0; i < PagesGrid.Children.Count; i++)
-                Set((Rectangle)PagesGrid.Children[i], _filter[i]);
+            for (int i = 0; i < PagesGrid.Children.Count; i++) {
+                PageRectangle Rect = (PageRectangle)PagesGrid.Children[i];
+                Set(Rect, _filter[i]);
+                Rect.Index = i + 1;
+            }
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
@@ -54,6 +58,6 @@ namespace Apollo.DeviceViewers {
             _filter[index] = !_filter[index];
         }
 
-        public void Set(int index, bool value) => Set((Rectangle)PagesGrid.Children[index], value);
+        public void Set(int index, bool value) => Set((PageRectangle)PagesGrid.Children[index], value);
     }
 }
