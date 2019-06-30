@@ -138,19 +138,41 @@ namespace Apollo.Structures {
 
         public SolidColorBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());
         public SolidColorBrush ToScreenBrush() {
-            double fr = Math.Pow(_r / 63.0, 1 / 4.5);
-            double fg = Math.Pow(_g / 63.0, 1 / 4.5);
-            double fb = Math.Pow(_b / 63.0, 1 / 4.5);
+            double h, s, val;
+            (h, s, val) = ToHSV();
 
-            double max = new double[] {fr, fg, fb}.Max();
+            s = Math.Pow(s, 1.8);
+            val = Math.Pow(val, 1 / 4.5);
+
+            byte fr, fg, fb;
+
+            h /= 60;
+
+            int hi = Convert.ToInt32(Math.Floor(h)) % 6;
+            double f = h - Math.Floor(h);
+            val *= 255;
+
+            byte v = Convert.ToByte(val);
+            byte p = Convert.ToByte(val * (1 - s));
+            byte q = Convert.ToByte(val * (1 - f * s));
+            byte t = Convert.ToByte(val * (1 - (1 - f) * s));
+
+            if (hi == 0)      (fr, fg, fb) = (v, t, p);
+            else if (hi == 1) (fr, fg, fb) = (q, v, p);
+            else if (hi == 2) (fr, fg, fb) = (p, v, t);
+            else if (hi == 3) (fr, fg, fb) = (p, q, v);
+            else if (hi == 4) (fr, fg, fb) = (t, p, v);
+            else              (fr, fg, fb) = (v, p, q);
+
+            double max = new double[] {fr, fg, fb}.Max() / 255;
 
             AvaloniaColor bg = (AvaloniaColor)Application.Current.Styles.FindResource("ThemeForegroundLowColor");
 
             return new SolidColorBrush(new AvaloniaColor(
                 255,
-                (byte)(fr * 255 * max + bg.R * (1 - max)),
-                (byte)(fg * 255 * max + bg.G * (1 - max)),
-                (byte)(fb * 255 * max + bg.B * (1 - max))
+                (byte)(fr * max + bg.R * (1 - max)),
+                (byte)(fg * max + bg.G * (1 - max)),
+                (byte)(fb * max + bg.B * (1 - max))
             ));
         }
 
