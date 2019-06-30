@@ -17,156 +17,164 @@
 
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
+    <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
 
-  <StackPanel VerticalAlignment="Center" x:Name="Root" LayoutUpdated="LayoutChanged" PointerMoved="MouseMove" PointerReleased="MouseUp">
-    <StackPanel.Styles>
-      <Style Selector="Path, Rectangle">
-        <Setter Property="Cursor" Value="Hand" />
-      </Style>
+  
+  <LayoutTransformControl x:Name="Root" VerticalAlignment="Center" LayoutUpdated="LayoutChanged" PointerMoved="MouseMove" PointerReleased="MouseUp">
+    <LayoutTransformControl.LayoutTransform>
+      <RotateTransform Angle="{DynamicResource Rotation}" />
+    </LayoutTransformControl.LayoutTransform>
 
-      <Style Selector="Path.square, Path.circle, Path.corner">
-        <Setter Property="Fill" Value="Transparent" />
-        <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
-        <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
-        <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
-      </Style>
-    </StackPanel.Styles>
+    <StackPanel>
+      <StackPanel.Styles>
+        <Style Selector="Path, Rectangle">
+          <Setter Property="Cursor" Value="Hand" />
+        </Style>
 
-    <Viewbox Stretch="None">
-      <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
-        <UniformGrid.Styles>
-          <Style Selector="Path">
-            <Setter Property="Width" Value="{DynamicResource PadSize}" />
-            <Setter Property="Height" Value="{DynamicResource PadSize}" />
-          </Style>
+        <Style Selector="Path.square, Path.circle, Path.corner">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
+          <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+          <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
+        </Style>
+      </StackPanel.Styles>
 
-          <Style Selector="Path.square">
-            <Setter Property="Data" Value="{DynamicResource SquareGeometry}" />
-          </Style>
+      <Viewbox Stretch="None">
+        <UniformGrid Rows="10" Columns="10" x:Name="LaunchpadGrid">
+          <UniformGrid.Styles>
+            <Style Selector="Path">
+              <Setter Property="Width" Value="{DynamicResource PadSize}" />
+              <Setter Property="Height" Value="{DynamicResource PadSize}" />
+            </Style>
 
-          <Style Selector="Path.circle">
-            <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
-          </Style>
+            <Style Selector="Path.square">
+              <Setter Property="Data" Value="{DynamicResource SquareGeometry}" />
+            </Style>
 
-          <Style Selector="Path.empty">
-            <Setter Property="Fill" Value="Transparent" />
-          </Style>
-        </UniformGrid.Styles>
+            <Style Selector="Path.circle">
+              <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
+            </Style>
 
-        <Path Classes="empty" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="empty" />
+            <Style Selector="Path.empty">
+              <Setter Property="Fill" Value="Transparent" />
+            </Style>
+          </UniformGrid.Styles>
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="empty" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="empty" />
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="corner" PointerPressed="MouseDown" x:Name="TopLeft" />
-        <Path Classes="corner" PointerPressed="MouseDown" x:Name="TopRight" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="corner" PointerPressed="MouseDown" x:Name="BottomLeft" />
-        <Path Classes="corner" PointerPressed="MouseDown" x:Name="BottomRight" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="corner" PointerPressed="MouseDown" x:Name="TopLeft" />
+          <Path Classes="corner" PointerPressed="MouseDown" x:Name="TopRight" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="corner" PointerPressed="MouseDown" x:Name="BottomLeft" />
+          <Path Classes="corner" PointerPressed="MouseDown" x:Name="BottomRight" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="square" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-        <Path Classes="empty" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="circle" PointerPressed="MouseDown" />
-        <Path Classes="empty" />
-      </UniformGrid>
-    </Viewbox>
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="square" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
 
-    <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ThemeForegroundLowBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
-               PointerPressed="MouseDown" />
-  </StackPanel>
+          <Path Classes="empty" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="circle" PointerPressed="MouseDown" />
+          <Path Classes="empty" />
+        </UniformGrid>
+      </Viewbox>
+
+      <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ThemeForegroundLowBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
+                PointerPressed="MouseDown" />
+    </StackPanel>
+  </LayoutTransformControl>
 </UserControl>

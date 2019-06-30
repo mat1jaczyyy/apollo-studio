@@ -18,7 +18,7 @@ namespace Apollo.Components {
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
-            Root = this.Get<StackPanel>("Root");
+            Root = this.Get<LayoutTransformControl>("Root");
             Grid = this.Get<UniformGrid>("LaunchpadGrid");
 
             TopLeft = this.Get<Path>("TopLeft");
@@ -29,7 +29,7 @@ namespace Apollo.Components {
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
         
-        StackPanel Root;
+        LayoutTransformControl Root;
         UniformGrid Grid;
         Path TopLeft, TopRight, BottomLeft, BottomRight;
         Rectangle ModeLight;
@@ -87,23 +87,15 @@ namespace Apollo.Components {
         public double Scale {
             get => _scale;
             set {
-                value = Math.Max(0, value);
-                if (value != _scale) {
+                if ((value = Math.Max(0, value)) != _scale) {
                     _scale = value;
 
-                    this.Resources["PadSize"] = 15 * Scale;
-                    if (!LowQuality) this.Resources["PadThickness"] = 1 * Scale;
-                    this.Resources["PadCut1"] = 3 * Scale;
-                    this.Resources["PadCut2"] = 12 * Scale;
-                    this.Resources["ModeWidth"] = 4 * Scale;
-                    this.Resources["ModeHeight"] = 2 * Scale;
-                    this.Resources["PadMargin"] = new Thickness(1 * Scale);
-                    this.Resources["ModeMargin"] = new Thickness(0, 5 * Scale, 0, 0);
-                    
-                    DrawPath();
+                    ApplyScale();
                 }
             }
         }
+
+        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? (Math.Sqrt(2) / 2) : 1);
         
         private bool _lowQuality = false;
         public bool LowQuality {
@@ -112,10 +104,7 @@ namespace Apollo.Components {
                 if (value != _lowQuality) {
                     _lowQuality = value;
 
-                    this.Resources["PadThickness"] = LowQuality? 0 : 1 * Scale;
-                    ModeLight.Opacity = Convert.ToInt32(!LowQuality);
-                    
-                    DrawPath();
+                    ApplyScale();
                 }
             }
         }
@@ -151,10 +140,28 @@ namespace Apollo.Components {
             BottomRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
+        private void ApplyScale() {
+            this.Resources["Rotation"] = (double)((Preferences.LaunchpadGridRotation && !LowQuality)? -45 : 0);
+            this.Resources["PadSize"] = 15 * EffectiveScale;
+            this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
+            this.Resources["PadCut1"] = 3 * EffectiveScale;
+            this.Resources["PadCut2"] = 12 * EffectiveScale;
+            this.Resources["ModeWidth"] = 4 * EffectiveScale;
+            this.Resources["ModeHeight"] = 2 * EffectiveScale;
+            this.Resources["PadMargin"] = new Thickness(1 * EffectiveScale);
+            this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
+            ModeLight.Opacity = Convert.ToInt32(!LowQuality);
+            
+            DrawPath();
+        }
+
         public LaunchpadGrid() {
             InitializeComponent();
 
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
+            Preferences.LaunchpadGridRotationChanged += ApplyScale;
+
+            ApplyScale();
         }
 
         private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -165,6 +172,7 @@ namespace Apollo.Components {
             PadModsPressed = null;
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
+            Preferences.LaunchpadGridRotationChanged -= ApplyScale;
 
             Clear();
         }
