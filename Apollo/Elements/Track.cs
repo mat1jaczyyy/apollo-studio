@@ -79,16 +79,14 @@ namespace Apollo.Elements {
             ISelect last = child;
 
             while (true) {
-                if (last.GetType() == typeof(Chain) && ((Chain)last).IRoot)
-                    last = (ISelect)((Chain)last).Parent;
+                if (last is Chain chain && (chain.Parent.GetType() == typeof(Choke) || chain.IRoot))
+                    last = (ISelect)chain.Parent;
 
                 path.Add(last.IParentIndex?? -1);
 
                 if (last.GetType() == typeof(Track)) break;
-                
-                last = (last.GetType() == typeof(Chain) && ((Chain)last).Parent.GetType() == typeof(Choke))
-                    ? (ISelect)((Chain)last).Parent
-                    : (ISelect)last.IParent;
+
+                last = (ISelect)last.IParent;
             }
 
             return path;
@@ -101,9 +99,11 @@ namespace Apollo.Elements {
 
             for (int i = path.Count - 2; i > 0; i--)
                 if (path[i] == -1) ret = ((Multi)ret).Preprocess;
+                else if (ret.IChildren[path[i]] is Choke choke) ret = choke.Chain;
                 else ret = (ISelectParent)ret.IChildren[path[i]];
 
             if (path[0] == -1) return ((Multi)ret).Preprocess;
+            else if (ret.IChildren[path[0]] is Choke choke) return choke.Chain;
             else return (ISelect)ret.IChildren[path[0]];
         }
 
