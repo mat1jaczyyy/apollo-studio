@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Globalization;
 
 using Avalonia;
@@ -19,19 +20,15 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<LayoutTransformControl>("Root");
-            Grid = this.Get<UniformGrid>("LaunchpadGrid");
-
-            TopLeft = this.Get<Path>("TopLeft");
-            TopRight = this.Get<Path>("TopRight");
-            BottomLeft = this.Get<Path>("BottomLeft");
-            BottomRight = this.Get<Path>("BottomRight");
+            View = this.Get<Viewbox>("View");
 
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
         
         LayoutTransformControl Root;
-        UniformGrid Grid;
-        Path TopLeft, TopRight, BottomLeft, BottomRight;
+        Viewbox View;
+        Grid Grid;
+        Path[] Elements;
         Rectangle ModeLight;
 
         public delegate void PadChangedEventHandler(int index);
@@ -61,11 +58,8 @@ namespace Apollo.Components {
             if (index == 0 || index == 9 || index == 90 || index == 99) return;
 
             if (index == -1) ModeLight.Fill = color;
-            else if (LowQuality) ((Path)Grid.Children[index]).Fill = color;
-            else {
-
-                ((Path)Grid.Children[index]).Stroke = IsPhantom(index)? color : ((Path)Grid.Children[index]).Fill = color;
-            }
+            else if (LowQuality) Elements[index].Fill = color;
+            else Elements[index].Stroke = IsPhantom(index)? color : Elements[index].Fill = color;
         }
 
         public void Clear() {
@@ -79,7 +73,7 @@ namespace Apollo.Components {
             for (int i = 0; i < 100; i++) {
                 if (i == 0 || i == 9 || i == 90 || i == 99) continue;
 
-                ((Path)Grid.Children[i]).Fill = IsPhantom(i)? SolidColorBrush.Parse("Transparent") : ((Path)Grid.Children[i]).Stroke;
+                Elements[i].Fill = IsPhantom(i)? SolidColorBrush.Parse("Transparent") : Elements[i].Stroke;
             }
         }
 
@@ -95,7 +89,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? (Math.Sqrt(2) / 2) : 1);
+        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.819 : 1);
         
         private bool _lowQuality = false;
         public bool LowQuality {
@@ -134,10 +128,10 @@ namespace Apollo.Components {
             this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
             this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
 
-            TopLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
-            TopRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
-            BottomLeft.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
-            BottomRight.Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
+            Elements[44].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
+            Elements[45].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
+            Elements[54].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
+            Elements[55].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
         private void ApplyScale() {
@@ -150,6 +144,18 @@ namespace Apollo.Components {
             this.Resources["ModeHeight"] = 2 * EffectiveScale;
             this.Resources["PadMargin"] = new Thickness(1 * EffectiveScale);
             this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
+
+            string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select 17 * EffectiveScale).ToArray());
+
+            for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
+
+            View.Child = Grid = new Grid() {
+                RowDefinitions = RowDefinitions.Parse(GridDefinitions),
+                ColumnDefinitions = ColumnDefinitions.Parse(GridDefinitions)
+            };
+
+            for (int i = 0; i < 100; i++) Grid.Children.Add(Elements[i]);
+
             ModeLight.Opacity = Convert.ToInt32(!LowQuality);
             
             DrawPath();
@@ -157,6 +163,31 @@ namespace Apollo.Components {
 
         public LaunchpadGrid() {
             InitializeComponent();
+
+            View.Child = Grid = new Grid() {
+                RowDefinitions = RowDefinitions.Parse("*,*,*,*,*,*,*,*,*,*"),
+                ColumnDefinitions = ColumnDefinitions.Parse("*,*,*,*,*,*,*,*,*,*")
+            };
+
+            Elements = new Path[100];
+            for (int i = 0; i < 100; i++) {
+                Grid.Children.Add(Elements[i] = new Path());
+
+                int x = i % 10;
+                int y = i / 10;
+
+                Grid.SetRow(Elements[i], y);
+                Grid.SetColumn(Elements[i], x);
+
+                if (i == 0 || i == 9 || i == 90 || i == 99) Elements[i].Classes.Add("empty");
+                else {
+                    Elements[i].PointerPressed += MouseDown;
+
+                    if (x == 0 || x == 9 || y == 0 || y == 9) Elements[i].Classes.Add("circle");
+                    else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
+                    else Elements[i].Classes.Add("square");
+                }
+            }
 
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged += ApplyScale;
@@ -170,6 +201,10 @@ namespace Apollo.Components {
             PadPressed = null;
             PadReleased = null;
             PadModsPressed = null;
+
+            for (int i = 0; i < 100; i++)
+                if (!(i == 0 || i == 9 || i == 90 || i == 99)) 
+                    Elements[i].PointerPressed -= MouseDown;
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged -= ApplyScale;
@@ -194,7 +229,7 @@ namespace Apollo.Components {
                 e.Device.Capture(Root);
                 Root.Cursor = new Cursor(StandardCursorType.Hand);
 
-                PadStarted?.Invoke(Grid.Children.IndexOf((IControl)sender));
+                PadStarted?.Invoke(Array.IndexOf(Elements, (IControl)sender));
                 MouseMove(sender, e);
             }
         }
@@ -202,7 +237,7 @@ namespace Apollo.Components {
         private void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 MouseMove(sender, e);
-                PadFinished?.Invoke(Grid.Children.IndexOf((IControl)sender));
+                PadFinished?.Invoke(Array.IndexOf(Elements, (IControl)sender));
 
                 mouseHeld = false;
                 if (mouseOver != null) MouseLeave(mouseOver);
@@ -214,12 +249,12 @@ namespace Apollo.Components {
         }
 
         private void MouseEnter(Shape control, InputModifiers mods) {
-            int index = Grid.Children.IndexOf((IControl)control);
+            int index = Array.IndexOf(Elements, (IControl)control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
         }
 
-        private void MouseLeave(Shape control) => PadReleased?.Invoke(Grid.Children.IndexOf((IControl)control));
+        private void MouseLeave(Shape control) => PadReleased?.Invoke(Array.IndexOf(Elements, (IControl)control));
 
         private void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
