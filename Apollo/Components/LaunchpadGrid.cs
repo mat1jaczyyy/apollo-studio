@@ -136,14 +136,17 @@ namespace Apollo.Components {
 
         private void ApplyScale() {
             this.Resources["Rotation"] = (double)((Preferences.LaunchpadGridRotation && !LowQuality)? -45 : 0);
+            this.Resources["CanvasSize"] = 184 * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
             this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
             this.Resources["PadCut1"] = 3 * EffectiveScale;
             this.Resources["PadCut2"] = 12 * EffectiveScale;
             this.Resources["ModeWidth"] = 4 * EffectiveScale;
             this.Resources["ModeHeight"] = 2 * EffectiveScale;
+            this.Resources["TopMargin"] = new Thickness(7 * EffectiveScale, 7 * EffectiveScale, 7 * EffectiveScale, 0);
             this.Resources["PadMargin"] = new Thickness(1 * EffectiveScale);
             this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
+            this.Resources["CornerRadius"] = new CornerRadius(1 * EffectiveScale);
 
             string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select 17 * EffectiveScale).ToArray());
 

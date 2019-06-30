@@ -19,7 +19,7 @@
     <Color x:Key="ThemeControlHighlightMidColor">#FF7D7D7D</Color>
     <Color x:Key="ThemeControlHighlightHighColor">#FFAFAFAF</Color>
     <Color x:Key="ThemeForegroundColor">#FF232323</Color>
-    <Color x:Key="ThemeForegroundLowColor">#FF808080</Color>
+    <Color x:Key="ThemeForegroundLowColor">#FFA0A0A0</Color>
     <Color x:Key="ThemeButtonDownColor">#FF505050</Color>
     <Color x:Key="ThemeButtonOverColor">#FF404040</Color>
     <Color x:Key="ThemeButtonEnabledColor">#FF606060</Color>

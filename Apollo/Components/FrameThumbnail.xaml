@@ -6,7 +6,7 @@
              DetachedFromVisualTree="Unloaded">
 
   <StackPanel Spacing="2" Background="Transparent" Orientation="Horizontal" PointerReleased="Click">
-    <Components:LaunchpadGrid VerticalAlignment="Center" Margin="0 3 0 0" Scale="0.05" LowQuality="true" x:Name="Launchpad" />
+    <Components:LaunchpadGrid VerticalAlignment="Center" Scale="0.05882" LowQuality="true" x:Name="Launchpad" />
     <TextBlock VerticalAlignment="Center" x:Name="Time" />
   </StackPanel>
 </UserControl>

@@ -6,62 +6,71 @@
              DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
+    <sys:Double x:Key="CanvasSize">184</sys:Double>
     <sys:Double x:Key="PadSize">15</sys:Double>
     <sys:Double x:Key="PadThickness">1</sys:Double>
     <sys:Double x:Key="PadCut1">3</sys:Double>
     <sys:Double x:Key="PadCut2">12</sys:Double>
     <sys:Double x:Key="ModeWidth">4</sys:Double>
     <sys:Double x:Key="ModeHeight">2</sys:Double>
+    <Thickness x:Key="TopMargin">7 7 7 0</Thickness>
     <Thickness x:Key="PadMargin">1</Thickness>
     <Thickness x:Key="ModeMargin">0 5 0 0</Thickness>
+    <CornerRadius x:Key="CornerRadius">1</CornerRadius>
 
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
     <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
   
-  <LayoutTransformControl x:Name="Root" VerticalAlignment="Center" LayoutUpdated="LayoutChanged" PointerMoved="MouseMove" PointerReleased="MouseUp">
-    <LayoutTransformControl.LayoutTransform>
-      <RotateTransform Angle="{DynamicResource Rotation}" />
-    </LayoutTransformControl.LayoutTransform>
+  <Canvas Width="{DynamicResource CanvasSize}" Height="{DynamicResource CanvasSize}" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <LayoutTransformControl x:Name="Root" HorizontalAlignment="Center" VerticalAlignment="Center" LayoutUpdated="LayoutChanged" PointerMoved="MouseMove" PointerReleased="MouseUp">
+      <LayoutTransformControl.LayoutTransform>
+        <RotateTransform Angle="{DynamicResource Rotation}" />
+      </LayoutTransformControl.LayoutTransform>
 
-    <StackPanel>
-      <StackPanel.Styles>
-        <Style Selector="Path, Rectangle">
-          <Setter Property="Cursor" Value="Hand" />
-        </Style>
+      <Grid>
+        <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="{DynamicResource PadMargin}" CornerRadius="{DynamicResource CornerRadius}" />
 
-        <Style Selector="Path.square, Path.circle, Path.corner">
-          <Setter Property="Fill" Value="Transparent" />
-          <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
-          <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
-          <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
-        </Style>
-      </StackPanel.Styles>
+        <StackPanel>
+          <StackPanel.Styles>
+            <Style Selector="Path, Rectangle">
+              <Setter Property="Cursor" Value="Hand" />
+            </Style>
 
-      <Viewbox Stretch="None" x:Name="View">
-        <Viewbox.Styles>
-          <Style Selector="Path">
-            <Setter Property="Width" Value="{DynamicResource PadSize}" />
-            <Setter Property="Height" Value="{DynamicResource PadSize}" />
-          </Style>
+            <Style Selector="Path.square, Path.circle, Path.corner">
+              <Setter Property="Fill" Value="Transparent" />
+              <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
+              <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+              <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
+            </Style>
+          </StackPanel.Styles>
 
-          <Style Selector="Path.square">
-            <Setter Property="Data" Value="{DynamicResource SquareGeometry}" />
-          </Style>
+          <Viewbox Margin="{DynamicResource TopMargin}" Stretch="None" x:Name="View">
+            <Viewbox.Styles>
+              <Style Selector="Path">
+                <Setter Property="Width" Value="{DynamicResource PadSize}" />
+                <Setter Property="Height" Value="{DynamicResource PadSize}" />
+              </Style>
 
-          <Style Selector="Path.circle">
-            <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
-          </Style>
+              <Style Selector="Path.square">
+                <Setter Property="Data" Value="{DynamicResource SquareGeometry}" />
+              </Style>
 
-          <Style Selector="Path.empty">
-            <Setter Property="Fill" Value="Transparent" />
-          </Style>
-        </Viewbox.Styles>
-      </Viewbox>
+              <Style Selector="Path.circle">
+                <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
+              </Style>
 
-      <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ThemeForegroundLowBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
-                PointerPressed="MouseDown" />
-    </StackPanel>
-  </LayoutTransformControl>
+              <Style Selector="Path.empty">
+                <Setter Property="Fill" Value="Transparent" />
+              </Style>
+            </Viewbox.Styles>
+          </Viewbox>
+
+          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ThemeForegroundLowBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
+                    PointerPressed="MouseDown" />
+        </StackPanel>
+      </Grid>
+    </LayoutTransformControl>
+  </Canvas>
 </UserControl>
