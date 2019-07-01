@@ -150,7 +150,8 @@ namespace Apollo.Components {
             this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
             this.Resources["CornerRadius"] = new CornerRadius(1 * EffectiveScale);
 
-            string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select 17 * EffectiveScale).ToArray());
+            string gridSize = (17 * EffectiveScale).ToString(CultureInfo.InvariantCulture);
+            string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select gridSize).ToArray());
 
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
 
