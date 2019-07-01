@@ -45,9 +45,11 @@ namespace Apollo.Components {
         }
 
         public void SetColor(Color color) {
-            _color = color;
-            Preview.Fill = Color.ToBrush();
-            InitCanvas();
+            if (_color != color) {
+                _color = color;
+                Preview.Fill = Color.ToScreenBrush();
+                InitCanvas();
+            }
         }
 
         Ellipse Preview;
