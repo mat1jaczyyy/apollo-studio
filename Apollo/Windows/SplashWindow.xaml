@@ -46,7 +46,15 @@
           </TabItem>
           
           <TabItem Header="News">
-            <TextBlock Text="Test 2" />
+            <Grid RowDefinitions="*,*">
+              <StackPanel Grid.Row="0">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Blogpost" />
+              </StackPanel>
+              
+              <StackPanel Grid.Row="1">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Update Changelog" />
+              </StackPanel>
+            </Grid>
           </TabItem>
         </TabControl>
       </Grid>
