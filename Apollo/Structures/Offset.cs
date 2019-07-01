@@ -3,7 +3,7 @@ namespace Apollo.Structures {
         public delegate void ChangedEventHandler(Offset sender);
         public event ChangedEventHandler Changed;
 
-        private int _x = 0;
+        int _x = 0;
         public int X {
             get => _x;
             set {
@@ -14,7 +14,7 @@ namespace Apollo.Structures {
             }
         }
 
-        private int _y = 0;
+        int _y = 0;
         public int Y {
             get => _y;
             set {

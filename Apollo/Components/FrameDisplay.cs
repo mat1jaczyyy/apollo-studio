@@ -20,7 +20,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class FrameDisplay: UserControl, ISelectViewer {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<StackPanel>("DropZone");
@@ -45,7 +45,7 @@ namespace Apollo.Components {
         public VerticalAdd FrameAdd;
         ContextMenu FrameContextMenu;
 
-        private void ApplyHeaderBrush(IBrush brush) {
+        void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
             else this.Resources["BackgroundBrush"] = brush;
         }
@@ -74,7 +74,7 @@ namespace Apollo.Components {
             this.AddHandler(DragDrop.DropEvent, Drop);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             FrameAdded = null;
             FrameRemoved = null;
             FrameSelected = null;
@@ -87,9 +87,9 @@ namespace Apollo.Components {
             FrameContextMenu = null;
         }
 
-        private void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
+        void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
-        private void ContextMenu_Click(object sender, EventArgs e) {
+        void ContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -97,7 +97,7 @@ namespace Apollo.Components {
                 _pattern.Window?.Selection.Action((string)((MenuItem)item).Header);
         }
 
-        private void Select(PointerPressedEventArgs e) {
+        void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
                 _pattern.Window?.Selection.Select(Viewer.Frame, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }
@@ -191,7 +191,7 @@ namespace Apollo.Components {
             } else e.DragEffects = DragDropEffects.None;
         }
         
-        private void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);
-        private void Frame_Remove() => FrameRemoved?.Invoke(Viewer.Frame.ParentIndex.Value);
+        void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);
+        void Frame_Remove() => FrameRemoved?.Invoke(Viewer.Frame.ParentIndex.Value);
     }
 }

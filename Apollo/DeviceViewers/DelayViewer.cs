@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class DelayViewer: UserControl {
         public static readonly string DeviceIdentifier = "delay";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Duration = this.Get<Dial>("Duration");
@@ -36,7 +36,7 @@ namespace Apollo.DeviceViewers {
             Gate.RawValue = (double)_delay.Gate * 100;
         }
 
-        private void Duration_Changed(double value, double? old) {
+        void Duration_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -52,11 +52,11 @@ namespace Apollo.DeviceViewers {
             _delay.Time.Free = (int)value;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
-        private void Duration_ModeChanged(bool value, bool? old) {
+        void Duration_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
@@ -74,7 +74,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
-        private void Duration_StepChanged(int value, int? old) {
+        void Duration_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
@@ -90,7 +90,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
-        private void Gate_Changed(double value, double? old) {
+        void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);

@@ -11,7 +11,7 @@ namespace Apollo.Structures {
         public delegate void ModeChangedEventHandler(bool mode);
         public event ModeChangedEventHandler ModeChanged;
 
-        private int _min = 0;
+        int _min = 0;
         public int Minimum {
             get => _min;
             set {
@@ -22,7 +22,7 @@ namespace Apollo.Structures {
             }
         }
         
-        private int _max = int.MaxValue;
+        int _max = int.MaxValue;
         public int Maximum {
             get => _max;
             set {
@@ -33,7 +33,7 @@ namespace Apollo.Structures {
             }
         }
 
-        private int _free;
+        int _free;
         public int Free {
             get => _free;
             set {
@@ -44,7 +44,7 @@ namespace Apollo.Structures {
             }
         }
 
-        private bool _mode; // true uses Length
+        bool _mode; // true uses Length
         public bool Mode {
             get => _mode;
             set {
@@ -56,7 +56,7 @@ namespace Apollo.Structures {
         }
 
         public Length Length;
-        private void LengthChanged() => StepChanged?.Invoke(Length);
+        void LengthChanged() => StepChanged?.Invoke(Length);
 
         public Time Clone() => new Time(_mode, Length.Clone(), _free) {
             Minimum = Minimum,

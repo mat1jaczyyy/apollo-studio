@@ -10,7 +10,7 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class VerticalAdd: AddButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
@@ -27,7 +27,7 @@ namespace Apollo.Components {
             None, Paste, PasteAndImport
         }
 
-        private AvailableActions _actions = AvailableActions.None;
+        AvailableActions _actions = AvailableActions.None;
         public AvailableActions Actions {
             get => _actions;
             set {
@@ -71,7 +71,7 @@ namespace Apollo.Components {
             base.Unloaded(sender, e);
         }
 
-        private void ActionContextMenu_Click(object sender, EventArgs e) {
+        void ActionContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 

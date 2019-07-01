@@ -19,7 +19,7 @@ namespace Apollo.Helpers {
 
         static Dictionary<IPEndPoint, AbletonLaunchpad> portMap = new Dictionary<IPEndPoint, AbletonLaunchpad>();
 
-        private static void Receive(IAsyncResult result) {
+        static void Receive(IAsyncResult result) {
             if (connection == null || result == null) return;
 
             IPEndPoint source = null;

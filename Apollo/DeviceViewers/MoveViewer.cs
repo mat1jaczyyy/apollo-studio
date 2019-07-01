@@ -15,7 +15,7 @@ namespace Apollo.DeviceViewers {
     public class MoveViewer: UserControl {
         public static readonly string DeviceIdentifier = "move";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Offset = this.Get<MoveDial>("Offset");
@@ -43,13 +43,13 @@ namespace Apollo.DeviceViewers {
             Wrap.IsChecked = _move.Wrap;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Offset.Changed -= Offset_Changed;
 
             _move = null;
         }
 
-        private void Offset_Changed(int x, int y, int? old_x, int? old_y) {
+        void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             _move.Offset.X = x;
             _move.Offset.Y = y;
 
@@ -79,7 +79,7 @@ namespace Apollo.DeviceViewers {
             Offset.Y = y;
         }
         
-        private void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
+        void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
             GridType selected = (GridType)GridMode.SelectedIndex;
 
             if (_move.GridMode != selected) {
@@ -99,7 +99,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
-        private void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, EventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_move.Wrap != value) {

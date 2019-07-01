@@ -29,7 +29,7 @@ namespace Apollo.DeviceViewers {
             get => _group.Expanded;
         }
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Contents = this.Get<StackPanel>("Contents").Children;
@@ -45,7 +45,7 @@ namespace Apollo.DeviceViewers {
         Controls Contents;
         VerticalAdd ChainAdd;
 
-        private void SetAlwaysShowing() {
+        void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
             for (int i = 1; i < Contents.Count; i++)
@@ -98,7 +98,7 @@ namespace Apollo.DeviceViewers {
             if (_group.Expanded != null) Expand_Insert(_group.Expanded.Value);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -110,7 +110,7 @@ namespace Apollo.DeviceViewers {
             _root = null;
         }
 
-        private void Expand_Insert(int index) {
+        void Expand_Insert(int index) {
             _root.Insert(1, new ChainViewer(_group[index], true));
             _root.Insert(2, new DeviceTail(_group, _parent));
 
@@ -119,7 +119,7 @@ namespace Apollo.DeviceViewers {
             ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
         }
 
-        private void Expand_Remove() {
+        void Expand_Remove() {
             _root.RemoveAt(2);
             _root.RemoveAt(1);
 
@@ -143,7 +143,7 @@ namespace Apollo.DeviceViewers {
             _group.Expanded = index;
         }
 
-        private void Chain_Insert(int index) {
+        void Chain_Insert(int index) {
             Chain chain = new Chain();
             if (Preferences.AutoCreatePageFilter) chain.Add(new PageFilter());
             if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
@@ -152,9 +152,9 @@ namespace Apollo.DeviceViewers {
             Chain_Insert(index, chain);
         }
 
-        private void Chain_InsertStart() => Chain_Insert(0);
+        void Chain_InsertStart() => Chain_Insert(0);
 
-        private void Chain_Insert(int index, Chain chain) {
+        void Chain_Insert(int index, Chain chain) {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
@@ -167,10 +167,10 @@ namespace Apollo.DeviceViewers {
             _group.Insert(index, chain);
         }
 
-        private void Chain_Action(string action) => Chain_Action(action, false);
-        private void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
+        void Chain_Action(string action) => Chain_Action(action, false);
+        void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
 
-        private void ChainContextMenu_Click(object sender, EventArgs e) {
+        void ChainContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -178,19 +178,19 @@ namespace Apollo.DeviceViewers {
                 Chain_Action((string)((MenuItem)item).Header, true);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right)
                 ChainContextMenu.Open((Control)sender);
 
             e.Handled = true;
         }
 
-        private void DragOver(object sender, DragEventArgs e) {
+        void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
-        private void Drop(object sender, DragEventArgs e) {
+        void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
             
             IControl source = (IControl)e.Source;
@@ -319,7 +319,7 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+        void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Chain> pasted;
             try {
                 pasted = paste.Contents.Cast<Chain>().ToList();

@@ -12,7 +12,7 @@ using Avalonia.Threading;
 
 namespace Apollo.Components {
     public class MoveDial: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             PlaneCanvas = this.Get<Canvas>("PlaneCanvas");
@@ -35,7 +35,7 @@ namespace Apollo.Components {
         TextBlock TitleText, Display;
         TextBox InputX, InputY;
 
-        private int _x = 0;
+        int _x = 0;
         public int X {
             get => _x;
             set {
@@ -49,7 +49,7 @@ namespace Apollo.Components {
             }
         }
 
-        private int _y = 0;
+        int _y = 0;
         public int Y {
             get => _y;
             set {
@@ -63,7 +63,7 @@ namespace Apollo.Components {
             }
         }
 
-        private string _title = "Dial";
+        string _title = "Dial";
         public string Title {
             get => _title;
             set {
@@ -71,21 +71,21 @@ namespace Apollo.Components {
             }
         }
 
-        private string ValueString => $"({_x}, {_y})";
+        string ValueString => $"({_x}, {_y})";
 
-        private void DrawPoint() {
+        void DrawPoint() {
             Canvas.SetLeft(Point, 18 + 2 * _x);
             Canvas.SetTop(Point, 18 - 2 * _y);
 
             Display.Text = ValueString;
         }
 
-        private void DrawX() {
+        void DrawX() {
             XRect.Width = Math.Abs(2 * _x) + 2;
             Canvas.SetLeft(XRect, (_x > 0)? 18 : 20 - XRect.Width);
         }
 
-        private void DrawY() {
+        void DrawY() {
             YRect.Height = Math.Abs(2 * _y) + 2;
             Canvas.SetTop(YRect, (_y < 0)? 18 : 20 - YRect.Height);
         }
@@ -104,18 +104,18 @@ namespace Apollo.Components {
             DrawPoint();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Changed = null;
 
             InputX.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
             InputY.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
         }
 
-        private bool mouseHeld = false;
-        private int old_x, old_y;
-        private double lastX, lastY;
+        bool mouseHeld = false;
+        int old_x, old_y;
+        double lastX, lastY;
 
-        private void MouseDown(object sender, PointerPressedEventArgs e) {
+        void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 if (e.ClickCount == 2) {
                     DisplayPressed(sender, e);
@@ -134,7 +134,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+        void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
                 e.Device.Capture(null);
@@ -146,7 +146,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseMove(object sender, PointerEventArgs e) {
+        void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
                 double x = e.GetPosition(PlaneCanvas).X;
                 double y = e.GetPosition(PlaneCanvas).Y;
@@ -163,12 +163,12 @@ namespace Apollo.Components {
             }
         }
 
-        private Action InputX_Update = null, InputY_Update = null;
+        Action InputX_Update = null, InputY_Update = null;
 
-        private void InputX_Changed(string text) => X = Input_Changed(InputX, InputX_Update, X, text);
-        private void InputY_Changed(string text) => Y = Input_Changed(InputY, InputY_Update, Y, text);
+        void InputX_Changed(string text) => X = Input_Changed(InputX, InputX_Update, X, text);
+        void InputY_Changed(string text) => Y = Input_Changed(InputY, InputY_Update, Y, text);
 
-        private int Input_Changed(TextBox Input, Action Update, int RawValue, string text) {
+        int Input_Changed(TextBox Input, Action Update, int RawValue, string text) {
             if (text == null) return RawValue;
             if (text == "") return RawValue;
 
@@ -204,7 +204,7 @@ namespace Apollo.Components {
             return RawValue;
         }
 
-        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+        void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 InputX.Text = X.ToString(CultureInfo.InvariantCulture);
                 InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
@@ -225,7 +225,7 @@ namespace Apollo.Components {
 
         bool SkipLostFocus = false;
         
-        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+        void Input_LostFocus(object sender, RoutedEventArgs e) {
             if (SkipLostFocus) {
                 SkipLostFocus = false;
                 return;
@@ -244,16 +244,16 @@ namespace Apollo.Components {
                 Changed?.Invoke(X, Y, old_x, old_y);
         }
 
-        private void Input_KeyDown(object sender, KeyEventArgs e) {
+        void Input_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Input_MouseDown(object sender, PointerPressedEventArgs e) {
+        void Input_MouseDown(object sender, PointerPressedEventArgs e) {
             TextBox Input = (TextBox)sender;
 
             if (!Input.IsFocused) {
@@ -262,6 +262,6 @@ namespace Apollo.Components {
             }
         }
 
-        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

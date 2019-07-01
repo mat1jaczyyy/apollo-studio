@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class LayerViewer: UserControl {
         public static readonly string DeviceIdentifier = "layer";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Target = this.Get<Dial>("Target");
@@ -35,9 +35,9 @@ namespace Apollo.DeviceViewers {
             BlendingMode.SelectedIndex = (int)_layer.BlendingMode;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
 
-        private void Target_Changed(double value, double? old) {
+        void Target_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -55,7 +55,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetTarget(int value) => Target.RawValue = value;
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+        void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             BlendingType selected = (BlendingType)BlendingMode.SelectedIndex;
 
             if (_layer.BlendingMode != selected) {

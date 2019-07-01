@@ -15,7 +15,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _bypass;
+        bool _bypass;
         public bool Bypass {
             get => _bypass;
             set {

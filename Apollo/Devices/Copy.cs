@@ -10,7 +10,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Copy: Device {
-        private Random RNG = new Random();
+        Random RNG = new Random();
 
         public List<Offset> Offsets;
 
@@ -28,11 +28,11 @@ namespace Apollo.Devices {
             Offsets.RemoveAt(index);
         }
 
-        private void OffsetChanged(Offset sender) {
+        void OffsetChanged(Offset sender) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
         }
 
-        private Time _time;
+        Time _time;
         public Time Time {
             get => _time;
             set {
@@ -55,19 +55,19 @@ namespace Apollo.Devices {
             }
         }
 
-        private void FreeChanged(int value) {
+        void FreeChanged(int value) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateValue(value);
         }
 
-        private void ModeChanged(bool value) {
+        void ModeChanged(bool value) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetMode(value);
         }
 
-        private void StepChanged(Length value) {
+        void StepChanged(Length value) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
 
-        private decimal _gate;
+        decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
@@ -79,7 +79,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _wrap;
+        bool _wrap;
         public bool Wrap {
             get => _wrap;
             set {
@@ -89,7 +89,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private class PolyInfo {
+        class PolyInfo {
             public Signal n;
             public int index = 0;
             public object locker = new object();
@@ -102,7 +102,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private CopyType _copymode;
+        CopyType _copymode;
         public CopyType CopyMode {
             get => _copymode;
             set {
@@ -114,7 +114,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private GridType _gridmode;
+        GridType _gridmode;
         public GridType GridMode {
             get => _gridmode;
             set {
@@ -124,10 +124,10 @@ namespace Apollo.Devices {
             }
         }
 
-        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        private ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
-        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
+        HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
@@ -143,9 +143,9 @@ namespace Apollo.Devices {
             Offsets = offsets?? new List<Offset>();
         }
         
-        private int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
-        private bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
+        bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
             x = index % 10;
             y = index / 10;
 
@@ -160,7 +160,7 @@ namespace Apollo.Devices {
             return Validate(x, y, out result);
         }
 
-        private bool Validate(int x, int y, out int result) {
+        bool Validate(int x, int y, out int result) {
             if (Wrap) {
                 x = ApplyWrap(x);
                 y = ApplyWrap(y);
@@ -184,7 +184,7 @@ namespace Apollo.Devices {
             return false;
         }
 
-        private void FireCourier(PolyInfo info, decimal time) {
+        void FireCourier(PolyInfo info, decimal time) {
             Courier courier;
 
             info.timers.Add(courier = new Courier() {
@@ -196,7 +196,7 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
-        private void FireCourier((Signal n, List<int>) info, decimal time) {
+        void FireCourier((Signal n, List<int>) info, decimal time) {
             Courier courier = timers[info.n] = new Courier() {
                 Info = info,
                 AutoReset = false,
@@ -206,7 +206,7 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
-        private void Tick(object sender, EventArgs e) {
+        void Tick(object sender, EventArgs e) {
             if (Disposed) return;
 
             Courier courier = (Courier)sender;
@@ -234,7 +234,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private void HandleRandomLoop(Signal original, List<int> offsets) {
+        void HandleRandomLoop(Signal original, List<int> offsets) {
             Signal n = original.Clone();
             Signal m = original.Clone();
             n.Color = new Color();

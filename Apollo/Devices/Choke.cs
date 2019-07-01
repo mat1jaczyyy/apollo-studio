@@ -13,7 +13,7 @@ namespace Apollo.Devices {
         public delegate void ChokedEventHandler(Choke sender, int index);
         public static event ChokedEventHandler Choked;
         
-        private int _target = 1;
+        int _target = 1;
         public int Target {
             get => _target;
             set {
@@ -25,7 +25,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private Chain _chain;
+        Chain _chain;
         public Chain Chain {
             get => _chain;
             set {
@@ -49,7 +49,7 @@ namespace Apollo.Devices {
         object locker = new object();
         ConcurrentDictionary<(int, int), Signal> signals = new ConcurrentDictionary<(int, int), Signal>();
 
-        private void HandleChoke(Choke sender, int index) {
+        void HandleChoke(Choke sender, int index) {
             if (Target == index && sender != this && !choked) {
                 choked = true;
                 Chain.MIDIEnter(new StopSignal());
@@ -77,7 +77,7 @@ namespace Apollo.Devices {
             Choked += HandleChoke;
         }
 
-        private void ChainExit(Signal n) {
+        void ChainExit(Signal n) {
             if (!choked) {
                 MIDIExit?.Invoke(n.Clone());
                 

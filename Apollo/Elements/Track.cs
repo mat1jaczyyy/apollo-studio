@@ -34,7 +34,7 @@ namespace Apollo.Elements {
         public delegate void DisposingEventHandler();
         public event DisposingEventHandler Disposing;
 
-        private int? _ParentIndex;
+        int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
             set {
@@ -108,7 +108,7 @@ namespace Apollo.Elements {
         }
 
         public Chain Chain;
-        private Launchpad _launchpad;
+        Launchpad _launchpad;
 
         public Launchpad Launchpad {
             get => _launchpad;
@@ -124,7 +124,7 @@ namespace Apollo.Elements {
             }
         }
         
-        private string _name;
+        string _name;
         public string Name {
             get => _name;
             set {
@@ -144,7 +144,7 @@ namespace Apollo.Elements {
             }
         }
 
-        private bool _enabled = true;
+        bool _enabled = true;
         public bool Enabled {
             get => _enabled;
             set {
@@ -168,9 +168,9 @@ namespace Apollo.Elements {
             Name = name;
         }
 
-        private void ChainExit(Signal n) => n.Source?.Render(n);
+        void ChainExit(Signal n) => n.Source?.Render(n);
 
-        private void MIDIEnter(Signal n) {
+        void MIDIEnter(Signal n) {
             if (Enabled) Chain?.MIDIEnter(n);
         }
 

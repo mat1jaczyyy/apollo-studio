@@ -33,7 +33,7 @@ namespace Apollo.Elements {
 
         public List<Track> Tracks;
 
-        private int _bpm;
+        int _bpm;
         public int BPM {
             get => _bpm;
             set {
@@ -49,7 +49,7 @@ namespace Apollo.Elements {
         public delegate void PathChangedEventHandler();
         public event PathChangedEventHandler PathChanged;
 
-        private string _path;
+        string _path;
         public string FilePath {
             get => _path;
             set {
@@ -65,7 +65,7 @@ namespace Apollo.Elements {
         public delegate void PageChangedEventHandler();
         public event PageChangedEventHandler PageChanged;
 
-        private int _page;
+        int _page;
         public int Page {
             get => _page;
             set {
@@ -140,7 +140,7 @@ namespace Apollo.Elements {
         public delegate void TrackCountChangedEventHandler(int value);
         public event TrackCountChangedEventHandler TrackCountChanged;
 
-        private void Reroute() {
+        void Reroute() {
             for (int i = 0; i < Tracks.Count; i++)
                 Tracks[i].ParentIndex = i;
             

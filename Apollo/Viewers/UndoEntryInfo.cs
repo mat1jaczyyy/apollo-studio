@@ -8,7 +8,7 @@ using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;
 
 namespace Apollo.Viewers {
     public class UndoEntryInfo: UserControl {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public delegate void SelectedEventHandler(int index);
         public event SelectedEventHandler Selected;
@@ -23,12 +23,12 @@ namespace Apollo.Viewers {
             this.Get<TextBlock>("Description").Text = _entry.Description;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Selected = null;
             _entry = null;
         }
 
-        private void Click(object sender, PointerPressedEventArgs e) {
+        void Click(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
         }
     }

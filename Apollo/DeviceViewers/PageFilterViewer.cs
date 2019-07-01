@@ -17,7 +17,7 @@ namespace Apollo.DeviceViewers {
     public class PageFilterViewer: UserControl {
         public static readonly string DeviceIdentifier = "pagefilter";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             PagesGrid = this.Get<UniformGrid>("PagesGrid");
@@ -26,7 +26,7 @@ namespace Apollo.DeviceViewers {
         PageFilter _filter;
         UniformGrid PagesGrid;
 
-        private void Set(PageRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
+        void Set(PageRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
 
         public PageFilterViewer(PageFilter filter) {
             InitializeComponent();
@@ -40,9 +40,9 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) {
+        void Clicked(object sender, PointerReleasedEventArgs e) {
             int index = PagesGrid.Children.IndexOf((IControl)sender);
 
             bool u = _filter[index];

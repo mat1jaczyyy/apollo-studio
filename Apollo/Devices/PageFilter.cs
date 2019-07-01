@@ -7,7 +7,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class PageFilter: Device {
-        private bool[] _filter;
+        bool[] _filter;
 
         public override Device Clone() => new PageFilter(_filter.ToArray()) {
             Collapsed = Collapsed,

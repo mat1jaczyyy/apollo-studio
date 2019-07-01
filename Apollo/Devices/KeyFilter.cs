@@ -6,7 +6,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class KeyFilter: Device {
-        private bool[] _filter;
+        bool[] _filter;
         public bool[] Filter {
             get => _filter;
             set {

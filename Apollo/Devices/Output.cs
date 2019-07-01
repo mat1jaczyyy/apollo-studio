@@ -14,7 +14,7 @@ namespace Apollo.Devices {
         public delegate void TargetChangedEventHandler(int value);
         public event TargetChangedEventHandler TargetChanged;
         
-        private int _target;
+        int _target;
         public int Target {
             get => _target;
             set {
@@ -31,12 +31,12 @@ namespace Apollo.Devices {
             }
         }
 
-        private void IndexChanged(int value) {
+        void IndexChanged(int value) {
             _target = value;
             TargetChanged?.Invoke(_target);
         }
 
-        private void IndexRemoved() {
+        void IndexRemoved() {
             bool redoing = false;
 
             foreach (StackFrame call in new StackTrace().GetFrames()) {
@@ -72,7 +72,7 @@ namespace Apollo.Devices {
             else Initialize();
         }
 
-        private void Initialize() {
+        void Initialize() {
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }

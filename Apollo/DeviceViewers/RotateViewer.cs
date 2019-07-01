@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class RotateViewer: UserControl {
         public static readonly string DeviceIdentifier = "rotate";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             RotateMode = this.Get<ComboBox>("RotateMode");
@@ -34,9 +34,9 @@ namespace Apollo.DeviceViewers {
             Bypass.IsChecked = _rotate.Bypass;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _rotate = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _rotate = null;
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+        void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             RotateType selected = (RotateType)RotateMode.SelectedIndex;
 
             if (_rotate.Mode != selected) {
@@ -56,7 +56,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(RotateType mode) => RotateMode.SelectedIndex = (int)mode;
 
-        private void Bypass_Changed(object sender, EventArgs e) {
+        void Bypass_Changed(object sender, EventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
             if (_rotate.Bypass != value) {

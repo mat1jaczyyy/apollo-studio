@@ -26,7 +26,7 @@ namespace Apollo.Devices {
 
         public PatternWindow Window;
 
-        private List<Frame> _frames;
+        List<Frame> _frames;
         public List<Frame> Frames {
             get => _frames;
             set {
@@ -35,7 +35,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private void Reroute() {
+        void Reroute() {
             for (int i = 0; i < Frames.Count; i++) {
                 Frames[i].Parent = this;
                 Frames[i].ParentIndex = i;
@@ -72,12 +72,12 @@ namespace Apollo.Devices {
             Window?.Selection.Select(Frames[Expanded]);
         }
 
-        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        private ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        private HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
-        private decimal _gate;
+        decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
@@ -89,7 +89,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private class PolyInfo {
+        class PolyInfo {
             public Signal n;
             public int index = 0;
             public object locker = new object();
@@ -98,7 +98,7 @@ namespace Apollo.Devices {
             public PolyInfo(Signal init) => n = init;
         }
 
-        private PlaybackType _mode;
+        PlaybackType _mode;
         public PlaybackType Mode {
             get => _mode;
             set {
@@ -110,7 +110,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _infinite;
+        bool _infinite;
         public bool Infinite {
             get => _infinite;
             set {
@@ -122,7 +122,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private int _repeats;
+        int _repeats;
         public int Repeats {
             get => _repeats;
             set {
@@ -133,9 +133,9 @@ namespace Apollo.Devices {
                 }
             }
         }
-        private int AdjustedRepeats => (Mode == PlaybackType.Loop || _infinite)? 1 : Repeats;
+        int AdjustedRepeats => (Mode == PlaybackType.Loop || _infinite)? 1 : Repeats;
 
-        private int? _root;
+        int? _root;
         public int? RootKey {
             get => _root;
             set {
@@ -147,7 +147,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _wrap;
+        bool _wrap;
         public bool Wrap {
             get => _wrap;
             set {
@@ -179,7 +179,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        private bool ApplyRootKey(int index, int trigger, out int result) {
+        bool ApplyRootKey(int index, int trigger, out int result) {
             if (RootKey == null) {
                 result = index;
                 return true;
@@ -206,7 +206,7 @@ namespace Apollo.Devices {
             return false;
         }
 
-        private void FireCourier(Signal n, decimal time) {
+        void FireCourier(Signal n, decimal time) {
             Courier courier;
 
             timers[n].Add(courier = new Courier() {
@@ -218,7 +218,7 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
-        private void FireCourier(PolyInfo info, decimal time) {
+        void FireCourier(PolyInfo info, decimal time) {
             Courier courier;
 
             info.timers.Add(courier = new Courier() {
@@ -230,7 +230,7 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
-        private void Tick(object sender, EventArgs e) {
+        void Tick(object sender, EventArgs e) {
             if (Disposed) return;
 
             Courier courier = (Courier)sender;
@@ -290,7 +290,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private void Stop(Signal n) {
+        void Stop(Signal n) {
             if (!locker.ContainsKey(n)) locker[n] = new object();
 
             lock (locker[n]) {

@@ -12,7 +12,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class CopyOffset: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             _viewer = this.Get<MoveDial>("Offset");
@@ -37,7 +37,7 @@ namespace Apollo.Components {
             _viewer.Changed += Offset_Changed;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             OffsetAdded = null;
             OffsetRemoved = null;
 
@@ -46,11 +46,11 @@ namespace Apollo.Components {
             _viewer = null;
         }
 
-        private void Offset_Add() => OffsetAdded?.Invoke(_copy.Offsets.IndexOf(_offset) + 1);
+        void Offset_Add() => OffsetAdded?.Invoke(_copy.Offsets.IndexOf(_offset) + 1);
 
-        private void Offset_Remove() => OffsetRemoved?.Invoke(_copy.Offsets.IndexOf(_offset));
+        void Offset_Remove() => OffsetRemoved?.Invoke(_copy.Offsets.IndexOf(_offset));
 
-        private void Offset_Changed(int x, int y, int? old_x, int? old_y) {
+        void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             _offset.X = x;
             _offset.Y = y;
 

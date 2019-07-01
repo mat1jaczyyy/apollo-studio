@@ -16,7 +16,7 @@ namespace Apollo.DeviceViewers {
     public class CopyViewer: UserControl {
         public static readonly string DeviceIdentifier = "copy";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Rate = this.Get<Dial>("Rate");
@@ -72,9 +72,9 @@ namespace Apollo.DeviceViewers {
                 Contents_Insert(i, _copy.Offsets[i]);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
 
-        private void Rate_ValueChanged(double value, double? old) {
+        void Rate_ValueChanged(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -92,7 +92,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetRateValue(int rate) => Rate.RawValue = rate;
 
-        private void Rate_ModeChanged(bool value, bool? old) {
+        void Rate_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
@@ -110,7 +110,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(bool mode) => Rate.UsingSteps = mode;
 
-        private void Rate_StepChanged(int value, int? old) {
+        void Rate_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
@@ -126,7 +126,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetRateStep(Length rate) => Rate.Length = rate;
 
-        private void Gate_Changed(double value, double? old) {
+        void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
@@ -144,7 +144,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
-        private void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
+        void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
             CopyType selected = (CopyType)CopyMode.SelectedIndex;
 
             if (_copy.CopyMode != selected) {
@@ -166,7 +166,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
 
-        private void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
+        void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
             GridType selected = (GridType)GridMode.SelectedIndex;
 
             if (_copy.GridMode != selected) {
@@ -186,7 +186,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
-        private void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, EventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_copy.Wrap != value) {
@@ -206,9 +206,9 @@ namespace Apollo.DeviceViewers {
 
         public void SetWrap(bool value) => Wrap.IsChecked = value;
 
-        private void Offset_InsertStart() => Offset_Insert(0);
+        void Offset_InsertStart() => Offset_Insert(0);
 
-        private void Offset_Insert(int index) {
+        void Offset_Insert(int index) {
             List<int> path = Track.GetPath(_copy);
 
             Program.Project.Undo.Add($"Copy Offset {index + 1} Inserted", () => {
@@ -220,7 +220,7 @@ namespace Apollo.DeviceViewers {
             _copy.Insert(index);
         }
 
-        private void Offset_Remove(int index) {
+        void Offset_Remove(int index) {
             Offset u = _copy.Offsets[index].Clone();
             List<int> path = Track.GetPath(_copy);
 

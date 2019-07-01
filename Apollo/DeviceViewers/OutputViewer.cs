@@ -13,7 +13,7 @@ namespace Apollo.DeviceViewers {
     public class OutputViewer: UserControl {
         public static readonly string DeviceIdentifier = "output";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Target = this.Get<Dial>("Target");
@@ -26,7 +26,7 @@ namespace Apollo.DeviceViewers {
             Target.RawValue = value + 1;
         }
 
-        private void Update_Maximum(int value) {
+        void Update_Maximum(int value) {
             Target.Enabled = (value != 1);
             if (Target.Enabled) Target.Maximum = value;
         } 
@@ -42,14 +42,14 @@ namespace Apollo.DeviceViewers {
             Update_Target(_output.Target);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _output.TargetChanged -= Update_Target;
             Program.Project.TrackCountChanged -= Update_Maximum;
 
             _output = null;
         }
 
-        private void Target_Changed(double value, double? old) {
+        void Target_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value - 1;
                 int r = (int)value - 1;

@@ -15,7 +15,7 @@ namespace Apollo.DeviceViewers {
     public class HoldViewer: UserControl {
         public static readonly string DeviceIdentifier = "hold";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Duration = this.Get<Dial>("Duration");
@@ -46,9 +46,9 @@ namespace Apollo.DeviceViewers {
             Release.IsChecked = _hold.Release;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _hold = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _hold = null;
 
-        private void Duration_Changed(double value, double? old) {
+        void Duration_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -66,7 +66,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
-        private void Duration_ModeChanged(bool value, bool? old) {
+        void Duration_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
@@ -84,7 +84,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
-        private void Duration_StepChanged(int value, int? old) {
+        void Duration_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
@@ -100,7 +100,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
-        private void Gate_Changed(double value, double? old) {
+        void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
@@ -118,7 +118,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
-        private void Infinite_Changed(object sender, EventArgs e) {
+        void Infinite_Changed(object sender, EventArgs e) {
             bool value = Infinite.IsChecked.Value;
 
             if (_hold.Infinite != value) {
@@ -139,7 +139,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetInfinite(bool value) => Infinite.IsChecked = value;
 
-        private void Release_Changed(object sender, EventArgs e) {
+        void Release_Changed(object sender, EventArgs e) {
             bool value = Release.IsChecked.Value;
 
             if (_hold.Release != value) {

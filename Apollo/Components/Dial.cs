@@ -14,7 +14,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class Dial: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             ArcCanvas = this.Get<Canvas>("ArcCanvas");
@@ -55,7 +55,7 @@ namespace Apollo.Components {
         protected double ToValue(double rawValue) => Math.Pow((rawValue - _min) / (_max - _min), 1 / _exp);
         protected double ToRawValue(double value) => _min + (_max - _min) * Math.Pow(value, _exp);
 
-        private double _min = 0;
+        double _min = 0;
         public double Minimum {
             get => _min;
             set {
@@ -77,7 +77,7 @@ namespace Apollo.Components {
             }
         }
 
-        private int _round = 0;
+        int _round = 0;
         public int Round {
             get => _round;
             set {
@@ -88,7 +88,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double _exp = 1;
+        double _exp = 1;
         public double Exponent {
             get => _exp;
             set {
@@ -99,8 +99,8 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _valuechanging = false;
-        private double _value = 0.5;
+        bool _valuechanging = false;
+        double _value = 0.5;
         public double Value {
             get => _value;
             set {
@@ -117,8 +117,8 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _rawchanging = false;
-        private double _raw = 50;
+        bool _rawchanging = false;
+        double _raw = 50;
         public double RawValue {
             get => _raw;
             set {
@@ -137,19 +137,19 @@ namespace Apollo.Components {
             }
         }
         
-        private double _default = 50;
+        double _default = 50;
         public double Default {
             get => _default;
             set => _default = Math.Round(Math.Max(_min, Math.Min(_max, value)) * Math.Pow(10, _round), 0) / Math.Pow(10, _round);
         }
 
-        private string _title = "Dial";
+        string _title = "Dial";
         public string Title {
             get => _title;
             set => TitleText.Text = _title = value;
         }
 
-        private string _unit = "";
+        string _unit = "";
         public string Unit {
             get => _unit;
             set {
@@ -158,7 +158,7 @@ namespace Apollo.Components {
             }
         }
 
-        private string _disabledtext = "Disabled";
+        string _disabledtext = "Disabled";
         public string DisabledText {
             get => _disabledtext;
             set {
@@ -168,7 +168,7 @@ namespace Apollo.Components {
             }
         }
         
-        private bool _displaydisabledtext = true;
+        bool _displaydisabledtext = true;
         public bool DisplayDisabledText {
             get => _displaydisabledtext;
             set {
@@ -179,7 +179,7 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _centered = false;
+        bool _centered = false;
         public bool Centered {
             get => _centered;
             set {
@@ -188,7 +188,7 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _enabled = true;
+        bool _enabled = true;
         public bool Enabled {
             get => _enabled;
             set {
@@ -199,7 +199,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double _scale = 1;
+        double _scale = 1;
         public double Scale {
             get => _scale;
             set {
@@ -216,7 +216,7 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _allowSteps = false;
+        bool _allowSteps = false;
         public bool AllowSteps {
             get => _allowSteps;
             set {
@@ -225,7 +225,7 @@ namespace Apollo.Components {
             }
         }
 
-        private bool _usingSteps = false;
+        bool _usingSteps = false;
         public bool UsingSteps {
             get => _usingSteps;
             set {
@@ -238,7 +238,7 @@ namespace Apollo.Components {
             }
         }
 
-        private Length _length = new Length();
+        Length _length = new Length();
         public Length Length {
             get => _length;
             set {
@@ -247,9 +247,9 @@ namespace Apollo.Components {
             }
         }
 
-        private string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+        string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
-        private void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
+        void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             double angle_starting = (_centered && !overrideBase)? angle_center: angle_start;
 
             double x_start = (radius * (Math.Cos(angle_starting) + 1) + strokeHalf) * _scale;
@@ -285,11 +285,11 @@ namespace Apollo.Components {
 
         protected void DrawArcBase() => DrawArc(ArcBase, 1, true);
 
-        private void DrawArcValue() {
+        void DrawArcValue() {
             if (!UsingSteps) DrawArc(Arc, _value, false);
         }
 
-        private void DrawArcSteps() {
+        void DrawArcSteps() {
             if (UsingSteps) DrawArc(Arc, (double)_length.Step / 9, false, "ThemeExtraBrush");
         }
 
@@ -319,10 +319,10 @@ namespace Apollo.Components {
 
         protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
 
-        private bool mouseHeld = false;
-        private double oldValue;
-        private int oldStep;
-        private double lastY;
+        bool mouseHeld = false;
+        double oldValue;
+        int oldStep;
+        double lastY;
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
@@ -391,7 +391,7 @@ namespace Apollo.Components {
             }
         }
 
-        private Action Input_Update;
+        Action Input_Update;
 
         protected void Input_Changed(string text) {
             if (text == null) return;

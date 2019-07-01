@@ -12,7 +12,7 @@ namespace Apollo.Helpers {
     public class Importer {
         public static Palette Palette = Palette.NovationPalette;
 
-        private static int MIDIReadVariableLength(BinaryReader reader) {
+        static int MIDIReadVariableLength(BinaryReader reader) {
             int ret = 0;
             for (int i = 0; i < 4; i++) {
                 byte b = reader.ReadByte();
@@ -23,7 +23,7 @@ namespace Apollo.Helpers {
             return ret;
         }
 
-        private static void MIDIDiscardMeta(BinaryReader reader) {
+        static void MIDIDiscardMeta(BinaryReader reader) {
             switch (reader.ReadByte()) {
                 case 0x00: // Sequence number
                 case 0x59: // Key signature
@@ -142,7 +142,7 @@ namespace Apollo.Helpers {
             }
         }
 
-        private static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
+        static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
 
         public static bool FramesFromImage(string path, out List<Frame> ret) {
             ret = null;

@@ -11,11 +11,11 @@ using Apollo.Core;
 
 namespace Apollo.Windows {
     public class MessageWindow: Window {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public TaskCompletionSource<string> Completed = new TaskCompletionSource<string>();
         
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
         public MessageWindow(string message, string[] options = null) {
             InitializeComponent();
@@ -39,7 +39,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             foreach (Window window in Application.Current.Windows)
@@ -47,7 +47,7 @@ namespace Apollo.Windows {
                     window.IsVisible = false;
         }
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
             foreach (Window window in Application.Current.Windows)
@@ -57,16 +57,16 @@ namespace Apollo.Windows {
             this.Content = null;
         }
 
-        private void Complete(object sender, EventArgs e) {
+        void Complete(object sender, EventArgs e) {
             Completed.SetResult((string)((Button)sender).Content);
             Close();
         }
 
-        private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
 
-        private void Close(object sender, RoutedEventArgs e) => Close();
+        void Close(object sender, RoutedEventArgs e) => Close();
 
         public static async Task<string> Create(string message, string[] options, Window owner) {
             MessageWindow window = new MessageWindow(message, options) {Owner = owner};

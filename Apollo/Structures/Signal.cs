@@ -8,8 +8,8 @@ using Apollo.Helpers;
 namespace Apollo.Structures {
     public class Signal {
         public Launchpad Source;
-        private byte _index = 11;
-        private int _page = 1;
+        byte _index = 11;
+        int _page = 1;
         public Color Color;
         public int Layer;
         public BlendingType BlendingMode;

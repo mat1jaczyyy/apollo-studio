@@ -5,7 +5,7 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Expand: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public new delegate void ClickedEventHandler(IPointerDevice e);
         public new event ClickedEventHandler Clicked;

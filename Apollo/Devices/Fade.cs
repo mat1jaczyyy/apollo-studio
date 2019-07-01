@@ -11,7 +11,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Fade: Device {
-        private class FadeInfo {
+        class FadeInfo {
             public Color Color;
             public double Time;
 
@@ -21,9 +21,9 @@ namespace Apollo.Devices {
             }
         }
 
-        private List<Color> _colors = new List<Color>();
-        private List<decimal> _positions = new List<decimal>();
-        private List<FadeInfo> fade;
+        List<Color> _colors = new List<Color>();
+        List<decimal> _positions = new List<decimal>();
+        List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -45,11 +45,11 @@ namespace Apollo.Devices {
             }
         }
         
-        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        private ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
-        private Time _time;
+        Time _time;
         public Time Time {
             get => _time;
             set {
@@ -72,22 +72,22 @@ namespace Apollo.Devices {
             }
         }
 
-        private void FreeChanged(int value) {
+        void FreeChanged(int value) {
             Generate();
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationValue(value);
         }
 
-        private void ModeChanged(bool value) {
+        void ModeChanged(bool value) {
             Generate();
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetMode(value);
         }
 
-        private void StepChanged(Length value) {
+        void StepChanged(Length value) {
             Generate();
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
-        private decimal _gate;
+        decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
@@ -100,7 +100,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private FadePlaybackType _mode;
+        FadePlaybackType _mode;
         public FadePlaybackType PlayMode {
             get => _mode;
             set {
@@ -113,9 +113,9 @@ namespace Apollo.Devices {
         public delegate void GeneratedEventHandler();
         public event GeneratedEventHandler Generated;
 
-        private void Generate() => Generate(Preferences.FadeSmoothness);
+        void Generate() => Generate(Preferences.FadeSmoothness);
 
-        private void Generate(double smoothness) {
+        void Generate(double smoothness) {
             if (_colors.Count < 2 || _positions.Count < 2) return;
 
             List<Color> _steps = new List<Color>();
@@ -212,7 +212,7 @@ namespace Apollo.Devices {
             Preferences.FadeSmoothnessChanged += Generate;
         }
 
-        private void FireCourier(Signal n, double time) {
+        void FireCourier(Signal n, double time) {
             Courier courier;
 
             timers[n].Add(courier = new Courier() {
@@ -224,7 +224,7 @@ namespace Apollo.Devices {
             courier.Start();
         }
 
-        private void Tick(object sender, EventArgs e) {
+        void Tick(object sender, EventArgs e) {
             if (Disposed) return;
 
             Courier courier = (Courier)sender;
@@ -252,7 +252,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private void Stop(Signal n) {
+        void Stop(Signal n) {
             if (!locker.ContainsKey(n)) locker[n] = new object();
 
             lock (locker[n]) {

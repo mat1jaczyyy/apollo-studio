@@ -4,7 +4,7 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class PageRectangle: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Rect = this.Get<Grid>("Rect");

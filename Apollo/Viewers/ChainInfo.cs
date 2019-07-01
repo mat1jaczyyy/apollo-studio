@@ -18,7 +18,7 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<Grid>("DropZone");
@@ -45,9 +45,9 @@ namespace Apollo.Viewers {
         ContextMenu ChainContextMenu;
         TextBox Input;
 
-        private void UpdateText() => NameText.Text = _chain.ProcessedName;
+        void UpdateText() => NameText.Text = _chain.ProcessedName;
         
-        private void ApplyHeaderBrush(IBrush brush) {
+        void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
             else this.Resources["BackgroundBrush"] = brush;
         }
@@ -83,7 +83,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ChainAdded = null;
             ChainExpanded = null;
 
@@ -100,9 +100,9 @@ namespace Apollo.Viewers {
 
         public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
-        private void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
+        void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
 
-        private void ContextMenu_Click(object sender, EventArgs e) {
+        void ContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -110,7 +110,7 @@ namespace Apollo.Viewers {
                 Track.Get(_chain)?.Window?.Selection.Action((string)((MenuItem)item).Header);
         }
 
-        private void Select(PointerPressedEventArgs e) {
+        void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
                 Track.Get(_chain)?.Window?.Selection.Select(_chain, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }
@@ -276,13 +276,13 @@ namespace Apollo.Viewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
         
-        private void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
+        void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
 
         int Input_Left, Input_Right;
         List<string> Input_Clean;
         bool Input_Ignore = false;
 
-        private void Input_Changed(string text) {
+        void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
@@ -311,7 +311,7 @@ namespace Apollo.Viewers {
             Input.Focus();
         }
         
-        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+        void Input_LostFocus(object sender, RoutedEventArgs e) {
             Input.Text = _chain.Name;
 
             Input.Opacity = 0;
@@ -362,15 +362,15 @@ namespace Apollo.Viewers {
             Input_Ignore = false;
         }
 
-        private void Input_KeyDown(object sender, KeyEventArgs e) {
+        void Input_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class HorizontalAdd: AddButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");

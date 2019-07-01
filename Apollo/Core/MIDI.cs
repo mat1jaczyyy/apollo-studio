@@ -14,7 +14,7 @@ namespace Apollo.Core {
 
         public static void DoneIdentifying() => DevicesUpdated?.Invoke();
 
-        private static List<Launchpad> _devices = new List<Launchpad>();
+        static List<Launchpad> _devices = new List<Launchpad>();
         public static List<Launchpad> Devices {
             get => _devices;
             set {
@@ -28,8 +28,8 @@ namespace Apollo.Core {
 
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output");
         
-        private static Courier courier;
-        private static bool started = false;
+        static Courier courier;
+        static bool started = false;
 
         public static void Start() {
             if (started) return;
@@ -53,8 +53,8 @@ namespace Apollo.Core {
             started = false;
         }
 
-        private static object locker = new object();
-        private static bool updated = false;
+        static object locker = new object();
+        static bool updated = false;
 
         public static void Update() {
             lock (locker) {

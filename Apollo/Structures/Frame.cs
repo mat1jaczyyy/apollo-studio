@@ -8,7 +8,7 @@ using Apollo.Interfaces;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {
-        private Color[] _screen;
+        Color[] _screen;
         public Color[] Screen {
             get => _screen;
             set {
@@ -37,7 +37,7 @@ namespace Apollo.Structures {
         public Pattern Parent;
         public int? ParentIndex;
 
-        private Time _time;
+        Time _time;
         public Time Time {
             get => _time;
             set {
@@ -64,17 +64,17 @@ namespace Apollo.Structures {
             }
         }
 
-        private void FreeChanged(int value) {
+        void FreeChanged(int value) {
             Parent?.Window?.SetDurationValue(ParentIndex.Value, Time.Free);
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
-        private void ModeChanged(bool value) {
+        void ModeChanged(bool value) {
             Parent?.Window?.SetDurationMode(ParentIndex.Value, Time.Mode);
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
-        private void StepChanged(Length value) {
+        void StepChanged(Length value) {
             Parent?.Window?.SetDurationStep(ParentIndex.Value, Time.Length);
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }

@@ -17,11 +17,11 @@ namespace Apollo.Devices {
 
         public Offset Offset;
 
-        private void OffsetChanged(Offset sender) {
+        void OffsetChanged(Offset sender) {
             if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetOffset(Offset.X, Offset.Y);
         }
 
-        private bool _wrap;
+        bool _wrap;
         public bool Wrap {
             get => _wrap;
             set {
@@ -44,9 +44,9 @@ namespace Apollo.Devices {
             Offset.Changed += OffsetChanged;
         }
 
-        private int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+        int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
-        private bool ApplyOffset(int index, out int result) {
+        bool ApplyOffset(int index, out int result) {
             int x = index % 10;
             int y = index / 10;
 

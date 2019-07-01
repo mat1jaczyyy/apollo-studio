@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class LargePopout: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         protected override IBrush Fill {
             get => (IBrush)this.Resources["Brush"];

@@ -30,7 +30,7 @@ namespace Apollo.DeviceViewers {
             get => _multi.Expanded;
         }
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             MultiMode = this.Get<ComboBox>("MultiMode");
@@ -49,7 +49,7 @@ namespace Apollo.DeviceViewers {
         ComboBox MultiMode;
         VerticalAdd ChainAdd;
 
-        private void SetAlwaysShowing() {
+        void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
             for (int i = 1; i < Contents.Count; i++)
@@ -111,7 +111,7 @@ namespace Apollo.DeviceViewers {
             if (_multi.Expanded != null) Expand_Insert(multi.Expanded.Value);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -123,7 +123,7 @@ namespace Apollo.DeviceViewers {
             _root = null;
         }
 
-        private void Expand_Insert(int index) {
+        void Expand_Insert(int index) {
             _root.Insert(3, new ChainViewer(_multi[index], true));
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
@@ -132,7 +132,7 @@ namespace Apollo.DeviceViewers {
             ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
         }
 
-        private void Expand_Remove() {
+        void Expand_Remove() {
             _root.RemoveAt(4);
             _root.RemoveAt(3);
 
@@ -156,10 +156,10 @@ namespace Apollo.DeviceViewers {
             _multi.Expanded = index;
         }
 
-        private void Chain_Insert(int index) => Chain_Insert(index, new Chain());
-        private void Chain_InsertStart() => Chain_Insert(0);
+        void Chain_Insert(int index) => Chain_Insert(index, new Chain());
+        void Chain_InsertStart() => Chain_Insert(0);
 
-        private void Chain_Insert(int index, Chain chain) {
+        void Chain_Insert(int index, Chain chain) {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_multi);
 
@@ -172,10 +172,10 @@ namespace Apollo.DeviceViewers {
             _multi.Insert(index, chain);
         }
 
-        private void Chain_Action(string action) => Chain_Action(action, false);
-        private void Chain_Action(string action, bool right) => Track.Get(_multi)?.Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
+        void Chain_Action(string action) => Chain_Action(action, false);
+        void Chain_Action(string action, bool right) => Track.Get(_multi)?.Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
 
-        private void ChainContextMenu_Click(object sender, EventArgs e) {
+        void ChainContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -183,14 +183,14 @@ namespace Apollo.DeviceViewers {
                 Chain_Action((string)((MenuItem)item).Header, true);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right)
                 ChainContextMenu.Open((Control)sender);
 
             e.Handled = true;
         }
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+        void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             MultiType selected = (MultiType)MultiMode.SelectedIndex;
 
             if (_multi.Mode != selected) {
@@ -210,12 +210,12 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(MultiType mode) => MultiMode.SelectedIndex = (int)mode;
 
-        private void DragOver(object sender, DragEventArgs e) {
+        void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None;
         }
 
-        private void Drop(object sender, DragEventArgs e) {
+        void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
             
             IControl source = (IControl)e.Source;
@@ -344,7 +344,7 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+        void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Chain> pasted;
             try {
                 pasted = paste.Contents.Cast<Chain>().ToList();

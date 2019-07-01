@@ -25,7 +25,7 @@ namespace Apollo.Devices {
             get => false;
         }
 
-        private Action<Signal> _midiexit;
+        Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
             get => _midiexit;
             set {
@@ -36,7 +36,7 @@ namespace Apollo.Devices {
 
         public List<Chain> Chains = new List<Chain>();
 
-        private void Reroute() {
+        void Reroute() {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;
                 Chains[i].ParentIndex = i;
@@ -91,7 +91,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
+        void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIProcess(Signal n) {
             if (Chains.Count == 0) ChainExit(n);

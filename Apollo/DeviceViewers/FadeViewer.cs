@@ -24,7 +24,7 @@ namespace Apollo.DeviceViewers {
     public class FadeViewer: UserControl {
         public static readonly string DeviceIdentifier = "fade";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             canvas = this.Get<Canvas>("Canvas");
@@ -108,7 +108,7 @@ namespace Apollo.DeviceViewers {
             Gradient_Generate();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _fade.Generated -= Gradient_Generate;
             _fade = null;
         }
@@ -142,7 +142,7 @@ namespace Apollo.DeviceViewers {
             current = index;
         }
 
-        private void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
+        void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 int index;
                 double x = e.Device.GetPosition(canvas).X - 7;
@@ -164,7 +164,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        private void Thumb_Delete(FadeThumb sender) {
+        void Thumb_Delete(FadeThumb sender) {
             int index = thumbs.IndexOf(sender);
 
             Color uc = _fade.GetColor(index).Clone();
@@ -180,7 +180,7 @@ namespace Apollo.DeviceViewers {
             _fade.Remove(index);
         }
 
-        private void Thumb_Move(FadeThumb sender, double change, double? total) {
+        void Thumb_Move(FadeThumb sender, double change, double? total) {
             int i = thumbs.IndexOf(sender);
 
             double left = Canvas.GetLeft(thumbs[i - 1]) + 1;
@@ -215,9 +215,9 @@ namespace Apollo.DeviceViewers {
                 Display.Text = $"{((double)Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString(CultureInfo.InvariantCulture)}%";
         }
 
-        private void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
+        void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
 
-        private void Color_Changed(Color color, Color old) {
+        void Color_Changed(Color color, Color old) {
             if (current != null) {
                 if (old != null) {
                     Color u = old.Clone();
@@ -243,14 +243,14 @@ namespace Apollo.DeviceViewers {
             thumbs[index].Fill = color.ToBrush();
         }
 
-        private void Gradient_Generate() {
+        void Gradient_Generate() {
             Gradient.GradientStops.Clear();
 
             for (int i = 0; i < _fade.Count; i++)
                 Gradient.GradientStops.Add(new GradientStop(_fade.GetColor(i).ToAvaloniaColor(), (double)_fade.GetPosition(i)));
         }
 
-        private void Duration_Changed(double value, double? old) {
+        void Duration_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -268,7 +268,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
-        private void Duration_ModeChanged(bool value, bool? old) {
+        void Duration_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
@@ -286,7 +286,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
-        private void Duration_StepChanged(int value, int? old) {
+        void Duration_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
@@ -302,7 +302,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
-        private void Gate_Changed(double value, double? old) {
+        void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
@@ -320,7 +320,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
-        private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
+        void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
             FadePlaybackType selected = (FadePlaybackType)PlaybackMode.SelectedIndex;
 
             if (_fade.PlayMode != selected) {
@@ -340,9 +340,9 @@ namespace Apollo.DeviceViewers {
 
         public void SetPlaybackMode(FadePlaybackType mode) => PlaybackMode.SelectedIndex = (int)mode;
 
-        private Action Input_Update;
+        Action Input_Update;
 
-        private void Input_Changed(string text) {
+        void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
@@ -379,9 +379,9 @@ namespace Apollo.DeviceViewers {
             });
         }
 
-        private double oldValue;
+        double oldValue;
 
-        private void DisplayPressed(object sender, PointerPressedEventArgs e) {
+        void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 oldValue = (double)Math.Round(_fade.GetPosition(current.Value) * 1000) / 10;
                 Input.Text = oldValue.ToString(CultureInfo.InvariantCulture);
@@ -397,7 +397,7 @@ namespace Apollo.DeviceViewers {
             }
         }
         
-        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+        void Input_LostFocus(object sender, RoutedEventArgs e) {
             decimal raw = _fade.GetPosition(current.Value);
 
             Input.Text = ((double)Math.Round(raw * 1000) / 10).ToString(CultureInfo.InvariantCulture);
@@ -417,15 +417,15 @@ namespace Apollo.DeviceViewers {
             });
         }
 
-        private void Input_KeyDown(object sender, KeyEventArgs e) {
+        void Input_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

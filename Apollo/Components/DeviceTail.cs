@@ -9,7 +9,7 @@ using Apollo.Viewers;
 
 namespace Apollo.Components {
     public class DeviceTail: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Border = this.Get<Border>("Border");
@@ -32,7 +32,7 @@ namespace Apollo.Components {
             SetEnabled(owner.Enabled);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Owner = null;
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -44,8 +44,8 @@ namespace Apollo.Components {
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(value? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
         }
 
-        private void Drag(object sender, PointerPressedEventArgs e) => Owner.Drag(sender, e);
-        private void DragOver(object sender, DragEventArgs e) => Owner.DragOver(sender, e);
-        private void Drop(object sender, DragEventArgs e) => Owner.Drop(sender, e);
+        void Drag(object sender, PointerPressedEventArgs e) => Owner.Drag(sender, e);
+        void DragOver(object sender, DragEventArgs e) => Owner.DragOver(sender, e);
+        void Drop(object sender, DragEventArgs e) => Owner.Drop(sender, e);
     }
 }

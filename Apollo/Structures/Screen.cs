@@ -5,16 +5,16 @@ using Apollo.Enums;
 
 namespace Apollo.Structures {
     public class Screen {
-        private class Pixel {
+        class Pixel {
             public Action<Signal> Exit = null;
             
-            private SortedList<int, Signal> _signals = new SortedList<int, Signal>() {
+            SortedList<int, Signal> _signals = new SortedList<int, Signal>() {
                 [10000] = new Signal(null, 11, new Color(0))
             };
             
-            private Color state = new Color(0);
+            Color state = new Color(0);
 
-            private object locker = new object();
+            object locker = new object();
 
             public Pixel() {}
 
@@ -55,7 +55,7 @@ namespace Apollo.Structures {
 
         public Action<Signal> ScreenExit;
 
-        private Pixel[] _screen = new Pixel[100];
+        Pixel[] _screen = new Pixel[100];
 
         public Screen() {
             for (int i = 0; i < 100; i++)

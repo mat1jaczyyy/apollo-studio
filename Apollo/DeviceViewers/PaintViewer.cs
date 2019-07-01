@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class PaintViewer: UserControl {
         public static readonly string DeviceIdentifier = "paint";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Picker = this.Get<ColorPicker>("Picker");
@@ -31,9 +31,9 @@ namespace Apollo.DeviceViewers {
             Picker.SetColor(_paint.Color);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
         
-        private void Color_Changed(Color color, Color old) {
+        void Color_Changed(Color color, Color old) {
             if (old != null) {
                 Color u = old.Clone();
                 Color r = color.Clone();

@@ -28,7 +28,7 @@ namespace Apollo.Windows {
             get => _pattern.Expanded;
         }
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
@@ -71,7 +71,7 @@ namespace Apollo.Windows {
         public Pattern Device { get => _pattern; }
         
         Launchpad _launchpad;
-        private Launchpad Launchpad {
+        Launchpad Launchpad {
             get => _launchpad;
             set {
                 if (_launchpad != null) {
@@ -156,15 +156,15 @@ namespace Apollo.Windows {
 
         Action<Signal> PlayExit;
         
-        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
-        private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
-        private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
-        private void UpdateTitle(int index, string name)
+        void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
+        void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
+        void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
+        void UpdateTitle(int index, string name)
             => Title = TitleText.Text = TitleCenter.Text = $"Editing Pattern - {name}";
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
-        private void UpdatePorts() {
+        void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
             if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == LaunchpadType.Unknown)) ports.Add(Launchpad);
             ports.Add(MIDI.NoOutput);
@@ -174,9 +174,9 @@ namespace Apollo.Windows {
             PortSelector.SelectedItem = Launchpad;
         }
 
-        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
-        private void SetAlwaysShowing() {
+        void SetAlwaysShowing() {
             for (int i = 1; i < Contents.Count; i++)
                 ((FrameDisplay)Contents[i]).FrameAdd.AlwaysShowing = false;
 
@@ -270,7 +270,7 @@ namespace Apollo.Windows {
             CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
-        private void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             _track.ParentIndexChanged += UpdateTitle;
@@ -280,7 +280,7 @@ namespace Apollo.Windows {
             ColorHistory.HistoryChanged += RenderHistory;
         }
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             Locked = false;
             
             foreach (Courier i in PlayTimers) i.Dispose();
@@ -333,7 +333,7 @@ namespace Apollo.Windows {
             Editor.Scale = Math.Min(bounds.Width, bounds.Height) / 189.6;
         }
 
-        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
+        void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
 
             if (selected != null && Launchpad != selected) {
@@ -346,7 +346,7 @@ namespace Apollo.Windows {
             if (index != null) Frame_Select(index.Value);
         }
 
-        private void Frame_Insert(int index) {
+        void Frame_Insert(int index) {
             if (Locked) return;
 
             Frame reference = _pattern[Math.Max(0, index - 1)];
@@ -354,7 +354,7 @@ namespace Apollo.Windows {
             Frame_Insert(index, new Frame(reference.Time.Clone()));
         }
 
-        private void Frame_Insert(int index, Frame frame) {
+        void Frame_Insert(int index, Frame frame) {
             if (Locked) return;
 
             Frame reference = _pattern[Math.Max(0, index - 1)];
@@ -375,9 +375,9 @@ namespace Apollo.Windows {
             _pattern.Insert(index, frame);
         }
 
-        private void Frame_InsertStart() => Frame_Insert(0);
+        void Frame_InsertStart() => Frame_Insert(0);
 
-        private void Frame_Remove(int index) {
+        void Frame_Remove(int index) {
             if (Locked) return;
 
             if (_pattern.Count == 1) return;
@@ -421,10 +421,10 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Frame_Action(string action) => Frame_Action(action, false);
-        private void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
+        void Frame_Action(string action) => Frame_Action(action, false);
+        void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
 
-        private void FrameContextMenu_Click(object sender, EventArgs e) {
+        void FrameContextMenu_Click(object sender, EventArgs e) {
             this.Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -432,14 +432,14 @@ namespace Apollo.Windows {
                 Frame_Action((string)((MenuItem)item).Header, true);
         }
         
-        private void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
+        void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right)
                 FrameContextMenu.Open((Control)sender);
 
             e.Handled = true;
         }
 
-        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (Locked) return;
 
             if (e.Key == Key.Enter) {
@@ -469,14 +469,14 @@ namespace Apollo.Windows {
             }
         }
 
-        private void ColorPicker_Changed(Color color, Color old) => ColorHistory.Select(color.Clone());
+        void ColorPicker_Changed(Color color, Color old) => ColorHistory.Select(color.Clone());
 
-        private void ColorHistory_Changed(Color color) {
+        void ColorHistory_Changed(Color color) {
             ColorPicker.SetColor(color.Clone());
             RenderHistory();
         }
 
-        private void RenderHistory() {
+        void RenderHistory() {
             if (!historyShowing) return;
             ColorHistory.Render(Launchpad);
         }
@@ -484,7 +484,7 @@ namespace Apollo.Windows {
         Color drawingState;
         Color[] oldScreen;
         
-        private void PadStarted(int index) {
+        void PadStarted(int index) {
             drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
                 ? new Color(0)
                 : ColorPicker.Color;
@@ -492,7 +492,7 @@ namespace Apollo.Windows {
             oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
     
-        private void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
+        void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
@@ -520,7 +520,7 @@ namespace Apollo.Windows {
             Launchpad?.Send(new Signal(Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
 
-        private void PadFinished(int _) {
+        void PadFinished(int _) {
             if (oldScreen == null) return;
 
             if (!oldScreen.SequenceEqual(_pattern[_pattern.Expanded].Screen)) {
@@ -548,7 +548,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void HandleGesture(int x, int y) {
+        void HandleGesture(int x, int y) {
             if (x == -1 && y == 0) { // Left
                 if (_pattern.Expanded == 0) Frame_Insert(0);
                 else Frame_Select(_pattern.Expanded - 1);
@@ -643,7 +643,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Infinite_Changed(object sender, EventArgs e) {
+        void Infinite_Changed(object sender, EventArgs e) {
             bool value = Infinite.IsChecked.Value;
 
             if (_pattern.Infinite != value) {
@@ -672,14 +672,14 @@ namespace Apollo.Windows {
 
         List<Time> oldTime;
 
-        private void Duration_Started() {
+        void Duration_Started() {
             oldTime = new List<Time>();
 
             foreach (Frame frame in Selection.Selection)
                 oldTime.Add(frame.Time.Clone());
         }
 
-        private void Duration_Changed(double value, double? old) {
+        void Duration_Changed(double value, double? old) {
             if (oldTime == null) return;
 
             if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
@@ -718,7 +718,7 @@ namespace Apollo.Windows {
                 Duration.RawValue = value;
         }
 
-        private void Duration_StepChanged(int value, int? old) {
+        void Duration_StepChanged(int value, int? old) {
             if (oldTime == null) return;
 
             if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
@@ -757,7 +757,7 @@ namespace Apollo.Windows {
                 Duration.Length = value;
         }
 
-        private void Duration_ModeChanged(bool value, bool? old) {
+        void Duration_ModeChanged(bool value, bool? old) {
             if (oldTime == null) return;
 
             if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
@@ -792,7 +792,7 @@ namespace Apollo.Windows {
                 Duration.UsingSteps = value;
         }
 
-        private void Frame_Reverse(object sender, RoutedEventArgs e) {
+        void Frame_Reverse(object sender, RoutedEventArgs e) {
             List<ISelect> selection = Selection.Selection;
 
             int left = selection.First().IParentIndex.Value;
@@ -841,7 +841,7 @@ namespace Apollo.Windows {
             Selection.Select(_pattern[right], true);
         }
 
-        private void Frame_Invert(object sender, RoutedEventArgs e) {
+        void Frame_Invert(object sender, RoutedEventArgs e) {
             List<ISelect> selection = Selection.Selection;
 
             int left = selection.First().IParentIndex.Value;
@@ -862,7 +862,7 @@ namespace Apollo.Windows {
                 _pattern[i].Screen = _pattern[i].Screen.Reverse().ToArray();
         }
 
-        private void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
+        void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
             PlaybackType selected = (PlaybackType)PlaybackMode.SelectedIndex;
 
             if (_pattern.Mode != selected) {
@@ -887,7 +887,7 @@ namespace Apollo.Windows {
             Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
         }
 
-        private void Gate_Changed(double value, double? old) {
+        void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
                 decimal u = (decimal)(old.Value / 100);
                 decimal r = (decimal)(value / 100);
@@ -905,7 +905,7 @@ namespace Apollo.Windows {
 
         public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
 
-        private void Repeats_Changed(double value, double? old) {
+        void Repeats_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -925,13 +925,13 @@ namespace Apollo.Windows {
 
         int? oldRootKey = -1;
 
-        private void RootKeyStarted(int index) {
+        void RootKeyStarted(int index) {
             if (Locked) return;
 
             oldRootKey = _pattern.RootKey;
         }
 
-        private void RootKeyPressed(int index) {
+        void RootKeyPressed(int index) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
@@ -939,7 +939,7 @@ namespace Apollo.Windows {
             _pattern.RootKey = (signalIndex == _pattern.RootKey)? null : (int?)signalIndex;
         }
 
-        private void RootKeyFinished(int _) {
+        void RootKeyFinished(int _) {
             if (Locked) return;
 
             if (oldRootKey == -1) return;
@@ -969,7 +969,7 @@ namespace Apollo.Windows {
             );
         }
 
-        private void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, EventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_pattern.Wrap != value) {
@@ -989,7 +989,7 @@ namespace Apollo.Windows {
 
         public void SetWrap(bool value) => Wrap.IsChecked = value;
 
-        private void PlayColor(int index, Color color) {
+        void PlayColor(int index, Color color) {
             Dispatcher.UIThread.InvokeAsync(() => {
                 Editor.SetColor(LaunchpadGrid.SignalToGrid(index), color.ToScreenBrush());
             });
@@ -997,7 +997,7 @@ namespace Apollo.Windows {
             PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)index, color.Clone()));
         }
 
-        private void FireCourier(decimal time) {
+        void FireCourier(decimal time) {
             Courier courier;
             PlayTimers.Add(courier = new Courier() {
                 AutoReset = false,
@@ -1007,7 +1007,7 @@ namespace Apollo.Windows {
             courier.Start();
         }
 
-        private void Tick(object sender, EventArgs e) {
+        void Tick(object sender, EventArgs e) {
             if (_pattern.Disposed || !Locked) return;
 
             Courier courier = (Courier)sender;
@@ -1034,11 +1034,11 @@ namespace Apollo.Windows {
             }
         }
 
-        private int PlayIndex = 0;
-        private object PlayLocker = new object();
-        private List<Courier> PlayTimers = new List<Courier>();
+        int PlayIndex = 0;
+        object PlayLocker = new object();
+        List<Courier> PlayTimers = new List<Courier>();
 
-        private void PatternStop(bool send = true) {
+        void PatternStop(bool send = true) {
             lock (PlayLocker) {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
@@ -1053,7 +1053,7 @@ namespace Apollo.Windows {
             }
         }
 
-        private void PatternPlay(object sender, RoutedEventArgs e) {
+        void PatternPlay(object sender, RoutedEventArgs e) {
             if (Locked) {
                 PatternStop();
                 PatternFinish();
@@ -1089,12 +1089,12 @@ namespace Apollo.Windows {
             }
         }
 
-        private void PatternFire(object sender, RoutedEventArgs e) {
+        void PatternFire(object sender, RoutedEventArgs e) {
             PlayExit = _pattern.MIDIExit;
             PatternPlay(sender, e);
         }
 
-        private void PatternFinish() {
+        void PatternFinish() {
             Dispatcher.UIThread.InvokeAsync(() => {
                 Locked = false;
 
@@ -1111,7 +1111,7 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
-        private static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
+        static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
             pattern.Repeats = repeats;
             pattern.Gate = gate;
             pattern.Frames = frames;
@@ -1131,7 +1131,7 @@ namespace Apollo.Windows {
             pattern.Window?.Selection.Select(pattern[0]);
         }
 
-        private async void ImportFile(string filepath) {
+        async void ImportFile(string filepath) {
             if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) && !Importer.FramesFromImage(filepath, out frames)) {
                 await MessageWindow.Create(
                     $"An error occurred while reading the file.\n\n" +
@@ -1168,7 +1168,7 @@ namespace Apollo.Windows {
             ImportFrames(_pattern, 1, 1, frames, PlaybackType.Mono, false, null);
         }
 
-        private async void ImportDialog(object sender, RoutedEventArgs e) {
+        async void ImportDialog(object sender, RoutedEventArgs e) {
             if (Locked) return;
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -1446,9 +1446,9 @@ namespace Apollo.Windows {
         public void Export(int left, int right) {}
         public void Import(int right) {}
 
-        private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
+        void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Maximize(null);
             else BeginMoveDrag();
 
@@ -1457,9 +1457,9 @@ namespace Apollo.Windows {
             Activate();
         }
         
-        private void Minimize() => WindowState = WindowState.Minimized;
+        void Minimize() => WindowState = WindowState.Minimized;
 
-        private void Maximize(IPointerDevice e) {
+        void Maximize(IPointerDevice e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;
@@ -1467,14 +1467,14 @@ namespace Apollo.Windows {
             Activate();
         }
 
-        private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
-        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
-        private void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
-        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
-        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
-        private void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
-        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
-        private void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
+        void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
 
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {

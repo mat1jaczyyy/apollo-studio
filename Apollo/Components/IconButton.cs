@@ -12,7 +12,7 @@ namespace Apollo.Components {
 
         protected bool AllowRightClick = false;
 
-        private bool _enabled = true;
+        bool _enabled = true;
         protected bool Enabled {
             get => _enabled;
             set {
@@ -31,8 +31,8 @@ namespace Apollo.Components {
 
         protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Clicked = null;
 
-        private bool mouseHeld = false;
-        private bool mouseOver = false;
+        bool mouseHeld = false;
+        bool mouseOver = false;
 
         protected void MouseEnter(object sender, PointerEventArgs e) {
             if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");

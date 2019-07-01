@@ -20,7 +20,7 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class TrackInfo: UserControl, ISelectViewer {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             NameText = this.Get<TextBlock>("Name");
@@ -47,7 +47,7 @@ namespace Apollo.Viewers {
         ContextMenu TrackContextMenu;
         TextBox Input;
         
-        private void UpdateText(int index) => NameText.Text = _track.ProcessedName;
+        void UpdateText(int index) => NameText.Text = _track.ProcessedName;
 
         public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
@@ -59,9 +59,9 @@ namespace Apollo.Viewers {
             PortSelector.SelectedItem = _track.Launchpad;
         }
 
-        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
-        private void ApplyHeaderBrush(string resource) {
+        void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
 
             if (IsArrangeValid) DropZone.Background = brush;
@@ -102,7 +102,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
             
             MIDI.DevicesUpdated -= HandlePorts;
@@ -120,9 +120,9 @@ namespace Apollo.Viewers {
 
         public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
         
-        private void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
+        void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
 
-        private void ContextMenu_Click(object sender, EventArgs e) {
+        void ContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -130,7 +130,7 @@ namespace Apollo.Viewers {
                 Program.Project.Window?.Selection.Action((string)((MenuItem)item).Header);
         }
 
-        private void Select(PointerPressedEventArgs e) {
+        void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
                 Program.Project.Window?.Selection.Select(_track, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }
@@ -211,9 +211,9 @@ namespace Apollo.Viewers {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        private void Track_Add() => Added?.Invoke(_track.ParentIndex.Value + 1);
+        void Track_Add() => Added?.Invoke(_track.ParentIndex.Value + 1);
 
-        private void Port_Changed(object sender, SelectionChangedEventArgs e) {
+        void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
 
             if (selected != null && _track.Launchpad != selected) {
@@ -235,7 +235,7 @@ namespace Apollo.Viewers {
         List<string> Input_Clean;
         bool Input_Ignore = false;
 
-        private void Input_Changed(string text) {
+        void Input_Changed(string text) {
             if (text == null) return;
             if (text == "") return;
 
@@ -264,7 +264,7 @@ namespace Apollo.Viewers {
             Input.Focus();
         }
         
-        private void Input_LostFocus(object sender, RoutedEventArgs e) {
+        void Input_LostFocus(object sender, RoutedEventArgs e) {
             Input.Text = _track.Name;
 
             Input.Opacity = 0;
@@ -304,15 +304,15 @@ namespace Apollo.Viewers {
             Input_Ignore = false;
         }
 
-        private void Input_KeyDown(object sender, KeyEventArgs e) {
+        void Input_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }
 }

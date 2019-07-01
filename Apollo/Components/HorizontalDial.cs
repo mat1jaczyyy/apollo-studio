@@ -8,7 +8,7 @@ using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class HorizontalDial: Dial {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             ArcCanvas = this.Get<Canvas>("ArcCanvas");

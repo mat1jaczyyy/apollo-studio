@@ -10,9 +10,9 @@ using Apollo.Windows;
 
 namespace Apollo.Components {
     public class RedoButton: IconButton {
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        private void Update_Position(int position) => Enabled = position != Program.Project.Undo.History.Count - 1;
+        void Update_Position(int position) => Enabled = position != Program.Project.Undo.History.Count - 1;
 
         protected override IBrush Fill {
             get => (IBrush)this.Resources["Brush"];

@@ -10,14 +10,14 @@ namespace Apollo.Core {
     public static class Preferences {
         public static PreferencesWindow Window;
 
-        private static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config";
+        static readonly string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.config";
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
         public delegate void Changed();
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
-        private static bool _AlwaysOnTop = true;
+        static bool _AlwaysOnTop = true;
         public static bool AlwaysOnTop {
             get => _AlwaysOnTop;
             set {
@@ -28,7 +28,7 @@ namespace Apollo.Core {
         }
 
         public static event CheckBoxChanged CenterTrackContentsChanged;
-        private static bool _CenterTrackContents = true;
+        static bool _CenterTrackContents = true;
         public static bool CenterTrackContents {
             get => _CenterTrackContents;
             set {
@@ -39,7 +39,7 @@ namespace Apollo.Core {
         }
 
         public static event Changed LaunchpadStyleChanged;
-        private static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
+        static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
         public static LaunchpadStyles LaunchpadStyle {
             get => _LaunchpadStyle;
             set {
@@ -50,7 +50,7 @@ namespace Apollo.Core {
         }
 
         public static event Changed LaunchpadGridRotationChanged;
-        private static bool _LaunchpadGridRotation = false;
+        static bool _LaunchpadGridRotation = false;
         public static bool LaunchpadGridRotation {
             get => _LaunchpadGridRotation;
             set {
@@ -60,7 +60,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _AutoCreateKeyFilter = true;
+        static bool _AutoCreateKeyFilter = true;
         public static bool AutoCreateKeyFilter {
             get => _AutoCreateKeyFilter;
             set {
@@ -69,7 +69,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _AutoCreatePageFilter = false;
+        static bool _AutoCreatePageFilter = false;
         public static bool AutoCreatePageFilter {
             get => _AutoCreatePageFilter;
             set {
@@ -78,7 +78,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _AutoCreatePattern = false;
+        static bool _AutoCreatePattern = false;
         public static bool AutoCreatePattern {
             get => _AutoCreatePattern;
             set {
@@ -89,7 +89,7 @@ namespace Apollo.Core {
 
         public static event SmoothnessChanged FadeSmoothnessChanged;
         public static double FadeSmoothnessSlider { get; private set; } = 1;
-        private static double _FadeSmoothness;
+        static double _FadeSmoothness;
         public static double FadeSmoothness {
             get => _FadeSmoothness;
             set {
@@ -102,7 +102,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _CopyPreviousFrame = false;
+        static bool _CopyPreviousFrame = false;
         public static bool CopyPreviousFrame {
             get => _CopyPreviousFrame;
             set {
@@ -111,7 +111,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _CaptureLaunchpad = false;
+        static bool _CaptureLaunchpad = false;
         public static bool CaptureLaunchpad {
             get => _CaptureLaunchpad;
             set {
@@ -120,7 +120,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _EnableGestures = false;
+        static bool _EnableGestures = false;
         public static bool EnableGestures {
             get => _EnableGestures;
             set {
@@ -129,7 +129,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static string _PaletteName = "mat1jaczyyyPalette";
+        static string _PaletteName = "mat1jaczyyyPalette";
         public static string PaletteName {
             get => _PaletteName;
             set {
@@ -138,7 +138,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static Palette _CustomPalette = Palette.mat1jaczyyyPalette;
+        static Palette _CustomPalette = Palette.mat1jaczyyyPalette;
         public static Palette CustomPalette {
             get => _CustomPalette;
             set {
@@ -147,7 +147,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static Palettes _ImportPalette = Palettes.NovationPalette;
+        static Palettes _ImportPalette = Palettes.NovationPalette;
         public static Palettes ImportPalette {
             get => _ImportPalette;
             set {
@@ -161,7 +161,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static Themes _Theme = Themes.Dark;
+        static Themes _Theme = Themes.Dark;
         public static Themes Theme {
             get => _Theme;
             set {
@@ -170,7 +170,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _Backup = true;
+        static bool _Backup = true;
         public static bool Backup {
             get => _Backup;
             set {
@@ -179,7 +179,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _Autosave = true;
+        static bool _Autosave = true;
         public static bool Autosave {
             get => _Autosave;
             set {
@@ -188,7 +188,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _UndoLimit = true;
+        static bool _UndoLimit = true;
         public static bool UndoLimit {
             get => _UndoLimit;
             set {
@@ -199,7 +199,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _DiscordPresence = true;
+        static bool _DiscordPresence = true;
         public static bool DiscordPresence {
             get => _DiscordPresence;
             set {
@@ -209,7 +209,7 @@ namespace Apollo.Core {
             }
         }
 
-        private static bool _DiscordFilename = false;
+        static bool _DiscordFilename = false;
         public static bool DiscordFilename {
             get => _DiscordFilename;
             set {

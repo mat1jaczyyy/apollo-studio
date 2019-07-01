@@ -36,7 +36,7 @@ namespace Apollo.Elements {
 
         public bool Collapsed = false;
         
-        private bool _enabled = true;
+        bool _enabled = true;
         public bool Enabled {
             get => _enabled;
             set {

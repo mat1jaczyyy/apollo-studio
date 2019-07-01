@@ -14,7 +14,7 @@ using Apollo.Structures;
 
 namespace Apollo.Windows {
     public class LaunchpadWindow: Window {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
@@ -32,7 +32,7 @@ namespace Apollo.Windows {
         TextBlock TitleText, TitleCenter;
         StackPanel CenteringLeft, CenteringRight;
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
         public LaunchpadWindow(Launchpad launchpad) {
             InitializeComponent();
@@ -59,7 +59,7 @@ namespace Apollo.Windows {
             CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             _launchpad.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -87,7 +87,7 @@ namespace Apollo.Windows {
             Grid.Scale = Math.Min(bounds.Width, bounds.Height) / 200;
         }
 
-        private void PadChanged(int index, bool state) {
+        void PadChanged(int index, bool state) {
             Signal n = new Signal(_launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0)));
 
             if (_launchpad is AbletonLaunchpad abletonLaunchpad)
@@ -96,14 +96,14 @@ namespace Apollo.Windows {
             _launchpad.HandleMessage(n, true);
         }
 
-        private void PadPressed(int index) => PadChanged(index, true);
-        private void PadReleased(int index) => PadChanged(index, false);
+        void PadPressed(int index) => PadChanged(index, true);
+        void PadReleased(int index) => PadChanged(index, false);
 
         public void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) {
+        void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Maximize(null);
             else BeginMoveDrag();
 
@@ -112,9 +112,9 @@ namespace Apollo.Windows {
             Activate();
         }
 
-        private void Minimize() => WindowState = WindowState.Minimized;
+        void Minimize() => WindowState = WindowState.Minimized;
 
-        private void Maximize(IPointerDevice e) {
+        void Maximize(IPointerDevice e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;
@@ -122,14 +122,14 @@ namespace Apollo.Windows {
             Activate();
         }
 
-        private void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
-        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
-        private void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
-        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
-        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
-        private void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
-        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
-        private void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
+        void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast);
 
         public static void Create(Launchpad launchpad, Window owner) {
             if (launchpad.Window == null) {

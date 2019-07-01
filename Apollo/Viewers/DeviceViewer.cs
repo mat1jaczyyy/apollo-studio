@@ -31,7 +31,7 @@ namespace Apollo.Viewers {
             Draggable = this.Get<Grid>("Draggable");
         }
 
-        private static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
+        static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
             foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
                     if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi" || device.DeviceIdentifier == "choke")
@@ -165,7 +165,7 @@ namespace Apollo.Viewers {
                 Track.Get(_device)?.Window?.Selection.Action((string)((MenuItem)item).Header);
         }
 
-        private void Select(PointerPressedEventArgs e) {
+        void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
                 Track.Get(_device)?.Window?.Selection.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
         }

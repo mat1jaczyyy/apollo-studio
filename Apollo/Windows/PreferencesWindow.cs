@@ -19,7 +19,7 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class PreferencesWindow: Window {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
@@ -61,16 +61,16 @@ namespace Apollo.Windows {
         Slider FadeSmoothness;
         Controls Contents;
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
-        private void UpdatePorts() {
+        void UpdatePorts() {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
 
             foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new LaunchpadInfo(i)))
                 Contents.Insert(Contents.Count - 1, control);
         }
 
-        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public PreferencesWindow() {
             InitializeComponent();
@@ -121,9 +121,9 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated += HandlePorts;
         }
 
-        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+        void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             Preferences.Window = null;
 
             MIDI.DevicesUpdated -= HandlePorts;
@@ -133,42 +133,42 @@ namespace Apollo.Windows {
             this.Content = null;
         }
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
 
-        private void AlwaysOnTop_Changed(object sender, EventArgs e) {
+        void AlwaysOnTop_Changed(object sender, EventArgs e) {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
             Activate();
         }
 
-        private void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
+        void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        private void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
+        void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
-        private void LaunchpadGridRotation_Changed(object sender, EventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
+        void LaunchpadGridRotation_Changed(object sender, EventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
 
-        private void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
+        void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
-        private void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
+        void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
 
-        private void AutoCreatePattern_Changed(object sender, EventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
+        void AutoCreatePattern_Changed(object sender, EventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
-        private void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
+        void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
 
-        private void CaptureLaunchpad_Changed(object sender, EventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
+        void CaptureLaunchpad_Changed(object sender, EventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 
-        private void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
+        void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
 
-        private void EnableGestures_Changed(object sender, EventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
+        void EnableGestures_Changed(object sender, EventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
 
-        private void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
+        void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
 
-        private void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.Monochrome;
+        void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.Monochrome;
 
-        private void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.NovationPalette;
+        void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.NovationPalette;
 
-        private void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
+        void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
-        private async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
+        async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {
@@ -199,31 +199,31 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Dark_Changed(object sender, EventArgs e) {
+        void Dark_Changed(object sender, EventArgs e) {
             if (Preferences.Theme != Themes.Dark)
                 this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
 
             Preferences.Theme = Themes.Dark;
         }
 
-        private void Light_Changed(object sender, EventArgs e) {
+        void Light_Changed(object sender, EventArgs e) {
             if (Preferences.Theme != Themes.Light)
                 this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
             
             Preferences.Theme = Themes.Light;
         }
 
-        private void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
+        void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
-        private void Autosave_Changed(object sender, EventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
+        void Autosave_Changed(object sender, EventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
 
-        private void UndoLimit_Changed(object sender, EventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
+        void UndoLimit_Changed(object sender, EventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
 
-        private void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
+        void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 
-        private void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
+        void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
-        private void Launchpad_Add() {
+        void Launchpad_Add() {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);
             MIDI.Update();
         }

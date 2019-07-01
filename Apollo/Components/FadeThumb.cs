@@ -9,7 +9,7 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class FadeThumb: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Base = this.Get<Thumb>("Thumb");
@@ -36,7 +36,7 @@ namespace Apollo.Components {
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Moved = null;
             Focused = null;
             Deleted = null;
@@ -47,21 +47,21 @@ namespace Apollo.Components {
 
         bool dragged = false;
 
-        private void DragStarted(object sender, VectorEventArgs e) {
+        void DragStarted(object sender, VectorEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             dragged = false;
         }
 
-        private void DragCompleted(object sender, VectorEventArgs e) {
+        void DragCompleted(object sender, VectorEventArgs e) {
             if (!dragged) Focused?.Invoke(this);
             else if (change != 0) Moved?.Invoke(this, 0, change);
         }
 
-        private void MouseDown(object sender, PointerPressedEventArgs e) {
+        void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton != MouseButton.Left) e.Handled = true;
         }
 
-        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+        void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) {
                 Deleted?.Invoke(this);
                 e.Handled = true;
@@ -70,7 +70,7 @@ namespace Apollo.Components {
 
         double change;
 
-        private void MouseMove(object sender, VectorEventArgs e) {
+        void MouseMove(object sender, VectorEventArgs e) {
             if (!dragged) change = 0;
             change += e.Vector.X;
 

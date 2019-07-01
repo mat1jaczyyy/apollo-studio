@@ -13,14 +13,14 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class UndoWindow: Window {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             ScrollViewer = this.Get<ScrollViewer>("ScrollViewer");
             Contents = this.Get<StackPanel>("Contents");
         }
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
         ScrollViewer ScrollViewer;
         StackPanel Contents;
@@ -67,9 +67,9 @@ namespace Apollo.Windows {
             HighlightPosition(Program.Project.Undo.Position);
         }
 
-        private void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+        void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             Program.Project.Undo.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -79,7 +79,7 @@ namespace Apollo.Windows {
             this.Content = null;
         }
 
-        private void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
+        void UndoEntry_Select(int index) => Program.Project.Undo.Select(index);
 
         public void HighlightSaved(int? index) {
             if (saved.HasValue && saved != current)
@@ -99,7 +99,7 @@ namespace Apollo.Windows {
                 HighlightSaved(Program.Project.Undo.SavedPosition.Value);
         }
 
-        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
                 this.Focus();
                 return;
@@ -111,15 +111,15 @@ namespace Apollo.Windows {
             this.Focus();
         }
 
-        private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         
-        private void Minimize() => WindowState = WindowState.Minimized;
+        void Minimize() => WindowState = WindowState.Minimized;
 
-        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
 
-        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
 
         public static void Create(Window owner) {
             if (Program.Project.Undo.Window == null) {

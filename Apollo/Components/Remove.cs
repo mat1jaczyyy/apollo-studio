@@ -5,7 +5,7 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Remove: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");

@@ -26,7 +26,7 @@ namespace Apollo.Viewers {
             get => null;
         }
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             DropZoneBefore = this.Get<Grid>("DropZoneBefore");
@@ -44,7 +44,7 @@ namespace Apollo.Viewers {
         Controls Contents;
         DeviceAdd DeviceAdd;
 
-        private void SetAlwaysShowing() {
+        void SetAlwaysShowing() {
             bool RootChain = _chain.Parent.GetType() == typeof(Track);
 
             DeviceAdd.AlwaysShowing = Contents.Count == 1;
@@ -93,7 +93,7 @@ namespace Apollo.Viewers {
             }
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _chain.Viewer = null;
             _chain = null;
 
@@ -107,10 +107,10 @@ namespace Apollo.Viewers {
 
         public void Expand(int? index) {}
 
-        private void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
-        private void Device_InsertStart(Type device) => Device_Insert(0, device);
+        void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, _chain));
+        void Device_InsertStart(Type device) => Device_Insert(0, device);
 
-        private void Device_Insert(int index, Device device) {
+        void Device_Insert(int index, Device device) {
             Device r = device.Clone();
             List<int> path = Track.GetPath(_chain);
 
@@ -123,17 +123,17 @@ namespace Apollo.Viewers {
             _chain.Insert(index, device);
         }
 
-        private void Device_Collapsed(int index) {
+        void Device_Collapsed(int index) {
             Contents_Remove(index);
             Contents_Insert(index, _chain[index]);
             
             Track.Get(_chain[index]).Window?.Selection.Select(_chain[index]);
         }
 
-        private void Device_Action(string action) => Device_Action(action, false);
-        private void Device_Action(string action, bool right) => Track.Get(_chain)?.Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
+        void Device_Action(string action) => Device_Action(action, false);
+        void Device_Action(string action, bool right) => Track.Get(_chain)?.Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
 
-        private void DeviceContextMenu_Click(object sender, EventArgs e) {
+        void DeviceContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -141,7 +141,7 @@ namespace Apollo.Viewers {
                 Device_Action((string)((MenuItem)item).Header, sender == DeviceContextMenuAfter);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right) 
                 if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
                 else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
@@ -149,12 +149,12 @@ namespace Apollo.Viewers {
             e.Handled = true;
         }
 
-        private void DragOver(object sender, DragEventArgs e) {
+        void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
         }
 
-        private void Drop(object sender, DragEventArgs e) {
+        void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
             if (!e.Data.Contains("device")) return;
@@ -218,7 +218,7 @@ namespace Apollo.Viewers {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+        void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Device> pasted;
             try {
                 pasted = paste.Contents.Cast<Device>().ToList();

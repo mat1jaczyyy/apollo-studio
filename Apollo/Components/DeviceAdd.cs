@@ -11,7 +11,7 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class DeviceAdd: AddButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<Grid>("Root");
@@ -63,7 +63,7 @@ namespace Apollo.Components {
             base.Unloaded(sender, e);
         }
 
-        private void AddContextMenu_Click(object sender, EventArgs e) {
+        void AddContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -71,7 +71,7 @@ namespace Apollo.Components {
                 Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{((string)((MenuItem)item).Header).Replace(" ", "")}"));
         }
 
-        private void DeviceContextMenu_Click(object sender, EventArgs e) {
+        void DeviceContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 

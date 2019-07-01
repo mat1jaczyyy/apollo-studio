@@ -16,9 +16,9 @@ using Apollo.Windows;
 
 namespace Apollo.Binary {
     public static class Decoder {
-        private static bool DecodeHeader(BinaryReader reader) => reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
+        static bool DecodeHeader(BinaryReader reader) => reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
 
-        private static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
+        static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
         public static async Task<dynamic> Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
@@ -49,7 +49,7 @@ namespace Apollo.Binary {
             }
         }
         
-        private static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
+        static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) return new InvalidDataException();
 

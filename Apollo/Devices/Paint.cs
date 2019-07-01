@@ -4,7 +4,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Paint: Device {
-        private Color _color;
+        Color _color;
         public Color Color {
             get => _color;
             set {

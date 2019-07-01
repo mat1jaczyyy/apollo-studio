@@ -42,7 +42,7 @@ namespace Apollo.Elements {
         public event ParentIndexChangedEventHandler ParentIndexChanged;
         public void ClearParentIndexChanged() => ParentIndexChanged = null;
 
-        private int? _ParentIndex;
+        int? _ParentIndex;
         public int? ParentIndex {
             get => _ParentIndex;
             set {
@@ -53,7 +53,7 @@ namespace Apollo.Elements {
             }
         }
 
-        private Action<Signal> _midiexit = null;
+        Action<Signal> _midiexit = null;
         public Action<Signal> MIDIExit {
             get => _midiexit;
             set {
@@ -63,9 +63,9 @@ namespace Apollo.Elements {
         }
 
         public List<Device> Devices = new List<Device>();
-        private Action<Signal> _chainenter = null;
+        Action<Signal> _chainenter = null;
 
-        private void Reroute() {
+        void Reroute() {
             for (int i = 0; i < Devices.Count; i++) {
                 Devices[i].Parent = this;
                 Devices[i].ParentIndex = i;
@@ -92,7 +92,7 @@ namespace Apollo.Elements {
             get => Devices.Count;
         }
 
-        private string _name;
+        string _name;
         public string Name {
             get => _name;
             set {
@@ -111,7 +111,7 @@ namespace Apollo.Elements {
             } 
         }
 
-        private bool _enabled = true;
+        bool _enabled = true;
         public bool Enabled {
             get => _enabled;
             set {

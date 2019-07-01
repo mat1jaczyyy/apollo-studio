@@ -9,7 +9,7 @@ using Apollo.Windows;
 
 namespace Apollo.Components {
     public class ProjectButton: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");

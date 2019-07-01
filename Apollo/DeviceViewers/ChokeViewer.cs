@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class ChokeViewer: UserControl {
         public static readonly string DeviceIdentifier = "choke";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Target = this.Get<Dial>("Target");
@@ -38,9 +38,9 @@ namespace Apollo.DeviceViewers {
             parent.Root.Children.Insert(2, new DeviceTail(_choke, parent));
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
 
-        private void Target_Changed(double value, double? old) {
+        void Target_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;

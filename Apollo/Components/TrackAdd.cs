@@ -10,7 +10,7 @@ using Avalonia.VisualTree;
 
 namespace Apollo.Components {
     public class TrackAdd: AddButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
@@ -52,7 +52,7 @@ namespace Apollo.Components {
             base.Unloaded(sender, e);
         }
 
-        private void ActionContextMenu_Click(object sender, EventArgs e) {
+        void ActionContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 

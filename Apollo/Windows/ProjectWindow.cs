@@ -27,7 +27,7 @@ namespace Apollo.Windows {
             get => null;
         }
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
@@ -53,14 +53,14 @@ namespace Apollo.Windows {
         TextBox BPM;
         HorizontalDial Page;
 
-        private void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
+        void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        private void UpdatePage() => Page.RawValue = Program.Project.Page;
-        private void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
+        void UpdatePage() => Page.RawValue = Program.Project.Page;
+        void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
         
-        private void SetAlwaysShowing() {
+        void SetAlwaysShowing() {
             TrackAdd.AlwaysShowing = (Contents.Count == 1);
 
             for (int i = 1; i < Contents.Count; i++)
@@ -115,7 +115,7 @@ namespace Apollo.Windows {
             CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
         
-        private void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
             
             Program.Project.PathChanged += UpdateTitle;
@@ -125,7 +125,7 @@ namespace Apollo.Windows {
             UpdatePage();
         }
 
-        private void Unloaded(object sender, CancelEventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Program.Project.Window = null;
 
             Program.Project.PathChanged -= UpdateTitle;
@@ -156,10 +156,10 @@ namespace Apollo.Windows {
         
         public void Expand(int? index) {}
 
-        private void Track_Insert(int index) => Track_Insert(index, new Track());
-        private void Track_InsertStart() => Track_Insert(0);
+        void Track_Insert(int index) => Track_Insert(index, new Track());
+        void Track_InsertStart() => Track_Insert(0);
 
-        private void Track_Insert(int index, Track track) {
+        void Track_Insert(int index, Track track) {
             Track r = track.Clone();
 
             Program.Project.Undo.Add($"Track {index + 1} Inserted", () => {
@@ -171,7 +171,7 @@ namespace Apollo.Windows {
             Program.Project.Insert(index, track);
         }
 
-        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
@@ -182,14 +182,14 @@ namespace Apollo.Windows {
                     TrackWindow.Create((Track)i, this);
         }
 
-        private void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
+        void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
 
-        private Action BPM_Update;
-        private bool BPM_Dirty = false;
-        private int BPM_Clean = Program.Project.BPM;
-        private bool BPM_Ignore = false;
+        Action BPM_Update;
+        bool BPM_Dirty = false;
+        int BPM_Clean = Program.Project.BPM;
+        bool BPM_Ignore = false;
 
-        private void BPM_Changed(string text) {
+        void BPM_Changed(string text) {
             if (text == null) return;
             if (text == "") text = "0";
 
@@ -227,16 +227,16 @@ namespace Apollo.Windows {
             });
         }
         
-        private void BPM_KeyDown(object sender, KeyEventArgs e) {
+        void BPM_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return) 
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        private void BPM_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void BPM_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void BPM_Unfocus(object sender, RoutedEventArgs e) {
+        void BPM_Unfocus(object sender, RoutedEventArgs e) {
             if (BPM_Clean != Program.Project.BPM) {
                 int u = BPM_Clean;
                 int r = BPM_Clean = Program.Project.BPM;
@@ -260,13 +260,13 @@ namespace Apollo.Windows {
             this.Focus();
         }
 
-        private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         
-        private void Minimize() => WindowState = WindowState.Minimized;
+        void Minimize() => WindowState = WindowState.Minimized;
 
-        private async void CheckClose(bool force) {
+        async void CheckClose(bool force) {
             if (force || Program.Project.Tracks.FirstOrDefault(i => i.Window != null) == null) {
                 string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
                     "You have unsaved changes. Do you want to save before closing?\n",
@@ -283,9 +283,9 @@ namespace Apollo.Windows {
             } else Close();
         }
 
-        private void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
 
-        private void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
 
         public static void Create(Window owner) {
             if (Program.Project.Window == null) {
@@ -298,10 +298,10 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Track_Action(string action) => Track_Action(action, false);
-        private void Track_Action(string action, bool right) => Program.Project.Window?.Selection.Action(action, Program.Project, (right? Program.Project.Count : 0) - 1);
+        void Track_Action(string action) => Track_Action(action, false);
+        void Track_Action(string action, bool right) => Program.Project.Window?.Selection.Action(action, Program.Project, (right? Program.Project.Count : 0) - 1);
 
-        private void TrackContextMenu_Click(object sender, EventArgs e) {
+        void TrackContextMenu_Click(object sender, EventArgs e) {
             this.Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -309,19 +309,19 @@ namespace Apollo.Windows {
                 Track_Action((string)((MenuItem)item).Header, true);
         }
 
-        private void Click(object sender, PointerReleasedEventArgs e) {
+        void Click(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton == MouseButton.Right)
                 TrackContextMenu.Open((Control)sender);
 
             e.Handled = true;
         }
 
-        private void DragOver(object sender, DragEventArgs e) {
+        void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("track")) e.DragEffects = DragDropEffects.None; 
         }
 
-        private void Drop(object sender, DragEventArgs e) {
+        void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
             if (!e.Data.Contains("track")) return;
@@ -372,7 +372,7 @@ namespace Apollo.Windows {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        private void Copyable_Insert(Copyable paste, int right, bool imported) {
+        void Copyable_Insert(Copyable paste, int right, bool imported) {
             List<Track> pasted;
             try {
                 pasted = paste.Contents.Cast<Track>().ToList();

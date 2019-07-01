@@ -10,7 +10,7 @@ using Apollo.Windows;
 
 namespace Apollo.Components {
     public class PreferencesButton: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
    
             Hole = this.Get<Ellipse>("Hole");

@@ -17,7 +17,7 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class TrackWindow: Window {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             TitleText = this.Get<TextBlock>("Title");
@@ -38,15 +38,15 @@ namespace Apollo.Windows {
         TextBlock TitleText, TitleCenter;
         StackPanel CenteringLeft, CenteringRight;
         
-        private void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
-        private void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
-        private void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
-        private void UpdateTitle(int index, string name)
+        void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
+        void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
+        void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
+        void UpdateTitle(int index, string name)
             => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
-        private void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
+        void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
         public SelectionManager Selection = new SelectionManager();
 
@@ -79,7 +79,7 @@ namespace Apollo.Windows {
             CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
-        private void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             Program.Project.PathChanged += UpdateTitle;
@@ -88,7 +88,7 @@ namespace Apollo.Windows {
             UpdateTitle();
         }
 
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             _track.Window = null;
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
@@ -118,18 +118,18 @@ namespace Apollo.Windows {
 
         public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
 
-        private void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
+        void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
-        private bool InChoke() => Selection.Start is Device &&
+        bool InChoke() => Selection.Start is Device &&
             Selection.Start.IParent is Chain &&
             ((Chain)Selection.Start.IParent).Parent?.GetType() == typeof(Choke);
 
-        private bool InMultiPreprocess() => Selection.Start is Device &&
+        bool InMultiPreprocess() => Selection.Start is Device &&
             Selection.Start.IParent is ISelect &&
             ((ISelect)Selection.Start.IParent).IParentIndex == null &&
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
-        private async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
@@ -182,13 +182,13 @@ namespace Apollo.Windows {
             }
         }
 
-        private void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
 
-        private void Minimize() => WindowState = WindowState.Minimized;
+        void Minimize() => WindowState = WindowState.Minimized;
         
-        private void Expand(IPointerDevice e) {
+        void Expand(IPointerDevice e) {
             Point pointerRelative = e.GetPosition(this);
 
             PixelPoint pointerAbsolute = new PixelPoint(
@@ -210,9 +210,9 @@ namespace Apollo.Windows {
             }
         }
 
-        private void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
 
-        private void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
 
         public static void Create(Track track, Window owner) {
             if (track.Window == null) {

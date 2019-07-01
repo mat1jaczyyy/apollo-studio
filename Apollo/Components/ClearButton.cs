@@ -9,7 +9,7 @@ using Apollo.Elements;
 
 namespace Apollo.Components {
     public class ClearButton: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");

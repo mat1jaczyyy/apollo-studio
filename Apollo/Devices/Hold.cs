@@ -7,7 +7,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Hold: Device {
-        private Time _time;
+        Time _time;
         public Time Time {
             get => _time;
             set {
@@ -30,19 +30,19 @@ namespace Apollo.Devices {
             }
         }
 
-        private void FreeChanged(int value) {
+        void FreeChanged(int value) {
             if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetDurationValue(value);
         }
 
-        private void ModeChanged(bool value) {
+        void ModeChanged(bool value) {
             if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetMode(value);
         }
 
-        private void StepChanged(Length value) {
+        void StepChanged(Length value) {
             if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
-        private decimal _gate;
+        decimal _gate;
         public decimal Gate {
             get => _gate;
             set {
@@ -54,7 +54,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _infinite;
+        bool _infinite;
         public bool Infinite {
             get => _infinite;
             set {
@@ -64,7 +64,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _release;
+        bool _release;
         public bool Release {
             get => _release;
             set {
@@ -74,8 +74,8 @@ namespace Apollo.Devices {
             }
         }
 
-        private ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
-        private ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
 
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
@@ -89,7 +89,7 @@ namespace Apollo.Devices {
             Release = release;
         }
 
-        private void Tick(object sender, EventArgs e) {
+        void Tick(object sender, EventArgs e) {
             if (Disposed) return;
 
             Courier courier = (Courier)sender;

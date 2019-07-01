@@ -17,7 +17,7 @@ namespace Apollo.Components {
         public delegate void HistoryChangedEventHandler();
         public static event HistoryChangedEventHandler HistoryChanged;
 
-        private static List<Color> History = new List<Color>();
+        static List<Color> History = new List<Color>();
 
         public static Color GetColor(int index) => (index < Count)? History[index] : null;
 
@@ -30,7 +30,7 @@ namespace Apollo.Components {
             get => History.Count;
         }
 
-        private static void Use(Color color) {
+        static void Use(Color color) {
             if (History.Contains(color)) History.Remove(color);
             History.Insert(0, color);
 
@@ -44,7 +44,7 @@ namespace Apollo.Components {
         
         static ColorHistory() => HistoryChanged += Preferences.Save;
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Grid = this.Get<UniformGrid>("Grid");
@@ -96,7 +96,7 @@ namespace Apollo.Components {
 
         public void Input(int index) => Select((CurrentIndex == -1)? (index - 1) : index);
 
-        private void Draw() {
+        void Draw() {
             int offset = 0;
 
             if (CurrentIndex == -1) {
@@ -157,11 +157,11 @@ namespace Apollo.Components {
             Draw();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
             HistoryChanged -= Draw;
         }
 
-        private void Clicked(object sender, PointerReleasedEventArgs e) => Input(Grid.Children.IndexOf((IControl)sender));
+        void Clicked(object sender, PointerReleasedEventArgs e) => Input(Grid.Children.IndexOf((IControl)sender));
     }
 }

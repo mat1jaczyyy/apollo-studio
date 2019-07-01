@@ -28,7 +28,7 @@ namespace Apollo.Devices {
             get => false;
         }
 
-        private Action<Signal> _midiexit;
+        Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
             get => _midiexit;
             set {
@@ -40,9 +40,9 @@ namespace Apollo.Devices {
         public Chain Preprocess;
         public List<Chain> Chains = new List<Chain>();
 
-        private Random RNG = new Random();
+        Random RNG = new Random();
 
-        private MultiType _mode;
+        MultiType _mode;
         public MultiType Mode {
             get => _mode;
             set {
@@ -52,10 +52,10 @@ namespace Apollo.Devices {
             }
         }
 
-        private int current = -1;
-        private ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        int current = -1;
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
 
-        private void Reroute() {
+        void Reroute() {
             Preprocess.Parent = this;
             Preprocess.MIDIExit = PreprocessExit;
 
@@ -104,7 +104,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        private void Reset() => current = -1;
+        void Reset() => current = -1;
 
         public int? Expanded { get; set; }
 
@@ -122,7 +122,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        private void ChainExit(Signal n) => MIDIExit?.Invoke(n);
+        void ChainExit(Signal n) => MIDIExit?.Invoke(n);
 
         public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
@@ -156,7 +156,7 @@ namespace Apollo.Devices {
             Preprocess.MIDIEnter(m);
         }
 
-        private void PreprocessExit(Signal n) {
+        void PreprocessExit(Signal n) {
             int target = n.MultiTarget.Value;
             n.MultiTarget = null;
             

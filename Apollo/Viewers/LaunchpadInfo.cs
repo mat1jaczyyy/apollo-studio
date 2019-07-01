@@ -16,7 +16,7 @@ using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class LaunchpadInfo: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Popout = this.Get<Popout>("Popout");
@@ -47,7 +47,7 @@ namespace Apollo.Viewers {
             TargetPortSelector.SelectedItem = target;
         }
 
-        private void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         public LaunchpadInfo(Launchpad launchpad) {
             InitializeComponent();
@@ -78,20 +78,20 @@ namespace Apollo.Viewers {
             }
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             if (_launchpad.GetType() == typeof(AbletonLaunchpad))
                 MIDI.DevicesUpdated -= HandlePorts;
             
             _launchpad = null;
         }
 
-        private void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
+        void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
 
-        private void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (RotationType)Rotation.SelectedIndex;
+        void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (RotationType)Rotation.SelectedIndex;
 
-        private void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (InputType)InputFormatSelector.SelectedIndex;
+        void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (InputType)InputFormatSelector.SelectedIndex;
 
-        private void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
+        void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)TargetPortSelector.SelectedItem;
 
             if (_launchpad is AbletonLaunchpad abletonLaunchpad && selected != null && abletonLaunchpad.Target != selected)

@@ -10,7 +10,7 @@ using Apollo.Structures;
 
 namespace Apollo.Elements {
     public class AbletonLaunchpad: Launchpad {
-        private Launchpad _target = null;
+        Launchpad _target = null;
         public Launchpad Target {
             get => _target;
             set {

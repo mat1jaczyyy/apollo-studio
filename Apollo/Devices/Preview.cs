@@ -3,7 +3,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Preview: Device {
-        private Screen screen;
+        Screen screen;
 
         public override Device Clone() => new Preview() {
             Collapsed = Collapsed,

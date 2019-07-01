@@ -14,7 +14,7 @@ namespace Apollo.DeviceViewers {
     public class FlipViewer: UserControl {
         public static readonly string DeviceIdentifier = "flip";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             FlipMode = this.Get<ComboBox>("FlipMode");
@@ -34,9 +34,9 @@ namespace Apollo.DeviceViewers {
             Bypass.IsChecked = _flip.Bypass;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
 
-        private void Mode_Changed(object sender, SelectionChangedEventArgs e) {
+        void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             FlipType selected = (FlipType)FlipMode.SelectedIndex;
 
             if (_flip.Mode != selected) {
@@ -56,7 +56,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(FlipType mode) => FlipMode.SelectedIndex = (int)mode;
 
-        private void Bypass_Changed(object sender, EventArgs e) {
+        void Bypass_Changed(object sender, EventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
             if (_flip.Bypass != value) {

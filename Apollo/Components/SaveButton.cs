@@ -13,7 +13,7 @@ using Apollo.Core;
 
 namespace Apollo.Components {
     public class SaveButton: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");
@@ -21,7 +21,7 @@ namespace Apollo.Components {
 
         ContextMenu SaveContextMenu;
 
-        private void Update_Saved(bool saved) => Enabled = !saved;
+        void Update_Saved(bool saved) => Enabled = !saved;
 
         Path Path;
 
@@ -51,7 +51,7 @@ namespace Apollo.Components {
             SaveContextMenu = null;
         }
 
-        private async void SaveContextMenu_Click(object sender, EventArgs e) {
+        async void SaveContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 

@@ -13,7 +13,7 @@ namespace Apollo.DeviceViewers {
     public class SwitchViewer: UserControl {
         public static readonly string DeviceIdentifier = "switch";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Page = this.Get<Dial>("Page");
@@ -30,9 +30,9 @@ namespace Apollo.DeviceViewers {
             Page.RawValue = _switch.Page;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
-        private void Page_Changed(double value, double? old) {
+        void Page_Changed(double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;

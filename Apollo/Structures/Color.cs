@@ -8,9 +8,9 @@ using AvaloniaColor = Avalonia.Media.Color;
 
 namespace Apollo.Structures {
     public class Color {
-        private byte _r, _g, _b;
+        byte _r, _g, _b;
 
-        private bool IsValid(byte value) => 0 <= value && value <= 63;
+        bool IsValid(byte value) => 0 <= value && value <= 63;
 
         public byte Red {
             get => _r;

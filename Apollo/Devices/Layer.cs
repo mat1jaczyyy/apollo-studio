@@ -7,7 +7,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Layer: Device {
-        private int _target;
+        int _target;
         public int Target {
             get => _target;
             set {

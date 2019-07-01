@@ -289,7 +289,7 @@ namespace Apollo.Helpers {
 
         public readonly Color[] BackingArray;
 
-        private Func<byte, Color> _converter;
+        Func<byte, Color> _converter;
 
         public Palette(Func<byte, Color> converter) => _converter = converter;
 

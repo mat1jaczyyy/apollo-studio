@@ -7,7 +7,7 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Close: IconButton {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");

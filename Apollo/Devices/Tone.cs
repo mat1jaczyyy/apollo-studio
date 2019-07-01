@@ -4,7 +4,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Tone: Device {
-        private double _h, _sh, _sl, _vh, _vl;
+        double _h, _sh, _sl, _vh, _vl;
 
         public double Hue {
             get => _h;

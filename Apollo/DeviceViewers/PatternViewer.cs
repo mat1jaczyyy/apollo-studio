@@ -10,7 +10,7 @@ namespace Apollo.DeviceViewers {
     public class PatternViewer: UserControl {
         public static readonly string DeviceIdentifier = "pattern";
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Pattern _pattern;
 
@@ -20,8 +20,8 @@ namespace Apollo.DeviceViewers {
             _pattern = pattern;
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _pattern = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _pattern = null;
 
-        private void Pattern_Popout() => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
+        void Pattern_Popout() => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
     }
 }

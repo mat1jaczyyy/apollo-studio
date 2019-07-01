@@ -5,7 +5,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Switch: Device {
-        private int _page = 1;
+        int _page = 1;
         public int Page {
             get => _page;
             set {

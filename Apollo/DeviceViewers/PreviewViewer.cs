@@ -12,7 +12,7 @@ namespace Apollo.DeviceViewers {
     public class PreviewViewer: UserControl {
         public static readonly string DeviceIdentifier = "preview";
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Grid = this.Get<LaunchpadGrid>("Grid");
@@ -31,13 +31,13 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _preview = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _preview = null;
 
-        private void PadChanged(int index, bool state) => _preview.MIDIEnter(new Signal(Track.Get(_preview)?.Launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
-        private void PadPressed(int index) => PadChanged(index, true);
-        private void PadReleased(int index) => PadChanged(index, false);
+        void PadChanged(int index, bool state) => _preview.MIDIEnter(new Signal(Track.Get(_preview)?.Launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
+        void PadPressed(int index) => PadChanged(index, true);
+        void PadReleased(int index) => PadChanged(index, false);
 
-        private void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+        void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
     }

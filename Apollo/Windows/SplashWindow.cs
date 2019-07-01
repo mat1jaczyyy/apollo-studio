@@ -16,9 +16,9 @@ using Apollo.Enums;
 
 namespace Apollo.Windows {
     public class SplashWindow: Window {
-        private static Image SplashImage = (Image)Application.Current.Styles.FindResource("SplashImage");
+        static Image SplashImage = (Image)Application.Current.Styles.FindResource("SplashImage");
 
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
@@ -26,7 +26,7 @@ namespace Apollo.Windows {
 
         Grid Root;
 
-        private void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => Topmost = value;
 
         public SplashWindow() {
             InitializeComponent();
@@ -42,7 +42,7 @@ namespace Apollo.Windows {
             Root.Children.Add(SplashImage);
         }
 
-        private async void Loaded(object sender, EventArgs e) {
+        async void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) {
@@ -63,7 +63,7 @@ namespace Apollo.Windows {
             Program.Args = null;
         }
         
-        private void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, EventArgs e) {
             Root.Children.Remove(SplashImage);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -127,6 +127,6 @@ namespace Apollo.Windows {
                 ReadFile(result[0]);
         }
 
-        private void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
     }
 }

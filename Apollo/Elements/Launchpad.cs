@@ -28,12 +28,12 @@ namespace Apollo.Elements {
         public delegate void MultiResetHandler();
         public static event MultiResetHandler MultiReset;
 
-        private IMidiInputDevice Input;
-        private IMidiOutputDevice Output;
+        IMidiInputDevice Input;
+        IMidiOutputDevice Output;
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        private InputType _format = InputType.DrumRack;
+        InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
             set {
@@ -45,7 +45,7 @@ namespace Apollo.Elements {
             }
         }
 
-        private RotationType _rotation = RotationType.D0;
+        RotationType _rotation = RotationType.D0;
         public virtual RotationType Rotation {
             get => _rotation;
             set {
@@ -73,9 +73,9 @@ namespace Apollo.Elements {
             ? screen.GetColor(index)
             : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
 
-        private readonly static SysExMessage Inquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
+        readonly static SysExMessage Inquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
 
-        private LaunchpadType AttemptIdentify(SysExMessage response) {
+        LaunchpadType AttemptIdentify(SysExMessage response) {
             if (response.Data.Length != 15)
                 return LaunchpadType.Unknown;
 
@@ -101,7 +101,7 @@ namespace Apollo.Elements {
             return LaunchpadType.Unknown;
         }
 
-        private void WaitForIdentification(object sender, in SysExMessage e) {
+        void WaitForIdentification(object sender, in SysExMessage e) {
             if ((Type = AttemptIdentify(e)) != LaunchpadType.Unknown) {
                 Input.SysEx -= WaitForIdentification;
 
@@ -124,7 +124,7 @@ namespace Apollo.Elements {
         }
 
         [HandleProcessCorruptedStateExceptions]
-        private bool SysExSend(byte[] raw) {
+        bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
             if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = 0x6F;
@@ -272,14 +272,14 @@ namespace Apollo.Elements {
             new Color((byte)(e.Velocity >> 1))
         ));
 
-        private void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
+        void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
             InputFormat,
             this,
             (byte)e.Key,
             new Color(0)
         ));
 
-        private void ControlChange(object sender, in ControlChangeMessage e) {
+        void ControlChange(object sender, in ControlChangeMessage e) {
             switch (Type) {
                 case LaunchpadType.MK2:
                     if (104 <= e.Control && e.Control <= 111)

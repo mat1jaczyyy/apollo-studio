@@ -16,7 +16,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class LaunchpadGrid: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<LayoutTransformControl>("Root");
@@ -45,7 +45,7 @@ namespace Apollo.Components {
         public static int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
         public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
-        private bool IsPhantom(int index) {
+        bool IsPhantom(int index) {
             if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
                 int x = index % 10;
                 int y = index / 10;
@@ -69,7 +69,7 @@ namespace Apollo.Components {
             for (int i = 0; i < 100; i++) SetColor(i, color);
         }
 
-        private void Update_LaunchpadStyle() {
+        void Update_LaunchpadStyle() {
             if (LowQuality) return;
 
             for (int i = 0; i < 100; i++) {
@@ -79,7 +79,7 @@ namespace Apollo.Components {
             }
         }
 
-        private double _scale = 1;
+        double _scale = 1;
         public double Scale {
             get => _scale;
             set {
@@ -91,9 +91,9 @@ namespace Apollo.Components {
             }
         }
 
-        private double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
+        double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
         
-        private bool _lowQuality = false;
+        bool _lowQuality = false;
         public bool LowQuality {
             get => _lowQuality;
             set {
@@ -105,7 +105,7 @@ namespace Apollo.Components {
             }
         }
 
-        private readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
+        readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
 
         public Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
             ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
@@ -136,7 +136,7 @@ namespace Apollo.Components {
             Elements[55].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
-        private void ApplyScale() {
+        void ApplyScale() {
             this.Resources["Rotation"] = (double)((Preferences.LaunchpadGridRotation && !LowQuality)? -45 : 0);
             this.Resources["CanvasSize"] = 184 * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
@@ -200,7 +200,7 @@ namespace Apollo.Components {
             ApplyScale();
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             PadStarted = null;
             PadFinished = null;
             PadPressed = null;
@@ -217,7 +217,7 @@ namespace Apollo.Components {
             Clear();
         }
 
-        private void LayoutChanged(object sender, EventArgs e) => DrawPath();
+        void LayoutChanged(object sender, EventArgs e) => DrawPath();
 
         public void RenderFrame(Frame frame) {
             for (int i = 0; i < 100; i++)
@@ -227,7 +227,7 @@ namespace Apollo.Components {
         bool mouseHeld = false;
         Shape mouseOver = null;
 
-        private void MouseDown(object sender, PointerPressedEventArgs e) {
+        void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = true;
 
@@ -239,7 +239,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseUp(object sender, PointerReleasedEventArgs e) {
+        void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 MouseMove(sender, e);
                 PadFinished?.Invoke(Array.IndexOf(Elements, (IControl)sender));
@@ -253,15 +253,15 @@ namespace Apollo.Components {
             }
         }
 
-        private void MouseEnter(Shape control, InputModifiers mods) {
+        void MouseEnter(Shape control, InputModifiers mods) {
             int index = Array.IndexOf(Elements, (IControl)control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
         }
 
-        private void MouseLeave(Shape control) => PadReleased?.Invoke(Array.IndexOf(Elements, (IControl)control));
+        void MouseLeave(Shape control) => PadReleased?.Invoke(Array.IndexOf(Elements, (IControl)control));
 
-        private void MouseMove(object sender, PointerEventArgs e) {
+        void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
                 IInputElement _over = Root.InputHitTest(e.Device.GetPosition(Root));
 

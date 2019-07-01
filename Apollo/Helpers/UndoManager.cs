@@ -23,7 +23,7 @@ namespace Apollo.Helpers {
 
         public UndoWindow Window;
 
-        private object locker = new object();
+        object locker = new object();
 
         public List<UndoEntry> History = new List<UndoEntry>() {
             new UndoEntry("Initial State")
@@ -32,7 +32,7 @@ namespace Apollo.Helpers {
         public delegate void PositionChangedEventHandler(int position);
         public event PositionChangedEventHandler PositionChanged;
 
-        private int _position = 0;
+        int _position = 0;
         public int Position { 
             get => _position;
             private set {
@@ -48,7 +48,7 @@ namespace Apollo.Helpers {
         public delegate void SavedPositionChangedEventHandler(int? position);
         public event SavedPositionChangedEventHandler SavedPositionChanged;
 
-        private int? _saved = null;
+        int? _saved = null;
         public int? SavedPosition {
             get => _saved;
         }

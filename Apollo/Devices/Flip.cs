@@ -5,7 +5,7 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Flip: Device {
-        private FlipType _mode;
+        FlipType _mode;
         public FlipType Mode {
             get => _mode;
             set {
@@ -15,7 +15,7 @@ namespace Apollo.Devices {
             }
         }
 
-        private bool _bypass;
+        bool _bypass;
         public bool Bypass {
             get => _bypass;
             set {

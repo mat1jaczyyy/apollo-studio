@@ -16,7 +16,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class ColorPicker: UserControl {
-        private void InitializeComponent() {
+        void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Preview = this.Get<Ellipse>("Color");
@@ -35,7 +35,7 @@ namespace Apollo.Components {
         public delegate void ColorChangedEventHandler(Color value, Color old);
         public event ColorChangedEventHandler ColorChanged;
 
-        private Color _color = new Color();
+        Color _color = new Color();
         public Color Color {
             get => _color;
             private set {
@@ -59,7 +59,7 @@ namespace Apollo.Components {
         TextBox Hex;
 
         bool main_mouseHeld, hue_mouseHeld, hexValidation;
-        private Color oldColor;
+        Color oldColor;
 
         public ColorPicker() {
             InitializeComponent();
@@ -71,13 +71,13 @@ namespace Apollo.Components {
             Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
 
-        private void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => ColorChanged = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => ColorChanged = null;
 
         public void Bounds_Updated(Rect bounds) {
             if (!bounds.IsEmpty) InitCanvas();
         }
 
-        private void InitCanvas() {
+        void InitCanvas() {
             double hueHeight = HueCanvas.Bounds.Height;
             double mainWidth = MainCanvas.Bounds.Width;
             double mainHeight = MainCanvas.Bounds.Height;
@@ -94,13 +94,13 @@ namespace Apollo.Components {
             UpdateText();
         }
 
-        private void UpdateText() {
+        void UpdateText() {
             hexValidation = false;
             Hex.Text = Color.ToHex();
             hexValidation = true;
         }
 
-        private void UpdateColor() {
+        void UpdateColor() {
             double hue = Canvas.GetTop(HueThumb) * 360 / HueCanvas.Bounds.Height;
             double saturation = Canvas.GetLeft(MainThumb) / MainCanvas.Bounds.Width;
             double value = (1 - (Canvas.GetTop(MainThumb) / MainCanvas.Bounds.Height));
@@ -112,7 +112,7 @@ namespace Apollo.Components {
             UpdateText();
         }
 
-        private void UpdateCanvas() {
+        void UpdateCanvas() {
             double hue = Canvas.GetTop(HueThumb) * 6 / HueCanvas.Bounds.Height;
 
             int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
@@ -131,7 +131,7 @@ namespace Apollo.Components {
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
         }
 
-        private void MainThumb_Move(object sender, VectorEventArgs e) {
+        void MainThumb_Move(object sender, VectorEventArgs e) {
             double x = Canvas.GetLeft(MainThumb) + e.Vector.X;
             x = (x < 0)? 0 : x;
             x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;
@@ -146,7 +146,7 @@ namespace Apollo.Components {
             UpdateColor();
         }
 
-        private void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
+        void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = true;
                 e.Device.Capture(MainCanvas);
@@ -161,7 +161,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+        void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (main_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = false;
                 e.Device.Capture(null);
@@ -171,7 +171,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void MainCanvas_MouseMove(object sender, PointerEventArgs e) {
+        void MainCanvas_MouseMove(object sender, PointerEventArgs e) {
             if (main_mouseHeld) {
                 Vector position = e.GetPosition(MainThumb);
                 position = position.WithX(position.X - MainThumb.Bounds.Width / 2)
@@ -181,7 +181,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void HueThumb_Move(object sender, VectorEventArgs e) {
+        void HueThumb_Move(object sender, VectorEventArgs e) {
             double y = Canvas.GetTop(HueThumb) + e.Vector.Y;
             y = (y < 0)? 0 : y;
             y = y > HueCanvas.Bounds.Height? HueCanvas.Bounds.Height : y;
@@ -192,7 +192,7 @@ namespace Apollo.Components {
             UpdateCanvas();
         }
 
-        private void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
+        void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = true;
                 e.Device.Capture(HueCanvas);
@@ -206,7 +206,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+        void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (hue_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = false;
                 e.Device.Capture(null);
@@ -216,7 +216,7 @@ namespace Apollo.Components {
             }
         }
 
-        private void HueCanvas_MouseMove(object sender, PointerEventArgs e) {
+        void HueCanvas_MouseMove(object sender, PointerEventArgs e) {
             if (hue_mouseHeld) {
                 Vector position = e.GetPosition(HueThumb);
                 position = position.WithY(position.Y - HueThumb.Bounds.Height / 2);
@@ -225,9 +225,9 @@ namespace Apollo.Components {
             }
         }
 
-        private bool Hex_Dirty = false;
+        bool Hex_Dirty = false;
 
-        private Action HexAction(string text) {
+        Action HexAction(string text) {
             Action update = () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
 
             foreach (char i in text.Substring(1))
@@ -263,7 +263,7 @@ namespace Apollo.Components {
             });
         }
 
-        private void Hex_Changed(string text) {
+        void Hex_Changed(string text) {
             if (!hexValidation) return;
             
             if (text == null) return;
@@ -272,16 +272,16 @@ namespace Apollo.Components {
             Dispatcher.UIThread.InvokeAsync(HexAction(text.ToUpper()));
         }
         
-        private void Hex_KeyDown(object sender, KeyEventArgs e) {
+        void Hex_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return)
                 this.Focus();
             
             e.Key = Key.None;
         }
         
-        private void Hex_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Hex_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
-        private void Hex_Unfocus(object sender, RoutedEventArgs e) {
+        void Hex_Unfocus(object sender, RoutedEventArgs e) {
             if (oldColor != Color)
                 ColorChanged?.Invoke(Color, oldColor);
 
