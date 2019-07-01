@@ -80,7 +80,7 @@ namespace Apollo.Devices {
             if (n.Color.Lit) {
                 (double hue, double saturation, double value) = n.Color.ToHSV();
 
-                hue = (hue + Hue) % 360;
+                hue = (hue + Hue + 360) % 360;
                 saturation = saturation * (SaturationHigh - SaturationLow) + SaturationLow;
                 value = value * (ValueHigh - ValueLow) + ValueLow;
 
