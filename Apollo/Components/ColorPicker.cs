@@ -105,7 +105,7 @@ namespace Apollo.Components {
 
             Color = Color.FromHSV(hue, saturation, value);
 
-            Preview.Fill = Color.ToBrush();
+            Preview.Fill = Color.ToScreenBrush();
 
             UpdateText();
         }
@@ -256,7 +256,7 @@ namespace Apollo.Components {
             return update + (() => { 
                 Color = new Color((byte)r, (byte)g, (byte)b);
 
-                Preview.Fill = Color.ToBrush();
+                Preview.Fill = Color.ToScreenBrush();
                 InitCanvas();
             });
         }
