@@ -85,7 +85,12 @@ namespace Apollo.Core {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}crashdump-{DateTimeOffset.Now.ToUnixTimeSeconds()}-";
 
-                File.WriteAllText(FilePath + "exception.log", e.ExceptionObject.ToString());
+                File.WriteAllText(
+                    FilePath + "exception.log",
+                    $"Apollo Version: {Version}\n" +
+                    $"Operating System: {RuntimeInformation.OSDescription}\n\n" +
+                    e.ExceptionObject.ToString()
+                );
 
                 if (Project != null)
                     File.WriteAllBytes(FilePath + "project.approj", Encoder.Encode(Project).ToArray());
