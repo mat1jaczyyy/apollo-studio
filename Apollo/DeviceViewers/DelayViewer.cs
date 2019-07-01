@@ -33,7 +33,7 @@ namespace Apollo.DeviceViewers {
             Duration.Length = _delay.Time.Length;
             Duration.RawValue = _delay.Time.Free;
 
-            Gate.RawValue = (double)_delay.Gate * 100;
+            Gate.RawValue = _delay.Gate * 100;
         }
 
         void Duration_Changed(double value, double? old) {
@@ -92,8 +92,8 @@ namespace Apollo.DeviceViewers {
 
         void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
-                decimal u = (decimal)(old.Value / 100);
-                decimal r = (decimal)(value / 100);
+                double u = old.Value / 100;
+                double r = value / 100;
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Gate Changed to {value}{Gate.Unit}", () => {
@@ -103,9 +103,9 @@ namespace Apollo.DeviceViewers {
                 });
             }
 
-            _delay.Gate = (decimal)(value / 100);
+            _delay.Gate = value / 100;
         }
 
-        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+        public void SetGate(double gate) => Gate.RawValue = gate * 100;
     }
 }

@@ -67,11 +67,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
 
-        decimal _gate;
-        public decimal Gate {
+        double _gate;
+        public double Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4) {
+                if (0.01 <= value && value <= 4) {
                     _gate = value;
                     
                     if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetGate(Gate);
@@ -134,7 +134,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, decimal gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base("copy") {
+        public Copy(Time time = null, double gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base("copy") {
             Time = time?? new Time(true, null, 500);
             Gate = gate;
             CopyMode = copymode;
@@ -184,23 +184,23 @@ namespace Apollo.Devices {
             return false;
         }
 
-        void FireCourier(PolyInfo info, decimal time) {
+        void FireCourier(PolyInfo info, double time) {
             Courier courier;
 
             info.timers.Add(courier = new Courier() {
                 Info = info,
                 AutoReset = false,
-                Interval = (double)time,
+                Interval = time,
             });
             courier.Elapsed += Tick;
             courier.Start();
         }
 
-        void FireCourier((Signal n, List<int>) info, decimal time) {
+        void FireCourier((Signal n, List<int>) info, double time) {
             Courier courier = timers[info.n] = new Courier() {
                 Info = info,
                 AutoReset = false,
-                Interval = (double)time
+                Interval = time
             };
             courier.Elapsed += Tick;
             courier.Start();

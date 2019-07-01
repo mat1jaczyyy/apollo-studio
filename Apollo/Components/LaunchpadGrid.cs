@@ -137,7 +137,7 @@ namespace Apollo.Components {
         }
 
         void ApplyScale() {
-            this.Resources["Rotation"] = (double)((Preferences.LaunchpadGridRotation && !LowQuality)? -45 : 0);
+            this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality)? -45.0 : 0.0;
             this.Resources["CanvasSize"] = 184 * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
             this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;

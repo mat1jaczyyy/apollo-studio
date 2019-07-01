@@ -22,7 +22,7 @@ namespace Apollo.Devices {
         }
 
         List<Color> _colors = new List<Color>();
-        List<decimal> _positions = new List<decimal>();
+        List<double> _positions = new List<double>();
         List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
@@ -35,8 +35,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public decimal GetPosition(int index) => _positions[index];
-        public void SetPosition(int index, decimal position) {
+        public double GetPosition(int index) => _positions[index];
+        public void SetPosition(int index, double position) {
             if (_positions[index] != position) {
                 _positions[index] = position;
                 Generate();
@@ -87,11 +87,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
-        decimal _gate;
-        public decimal Gate {
+        double _gate;
+        public double Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4) {
+                if (0.01 <= value && value <= 4) {
                     _gate = value;
                     Generate();
                     
@@ -156,12 +156,12 @@ namespace Apollo.Devices {
                 if (_cutoffs[j + 1] == i) j++;
 
                 if (j < _colors.Count - 1) {
-                    double time = (double)((_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate);
+                    double time = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
                     if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
                 }
             }
 
-            fade.Add(new FadeInfo(_steps.Last(), (double)(_time * _gate)));
+            fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
             
             Generated?.Invoke();
         }
@@ -175,7 +175,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public void Insert(int index, Color color, decimal position) {
+        public void Insert(int index, Color color, double position) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
 
@@ -198,13 +198,13 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(Time time = null, decimal gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<decimal> positions = null): base("fade") {
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null): base("fade") {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
-            _positions = positions?? new List<decimal>() {0, 1};
+            _positions = positions?? new List<double>() {0, 1};
 
             if (Program.Project == null) Program.ProjectLoaded += Generate;
             else Generate();

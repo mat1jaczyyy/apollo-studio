@@ -77,11 +77,11 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
         HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
 
-        decimal _gate;
-        public decimal Gate {
+        double _gate;
+        public double Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4) {
+                if (0.01 <= value && value <= 4) {
                     _gate = value;
                     
                     Window?.SetGate(Gate);
@@ -164,7 +164,7 @@ namespace Apollo.Devices {
 
         public int Expanded;
 
-        public Pattern(int repeats = 1, decimal gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
+        public Pattern(int repeats = 1, double gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Repeats = repeats;
@@ -206,25 +206,25 @@ namespace Apollo.Devices {
             return false;
         }
 
-        void FireCourier(Signal n, decimal time) {
+        void FireCourier(Signal n, double time) {
             Courier courier;
 
             timers[n].Add(courier = new Courier() {
                 Info = n,
                 AutoReset = false,
-                Interval = (double)time,
+                Interval = time,
             });
             courier.Elapsed += Tick;
             courier.Start();
         }
 
-        void FireCourier(PolyInfo info, decimal time) {
+        void FireCourier(PolyInfo info, double time) {
             Courier courier;
 
             info.timers.Add(courier = new Courier() {
                 Info = info,
                 AutoReset = false,
-                Interval = (double)time,
+                Interval = time,
             });
             courier.Elapsed += Tick;
             courier.Start();
@@ -259,7 +259,7 @@ namespace Apollo.Devices {
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
 
                         buffer[n] = 0;
-                        decimal time = 0;
+                        double time = 0;
 
                         for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
                             time += Frames[i % Frames.Count].Time * _gate;
@@ -332,7 +332,7 @@ namespace Apollo.Devices {
                             if (Frames[0].Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
                                 MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.MultiTarget));
                         
-                        decimal time = 0;
+                        double time = 0;
                         PolyInfo info = new PolyInfo(n);
                         poly.Add(info);
 

@@ -42,11 +42,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
 
-        decimal _gate;
-        public decimal Gate {
+        double _gate;
+        public double Gate {
             get => _gate;
             set {
-                if (0.01M <= value && value <= 4) {
+                if (0.01 <= value && value <= 4) {
                     _gate = value;
                     
                     if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetGate(Gate);
@@ -82,7 +82,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Hold(Time time = null, decimal gate = 1, bool infinite = false, bool release = false): base("hold") {
+        public Hold(Time time = null, double gate = 1, bool infinite = false, bool release = false): base("hold") {
             Time = time?? new Time();
             Gate = gate;
             Infinite = infinite;
@@ -112,7 +112,7 @@ namespace Apollo.Devices {
                         Courier courier = new Courier() {
                             Info = n.Clone(),
                             AutoReset = false,
-                            Interval = (double)(_time * _gate),
+                            Interval = _time * _gate,
                         };
                         courier.Elapsed += Tick;
                         courier.Start();

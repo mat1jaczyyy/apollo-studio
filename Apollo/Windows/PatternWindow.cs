@@ -235,7 +235,7 @@ namespace Apollo.Windows {
             Wrap.IsChecked = _pattern.Wrap;
 
             Repeats.RawValue = _pattern.Repeats;
-            Gate.RawValue = (double)_pattern.Gate * 100;
+            Gate.RawValue = _pattern.Gate * 100;
 
             PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
@@ -889,8 +889,8 @@ namespace Apollo.Windows {
 
         void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
-                decimal u = (decimal)(old.Value / 100);
-                decimal r = (decimal)(value / 100);
+                double u = old.Value / 100;
+                double r = value / 100;
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Gate Changed to {value}{Gate.Unit}", () => {
@@ -900,10 +900,10 @@ namespace Apollo.Windows {
                 });
             }
 
-            _pattern.Gate = (decimal)(value / 100);
+            _pattern.Gate = value / 100;
         }
 
-        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+        public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
         void Repeats_Changed(double value, double? old) {
             if (old != null && old != value) {
@@ -997,11 +997,11 @@ namespace Apollo.Windows {
             PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)index, color.Clone()));
         }
 
-        void FireCourier(decimal time) {
+        void FireCourier(double time) {
             Courier courier;
             PlayTimers.Add(courier = new Courier() {
                 AutoReset = false,
-                Interval = (double)time,
+                Interval = time,
             });
             courier.Elapsed += Tick;
             courier.Start();
@@ -1081,7 +1081,7 @@ namespace Apollo.Windows {
             for (int i = 0; i < _pattern[0].Screen.Length; i++)
                 PlayExit?.Invoke(new Signal(_track.Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
 
-            decimal time = 0;
+            double time = 0;
 
             for (int i = 0; i < _pattern.Count; i++) {
                 time += _pattern[i].Time * _pattern.Gate;
@@ -1111,7 +1111,7 @@ namespace Apollo.Windows {
                 Launchpad?.Send(new Signal(_track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
         }
 
-        static void ImportFrames(Pattern pattern, int repeats, decimal gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
+        static void ImportFrames(Pattern pattern, int repeats, double gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
             pattern.Repeats = repeats;
             pattern.Gate = gate;
             pattern.Frames = frames;
@@ -1144,14 +1144,14 @@ namespace Apollo.Windows {
             }
 
             int ur = _pattern.Repeats;
-            decimal ug = _pattern.Gate;
+            double ug = _pattern.Gate;
             List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
             PlaybackType um = _pattern.Mode;
             bool ui = _pattern.Infinite;
             int? uo = _pattern.RootKey;
 
             int rr = 1;
-            decimal rg = 1;
+            double rg = 1;
             List<Frame> rf = frames.Select(i => i.Clone()).ToList();
             PlaybackType rm = PlaybackType.Mono;
             bool ri = false;

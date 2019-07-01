@@ -21,8 +21,8 @@ namespace Apollo.Structures {
             }
         }
         
-        public decimal Value {
-            get => Convert.ToDecimal(Math.Pow(2, _value - 7));
+        public double Value {
+            get => Convert.ToDouble(Math.Pow(2, _value - 7));
         }
 
         public Length Clone() => new Length(Step);
@@ -43,8 +43,7 @@ namespace Apollo.Structures {
         public override int GetHashCode() => HashCode.Combine(Step);
 
         public static implicit operator int(Length x) => (int)(x.Value * 240000 / Program.Project.BPM);
-        public static implicit operator double(Length x) => (double)(x.Value * 240000 / Program.Project.BPM);
-        public static implicit operator decimal(Length x) => x.Value * 240000 / Program.Project.BPM;
+        public static implicit operator double(Length x) => x.Value * 240000 / Program.Project.BPM;
 
         public override string ToString() => Steps[_value];
 

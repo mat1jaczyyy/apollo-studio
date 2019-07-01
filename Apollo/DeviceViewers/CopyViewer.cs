@@ -61,7 +61,7 @@ namespace Apollo.DeviceViewers {
             Rate.Length = _copy.Time.Length;
             Rate.RawValue = _copy.Time.Free;
 
-            Gate.RawValue = (double)_copy.Gate * 100;
+            Gate.RawValue = _copy.Gate * 100;
 
             CopyMode.SelectedIndex = (int)_copy.CopyMode;
             GridMode.SelectedIndex = (int)_copy.GridMode;
@@ -128,8 +128,8 @@ namespace Apollo.DeviceViewers {
 
         void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
-                decimal u = (decimal)(old.Value / 100);
-                decimal r = (decimal)(value / 100);
+                double u = old.Value / 100;
+                double r = value / 100;
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Gate Changed to {value}{Gate.Unit}", () => {
@@ -139,10 +139,10 @@ namespace Apollo.DeviceViewers {
                 });
             }
 
-            _copy.Gate = (decimal)(value / 100);
+            _copy.Gate = value / 100;
         }
 
-        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+        public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
         void CopyMode_Changed(object sender, SelectionChangedEventArgs e) {
             CopyType selected = (CopyType)CopyMode.SelectedIndex;

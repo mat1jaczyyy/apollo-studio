@@ -27,7 +27,7 @@ namespace Apollo.Components {
                 if (_max != value) {
                     _max = value;
 
-                    Input.Width = (double)((int)_max).ToString(CultureInfo.InvariantCulture).Length * 25 / 3;
+                    Input.Width = ((int)_max).ToString(CultureInfo.InvariantCulture).Length * 25.0 / 3;
                     
                     Value = ToValue(RawValue);
                 }

@@ -221,9 +221,16 @@ namespace Apollo.Binary {
                     time = Decode(reader, version);
                 }
 
+                double gate;
+                if (version <= 13) {
+                    gate = (double)reader.ReadDecimal();
+                } else {
+                    gate = reader.ReadDouble();
+                }
+
                 return new Copy(
                     time,
-                    reader.ReadDecimal(),
+                    gate,
                     (CopyType)reader.ReadInt32(),
                     (GridType)reader.ReadInt32(),
                     reader.ReadBoolean(),
@@ -242,11 +249,14 @@ namespace Apollo.Binary {
                     time = Decode(reader, version);
                 }
 
-                return new Delay(
-                    time,
-                    reader.ReadDecimal()
-                );
-            
+                double gate;
+                if (version <= 13) {
+                    gate = (double)reader.ReadDecimal();
+                } else {
+                    gate = reader.ReadDouble();
+                }
+
+                return new Delay(time, gate);
             
             } else if (t == typeof(Fade)) {
                 Time time;
@@ -260,14 +270,20 @@ namespace Apollo.Binary {
                     time = Decode(reader, version);
                 }
 
+                double gate;
+                if (version <= 13) {
+                    gate = (double)reader.ReadDecimal();
+                } else {
+                    gate = reader.ReadDouble();
+                }
+
+                FadePlaybackType playmode = (FadePlaybackType)reader.ReadInt32();
+
                 int count;
-                return new Fade(
-                    time,
-                    reader.ReadDecimal(),
-                    (FadePlaybackType)reader.ReadInt32(),
-                    (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList(),
-                    (from i in Enumerable.Range(0, count) select reader.ReadDecimal()).ToList()
-                );
+                List<Color> colors = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList();
+                List<double> positions = (from i in Enumerable.Range(0, count) select (version <= 13)? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
+
+                return new Fade(time, gate, playmode, colors, positions);
 
             } else if (t == typeof(Flip))
                 return new Flip(
@@ -287,9 +303,16 @@ namespace Apollo.Binary {
                     time = Decode(reader, version);
                 }
 
+                double gate;
+                if (version <= 13) {
+                    gate = (double)reader.ReadDecimal();
+                } else {
+                    gate = reader.ReadDouble();
+                }
+
                 return new Hold(
                     time,
-                    reader.ReadDecimal(),
+                    gate,
                     reader.ReadBoolean(),
                     reader.ReadBoolean()
                 );
@@ -359,7 +382,13 @@ namespace Apollo.Binary {
                     repeats = reader.ReadInt32();
                 }
 
-                decimal gate = reader.ReadDecimal();
+                double gate;
+                if (version <= 13) {
+                    gate = (double)reader.ReadDecimal();
+                } else {
+                    gate = reader.ReadDouble();
+                }
+
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
                 PlaybackType mode = (PlaybackType)reader.ReadInt32();
 

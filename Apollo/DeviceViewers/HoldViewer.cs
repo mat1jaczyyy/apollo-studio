@@ -38,7 +38,7 @@ namespace Apollo.DeviceViewers {
             Duration.Length = _hold.Time.Length;
             Duration.RawValue = _hold.Time.Free;
 
-            Gate.RawValue = (double)_hold.Gate * 100;
+            Gate.RawValue = _hold.Gate * 100;
 
             Infinite.IsChecked = _hold.Infinite;
             Infinite_Changed(null, EventArgs.Empty); // required to set Dial Enabled properties
@@ -102,8 +102,8 @@ namespace Apollo.DeviceViewers {
 
         void Gate_Changed(double value, double? old) {
             if (old != null && old != value) {
-                decimal u = (decimal)(old.Value / 100);
-                decimal r = (decimal)(value / 100);
+                double u = old.Value / 100;
+                double r = value / 100;
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Gate Changed to {value}{Gate.Unit}", () => {
@@ -113,10 +113,10 @@ namespace Apollo.DeviceViewers {
                 });
             }
 
-            _hold.Gate = (decimal)(value / 100);
+            _hold.Gate = value / 100;
         }
 
-        public void SetGate(decimal gate) => Gate.RawValue = (double)gate * 100;
+        public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
         void Infinite_Changed(object sender, EventArgs e) {
             bool value = Infinite.IsChecked.Value;
