@@ -98,7 +98,7 @@ namespace Apollo.Helpers {
         public void Undo() => Select(Math.Max(0, Position - 1));
         public void Redo() => Select(Math.Min(History.Count - 1, Position + 1));
 
-        public void Clear() {
+        public void Clear(string description = "Undo History Cleared") {
             _saved = (SavedPosition == Position)? (int?)0 : null;
             SavedPositionChanged?.Invoke(SavedPosition);
 
@@ -107,7 +107,7 @@ namespace Apollo.Helpers {
                     Window.Contents_Remove(i);
 
             History = new List<UndoEntry>() {
-                new UndoEntry("Undo History Cleared")
+                new UndoEntry(description)
             };
 
             Window?.Contents_Insert(0, History[0]);

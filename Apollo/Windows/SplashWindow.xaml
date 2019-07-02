@@ -59,6 +59,19 @@
             </Grid>
           </TabItem>
         </TabControl>
+
+        <Grid Grid.Column="1" Background="{DynamicResource ThemeSplashBrush}" Opacity="0" IsHitTestVisible="false" ZIndex="-1" x:Name="CrashPanel">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Your previous Apollo session has closed unexpectedly" />
+            <TextBlock Text="due to a problem." />
+            <TextBlock Text="Apollo Studio can recover your unsaved work." />
+
+            <Grid Margin="0 10 0 0" ColumnDefinitions="*,*">
+              <Button Grid.Column="0" Margin="0 0 5 0" Content="Restore Project" Click="Restore" />
+              <Button Grid.Column="1" Margin="5 0 0 0" Content="Ignore" Click="Ignore" />
+            </Grid>
+          </StackPanel>
+        </Grid>
       </Grid>
     </Grid>
   </Border>

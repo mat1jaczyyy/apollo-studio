@@ -27,11 +27,13 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+            CrashPanel = this.Get<Grid>("CrashPanel");
+
             TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
         }
 
-        Grid Root;
+        Grid Root, CrashPanel;
         TabControl TabControl;
         StackPanel Recents;
 
@@ -53,6 +55,12 @@ namespace Apollo.Windows {
             TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
 
             Preferences.RecentsCleared += Clear;
+
+            if (Preferences.CrashPath != "") {
+                CrashPanel.Opacity = 1;
+                CrashPanel.IsHitTestVisible = true;
+                CrashPanel.ZIndex = 1;
+            }
         }
 
         void Loaded(object sender, EventArgs e) {
@@ -90,14 +98,14 @@ namespace Apollo.Windows {
             } else Recents.Children.Clear();
         }
 
-        public void New(object sender, RoutedEventArgs e) {
+        void New(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
             ProjectWindow.Create(this);
             Close();
         }
 
-        public async void ReadFile(string path) {
+        async void ReadFile(string path) {
             Project loaded;
 
             try {
@@ -125,7 +133,7 @@ namespace Apollo.Windows {
             Close();
         }
 
-        public async void Open(object sender, RoutedEventArgs e) {
+        async void Open(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {
@@ -158,18 +166,43 @@ namespace Apollo.Windows {
             UseShellExecute = true
         });
 
-        public void Docs(object sender, RoutedEventArgs e)
+        void Docs(object sender, RoutedEventArgs e)
             => URL("https://github.com/mat1jaczyyy/apollo-studio/wiki");
 
-        public void Tutorials(object sender, RoutedEventArgs e) {}
+        void Tutorials(object sender, RoutedEventArgs e) {}
 
-        public void Bug(object sender, RoutedEventArgs e)
+        void Bug(object sender, RoutedEventArgs e)
             => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=bug&template=bug_report.md&title=");
 
-        public void Feature(object sender, RoutedEventArgs e)
+        void Feature(object sender, RoutedEventArgs e)
             => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=enhancement&template=feature_request.md&title=");
 
-        public void Discord(object sender, RoutedEventArgs e) {}
+        void Discord(object sender, RoutedEventArgs e) {}
+
+        void Restore(object sender, RoutedEventArgs e) {
+            CrashPanel.Opacity = 0;
+            CrashPanel.IsHitTestVisible = false;
+            CrashPanel.ZIndex = -1;
+
+            ReadFile(Preferences.CrashName + ".approj");
+
+            if (Program.Project != null) {
+                Program.Project.FilePath = Preferences.CrashPath;
+
+                Program.Project.Undo.Add("", () => {}, () => {});
+                Program.Project.Undo.Clear("Project Restored");
+            }
+
+            Preferences.CrashName = Preferences.CrashPath = "";
+        }
+
+        void Ignore(object sender, RoutedEventArgs e) {
+            CrashPanel.Opacity = 0;
+            CrashPanel.IsHitTestVisible = false;
+            CrashPanel.ZIndex = -1;
+
+            Preferences.CrashName = Preferences.CrashPath = "";
+        }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
     }

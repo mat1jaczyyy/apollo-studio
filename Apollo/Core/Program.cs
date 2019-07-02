@@ -85,14 +85,13 @@ namespace Apollo.Core {
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 string crashName = $"{AppDomain.CurrentDomain.BaseDirectory}crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}";
-                string FilePath = Path.Combine("crashdumps", crashName);
 
                 using (var memoryStream = new MemoryStream()) {
                     using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
                         if (Project != null) {
                             byte[] project = null;
 
-                            File.WriteAllBytes(FilePath + ".approj", project = Encoder.Encode(Project).ToArray());
+                            File.WriteAllBytes(crashName + ".approj", project = Encoder.Encode(Project).ToArray());
 
                             if (project != null)
                                 using (Stream writer = archive.CreateEntry("project.approj").Open())
@@ -108,7 +107,7 @@ namespace Apollo.Core {
                                 );
                     }
 
-                    File.WriteAllBytes(FilePath + ".zip", memoryStream.ToArray());
+                    File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
 
                 if (e.IsTerminating) {
