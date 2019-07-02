@@ -9,6 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 
+using Apollo.Windows;
+
 namespace Apollo.Viewers {
     public class RecentProjectInfo: UserControl {
         void InitializeComponent() {
@@ -48,13 +50,26 @@ namespace Apollo.Viewers {
             InfoContextMenu = null;
         }
 
-        protected void ContextMenu_Click(object sender, EventArgs e) {
+        async void ContextMenu_Click(object sender, EventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
+
             IInteractive item = ((RoutedEventArgs)e).Source;
 
             if (item is MenuItem selected) {
-                if ((string)selected.Header == "Remove") Removed?.Invoke(this, _path);
-                else if ((string)selected.Header == "Open Containing Folder") Showed?.Invoke(Path.GetDirectoryName(_path));
+                bool remove = (string)selected.Header == "Remove";
+
+                if ((string)selected.Header == "Open Containing Folder") {
+                    if (File.Exists(_path)) Showed?.Invoke(Path.GetDirectoryName(_path));
+                    else remove |= await MessageWindow.Create(
+                        $"An error occurred while locating the file.\n\n" +
+                        "You may not have sufficient privileges to read from the destination folder, or\n" +
+                        "the file you're attempting to locate has been moved.\n\n" +
+                        "Would you like to remove it from the Recent Projects list?",
+                        new string[] {"Yes", "No"}, null
+                    ) == "Yes";
+                }
+                
+                if (remove) Removed?.Invoke(this, _path);
             }
         }
 
@@ -67,10 +82,23 @@ namespace Apollo.Viewers {
                 mouseHeld = true;
         }
 
-        void MouseUp(object sender, PointerReleasedEventArgs e) {
+        async void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (mouseHeld) {
-                if (e.MouseButton == MouseButton.Left) Opened?.Invoke(_path);
-                else if (e.MouseButton == MouseButton.Right) InfoContextMenu.Open((Control)sender);
+                if (e.MouseButton == MouseButton.Left) {
+                    bool remove = false;
+
+                    if (File.Exists(_path)) Opened?.Invoke(_path);
+                    else remove = await MessageWindow.Create(
+                        $"An error occurred while locating the file.\n\n" +
+                        "You may not have sufficient privileges to read from the destination folder, or\n" +
+                        "the file you're attempting to locate has been moved.\n\n" +
+                        "Would you like to remove it from the Recent Projects list?",
+                        new string[] {"Yes", "No"}, null
+                    ) == "Yes";
+                
+                    if (remove) Removed?.Invoke(this, _path);
+
+                } else if (e.MouseButton == MouseButton.Right) InfoContextMenu.Open((Control)sender);
 
                 mouseHeld = false;
             }
