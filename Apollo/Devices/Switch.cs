@@ -25,7 +25,9 @@ namespace Apollo.Devices {
         public Switch(int page = 1): base("switch") => Page = page;
 
         public override void MIDIProcess(Signal n) {
-            Program.Project.Page = Page;
+            if (!n.Color.Lit)
+                Program.Project.Page = Page;
+            
             MIDIExit?.Invoke(n);
         }
     }
