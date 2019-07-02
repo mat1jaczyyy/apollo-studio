@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -54,20 +55,10 @@ namespace Apollo.Windows {
             Preferences.RecentsCleared += Clear;
         }
 
-        async void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) {
-                await MessageWindow.Create(
-                    "One or more connected Launchpad Pros are running an older version of the\n" + 
-                    "performance-optimized custom firmware which is not compatible with\n" +
-                    "Apollo Studio.\n\n" +
-                    "Update these to the latest version of the firmware or switch back to stock\n" +
-                    "firmware to use them with Apollo Studio.",
-                    null, this
-                );
-                Launchpad.CFWIncompatible = CFWIncompatibleState.Done;
-            }
+            if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
 
             if (Program.Args?.Length > 0)
                 ReadFile(Program.Args[0]);

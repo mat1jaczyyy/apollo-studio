@@ -4,6 +4,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
@@ -19,6 +20,19 @@ using Apollo.Windows;
 namespace Apollo.Elements {
     public class Launchpad {
         public static CFWIncompatibleState CFWIncompatible = CFWIncompatibleState.None;
+
+        public static void CFWError(Window sender) {
+            Launchpad.CFWIncompatible = CFWIncompatibleState.Done;
+
+            Dispatcher.UIThread.Post(async () => await MessageWindow.Create(
+                "One or more connected Launchpad Pros are running an older version of the\n" + 
+                "performance-optimized custom firmware which is not compatible with\n" +
+                "Apollo Studio.\n\n" +
+                "Update these to the latest version of the firmware or switch back to stock\n" +
+                "firmware to use them with Apollo Studio.",
+                null, sender
+            ), DispatcherPriority.MinValue);
+        }
 
         public LaunchpadWindow Window;
         public PatternWindow PatternWindow;
@@ -89,8 +103,10 @@ namespace Apollo.Elements {
                     
                     case 0x51: // Launchpad Pro
                         if (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w') {
-                            if (CFWIncompatible == CFWIncompatibleState.None)
-                                CFWIncompatible = CFWIncompatibleState.Show;
+                            if (CFWIncompatible == CFWIncompatibleState.None) {
+                                if (Application.Current != null && Application.Current.MainWindow != null) CFWError(null);
+                                else CFWIncompatible = CFWIncompatibleState.Show;
+                            }
 
                             break;
                         }
