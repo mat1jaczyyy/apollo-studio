@@ -77,8 +77,8 @@ namespace Apollo.Binary {
                     if (MIDI.Devices[i].GetType() == typeof(Launchpad))
                         Encode(writer, MIDI.Devices[i]);
                 
-                writer.Write(count = Math.Min(8, Preferences.Recents.Count));
-                for (int i = 0; i < count; i++)
+                writer.Write(Preferences.Recents.Count);
+                for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
             }
 

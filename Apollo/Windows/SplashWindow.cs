@@ -48,7 +48,7 @@ namespace Apollo.Windows {
             
             Root.Children.Add(SplashImage);
 
-            for (int i = 0; i < Math.Min(8, Preferences.Recents.Count); i++) {
+            for (int i = 0; i < Preferences.Recents.Count; i++) {
                 RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
                 viewer.Opened += ReadFile;
                 viewer.Removed += Remove;
@@ -146,7 +146,7 @@ namespace Apollo.Windows {
 
         void Remove(RecentProjectInfo sender, string path) {
             Preferences.RecentsRemove(path);
-            
+
             Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
         }
 
