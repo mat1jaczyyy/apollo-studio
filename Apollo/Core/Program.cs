@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -83,17 +84,33 @@ namespace Apollo.Core {
 
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
-                string FilePath = $"{AppDomain.CurrentDomain.BaseDirectory}crashdump-{DateTimeOffset.Now.ToUnixTimeSeconds()}-";
+                string crashName = $"{AppDomain.CurrentDomain.BaseDirectory}crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}";
+                string FilePath = Path.Combine("crashdumps", crashName);
 
-                File.WriteAllText(
-                    FilePath + "exception.log",
-                    $"Apollo Version: {Version}\n" +
-                    $"Operating System: {RuntimeInformation.OSDescription}\n\n" +
-                    e.ExceptionObject.ToString()
-                );
+                using (var memoryStream = new MemoryStream()) {
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
+                        if (Project != null) {
+                            byte[] project = null;
 
-                if (Project != null)
-                    File.WriteAllBytes(FilePath + "project.approj", Encoder.Encode(Project).ToArray());
+                            File.WriteAllBytes(FilePath + ".approj", project = Encoder.Encode(Project).ToArray());
+
+                            if (project != null)
+                                using (Stream writer = archive.CreateEntry("project.approj").Open())
+                                    writer.Write(project);
+                        }
+
+                        using (Stream log = archive.CreateEntry("exception.log").Open())
+                            using (StreamWriter writer = new StreamWriter(log))
+                                writer.Write(
+                                    $"Apollo Version: {Version}\n" +
+                                    $"Operating System: {RuntimeInformation.OSDescription}\n\n" +
+                                    e.ExceptionObject.ToString()
+                                );
+                    }
+
+                    File.WriteAllBytes(FilePath + ".zip", memoryStream.ToArray());
+                }
+
             };
 
             logTimer.Start();
