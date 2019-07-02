@@ -88,7 +88,7 @@ namespace Apollo.Elements {
         }
 
         public static bool Move(List<Device> source, Device target, bool copy = false) {
-            if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
+            if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
                 return false;
             
             List<Device> moved = new List<Device>();

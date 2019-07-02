@@ -97,7 +97,7 @@ namespace Apollo.Structures {
 
         public static bool Move(List<Frame> source, Frame target, bool copy = false) {
             if (!copy && ((source[0].Parent != target.Parent && source[0].Parent.Count == source.Count) ||
-                source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
+                source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
                 return false;
             
             List<Frame> moved = new List<Frame>();
