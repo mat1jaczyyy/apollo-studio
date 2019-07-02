@@ -20,7 +20,7 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Beta Build 18";
+        public static readonly string Version = "Beta Build 19";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
