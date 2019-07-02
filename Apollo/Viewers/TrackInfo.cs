@@ -146,13 +146,8 @@ namespace Apollo.Viewers {
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
                 
-                if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
-                    int i = 5;
-                    int j = 0;
-                    int a = i / j;
-
+                if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) 
                     TrackWindow.Create(_track, (Window)this.GetVisualRoot());
-                }
                 
                 if (e.MouseButton == MouseButton.Right)
                     TrackContextMenu.Open(Draggable);
