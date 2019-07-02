@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 using Apollo.Binary;
 using Apollo.Components;
@@ -24,10 +25,12 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+            TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
         }
 
         Grid Root;
+        TabControl TabControl;
         StackPanel Recents;
 
         void UpdateTopmost(bool value) => Topmost = value;
@@ -65,7 +68,7 @@ namespace Apollo.Windows {
                     "Apollo Studio.\n\n" +
                     "Update these to the latest version of the firmware or switch back to stock\n" +
                     "firmware to use them with Apollo Studio.",
-                    null, this  
+                    null, this
                 );
                 Launchpad.CFWIncompatible = CFWIncompatibleState.Done;
             }
@@ -143,7 +146,8 @@ namespace Apollo.Windows {
 
         void Remove(RecentProjectInfo sender, string path) {
             Preferences.RecentsRemove(path);
-            Recents.Children.Remove(sender);
+            
+            Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
         }
 
         void URL(string url) => Process.Start(new ProcessStartInfo() {

@@ -19,7 +19,7 @@
       <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="10 0 10 10">
         <Grid Grid.Column="0" Margin="10 0 10 10" x:Name="Root" />
 
-        <TabControl Grid.Column="1" Margin="10 0 0 0">
+        <TabControl Grid.Column="1" Margin="10 0 0 0" x:Name="TabControl">
           <TabItem Header="File">
             <Grid RowDefinitions="*,Auto">
               <StackPanel Grid.Row="0" Spacing="5" x:Name="Recents">

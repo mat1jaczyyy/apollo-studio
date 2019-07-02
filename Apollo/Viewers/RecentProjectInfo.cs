@@ -51,7 +51,8 @@ namespace Apollo.Viewers {
         }
 
         async void ContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
+            Window root = (Window)this.GetVisualRoot();
+            root.Focus();
 
             IInteractive item = ((RoutedEventArgs)e).Source;
 
@@ -65,7 +66,7 @@ namespace Apollo.Viewers {
                         "You may not have sufficient privileges to read from the destination folder, or\n" +
                         "the file you're attempting to locate has been moved.\n\n" +
                         "Would you like to remove it from the Recent Projects list?",
-                        new string[] {"Yes", "No"}, null
+                        new string[] {"Yes", "No"}, root
                     ) == "Yes";
                 }
                 
@@ -93,7 +94,7 @@ namespace Apollo.Viewers {
                         "You may not have sufficient privileges to read from the destination folder, or\n" +
                         "the file you're attempting to locate has been moved.\n\n" +
                         "Would you like to remove it from the Recent Projects list?",
-                        new string[] {"Yes", "No"}, null
+                        new string[] {"Yes", "No"}, (Window)this.GetVisualRoot()
                     ) == "Yes";
                 
                     if (remove) Removed?.Invoke(this, _path);
