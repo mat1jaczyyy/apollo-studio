@@ -81,7 +81,10 @@ namespace Apollo.Elements {
 
         protected Screen screen;
 
-        protected void CreateScreen() => screen = new Screen() { ScreenExit = Send };
+        protected void CreateScreen() {
+            screen = new Screen() { ScreenExit = Send };
+            inputbuffer = (from i in Enumerable.Range(0, 100) select 0).ToArray();
+        }
 
         public Color GetColor(int index) => (PatternWindow == null)
             ? screen.GetColor(index)
@@ -263,6 +266,8 @@ namespace Apollo.Elements {
             Available = false;
         }
 
+        private int[] inputbuffer;
+
         public void HandleMessage(Signal n, bool rotated = false) {
             if (Available) {
                 if (!rotated)
@@ -276,8 +281,19 @@ namespace Apollo.Elements {
                         n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
                     }
 
-                if (PatternWindow == null) Receive?.Invoke(n);
-                else PatternWindow.MIDIEnter(n);
+                if (PatternWindow == null) {
+                    if (n.Color.Lit) {
+                        if (inputbuffer[n.Index] == 0)
+                            inputbuffer[n.Index] = Program.Project.Page;
+                        
+                    } else if (inputbuffer[n.Index] == 0) return;
+                    
+                    n.Page = inputbuffer[n.Index];
+
+                    if (!n.Color.Lit) inputbuffer[n.Index] = 0;
+
+                    Receive?.Invoke(n);
+                } else PatternWindow.MIDIEnter(n);
             }
         }
 

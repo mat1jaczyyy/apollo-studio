@@ -34,7 +34,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-            if (_filter[Program.Project.Page - 1] && n.Page == Program.Project.Page)
+            if (_filter[n.Page - 1])
                 MIDIExit?.Invoke(n);
         }
     }
