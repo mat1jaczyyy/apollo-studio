@@ -23,9 +23,9 @@ namespace Apollo.Helpers {
             if (connection == null || result == null) return;
 
             IPEndPoint source = null;
-            byte[] message = connection.EndReceive(result, ref source);
+            byte[] message = connection?.EndReceive(result, ref source);
 
-            connection.BeginReceive(new AsyncCallback(Receive), connection);
+            connection?.BeginReceive(new AsyncCallback(Receive), connection);
 
             if (source.Address.Equals(localhost)) {
                 if (!portMap.ContainsKey(source))
