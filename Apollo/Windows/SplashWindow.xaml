@@ -21,14 +21,14 @@
 
         <TabControl Grid.Column="1" Margin="10 0 0 0" x:Name="TabControl">
           <TabItem Header="File">
-            <Grid RowDefinitions="*,Auto">
-              <ScrollViewer>
-                <StackPanel Grid.Row="0" Spacing="5" x:Name="Recents">
-                  <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Projects" />
-                </StackPanel>
+            <Grid RowDefinitions="Auto,*,Auto">
+              <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Projects" />
+
+              <ScrollViewer Grid.Row="1" Margin="0 5">
+                <StackPanel Grid.Row="0" Spacing="5" x:Name="Recents" />
               </ScrollViewer>
 
-              <Grid Grid.Row="1" Margin="0 5 0 0" ColumnDefinitions="*,*">
+              <Grid Grid.Row="2" ColumnDefinitions="*,*">
                 <Button Grid.Column="0" Margin="0 0 5 0" Content="New Project" Click="New" />
                 <Button Grid.Column="1" Margin="5 0 0 0" Content="Open Project" Click="Open" />
               </Grid>

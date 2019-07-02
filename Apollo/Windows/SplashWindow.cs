@@ -5,6 +5,7 @@ using System.IO;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -48,14 +49,7 @@ namespace Apollo.Windows {
             
             Root.Children.Add(SplashImage);
 
-            for (int i = 0; i < Preferences.Recents.Count; i++) {
-                RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
-                viewer.Opened += ReadFile;
-                viewer.Removed += Remove;
-                viewer.Showed += URL;
-
-                Recents.Children.Add(viewer);
-            }
+            TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
         }
 
         async void Loaded(object sender, EventArgs e) {
@@ -87,6 +81,20 @@ namespace Apollo.Windows {
             this.Content = null;
 
             Program.WindowClose(this);
+        }
+
+        void TabChanged(int tab) {
+            if (tab == 0) {
+                for (int i = 0; i < Preferences.Recents.Count; i++) {
+                    RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
+                    viewer.Opened += ReadFile;
+                    viewer.Removed += Remove;
+                    viewer.Showed += URL;
+
+                    Recents.Children.Add(viewer);
+                }
+            
+            } else Recents.Children.Clear();
         }
 
         public void New(object sender, RoutedEventArgs e) {
