@@ -3,7 +3,11 @@
              x:Class="Apollo.Viewers.RecentProjectInfo"
              DetachedFromVisualTree="Unloaded">
   
-  <Grid Margin="5 0" Background="Transparent" Cursor="Hand" PointerReleased="Click">
-    <TextBlock VerticalAlignment="Center" x:Name="Path" />
+  <Grid Margin="5 0" Background="Transparent" Cursor="Hand"
+        PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+    <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="5">
+      <TextBlock x:Name="Filename" />
+      <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" x:Name="Folder" />
+    </StackPanel>
   </Grid>
 </UserControl>
