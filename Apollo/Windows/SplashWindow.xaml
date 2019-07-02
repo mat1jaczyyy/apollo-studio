@@ -22,7 +22,7 @@
         <TabControl Grid.Column="1" Margin="10 0 0 0">
           <TabItem Header="File">
             <Grid RowDefinitions="*,Auto">
-              <StackPanel Grid.Row="0" Spacing="5">
+              <StackPanel Grid.Row="0" Spacing="5" x:Name="Recents">
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Projects" />
               </StackPanel>
 

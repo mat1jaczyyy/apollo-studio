@@ -113,8 +113,13 @@ namespace Apollo.Elements {
         public async Task<bool> Save(Window sender) {
             if (Undo.Saved) return false;
 
-            if (FilePath == "") return await Save(sender, true);
-            else return await WriteFile(sender);
+            bool ret = (FilePath == "")
+                ? await Save(sender, true)
+                : await WriteFile(sender);
+
+            if (ret) Preferences.RecentsAdd(FilePath);
+
+            return ret;
         }
 
         public async Task<bool> Save(Window sender, bool store) {
@@ -131,10 +136,14 @@ namespace Apollo.Elements {
             };
             
             string result = await sfd.ShowAsync(sender);
-
-            if (result != null) return await WriteFile(sender, result, store);
             
-            return false;
+            bool ret = (result != null)
+                ? await WriteFile(sender, result, store)
+                : false;
+            
+            if (ret) Preferences.RecentsAdd(result);
+            
+            return ret;
         }
 
         public delegate void TrackCountChangedEventHandler(int value);

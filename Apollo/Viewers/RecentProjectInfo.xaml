@@ -1,0 +1,9 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Viewers.RecentProjectInfo"
+             DetachedFromVisualTree="Unloaded">
+  
+  <Grid Margin="5 0" Background="Transparent" Cursor="Hand" PointerReleased="Click">
+    <TextBlock VerticalAlignment="Center" x:Name="Path" />
+  </Grid>
+</UserControl>

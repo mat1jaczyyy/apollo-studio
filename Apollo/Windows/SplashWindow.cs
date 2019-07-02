@@ -14,6 +14,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class SplashWindow: Window {
@@ -23,9 +24,11 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+            Recents = this.Get<StackPanel>("Recents");
         }
 
         Grid Root;
+        StackPanel Recents;
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -41,6 +44,13 @@ namespace Apollo.Windows {
             this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
             
             Root.Children.Add(SplashImage);
+
+            foreach (string path in Preferences.Recents) {
+                RecentProjectInfo viewer = new RecentProjectInfo(path);
+                viewer.Opened += ReadFile;
+
+                Recents.Children.Add(viewer);
+            }
         }
 
         async void Loaded(object sender, EventArgs e) {
@@ -101,6 +111,7 @@ namespace Apollo.Windows {
 
             loaded.FilePath = path;
             loaded.Undo.SavePosition();
+            Preferences.RecentsAdd(path);
 
             Program.Project = loaded;
             ProjectWindow.Create(this);

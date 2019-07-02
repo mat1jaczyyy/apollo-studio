@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Apollo.Binary;
@@ -217,6 +218,15 @@ namespace Apollo.Core {
                 Discord.Set(DiscordPresence);
                 Save();
             }
+        }
+
+        public static List<string> Recents = new List<string>();
+        public static void RecentsAdd(string path) {
+            if (Recents.Contains(path)) Recents.Remove(path);
+
+            Recents.Insert(0, path);
+
+            while (Recents.Count > 8) Recents.RemoveAt(8);
         }
 
         public static void Save() {
