@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -43,16 +44,17 @@ namespace Apollo.Windows {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             foreach (Window window in Application.Current.Windows)
-                if (window != this)
+                if (!(window is MessageWindow))
                     window.IsVisible = false;
         }
 
         void Unloaded(object sender, EventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
-            foreach (Window window in Application.Current.Windows)
-                if (window != this)
-                    window.IsVisible = true;
+            if (Application.Current.Windows.LongCount(i => i is MessageWindow) <= 1)
+                foreach (Window window in Application.Current.Windows)
+                    if (!(window is MessageWindow))
+                        window.IsVisible = true;
 
             this.Content = null;
         }
