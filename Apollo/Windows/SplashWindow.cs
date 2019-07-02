@@ -45,8 +45,8 @@ namespace Apollo.Windows {
             
             Root.Children.Add(SplashImage);
 
-            foreach (string path in Preferences.Recents) {
-                RecentProjectInfo viewer = new RecentProjectInfo(path);
+            for (int i = 0; i < Math.Min(8, Preferences.Recents.Count); i++) {
+                RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
                 viewer.Opened += ReadFile;
 
                 Recents.Children.Add(viewer);

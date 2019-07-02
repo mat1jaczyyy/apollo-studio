@@ -114,6 +114,9 @@ namespace Apollo.Binary {
 
                     if (version >= 2)
                         MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
+
+                    if (version >= 15)
+                        Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
                     
                     return null;
 

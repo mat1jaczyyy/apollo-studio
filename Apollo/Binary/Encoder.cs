@@ -67,8 +67,8 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);
 
-                int count = Math.Min(64, ColorHistory.Count);
-                writer.Write(count);
+                int count;
+                writer.Write(count = Math.Min(64, ColorHistory.Count));
                 for (int i = 0; i < count; i++)
                     Encode(writer, ColorHistory.GetColor(i));
                 
@@ -76,6 +76,10 @@ namespace Apollo.Binary {
                 for (int i = 0; i < MIDI.Devices.Count; i++)
                     if (MIDI.Devices[i].GetType() == typeof(Launchpad))
                         Encode(writer, MIDI.Devices[i]);
+                
+                writer.Write(count = Math.Min(8, Preferences.Recents.Count));
+                for (int i = 0; i < count; i++)
+                    writer.Write(Preferences.Recents[i]);
             }
 
             return output;

@@ -227,6 +227,8 @@ namespace Apollo.Core {
             Recents.Insert(0, path);
 
             while (Recents.Count > 8) Recents.RemoveAt(8);
+
+            Save();
         }
 
         public static void Save() {
