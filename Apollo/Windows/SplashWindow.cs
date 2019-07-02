@@ -56,7 +56,7 @@ namespace Apollo.Windows {
 
             Preferences.RecentsCleared += Clear;
 
-            if (Preferences.CrashPath != "") {
+            if (Preferences.CrashName != "") {
                 CrashPanel.Opacity = 1;
                 CrashPanel.IsHitTestVisible = true;
                 CrashPanel.ZIndex = 1;
@@ -105,7 +105,8 @@ namespace Apollo.Windows {
             Close();
         }
 
-        async void ReadFile(string path) {
+        void ReadFile(string path) => ReadFile(path, false);
+        async void ReadFile(string path, bool recovery) {
             Project loaded;
 
             try {
@@ -123,9 +124,11 @@ namespace Apollo.Windows {
                 return;
             }
 
-            loaded.FilePath = path;
-            loaded.Undo.SavePosition();
-            Preferences.RecentsAdd(path);
+            if (!recovery) {
+                loaded.FilePath = path;
+                loaded.Undo.SavePosition();
+                Preferences.RecentsAdd(path);
+            }
 
             Program.Project = loaded;
             ProjectWindow.Create(this);
@@ -184,12 +187,10 @@ namespace Apollo.Windows {
             CrashPanel.IsHitTestVisible = false;
             CrashPanel.ZIndex = -1;
 
-            ReadFile(Preferences.CrashName + ".approj");
+            ReadFile(Preferences.CrashName + ".approj", true);
 
             if (Program.Project != null) {
                 Program.Project.FilePath = Preferences.CrashPath;
-
-                Program.Project.Undo.Add("", () => {}, () => {});
                 Program.Project.Undo.Clear("Project Restored");
             }
 
