@@ -2,6 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Viewers.RecentProjectInfo"
              DetachedFromVisualTree="Unloaded">
+  <UserControl.Resources>
+    <ContextMenu x:Key="InfoContextMenu" Cursor="Arrow">
+      <MenuItem Header="Open Containing Folder" />
+      <MenuItem Header="Remove" />
+    </ContextMenu>
+  </UserControl.Resources>
   
   <Grid Margin="5 0" Background="Transparent" Cursor="Hand"
         PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">

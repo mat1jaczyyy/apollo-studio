@@ -48,6 +48,8 @@ namespace Apollo.Windows {
             for (int i = 0; i < Math.Min(8, Preferences.Recents.Count); i++) {
                 RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
                 viewer.Opened += ReadFile;
+                viewer.Removed += Remove;
+                viewer.Showed += URL;
 
                 Recents.Children.Add(viewer);
             }
@@ -137,6 +139,11 @@ namespace Apollo.Windows {
 
             if (result.Length > 0)
                 ReadFile(result[0]);
+        }
+
+        void Remove(RecentProjectInfo sender, string path) {
+            Preferences.RecentsRemove(path);
+            Recents.Children.Remove(sender);
         }
 
         void URL(string url) => Process.Start(new ProcessStartInfo() {

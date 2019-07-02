@@ -221,12 +221,19 @@ namespace Apollo.Core {
         }
 
         public static List<string> Recents = new List<string>();
+
         public static void RecentsAdd(string path) {
             if (Recents.Contains(path)) Recents.Remove(path);
 
             Recents.Insert(0, path);
 
             while (Recents.Count > 8) Recents.RemoveAt(8);
+
+            Save();
+        }
+
+        public static void RecentsRemove(string path) {
+            if (Recents.Contains(path)) Recents.Remove(path);
 
             Save();
         }
