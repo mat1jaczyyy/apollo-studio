@@ -220,6 +220,7 @@ namespace Apollo.Core {
             }
         }
 
+        public static event Changed RecentsCleared;
         public static List<string> Recents = new List<string>();
 
         public static void RecentsAdd(string path) {
@@ -232,6 +233,14 @@ namespace Apollo.Core {
 
         public static void RecentsRemove(string path) {
             if (Recents.Contains(path)) Recents.Remove(path);
+
+            Save();
+        }
+
+        public static void RecentsClear() {
+            Recents.Clear();
+
+            RecentsCleared.Invoke();
 
             Save();
         }

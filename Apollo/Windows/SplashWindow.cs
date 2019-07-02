@@ -50,6 +50,8 @@ namespace Apollo.Windows {
             Root.Children.Add(SplashImage);
 
             TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
+
+            Preferences.RecentsCleared += Clear;
         }
 
         async void Loaded(object sender, EventArgs e) {
@@ -151,6 +153,8 @@ namespace Apollo.Windows {
             if (result.Length > 0)
                 ReadFile(result[0]);
         }
+
+        void Clear() => Dispatcher.UIThread.Post(() => Recents.Children.Clear(), DispatcherPriority.MinValue);
 
         void Remove(RecentProjectInfo sender, string path) {
             Preferences.RecentsRemove(path);

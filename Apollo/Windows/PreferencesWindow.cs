@@ -217,6 +217,8 @@ namespace Apollo.Windows {
 
         void Autosave_Changed(object sender, EventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
 
+        void ClearRecentProjects(object sender, RoutedEventArgs e) => Preferences.RecentsClear();
+
         void UndoLimit_Changed(object sender, EventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
 
         void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
