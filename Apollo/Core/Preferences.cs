@@ -245,6 +245,23 @@ namespace Apollo.Core {
             Save();
         }
 
+        static string _CrashName = "";
+        public static string CrashName {
+            get => _CrashName;
+            set {
+                _CrashName = value;
+                Save();
+            }
+        }
+        static string _CrashPath = "";
+        public static string CrashPath {
+            get => _CrashPath;
+            set {
+                _CrashPath = value;
+                Save();
+            }
+        }
+
         public static void Save() {
             try {
                 File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());

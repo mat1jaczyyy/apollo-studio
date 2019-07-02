@@ -111,6 +111,10 @@ namespace Apollo.Core {
                     File.WriteAllBytes(FilePath + ".zip", memoryStream.ToArray());
                 }
 
+                if (e.IsTerminating) {
+                    Preferences.CrashName = crashName;
+                    Preferences.CrashPath = (Project != null)? Project.FilePath : "";
+                }
             };
 
             logTimer.Start();

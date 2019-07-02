@@ -80,6 +80,9 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.Recents.Count);
                 for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
+                
+                writer.Write(Preferences.CrashName);
+                writer.Write(Preferences.CrashPath);
             }
 
             return output;
