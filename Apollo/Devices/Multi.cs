@@ -167,6 +167,11 @@ namespace Apollo.Devices {
             
             Chains[target].MIDIEnter(n);
         }
+        
+        protected override void Stop() {
+            foreach (Chain chain in Chains) chain.MIDIEnter(new StopSignal());
+            Preprocess.MIDIEnter(new StopSignal());
+        }
 
         public override void Dispose() {
             Preprocess.Dispose();

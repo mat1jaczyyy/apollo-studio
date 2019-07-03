@@ -160,7 +160,7 @@ namespace Apollo.Elements {
         }
 
         public void MIDIEnter(Signal n) {
-            if (Enabled) _chainenter?.Invoke(n);
+            if (Enabled || n is StopSignal) _chainenter?.Invoke(n);
         }
 
         public void Dispose() {
