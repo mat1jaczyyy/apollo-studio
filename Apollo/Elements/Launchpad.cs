@@ -269,7 +269,7 @@ namespace Apollo.Elements {
         private int[] inputbuffer;
 
         public void HandleMessage(Signal n, bool rotated = false) {
-            if (Available) {
+            if (Available && Program.Project != null) {
                 if (!rotated)
                     if (Rotation == RotationType.D90) {
                         n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
