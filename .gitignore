@@ -3,14 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Build
+Build
+
 # macOS .DS_Store
 .DS_Store
 
 # Line counting script
 lines.py
-
-# Windows publishing script
-publish.bat
 
 # User-specific files
 *.rsuser
