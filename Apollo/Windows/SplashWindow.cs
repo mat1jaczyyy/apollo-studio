@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -12,11 +13,14 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
+using Humanizer;
+
 using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Helpers;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -31,11 +35,16 @@ namespace Apollo.Windows {
 
             TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
+
+            GithubVersion = this.Get<TextBlock>("GithubVersion");
+            GithubBody = this.Get<TextBlock>("GithubBody");
+            GithubLink = this.Get<TextBlock>("GithubLink");
         }
 
         Grid Root, CrashPanel;
         TabControl TabControl;
         StackPanel Recents;
+        TextBlock GithubVersion, GithubBody, GithubLink;
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -63,7 +72,7 @@ namespace Apollo.Windows {
             }
         }
 
-        void Loaded(object sender, EventArgs e) {
+        async void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
@@ -72,6 +81,13 @@ namespace Apollo.Windows {
                 ReadFile(Program.Args[0]);
             
             Program.Args = null;
+
+            Octokit.Release latest = await Github.LatestRelease();
+            
+            GithubVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
+            GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:").Take(3));
+            GithubLink.Opacity = 1;
+            GithubLink.IsHitTestVisible = true;
         }
         
         void Unloaded(object sender, EventArgs e) {
@@ -181,6 +197,9 @@ namespace Apollo.Windows {
             => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=enhancement&template=feature_request.md&title=");
 
         void Discord(object sender, RoutedEventArgs e) {}
+
+        async void Release(object sender, RoutedEventArgs e)
+            => URL((await Github.LatestRelease()).HtmlUrl);
 
         void Restore(object sender, RoutedEventArgs e) {
             CrashPanel.Opacity = 0;

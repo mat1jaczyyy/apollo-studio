@@ -17,6 +17,7 @@
     <PackageReference Include="DiscordRichPresence" Version="1.0.108">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
+    <PackageReference Include="Humanizer" Version="2.6.2" />
     <PackageReference Include="Octokit" Version="0.32.0" />
     <PackageReference Include="RtMidi.Core" Version="1.0.50" />
   </ItemGroup>
