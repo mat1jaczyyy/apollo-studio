@@ -82,7 +82,14 @@ namespace Apollo.Windows {
             
             Program.Args = null;
 
-            Octokit.Release latest = await Github.LatestRelease();
+            Octokit.Release latest;
+
+            try {
+                latest = await Github.LatestRelease();
+            } catch {
+                GithubBody.Text = "Failed to fetch release data from GitHub.";
+                return;
+            }
             
             GithubVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
             GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
