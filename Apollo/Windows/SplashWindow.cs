@@ -85,7 +85,7 @@ namespace Apollo.Windows {
             Octokit.Release latest = await Github.LatestRelease();
             
             GithubVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
-            GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:").Take(3));
+            GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
             GithubLink.Opacity = 1;
             GithubLink.IsHitTestVisible = true;
         }
