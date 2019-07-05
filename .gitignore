@@ -6,8 +6,9 @@
 # Build
 Build
 
-# macOS .DS_Store
+# macOS
 .DS_Store
+tmpicns.rsrc
 
 # Line counting script
 lines.py
