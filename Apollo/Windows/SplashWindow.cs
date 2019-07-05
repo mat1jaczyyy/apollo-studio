@@ -97,8 +97,13 @@ namespace Apollo.Windows {
             GithubLink.IsHitTestVisible = true;
 
             if (IsVisible && await Github.ShouldUpdate()) {
-                // UpdateWindow.Create();
-                Close();
+                Window[] windows = Application.Current.Windows.ToArray();
+                
+                foreach (Window window in windows)
+                    if (window.GetType() != typeof(MessageWindow))
+                        window.Close();
+                
+                UpdateWindow.Create(this);
             }
         }
         

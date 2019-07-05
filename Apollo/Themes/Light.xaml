@@ -4,6 +4,7 @@
   
   <Style.Resources>
     <Image Source="/Resources/SplashBlack.png" x:Key="SplashImage" />
+    <Image Source="/Resources/UpdateBlack.png" x:Key="UpdateImage" />
 
     <Color x:Key="ThemeBackgroundColor">#FFD6D6D6</Color>
     <Color x:Key="ThemeSplashColor">#FFF0F0F0</Color>
