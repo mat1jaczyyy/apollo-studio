@@ -46,6 +46,8 @@ namespace Apollo.Windows {
         StackPanel Recents;
         TextBlock GithubVersion, GithubBody, GithubLink;
 
+        bool openDialog = false;
+
         void UpdateTopmost(bool value) => Topmost = value;
 
         public SplashWindow() {
@@ -96,7 +98,7 @@ namespace Apollo.Windows {
             GithubLink.Opacity = 1;
             GithubLink.IsHitTestVisible = true;
 
-            if (IsVisible && await Github.ShouldUpdate()) {
+            if (IsVisible && !openDialog && await Github.ShouldUpdate()) {
                 Window[] windows = Application.Current.Windows.ToArray();
                 
                 foreach (Window window in windows)
@@ -183,7 +185,9 @@ namespace Apollo.Windows {
                 Title = "Open Project"
             };
 
+            openDialog = true;
             string[] result = await ofd.ShowAsync(this);
+            openDialog = false;
 
             if (result.Length > 0)
                 ReadFile(result[0]);
