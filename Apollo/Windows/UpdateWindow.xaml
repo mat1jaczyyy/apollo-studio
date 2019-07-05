@@ -16,7 +16,15 @@
       </Grid>
 
       <Grid Grid.Row="1" ColumnDefinitions="*,4*" Margin="10 0 10 10">
-        <Grid Grid.Column="0" x:Name="Root" />
+        <Grid Grid.Column="0" Margin="5 0 5 5" x:Name="Root" />
+
+        <Grid Grid.Column="1" Margin="5 0 0 5">
+          <StackPanel VerticalAlignment="Center" Spacing="5">
+            <TextBlock Text="Initializing..." x:Name="State" />
+
+            <ProgressBar HorizontalAlignment="Stretch" x:Name="DownloadProgress" />
+          </StackPanel>
+        </Grid>
       </Grid>
     </Grid>
   </Border>

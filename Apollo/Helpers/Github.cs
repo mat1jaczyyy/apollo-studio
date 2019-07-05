@@ -32,6 +32,17 @@ namespace Apollo.Helpers {
             return cache;
         }
 
+        public static async Task<ReleaseAsset> LatestDownload() {
+            if (cache == null)
+                try {
+                    await LatestRelease();
+                } catch {
+                    return null;
+                }
+
+            return download;
+        }
+
         public static async Task<bool> ShouldUpdate() {
             if (UpdateChecked) return false;
 
