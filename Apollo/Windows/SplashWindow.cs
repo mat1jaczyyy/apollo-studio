@@ -95,6 +95,11 @@ namespace Apollo.Windows {
             GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
             GithubLink.Opacity = 1;
             GithubLink.IsHitTestVisible = true;
+
+            if (IsVisible && await Github.ShouldUpdate()) {
+                // UpdateWindow.Create();
+                Close();
+            }
         }
         
         void Unloaded(object sender, EventArgs e) {
