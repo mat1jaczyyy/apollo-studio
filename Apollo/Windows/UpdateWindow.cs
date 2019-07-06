@@ -105,10 +105,9 @@ namespace Apollo.Windows {
             );
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-                Process chmod = Process.Start(new ProcessStartInfo(
+                Process.Start(new ProcessStartInfo(
                     "chmod", $"+x \"{Path.Combine(updatepath, "ApolloUpdate")}\""
-                ));
-                chmod.WaitForExit();
+                )).WaitForExit();
             }
 
             Program.LaunchUpdater = true;

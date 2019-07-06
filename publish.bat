@@ -20,7 +20,7 @@ echo.
 echo Merging...
 
 cd ..
-rd /S /Q Build
+rd /S /Q Build >nul 2>&1
 mkdir Build
 cd Build
 
@@ -31,5 +31,6 @@ mkdir Update
 robocopy ..\Apollo\bin\Release\netcoreapp2.2\win10-x64\publish Apollo /E >nul 2>&1
 robocopy ..\M4L M4L "Apollo Connector.amxd" >nul 2>&1
 robocopy ..\ApolloUpdate\bin\Release\netcoreapp2.2\win10-x64\publish Update /E >nul 2>&1
+robocopy ..\ApolloUpdate Update elevate.exe handle64.exe >nul 2>&1
 
 echo Done.
