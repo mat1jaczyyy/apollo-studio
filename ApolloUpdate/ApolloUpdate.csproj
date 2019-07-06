@@ -7,23 +7,7 @@
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64</RuntimeIdentifiers>
     <LangVersion>7.2</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <StartupObject>Update.Core.Program</StartupObject>
+    <StartupObject>ApolloUpdate.Program</StartupObject>
     <Version>0.0.0</Version>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.8.1-cibuild0002257-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.8.1-cibuild0002257-beta" />
-    <PackageReference Include="Octokit" Version="0.32.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="**/*.cs">
-      <DependentUpon>%(Filename).xaml</DependentUpon>
-    </Compile>
-    <AvaloniaResource Include="**/*.xaml">
-      <SubType>Designer</SubType>
-    </AvaloniaResource>
-    <AvaloniaResource Include="Resources/*" />
-  </ItemGroup>
 </Project>
