@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
@@ -11,6 +10,10 @@
     <Version>0.0.0</Version>
   </PropertyGroup>
   
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.8.1-cibuild0002257-beta" />
     <PackageReference Include="Avalonia.Desktop" Version="0.8.1-cibuild0002257-beta" />

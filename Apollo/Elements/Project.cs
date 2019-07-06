@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace Apollo.Elements {
             set {
                 if (20 <= value && value <= 999) {
                     _bpm = value;
-                    if (Window != null) Window.SetBPM(_bpm.ToString(CultureInfo.InvariantCulture));
+                    if (Window != null) Window.SetBPM(_bpm.ToString());
                 }
             }
         }

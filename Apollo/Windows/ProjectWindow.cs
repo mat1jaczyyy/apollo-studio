@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -103,7 +102,7 @@ namespace Apollo.Windows {
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
             
-            BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture);
+            BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
             Page.RawValue = Program.Project.Page;
@@ -193,7 +192,7 @@ namespace Apollo.Windows {
             if (text == null) return;
             if (text == "") text = "0";
 
-            BPM_Update = () => { BPM.Text = Program.Project.BPM.ToString(CultureInfo.InvariantCulture); };
+            BPM_Update = () => { BPM.Text = Program.Project.BPM.ToString(); };
 
             if (int.TryParse(text, out int value)) {
                 if (20 <= value && value <= 999) {

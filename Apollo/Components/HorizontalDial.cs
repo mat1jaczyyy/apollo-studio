@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -27,7 +26,7 @@ namespace Apollo.Components {
                 if (_max != value) {
                     _max = value;
 
-                    Input.Width = ((int)_max).ToString(CultureInfo.InvariantCulture).Length * 25.0 / 3;
+                    Input.Width = ((int)_max).ToString().Length * 25.0 / 3;
                     
                     Value = ToValue(RawValue);
                 }

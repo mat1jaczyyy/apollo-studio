@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 using Avalonia;
@@ -133,7 +132,7 @@ namespace Apollo.DeviceViewers {
 
                 if (index != 0 && index != _fade.Count - 1) {
                     PositionText.Text = "Position:";
-                    Display.Text = $"{(Math.Round(_fade.GetPosition(index.Value) * 1000) / 10).ToString(CultureInfo.InvariantCulture)}%";
+                    Display.Text = $"{(Math.Round(_fade.GetPosition(index.Value) * 1000) / 10).ToString()}%";
                 }
 
                 Picker.SetColor(_fade.GetColor(index.Value));
@@ -212,7 +211,7 @@ namespace Apollo.DeviceViewers {
             Canvas.SetLeft(thumbs[index], position * 200);
 
             if (index == current)
-                Display.Text = $"{(Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString(CultureInfo.InvariantCulture)}%";
+                Display.Text = $"{(Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString()}%";
         }
 
         void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
@@ -346,7 +345,7 @@ namespace Apollo.DeviceViewers {
             if (text == null) return;
             if (text == "") return;
 
-            Input_Update = () => { Input.Text = (Math.Round(_fade.GetPosition(current.Value) * 1000) / 10).ToString(CultureInfo.InvariantCulture); };
+            Input_Update = () => { Input.Text = (Math.Round(_fade.GetPosition(current.Value) * 1000) / 10).ToString(); };
 
             if (double.TryParse(text, out double value)) {
                 double min = _fade.GetPosition(current.Value - 1) * 100 + 0.5;
@@ -366,8 +365,8 @@ namespace Apollo.DeviceViewers {
 
                     if (value <= 0) text = "0";
 
-                    int upper = (int)Math.Pow(10, ((int)max).ToString(CultureInfo.InvariantCulture).Length) - 1;
-                    if (value > upper) text = upper.ToString(CultureInfo.InvariantCulture);
+                    int upper = (int)Math.Pow(10, ((int)max).ToString().Length) - 1;
+                    if (value > upper) text = upper.ToString();
                     
                     Input.Text = text;
                 };
@@ -384,7 +383,7 @@ namespace Apollo.DeviceViewers {
         void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 oldValue = Math.Round(_fade.GetPosition(current.Value) * 1000) / 10;
-                Input.Text = oldValue.ToString(CultureInfo.InvariantCulture);
+                Input.Text = oldValue.ToString();
 
                 Input.SelectionStart = 0;
                 Input.SelectionEnd = Input.Text.Length;
@@ -400,7 +399,7 @@ namespace Apollo.DeviceViewers {
         void Input_LostFocus(object sender, RoutedEventArgs e) {
             double raw = _fade.GetPosition(current.Value);
 
-            Input.Text = (Math.Round(raw * 1000) / 10).ToString(CultureInfo.InvariantCulture);
+            Input.Text = (Math.Round(raw * 1000) / 10).ToString();
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;

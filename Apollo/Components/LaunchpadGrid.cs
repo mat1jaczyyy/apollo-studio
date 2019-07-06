@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -108,22 +107,22 @@ namespace Apollo.Components {
         readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
 
         public Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
-            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
+            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
         public Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},{1} A {2},{2} 180 1 1 {0},{3} A {2},{2} 180 1 1 {0},{1} Z",
-            ((double)this.Resources["PadSize"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadSize"] / 8 + (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadSize"] * 3 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadSize"] * 7 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
+            ((double)this.Resources["PadSize"] / 2).ToString(),
+            ((double)this.Resources["PadSize"] / 8 + (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadSize"] * 3 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadSize"] * 7 / 8 - (double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
         public Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
-            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCut1"] + (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadCut2"] - (double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture),
-            ((double)this.Resources["PadThickness"] / 2).ToString(CultureInfo.InvariantCulture)
+            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadCut1"] + (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadCut2"] - (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
         public void DrawPath() {
@@ -150,7 +149,7 @@ namespace Apollo.Components {
             this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
             this.Resources["CornerRadius"] = new CornerRadius(1 * EffectiveScale);
 
-            string gridSize = (17 * EffectiveScale).ToString(CultureInfo.InvariantCulture);
+            string gridSize = (17 * EffectiveScale).ToString();
             string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select gridSize).ToArray());
 
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);

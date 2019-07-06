@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -172,7 +171,7 @@ namespace Apollo.Components {
             if (text == null) return RawValue;
             if (text == "") return RawValue;
 
-            Update = () => { Input.Text = RawValue.ToString(CultureInfo.InvariantCulture); };
+            Update = () => { Input.Text = RawValue.ToString(); };
 
             if (int.TryParse(text, out int value)) {
                 if (-9 <= value && value <= 9) {
@@ -206,8 +205,8 @@ namespace Apollo.Components {
 
         void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
-                InputX.Text = X.ToString(CultureInfo.InvariantCulture);
-                InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
+                InputX.Text = X.ToString();
+                InputY.Text = Y.ToString();
 
                 InputX.SelectionStart = 0;
                 InputX.SelectionEnd = InputX.Text.Length;
@@ -231,8 +230,8 @@ namespace Apollo.Components {
                 return;
             }
 
-            InputX.Text = X.ToString(CultureInfo.InvariantCulture);
-            InputY.Text = Y.ToString(CultureInfo.InvariantCulture);
+            InputX.Text = X.ToString();
+            InputY.Text = Y.ToString();
 
             Display.Opacity = 1;
             Display.IsHitTestVisible = true;

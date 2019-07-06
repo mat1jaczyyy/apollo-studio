@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -272,14 +271,14 @@ namespace Apollo.Components {
             }
             
             Arc.Data = Geometry.Parse(String.Format("M {0},{1} A {2},{2} {3} {4} {5} {6},{7}",
-                x_start.ToString(CultureInfo.InvariantCulture),
-                y_start.ToString(CultureInfo.InvariantCulture),
-                (radius * _scale).ToString(CultureInfo.InvariantCulture),
-                angle.ToString(CultureInfo.InvariantCulture),
+                x_start.ToString(),
+                y_start.ToString(),
+                (radius * _scale).ToString(),
+                angle.ToString(),
                 large,
                 direction,
-                x_end.ToString(CultureInfo.InvariantCulture),
-                y_end.ToString(CultureInfo.InvariantCulture)
+                x_end.ToString(),
+                y_end.ToString()
             ));
         }
 
@@ -397,7 +396,7 @@ namespace Apollo.Components {
             if (text == null) return;
             if (text == "") return;
 
-            Input_Update = () => { Input.Text = RawValue.ToString(CultureInfo.InvariantCulture); };
+            Input_Update = () => { Input.Text = RawValue.ToString(); };
 
             if (int.TryParse(text, out int value)) {
                 if (Minimum <= value && value <= Maximum) {
@@ -416,12 +415,12 @@ namespace Apollo.Components {
                         if (value < 0) text = "0";
 
                     } else {
-                        int lower = - (int)Math.Pow(10, ((int)Minimum).ToString(CultureInfo.InvariantCulture).Length - 1) + 1;
-                        if (value < lower) text = lower.ToString(CultureInfo.InvariantCulture);
+                        int lower = - (int)Math.Pow(10, ((int)Minimum).ToString().Length - 1) + 1;
+                        if (value < lower) text = lower.ToString();
                     }
 
-                    int upper = (int)Math.Pow(10, ((int)Maximum).ToString(CultureInfo.InvariantCulture).Length) - 1;
-                    if (value > upper) text = upper.ToString(CultureInfo.InvariantCulture);
+                    int upper = (int)Math.Pow(10, ((int)Maximum).ToString().Length) - 1;
+                    if (value > upper) text = upper.ToString();
                     
                     Input.Text = text;
                 };
@@ -437,7 +436,7 @@ namespace Apollo.Components {
 
         protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && !UsingSteps && Enabled) {
-                Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
+                Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 
                 Input.SelectionStart = 0;
@@ -454,7 +453,7 @@ namespace Apollo.Components {
         }
         
         protected void Input_LostFocus(object sender, RoutedEventArgs e) {
-            Input.Text = RawValue.ToString(CultureInfo.InvariantCulture);
+            Input.Text = RawValue.ToString();
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
