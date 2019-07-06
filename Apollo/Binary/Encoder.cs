@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -72,7 +73,7 @@ namespace Apollo.Binary {
                 for (int i = 0; i < count; i++)
                     Encode(writer, ColorHistory.GetColor(i));
                 
-                writer.Write(MIDI.Devices.Count);
+                writer.Write(MIDI.Devices.Count(i => i.GetType() == typeof(Launchpad)));
                 for (int i = 0; i < MIDI.Devices.Count; i++)
                     if (MIDI.Devices[i].GetType() == typeof(Launchpad))
                         Encode(writer, MIDI.Devices[i]);
