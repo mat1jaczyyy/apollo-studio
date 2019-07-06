@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 
 using Avalonia;
@@ -10,6 +13,7 @@ using Avalonia.Markup.Xaml;
 
 using Humanizer;
 
+using Apollo.Core;
 using Apollo.Helpers;
 
 namespace Apollo.Windows {
@@ -29,6 +33,27 @@ namespace Apollo.Windows {
         ProgressBar DownloadProgress;
 
         Stopwatch time = new Stopwatch();
+
+        ZipArchiveEntry GetZipFolder(ZipArchive zip, string folder) => zip.Entries.First(i => {
+            string[] path = i.FullName.Split('/');
+            return path.Length == 3 && path[1] == folder && path[2] == "";
+        });
+
+        void Extract(ZipArchiveEntry directory, string path) {
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            
+            Directory.CreateDirectory(path);
+
+            foreach (ZipArchiveEntry i in directory.Archive.Entries) {
+                if (i.FullName.StartsWith(directory.FullName)) {
+                    string name = i.FullName.Replace(directory.FullName, "");
+
+                    if (name.EndsWith("/")) Directory.CreateDirectory(Path.Combine(path, name));
+                    else if (name != "") i.ExtractToFile(Path.Combine(path, name));
+                }
+            }
+        }
 
         public UpdateWindow() {
             InitializeComponent();
@@ -64,7 +89,12 @@ namespace Apollo.Windows {
         }
 
         void Downloaded(object sender, AsyncCompletedEventArgs e) {
-
+            ZipArchive zip = new ZipArchive(new MemoryStream(((DownloadDataCompletedEventArgs)e).Result));
+            
+            Extract(
+                GetZipFolder(zip, "Update"),
+                Program.GetBaseFolder("Update")
+            );
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

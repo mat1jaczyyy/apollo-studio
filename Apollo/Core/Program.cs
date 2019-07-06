@@ -27,12 +27,12 @@ namespace Apollo.Core {
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToDebug();
-        
-        static string crashDir = Path.Combine(
+
+        public static string GetBaseFolder(string folder) => Path.Combine(
             Directory.GetParent(
                 Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory)
             ).FullName,
-            "Crashes"
+            folder
         );
         
         static Stopwatch logTimer = new Stopwatch();
@@ -91,6 +91,8 @@ namespace Apollo.Core {
 
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
+                string crashDir = GetBaseFolder("Crashes");
+
                 if (!Directory.Exists(crashDir)) Directory.CreateDirectory(crashDir);
                 string crashName = Path.Combine(crashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
 
