@@ -49,6 +49,13 @@ namespace ApolloUpdate {
             string temppath = Program.GetBaseFolder("Temp");
             Directory.Move(temppath, apollopath);
 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                Process chmod = Process.Start(new ProcessStartInfo(
+                    "chmod", $"+x \"{Path.Combine(apollopath, "Apollo")}\""
+                ));
+                chmod.WaitForExit();
+            }
+
             Process.Start(Path.Combine(apollopath, "Apollo" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")));
         }
     }

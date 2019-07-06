@@ -92,15 +92,24 @@ namespace Apollo.Windows {
         void Downloaded(object sender, AsyncCompletedEventArgs e) {
             ZipArchive zip = new ZipArchive(new MemoryStream(((DownloadDataCompletedEventArgs)e).Result));
             
+            string updatepath = Program.GetBaseFolder("Update");
+
             Extract(
                 GetZipFolder(zip, "Update"),
-                Program.GetBaseFolder("Update")
+                updatepath
             );
 
             Extract(
                 GetZipFolder(zip, "Apollo"),
                 Program.GetBaseFolder("Temp")
             );
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                Process chmod = Process.Start(new ProcessStartInfo(
+                    "chmod", $"+x \"{Path.Combine(updatepath, "ApolloUpdate")}\""
+                ));
+                chmod.WaitForExit();
+            }
 
             Program.LaunchUpdater = true;
 
