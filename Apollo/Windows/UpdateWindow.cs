@@ -40,7 +40,7 @@ namespace Apollo.Windows {
             return path.Length == 3 && path[1] == folder && path[2] == "";
         });
 
-        void Extract(ZipArchiveEntry directory, string path) {
+        void ExtractWin(ZipArchiveEntry directory, string path) {
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
             
@@ -54,6 +54,13 @@ namespace Apollo.Windows {
                     else if (name != "") i.ExtractToFile(Path.Combine(path, name));
                 }
             }
+        }
+
+        void ExtractMac(string directory, string path) {
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            
+            Directory.Move(directory, path);
         }
 
         public UpdateWindow() {
@@ -90,24 +97,39 @@ namespace Apollo.Windows {
         }
 
         void Downloaded(object sender, AsyncCompletedEventArgs e) {
-            ZipArchive zip = new ZipArchive(new MemoryStream(((DownloadDataCompletedEventArgs)e).Result));
-            
+            byte[] result = ((DownloadDataCompletedEventArgs)e).Result;
+                
             string updatepath = Program.GetBaseFolder("Update");
+            string temppath = Program.GetBaseFolder("Temp");
 
-            Extract(
-                GetZipFolder(zip, "Update"),
-                updatepath
-            );
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                ZipArchive zip = new ZipArchive(new MemoryStream(result));
 
-            Extract(
-                GetZipFolder(zip, "Apollo"),
-                Program.GetBaseFolder("Temp")
-            );
+                ExtractWin(GetZipFolder(zip, "Update"), updatepath);
+                ExtractWin(GetZipFolder(zip, "Apollo"), temppath);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+            } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                string zippath = Program.GetBaseFolder("Zip");
+
+                if (Directory.Exists(zippath))
+                    Directory.Delete(zippath, true);
+                
+                Directory.CreateDirectory(zippath);
+
+                string zipfile = Path.Combine(zippath, "update.zip");
+            
+                File.WriteAllBytes(zipfile, result);
+
                 Process.Start(new ProcessStartInfo(
-                    "chmod", $"+x \"{Path.Combine(updatepath, "ApolloUpdate")}\""
+                    "ditto", $"-x -k --sequesterRsrc --rsrc \"{zipfile}\" \"{zippath}\""
                 )).WaitForExit();
+
+                string foldername = Directory.GetDirectories(zippath)[0];
+
+                ExtractMac(Path.Combine(zippath, foldername, "Update"), updatepath);
+                ExtractMac(Path.Combine(zippath, foldername, "Apollo"), temppath);
+
+                Directory.Delete(zippath, true);
             }
 
             Program.LaunchUpdater = true;
