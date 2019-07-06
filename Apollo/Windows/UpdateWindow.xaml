@@ -1,30 +1,22 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.UpdateWindow"
-        xmlns:Components="clr-namespace:Apollo.Components"
         Title="Apollo Studio" Background="{DynamicResource ThemeSplashBrush}" Topmost="true" WindowStartupLocation="CenterScreen"
         Icon="/Resources/WindowIcon.png"
-        Width="480" MinWidth="480" MaxWidth="480"
+        Width="360" MinWidth="360" MaxWidth="360"
         Height="120" MinHeight="120" MaxHeight="120"
         Opened="Loaded" Closing="Unloaded">
 
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
-    <Grid RowDefinitions="Auto,*">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-        <Grid Grid.Column="0" Background="Transparent" PointerPressed="MoveWindow" />
-        <Components:Close Grid.Column="1" Margin="5 5" Clicked="Close" />
-      </Grid>
+    <Grid ColumnDefinitions="*,2*" Margin="10 5">
+      <Grid Grid.Column="0" Margin="5 5 10 5" x:Name="Root" />
 
-      <Grid Grid.Row="1" ColumnDefinitions="*,4*" Margin="10 0 10 10">
-        <Grid Grid.Column="0" Margin="5 0 5 5" x:Name="Root" />
+      <Grid Grid.Column="1" Margin="5 0 0 0">
+        <StackPanel VerticalAlignment="Center" Spacing="5">
+          <TextBlock Text="Initializing..." x:Name="State" />
 
-        <Grid Grid.Column="1" Margin="5 0 0 5">
-          <StackPanel VerticalAlignment="Center" Spacing="5">
-            <TextBlock Text="Initializing..." x:Name="State" />
-
-            <ProgressBar HorizontalAlignment="Stretch" x:Name="DownloadProgress" />
-          </StackPanel>
-        </Grid>
+          <ProgressBar HorizontalAlignment="Stretch" x:Name="DownloadProgress" />
+        </StackPanel>
       </Grid>
     </Grid>
   </Border>

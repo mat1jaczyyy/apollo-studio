@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -91,10 +92,20 @@ namespace Apollo.Windows {
         void Downloaded(object sender, AsyncCompletedEventArgs e) {
             ZipArchive zip = new ZipArchive(new MemoryStream(((DownloadDataCompletedEventArgs)e).Result));
             
+            string updatepath = Program.GetBaseFolder("Update");
+
             Extract(
                 GetZipFolder(zip, "Update"),
-                Program.GetBaseFolder("Update")
+                updatepath
             );
+
+            Extract(
+                GetZipFolder(zip, "Apollo"),
+                Program.GetBaseFolder("Temp")
+            );
+
+            Process.Start(Path.Combine(updatepath, "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")));
+            Application.Current.Exit();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
