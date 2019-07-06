@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using Apollo.Binary;
 using Apollo.Enums;
@@ -11,7 +12,10 @@ namespace Apollo.Core {
     public static class Preferences {
         public static PreferencesWindow Window;
 
-        static readonly string DirPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".apollostudio");
+        static readonly string DirPath = Path.Combine(Environment.GetEnvironmentVariable(
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
+        ), ".apollostudio");
+
         static readonly string FilePath = Path.Combine(DirPath, "Apollo.config");
 
         public delegate void CheckBoxChanged(bool newValue);
