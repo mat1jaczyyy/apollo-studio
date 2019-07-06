@@ -198,12 +198,19 @@ namespace Apollo.Core {
             AbletonConnector.Dispose();
             logTimer.Stop();
 
-            if (LaunchUpdater) Process.Start(
-                Path.Combine(
-                    Program.GetBaseFolder("Update"),
-                    "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")
-                )
-            );
+            if (LaunchUpdater) {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    Process.Start(
+                        $"{AppDomain.CurrentDomain.BaseDirectory}elevate.exe",
+                        $"\"{Path.Combine(Program.GetBaseFolder("Update"), "ApolloUpdate.exe")}\""
+                    );
+                
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    Process.Start(Path.Combine(
+                        Program.GetBaseFolder("Update"),
+                        "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")
+                    ));
+            }
         }
     }
 }

@@ -16,7 +16,6 @@ namespace ApolloUpdate {
             folder
         );
 
-        static string ElevatePath => $"{AppDomain.CurrentDomain.BaseDirectory}elevate.exe";
         static string Handle64Path => $"{AppDomain.CurrentDomain.BaseDirectory}handle64.exe";
 
         static void Main(string[] args) {
@@ -56,7 +55,7 @@ namespace ApolloUpdate {
                 string handle = strings.FirstOrDefault(i => i.Contains(apollopath));
 
                 if (handle != null)
-                    Process.Start(new ProcessStartInfo(ElevatePath, $"\"{Handle64Path}\" -p {pid.Trim().Split(' ')[2]} -c {handle.Trim().Split(':')[0]} -y -nobanner")).WaitForExit();
+                    Process.Start(new ProcessStartInfo(Handle64Path, $"-p {pid.Trim().Split(' ')[2]} -c {handle.Trim().Split(':')[0]} -y -nobanner")).WaitForExit();
             }
 
             Thread.Sleep(1000);
@@ -73,12 +72,10 @@ namespace ApolloUpdate {
             string temppath = Program.GetBaseFolder("Temp");
             Directory.Move(temppath, apollopath);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-                Process chmod = Process.Start(new ProcessStartInfo(
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                Process.Start(new ProcessStartInfo(
                     "chmod", $"+x \"{Path.Combine(apollopath, "Apollo")}\""
-                ));
-                chmod.WaitForExit();
-            }
+                )).WaitForExit();
 
             Process.Start(Path.Combine(apollopath, "Apollo" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")));
         }
