@@ -206,10 +206,7 @@ namespace Apollo.Core {
                     );
                 
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    Process.Start(Path.Combine(
-                        Program.GetBaseFolder("Update"),
-                        "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")
-                    ));
+                    Process.Start(Path.Combine(Program.GetBaseFolder("Update"), "ApolloUpdate"));
             }
         }
     }
