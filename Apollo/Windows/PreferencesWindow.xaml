@@ -2,11 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PreferencesWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
-        Title="Preferences" WindowStartupLocation="CenterOwner"
-        CanResize="false" SizeToContent="Height"
+        Title="Preferences" WindowStartupLocation="CenterOwner" CanResize="false"
         Icon="/Resources/WindowIcon.png"
         Width="750" MinWidth="750" MaxWidth="750"
-        Height="561" MinHeight="561" MaxHeight="561"
+        Height="616" MinHeight="616" MaxHeight="616"
         Opened="Loaded" Closing="Unloaded">
   
   <Grid RowDefinitions="Auto,*">
@@ -25,7 +24,7 @@
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
       <Grid ColumnDefinitions="*,*" Margin="10 5"> 
         <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
-          <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0 0 10 0">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0 0 10 0">
             <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
               <StackPanel Spacing="5">
                 <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" x:Name="ThemeHeader" />
@@ -73,17 +72,27 @@
               </StackPanel>
             </Border>
 
-            <StackPanel Grid.Row="4" Margin="0 5" Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
-              <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
-              <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
-              <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
-              <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
+            <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+              <StackPanel Spacing="5">
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
+                <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
+                <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
+                <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
+                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
+              </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Row="5" Margin="0 5" Spacing="5">
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
+              <StackPanel Margin="5 0" Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Fade Smoothness" />
+                <Slider Width="100" Minimum="0" Maximum="1" x:Name="FadeSmoothness" />
+              </StackPanel>
             </StackPanel>
           </Grid>
         </Border>
 
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="10 0 0 0">
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto" Margin="10 0 0 0">
           <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="File Management" />
@@ -99,18 +108,8 @@
               <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 150 entries</CheckBox>
             </StackPanel>
           </Border>
-
-          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
-              <StackPanel Margin="5 0" Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="Fade Smoothness" />
-                <Slider Width="100" Minimum="0" Maximum="1" x:Name="FadeSmoothness" />
-              </StackPanel>
-            </StackPanel>
-          </Border>
           
-          <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <Grid RowDefinitions="Auto,*">
               <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
               <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
@@ -121,11 +120,19 @@
             </Grid>
           </Border>
 
-          <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+          <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
             <StackPanel Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
               <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
               <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
+            <StackPanel Spacing="5">
+              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Application Management" />
+              <CheckBox Click="CheckForUpdates_Changed" x:Name="CheckForUpdates">Check for Updates on Startup</CheckBox>
+              <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Crashes Folder" Click="OpenCrashesFolder" />
             </StackPanel>
           </Border>
 

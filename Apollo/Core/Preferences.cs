@@ -225,6 +225,15 @@ namespace Apollo.Core {
             }
         }
 
+        static bool _CheckForUpdates = true;
+        public static bool CheckForUpdates {
+            get => _CheckForUpdates;
+            set {
+                _CheckForUpdates = value;
+                Save();
+            }
+        }
+
         public static event Changed RecentsCleared;
         public static List<string> Recents = new List<string>();
 

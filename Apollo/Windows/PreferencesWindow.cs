@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -52,10 +53,12 @@ namespace Apollo.Windows {
             DiscordPresence = this.Get<CheckBox>("DiscordPresence");
             DiscordFilename = this.Get<CheckBox>("DiscordFilename");
 
+            CheckForUpdates = this.Get<CheckBox>("CheckForUpdates");
+
             Contents = this.Get<StackPanel>("Contents").Children;
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename;
+        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
@@ -116,6 +119,8 @@ namespace Apollo.Windows {
 
             DiscordPresence.IsChecked = Preferences.DiscordPresence;
             DiscordFilename.IsChecked = Preferences.DiscordFilename;
+
+            CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
@@ -224,6 +229,19 @@ namespace Apollo.Windows {
         void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 
         void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
+
+        void CheckForUpdates_Changed(object sender, EventArgs e) => Preferences.CheckForUpdates = DiscordFilename.IsChecked.Value;
+
+        void OpenCrashesFolder(object sender, RoutedEventArgs e) {
+            string crashdir = Program.GetBaseFolder("Crashes");
+
+            if (!Directory.Exists(crashdir)) Directory.CreateDirectory(crashdir);
+
+            Process.Start(new ProcessStartInfo() {
+                FileName = crashdir,
+                UseShellExecute = true
+            });
+        }
 
         void Launchpad_Add() {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);

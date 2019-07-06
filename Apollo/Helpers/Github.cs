@@ -55,7 +55,7 @@ namespace Apollo.Helpers {
             
             UpdateChecked = true;
 
-            if (cache.Name != Program.Version && download != null)
+            if (Preferences.CheckForUpdates && cache.Name != Program.Version && download != null)
                 return await MessageWindow.Create(
                     $"A new version of Apollo Studio is available ({cache.Name} - {download.Size.Bytes().Humanize("#.##")}).\n\n" +
                     "Do you want to update to the latest version?",

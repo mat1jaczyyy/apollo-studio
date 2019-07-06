@@ -120,6 +120,9 @@ namespace Apollo.Binary {
                         Preferences.CrashName = reader.ReadString();
                         Preferences.CrashPath = reader.ReadString();
                     }
+
+                    if (version >= 16)
+                        Preferences.CheckForUpdates = reader.ReadBoolean();
                     
                     return null;
 
