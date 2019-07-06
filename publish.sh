@@ -1,4 +1,5 @@
 cd Apollo
+rm -rf bin/Release/netcoreapp2.2/osx.10.11-x64/publish
 dotnet publish -r osx.10.11-x64 -c Release
 sips -i icon.ico > /dev/null
 DeRez -only icns icon.ico > tmpicns.rsrc
@@ -10,6 +11,7 @@ rm bin/Release/netcoreapp2.2/win10-x64/publish/Apollo.config > /dev/null 2>&1
 echo
 
 cd ../ApolloUpdate
+rm -rf bin/Release/netcoreapp2.2/osx.10.11-x64/publish
 dotnet publish -r osx.10.11-x64 -c Release
 sips -i icon.ico > /dev/null
 DeRez -only icns icon.ico > tmpicns.rsrc
