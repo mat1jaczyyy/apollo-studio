@@ -34,6 +34,8 @@ namespace Apollo.Core {
             ).FullName,
             folder
         );
+
+        public static bool LaunchUpdater = false;
         
         static Stopwatch logTimer = new Stopwatch();
         public static void Log(string text) => Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
@@ -195,6 +197,13 @@ namespace Apollo.Core {
             Discord.Set(false);
             AbletonConnector.Dispose();
             logTimer.Stop();
+
+            if (LaunchUpdater) Process.Start(
+                Path.Combine(
+                    Program.GetBaseFolder("Update"),
+                    "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")
+                )
+            );
         }
     }
 }

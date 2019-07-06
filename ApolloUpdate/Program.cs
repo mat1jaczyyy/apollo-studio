@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ApolloUpdate {
     class Program {
@@ -31,8 +33,23 @@ namespace ApolloUpdate {
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
             };
+
+            Thread.Sleep(2000);
             
+            string apollopath = Program.GetBaseFolder("Apollo");
+            if (Directory.Exists(apollopath))
+                while (true)
+                    try {
+                        Directory.Delete(apollopath, true);
+                        break;
+                    } catch {
+                        Thread.Sleep(1000);
+                    }
             
+            string temppath = Program.GetBaseFolder("Temp");
+            Directory.Move(temppath, apollopath);
+
+            Process.Start(Path.Combine(apollopath, "Apollo" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")));
         }
     }
 }

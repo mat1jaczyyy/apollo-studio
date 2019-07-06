@@ -92,11 +92,9 @@ namespace Apollo.Windows {
         void Downloaded(object sender, AsyncCompletedEventArgs e) {
             ZipArchive zip = new ZipArchive(new MemoryStream(((DownloadDataCompletedEventArgs)e).Result));
             
-            string updatepath = Program.GetBaseFolder("Update");
-
             Extract(
                 GetZipFolder(zip, "Update"),
-                updatepath
+                Program.GetBaseFolder("Update")
             );
 
             Extract(
@@ -104,7 +102,8 @@ namespace Apollo.Windows {
                 Program.GetBaseFolder("Temp")
             );
 
-            Process.Start(Path.Combine(updatepath, "ApolloUpdate" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? ".exe" : "")));
+            Program.LaunchUpdater = true;
+
             Application.Current.Exit();
         }
 
