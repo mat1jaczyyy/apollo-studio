@@ -123,6 +123,9 @@ namespace Apollo.Binary {
 
                     if (version >= 16)
                         Preferences.CheckForUpdates = reader.ReadBoolean();
+
+                    if (version >= 17)
+                        Preferences.BaseTime = reader.ReadInt64();
                     
                     return null;
 

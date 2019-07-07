@@ -37,8 +37,8 @@ namespace Apollo.Core {
 
         public static bool LaunchUpdater = false;
         
-        static Stopwatch logTimer = new Stopwatch();
-        public static void Log(string text) => Console.WriteLine($"[{logTimer.Elapsed.ToString()}] {text}");
+        public static Stopwatch TimeSpent = new Stopwatch();
+        public static void Log(string text) => Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
 
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
@@ -122,13 +122,17 @@ namespace Apollo.Core {
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
 
+                if (TimeSpent.IsRunning) TimeSpent.Stop();
+
                 if (e.IsTerminating && Project != null) {
                     Preferences.CrashName = crashName;
                     Preferences.CrashPath = Project.FilePath;
                 }
+
+                Preferences.Save();
             };
 
-            logTimer.Start();
+            TimeSpent.Start();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { // USB Driver check
                 IEnumerable<int> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
@@ -187,6 +191,8 @@ namespace Apollo.Core {
                         );
                     } catch {}
                 }
+
+                Preferences.Save();
             };
             autosave.Start();
 
@@ -196,7 +202,7 @@ namespace Apollo.Core {
             MIDI.Stop();
             Discord.Set(false);
             AbletonConnector.Dispose();
-            logTimer.Stop();
+            TimeSpent.Stop();
 
             if (LaunchUpdater) {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

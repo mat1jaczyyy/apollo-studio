@@ -234,6 +234,9 @@ namespace Apollo.Core {
             }
         }
 
+        public static long BaseTime = 0;
+        public static long Time => BaseTime + (long)Program.TimeSpent.Elapsed.TotalSeconds;
+
         public static event Changed RecentsCleared;
         public static List<string> Recents = new List<string>();
 

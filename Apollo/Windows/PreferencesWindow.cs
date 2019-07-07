@@ -11,6 +11,9 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
+using Humanizer;
+using Humanizer.Localisation;
+
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
@@ -42,6 +45,7 @@ namespace Apollo.Windows {
             NovationPalette = this.Get<RadioButton>("NovationPalette");
             CustomPalette = this.Get<RadioButton>("CustomPalette");
 
+            ThemeHeader = this.Get<TextBlock>("ThemeHeader");
             Dark = this.Get<RadioButton>("Dark");
             Light = this.Get<RadioButton>("Light");
 
@@ -56,13 +60,18 @@ namespace Apollo.Windows {
             CheckForUpdates = this.Get<CheckBox>("CheckForUpdates");
 
             Contents = this.Get<StackPanel>("Contents").Children;
+
+            CurrentSession = this.Get<TextBlock>("CurrentSession");
+            AllTime = this.Get<TextBlock>("AllTime");
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation;
+        TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         Slider FadeSmoothness;
         Controls Contents;
+        DispatcherTimer Timer;
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -74,6 +83,11 @@ namespace Apollo.Windows {
         }
 
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+
+        void UpdateTime(object sender, EventArgs e) {
+            CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(maxUnit: TimeUnit.Hour)}";
+            AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(maxUnit: TimeUnit.Hour)}";
+        }
 
         public PreferencesWindow() {
             InitializeComponent();
@@ -122,6 +136,13 @@ namespace Apollo.Windows {
 
             CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
 
+            UpdateTime(null, EventArgs.Empty);
+            Timer = new DispatcherTimer() {
+                Interval = new TimeSpan(0, 0, 1)
+            };
+            Timer.Tick += UpdateTime;
+            Timer.Start();
+
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
         }
@@ -130,6 +151,8 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, EventArgs e) {
             Preferences.Window = null;
+
+            Timer.Stop();
 
             MIDI.DevicesUpdated -= HandlePorts;
 
@@ -206,14 +229,14 @@ namespace Apollo.Windows {
 
         void Dark_Changed(object sender, EventArgs e) {
             if (Preferences.Theme != Themes.Dark)
-                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
+                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
 
             Preferences.Theme = Themes.Dark;
         }
 
         void Light_Changed(object sender, EventArgs e) {
             if (Preferences.Theme != Themes.Light)
-                this.Get<TextBlock>("ThemeHeader").Text = "Theme     You must restart Apollo to apply this change.";
+                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
             
             Preferences.Theme = Themes.Light;
         }

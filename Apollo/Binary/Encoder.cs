@@ -86,6 +86,8 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.CrashPath);
                 
                 writer.Write(Preferences.CheckForUpdates);
+
+                writer.Write(Preferences.Time);
             }
 
             return output;
