@@ -43,35 +43,35 @@
 
       <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
         <Grid RowDefinitions="*,Auto">
-          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 15 5">
-            <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-              <Grid RowDefinitions="Auto,*" x:Name="Layout">
-                <StackPanel Grid.Row="0" MaxWidth="328" x:Name="Contents">
-                  <Components:TrackAdd AlwaysShowing="true" Added="Track_InsertStart" Action="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
-                </StackPanel>
+          <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+            <Grid RowDefinitions="Auto,*" x:Name="Layout">
+              <StackPanel Grid.Row="0" MaxWidth="328" x:Name="Contents">
+                <Components:TrackAdd AlwaysShowing="true" Added="Track_InsertStart" Action="Track_Action" DragDrop.AllowDrop="true" x:Name="TrackAdd" />
+              </StackPanel>
 
-                <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
-              </Grid>
-            </ScrollViewer>
-          </Border>
-
-          <StackPanel Grid.Row="1" Margin="10 5">
-            <Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" Scale="0.4"
-                                           ValueChanged="Page_Changed" />
-              
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                  <TextBlock VerticalAlignment="Center" Text="BPM: " />
-                  <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
-                           KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="BPM_Unfocus" />
-                </StackPanel>
-              </Grid>
-
-              <Components:CollapseButton HorizontalAlignment="Center" x:Name="CollapseButton" Clicked="BottomCollapse" />
+              <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
             </Grid>
+          </ScrollViewer>
 
-            <StackPanel x:Name="BottomPane" MaxHeight="0" Opacity="0" HorizontalAlignment="Stretch" Spacing="5">
+          <StackPanel Grid.Row="1" Margin="10 0 10 5">
+            <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+              <Grid Margin="5 5 5 0">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" Scale="0.4"
+                                             ValueChanged="Page_Changed" />
+                
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock VerticalAlignment="Center" Text="BPM: " />
+                    <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
+                             KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="BPM_Unfocus" />
+                  </StackPanel>
+                </Grid>
+
+                <Components:CollapseButton HorizontalAlignment="Center" x:Name="CollapseButton" Clicked="BottomCollapse" />
+              </Grid>
+            </Border>
+
+            <StackPanel Margin="5 0" x:Name="BottomPane" MaxHeight="0" Opacity="0" HorizontalAlignment="Stretch" Spacing="5">
               <Grid ColumnDefinitions="Auto,*" Margin="0 5 0 0">
                 <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Author: " />
                 <TextBox Grid.Column="1" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" Padding="2" x:Name="Author"
