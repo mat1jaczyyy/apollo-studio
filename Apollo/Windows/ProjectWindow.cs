@@ -40,16 +40,19 @@ namespace Apollo.Windows {
 
             BPM = this.Get<TextBox>("BPM");
             Page = this.Get<HorizontalDial>("Page");
+            Author = this.Get<TextBox>("Author");
+
+            TimeSpent = this.Get<TextBlock>("TimeSpent");
         }
 
-        TextBlock TitleText, TitleCenter;
+        TextBlock TitleText, TitleCenter, TimeSpent;
         StackPanel CenteringLeft, CenteringRight;
 
         ContextMenu TrackContextMenu;
         Controls Contents;
         TrackAdd TrackAdd;
 
-        TextBox BPM;
+        TextBox BPM, Author;
         HorizontalDial Page;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
@@ -104,6 +107,9 @@ namespace Apollo.Windows {
             
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
+            
+            Author.Text = Program.Project.Author.ToString();
+            Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);
 
             Page.RawValue = Program.Project.Page;
 
@@ -226,14 +232,14 @@ namespace Apollo.Windows {
             });
         }
         
-        void BPM_KeyDown(object sender, KeyEventArgs e) {
+        void Text_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Return) 
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        void BPM_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Text_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
 
         void BPM_Unfocus(object sender, RoutedEventArgs e) {
             if (BPM_Clean != Program.Project.BPM) {
@@ -255,6 +261,47 @@ namespace Apollo.Windows {
 
             BPM.Text = bpm;
             BPM_Dirty = false;
+
+            this.Focus();
+        }
+
+        bool Author_Dirty = false;
+        string Author_Clean = Program.Project.Author;
+        bool Author_Ignore = false;
+
+        void Author_Changed(string text) {
+            if (text == null) return;
+            
+            if (!Author_Dirty && text != Program.Project.Author) {
+                Author_Clean = Program.Project.Author;
+                Author_Dirty = true;
+            }
+
+            Author_Ignore = true;
+            Program.Project.Author = text;
+            Author_Ignore = false;
+        }
+
+        void Author_Unfocus(object sender, RoutedEventArgs e) {
+            if (Author_Clean != Program.Project.Author) {
+                string u = Author_Clean;
+                string r = Author_Clean = Program.Project.Author;
+
+                Program.Project.Undo.Add($"Author Changed to {r}", () => {
+                    Program.Project.Author = u;
+                }, () => {
+                    Program.Project.Author = r;
+                });
+            }
+
+            Author_Dirty = false;
+        }
+
+        public void SetAuthor(string author) {
+            if (Author_Ignore) return;
+
+            Author.Text = author;
+            Author_Dirty = false;
 
             this.Focus();
         }

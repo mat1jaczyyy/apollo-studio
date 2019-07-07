@@ -5,7 +5,7 @@
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
         Width="350" MinWidth="350" MaxWidth="350"
-        Height="320" MinHeight="180"
+        Height="400" MinHeight="250"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
@@ -55,16 +55,28 @@
             </ScrollViewer>
           </Border>
 
-          <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="10 5">
-            <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" Scale="0.4"
-                                       ValueChanged="Page_Changed" />
-          
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-              <TextBlock VerticalAlignment="Center" Text="BPM: " />
-              <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
-                       KeyDown="BPM_KeyDown" KeyUp="BPM_KeyUp" LostFocus="BPM_Unfocus" />
+          <StackPanel Grid.Row="1" Margin="10 5">
+            <Grid ColumnDefinitions="Auto,*">
+              <Components:HorizontalDial Grid.Column="0" HorizontalAlignment="Left" x:Name="Page" Title="Page:" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" Scale="0.4"
+                                         ValueChanged="Page_Changed" />
+            
+              <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock VerticalAlignment="Center" Text="BPM: " />
+                <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
+                         KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="BPM_Unfocus" />
+              </StackPanel>
+            </Grid>
+
+            <StackPanel x:Name="BottomPane" HorizontalAlignment="Stretch" Margin="0 5 0 0" Spacing="5">
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Author: " />
+                <TextBox Grid.Column="1" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" Padding="2" x:Name="Author"
+                         KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="Author_Unfocus" />
+              </Grid>
+
+              <TextBlock Margin="0 3" x:Name="TimeSpent" Text="Time spent: 0 seconds yeet" />
             </StackPanel>
-          </Grid>
+          </StackPanel>
         </Grid>
       </Border>
     </Grid>

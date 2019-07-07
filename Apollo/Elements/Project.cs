@@ -38,8 +38,17 @@ namespace Apollo.Elements {
             set {
                 if (20 <= value && value <= 999) {
                     _bpm = value;
-                    if (Window != null) Window.SetBPM(_bpm.ToString());
+                    Window?.SetBPM(_bpm.ToString());
                 }
+            }
+        }
+
+        string _author;
+        public string Author {
+            get => _author;
+            set {
+                _author = value;
+                Window?.SetAuthor(_author);
             }
         }
 
@@ -188,10 +197,11 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string path = "") {
+        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", string path = "") {
             BPM = bpm;
             Page = page;
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
+            Author = author;
             FilePath = path;
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());

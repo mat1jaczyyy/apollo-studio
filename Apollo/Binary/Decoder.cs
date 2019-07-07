@@ -139,14 +139,18 @@ namespace Apollo.Binary {
                     Contents = (from i in Enumerable.Range(0, reader.ReadInt32()) select (ISelect)Decode(reader, version)).ToList()
                 };
 
-            } else if (t == typeof(Project))
-                return new Project(
-                    reader.ReadInt32(),
-                    reader.ReadInt32(),
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList()
-                );
+            } else if (t == typeof(Project)) {
+                int bpm = reader.ReadInt32();
+                int page = reader.ReadInt32();
+                List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
+
+                string author = "";
+                if (version >= 17)
+                    author = reader.ReadString();
+
+                return new Project(bpm, page, tracks, author);
             
-            else if (t == typeof(Track)) {
+            } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);
                 Launchpad lp = (Launchpad)Decode(reader, version);
                 string name = reader.ReadString();
