@@ -172,6 +172,18 @@ namespace Apollo.Binary {
             writer.Write(o.Target);
             Encode(writer, o.Chain);
         }
+        
+        static void Encode(BinaryWriter writer, ColorFilter o) {
+            EncodeID(writer, typeof(ColorFilter));
+
+            writer.Write(o.Hue);
+            writer.Write(o.Saturation);
+            writer.Write(o.Value);
+
+            writer.Write(o.HueTolerance);
+            writer.Write(o.SaturationTolerance);
+            writer.Write(o.ValueTolerance);
+        }
 
         static void Encode(BinaryWriter writer, Copy o) {
             EncodeID(writer, typeof(Copy));

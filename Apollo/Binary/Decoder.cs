@@ -218,6 +218,16 @@ namespace Apollo.Binary {
                     (Chain)Decode(reader, version)
                 );
 
+            else if (t == typeof(ColorFilter))
+                return new ColorFilter(
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble(),
+                    reader.ReadDouble()
+                );
+
             else if (t == typeof(Copy)) {
                 Time time;
                 if (version <= 2) {
