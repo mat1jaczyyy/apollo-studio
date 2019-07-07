@@ -74,7 +74,10 @@
                          KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="Author_Unfocus" />
               </Grid>
 
-              <TextBlock Margin="0 3" x:Name="TimeSpent" />
+              <Grid ColumnDefinitions="*,Auto" Margin="0 3">
+                <TextBlock Grid.Column="0" x:Name="TimeSpent" />
+                <TextBlock Grid.Column="1" x:Name="Started" />
+              </Grid>
             </StackPanel>
           </StackPanel>
         </Grid>

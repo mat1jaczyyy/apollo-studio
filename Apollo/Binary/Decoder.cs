@@ -146,13 +146,15 @@ namespace Apollo.Binary {
 
                 string author = "";
                 long time = 0;
-                
+                long started = 0;
+
                 if (version >= 17) {
                     author = reader.ReadString();
                     time = reader.ReadInt64();
+                    started = reader.ReadInt64();
                 }
 
-                return new Project(bpm, page, tracks, author, time);
+                return new Project(bpm, page, tracks, author, time, started);
             
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);

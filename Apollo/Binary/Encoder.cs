@@ -114,6 +114,7 @@ namespace Apollo.Binary {
 
             writer.Write(o.Author);
             writer.Write(o.Time);
+            writer.Write(o.Started.ToUnixTimeSeconds());
         }
 
         static void Encode(BinaryWriter writer, Track o) {

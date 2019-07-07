@@ -56,6 +56,8 @@ namespace Apollo.Elements {
         public long BaseTime = 0;
         public long Time => BaseTime + (long)TimeSpent.Elapsed.TotalSeconds;
 
+        public DateTimeOffset Started { get; private set; }
+
         Stopwatch TimeSpent = new Stopwatch();
 
         public UndoManager Undo = new UndoManager();
@@ -203,7 +205,7 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", long basetime = 0, string path = "") {
+        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {
             TimeSpent.Start();
 
             BPM = bpm;
@@ -212,6 +214,7 @@ namespace Apollo.Elements {
             Author = author;
             BaseTime = basetime;
             FilePath = path;
+            Started = (started == 0)? DateTimeOffset.UtcNow : DateTimeOffset.FromUnixTimeSeconds(started);
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
 

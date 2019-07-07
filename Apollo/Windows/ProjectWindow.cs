@@ -46,9 +46,10 @@ namespace Apollo.Windows {
             Author = this.Get<TextBox>("Author");
 
             TimeSpent = this.Get<TextBlock>("TimeSpent");
+            Started = this.Get<TextBlock>("Started");
         }
 
-        TextBlock TitleText, TitleCenter, TimeSpent;
+        TextBlock TitleText, TitleCenter, TimeSpent, Started;
         StackPanel CenteringLeft, CenteringRight;
 
         ContextMenu TrackContextMenu;
@@ -126,6 +127,8 @@ namespace Apollo.Windows {
             };
             Timer.Tick += UpdateTime;
             Timer.Start();
+
+            Started.Text = $"Started {Program.Project.Started.LocalDateTime.ToString("MM/dd/yyyy HH:mm")}";
 
             this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
             TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
