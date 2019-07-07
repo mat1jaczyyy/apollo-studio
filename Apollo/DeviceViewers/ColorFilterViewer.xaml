@@ -1,0 +1,34 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.ColorFilterViewer"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
+  
+  <StackPanel Orientation="Horizontal" Spacing="10">
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+      <Grid RowDefinitions="*,*" Margin="0 0 10 0">
+        <Components:Dial Grid.Row="0" x:Name="Hue" Title="Hue" Minimum="-180" Maximum="180" Default="0" Round="0" Unit="°" Centered="true"
+                         ValueChanged="Hue_Changed" />
+        <Components:Dial Grid.Row="1" x:Name="HueTolerance" Title="Hue Tol" Minimum="0" Maximum="100" Default="5" Round="0" Unit="%"
+                         ValueChanged="HueTolerance_Changed" />
+      </Grid>
+    </Border>
+
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+      <Grid RowDefinitions="*,*" Margin="0 0 10 0">
+        <Components:Dial Grid.Row="0" x:Name="Saturation" Title="Sat" Minimum="0" Maximum="100" Default="100" Round="0" Unit="%"
+                         ValueChanged="Saturation_Changed" />
+        <Components:Dial Grid.Row="1" x:Name="SaturationTolerance" Title="Sat Tol" Minimum="0" Maximum="100" Default="5" Round="0" Unit="%"
+                         ValueChanged="SaturationTolerance_Changed" />
+      </Grid>
+    </Border>
+      
+    <Grid RowDefinitions="*,*">
+      <Components:Dial Grid.Row="0" x:Name="Value" Title="Val" Minimum="0" Maximum="100" Default="100" Round="0" Unit="%"
+                       ValueChanged="Value_Changed" />
+      <Components:Dial Grid.Row="1" x:Name="ValueTolerance" Title="Val Tol" Minimum="0" Maximum="100" Default="5" Round="0" Unit="%"
+                       ValueChanged="ValueTolerance_Changed" />
+    </Grid>
+  </StackPanel>
+</UserControl>
