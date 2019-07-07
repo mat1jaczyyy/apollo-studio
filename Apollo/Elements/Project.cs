@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
@@ -51,6 +52,11 @@ namespace Apollo.Elements {
                 Window?.SetAuthor(_author);
             }
         }
+
+        public long BaseTime = 0;
+        public long Time => BaseTime + (long)TimeSpent.Elapsed.TotalSeconds;
+
+        Stopwatch TimeSpent = new Stopwatch();
 
         public UndoManager Undo = new UndoManager();
 
@@ -197,11 +203,14 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", string path = "") {
+        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", long basetime = 0, string path = "") {
+            TimeSpent.Start();
+
             BPM = bpm;
             Page = page;
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             Author = author;
+            BaseTime = basetime;
             FilePath = path;
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
@@ -235,6 +244,8 @@ namespace Apollo.Elements {
 
             foreach (Track track in Tracks) track.Dispose();
             foreach (Launchpad launchpad in MIDI.Devices) launchpad.Clear();
+
+            TimeSpent.Stop();
         }
     }
 }

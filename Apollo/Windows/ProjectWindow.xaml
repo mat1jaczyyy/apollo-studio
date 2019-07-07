@@ -74,7 +74,7 @@
                          KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="Author_Unfocus" />
               </Grid>
 
-              <TextBlock Margin="0 3" x:Name="TimeSpent" Text="Time spent: 0 seconds yeet" />
+              <TextBlock Margin="0 3" x:Name="TimeSpent" />
             </StackPanel>
           </StackPanel>
         </Grid>

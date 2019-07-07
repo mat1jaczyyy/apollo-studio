@@ -145,10 +145,14 @@ namespace Apollo.Binary {
                 List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
 
                 string author = "";
-                if (version >= 17)
+                long time = 0;
+                
+                if (version >= 17) {
                     author = reader.ReadString();
+                    time = reader.ReadInt64();
+                }
 
-                return new Project(bpm, page, tracks, author);
+                return new Project(bpm, page, tracks, author, time);
             
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);

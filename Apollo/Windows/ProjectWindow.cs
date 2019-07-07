@@ -12,6 +12,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+using Humanizer;
+using Humanizer.Localisation;
+
 using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
@@ -55,12 +58,16 @@ namespace Apollo.Windows {
         TextBox BPM, Author;
         HorizontalDial Page;
 
+        DispatcherTimer Timer;
+
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
         void UpdatePage() => Page.RawValue = Program.Project.Page;
         void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
 
         void UpdateTopmost(bool value) => Topmost = value;
+
+        void UpdateTime(object sender, EventArgs e) => TimeSpent.Text = $"Total time spent: {Program.Project.Time.Seconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
         
         void SetAlwaysShowing() {
             TrackAdd.AlwaysShowing = (Contents.Count == 1);
@@ -107,11 +114,18 @@ namespace Apollo.Windows {
             
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
+
+            Page.RawValue = Program.Project.Page;
             
             Author.Text = Program.Project.Author.ToString();
             Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);
 
-            Page.RawValue = Program.Project.Page;
+            UpdateTime(null, EventArgs.Empty);
+            Timer = new DispatcherTimer() {
+                Interval = new TimeSpan(0, 0, 1)
+            };
+            Timer.Tick += UpdateTime;
+            Timer.Start();
 
             this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
             TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
@@ -132,6 +146,8 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, CancelEventArgs e) {
             Program.Project.Window = null;
+
+            Timer.Stop();
 
             Program.Project.PathChanged -= UpdateTitle;
             Program.Project.PageChanged -= HandlePage;

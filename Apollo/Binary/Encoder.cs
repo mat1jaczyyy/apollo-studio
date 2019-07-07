@@ -106,7 +106,6 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Project));
 
             writer.Write(o.BPM);
-
             writer.Write(o.Page);
 
             writer.Write(o.Tracks.Count);
@@ -114,6 +113,7 @@ namespace Apollo.Binary {
                 Encode(writer, o.Tracks[i]);
 
             writer.Write(o.Author);
+            writer.Write(o.Time);
         }
 
         static void Encode(BinaryWriter writer, Track o) {

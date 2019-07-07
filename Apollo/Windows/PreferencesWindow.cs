@@ -85,8 +85,8 @@ namespace Apollo.Windows {
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
         void UpdateTime(object sender, EventArgs e) {
-            CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(maxUnit: TimeUnit.Hour)}";
-            AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(maxUnit: TimeUnit.Hour)}";
+            CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
+            AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
         }
 
         public PreferencesWindow() {
