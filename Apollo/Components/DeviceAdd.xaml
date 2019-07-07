@@ -14,6 +14,7 @@
       <MenuItem Header="Filters">
         <MenuItem Header="Page Filter" />
         <MenuItem Header="Key Filter" />
+        <MenuItem Header="Color Filter" />
         <MenuItem Header="Switch" />
       </MenuItem>
 
