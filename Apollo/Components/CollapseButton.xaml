@@ -1,0 +1,17 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.CollapseButton"
+             DetachedFromVisualTree="Unloaded">
+
+  <LayoutTransformControl Width="16" Height="16">
+    <LayoutTransformControl.LayoutTransform>
+      <RotateTransform Angle="0" x:Name="Rotation" />
+    </LayoutTransformControl.LayoutTransform>
+
+    <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
+            PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+      <Path StrokeThickness="2" x:Name="Path"
+            Data="M 0,12 L 8,4 16,12" />
+    </Canvas>
+  </LayoutTransformControl>
+</UserControl>
