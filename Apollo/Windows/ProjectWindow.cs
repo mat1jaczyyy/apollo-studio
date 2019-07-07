@@ -45,12 +45,16 @@ namespace Apollo.Windows {
             Page = this.Get<HorizontalDial>("Page");
             Author = this.Get<TextBox>("Author");
 
+            BottomPane = this.Get<StackPanel>("BottomPane");
+            CollapseButton = this.Get<CollapseButton>("CollapseButton");
+
             TimeSpent = this.Get<TextBlock>("TimeSpent");
             Started = this.Get<TextBlock>("Started");
         }
 
         TextBlock TitleText, TitleCenter, TimeSpent, Started;
-        StackPanel CenteringLeft, CenteringRight;
+        StackPanel CenteringLeft, CenteringRight, BottomPane;
+        CollapseButton CollapseButton;
 
         ContextMenu TrackContextMenu;
         Controls Contents;
@@ -324,6 +328,8 @@ namespace Apollo.Windows {
 
             this.Focus();
         }
+
+        void BottomCollapse() => BottomPane.Opacity = Convert.ToInt32(CollapseButton.Showing = (BottomPane.MaxHeight = (BottomPane.MaxHeight == 0)? 1000 : 0) != 0);
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
