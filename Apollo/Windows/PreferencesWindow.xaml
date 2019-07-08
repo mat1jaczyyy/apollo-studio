@@ -84,10 +84,8 @@
 
             <StackPanel Grid.Row="5" Margin="0 5" Spacing="5">
               <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
-              <StackPanel Margin="5 0" Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="Fade Smoothness" />
-                <Slider Width="100" Minimum="0" Maximum="1" x:Name="FadeSmoothness" />
-              </StackPanel>
+              <Components:HorizontalDial Margin="5 0" HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
+                                         ValueChanged="FadeSmoothness_Changed"/>
             </StackPanel>
           </Grid>
         </Border>

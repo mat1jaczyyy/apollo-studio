@@ -35,7 +35,7 @@ namespace Apollo.Windows {
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
             AutoCreatePattern = this.Get<CheckBox>("AutoCreatePattern");
 
-            FadeSmoothness = this.Get<Slider>("FadeSmoothness");
+            FadeSmoothness = this.Get<HorizontalDial>("FadeSmoothness");
 
             CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
             CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
@@ -69,7 +69,7 @@ namespace Apollo.Windows {
         ComboBox LaunchpadStyle, LaunchpadGridRotation;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
-        Slider FadeSmoothness;
+        HorizontalDial FadeSmoothness;
         Controls Contents;
         DispatcherTimer Timer;
 
@@ -112,7 +112,6 @@ namespace Apollo.Windows {
             AutoCreatePattern.IsChecked = Preferences.AutoCreatePattern;
 
             FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
-            FadeSmoothness.GetObservable(Slider.ValueProperty).Subscribe(FadeSmoothness_Changed);
 
             CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
             CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
@@ -180,7 +179,7 @@ namespace Apollo.Windows {
 
         void AutoCreatePattern_Changed(object sender, EventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
-        void FadeSmoothness_Changed(double value) => Preferences.FadeSmoothness = value;
+        void FadeSmoothness_Changed(double value, double? old) => Preferences.FadeSmoothness = value / 100;
 
         void CaptureLaunchpad_Changed(object sender, EventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 
