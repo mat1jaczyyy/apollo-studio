@@ -126,7 +126,7 @@ namespace Apollo.Devices {
         public int Repeats {
             get => _repeats;
             set {
-                if (_repeats != value && 1 <= value && value <= 32) {
+                if (_repeats != value && 1 <= value && value <= 128) {
                     _repeats = value;
 
                     Window?.SetRepeats(_repeats);
