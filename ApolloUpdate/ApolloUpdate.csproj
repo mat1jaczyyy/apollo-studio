@@ -13,4 +13,8 @@
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
+  </ItemGroup>
 </Project>

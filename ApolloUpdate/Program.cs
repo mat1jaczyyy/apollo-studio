@@ -7,6 +7,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
+using Microsoft.Win32;
+
 namespace ApolloUpdate {
     class Program {
         static string GetBaseFolder(string folder) => Path.Combine(
@@ -38,6 +40,22 @@ namespace ApolloUpdate {
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
             };
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE", true);
+                if (!key.GetSubKeyNames().Contains("Sysinternals"))
+                    key.CreateSubKey("Sysinternals");
+                key.Flush();
+                
+                key = key.OpenSubKey("Sysinternals", true);
+                if (!key.GetSubKeyNames().Contains("Handle"))
+                    key.CreateSubKey("Handle");
+                key.Flush();
+                
+                key = key.OpenSubKey("Handle", true);
+                key.SetValue("EulaAccepted", 1);
+                key.Close();
+            }
 
             Thread.Sleep(2000);
             
