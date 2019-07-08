@@ -33,12 +33,18 @@ namespace Apollo.Elements {
 
         public List<Track> Tracks;
 
+        public delegate void ChangedEventHandler();
+        public event ChangedEventHandler BPMChanged;
+
         int _bpm;
         public int BPM {
             get => _bpm;
             set {
                 if (20 <= value && value <= 999) {
                     _bpm = value;
+
+                    BPMChanged?.Invoke();
+
                     Window?.SetBPM(_bpm.ToString());
                 }
             }
@@ -62,8 +68,7 @@ namespace Apollo.Elements {
 
         public UndoManager Undo = new UndoManager();
 
-        public delegate void PathChangedEventHandler();
-        public event PathChangedEventHandler PathChanged;
+        public event ChangedEventHandler PathChanged;
 
         string _path;
         public string FilePath {

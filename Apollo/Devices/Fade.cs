@@ -206,10 +206,13 @@ namespace Apollo.Devices {
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
 
-            if (Program.Project == null) Program.ProjectLoaded += Generate;
-            else Generate();
+            if (Program.Project == null) Program.ProjectLoaded += Initialize;
+            else Initialize();
+        }
 
-            Preferences.FadeSmoothnessChanged += Generate;
+        void Initialize() {
+            Generate();
+            Program.Project.BPMChanged += Generate;
         }
 
         void FireCourier(Signal n, double time) {
@@ -307,6 +310,7 @@ namespace Apollo.Devices {
         public override void Dispose() {
             Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
+            Program.Project.BPMChanged -= Generate;
 
             Time.Dispose();
             base.Dispose();
