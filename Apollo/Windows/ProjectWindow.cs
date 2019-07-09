@@ -194,6 +194,8 @@ namespace Apollo.Windows {
                 Program.Project.Remove(index);
             }, () => {
                 Program.Project.Insert(index, r.Clone());
+            }, () => {
+                r.Dispose();
             });
             
             Program.Project.Insert(index, track);
@@ -458,6 +460,10 @@ namespace Apollo.Windows {
             }, () => {
                 for (int i = 0; i < paste.Contents.Count; i++)
                     Program.Project.Insert(right + i + 1, pasted[i].Clone());
+            
+            }, () => {
+                foreach (Track track in pasted) track.Dispose();
+                pasted = null;
             });
             
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -520,6 +526,10 @@ namespace Apollo.Windows {
             }, () => {
                 for (int i = right; i >= left; i--)
                     Program.Project.Remove(i);
+            
+            }, () => {
+                foreach (Track track in ut) track.Dispose();
+                ut = null;
             });
 
             for (int i = right; i >= left; i--)

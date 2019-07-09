@@ -167,6 +167,8 @@ namespace Apollo.DeviceViewers {
                 ((Multi)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Multi)Track.TraversePath(path)).Insert(index, r.Clone());
+            }, () => {
+                r.Dispose();
             });
 
             _multi.Insert(index, chain);
@@ -365,6 +367,10 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     multi.Insert(right + i + 1, pasted[i].Clone());
+
+            }, () => {
+                foreach (Chain chain in pasted) chain.Dispose();      
+                pasted = null;
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -435,6 +441,10 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = right; i >= left; i--)
                     multi.Remove(i);
+
+            }, () => {
+                foreach (Chain chain in u) chain.Dispose();
+                u = null;
             });
 
             for (int i = right; i >= left; i--)

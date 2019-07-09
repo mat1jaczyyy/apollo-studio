@@ -228,6 +228,8 @@ namespace Apollo.DeviceViewers {
                 ((Copy)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Copy)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                u.Dispose();
             });
 
             _copy.Remove(index);

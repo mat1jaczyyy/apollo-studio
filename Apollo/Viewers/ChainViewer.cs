@@ -118,6 +118,8 @@ namespace Apollo.Viewers {
                 ((Chain)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Chain)Track.TraversePath(path)).Insert(index, r.Clone());
+            }, () => {
+                r.Dispose();
             });
             
             _chain.Insert(index, device);
@@ -239,6 +241,10 @@ namespace Apollo.Viewers {
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     chain.Insert(right + i + 1, pasted[i].Clone());
+
+            }, () => {
+                foreach (Device device in pasted) device.Dispose();
+                pasted = null;
             });
 
             for (int i = 0; i < paste.Contents.Count; i++)
@@ -309,6 +315,10 @@ namespace Apollo.Viewers {
 
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
+            
+            }, () => {
+               foreach (Device device in u) device.Dispose();
+               u = null;
             });
 
             for (int i = right; i >= left; i--)
@@ -342,6 +352,9 @@ namespace Apollo.Viewers {
                     chain.Remove(i);
                 
                 chain.Insert(left, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
+            
+            }, () => {
+                init.Dispose();
             });
             
             for (int i = right; i >= left; i--)
@@ -379,6 +392,10 @@ namespace Apollo.Viewers {
                 Track track = Track.Get(chain);
                 track?.Window?.Selection.Select(chain[index]);
                 track?.Window?.Selection.Select(chain[index + init.Count - 1], true);
+            
+            }, () => {
+                foreach (Device device in init) device.Dispose();
+                init = null;
             });
 
             _chain.Remove(index);

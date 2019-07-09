@@ -370,6 +370,8 @@ namespace Apollo.Windows {
                 ((Pattern)Track.TraversePath(path)).Remove(index);
             }, () => {
                 ((Pattern)Track.TraversePath(path)).Insert(index, r.Clone());
+            }, () => {
+                r.Dispose();
             });
 
             _pattern.Insert(index, frame);
@@ -389,6 +391,8 @@ namespace Apollo.Windows {
                 ((Pattern)Track.TraversePath(path)).Insert(index, u.Clone());
             }, () => {
                 ((Pattern)Track.TraversePath(path)).Remove(index);
+            }, () => {
+                u.Dispose();
             });
 
             _pattern.Remove(index);
@@ -702,6 +706,10 @@ namespace Apollo.Windows {
                         pattern[left + i].Time.Free = r;
                         pattern[left + i].Time.Mode = false;
                     }
+                
+                }, () => {
+                    foreach (Time time in u) time.Dispose();
+                    u = null;
                 });
 
                 oldTime = null;
@@ -741,6 +749,10 @@ namespace Apollo.Windows {
                         pattern[left + i].Time.Length.Step = r;
                         pattern[left + i].Time.Mode = true;
                     }
+                
+                }, () => {
+                    foreach (Time time in u) time.Dispose();
+                    u = null;
                 });
 
                 oldTime = null;
@@ -778,6 +790,10 @@ namespace Apollo.Windows {
                     
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time.Mode = r;
+                
+                }, () => {
+                    foreach (Time time in u) time.Dispose();
+                    u = null;
                 });
 
                 oldTime = null;
@@ -1163,6 +1179,10 @@ namespace Apollo.Windows {
                 ImportFrames((Pattern)Track.TraversePath(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
             }, () => {
                 ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
+            }, () => {
+                foreach (Frame frame in uf) frame.Dispose();
+                foreach (Frame frame in rf) frame.Dispose();
+                uf = rf = null;
             });
 
             ImportFrames(_pattern, 1, 1, frames, PlaybackType.Mono, false, null);
@@ -1335,6 +1355,10 @@ namespace Apollo.Windows {
 
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
+            
+            }, () => {
+                foreach (Frame frame in pasted) frame.Dispose();
+                pasted = null;
             });
 
             Draw = false;
@@ -1427,6 +1451,10 @@ namespace Apollo.Windows {
 
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
+            
+            }, () => {
+                foreach (Frame frame in u) frame.Dispose();
+                u = null;
             });
 
             Draw = false;
