@@ -27,8 +27,8 @@ namespace ApolloUpdate {
                 if (!Directory.Exists(crashDir)) Directory.CreateDirectory(crashDir);
                 string crashName = Path.Combine(crashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
 
-                using (var memoryStream = new MemoryStream()) {
-                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                using (MemoryStream memoryStream = new MemoryStream()) {
+                    using (ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                         using (Stream log = archive.CreateEntry("exception.log").Open())
                             using (StreamWriter writer = new StreamWriter(log))
                                 writer.Write(

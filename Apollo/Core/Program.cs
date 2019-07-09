@@ -21,7 +21,7 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Beta Build 21";
+        public static readonly string Version = "Release Candidate 1";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
@@ -98,8 +98,8 @@ namespace Apollo.Core {
                 if (!Directory.Exists(crashDir)) Directory.CreateDirectory(crashDir);
                 string crashName = Path.Combine(crashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
 
-                using (var memoryStream = new MemoryStream()) {
-                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
+                using (MemoryStream memoryStream = new MemoryStream()) {
+                    using (ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
                         if (Project != null) {
                             byte[] project = null;
 
