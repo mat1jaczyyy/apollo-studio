@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
 
 namespace Apollo.Components {
@@ -31,6 +32,8 @@ namespace Apollo.Components {
         protected override void Click(PointerReleasedEventArgs e) {
             foreach (Launchpad lp in MIDI.Devices)
                 lp.Clear(true);
+            
+            Multi.InvokeReset();
         }
     }
 }

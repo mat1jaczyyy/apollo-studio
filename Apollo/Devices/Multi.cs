@@ -37,6 +37,11 @@ namespace Apollo.Devices {
             }
         }
 
+        public delegate void MultiResetHandler();
+        public static event MultiResetHandler Reset;
+
+        public static void InvokeReset() => Reset?.Invoke();
+
         public Chain Preprocess;
         public List<Chain> Chains = new List<Chain>();
 
@@ -104,7 +109,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        void Reset() => current = -1;
+        void HandleReset() => current = -1;
 
         public int? Expanded { get; set; }
 
@@ -117,7 +122,7 @@ namespace Apollo.Devices {
 
             Mode = mode;
             
-            Launchpad.MultiReset += Reset;
+            Reset += HandleReset;
 
             Reroute();
         }
@@ -174,6 +179,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            Reset -= HandleReset;
+
             Preprocess.Dispose();
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();

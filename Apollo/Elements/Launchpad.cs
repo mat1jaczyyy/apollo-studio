@@ -13,6 +13,7 @@ using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
 
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Windows;
@@ -38,9 +39,6 @@ namespace Apollo.Elements {
         public PatternWindow PatternWindow;
 
         public List<AbletonLaunchpad> AbletonLaunchpads = new List<AbletonLaunchpad>();
-
-        public delegate void MultiResetHandler();
-        public static event MultiResetHandler MultiReset;
 
         IMidiInputDevice Input;
         IMidiOutputDevice Output;
@@ -326,7 +324,7 @@ namespace Apollo.Elements {
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
                     if (e.Control == 121) {
-                        MultiReset?.Invoke();
+                        Multi.InvokeReset();
                         return;
                     }
 
