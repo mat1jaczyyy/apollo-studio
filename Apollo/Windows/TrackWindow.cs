@@ -27,7 +27,6 @@ namespace Apollo.Windows {
             CenteringRight = this.Get<StackPanel>("CenteringRight");
 
             Contents = this.Get<ScrollViewer>("Contents");
-
         }
 
         Track _track;
@@ -184,7 +183,14 @@ namespace Apollo.Windows {
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) {
+            if (e.ClickCount == 2) Expand(e.Device);
+            else BeginMoveDrag();
+
+            Topmost = false;
+            Topmost = Preferences.AlwaysOnTop;
+            Activate();
+        }
 
         void Minimize() => WindowState = WindowState.Minimized;
         
