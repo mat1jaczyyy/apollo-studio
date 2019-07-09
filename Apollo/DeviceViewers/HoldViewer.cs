@@ -40,8 +40,7 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = _hold.Gate * 100;
 
-            Infinite.IsChecked = _hold.Infinite;
-            Infinite_Changed(null, EventArgs.Empty); // required to set Dial Enabled properties
+            SetInfinite(_hold.Infinite); // required to set Dial Enabled properties
 
             Release.IsChecked = _hold.Release;
         }
@@ -133,11 +132,13 @@ namespace Apollo.DeviceViewers {
                 });
 
                 _hold.Infinite = value;
-                Duration.Enabled = Gate.Enabled = !value;
             }
         }
 
-        public void SetInfinite(bool value) => Infinite.IsChecked = value;
+        public void SetInfinite(bool value) {
+            Infinite.IsChecked = value;
+            Duration.Enabled = Gate.Enabled = !value;
+        }
 
         void Release_Changed(object sender, EventArgs e) {
             bool value = Release.IsChecked.Value;
