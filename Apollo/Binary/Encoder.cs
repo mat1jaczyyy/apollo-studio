@@ -300,6 +300,7 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Switch));
 
             writer.Write(o.Page);
+            writer.Write(o.MultiReset);
         }
 
         static void Encode(BinaryWriter writer, Paint o) {

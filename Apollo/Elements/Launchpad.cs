@@ -264,7 +264,7 @@ namespace Apollo.Elements {
             Available = false;
         }
 
-        private int[] inputbuffer;
+        int[] inputbuffer;
 
         public void HandleMessage(Signal n, bool rotated = false) {
             if (Available && Program.Project != null) {

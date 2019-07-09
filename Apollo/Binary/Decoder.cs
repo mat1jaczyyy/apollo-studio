@@ -398,11 +398,6 @@ namespace Apollo.Binary {
                     (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
             
-            else if (t == typeof(Switch))
-                return new Switch(
-                    reader.ReadInt32()
-                );
-            
             else if (t == typeof(Paint))
                 return new Paint(
                     Decode(reader, version)
@@ -472,7 +467,16 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
             
-            else if (t == typeof(Tone))
+            else if (t == typeof(Switch)) {
+                int page = reader.ReadInt32();
+
+                bool multireset = false;
+                if (version >= 18)
+                    multireset = reader.ReadBoolean();
+
+                return new Switch(page, multireset);
+            
+            } else if (t == typeof(Tone))
                 return new Tone(
                     reader.ReadDouble(),
                     reader.ReadDouble(),

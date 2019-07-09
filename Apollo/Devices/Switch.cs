@@ -16,17 +16,32 @@ namespace Apollo.Devices {
                 }
             }
         }
+        
+        bool _multireset;
+        public bool MultiReset {
+            get => _multireset;
+            set {
+                _multireset = value;
+                
+                if (Viewer?.SpecificViewer != null) ((SwitchViewer)Viewer.SpecificViewer).SetMultiReset(MultiReset);
+            }
+        }
 
-        public override Device Clone() => new Switch(Page) {
+        public override Device Clone() => new Switch(Page, MultiReset) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Switch(int page = 1): base("switch") => Page = page;
+        public Switch(int page = 1, bool multireset = false): base("switch") {
+            Page = page;
+            MultiReset = multireset;
+        }
 
         public override void MIDIProcess(Signal n) {
-            if (!n.Color.Lit)
+            if (!n.Color.Lit) {
                 Program.Project.Page = Page;
+                if (MultiReset) Multi.InvokeReset();
+            }
             
             MIDIExit?.Invoke(n);
         }
