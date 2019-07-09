@@ -32,6 +32,7 @@ namespace Apollo.DeviceViewers {
             _switch = pageswitch;
 
             Page.RawValue = _switch.Page;
+            MultiReset.IsChecked = _switch.MultiReset;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
