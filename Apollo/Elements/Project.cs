@@ -100,9 +100,9 @@ namespace Apollo.Elements {
         public async Task<bool> WriteFile(Window sender, string path = null, bool store = true, bool error = true) {
             if (path == null) path = FilePath;
 
-            if (!Directory.Exists(Path.GetDirectoryName(path))) return false;
 
             try {
+                if (!Directory.Exists(Path.GetDirectoryName(path))) throw new UnauthorizedAccessException();
                 File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
             } catch (UnauthorizedAccessException) {
