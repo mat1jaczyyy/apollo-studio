@@ -78,7 +78,7 @@
                 <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
                 <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
                 <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
-                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Custom Retina Palette" Click="BrowseCustomPalette" />
+                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Load Custom Retina Palette" Click="BrowseCustomPalette" />
               </StackPanel>
             </Border>
 
@@ -112,7 +112,7 @@
               <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
               <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
                 <StackPanel x:Name="Contents">
-                  <Components:VerticalAdd AlwaysShowing="true" Added="Launchpad_Add" />
+                  <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
                 </StackPanel>
               </ScrollViewer>
             </Grid>
