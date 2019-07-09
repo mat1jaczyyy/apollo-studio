@@ -13,12 +13,16 @@ namespace Apollo.Helpers {
             public string Description;
             public Action Undo;
             public Action Redo;
+            Action DisposeAction;
 
-            public UndoEntry(string desc, Action undo = null, Action redo = null) {
+            public UndoEntry(string desc, Action undo = null, Action redo = null, Action dispose = null) {
                 Description = desc;
                 Undo = undo?? (() => {});
                 Redo = redo?? (() => {});
+                DisposeAction = dispose?? (() => {});
             }
+
+            public void Dispose() => DisposeAction?.Invoke();
         }
 
         public UndoWindow Window;
@@ -67,13 +71,11 @@ namespace Apollo.Helpers {
             SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
-        public void Add(string desc, Action undo, Action redo) {
-            for (int i = History.Count - 1; i > Position; i--) {
-                History.RemoveAt(i);
-                Window?.Contents_Remove(i);
-            }
+        public void Add(string desc, Action undo, Action redo, Action dispose = null) {
+            for (int i = History.Count - 1; i > Position; i--)
+                Remove(i);
             
-            History.Add(new UndoEntry(desc, undo, redo));
+            History.Add(new UndoEntry(desc, undo, redo, dispose));
             Window?.Contents_Insert(History.Count - 1, History.Last());
 
             Position = History.Count - 1;
@@ -98,6 +100,12 @@ namespace Apollo.Helpers {
         public void Undo() => Select(Math.Max(0, Position - 1));
         public void Redo() => Select(Math.Min(History.Count - 1, Position + 1));
 
+        void Remove(int index) {
+            History[index].Dispose();
+            History.RemoveAt(index);
+            Window?.Contents_Remove(index);
+        }
+
         public void Clear(string description = "Undo History Cleared") {
             _saved = (SavedPosition == Position)? (int?)0 : null;
             SavedPositionChanged?.Invoke(SavedPosition);
@@ -106,6 +114,7 @@ namespace Apollo.Helpers {
                 for (int i = History.Count - 1; i >= 0; i--)
                     Window.Contents_Remove(i);
 
+            foreach (UndoEntry entry in History) entry.Dispose();
             History = new List<UndoEntry>() {
                 new UndoEntry(description)
             };
@@ -129,10 +138,8 @@ namespace Apollo.Helpers {
 
                 SavedPositionChanged?.Invoke(SavedPosition);
 
-                for (int i = History.Count - 151; i >= 0; i--) {
-                    History.RemoveAt(i);
-                    Window?.Contents_Remove(i);
-                }
+                for (int i = History.Count - 151; i >= 0; i--)
+                    Remove(i);
 
                 Position = Position;
                 SavedPositionChanged?.Invoke(SavedPosition);
@@ -162,6 +169,7 @@ namespace Apollo.Helpers {
             SavedChanged = null;
             SavedPositionChanged = null;
 
+            foreach (UndoEntry entry in History) entry.Dispose();
             History = null;
         }
     }
