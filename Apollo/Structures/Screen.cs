@@ -55,10 +55,10 @@ namespace Apollo.Structures {
 
         public Action<Signal> ScreenExit;
 
-        Pixel[] _screen = new Pixel[100];
+        Pixel[] _screen = new Pixel[101];
 
         public Screen() {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 101; i++)
                 _screen[i] = new Pixel() { Exit = (n) => ScreenExit?.Invoke(n) };
         }
 

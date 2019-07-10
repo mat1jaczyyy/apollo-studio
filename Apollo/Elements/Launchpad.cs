@@ -81,7 +81,7 @@ namespace Apollo.Elements {
 
         protected void CreateScreen() {
             screen = new Screen() { ScreenExit = Send };
-            inputbuffer = (from i in Enumerable.Range(0, 100) select 0).ToArray();
+            inputbuffer = (from i in Enumerable.Range(0, 101) select 0).ToArray();
         }
 
         public Color GetColor(int index) => (PatternWindow == null)
@@ -157,6 +157,7 @@ namespace Apollo.Elements {
 
         public virtual void Send(Signal n) {
             if (!Available || Type == LaunchpadType.Unknown) return;
+            if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
 
             Signal m = n.Clone();
             Window?.SignalRender(m);
@@ -164,15 +165,12 @@ namespace Apollo.Elements {
             foreach (AbletonLaunchpad alp in AbletonLaunchpads)
                 alp.Window?.SignalRender(m);
 
-            if (Rotation == RotationType.D90) {
-                n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+            if (n.Index != 100) {
+                if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+                else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+                else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-            } else if (Rotation == RotationType.D180) {
-                n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
-
-            } else if (Rotation == RotationType.D270) {
-                n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
-            }
+            } else n.Index = 99;
 
             int offset = 0;
             if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
@@ -268,16 +266,11 @@ namespace Apollo.Elements {
 
         public void HandleMessage(Signal n, bool rotated = false) {
             if (Available && Program.Project != null) {
-                if (!rotated)
-                    if (Rotation == RotationType.D90) {
-                        n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
-
-                    } else if (Rotation == RotationType.D180) {
-                        n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
-
-                    } else if (Rotation == RotationType.D270) {
-                        n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
-                    }
+                if (!rotated && n.Index != 100) {
+                    if (Rotation == RotationType.D90) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+                    else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+                    else if (Rotation == RotationType.D270) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+                }
 
                 if (PatternWindow == null) {
                     if (n.Color.Lit) {

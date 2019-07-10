@@ -19,7 +19,7 @@ namespace Apollo.Structures {
         public byte Index {
             get => _index;
             set {
-                if (1 <= value && value <= 99)
+                if (0 <= value && value <= 100)
                     _index = value;
             }
         }
@@ -50,7 +50,7 @@ namespace Apollo.Structures {
 
         public Signal(InputType input, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int? multiTarget = null): this(
             source,
-            (input == InputType.DrumRack)? Converter.DRtoXY(index) : index,
+            (input == InputType.DrumRack)? Converter.DRtoXY(index) : ((index == 99)? (byte)100 : index),
             color,
             page,
             layer,

@@ -41,8 +41,8 @@ namespace Apollo.Components {
         public delegate void PadModsChangedEventHandler(int index, InputModifiers mods);
         public event PadModsChangedEventHandler PadModsPressed;
 
-        public static int GridToSignal(int index) => (index == -1)? 99 : ((9 - (index / 10)) * 10 + index % 10);
-        public static int SignalToGrid(int index) => (index == 99)? -1 : ((9 - (index / 10)) * 10 + index % 10);
+        public static int GridToSignal(int index) => (index == -1)? 100 : ((9 - (index / 10)) * 10 + index % 10);
+        public static int SignalToGrid(int index) => (index == 100)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
         bool IsPhantom(int index) {
             if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
@@ -65,7 +65,7 @@ namespace Apollo.Components {
 
         public void Clear() {
             SolidColorBrush color = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
-            for (int i = 0; i < 100; i++) SetColor(i, color);
+            for (int i = -1; i < 100; i++) SetColor(i, color);
         }
 
         void Update_LaunchpadStyle() {
@@ -220,7 +220,7 @@ namespace Apollo.Components {
         void LayoutChanged(object sender, EventArgs e) => DrawPath();
 
         public void RenderFrame(Frame frame) {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 101; i++)
                 SetColor(SignalToGrid(i), frame.Screen[i].ToScreenBrush());
         }
 
