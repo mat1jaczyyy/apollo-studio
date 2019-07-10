@@ -139,7 +139,7 @@ namespace Apollo.Devices {
         public int? RootKey {
             get => _root;
             set {
-                if (_root != value) {
+                if (_root != value && value != 100) {
                     _root = value;
 
                     Window?.SetRootKey(_root);
@@ -182,7 +182,7 @@ namespace Apollo.Devices {
         bool ApplyRootKey(int index, int trigger, out int result) {
             if (RootKey == null) {
                 result = index;
-                return true;
+                return result != 0 && result != 9 && result != 90 && result != 99;
             }
 
             int x = index % 10 + trigger % 10 - RootKey.Value % 10;
@@ -199,7 +199,7 @@ namespace Apollo.Devices {
                 return true;
             
             if (y == -1 && 4 <= x && x <= 5) {
-                result = 99;
+                result = 100;
                 return true;
             }
              

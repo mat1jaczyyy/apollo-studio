@@ -10,7 +10,7 @@ namespace Apollo.Devices {
         public bool[] Filter {
             get => _filter;
             set {
-                if (value != null && value.Length == 100) {
+                if (value != null && value.Length == 101) {
                     _filter = value;
 
                     if (Viewer?.SpecificViewer != null) ((KeyFilterViewer)Viewer.SpecificViewer).Set(_filter);
@@ -26,13 +26,13 @@ namespace Apollo.Devices {
         public bool this[int index] {
             get => _filter[index];
             set {
-                if (1 <= index && index <= 99)
+                if (0 <= index && index <= 100)
                     _filter[index] = value;
             }
         }
 
         public KeyFilter(bool[] init = null): base("keyfilter", "Key Filter") {
-            if (init == null || init.Length != 100) init = new bool[100];
+            if (init == null || init.Length != 101) init = new bool[101];
             _filter = init;
         }
 

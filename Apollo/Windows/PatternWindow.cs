@@ -587,6 +587,8 @@ namespace Apollo.Windows {
         }
 
         public void MIDIEnter(Signal n) {
+            if (n.Index == 100) return;
+
             if (!Preferences.EnableGestures) {
                 if (n.Color.Lit) Dispatcher.UIThread.InvokeAsync(() => {
                     int index = LaunchpadGrid.SignalToGrid(n.Index);

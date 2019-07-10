@@ -66,11 +66,11 @@ namespace Apollo.Devices {
             result = y * 10 + x;
 
             if (GridMode == GridType.Full) {
-                if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+                if (0 <= x && x <= 9 && 0 <= y && y <= 9)
                     return true;
                 
                 if (y == -1 && 4 <= x && x <= 5) {
-                    result = 99;
+                    result = 100;
                     return true;
                 }
 
@@ -82,7 +82,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-            if (n.Index == 99) {
+            if (n.Index == 100) {
                 MIDIExit?.Invoke(n);
                 return;
             }

@@ -82,9 +82,9 @@ namespace Apollo.Structures {
         public Frame Clone() => new Frame(Time.Clone(), (from i in Screen select i.Clone()).ToArray());
 
         public Frame(Time time = null, Color[] screen = null) {
-            if (screen == null || screen.Length != 100) {
-                screen = new Color[100];
-                for (int i = 0; i < 100; i++) screen[i] = new Color(0);
+            if (screen == null || screen.Length != 101) {
+                screen = new Color[101];
+                for (int i = 0; i < 101; i++) screen[i] = new Color(0);
             }
 
             Time = time?? new Time();
