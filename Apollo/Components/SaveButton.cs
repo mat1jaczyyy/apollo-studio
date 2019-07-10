@@ -45,7 +45,9 @@ namespace Apollo.Components {
 
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             base.Unloaded(sender, e);
-            Program.Project.Undo.SavedChanged -= Update_Saved;
+            
+            if (Program.Project.Undo != null)
+                Program.Project.Undo.SavedChanged -= Update_Saved;
             
             SaveContextMenu.RemoveHandler(MenuItem.ClickEvent, SaveContextMenu_Click);
             SaveContextMenu = null;

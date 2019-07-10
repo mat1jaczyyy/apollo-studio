@@ -31,7 +31,9 @@ namespace Apollo.Components {
 
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             base.Unloaded(sender, e);
-            Program.Project.Undo.PositionChanged -= Update_Position;
+
+            if (Program.Project.Undo != null)
+                Program.Project.Undo.PositionChanged -= Update_Position;
         }
 
         protected override void Click(PointerReleasedEventArgs e) {
