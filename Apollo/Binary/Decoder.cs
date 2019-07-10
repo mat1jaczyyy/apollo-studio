@@ -349,12 +349,18 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
             
-            } else if (t == typeof(KeyFilter))
-                return new KeyFilter(
-                    (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
-                );
+            } else if (t == typeof(KeyFilter)) {
+                bool[] filter;
+                if (version <= 18) {
+                    List<bool> oldFilter = (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToList();
+                    oldFilter.Insert(99, false);
+                    filter = oldFilter.ToArray();
+                } else
+                    filter = (from i in Enumerable.Range(0, 101) select reader.ReadBoolean()).ToArray();
 
-            else if (t == typeof(Layer)) {
+                return new KeyFilter(filter);
+
+            } else if (t == typeof(Layer)) {
                 int target = reader.ReadInt32();
 
                 BlendingType blending = BlendingType.Normal;
@@ -504,10 +510,15 @@ namespace Apollo.Binary {
                     time = Decode(reader, version);
                 }
 
-                return new Frame(
-                    time,
-                    (from i in Enumerable.Range(0, 100) select (Color)Decode(reader, version)).ToArray()
-                );
+                Color[] screen;
+                if (version <= 18) {
+                    List<Color> oldScreen = (from i in Enumerable.Range(0, 100) select (Color)Decode(reader, version)).ToList();
+                    oldScreen.Insert(99, new Color(0));
+                    screen = oldScreen.ToArray();
+                } else
+                    screen = (from i in Enumerable.Range(0, 101) select (Color)Decode(reader, version)).ToArray();
+
+                return new Frame(time, screen);
             
             } else if (t == typeof(Length))
                 return new Length(

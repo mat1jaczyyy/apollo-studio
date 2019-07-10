@@ -247,7 +247,7 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, KeyFilter o) {
             EncodeID(writer, typeof(KeyFilter));
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 101; i++)
                 writer.Write(o[i]);
         }
 
