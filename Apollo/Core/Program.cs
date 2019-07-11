@@ -56,7 +56,7 @@ namespace Apollo.Core {
             }
         }
         
-        public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : Program.ControlKey;
+        public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
 
         public static void WindowClose(Window sender) {
             if (Project != null) {
