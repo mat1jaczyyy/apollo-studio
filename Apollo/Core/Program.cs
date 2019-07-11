@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Logging.Serilog;
 
 using Apollo.Binary;
@@ -54,6 +55,8 @@ namespace Apollo.Core {
                 ProjectLoaded = null;
             }
         }
+        
+        public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : Program.ControlKey;
 
         public static void WindowClose(Window sender) {
             if (Project != null) {

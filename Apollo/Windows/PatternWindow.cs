@@ -501,7 +501,7 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (mods.HasFlag(InputModifiers.Control)) {
+            if (mods.HasFlag(Program.ControlKey)) {
                 if (_pattern[_pattern.Expanded].Screen[signalIndex] != new Color(0)) {
                     Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
                     ColorPicker.SetColor(color.Clone());
@@ -1250,7 +1250,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 

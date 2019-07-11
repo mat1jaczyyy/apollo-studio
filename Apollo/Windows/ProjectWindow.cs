@@ -414,7 +414,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

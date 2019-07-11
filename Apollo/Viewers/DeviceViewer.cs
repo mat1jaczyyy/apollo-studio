@@ -226,7 +226,7 @@ namespace Apollo.Viewers {
             int after = _device.ParentIndex.Value;
             if (source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2)) after--;
 
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Device.Move(moving, _chain, after, copy);
 

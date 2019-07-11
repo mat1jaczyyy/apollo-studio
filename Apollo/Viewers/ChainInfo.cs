@@ -152,7 +152,7 @@ namespace Apollo.Viewers {
                 }
             }
 
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
             bool result;
 
             if (e.Data.Contains("chain")) {

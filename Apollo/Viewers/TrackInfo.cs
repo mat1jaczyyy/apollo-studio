@@ -180,7 +180,7 @@ namespace Apollo.Viewers {
             int after = _track.ParentIndex.Value;
             if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
 
-            bool copy = e.Modifiers.HasFlag(InputModifiers.Control);
+            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

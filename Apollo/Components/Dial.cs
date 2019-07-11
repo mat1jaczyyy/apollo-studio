@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -325,7 +326,7 @@ namespace Apollo.Components {
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
-                if (e.InputModifiers.HasFlag(InputModifiers.Control)) {
+                if (e.InputModifiers.HasFlag(Program.ControlKey)) {
                     if (UsingSteps) Length.Step = 5;
                     else RawValue = Default;
                     return;

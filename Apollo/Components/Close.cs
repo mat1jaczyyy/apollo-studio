@@ -5,6 +5,8 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
+using Apollo.Core;
+
 namespace Apollo.Components {
     public class Close: IconButton {
         void InitializeComponent() {
@@ -34,6 +36,6 @@ namespace Apollo.Components {
             Clicked = null;
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == InputModifiers.Control);
+        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == Program.ControlKey);
     }
 }

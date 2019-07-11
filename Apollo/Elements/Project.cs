@@ -227,11 +227,11 @@ namespace Apollo.Elements {
         }
         
         public async Task<bool> HandleKey(Window sender, KeyEventArgs e) {
-            if (e.Modifiers == InputModifiers.Control) {
+            if (e.Modifiers == Program.ControlKey) {
                 if (e.Key == Key.S) await Save(sender);
                 else return false;
 
-            } else if (e.Modifiers == (InputModifiers.Control | InputModifiers.Shift)) {
+            } else if (e.Modifiers == (Program.ControlKey | InputModifiers.Shift)) {
                 if (e.Key == Key.S) await Save(sender, true);
                 else return false;
             

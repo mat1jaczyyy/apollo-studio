@@ -4,6 +4,7 @@ using System.Linq;
 
 using Avalonia.Input;
 
+using Apollo.Core;
 using Apollo.Interfaces;
 
 namespace Apollo.Helpers {
@@ -125,7 +126,7 @@ namespace Apollo.Helpers {
         public bool HandleKey(KeyEventArgs e) {
             if (Start == null) return true;
 
-            if (e.Modifiers == InputModifiers.Control) {
+            if (e.Modifiers == Program.ControlKey) {
                 if (e.Key == Key.X) Action("Cut");
                 else if (e.Key == Key.C) Action("Copy");
                 else if (e.Key == Key.D) Action("Duplicate");
