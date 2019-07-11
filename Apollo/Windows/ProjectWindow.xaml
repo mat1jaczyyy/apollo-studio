@@ -33,7 +33,7 @@
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5" x:Name="CenteringRight">
           <Components:Minimize Clicked="Minimize" />
-          <Components:Close Clicked="CheckClose" />
+          <Components:Close Clicked="CloseForce" />
         </StackPanel>
       </Grid>
       

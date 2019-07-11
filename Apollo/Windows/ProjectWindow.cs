@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -64,6 +65,7 @@ namespace Apollo.Windows {
         HorizontalDial Page;
 
         DispatcherTimer Timer;
+        bool SafeClose = false;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
@@ -152,6 +154,13 @@ namespace Apollo.Windows {
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
+            if (!SafeClose) {
+                e.Cancel = true;
+
+                CloseForce(false);
+                return;
+            }
+
             Program.Project.Window = null;
 
             Timer.Stop();
@@ -339,21 +348,26 @@ namespace Apollo.Windows {
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        async void CheckClose(bool force) {
-            if (force || Program.Project.Tracks.FirstOrDefault(i => i.Window != null) == null) {
-                string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
-                    "You have unsaved changes. Do you want to save before closing?\n",
-                    new string[] {"Yes", "No", "Cancel"}, this
-                );
+        async Task<bool> CheckClose(bool force = false) {
+            if (!force && Program.Project.Tracks.FirstOrDefault(i => i.Window != null) != null) return true;
 
-                if (result == "No" || (result == "Yes" && await Program.Project.Save(this))) {
-                    if (force)
-                        foreach (Track track in Program.Project.Tracks) track.Window?.Close();
+            string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
+                "You have unsaved changes. Do you want to save before closing?\n",
+                new string[] {"Yes", "No", "Cancel"}, this
+            );
 
-                    Close();
-                }
-                
-            } else Close();
+            if (result == "No" || (result == "Yes" && await Program.Project.Save(this))) {
+                if (force)
+                    foreach (Track track in Program.Project.Tracks) track.Window?.Close();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async void CloseForce(bool force) {
+            if (SafeClose = await CheckClose(force)) base.Close();
         }
 
         void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
