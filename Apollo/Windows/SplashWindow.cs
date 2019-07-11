@@ -247,6 +247,11 @@ namespace Apollo.Windows {
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
             if (Program.WindowKey(this, e)) return;
+
+            if (e.Modifiers == Program.ControlKey) {
+                if (e.Key == Key.N) New(sender, e);
+                else if (e.Key == Key.O) Open(sender, e);
+            }
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
