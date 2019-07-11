@@ -444,13 +444,15 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Locked) return;
 
             if (e.Key == Key.Enter) {
-                if (e.Modifiers == InputModifiers.Shift) PatternFire(Play, null);
+                if (e.Modifiers == InputModifiers.Shift) PatternFire(Fire, null);
                 else PatternPlay(Play, null);
+            }
+
+            if (Locked) return;
             
-            } else if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
+            if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
             else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
