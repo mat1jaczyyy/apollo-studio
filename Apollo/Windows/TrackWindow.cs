@@ -103,7 +103,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClose(this);
+            Program.WindowClosed(this);
         }
         
         public void Bounds_Updated(Rect bounds) {
@@ -129,7 +129,7 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
             bool vertical = Selection.Start.GetType() == typeof(Chain);

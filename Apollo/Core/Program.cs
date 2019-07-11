@@ -58,7 +58,19 @@ namespace Apollo.Core {
         
         public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
 
-        public static void WindowClose(Window sender) {
+        public static bool WindowKey(Window sender, KeyEventArgs e) {
+            if (e.Modifiers == Program.ControlKey) {
+                if (e.Key == Key.W) sender.Close();
+                else if (e.Key == Key.OemComma) PreferencesWindow.Create(sender);
+                else if (e.Key == Key.M) sender.WindowState = WindowState.Minimized;
+                else return false;
+
+            } else return false;
+
+            return true;
+        }
+
+        public static void WindowClosed(Window sender) {
             if (Project != null) {
                 if (Project.Window != null) return;
 

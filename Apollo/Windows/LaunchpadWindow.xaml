@@ -6,7 +6,8 @@
         Icon="/Resources/WindowIcon.png"
         Width="402" MinWidth="202"
         Height="432" MinHeight="232"
-        Closing="Unloaded">
+        Closing="Unloaded"
+        KeyDown="Window_KeyDown">
 
   <Grid>
     <Grid RowDefinitions="Auto,*">

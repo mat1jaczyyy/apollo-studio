@@ -270,6 +270,11 @@ namespace Apollo.Windows {
             MIDI.Update();
         }
 
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
+                Program.Project?.Undo.HandleKey(e);
+        }
+
         public static void Create(Window owner) {
             if (Preferences.Window == null) {
                 Preferences.Window = new PreferencesWindow() {Owner = owner};

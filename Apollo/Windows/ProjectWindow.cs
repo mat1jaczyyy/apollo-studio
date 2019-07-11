@@ -179,7 +179,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClose(this);
+            Program.WindowClosed(this);
         }
         
         public void Bounds_Updated(Rect bounds) {
@@ -211,7 +211,7 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);

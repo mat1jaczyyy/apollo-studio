@@ -116,7 +116,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClose(this);
+            Program.WindowClosed(this);
         }
 
         void TabChanged(int tab) {
@@ -243,6 +243,10 @@ namespace Apollo.Windows {
             CrashPanel.ZIndex = -1;
 
             Preferences.CrashName = Preferences.CrashPath = "";
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (Program.WindowKey(this, e)) return;
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

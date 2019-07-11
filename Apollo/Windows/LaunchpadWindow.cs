@@ -103,6 +103,11 @@ namespace Apollo.Windows {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
+        async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
+                Program.Project?.Undo.HandleKey(e);
+        }
+
         void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Maximize(null);
             else BeginMoveDrag();

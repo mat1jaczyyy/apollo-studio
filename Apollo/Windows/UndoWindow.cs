@@ -100,7 +100,7 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
+            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
                 this.Focus();
                 return;
             }

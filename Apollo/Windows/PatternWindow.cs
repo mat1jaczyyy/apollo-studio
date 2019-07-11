@@ -315,7 +315,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClose(this);
+            Program.WindowClosed(this);
         }
 
         public void Bounds_Updated(Rect bounds) {
@@ -444,7 +444,6 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-
             if (e.Key == Key.Enter) {
                 if (e.Modifiers == InputModifiers.Shift) PatternFire(Fire, null);
                 else PatternPlay(Play, null);
@@ -456,7 +455,7 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
-                if (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                     this.Focus();
                     return;
                 }
