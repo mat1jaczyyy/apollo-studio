@@ -511,7 +511,7 @@ namespace Apollo.Binary {
                 }
 
                 Color[] screen;
-                if (version <= 18) {
+                if (version <= 19) {
                     List<Color> oldScreen = (from i in Enumerable.Range(0, 100) select (Color)Decode(reader, version)).ToList();
                     oldScreen.Insert(99, new Color(0));
                     screen = oldScreen.ToArray();

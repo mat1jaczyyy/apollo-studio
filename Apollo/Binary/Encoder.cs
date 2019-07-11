@@ -367,7 +367,7 @@ namespace Apollo.Binary {
 
             Encode(writer, o.Time);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 101; i++)
                 Encode(writer, o.Screen[i]);
         }
 
