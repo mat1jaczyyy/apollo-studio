@@ -2,7 +2,7 @@
 
 ### Fly your Launchpad to the moon. ☆.。.:*・°☆
 
-![Logo](assets/logo/ApolloStudio_TextLogo_Black.png)
+![Logo](assets/readme.png)
 
 Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 262k of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
 
