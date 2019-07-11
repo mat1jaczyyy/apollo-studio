@@ -5,8 +5,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Core;
-using Apollo.Devices;
-using Apollo.Elements;
 
 namespace Apollo.Components {
     public class ClearButton: IconButton {
@@ -29,11 +27,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(PointerReleasedEventArgs e) {
-            foreach (Launchpad lp in MIDI.Devices)
-                lp.Clear(true);
-            
-            Multi.InvokeReset();
-        }
+        protected override void Click(PointerReleasedEventArgs e) => MIDI.ClearState();
     }
 }

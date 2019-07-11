@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using RtMidi.Core;
 using RtMidi.Core.Devices.Infos;
 
+using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 
@@ -27,6 +28,16 @@ namespace Apollo.Core {
         }
 
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output");
+
+        public static void ClearState() {
+            foreach (Track track in Program.Project?.Tracks)
+                track.Chain.MIDIEnter(new StopSignal());
+            
+            Multi.InvokeReset();
+
+            foreach (Launchpad lp in MIDI.Devices)
+                lp.Clear(true);
+        }
         
         static Courier courier;
         static bool started = false;
