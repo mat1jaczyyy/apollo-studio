@@ -147,8 +147,8 @@ namespace Apollo.Devices {
                 
                 else if (Mode == MultiType.RandomPlus) {
                     int old = current;
-                    current = RNG.Next(Chains.Count - 1);
-                    if (current >= old) current++;
+                    if (Chains.Count <= 1) current = 0;
+                    else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
                 }
 
                 m.MultiTarget = buffer[n] = current;
@@ -167,12 +167,8 @@ namespace Apollo.Devices {
             int target = n.MultiTarget.Value;
             n.MultiTarget = null;
             
-            if (Chains.Count == 0) {
-                MIDIExit?.Invoke(n);
-                return;
-            }
-            
-            Chains[target].MIDIEnter(n);
+            if (Chains.Count == 0) MIDIExit?.Invoke(n);
+            else Chains[target].MIDIEnter(n);
         }
         
         protected override void Stop() {
