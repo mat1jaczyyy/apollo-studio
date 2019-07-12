@@ -12,7 +12,9 @@ Apollo Studio solves all the problems we experience every day in Live including 
 
 Here are a few Launchpad covers created by early testers entirely in Apollo Studio. See for yourself what our software is capable of even when using early, unfinished versions.
 
-[![Teminite & MDK - Space Invaders](http://img.youtube.com/vi/l5rQk0G3YBo/0.jpg)](http://www.youtube.com/watch?v=l5rQk0G3YBo "Teminite & MDK - Space Invaders")
+[![Teminite & MDK - Space Invaders](http://img.youtube.com/vi/l5rQk0G3YBo/mqdefault.jpg)](http://www.youtube.com/watch?v=l5rQk0G3YBo "Teminite & MDK - Space Invaders")
+
+[![Dodge & Fuski - Mistakes (Chime Remix)](http://img.youtube.com/vi/1cGd6CvrV0A/mqdefault.jpg)](http://www.youtube.com/watch?v=1cGd6CvrV0A "Dodge & Fuski - Mistakes (Chime Remix)")
 
 ## Getting Started
 
