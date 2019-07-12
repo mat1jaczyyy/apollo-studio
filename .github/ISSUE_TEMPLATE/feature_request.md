@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest an idea to help us improve
 title: ''
 labels: enhancement
 assignees: mat1jaczyyy
@@ -15,6 +15,9 @@ assignees: mat1jaczyyy
 
 ### Describe alternatives you've considered
 <!--A clear and concise description of any alternative solutions or features you've considered.-->
+
+### Your setup
+<!--Describe the system you are running on. Usually, just the OS and apollo version is fine.-->
 
 ### Additional context
 <!--Add any other context or screenshots about the feature request here.-->
