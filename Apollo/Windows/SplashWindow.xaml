@@ -38,13 +38,18 @@
 
           <TabItem Header="Learn">
             <StackPanel VerticalAlignment="Center" Spacing="5">
-              <Button Content="Documentation" Click="Docs" />
-              <Button Content="Video Tutorials" Click="Tutorials" />
               <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Report a bug" Click="Bug" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Feature request" Click="Feature" />
+                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Documentation" Click="Docs" />
+                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Report a Bug" Click="Bug" />
               </Grid>
-              <Button Content="Discord Server" Click="Discord" />
+              <Grid ColumnDefinitions="*,*">
+                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Video Tutorials" Click="Tutorials" />
+                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Feature Request" Click="Feature" />
+              </Grid>
+              <Grid ColumnDefinitions="*,*">
+                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Discord Server" Click="Discord" />
+                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Ask a Question" Click="Question" />
+              </Grid>
             </StackPanel>
           </TabItem>
           
