@@ -78,6 +78,8 @@ namespace Apollo.Devices {
             lock (locker) {
                 if (buffer.TryDequeue(out Signal n))
                     MIDIExit?.Invoke(n);
+                
+                timers.Remove(courier);
             }
         }
 
@@ -85,10 +87,11 @@ namespace Apollo.Devices {
             lock (locker) {
                 buffer.Enqueue(n.Clone());
 
-                Courier courier = new Courier() {
+                Courier courier;
+                timers.Add(courier = new Courier() {
                     AutoReset = false,
                     Interval = _time * _gate,
-                };
+                });
                 courier.Elapsed += Tick;
                 courier.Start();
             }
@@ -104,7 +107,7 @@ namespace Apollo.Devices {
 
         public override void Dispose() {
             Stop();
-            
+
             Time.Dispose();
             base.Dispose();
         }
