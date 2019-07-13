@@ -348,9 +348,6 @@ namespace Apollo.Devices {
         }
 
         protected override void Stop() {
-            buffer.Clear();
-            locker.Clear();
-            
             foreach (List<Courier> i in timers.Values) {
                 foreach (Courier j in i) j.Dispose();
                 i.Clear();
@@ -362,6 +359,9 @@ namespace Apollo.Devices {
                 info.timers.Clear();
             }
             poly.Clear();
+
+            buffer.Clear();
+            locker.Clear();
         }
 
         public override void Dispose() {
