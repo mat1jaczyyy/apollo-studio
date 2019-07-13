@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Helpers;
 using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Windows;
@@ -75,7 +76,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
+        ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
         double _gate;
         public double Gate {

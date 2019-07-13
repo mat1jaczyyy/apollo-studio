@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -127,7 +128,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
-        HashSet<PolyInfo> poly = new HashSet<PolyInfo>();
+        ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
             Collapsed = Collapsed,
