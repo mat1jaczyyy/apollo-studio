@@ -162,6 +162,18 @@ namespace Apollo.Components {
             HistoryChanged -= Draw;
         }
 
-        void Clicked(object sender, PointerReleasedEventArgs e) => Input(Grid.Children.IndexOf((IControl)sender));
+        void Clicked(object sender, PointerReleasedEventArgs e) {
+            int index = Grid.Children.IndexOf((IControl)sender);
+
+            if (e.MouseButton.HasFlag(MouseButton.Left)) Input(index);
+            else if (e.MouseButton.HasFlag(MouseButton.Right)) {
+                if ((index = (CurrentIndex == -1)? (index - 1) : index) == -1) return;
+                
+                History.RemoveAt(index);
+                HistoryChanged?.Invoke();
+                
+                Select(CurrentIndex - Convert.ToInt32(index <= CurrentIndex));
+            }
+        }
     }
 }
