@@ -364,6 +364,8 @@ namespace Apollo.Viewers {
         }
 
         public void Ungroup(int index) {
+            if (_chain.Devices[index].GetType() != typeof(Group)) return;
+
             List<Device> init = (from i in ((Group)_chain.Devices[index])[0].Devices select i.Clone()).ToList();
 
             List<int> path = Track.GetPath(_chain);
