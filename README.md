@@ -16,6 +16,8 @@ Here are a few Launchpad covers created by early testers entirely in Apollo Stud
 
 [![Dodge & Fuski - Mistakes (Chime Remix)](http://img.youtube.com/vi/1cGd6CvrV0A/mqdefault.jpg)](http://www.youtube.com/watch?v=1cGd6CvrV0A "Dodge & Fuski - Mistakes (Chime Remix)")
 
+[![Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)](http://img.youtube.com/vi/EnGCZJjy3_g/mqdefault.jpg)](https://www.youtube.com/watch?v=EnGCZJjy3_g "Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)")
+
 ## Getting Started
 
 Unfortunately, Apollo Studio is not quite ready for public use yet, so we'll have to ask you to be patient and wait a little more.
