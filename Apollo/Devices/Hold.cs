@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
@@ -74,8 +75,12 @@ namespace Apollo.Devices {
             }
         }
 
-        ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
+        ConcurrentDictionary<Signal, Color> releasebuffer = new ConcurrentDictionary<Signal, Color>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+
+        ConcurrentQueue<Signal> buffer = new ConcurrentQueue<Signal>();
+        object queuelocker = new object();
+        ConcurrentHashSet<Courier> timers = new ConcurrentHashSet<Courier>();
 
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
@@ -95,7 +100,10 @@ namespace Apollo.Devices {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
             
-            MIDIExit?.Invoke((Signal)courier.Info);
+            lock (queuelocker) {
+                if (buffer.TryDequeue(out Signal n))
+                    MIDIExit?.Invoke(n);
+            }
         }
 
         public override void MIDIProcess(Signal n) {
@@ -105,24 +113,27 @@ namespace Apollo.Devices {
             if (!locker.ContainsKey(n)) locker[n] = new object();
             
             lock (locker[n]) {
-                if (color.Lit && Release) buffer[n] = color;
+                if (color.Lit && Release) releasebuffer[n] = color;
 
                 if (color.Lit != Release) {
-                    if (!Infinite) {
-                        Courier courier = new Courier() {
-                            Info = n.Clone(),
-                            AutoReset = false,
-                            Interval = _time * _gate,
-                        };
-                        courier.Elapsed += Tick;
-                        courier.Start();
-                    }
+                    if (!Infinite)
+                        lock (queuelocker) {
+                            buffer.Enqueue(n.Clone());
+
+                            Courier courier;
+                            timers.Add(courier = new Courier() {
+                                AutoReset = false,
+                                Interval = _time * _gate,
+                            });
+                            courier.Elapsed += Tick;
+                            courier.Start();
+                        }
 
                     if (Release) {
-                        if (!buffer.ContainsKey(n)) return;
+                        if (!releasebuffer.ContainsKey(n)) return;
 
-                        color = buffer[n];
-                        buffer.TryRemove(n, out Color _);
+                        color = releasebuffer[n];
+                        releasebuffer.TryRemove(n, out Color _);
                     }
 
                     n.Color = color;
@@ -131,7 +142,20 @@ namespace Apollo.Devices {
             }
         }
 
+        protected override void Stop() {
+            foreach (Courier i in timers) i.Dispose();
+            timers.Clear();
+            
+            buffer.Clear();
+            queuelocker = new object();
+
+            releasebuffer.Clear();
+            locker.Clear();
+        }
+
         public override void Dispose() {
+            Stop();
+
             Time.Dispose();
             base.Dispose();
         }
