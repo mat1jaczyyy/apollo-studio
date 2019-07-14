@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using SelectingItemsControl = Avalonia.Controls.Primitives.SelectingItemsControl;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -18,6 +18,7 @@ using Humanizer;
 using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
@@ -142,11 +143,40 @@ namespace Apollo.Windows {
 
         void ReadFile(string path) => ReadFile(path, false);
         async void ReadFile(string path, bool recovery) {
-            Project loaded;
+            Project loaded = null;
+            Copyable imported = null;
+            bool isImport = false;
 
             try {
-                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    loaded = await Decoder.Decode(file, typeof(Project));
+                try {
+                    using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                        loaded = await Decoder.Decode(file, typeof(Project));
+
+                    if (!recovery) {
+                        loaded.FilePath = path;
+                        loaded.Undo.SavePosition();
+                        Preferences.RecentsAdd(path);
+                    }
+                    
+                    Program.Project?.Dispose();
+                    Program.Project = loaded;
+
+                } catch (InvalidDataException) {
+                    using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                        imported = await Decoder.Decode(file, typeof(Copyable));
+
+                    Program.Project?.Dispose();
+                    Program.Project = new Project(
+                        tracks: (imported.Type == typeof(Track))
+                            ? imported.Contents.Cast<Track>().ToList()
+                            : new List<Track>() {
+                                new Track(new Chain((imported.Type == typeof(Chain))
+                                    ? new List<Device>() { new Group(imported.Contents.Cast<Chain>().ToList()) }
+                                    : imported.Contents.Cast<Device>().ToList()
+                                ))
+                            }
+                    );
+                }
 
             } catch {
                 await MessageWindow.Create(
@@ -158,16 +188,8 @@ namespace Apollo.Windows {
 
                 return;
             }
-
-            if (!recovery) {
-                loaded.FilePath = path;
-                loaded.Undo.SavePosition();
-                Preferences.RecentsAdd(path);
-            }
-
-            Program.Project = loaded;
+            
             ProjectWindow.Create(this);
-
             Close();
         }
 
