@@ -163,7 +163,14 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public int Expanded;
+        int _expanded;
+        public int Expanded {
+            get => _expanded;
+            set {
+                if (!(0 <= value && value < Frames.Count)) value = 0;
+                _expanded = value;                
+            }
+        }
 
         public Pattern(int repeats = 1, double gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};

@@ -111,7 +111,14 @@ namespace Apollo.Devices {
 
         void HandleReset() => current = -1;
 
-        public int? Expanded { get; set; }
+        int? _expanded;
+        public int? Expanded {
+            get => _expanded;
+            set {
+                if (value != null && !(0 <= value && value < Chains.Count)) value = null;
+                _expanded = value;                
+            }
+        }
 
         public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
             Preprocess = preprocess?? new Chain();

@@ -82,7 +82,14 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public int? Expanded { get; set; }
+        int? _expanded;
+        public int? Expanded {
+            get => _expanded;
+            set {
+                if (value != null && !(0 <= value && value < Chains.Count)) value = null;
+                _expanded = value;                
+            }
+        }
 
         public Group(List<Chain> init = null, int? expanded = null): base("group") {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
