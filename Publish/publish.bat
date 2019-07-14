@@ -1,7 +1,6 @@
 @echo off
 
-cd ..
-cd Apollo
+cd ..\Apollo
 rd /S /Q bin\Release\netcoreapp2.2\win10-x64\publish
 dotnet publish -r win10-x64 -c Release
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\netcoreapp2.2\win10-x64\publish\Apollo.exe >nul 2>&1
@@ -10,8 +9,7 @@ del /s bin\Release\netcoreapp2.2\win10-x64\publish\Apollo.config >nul 2>&1
 
 echo.
 
-cd ..
-cd ApolloUpdate
+cd ..\ApolloUpdate
 rd /S /Q bin\Release\netcoreapp2.2\win10-x64\publish
 dotnet publish -r win10-x64 -c Release
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\netcoreapp2.2\win10-x64\publish\ApolloUpdate.exe >nul 2>&1
@@ -40,11 +38,9 @@ robocopy ..\M4L M4L "Apollo Connector.amxd" >nul 2>&1
 echo Creating Windows Installer...
 
 cd ..
-
 rd /S /Q Dist >nul 2>&1
 mkdir Dist
 
-del Build/Apollo.exe >nul 2>&1
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /q Publish/Apollo.iss
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /q Publish\Apollo.iss
 
 echo Done.

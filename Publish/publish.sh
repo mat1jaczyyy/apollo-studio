@@ -1,4 +1,6 @@
-cd Apollo
+#!/bin/sh
+
+cd ../Apollo
 rm -rf bin/Release/netcoreapp2.2/osx.10.11-x64/publish
 dotnet publish -r osx.10.11-x64 -c Release
 sips -i icon.ico > /dev/null
@@ -32,7 +34,15 @@ mkdir M4L
 mkdir Update
 
 cp -r ../Apollo/bin/Release/netcoreapp2.2/osx.10.11-x64/publish/* Apollo
-cp "../M4L/Apollo Connector.amxd" M4L
 cp -r ../ApolloUpdate/bin/Release/netcoreapp2.2/osx.10.11-x64/publish/* Update
+cp "../M4L/Apollo Connector.amxd" M4L
+
+echo Creating macOS Package...
+
+cd ..
+rm -rf Dist
+mkdir Dist
+
+packagesbuild Publish/Apollo.pkgproj
 
 echo Done.
