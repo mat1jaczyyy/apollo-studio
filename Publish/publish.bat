@@ -1,5 +1,6 @@
 @echo off
 
+cd ..
 cd Apollo
 rd /S /Q bin\Release\netcoreapp2.2\win10-x64\publish
 dotnet publish -r win10-x64 -c Release
@@ -35,5 +36,15 @@ robocopy ..\ApolloUpdate\bin\Release\netcoreapp2.2\win10-x64\publish Update /E >
 robocopy ..\ApolloUpdate Update handle64.exe >nul 2>&1
 
 robocopy ..\M4L M4L "Apollo Connector.amxd" >nul 2>&1
+
+echo Creating Windows Installer...
+
+cd ..
+
+rd /S /Q Dist >nul 2>&1
+mkdir Dist
+
+del Build/Apollo.exe >nul 2>&1
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /q Publish/Apollo.iss
 
 echo Done.

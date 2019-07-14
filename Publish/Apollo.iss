@@ -1,0 +1,65 @@
+#define MyAppName "Apollo Studio"
+#define MyAppVersion "0.0.0"
+#define MyAppPublisher "mat1jaczyyy"
+#define MyAppURL ""
+#define MyAppExeName "Apollo.exe"
+
+[Setup]
+AppId={{BE7DB952-7C93-4DF7-B256-3C14F64088CF}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+DefaultDirName={autopf}\{#MyAppName}
+DisableDirPage=yes
+DisableProgramGroupPage=yes
+UsedUserAreasWarning=no
+LicenseFile=C:\Users\mat1jaczyyy\Desktop\apollo-studio\LICENSE
+OutputDir=C:\Users\mat1jaczyyy\Desktop\apollo-studio\Dist\
+OutputBaseFilename=Apollo-Win
+Compression=lzma
+SolidCompression=yes
+WizardStyle=modern
+ChangesAssociations=yes
+ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x64
+
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; Check: not IsAdminInstallMode
+
+[Files]
+Source: "C:\Users\mat1jaczyyy\Downloads\novation-usb-driver-2.12.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "C:\Users\mat1jaczyyy\Desktop\apollo-studio\Build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+
+[Registry]
+Root: HKLM; Subkey: "Software\Classes\.approj"; ValueType: string; ValueName: ""; ValueData: "ApolloStudioProject"; Flags: uninsdeletevalue 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioProject"; ValueType: string; ValueName: ""; ValueData: "Apollo Studio Project"; Flags: uninsdeletekey 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioProject\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Apollo\{#MyAppExeName},0" 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioProject\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
+Root: HKLM; Subkey: "Software\Classes\.aptrk"; ValueType: string; ValueName: ""; ValueData: "ApolloStudioTrack"; Flags: uninsdeletevalue 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioTrack"; ValueType: string; ValueName: ""; ValueData: "Apollo Studio Track"; Flags: uninsdeletekey 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioTrack\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Apollo\{#MyAppExeName},0" 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioTrack\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
+Root: HKLM; Subkey: "Software\Classes\.apchn"; ValueType: string; ValueName: ""; ValueData: "ApolloStudioChain"; Flags: uninsdeletevalue 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioChain"; ValueType: string; ValueName: ""; ValueData: "Apollo Studio Chain"; Flags: uninsdeletekey 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioChain\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Apollo\{#MyAppExeName},0" 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioChain\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
+Root: HKLM; Subkey: "Software\Classes\.apdev"; ValueType: string; ValueName: ""; ValueData: "ApolloStudioDevice"; Flags: uninsdeletevalue 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice"; ValueType: string; ValueName: ""; ValueData: "Apollo Studio Device"; Flags: uninsdeletekey 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Apollo\{#MyAppExeName},0" 
+Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
+
+[Icons]
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: quicklaunchicon
+
+[Run]
+Filename: "{tmp}\novation-usb-driver-2.12.exe"; StatusMsg: Installing Novation USB Driver...
+Filename: "{app}\Apollo\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
