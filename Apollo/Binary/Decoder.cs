@@ -22,7 +22,7 @@ namespace Apollo.Binary {
 
         public static async Task<dynamic> Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
-                if (!DecodeHeader(reader)) return new InvalidDataException();
+                if (!DecodeHeader(reader)) throw new InvalidDataException();
 
                 int version = reader.ReadInt32();
 
@@ -31,7 +31,7 @@ namespace Apollo.Binary {
                     "Apollo Studio, which might result in it not loading correctly.\n\n" +
                     "Are you sure you want to proceed?",
                     new string[] { "Yes", "No" }, null
-                ) == "No") return new InvalidDataException();
+                ) == "No") throw new InvalidDataException();
 
                 return Decode(reader, version, ensure, true);
             }
@@ -39,11 +39,11 @@ namespace Apollo.Binary {
 
         public static dynamic DecodeBlock(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
-                if (!DecodeHeader(reader)) return new InvalidDataException();
+                if (!DecodeHeader(reader)) throw new InvalidDataException();
 
                 int version = reader.ReadInt32();
 
-                if (version > Common.version) return new InvalidDataException();
+                if (version > Common.version) throw new InvalidDataException();
 
                 return Decode(reader, version, ensure, true);
             }
@@ -51,7 +51,7 @@ namespace Apollo.Binary {
         
         static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
             Type t = DecodeID(reader);
-            if (ensure != null && ensure != t) return new InvalidDataException();
+            if (ensure != null && ensure != t) throw new InvalidDataException();
 
             if (t == typeof(Preferences) && root) {
                 try {
@@ -538,7 +538,7 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
 
-            return new InvalidDataException();
+            throw new InvalidDataException();
         }
     }
 }
