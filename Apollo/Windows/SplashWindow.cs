@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -106,7 +107,8 @@ namespace Apollo.Windows {
                     if (window.GetType() != typeof(MessageWindow))
                         window.Close();
                 
-                UpdateWindow.Create(this);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
+                else UpdateWindow.Create(this);
             }
         }
         

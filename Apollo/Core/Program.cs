@@ -36,6 +36,7 @@ namespace Apollo.Core {
             folder
         );
 
+        public static bool LaunchAdmin = false;
         public static bool LaunchUpdater = false;
         
         public static Stopwatch TimeSpent = new Stopwatch();
@@ -149,77 +150,89 @@ namespace Apollo.Core {
 
             TimeSpent.Start();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { // USB Driver check
-                IEnumerable<int> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
-                    where Path.GetFileName(j).StartsWith("nvnusbaudio.inf")
-                    select Convert.ToInt32((
-                        from i in File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
-                            where i.StartsWith("DriverVer=")
-                            select i
-                    ).First().Substring(10).Split(',')[1].Split('.')[1])
-                );
-
-                if (a.Count() == 0) {
-                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                        $"Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
-                        "computer.\n\n" +
-                        "Please install at least version 2.7 of the driver before launching Apollo Studio."
-                    )), args);
-                    return;
-                }
-
-                if (a.Max() < 7) {
-                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                        $"Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
-                        "installed on your computer.\n\n" +
-                        "Please install at least version 2.7 of the driver before launching Apollo Studio."
-                    )), args);
-                    return;
-                }
-            }
-
-            if (!AbletonConnector.Connected) {
-                BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                    $"Another instance of Apollo Studio is currently running.\n\n" +
-                    "Please close other instances of Apollo Studio before launching Apollo Studio."
-                )), args);
-                return;
-            }
-
-            Args = args;
-
-            if (Preferences.DiscordPresence) Discord.Set(true);
-
-            MIDI.Start();
+            if (args.Length > 0 && args[0] == "--update")
+                BuildAvaloniaApp().Start<UpdateWindow>();
             
-            Courier autosave = new Courier() { Interval = 180000 };
-            autosave.Elapsed += async (_, __) => {
-                if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
-                    try {
-                        string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
-                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            else {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { // USB Driver check
+                    IEnumerable<int> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
+                        where Path.GetFileName(j).StartsWith("nvnusbaudio.inf")
+                        select Convert.ToInt32((
+                            from i in File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
+                                where i.StartsWith("DriverVer=")
+                                select i
+                        ).First().Substring(10).Split(',')[1].Split('.')[1])
+                    );
 
-                        await Program.Project.WriteFile(
-                            Application.Current.MainWindow,
-                            Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
-                            false, false
-                        );
-                    } catch {}
+                    if (a.Count() == 0) {
+                        BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
+                            $"Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
+                            "computer.\n\n" +
+                            "Please install at least version 2.7 of the driver before launching Apollo Studio."
+                        )), args);
+                        return;
+                    }
+
+                    if (a.Max() < 7) {
+                        BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
+                            $"Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
+                            "installed on your computer.\n\n" +
+                            "Please install at least version 2.7 of the driver before launching Apollo Studio."
+                        )), args);
+                        return;
+                    }
                 }
 
-                Preferences.Save();
-            };
-            autosave.Start();
+                if (!AbletonConnector.Connected) {
+                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
+                        $"Another instance of Apollo Studio is currently running.\n\n" +
+                        "Please close other instances of Apollo Studio before launching Apollo Studio."
+                    )), args);
+                    return;
+                }
 
-            BuildAvaloniaApp().Start<SplashWindow>();
+                Args = args;
 
-            autosave.Dispose();
-            MIDI.Stop();
-            Discord.Set(false);
-            AbletonConnector.Dispose();
+                if (Preferences.DiscordPresence) Discord.Set(true);
+
+                MIDI.Start();
+                
+                Courier autosave = new Courier() { Interval = 180000 };
+                autosave.Elapsed += async (_, __) => {
+                    if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
+                        try {
+                            string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
+                            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                            await Program.Project.WriteFile(
+                                Application.Current.MainWindow,
+                                Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
+                                false, false
+                            );
+                        } catch {}
+                    }
+
+                    Preferences.Save();
+                };
+                autosave.Start();
+
+                BuildAvaloniaApp().Start<SplashWindow>();
+
+                autosave.Dispose();
+                MIDI.Stop();
+                Discord.Set(false);
+                AbletonConnector.Dispose();
+            }
+
             TimeSpent.Stop();
 
-            if (LaunchUpdater) {
+            if (LaunchAdmin && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start(
+                    $"{AppDomain.CurrentDomain.BaseDirectory}elevate.exe",
+                    $"\"{Path.Combine(Program.GetBaseFolder("Apollo"), "Apollo.exe")}\" --update"
+                );
+
+            else if (LaunchUpdater) {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     Process.Start(
                         $"{AppDomain.CurrentDomain.BaseDirectory}elevate.exe",
