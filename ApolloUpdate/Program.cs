@@ -40,6 +40,10 @@ namespace ApolloUpdate {
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
             };
+            
+            string temppath = Program.GetBaseFolder("Temp");
+
+            if (!Directory.Exists(temppath)) return;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE", true);
@@ -87,7 +91,6 @@ namespace ApolloUpdate {
                         Thread.Sleep(1000);
                     }
             
-            string temppath = Program.GetBaseFolder("Temp");
             Directory.Move(temppath, apollopath);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
