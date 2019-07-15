@@ -22,10 +22,6 @@ namespace Apollo.DeviceViewers {
         Output _output;
         Dial Target;
 
-        public void Update_Target(int value) {
-            Target.RawValue = value + 1;
-        }
-
         void Update_Maximum(int value) {
             Target.Enabled = (value != 1);
             if (Target.Enabled) Target.Maximum = value;
@@ -35,15 +31,13 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
             
             _output = output;
-            _output.TargetChanged += Update_Target;
             Program.Project.TrackCountChanged += Update_Maximum;
 
             Update_Maximum(Program.Project.Tracks.Count);
-            Update_Target(_output.Target);
+            SetTarget(_output.Target);
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            _output.TargetChanged -= Update_Target;
             Program.Project.TrackCountChanged -= Update_Maximum;
 
             _output = null;
@@ -64,5 +58,7 @@ namespace Apollo.DeviceViewers {
 
             _output.Target = (int)value - 1;
         }
+
+        public void SetTarget(int value) => Target.RawValue = value + 1;
     }
 }

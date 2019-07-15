@@ -68,8 +68,19 @@ namespace Apollo.Elements {
 
         public UndoManager Undo = new UndoManager();
 
-        public event ChangedEventHandler PathChanged;
+        public event ChangedEventHandler TrackOperationFinished;
+        bool _trackoperation = false;
+        public bool TrackOperation {
+            get => _trackoperation;
+            set {
+                if (_trackoperation != value && (_trackoperation = value) == false) {
+                    TrackOperationFinished?.Invoke();
+                    TrackOperationFinished = null;
+                }
+            }
+        }
 
+        public event ChangedEventHandler PathChanged;
         string _path;
         public string FilePath {
             get => _path;
@@ -99,7 +110,6 @@ namespace Apollo.Elements {
 
         public async Task<bool> WriteFile(Window sender, string path = null, bool store = true, bool error = true) {
             if (path == null) path = FilePath;
-
 
             try {
                 if (!Directory.Exists(Path.GetDirectoryName(path))) throw new UnauthorizedAccessException();
@@ -186,8 +196,10 @@ namespace Apollo.Elements {
         }
 
         public void Insert(int index, Track track) {
+            TrackOperation = true;
             Tracks.Insert(index, track);
             Reroute();
+            TrackOperation = false;
 
             Window?.Contents_Insert(index, Tracks[index]);
 
@@ -205,9 +217,11 @@ namespace Apollo.Elements {
             Window?.Contents_Remove(index);
             Tracks[index].Window?.Close();
 
+            TrackOperation = true;
             if (dispose) Tracks[index].Dispose();
             Tracks.RemoveAt(index);
             Reroute();
+            TrackOperation = false;
         }
 
         public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {

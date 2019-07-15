@@ -11,9 +11,6 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Output: Device {
-        public delegate void TargetChangedEventHandler(int value);
-        public event TargetChangedEventHandler TargetChanged;
-        
         int _target;
         public int Target {
             get => _target;
@@ -26,17 +23,21 @@ namespace Apollo.Devices {
                     Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
                     Program.Project.Tracks[_target].Disposing += IndexRemoved;
                     
-                    if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).Update_Target(Target);
+                    if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
                 }
             }
         }
 
         void IndexChanged(int value) {
+            if (Program.Project.TrackOperation) return;
+            
             _target = value;
-            TargetChanged?.Invoke(_target);
+            if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
         }
 
         void IndexRemoved() {
+            if (Program.Project.TrackOperation) return;
+
             bool redoing = false;
 
             foreach (StackFrame call in new StackTrace().GetFrames()) {
@@ -54,7 +55,7 @@ namespace Apollo.Devices {
             }
 
             Target = Track.Get(this).ParentIndex.Value;
-            TargetChanged?.Invoke(_target);
+            if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
         }
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
@@ -69,6 +70,7 @@ namespace Apollo.Devices {
             _target = target;
 
             if (Program.Project == null) Program.ProjectLoaded += Initialize;
+            else if (Program.Project.TrackOperation) Program.Project.TrackOperationFinished += Initialize;
             else Initialize();
         }
 
@@ -83,7 +85,6 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
-            TargetChanged = null;
             Program.Project.Tracks[_target].ParentIndexChanged -= IndexChanged;
             Program.Project.Tracks[_target].Disposing -= IndexRemoved;
 
