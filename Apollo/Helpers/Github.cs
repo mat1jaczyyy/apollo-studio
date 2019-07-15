@@ -25,7 +25,7 @@ namespace Apollo.Helpers {
                 ).First(/* i => i.Prerelease == false */);
                 
                 download = cache.Assets.FirstOrDefault(i => i.Name.Contains(
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win" : "Mac"
+                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
                 ));
             }
 
