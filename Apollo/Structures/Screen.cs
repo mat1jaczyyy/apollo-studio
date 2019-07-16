@@ -23,10 +23,12 @@ namespace Apollo.Structures {
 
                 for (int i = 0; i < _signals.Count; i++) {
                     Signal signal = _signals.Values[i];
+                    if (signal.BlendingMode != BlendingType.Normal && ((i == _signals.Count - 1)? true : signal.Layer - _signals.Values[i + 1].Layer > signal.BlendingRange))
+                        continue;
 
                     if (signal.BlendingMode == BlendingType.Mask) break;
 
-                    ret.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == BlendingType.Multiply));
+                    ret.Mix(signal.Color, (i == 0)? false : (_signals.Values[i - 1].BlendingMode == BlendingType.Multiply && _signals.Values[i - 1].Layer - signal.Layer <= _signals.Values[i - 1].BlendingRange));
 
                     if (signal.BlendingMode == BlendingType.Normal) break;
                 }
