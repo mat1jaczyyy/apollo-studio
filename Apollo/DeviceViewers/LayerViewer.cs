@@ -19,11 +19,12 @@ namespace Apollo.DeviceViewers {
 
             Target = this.Get<Dial>("Target");
             BlendingMode = this.Get<ComboBox>("BlendingMode");
+            Range = this.Get<Dial>("Range");
         }
         
         Layer _layer;
         
-        Dial Target;
+        Dial Target, Range;
         ComboBox BlendingMode;
 
         public LayerViewer(Layer layer) {
@@ -32,7 +33,8 @@ namespace Apollo.DeviceViewers {
             _layer = layer;
             
             Target.RawValue = _layer.Target;
-            BlendingMode.SelectedIndex = (int)_layer.BlendingMode;
+            SetMode(_layer.BlendingMode);
+            Range.RawValue = _layer.Range;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
@@ -73,6 +75,24 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetMode(BlendingType mode) => BlendingMode.SelectedIndex = (int)mode;
+        public void SetMode(BlendingType mode) => Range.Enabled = (BlendingMode.SelectedIndex = (int)mode) > 0;
+
+        void Range_Changed(double value, double? old) {
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_layer);
+
+                Program.Project.Undo.Add($"Layer Range Changed to {r}{Range.Unit}", () => {
+                    ((Layer)Track.TraversePath(path)).Range = u;
+                }, () => {
+                    ((Layer)Track.TraversePath(path)).Range = r;
+                });
+            }
+
+            _layer.Range = (int)value;
+        }
+
+        public void SetRange(int value) => Range.RawValue = value;
     }
 }

@@ -374,10 +374,11 @@ namespace Apollo.Binary {
                     }
                 }
 
-                return new Layer(
-                    target,
-                    blending
-                );
+                int range = 200;
+                if (version >= 21)
+                    range = reader.ReadInt32();
+
+                return new Layer(target, blending, range);
 
             } else if (t == typeof(Move))
                 return new Move(

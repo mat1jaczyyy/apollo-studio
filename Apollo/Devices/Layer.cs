@@ -29,19 +29,33 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Layer(Target, BlendingMode) {
+        int _range;
+        public int Range {
+            get => _range;
+            set {
+                if (_range != value) {
+                    _range = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((LayerViewer)Viewer.SpecificViewer).SetRange(Range);
+                }
+            }
+        }
+
+        public override Device Clone() => new Layer(Target, BlendingMode, Range) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Layer(int target = 0, BlendingType blending = BlendingType.Normal): base("layer") {
+        public Layer(int target = 0, BlendingType blending = BlendingType.Normal, int range = 200): base("layer") {
             Target = target;
             BlendingMode = blending;
+            Range = range;
         }
 
         public override void MIDIProcess(Signal n) {
             n.Layer = Target;
             n.BlendingMode = BlendingMode;
+            n.BlendingRange = Range;
 
             MIDIExit?.Invoke(n);
         }
