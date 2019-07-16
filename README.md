@@ -24,7 +24,7 @@ Unfortunately, Apollo Studio is not quite ready for public use yet, so we'll hav
 
 ## Documentation and Support
 
-You can take a look at the [GitHub Wikis](../../wiki) for all documentation on Apollo Studio. Everything you might ask for should be documented there. If it isn't, feel free to ask in our Discord server.
+You can take a look at the [GitHub Wikis](../../wiki) for all documentation on Apollo Studio. Everything you might ask for should be documented there. If it isn't, feel free to ask in our Discord server, or open an issue.
 
 ## Special thanks
 
