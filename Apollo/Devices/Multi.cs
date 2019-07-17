@@ -158,10 +158,10 @@ namespace Apollo.Devices {
                     else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
                 }
 
-                m.MultiTarget = buffer[n] = current;
+                m.MultiTarget.Push(buffer[n] = current);
 
             } else {
-                m.MultiTarget = buffer[n];
+                m.MultiTarget.Push(buffer[n]);
                 if (!m.Color.Lit) buffer.Remove(n, out int _);
             }
 
@@ -171,8 +171,7 @@ namespace Apollo.Devices {
         void PreprocessExit(Signal n) {
             if (n.GetType() == typeof(StopSignal)) return;
 
-            int target = n.MultiTarget.Value;
-            n.MultiTarget = null;
+            int target = n.MultiTarget.Pop();
             
             if (Chains.Count == 0) MIDIExit?.Invoke(n);
             else Chains[target].MIDIEnter(n);
