@@ -15,7 +15,6 @@
         <MenuItem Header="Page Filter" />
         <MenuItem Header="Key Filter" />
         <MenuItem Header="Color Filter" />
-        <MenuItem Header="Switch" />
       </MenuItem>
 
       <MenuItem Header="Timing">
@@ -42,7 +41,11 @@
         <MenuItem Header="Fade" />
       </MenuItem>
       
-      <MenuItem Header="Preview" />
+      <MenuItem Header="Utilities">
+        <MenuItem Header="Preview" />
+        <MenuItem Header="Switch" />
+        <MenuItem Header="Clear" />
+      </MenuItem>
     </ContextMenu>
 
     <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
