@@ -11,6 +11,12 @@ namespace Apollo.Enums {
         Stock, Phantom, Sanded
     }
 
+    public enum ClearType {
+        Lights,
+        Multi,
+        Both
+    }
+
     public enum CopyType {
         Static,
         Animate,

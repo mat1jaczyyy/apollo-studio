@@ -5,12 +5,6 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   
-  <StackPanel VerticalAlignment="Center" Spacing="5">
-    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" VerticalAlignment="Center" x:Name="Page" Title="Page" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit=""
-                       ValueChanged="Page_Changed" />
-    </Border>
-
-    <CheckBox HorizontalAlignment="Center" x:Name="MultiReset" Click="MultiReset_Changed" Content="Multi&#x0a;Reset" />
-  </StackPanel>
+  <Components:Dial VerticalAlignment="Center" x:Name="Page" Title="Page" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit=""
+                   ValueChanged="Page_Changed" />
 </UserControl>

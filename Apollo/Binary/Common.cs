@@ -8,7 +8,7 @@ using Apollo.Structures;
 
 namespace Apollo.Binary {
     public static class Common {
-        public const int version = 21;
+        public const int version = 22;
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),
@@ -46,7 +46,8 @@ namespace Apollo.Binary {
             typeof(Time),
 
             typeof(Choke),
-            typeof(ColorFilter)
+            typeof(ColorFilter),
+            typeof(Clear)
         };
     }
 }

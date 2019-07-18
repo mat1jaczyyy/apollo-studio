@@ -231,6 +231,11 @@ namespace Apollo.Binary {
                     (Chain)Decode(reader, version)
                 );
 
+            else if (t == typeof(Clear))
+                return new Clear(
+                    (ClearType)reader.ReadInt32()
+                );
+
             else if (t == typeof(ColorFilter))
                 return new ColorFilter(
                     reader.ReadDouble(),
@@ -477,11 +482,14 @@ namespace Apollo.Binary {
             else if (t == typeof(Switch)) {
                 int page = reader.ReadInt32();
 
-                bool multireset = false;
-                if (version >= 18)
-                    multireset = reader.ReadBoolean();
+                if (18 <= version && version <= 21 && reader.ReadBoolean())
+                    return new Group(new List<Chain>() {
+                        new Chain(new List<Device>() {
+                            new Switch(page), new Clear(ClearType.Multi)
+                        }, "Switch Reset")
+                    });
 
-                return new Switch(page, multireset);
+                return new Switch(page);
             
             } else if (t == typeof(Tone))
                 return new Tone(

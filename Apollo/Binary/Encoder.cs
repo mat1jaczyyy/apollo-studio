@@ -177,6 +177,12 @@ namespace Apollo.Binary {
             writer.Write(o.Target);
             Encode(writer, o.Chain);
         }
+
+        static void Encode(BinaryWriter writer, Clear o) {
+            EncodeID(writer, typeof(Clear));
+
+            writer.Write((int)o.Mode);
+        }
         
         static void Encode(BinaryWriter writer, ColorFilter o) {
             EncodeID(writer, typeof(ColorFilter));
@@ -300,7 +306,6 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Switch));
 
             writer.Write(o.Page);
-            writer.Write(o.MultiReset);
         }
 
         static void Encode(BinaryWriter writer, Paint o) {
