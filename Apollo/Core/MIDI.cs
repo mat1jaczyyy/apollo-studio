@@ -34,6 +34,7 @@ namespace Apollo.Core {
                 track.Chain.MIDIEnter(new StopSignal());
             
             Multi.InvokeReset();
+            Preview.InvokeClear();
 
             foreach (Launchpad lp in MIDI.Devices)
                 lp.Clear(true);

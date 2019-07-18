@@ -25,7 +25,6 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _preview = preview;
-            _preview.SignalExited += SignalRender;
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
@@ -37,8 +36,12 @@ namespace Apollo.DeviceViewers {
         void PadPressed(int index) => PadChanged(index, true);
         void PadReleased(int index) => PadChanged(index, false);
 
-        void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+        public void Signal(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        });
+
+        public void Clear() => Dispatcher.UIThread.InvokeAsync(() => {
+            Grid.Clear();
         });
     }
 }
