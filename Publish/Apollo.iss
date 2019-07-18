@@ -13,7 +13,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
-DisableDirPage=yes
+DisableDirPage=auto
 DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 LicenseFile=C:\Users\mat1jaczyyy\Desktop\apollo-studio\LICENSE
@@ -30,8 +30,8 @@ ArchitecturesAllowed=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; Check: not IsAdminInstallMode
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "clearpreferences"; Description: "Clear Preferences"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "C:\Users\mat1jaczyyy\Downloads\novation-usb-driver-2.12.exe"; DestDir: {tmp}; Flags: deleteafterinstall
@@ -55,10 +55,12 @@ Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice"; ValueType: string; Va
 Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Apollo\{#MyAppExeName},0" 
 Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
 
+[InstallDelete]
+Type: files; Name: "{%USERPROFILE}\.apollostudio\Apollo.config"
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: quicklaunchicon
 
 [Run]
 Filename: "{tmp}\novation-usb-driver-2.12.exe"; StatusMsg: Installing Novation USB Driver...
