@@ -5,5 +5,5 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   
-  <Components:LargePopout HorizontalAlignment="Center" VerticalAlignment="Center" Clicked="Pattern_Popout" />
+  <Components:LargePopout Width="44" HorizontalAlignment="Center" VerticalAlignment="Center" Clicked="Pattern_Popout" />
 </UserControl>
