@@ -161,7 +161,7 @@ namespace Apollo.DeviceViewers {
                 _copy.CopyMode = selected;
             }
 
-            Rate.Enabled = Gate.Enabled = CopyMode.SelectedIndex > 0;
+            Rate.Enabled = Gate.Enabled = selected != CopyType.Static && selected != CopyType.RandomSingle;
         }
 
         public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
