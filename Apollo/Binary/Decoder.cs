@@ -54,85 +54,79 @@ namespace Apollo.Binary {
             if (ensure != null && ensure != t) throw new InvalidDataException();
 
             if (t == typeof(Preferences) && root) {
-                try {
-                    Preferences.AlwaysOnTop = reader.ReadBoolean();
-                    Preferences.CenterTrackContents = reader.ReadBoolean();
+                Preferences.AlwaysOnTop = reader.ReadBoolean();
+                Preferences.CenterTrackContents = reader.ReadBoolean();
 
-                    if (version >= 9) {
-                        Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
-                    }
-
-                    if (version >= 14) {
-                        Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
-                    }
-
-                    Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
-                    Preferences.AutoCreatePageFilter = reader.ReadBoolean();
-
-                    if (version >= 11) {
-                        Preferences.AutoCreatePattern = reader.ReadBoolean();
-                    }
-
-                    Preferences.FadeSmoothness = reader.ReadDouble();
-                    Preferences.CopyPreviousFrame = reader.ReadBoolean();
-
-                    if (version >= 7) {
-                        Preferences.CaptureLaunchpad = reader.ReadBoolean();
-                    }
-                    
-                    Preferences.EnableGestures = reader.ReadBoolean();
-
-                    if (version >= 7) {
-                        Preferences.PaletteName = reader.ReadString();
-                        Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
-                        Preferences.ImportPalette = (Palettes)reader.ReadInt32();
-
-                        Preferences.Theme = (Themes)reader.ReadInt32();
-                    }
-
-                    if (version >= 10) {
-                        Preferences.Backup = reader.ReadBoolean();
-                        Preferences.Autosave = reader.ReadBoolean();
-                    }
-
-                    if (version >= 12) {
-                        Preferences.UndoLimit = reader.ReadBoolean();
-                    }
-
-                    if (version <= 0) {
-                        Preferences.DiscordPresence = true;
-                        reader.ReadBoolean();
-                    } else {
-                        Preferences.DiscordPresence = reader.ReadBoolean();
-                    }
-                    
-                    Preferences.DiscordFilename = reader.ReadBoolean();
-
-                    ColorHistory.Set(
-                        (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
-                    );
-
-                    if (version >= 2)
-                        MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
-
-                    if (version >= 15) {
-                        Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
-                        Preferences.CrashName = reader.ReadString();
-                        Preferences.CrashPath = reader.ReadString();
-                    }
-
-                    if (version >= 16)
-                        Preferences.CheckForUpdates = reader.ReadBoolean();
-
-                    if (version >= 17)
-                        Preferences.BaseTime = reader.ReadInt64();
-                    
-                    return null;
-
-                } catch {
-                    Program.Log("Error reading Preferences");
-                    return null;
+                if (version >= 9) {
+                    Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
                 }
+
+                if (version >= 14) {
+                    Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
+                }
+
+                Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
+                Preferences.AutoCreatePageFilter = reader.ReadBoolean();
+
+                if (version >= 11) {
+                    Preferences.AutoCreatePattern = reader.ReadBoolean();
+                }
+
+                Preferences.FadeSmoothness = reader.ReadDouble();
+                Preferences.CopyPreviousFrame = reader.ReadBoolean();
+
+                if (version >= 7) {
+                    Preferences.CaptureLaunchpad = reader.ReadBoolean();
+                }
+                
+                Preferences.EnableGestures = reader.ReadBoolean();
+
+                if (version >= 7) {
+                    Preferences.PaletteName = reader.ReadString();
+                    Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
+                    Preferences.ImportPalette = (Palettes)reader.ReadInt32();
+
+                    Preferences.Theme = (Themes)reader.ReadInt32();
+                }
+
+                if (version >= 10) {
+                    Preferences.Backup = reader.ReadBoolean();
+                    Preferences.Autosave = reader.ReadBoolean();
+                }
+
+                if (version >= 12) {
+                    Preferences.UndoLimit = reader.ReadBoolean();
+                }
+
+                if (version <= 0) {
+                    Preferences.DiscordPresence = true;
+                    reader.ReadBoolean();
+                } else {
+                    Preferences.DiscordPresence = reader.ReadBoolean();
+                }
+                
+                Preferences.DiscordFilename = reader.ReadBoolean();
+
+                ColorHistory.Set(
+                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Color)Decode(reader, version)).ToList()
+                );
+
+                if (version >= 2)
+                    MIDI.Devices = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Launchpad)Decode(reader, version)).ToList();
+
+                if (version >= 15) {
+                    Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
+                    Preferences.CrashName = reader.ReadString();
+                    Preferences.CrashPath = reader.ReadString();
+                }
+
+                if (version >= 16)
+                    Preferences.CheckForUpdates = reader.ReadBoolean();
+
+                if (version >= 17)
+                    Preferences.BaseTime = reader.ReadInt64();
+                
+                return null;
 
             } else if (t == typeof(Copyable)) {
                 return new Copyable() {

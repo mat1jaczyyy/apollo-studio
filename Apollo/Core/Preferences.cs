@@ -290,7 +290,11 @@ namespace Apollo.Core {
         static Preferences() {
             if (File.Exists(FilePath))
                 using (FileStream file = File.Open(FilePath, FileMode.Open, FileAccess.Read))
-                    Decoder.DecodeBlock(file, typeof(Preferences));
+                    try {
+                        Decoder.DecodeBlock(file, typeof(Preferences));
+                    } catch {
+                        Console.WriteLine("Error reading Preferences");
+                    }
 
             Save();
 
