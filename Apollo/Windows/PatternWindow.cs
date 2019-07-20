@@ -871,13 +871,13 @@ namespace Apollo.Windows {
                 Pattern pattern = (Pattern)Track.TraversePath(path);
 
                 for (int i = left; i <= right; i++)
-                    pattern[i].Screen = pattern[i].Screen.Reverse().ToArray();
+                    pattern[i].Invert();
             }
 
             Program.Project.Undo.Add($"Pattern Frames Inverted", ur, ur);
             
             for (int i = left; i <= right; i++)
-                _pattern[i].Screen = _pattern[i].Screen.Reverse().ToArray();
+                _pattern[i].Invert();
         }
 
         void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {

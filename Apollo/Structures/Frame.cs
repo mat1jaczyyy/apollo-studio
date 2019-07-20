@@ -91,6 +91,8 @@ namespace Apollo.Structures {
             Screen = screen;
         }
 
+        public void Invert() => Screen = Screen.SkipLast(1).Reverse().Concat(Screen.TakeLast(1)).ToArray();
+
         public static bool Move(List<Frame> source, Pattern target, int position, bool copy = false) => (position == -1)
             ? Move(source, target, copy)
             : Move(source, target[position], copy);
