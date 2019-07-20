@@ -56,7 +56,7 @@
 
             <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
               <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Chain Editor" />
+                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Group Behavior" />
                 <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create KeyFilter in new Group Chain</CheckBox>
                 <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create PageFilter in new Group Chain</CheckBox>
                 <CheckBox Click="AutoCreatePattern_Changed" x:Name="AutoCreatePattern">Auto create Pattern in new Group Chain</CheckBox>
