@@ -253,18 +253,18 @@ namespace Apollo.Devices {
                     if (++buffer[n] < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
                             if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
-                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.BlendingRange, n.MultiTarget));
+                                    MIDIExit?.Invoke(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
 
                     } else if (Mode == PlaybackType.Mono) {
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                    MIDIExit?.Invoke(new Signal(n.Source, (byte)index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.BlendingRange, n.MultiTarget));
+                                    MIDIExit?.Invoke(n.With((byte)index, new Color(0)));
 
                     } else if (Mode == PlaybackType.Loop) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.BlendingRange, n.MultiTarget));
+                                MIDIExit?.Invoke(n.With((byte)index, Frames[0].Screen[i].Clone()));
 
                         buffer[n] = 0;
                         double time = 0;
@@ -285,14 +285,14 @@ namespace Apollo.Devices {
                     if (++info.index < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
                             if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
-                                MIDIExit?.Invoke(new Signal(info.n.Source, (byte)index, Frames[info.index % Frames.Count].Screen[i].Clone(), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.BlendingRange, info.n.MultiTarget));
+                                MIDIExit?.Invoke(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
                     } else {
                         poly.Remove(info);
 
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
-                                    MIDIExit?.Invoke(new Signal(info.n.Source, (byte)index, new Color(0), info.n.Page, info.n.Layer, info.n.BlendingMode, info.n.BlendingRange, info.n.MultiTarget));
+                                    MIDIExit?.Invoke(info.n.With((byte)index, new Color(0)));
                     }
                 }
             }
@@ -312,7 +312,7 @@ namespace Apollo.Devices {
 
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
                             if (Frames[buffer[n] % Frames.Count].Screen[i].Lit && ApplyRootKey(i, originalIndex, out int index))
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, new Color(0), n.Page, n.Layer, n.BlendingMode, n.BlendingRange, n.MultiTarget));
+                                MIDIExit?.Invoke(n.With((byte)index, new Color(0)));
                     }
 
                     buffer.Remove(n, out int _);
@@ -338,7 +338,7 @@ namespace Apollo.Devices {
                     if (lit) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if (Frames[0].Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                MIDIExit?.Invoke(new Signal(n.Source, (byte)index, Frames[0].Screen[i].Clone(), n.Page, n.Layer, n.BlendingMode, n.BlendingRange, n.MultiTarget));
+                                MIDIExit?.Invoke(n.With((byte)index, Frames[0].Screen[i].Clone()));
                         
                         double time = 0;
                         PolyInfo info = new PolyInfo(n);

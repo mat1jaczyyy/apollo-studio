@@ -46,9 +46,13 @@ namespace Apollo.Structures {
 
         public int? PeekMultiTarget => MultiTarget.TryPeek(out int target)? (int?)target : null;
 
-        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Page, Layer, BlendingMode, BlendingRange, new Stack<int>(MultiTarget.ToArray())) {
+        public Stack<int> CopyMultiTarget() => new Stack<int>(MultiTarget.ToArray());
+
+        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
             HashIndex = HashIndex
         };
+
+        public Signal With(byte index = 11, Color color = null) => new Signal(Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
 
         public Signal(Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
             Source = source;

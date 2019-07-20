@@ -465,7 +465,6 @@ namespace Apollo.Windows {
                 if (e.Key == Key.Up || e.Key == Key.Left) {
                     if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
                     else Frame_Insert(0);
-                    
 
                 } else if (e.Key == Key.Down || e.Key == Key.Right) {
                     if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
