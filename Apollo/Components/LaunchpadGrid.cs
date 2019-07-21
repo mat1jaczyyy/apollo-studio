@@ -58,7 +58,11 @@ namespace Apollo.Components {
         public void SetColor(int index, SolidColorBrush color) {
             if (index == 0 || index == 9 || index == 90 || index == 99) return;
 
-            if (index == -1) ModeLight.Fill = color;
+            if (index == -1) {
+                if (IsArrangeValid) ModeLight.Fill = color;
+                else this.Resources["ModeBrush"] = color;
+            }
+
             else if (LowQuality) Elements[index].Fill = color;
             else Elements[index].Stroke = IsPhantom(index)? color : Elements[index].Fill = color;
         }
@@ -197,6 +201,7 @@ namespace Apollo.Components {
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged += ApplyScale;
 
+            Clear();
             ApplyScale();
         }
 

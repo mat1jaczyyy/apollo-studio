@@ -20,6 +20,7 @@
 
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
+    <media:SolidColorBrush x:Key="ModeBrush" />
     <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
   
@@ -67,8 +68,8 @@
             </Viewbox.Styles>
           </Viewbox>
 
-          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ThemeForegroundLowBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
-                    PointerPressed="MouseDown" />
+          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
+                     PointerPressed="MouseDown" />
         </StackPanel>
       </Grid>
     </LayoutTransformControl>
