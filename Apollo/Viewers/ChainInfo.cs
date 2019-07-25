@@ -25,6 +25,7 @@ namespace Apollo.Viewers {
             ChainAdd = this.Get<VerticalAdd>("DropZoneAfter");
             NameText = this.Get<TextBlock>("Name");
             Draggable = this.Get<Grid>("Draggable");
+            MuteItem = this.Get<MenuItem>("MuteItem");
             Input = this.Get<TextBox>("Input");
         }
 
@@ -43,6 +44,7 @@ namespace Apollo.Viewers {
 
         Grid Draggable;
         ContextMenu ChainContextMenu;
+        MenuItem MuteItem;
         TextBox Input;
 
         void UpdateText() => NameText.Text = _chain.ProcessedName;
@@ -129,8 +131,10 @@ namespace Apollo.Viewers {
                 if (e.MouseButton == MouseButton.Left)
                     ChainExpanded?.Invoke(_chain.ParentIndex.Value);
                 
-                if (e.MouseButton == MouseButton.Right)
+                if (e.MouseButton == MouseButton.Right) {
+                    MuteItem.Header = ((Chain)Track.Get(_chain)?.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
                     ChainContextMenu.Open(Draggable);
+                }
             }
         }
 

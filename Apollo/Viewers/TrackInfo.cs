@@ -29,6 +29,7 @@ namespace Apollo.Viewers {
             PortSelector = this.Get<ComboBox>("PortSelector");
             DropZone = this.Get<Border>("DropZone");
             TrackAdd = this.Get<TrackAdd>("DropZoneAfter");
+            MuteItem = this.Get<MenuItem>("MuteItem");
             Input = this.Get<TextBox>("Input");
         }
 
@@ -45,6 +46,7 @@ namespace Apollo.Viewers {
         Grid Draggable;
         Border DropZone;
         ContextMenu TrackContextMenu;
+        MenuItem MuteItem;
         TextBox Input;
         
         void UpdateText(int index) => NameText.Text = _track.ProcessedName;
@@ -149,8 +151,10 @@ namespace Apollo.Viewers {
                 if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) 
                     TrackWindow.Create(_track, (Window)this.GetVisualRoot());
                 
-                if (e.MouseButton == MouseButton.Right)
+                if (e.MouseButton == MouseButton.Right) {
+                    MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
                     TrackContextMenu.Open(Draggable);
+                }
             }
         }
 

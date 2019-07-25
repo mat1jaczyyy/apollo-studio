@@ -14,7 +14,7 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
-      <MenuItem Header="Mute" />
+      <MenuItem Header="Mute" x:Name="MuteItem" />
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>

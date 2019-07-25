@@ -117,7 +117,7 @@ namespace Apollo.Helpers {
             else if (action == "Delete") parent.IViewer?.Delete(left, right);
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
-            else if (action == "Mute") parent.IViewer?.Mute(left, right);
+            else if (action == "Mute" || action == "Unmute") parent.IViewer?.Mute(left, right);
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
             else if (action == "Export") parent.IViewer?.Export(left, right);
             else if (action == "Import") parent.IViewer?.Import(right);

@@ -187,6 +187,8 @@ namespace Apollo.Viewers {
 
                     if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
                         menu = GroupContextMenu;
+                    
+                    this.Resources["Mute"] = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 
                     menu.Open(Draggable);
                 
