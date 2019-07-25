@@ -1074,8 +1074,9 @@ namespace Apollo.Windows {
         void PatternPlay(object sender, RoutedEventArgs e) {
             if (Locked) {
                 PatternStop();
-                PatternFinish();
+                _pattern.MIDIEnter(new StopSignal());
 
+                PatternFinish();
                 return;
             }
 
@@ -1089,6 +1090,7 @@ namespace Apollo.Windows {
             });
             
             PatternStop(false);
+            _pattern.MIDIEnter(new StopSignal());
 
             foreach (Launchpad lp in MIDI.Devices)
                 if (lp.Available && lp.Type != LaunchpadType.Unknown)
