@@ -194,7 +194,10 @@ namespace Apollo.Elements {
             Send(n);
         }
 
-        public virtual void Render(Signal n) => screen?.MIDIEnter(n);
+        public virtual void Render(Signal n) {
+            if (PatternWindow == null)
+                screen?.MIDIEnter(n);
+        }
 
         public Launchpad() => CreateScreen();
 
