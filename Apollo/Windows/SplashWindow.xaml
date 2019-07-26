@@ -55,15 +55,17 @@
           
           <TabItem Header="News">
             <Grid RowDefinitions="*,*">
-              <StackPanel Grid.Row="0">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Blogpost" />
-              </StackPanel>
+              <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
+                <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Recent Blogpost" />
+                <TextBlock Grid.Row="1" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Grabbing info from GitHub..." x:Name="BlogpostBody" />
+                <TextBlock Grid.Row="2" Margin="5 0 0 0" HorizontalAlignment="Right" Cursor="Hand" Foreground="{DynamicResource ThemeAccentBrush}" Opacity="0" IsHitTestVisible="false" Text="Read more..." x:Name="BlogpostLink" PointerReleased="Blogpost" />
+              </Grid>
               
               <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*,Auto">
                 <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Update Changelog" />
-                <TextBlock Grid.Row="1" Margin="5" Text="" x:Name="GithubVersion" />
-                <TextBlock Grid.Row="2" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Grabbing info from GitHub..." x:Name="GithubBody" />
-                <TextBlock Grid.Row="3" Margin="5 0 0 0" HorizontalAlignment="Right" Cursor="Hand" Foreground="{DynamicResource ThemeAccentBrush}" Opacity="0" IsHitTestVisible="false" Text="View more..." x:Name="GithubLink" PointerReleased="Release" />
+                <TextBlock Grid.Row="1" Margin="5" Text="" x:Name="ReleaseVersion" />
+                <TextBlock Grid.Row="2" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Grabbing info from GitHub..." x:Name="ReleaseBody" />
+                <TextBlock Grid.Row="3" Margin="5 0 0 0" HorizontalAlignment="Right" Cursor="Hand" Foreground="{DynamicResource ThemeAccentBrush}" Opacity="0" IsHitTestVisible="false" Text="View more..." x:Name="ReleaseLink" PointerReleased="Release" />
               </Grid>
             </Grid>
           </TabItem>

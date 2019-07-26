@@ -11,29 +11,46 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public static class Github {
-        static Release cache = null;
+        static GitHubClient _client = null;
+        static GitHubClient client => _client
+            ?? (_client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("mat1jaczyyy-apollo-studio")));
+
+        static RepositoryContent blogpost = null;
+        static Release release = null;
         static ReleaseAsset download = null;
 
         public static bool UpdateChecked = false;
 
+        public static async Task<RepositoryContent> LatestBlogpost() {
+            if (blogpost == null) {
+                blogpost = (
+                    await client.Repository.Content.GetAllContentsByRef(
+                        "mat1jaczyyy", "apollo-studio-blog", 
+                        (await client.Repository.Content.GetAllContents("mat1jaczyyy", "apollo-studio-blog")).Last().Name,
+                        "master"
+                    )
+                ).Last();
+            }
+
+            return blogpost;
+        }
+
         public static async Task<Release> LatestRelease() {
-            if (cache == null) {
-                cache = (
-                    await new Octokit.GitHubClient(
-                        new Octokit.ProductHeaderValue("mat1jaczyyy-apollo-studio")
-                    ).Repository.Release.GetAll("mat1jaczyyy", "apollo-studio")
+            if (release == null) {
+                release = (
+                    await client.Repository.Release.GetAll("mat1jaczyyy", "apollo-studio")
                 ).First(/* i => i.Prerelease == false */);
                 
-                download = cache.Assets.FirstOrDefault(i => i.Name.Contains(
+                download = release.Assets.FirstOrDefault(i => i.Name.Contains(
                     RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
                 ));
             }
 
-            return cache;
+            return release;
         }
 
         public static async Task<ReleaseAsset> LatestDownload() {
-            if (cache == null)
+            if (release == null)
                 try {
                     await LatestRelease();
                 } catch {
@@ -46,7 +63,7 @@ namespace Apollo.Helpers {
         public static async Task<bool> ShouldUpdate() {
             if (UpdateChecked) return false;
 
-            if (cache == null)
+            if (release == null)
                 try {
                     await LatestRelease();
                 } catch {
@@ -55,9 +72,9 @@ namespace Apollo.Helpers {
             
             UpdateChecked = true;
 
-            if (Preferences.CheckForUpdates && cache.Name != Program.Version && download != null)
+            if (Preferences.CheckForUpdates && release.Name != Program.Version && download != null)
                 return await MessageWindow.Create(
-                    $"A new version of Apollo Studio is available ({cache.Name} - {download.Size.Bytes().Humanize("#.##")}).\n\n" +
+                    $"A new version of Apollo Studio is available ({release.Name} - {download.Size.Bytes().Humanize("#.##")}).\n\n" +
                     "Do you want to update to the latest version?",
                     new string[] { "Yes", "No" }, null
                 ) == "Yes";

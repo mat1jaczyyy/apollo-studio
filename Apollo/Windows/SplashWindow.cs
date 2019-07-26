@@ -38,19 +38,55 @@ namespace Apollo.Windows {
             TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
 
-            GithubVersion = this.Get<TextBlock>("GithubVersion");
-            GithubBody = this.Get<TextBlock>("GithubBody");
-            GithubLink = this.Get<TextBlock>("GithubLink");
+            BlogpostBody = this.Get<TextBlock>("BlogpostBody");
+            BlogpostLink = this.Get<TextBlock>("BlogpostLink");
+
+            ReleaseVersion = this.Get<TextBlock>("ReleaseVersion");
+            ReleaseBody = this.Get<TextBlock>("ReleaseBody");
+            ReleaseLink = this.Get<TextBlock>("ReleaseLink");
         }
 
         Grid Root, CrashPanel;
         TabControl TabControl;
         StackPanel Recents;
-        TextBlock GithubVersion, GithubBody, GithubLink;
+        TextBlock BlogpostBody, BlogpostLink, ReleaseVersion, ReleaseBody, ReleaseLink;
 
         bool openDialog = false;
 
         void UpdateTopmost(bool value) => Topmost = value;
+
+        async void UpdateBlogpost() {
+            Octokit.RepositoryContent latest;
+
+            try {
+                latest = await Github.LatestBlogpost();
+            } catch {
+                BlogpostBody.Text = "Failed to fetch blogpost data from GitHub.";
+                return;
+            }
+
+            BlogpostBody.Text = $"{latest.Content.Replace("\r", "").Split('\n').First().Replace("# ", "").Replace("#", "")}\n" +
+                $" published {DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(Path.GetFileNameWithoutExtension(latest.Name))).Humanize()}";
+            
+            BlogpostLink.Opacity = 1;
+            BlogpostLink.IsHitTestVisible = true;
+        }
+
+        async void UpdateRelease() {
+            Octokit.Release latest;
+
+            try {
+                latest = await Github.LatestRelease();
+            } catch {
+                ReleaseBody.Text = "Failed to fetch release data from GitHub.";
+                return;
+            }
+            
+            ReleaseVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
+            ReleaseBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
+            ReleaseLink.Opacity = 1;
+            ReleaseLink.IsHitTestVisible = true;
+        }
 
         public SplashWindow() {
             InitializeComponent();
@@ -86,19 +122,8 @@ namespace Apollo.Windows {
             
             Program.Args = null;
 
-            Octokit.Release latest;
-
-            try {
-                latest = await Github.LatestRelease();
-            } catch {
-                GithubBody.Text = "Failed to fetch release data from GitHub.";
-                return;
-            }
-            
-            GithubVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
-            GithubBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
-            GithubLink.Opacity = 1;
-            GithubLink.IsHitTestVisible = true;
+            UpdateBlogpost();
+            UpdateRelease();
 
             if (IsVisible && !openDialog && await Github.ShouldUpdate()) {
                 Window[] windows = Application.Current.Windows.ToArray();
@@ -244,7 +269,11 @@ namespace Apollo.Windows {
         void Question(object sender, RoutedEventArgs e)
             => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=question&template=question.md&title=");
 
-        void Discord(object sender, RoutedEventArgs e) {}
+        void Discord(object sender, RoutedEventArgs e)
+            => URL("https://discordapp.com/invite/SP7DsUf");
+
+        async void Blogpost(object sender, RoutedEventArgs e)
+            => URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
 
         async void Release(object sender, RoutedEventArgs e)
             => URL((await Github.LatestRelease()).HtmlUrl);
