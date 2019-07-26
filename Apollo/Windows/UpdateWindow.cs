@@ -34,6 +34,7 @@ namespace Apollo.Windows {
         ProgressBar DownloadProgress;
 
         Stopwatch time = new Stopwatch();
+        bool exiting = false;
 
         ZipArchiveEntry GetZipFolder(ZipArchive zip, string folder) => zip.Entries.First(i => {
             string[] path = i.FullName.Split('/');
@@ -83,7 +84,12 @@ namespace Apollo.Windows {
             downloader.DownloadDataAsync(new Uri((await Github.LatestDownload()).BrowserDownloadUrl));
         }
         
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
+            if (!exiting) {
+                e.Cancel = true;
+                return;
+            }
+
             Root.Children.Remove(UpdateImage);
 
             this.Content = null;
@@ -134,8 +140,11 @@ namespace Apollo.Windows {
 
             Program.LaunchUpdater = true;
 
+            exiting = true;
             Application.Current.Exit();
         }
+        
+        void Minimize() => WindowState = WindowState.Minimized;
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
         
