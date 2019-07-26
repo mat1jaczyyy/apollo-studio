@@ -14,11 +14,14 @@ Here are a few Launchpad covers created by early testers entirely in Apollo Stud
 
 [![Owl City - Fireflies](http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg)](http://www.youtube.com/watch?v=DDJ0JPgd8fw "Owl City - Fireflies")
 
-[![Teminite & MDK - Space Invaders](http://img.youtube.com/vi/l5rQk0G3YBo/mqdefault.jpg)](http://www.youtube.com/watch?v=l5rQk0G3YBo "Teminite & MDK - Space Invaders")
+[![ARMNHMR & Convex - Won't Come Back (feat. Jex)](http://img.youtube.com/vi/l6mjEfLrWr4/mqdefault.jpg)](http://www.youtube.com/watch?v=l6mjEfLrWr4 "ARMNHMR & Convex - Won't Come Back (feat. Jex)")
+
+[![Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)](http://img.youtube.com/vi/EnGCZJjy3_g/mqdefault.jpg)](https://www.youtube.com/watch?v=EnGCZJjy3_g "Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)")
 
 [![Dodge & Fuski - Mistakes (Chime Remix)](http://img.youtube.com/vi/1cGd6CvrV0A/mqdefault.jpg)](http://www.youtube.com/watch?v=1cGd6CvrV0A "Dodge & Fuski - Mistakes (Chime Remix)")
 
-[![Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)](http://img.youtube.com/vi/EnGCZJjy3_g/mqdefault.jpg)](https://www.youtube.com/watch?v=EnGCZJjy3_g "Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)")
+[![Teminite & MDK - Space Invaders](http://img.youtube.com/vi/l5rQk0G3YBo/mqdefault.jpg)](http://www.youtube.com/watch?v=l5rQk0G3YBo "Teminite & MDK - Space Invaders")
+
 
 ## Getting Started
 
