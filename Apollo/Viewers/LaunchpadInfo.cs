@@ -94,8 +94,12 @@ namespace Apollo.Viewers {
         void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)TargetPortSelector.SelectedItem;
 
-            if (_launchpad is AbletonLaunchpad abletonLaunchpad && selected != null && abletonLaunchpad.Target != selected)
-                abletonLaunchpad.Target = selected;
+            if (_launchpad is AbletonLaunchpad abletonLaunchpad) {
+                if (selected != null && abletonLaunchpad.Target != selected && abletonLaunchpad.PatternWindow == null && _launchpad.PatternWindow == null)
+                    abletonLaunchpad.Target = selected;
+            
+                else TargetPortSelector.SelectedItem = abletonLaunchpad.Target;
+            }
         }
     }
 }

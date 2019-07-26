@@ -7,6 +7,7 @@ using Apollo.Core;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class AbletonLaunchpad: Launchpad {
@@ -24,12 +25,19 @@ namespace Apollo.Elements {
             }
         }
 
+        public override PatternWindow PatternWindow {
+            get => Target?.PatternWindow;
+            set {
+                if (Target != null) Target.PatternWindow = value;
+            }
+        }
+
         public override RotationType Rotation {
             get => Target.Rotation;
             set {}
         }
 
-        public override void Send(Signal n) {}
+        public override void Send(Signal n) => Target?.Send(n);
 
         public override void Clear(bool manual = false) {
             if (!Available || (manual && PatternWindow != null)) return;

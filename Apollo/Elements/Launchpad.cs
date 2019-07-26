@@ -36,7 +36,12 @@ namespace Apollo.Elements {
         }
 
         public LaunchpadWindow Window;
-        public PatternWindow PatternWindow;
+
+        PatternWindow _patternwindow;
+        public virtual PatternWindow PatternWindow {
+            get => _patternwindow;
+            set => _patternwindow = value;
+        }
 
         public List<AbletonLaunchpad> AbletonLaunchpads = new List<AbletonLaunchpad>();
 
