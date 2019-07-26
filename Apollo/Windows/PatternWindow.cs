@@ -227,6 +227,8 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             _pattern = pattern;
+            _pattern.MIDIEnter(new StopSignal());
+
             _track = Track.Get(_pattern);
 
             Editor.GetObservable(Visual.BoundsProperty).Subscribe(Editor_Updated);
