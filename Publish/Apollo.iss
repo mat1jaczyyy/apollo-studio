@@ -56,7 +56,7 @@ Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\DefaultIcon"; ValueType
 Root: HKLM; Subkey: "Software\Classes\ApolloStudioDevice\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Apollo\{#MyAppExeName}"" ""%1""" 
 
 [InstallDelete]
-Type: files; Name: "{%USERPROFILE}\.apollostudio\Apollo.config"
+Type: files; Name: "{%USERPROFILE}\.apollostudio\Apollo.config"; Tasks: clearpreferences
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"
