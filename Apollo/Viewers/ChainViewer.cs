@@ -153,13 +153,11 @@ namespace Apollo.Viewers {
 
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
-
-            if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd") {
@@ -171,12 +169,21 @@ namespace Apollo.Viewers {
                 }
             }
 
-            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
-
-            Chain source_parent = moving[0].Parent;
-
-            int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _chain.Count - 1 : -1;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) Import(after, path);
+
+                return;
+            }
+
+            if (!e.Data.Contains("device")) return;
+
+            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
+            Chain source_parent = moving[0].Parent;
+            int before = moving[0].IParentIndex.Value - 1;
 
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
@@ -480,44 +487,47 @@ namespace Apollo.Viewers {
             }
         }
         
-        public async void Import(int right) {
+        public async void Import(int right, string path = null) {
             Window sender = Track.Get(_chain).Window;
 
-            OpenFileDialog ofd = new OpenFileDialog() {
-                AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "apdev"
-                        },
-                        Name = "Apollo Device Preset"
-                    }
-                },
-                Title = "Import Device Preset"
-            };
+            if (path == null) {
+                OpenFileDialog ofd = new OpenFileDialog() {
+                    AllowMultiple = false,
+                    Filters = new List<FileDialogFilter>() {
+                        new FileDialogFilter() {
+                            Extensions = new List<string>() {
+                                "apdev"
+                            },
+                            Name = "Apollo Device Preset"
+                        }
+                    },
+                    Title = "Import Device Preset"
+                };
 
-            string[] result = await ofd.ShowAsync(sender);
+                string[] result = await ofd.ShowAsync(sender);
 
-            if (result.Length > 0) {
-                Copyable loaded;
-
-                try {
-                    using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                        loaded = await Decoder.Decode(file, typeof(Copyable));
-
-                } catch {
-                    await MessageWindow.Create(
-                        $"An error occurred while reading the file.\n\n" +
-                        "You may not have sufficient privileges to read from the destination folder, or\n" +
-                        "the file you're attempting to read is invalid.",
-                        null, sender
-                    );
-
-                    return;
-                }
-                
-                Copyable_Insert(loaded, right, true);
+                if (result.Length > 0) path = result[0];
+                else return;
             }
+        
+            Copyable loaded;
+
+            try {
+                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                    loaded = await Decoder.Decode(file, typeof(Copyable));
+
+            } catch {
+                await MessageWindow.Create(
+                    $"An error occurred while reading the file.\n\n" +
+                    "You may not have sufficient privileges to read from the destination folder, or\n" +
+                    "the file you're attempting to read is invalid.",
+                    null, sender
+                );
+
+                return;
+            }
+            
+            Copyable_Insert(loaded, right, true);
         }
     }
 }

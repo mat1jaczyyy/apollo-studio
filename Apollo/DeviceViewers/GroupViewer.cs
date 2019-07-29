@@ -495,7 +495,7 @@ namespace Apollo.DeviceViewers {
             }
         }
         
-        public async void Import(int right) {
+        public async void Import(int right, string path = null) {
             Window sender = Track.Get(_group).Window;
 
             OpenFileDialog ofd = new OpenFileDialog() {

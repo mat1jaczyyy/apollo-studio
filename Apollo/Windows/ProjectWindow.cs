@@ -612,7 +612,7 @@ namespace Apollo.Windows {
             }
         }
         
-        public async void Import(int right) {
+        public async void Import(int right, string path = null) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {

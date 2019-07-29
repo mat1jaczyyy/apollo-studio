@@ -57,6 +57,6 @@ namespace Apollo.Interfaces {
         void Mute(int left, int right);
         void Rename(int left, int right);
         void Export(int left, int right);
-        void Import(int right);
+        void Import(int right, string path = null);
     }
 }

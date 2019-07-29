@@ -1480,7 +1480,7 @@ namespace Apollo.Windows {
         public void Mute(int left, int right) {}
         public void Rename(int left, int right) {}
         public void Export(int left, int right) {}
-        public void Import(int right) {}
+        public void Import(int right, string path = null) {}
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
