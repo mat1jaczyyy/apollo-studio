@@ -44,7 +44,7 @@ namespace Apollo.Elements {
             
             Target?.Clear(manual);
 
-            Signal n = new Signal(this, 0, new Color(0));
+            Signal n = new Signal(this, this, 0, new Color(0));
 
             for (int i = 0; i < 100; i++) {
                 n.Index = (byte)i;

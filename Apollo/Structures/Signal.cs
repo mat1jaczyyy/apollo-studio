@@ -8,6 +8,7 @@ using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {
+        public object Origin;
         public Launchpad Source;
         byte _index = 11;
         int _page = 1;
@@ -48,13 +49,18 @@ namespace Apollo.Structures {
 
         public Stack<int> CopyMultiTarget() => new Stack<int>(MultiTarget.ToArray());
 
-        public Signal Clone() => new Signal(Source, Index, Color.Clone(), Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
+        public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
             HashIndex = HashIndex
         };
 
-        public Signal With(byte index = 11, Color color = null) => new Signal(Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
+        public Signal With(byte index = 11, Color color = null) {
+            Signal ret = new Signal(Origin, Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
+            ret.HashIndex = HashIndex;
+            return ret;
+        }
 
-        public Signal(Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
+        public Signal(object origin, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
+            Origin = origin;
             Source = source;
             Index = index;
             Color = color?? new Color(63);
@@ -65,7 +71,8 @@ namespace Apollo.Structures {
             MultiTarget = multiTarget?? new Stack<int>();
         }
 
-        public Signal(InputType input, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null): this(
+        public Signal(InputType input, object origin, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null): this(
+            origin,
             source,
             (input == InputType.DrumRack)? Converter.DRtoXY(index) : ((index == 99)? (byte)100 : index),
             color,
@@ -90,6 +97,6 @@ namespace Apollo.Structures {
     }
 
     public class StopSignal: Signal {
-        public StopSignal(): base(null) {}
+        public StopSignal(): base(null, null) {}
     }
 }

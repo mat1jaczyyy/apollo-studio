@@ -9,7 +9,7 @@ namespace Apollo.Structures {
             public Action<Signal> Exit = null;
             
             SortedList<int, Signal> _signals = new SortedList<int, Signal>() {
-                [10000] = new Signal(null, color: new Color(0), layer: -100)
+                [10000] = new Signal(null, null, color: new Color(0), layer: -100)
             };
             
             Color state = new Color(0);

@@ -188,7 +188,7 @@ namespace Apollo.Elements {
 
             CreateScreen();
 
-            Signal n = new Signal(this, 0, new Color(0));
+            Signal n = new Signal(this, this, 0, new Color(0));
 
             for (int i = 0; i < 101; i++) {
                 n.Index = (byte)i;
@@ -200,7 +200,7 @@ namespace Apollo.Elements {
         }
 
         public virtual void Render(Signal n) {
-            if (PatternWindow == null)
+            if (PatternWindow == null || n.Origin == PatternWindow)
                 screen?.MIDIEnter(n);
         }
 
@@ -299,12 +299,14 @@ namespace Apollo.Elements {
         public void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(
             InputFormat,
             this,
+            this,
             (byte)e.Key,
             new Color((byte)(e.Velocity >> 1))
         ));
 
         void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
             InputFormat,
+            this,
             this,
             (byte)e.Key,
             new Color(0)
@@ -316,6 +318,7 @@ namespace Apollo.Elements {
                     if (104 <= e.Control && e.Control <= 111)
                         HandleMessage(new Signal(
                             InputType.XY,
+                            this,
                             this,
                             (byte)(e.Control - 13),
                             new Color((byte)(e.Value >> 1))
@@ -331,6 +334,7 @@ namespace Apollo.Elements {
 
                     HandleMessage(new Signal(
                         InputType.XY,
+                        this,
                         this,
                         (byte)e.Control,
                         new Color((byte)(e.Value >> 1))
