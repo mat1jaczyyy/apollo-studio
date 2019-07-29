@@ -405,13 +405,11 @@ namespace Apollo.Windows {
 
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("track")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("track") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
-
-            if (!e.Data.Contains("track")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneAfter" && source.Name != "TrackAdd") {
@@ -423,11 +421,21 @@ namespace Apollo.Windows {
                 }
             }
 
+            int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) Import(after, path);
+
+                return;
+            }
+
+            if (!e.Data.Contains("track")) return;
+
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
 
             int before = moving[0].IParentIndex.Value - 1;
-            int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
-
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
@@ -613,41 +621,44 @@ namespace Apollo.Windows {
         }
         
         public async void Import(int right, string path = null) {
-            OpenFileDialog ofd = new OpenFileDialog() {
-                AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "aptrk"
-                        },
-                        Name = "Apollo Track Preset"
-                    }
-                },
-                Title = "Import Track Preset"
-            };
+            if (path == null) {
+                OpenFileDialog ofd = new OpenFileDialog() {
+                    AllowMultiple = false,
+                    Filters = new List<FileDialogFilter>() {
+                        new FileDialogFilter() {
+                            Extensions = new List<string>() {
+                                "aptrk"
+                            },
+                            Name = "Apollo Track Preset"
+                        }
+                    },
+                    Title = "Import Track Preset"
+                };
 
-            string[] result = await ofd.ShowAsync(this);
+                string[] result = await ofd.ShowAsync(this);
 
-            if (result.Length > 0) {
-                Copyable loaded;
-
-                try {
-                    using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                        loaded = await Decoder.Decode(file, typeof(Copyable));
-
-                } catch {
-                    await MessageWindow.Create(
-                        $"An error occurred while reading the file.\n\n" +
-                        "You may not have sufficient privileges to read from the destination folder, or\n" +
-                        "the file you're attempting to read is invalid.",
-                        null, this
-                    );
-
-                    return;
-                }
-                
-                Copyable_Insert(loaded, right, true);
+                if (result.Length > 0) path = result[0];
+                else return;
             }
+
+            Copyable loaded;
+
+            try {
+                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                    loaded = await Decoder.Decode(file, typeof(Copyable));
+
+            } catch {
+                await MessageWindow.Create(
+                    $"An error occurred while reading the file.\n\n" +
+                    "You may not have sufficient privileges to read from the destination folder, or\n" +
+                    "the file you're attempting to read is invalid.",
+                    null, this
+                );
+
+                return;
+            }
+            
+            Copyable_Insert(loaded, right, true);
         }
     }
 }
