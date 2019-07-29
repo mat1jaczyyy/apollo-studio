@@ -20,12 +20,16 @@ namespace ApolloUpdate {
 
         static string Handle64Path => $"{AppDomain.CurrentDomain.BaseDirectory}handle64.exe";
 
+        public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
+        ), ".apollostudio");
+
+        public static readonly string CrashDir = Path.Combine(Program.UserPath, "Crashes");
+
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
-                string crashDir = GetBaseFolder("Crashes");
-
-                if (!Directory.Exists(crashDir)) Directory.CreateDirectory(crashDir);
-                string crashName = Path.Combine(crashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
+                if (!Directory.Exists(CrashDir)) Directory.CreateDirectory(CrashDir);
+                string crashName = Path.Combine(CrashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
 
                 using (MemoryStream memoryStream = new MemoryStream()) {
                     using (ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))

@@ -12,11 +12,7 @@ namespace Apollo.Core {
     public static class Preferences {
         public static PreferencesWindow Window;
 
-        static readonly string DirPath = Path.Combine(Environment.GetEnvironmentVariable(
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
-        ), ".apollostudio");
-
-        static readonly string FilePath = Path.Combine(DirPath, "Apollo.config");
+        static readonly string FilePath = Path.Combine(Program.UserPath, "Apollo.config");
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
@@ -280,7 +276,7 @@ namespace Apollo.Core {
         }
 
         public static void Save() {
-            if (!Directory.Exists(DirPath)) Directory.CreateDirectory(DirPath);
+            if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
 
             try {
                 File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());

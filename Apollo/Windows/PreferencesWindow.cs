@@ -255,12 +255,11 @@ namespace Apollo.Windows {
         void CheckForUpdates_Changed(object sender, EventArgs e) => Preferences.CheckForUpdates = DiscordFilename.IsChecked.Value;
 
         void OpenCrashesFolder(object sender, RoutedEventArgs e) {
-            string crashdir = Program.GetBaseFolder("Crashes");
-
-            if (!Directory.Exists(crashdir)) Directory.CreateDirectory(crashdir);
+            if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
+            if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
 
             Process.Start(new ProcessStartInfo() {
-                FileName = crashdir,
+                FileName = Program.CrashDir,
                 UseShellExecute = true
             });
         }

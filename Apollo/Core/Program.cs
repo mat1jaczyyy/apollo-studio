@@ -36,6 +36,12 @@ namespace Apollo.Core {
             folder
         );
 
+        public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
+        ), ".apollostudio");
+
+        public static readonly string CrashDir = Path.Combine(Program.UserPath, "Crashes");
+
         public static bool LaunchAdmin = false;
         public static bool LaunchUpdater = false;
         
@@ -109,10 +115,8 @@ namespace Apollo.Core {
 
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
-                string crashDir = GetBaseFolder("Crashes");
-
-                if (!Directory.Exists(crashDir)) Directory.CreateDirectory(crashDir);
-                string crashName = Path.Combine(crashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
+                if (!Directory.Exists(CrashDir)) Directory.CreateDirectory(CrashDir);
+                string crashName = Path.Combine(CrashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
 
                 using (MemoryStream memoryStream = new MemoryStream()) {
                     using (ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
