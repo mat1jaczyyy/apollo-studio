@@ -391,10 +391,12 @@ namespace Apollo.Viewers {
                 for (int i = 0; i < init.Count; i++)
                     chain.Insert(index + i, init[i].Clone());
                     
-                Track track = Track.Get(chain);
-                track?.Window?.Selection.Select(chain[index]);
-                track?.Window?.Selection.Select(chain[index + init.Count - 1], true);
-            
+                if (init.Count > 0) {
+                    Track track = Track.Get(chain);
+                    track?.Window?.Selection.Select(chain[index]);
+                    track?.Window?.Selection.Select(chain[index + init.Count - 1], true);
+                }
+                
             }, () => {
                 foreach (Device device in init) device.Dispose();
                 init = null;
@@ -405,9 +407,11 @@ namespace Apollo.Viewers {
             for (int i = 0; i < init.Count; i++)
                 _chain.Insert(index + i, init[i].Clone());
 
-            Track _track = Track.Get(_chain);
-            _track?.Window?.Selection.Select(_chain[index]);
-            _track?.Window?.Selection.Select(_chain[index + init.Count - 1], true);
+            if (init.Count > 0) {
+                Track _track = Track.Get(_chain);
+                _track?.Window?.Selection.Select(_chain[index]);
+                _track?.Window?.Selection.Select(_chain[index + init.Count - 1], true);
+            }
         }
         
         public void Mute(int left, int right) {
