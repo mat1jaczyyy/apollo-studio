@@ -21,6 +21,9 @@ namespace Apollo.Viewers {
             Draggable = this.Get<Grid>("Draggable");
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
             TitleText = this.Get<TextBlock>("Title");
+
+            DeviceMute = this.Get<MenuItem>("DeviceMute");
+            GroupMute = this.Get<MenuItem>("DeviceMute");
         }
 
         protected override void ApplyHeaderBrush(string resource) {

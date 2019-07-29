@@ -15,7 +15,7 @@
       <MenuItem Header="Paste" />
       <MenuItem Header="Delete" />
       <MenuItem Header="Group" />
-      <MenuItem Header="{DynamicResource Mute}" />
+      <MenuItem Header="Mute" x:Name="DeviceMute" />
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>
@@ -28,12 +28,10 @@
       <MenuItem Header="Delete" />
       <MenuItem Header="Group" />
       <MenuItem Header="Ungroup" />
-      <MenuItem Header="{DynamicResource Mute}" />
+      <MenuItem Header="Mute" x:Name="GroupMute" />
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>
-
-    <sys:String x:Key="Mute">Mute</sys:String>
   </UserControl.Resources>
   
   <StackPanel Orientation="Horizontal" MaxHeight="223" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">

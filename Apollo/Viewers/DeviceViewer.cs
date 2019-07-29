@@ -29,6 +29,9 @@ namespace Apollo.Viewers {
             
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
             Draggable = this.Get<Grid>("Draggable");
+
+            DeviceMute = this.Get<MenuItem>("DeviceMute");
+            GroupMute = this.Get<MenuItem>("DeviceMute");
         }
 
         static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
@@ -66,6 +69,7 @@ namespace Apollo.Viewers {
         protected TextBlock TitleText;
         protected Grid Draggable;
         protected ContextMenu DeviceContextMenu, GroupContextMenu;
+        protected MenuItem DeviceMute, GroupMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -188,7 +192,7 @@ namespace Apollo.Viewers {
                     if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
                         menu = GroupContextMenu;
                     
-                    this.Resources["Mute"] = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
+                    DeviceMute.Header = GroupMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 
                     menu.Open(Draggable);
                 
