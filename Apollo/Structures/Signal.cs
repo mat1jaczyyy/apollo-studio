@@ -53,11 +53,7 @@ namespace Apollo.Structures {
             HashIndex = HashIndex
         };
 
-        public Signal With(byte index = 11, Color color = null) {
-            Signal ret = new Signal(Origin, Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
-            ret.HashIndex = HashIndex;
-            return ret;
-        }
+        public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
 
         public Signal(object origin, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
             Origin = origin;
