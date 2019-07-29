@@ -17,11 +17,9 @@ namespace Apollo.Interfaces {
         void Remove(int index, bool dispose = true);
     }
 
-    public interface IMultipleChainParentViewer {
+    public interface IMultipleChainParentViewer: ISelectParentViewer {
         void Contents_Insert(int index, Chain chain);
         void Contents_Remove(int index);
-
-        void Expand(int? index);
     }
 
     public interface ISelect {
@@ -57,6 +55,6 @@ namespace Apollo.Interfaces {
         void Mute(int left, int right);
         void Rename(int left, int right);
         void Export(int left, int right);
-        void Import(int right);
+        void Import(int right, string path = null);
     }
 }

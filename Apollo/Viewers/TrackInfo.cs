@@ -160,13 +160,11 @@ namespace Apollo.Viewers {
 
         public void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("track")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("track") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
-
-            if (!e.Data.Contains("track")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
@@ -178,12 +176,21 @@ namespace Apollo.Viewers {
                 }
             }
 
-            List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
-
-            int before = moving[0].IParentIndex.Value - 1;
             int after = _track.ParentIndex.Value;
             if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
 
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) Program.Project.Window?.Import(after, path);
+
+                return;
+            }
+
+            if (!e.Data.Contains("track")) return;
+
+            List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
+            int before = moving[0].IParentIndex.Value - 1;
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 
             bool result = Track.Move(moving, Program.Project, after, copy);

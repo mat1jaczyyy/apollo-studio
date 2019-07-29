@@ -205,13 +205,11 @@ namespace Apollo.Viewers {
 
         public void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
-
-            if (!e.Data.Contains("device")) return;
 
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneHead" && source.Name != "Contents" && source.Name != "DropZoneTail" && source.Name != "DropZoneAfter") {
@@ -223,14 +221,24 @@ namespace Apollo.Viewers {
                 }
             }
 
-            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
-
-            Chain source_parent = moving[0].Parent;
             Chain _chain = _device.Parent;
 
-            int before = moving[0].IParentIndex.Value - 1;
             int after = _device.ParentIndex.Value;
             if (source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2)) after--;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) _chain.Viewer?.Import(after, path);
+
+                return;
+            }
+
+            if (!e.Data.Contains("device")) return;
+
+            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
+            Chain source_parent = moving[0].Parent;
+            int before = moving[0].IParentIndex.Value - 1;
 
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
 

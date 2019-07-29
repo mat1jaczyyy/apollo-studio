@@ -113,6 +113,7 @@ namespace Apollo.Core {
 
         public static string[] Args;
 
+        [STAThread]
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 if (!Directory.Exists(CrashDir)) Directory.CreateDirectory(CrashDir);

@@ -140,7 +140,7 @@ namespace Apollo.Viewers {
 
         public void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("chain") && !e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
@@ -156,6 +156,19 @@ namespace Apollo.Viewers {
                 }
             }
 
+            IMultipleChainParent _device = (IMultipleChainParent)_chain.Parent;
+            
+            int after = _chain.ParentIndex.Value;
+            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) _device.SpecificViewer?.Import(after, path);
+
+                return;
+            }
+
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
             bool result;
 
@@ -163,11 +176,8 @@ namespace Apollo.Viewers {
                 List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
                 IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
-                IMultipleChainParent _device = (IMultipleChainParent)_chain.Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
-                int after = _chain.ParentIndex.Value;
-                if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
 
                 if (result = Chain.Move(moving, _device, after, copy)) {
                     int before_pos = before;
@@ -212,7 +222,6 @@ namespace Apollo.Viewers {
                 Chain target_chain = _chain;
 
                 int before = moving[0].IParentIndex.Value - 1;
-                int after;
 
                 int? remove = null;
 

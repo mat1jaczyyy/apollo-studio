@@ -189,7 +189,7 @@ namespace Apollo.DeviceViewers {
 
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("chain") && !e.Data.Contains("device")) e.DragEffects = DragDropEffects.None; 
+            if (!e.Data.Contains("chain") && !e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
         void Drop(object sender, DragEventArgs e) {
@@ -205,6 +205,16 @@ namespace Apollo.DeviceViewers {
                 }
             }
 
+            int after = (source.Name == "DropZoneAfter")? _group.Count - 1 : -1;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) Import(after, path);
+
+                return;
+            }
+
             bool copy = e.Modifiers.HasFlag(Program.ControlKey);
             bool result;
 
@@ -214,7 +224,6 @@ namespace Apollo.DeviceViewers {
                 IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
-                int after = (source.Name == "DropZoneAfter")? _group.Count - 1 : -1;
 
                 if (result = Chain.Move(moving, _group, after, copy)) {
                     int before_pos = before;
@@ -259,7 +268,7 @@ namespace Apollo.DeviceViewers {
                 Chain target_chain;
 
                 int before = moving[0].IParentIndex.Value - 1;
-                int after = -1;
+                after = -1;
 
                 int remove = 0;
 
@@ -495,44 +504,47 @@ namespace Apollo.DeviceViewers {
             }
         }
         
-        public async void Import(int right) {
+        public async void Import(int right, string path = null) {
             Window sender = Track.Get(_group).Window;
 
-            OpenFileDialog ofd = new OpenFileDialog() {
-                AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "apchn"
-                        },
-                        Name = "Apollo Chain Preset"
-                    }
-                },
-                Title = "Import Chain Preset"
-            };
+            if (path == null) {
+                OpenFileDialog ofd = new OpenFileDialog() {
+                    AllowMultiple = false,
+                    Filters = new List<FileDialogFilter>() {
+                        new FileDialogFilter() {
+                            Extensions = new List<string>() {
+                                "apchn"
+                            },
+                            Name = "Apollo Chain Preset"
+                        }
+                    },
+                    Title = "Import Chain Preset"
+                };
 
-            string[] result = await ofd.ShowAsync(sender);
+                string[] result = await ofd.ShowAsync(sender);
 
-            if (result.Length > 0) {
-                Copyable loaded;
-
-                try {
-                    using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
-                        loaded = await Decoder.Decode(file, typeof(Copyable));
-
-                } catch {
-                    await MessageWindow.Create(
-                        $"An error occurred while reading the file.\n\n" +
-                        "You may not have sufficient privileges to read from the destination folder, or\n" +
-                        "the file you're attempting to read is invalid.",
-                        null, sender
-                    );
-
-                    return;
-                }
-                
-                Copyable_Insert(loaded, right, true);
+                if (result.Length > 0) path = result[0];
+                else return;
             }
+
+            Copyable loaded;
+
+            try {
+                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                    loaded = await Decoder.Decode(file, typeof(Copyable));
+
+            } catch {
+                await MessageWindow.Create(
+                    $"An error occurred while reading the file.\n\n" +
+                    "You may not have sufficient privileges to read from the destination folder, or\n" +
+                    "the file you're attempting to read is invalid.",
+                    null, sender
+                );
+
+                return;
+            }
+            
+            Copyable_Insert(loaded, right, true);
         }
     }
 }
