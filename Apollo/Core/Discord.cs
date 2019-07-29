@@ -43,8 +43,10 @@ namespace Apollo.Core {
                         }
                     };
 
-                    if (Preferences.DiscordFilename && Program.Project != null)
-                        Info.State = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Program.Project.FileName);
+                    if (Preferences.DiscordFilename && Program.Project != null) {
+                        string s = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Program.Project.FileName);
+                        Info.State = (s.Length > 128)? s.Substring(0, 125) + "..." : s;
+                    }
 
                     Presence.SetPresence(Info);
                 }
