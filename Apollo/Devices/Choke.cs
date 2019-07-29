@@ -99,6 +99,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Choked -= HandleChoke;
 
             Chain.Dispose();

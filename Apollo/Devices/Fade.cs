@@ -310,6 +310,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
             Program.Project.BPMChanged -= Generate;

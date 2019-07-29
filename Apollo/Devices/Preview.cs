@@ -38,6 +38,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Clear -= HandleClear;
 
             base.Dispose();

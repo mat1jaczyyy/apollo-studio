@@ -372,6 +372,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Stop();
 
             Window?.Close();

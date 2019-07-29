@@ -112,6 +112,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
         }

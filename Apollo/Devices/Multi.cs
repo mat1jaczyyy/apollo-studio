@@ -183,6 +183,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Reset -= HandleReset;
 
             Preprocess.Dispose();

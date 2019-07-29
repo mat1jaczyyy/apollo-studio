@@ -375,6 +375,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Stop();
 
             foreach (Offset offset in Offsets) offset.Dispose();

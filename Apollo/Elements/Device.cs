@@ -58,6 +58,8 @@ namespace Apollo.Elements {
         public abstract void MIDIProcess(Signal n);
 
         public void MIDIEnter(Signal n) {
+            if (Disposed) return;
+
             if (n is StopSignal) Stop();
             else if (Enabled) {
                 MIDIProcess(n);
@@ -72,11 +74,14 @@ namespace Apollo.Elements {
         public bool Disposed { get; private set; } = false;
 
         public virtual void Dispose() {
+            if (Disposed) return;
+
             MIDIExit = null;
-            Disposed = true;
             Viewer = null;
             Parent = null;
             ParentIndex = null;
+            
+            Disposed = true;
         }
 
         public static bool Move(List<Device> source, Chain target, int position, bool copy = false) {

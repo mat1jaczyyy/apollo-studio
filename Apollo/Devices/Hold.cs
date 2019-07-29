@@ -154,6 +154,8 @@ namespace Apollo.Devices {
         }
 
         public override void Dispose() {
+            if (Disposed) return;
+
             Stop();
 
             Time.Dispose();
