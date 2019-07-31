@@ -254,29 +254,21 @@ namespace Apollo.Windows {
             UseShellExecute = true
         });
 
-        void Docs(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/wiki");
+        void Docs() => URL("https://github.com/mat1jaczyyy/apollo-studio/wiki");
 
-        void Tutorials(object sender, RoutedEventArgs e)
-            => URL("https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH");
+        void Tutorials() => URL("https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH");
 
-        void Bug(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=bug&template=bug_report.md&title=");
+        void Bug() => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=bug&template=bug_report.md&title=");
 
-        void Feature(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=enhancement&template=feature_request.md&title=");
+        void Feature() => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=enhancement&template=feature_request.md&title=");
 
-        void Question(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=question&template=question.md&title=");
+        void Question() => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=question&template=question.md&title=");
 
-        void Discord(object sender, RoutedEventArgs e)
-            => URL("https://discordapp.com/invite/SP7DsUf");
+        void Discord() => URL("https://discordapp.com/invite/SP7DsUf");
 
-        void Website(object sender, RoutedEventArgs e)
-            => URL("https://apollo.mat1jaczyyy.com");
+        void Website() => URL("https://apollo.mat1jaczyyy.com");
 
-        void Patron(object sender, RoutedEventArgs e)
-            => URL(Patreon.URL);
+        void Patron() => URL(Patreon.URL);
 
         async void Blogpost(object sender, RoutedEventArgs e)
             => URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");

@@ -37,24 +37,95 @@
           </TabItem>
 
           <TabItem Header="Learn">
-            <StackPanel VerticalAlignment="Center" Spacing="5">
-              <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Documentation" Click="Docs" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Report a Bug" Click="Bug" />
-              </Grid>
-              <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Video Tutorials" Click="Tutorials" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Feature Request" Click="Feature" />
-              </Grid>
-              <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Discord Server" Click="Discord" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Ask a Question" Click="Question" />
-              </Grid>
-              <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Official Website" Click="Website" />
-                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Become a Patron" Click="Patron" />
-              </Grid>
-            </StackPanel>
+            <UniformGrid Columns="2" VerticalAlignment="Center">
+              <Components:LearnButton Text="Documentation" Click="Docs">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Video Tutorials" Click="Tutorials">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Report a Bug" Click="Bug">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Feature Request" Click="Feature">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Ask a Question" Click="Question">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Discord Server" Click="Discord">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Official Website" Click="Website">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+              
+              <Components:LearnButton Text="Become a Patron" Click="Patron">
+                <Components:LearnButton.Icon>
+                  <Canvas>
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
+                    <Ellipse Fill="{DynamicResource ThemeForegroundBrush}"
+                             Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+                  </Canvas>
+                </Components:LearnButton.Icon>
+              </Components:LearnButton>
+            </UniformGrid>
           </TabItem>
           
           <TabItem Header="News">
