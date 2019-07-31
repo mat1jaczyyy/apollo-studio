@@ -1,5 +1,5 @@
 #define MyAppName "Apollo Studio"
-#define MyAppVersion "0.0.0"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "mat1jaczyyy"
 #define MyAppURL "apollo.mat1jaczyyy.com"
 #define MyAppExeName "Apollo.exe"
@@ -18,7 +18,7 @@ DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 LicenseFile=C:\Users\mat1jaczyyy\Desktop\apollo-studio\LICENSE
 OutputDir=C:\Users\mat1jaczyyy\Desktop\apollo-studio\Dist\
-OutputBaseFilename=Apollo-Win
+OutputBaseFilename=Apollo-{#MyAppVersion}-Win
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
