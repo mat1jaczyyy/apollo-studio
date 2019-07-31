@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+
+using Apollo.Core;
 
 namespace Apollo.Components {
     public class Patreon: IconButton {
@@ -21,9 +21,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Process.Start(new ProcessStartInfo() {
-            FileName = URL,
-            UseShellExecute = true
-        });
+        protected override void Click(PointerReleasedEventArgs e) => Program.URL(URL);
     }
 }
