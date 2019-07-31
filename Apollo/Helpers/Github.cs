@@ -13,7 +13,7 @@ namespace Apollo.Helpers {
     public static class Github {
         static GitHubClient _client = null;
         static GitHubClient client => _client
-            ?? (_client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("mat1jaczyyy-apollo-studio")));
+            ?? (_client = new GitHubClient(new ProductHeaderValue("mat1jaczyyy-apollo-studio")));
 
         static RepositoryContent blogpost = null;
         static Release release = null;
@@ -39,7 +39,7 @@ namespace Apollo.Helpers {
             if (release == null) {
                 release = (
                     await client.Repository.Release.GetAll("mat1jaczyyy", "apollo-studio")
-                ).First(/* i => i.Prerelease == false */);
+                ).First(i => i.Prerelease == false);
                 
                 download = release.Assets.FirstOrDefault(i => i.Name.Contains(
                     RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
