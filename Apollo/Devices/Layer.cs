@@ -1,5 +1,3 @@
-using System;
-
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;

@@ -23,7 +23,7 @@ namespace Apollo.Elements {
         public static CFWIncompatibleState CFWIncompatible = CFWIncompatibleState.None;
 
         public static void CFWError(Window sender) {
-            Launchpad.CFWIncompatible = CFWIncompatibleState.Done;
+            CFWIncompatible = CFWIncompatibleState.Done;
 
             Dispatcher.UIThread.Post(async () => await MessageWindow.Create(
                 "One or more connected Launchpad Pros are running an older version of the\n" + 

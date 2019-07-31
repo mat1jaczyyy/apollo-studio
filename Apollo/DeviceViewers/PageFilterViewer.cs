@@ -3,7 +3,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using UniformGrid = Avalonia.Controls.Primitives.UniformGrid;
-using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Input;

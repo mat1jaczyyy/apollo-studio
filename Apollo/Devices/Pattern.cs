@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;

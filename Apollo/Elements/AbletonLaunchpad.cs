@@ -1,7 +1,6 @@
 using Avalonia.Threading;
 
 using RtMidi.Core.Devices.Infos;
-using RtMidi.Core.Messages;
 
 using Apollo.Core;
 using Apollo.Enums;

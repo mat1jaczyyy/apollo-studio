@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Components;
-using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Interfaces;
 

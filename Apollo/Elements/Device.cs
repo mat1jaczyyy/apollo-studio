@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Interfaces;
 using Apollo.Structures;

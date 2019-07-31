@@ -5,9 +5,7 @@ using Apollo.Core;
 
 namespace Apollo.Components {
     public class LearnTab: UserControl {
-        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
-
-        public LearnTab() => InitializeComponent();
+        public LearnTab() => AvaloniaXamlLoader.Load(this);
 
         void Docs() => Program.URL("https://github.com/mat1jaczyyy/apollo-studio/wiki");
 
