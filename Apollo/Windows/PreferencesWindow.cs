@@ -258,10 +258,7 @@ namespace Apollo.Windows {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
 
-            Process.Start(new ProcessStartInfo() {
-                FileName = Program.CrashDir,
-                UseShellExecute = true
-            });
+            Program.URL(Program.CrashDir);
         }
 
         void Launchpad_Add() {

@@ -111,6 +111,11 @@ namespace Apollo.Core {
             }
         }
 
+        public static void URL(string url) => Process.Start(new ProcessStartInfo() {
+            FileName = url,
+            UseShellExecute = true
+        });
+
         public static string[] Args;
 
         [STAThread]

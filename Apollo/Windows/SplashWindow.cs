@@ -153,7 +153,7 @@ namespace Apollo.Windows {
                     RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
                     viewer.Opened += ReadFile;
                     viewer.Removed += Remove;
-                    viewer.Showed += URL;
+                    viewer.Showed += Program.URL;
 
                     Recents.Children.Add(viewer);
                 }
@@ -249,40 +249,11 @@ namespace Apollo.Windows {
             Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
         }
 
-        void URL(string url) => Process.Start(new ProcessStartInfo() {
-            FileName = url,
-            UseShellExecute = true
-        });
-
-        void Docs(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/wiki");
-
-        void Tutorials(object sender, RoutedEventArgs e)
-            => URL("https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH");
-
-        void Bug(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=bug&template=bug_report.md&title=");
-
-        void Feature(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=enhancement&template=feature_request.md&title=");
-
-        void Question(object sender, RoutedEventArgs e)
-            => URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=question&template=question.md&title=");
-
-        void Discord(object sender, RoutedEventArgs e)
-            => URL("https://discordapp.com/invite/SP7DsUf");
-
-        void Website(object sender, RoutedEventArgs e)
-            => URL("https://apollo.mat1jaczyyy.com");
-
-        void Patron(object sender, RoutedEventArgs e)
-            => URL(Patreon.URL);
-
         async void Blogpost(object sender, RoutedEventArgs e)
-            => URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
+            => Program.URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
 
         async void Release(object sender, RoutedEventArgs e)
-            => URL((await Github.LatestRelease()).HtmlUrl);
+            => Program.URL((await Github.LatestRelease()).HtmlUrl);
 
         void Restore(object sender, RoutedEventArgs e) {
             CrashPanel.Opacity = 0;

@@ -45,6 +45,8 @@ namespace Apollo.Viewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Opened = null;
+            Showed = null;
+            Removed = null;
             
             InfoContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             InfoContextMenu = null;
