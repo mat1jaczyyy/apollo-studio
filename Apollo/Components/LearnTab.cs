@@ -19,11 +19,10 @@ namespace Apollo.Components {
 
         void Question() => Program.URL("https://github.com/mat1jaczyyy/apollo-studio/issues/new?assignees=mat1jaczyyy&labels=question&template=question.md&title=");
 
-        void Discord() => Program.URL("https://discordapp.com/invite/SP7DsUf");
+        void Discord() => Program.URL("https://discordapp.com/invite/2ZSHYHA");
 
         void Website() => Program.URL("https://apollo.mat1jaczyyy.com");
 
         void Patron() => Program.URL(Patreon.URL);
-
     }
 }
