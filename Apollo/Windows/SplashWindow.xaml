@@ -50,6 +50,10 @@
                 <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Discord Server" Click="Discord" />
                 <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Ask a Question" Click="Question" />
               </Grid>
+              <Grid ColumnDefinitions="*,*">
+                <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Official Website" Click="Website" />
+                <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Become a Patron" Click="Patron" />
+              </Grid>
             </StackPanel>
           </TabItem>
           

@@ -272,6 +272,12 @@ namespace Apollo.Windows {
         void Discord(object sender, RoutedEventArgs e)
             => URL("https://discordapp.com/invite/SP7DsUf");
 
+        void Website(object sender, RoutedEventArgs e)
+            => URL("https://apollo.mat1jaczyyy.com");
+
+        void Patron(object sender, RoutedEventArgs e)
+            => URL(Patreon.URL);
+
         async void Blogpost(object sender, RoutedEventArgs e)
             => URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
 

@@ -6,6 +6,8 @@ using Avalonia.Media;
 
 namespace Apollo.Components {
     public class Patreon: IconButton {
+        public static readonly string URL = "https://patreon.com/mat1jaczyyy";
+
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         protected override IBrush Fill {
@@ -20,7 +22,7 @@ namespace Apollo.Components {
         }
 
         protected override void Click(PointerReleasedEventArgs e) => Process.Start(new ProcessStartInfo() {
-            FileName = "https://patreon.com/mat1jaczyyy",
+            FileName = URL,
             UseShellExecute = true
         });
     }
