@@ -1,0 +1,18 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.Patreon"
+             ToolTip.Tip="Support Apollo Studio on Patreon"
+             DetachedFromVisualTree="Unloaded">
+
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="Brush" />
+  </UserControl.Resources>
+
+  <Canvas Width="30" Height="30" Background="Transparent" x:Name="Icon"
+          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+    <Path Fill="{DynamicResource Brush}"
+          Data="M 0,0.6 L 0,29.4 5.4,29.4 5.4,0.6 Z" />
+    <Ellipse Fill="{DynamicResource Brush}"
+          Canvas.Left="8.4" Canvas.Top="0.4" Width="21.6" Height="21.6" />
+  </Canvas>
+</UserControl>
