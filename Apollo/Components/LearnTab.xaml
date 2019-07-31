@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.LearnTab">
+             x:Class="Apollo.Components.LearnTab"
+             xmlns:Components="clr-namespace:Apollo.Components">
 
   <UniformGrid Columns="2" VerticalAlignment="Center">
     <Components:LearnButton Text="Documentation" Click="Docs">
