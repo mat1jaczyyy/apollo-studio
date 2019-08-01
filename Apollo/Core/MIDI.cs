@@ -171,7 +171,7 @@ namespace Apollo.Core {
                     if (device.GetType() == typeof(Launchpad) && device.Available)
                         Disconnect(device);
 
-                Program.Log($"Rescan");
+                Program.Log("");
 
                 if (updated) Update();
             }
