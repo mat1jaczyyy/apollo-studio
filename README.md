@@ -16,7 +16,7 @@ Here are a few Launchpad covers created by early testers entirely in Apollo Stud
 
 ## Getting Started
 
-Unfortunately, Apollo Studio is not quite ready for public use yet, so we'll have to ask you to be patient and wait a little more.
+Download Apollo Studio from the [Releases](/releases) page. Configure your Launchpads in the Preferences and start a new Project to begin working. We recommend you read the [Documentation](https://github.com/mat1jaczyyy/apollo-studio/wiki) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
 ## Documentation and Support
 
