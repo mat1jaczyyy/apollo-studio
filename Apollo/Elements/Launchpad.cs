@@ -86,11 +86,13 @@ namespace Apollo.Elements {
         ConcurrentQueue<SysExMessage> buffer;
         object locker;
         int[] inputbuffer;
+        ulong signalCount;
 
         protected void CreateScreen() {
             screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
+            signalCount = 0;
             inputbuffer = (from i in Enumerable.Range(0, 101) select 0).ToArray();
         }
 
@@ -154,19 +156,22 @@ namespace Apollo.Elements {
             if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = 0x6F;
             else raw = new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray();
 
-            bool done = false;
             buffer.Enqueue(new SysExMessage(raw));
+            ulong current = signalCount;
 
             Task.Run(() => {
                 lock (locker) {
                     if (buffer.TryDequeue(out SysExMessage msg))
                         Output.Send(msg);
+                    
+                    signalCount++;
                 }
             });
 
             // This protects from deadlock for some reason
             Task.Delay(1000).ContinueWith(_ => {
-                if (!done) Disconnect(false);
+                if (signalCount <= current)
+                    Disconnect(false);
             });
 
             return true;
