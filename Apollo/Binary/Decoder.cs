@@ -206,12 +206,21 @@ namespace Apollo.Binary {
 
                 foreach (Launchpad lp in MIDI.Devices)
                     if (lp.Name == name) {
-                        lp.InputFormat = format;
-                        lp.Rotation = rotation;
+                        if (lp.GetType() == typeof(Launchpad)) {
+                            lp.InputFormat = format;
+                            lp.Rotation = rotation;
+                        }
                         return lp;
                     }
                 
-                return new Launchpad(name, format, rotation);
+                Launchpad ret;
+                if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name);
+                else if (name.Contains("Ableton Connector ")) ret = new AbletonLaunchpad(name);
+                else ret = new Launchpad(name, format, rotation);
+
+                MIDI.Devices.Add(ret);
+
+                return ret;
 
             } else if (t == typeof(Group))
                 return new Group(
