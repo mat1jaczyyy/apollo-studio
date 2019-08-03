@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,9 +83,14 @@ namespace Apollo.Elements {
         protected void InvokeReceive(Signal n) => Receive?.Invoke(n);
 
         protected Screen screen;
+        ConcurrentQueue<SysExMessage> buffer;
+        object locker;
+        int[] inputbuffer;
 
         protected void CreateScreen() {
             screen = new Screen() { ScreenExit = Send };
+            buffer = new ConcurrentQueue<SysExMessage>();
+            locker = new object();
             inputbuffer = (from i in Enumerable.Range(0, 101) select 0).ToArray();
         }
 
@@ -135,9 +141,7 @@ namespace Apollo.Elements {
                 MIDI.DoneIdentifying();
 
             } else {
-                Task.Run(() => {
-                    Thread.Sleep(1000);
-
+                Task.Delay(1000).ContinueWith(_ => {
                     if (Available && Type == LaunchpadType.Unknown)
                         Output.Send(in Inquiry);
                 });
@@ -150,13 +154,14 @@ namespace Apollo.Elements {
             if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = 0x6F;
             else raw = new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray();
 
-            SysExMessage msg = new SysExMessage(raw);
-            
             bool done = false;
+            buffer.Enqueue(new SysExMessage(raw));
 
             Task.Run(() => {
-                Output.Send(in msg);
-                done = true;
+                lock (locker) {
+                    if (buffer.TryDequeue(out SysExMessage msg))
+                        Output.Send(msg);
+                }
             });
 
             // This protects from deadlock for some reason
@@ -278,8 +283,6 @@ namespace Apollo.Elements {
 
             Available = false;
         }
-
-        int[] inputbuffer;
 
         public void HandleMessage(Signal n, bool rotated = false) {
             if (Available && Program.Project != null) {
