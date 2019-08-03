@@ -79,7 +79,7 @@
               KeyDown="Hex_KeyDown" LostFocus="Hex_Unfocus" />
       
       <Canvas Margin="5 0 0 0" Width="15" Height="15" VerticalAlignment="Center">
-        <Ellipse Width="15" Height="15" x:Name="Color" />
+        <Ellipse Width="15" Height="15" x:Name="Color" Fill="White" />
       </Canvas>
     </StackPanel>
   </Grid>

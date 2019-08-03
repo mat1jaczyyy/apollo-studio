@@ -34,7 +34,7 @@ namespace Apollo.Elements {
             Program.Log($"MIDI Created {Name}");
         }
         
-        public override void Disconnect() {
+        public override void Disconnect(bool actuallyClose = true) {
             Program.Log($"MIDI Disconnected {Name}");
 
             Available = false;

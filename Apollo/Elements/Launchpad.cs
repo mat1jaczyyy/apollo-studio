@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -145,7 +144,6 @@ namespace Apollo.Elements {
             }
         }
 
-        [HandleProcessCorruptedStateExceptions]
         bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
@@ -153,10 +151,19 @@ namespace Apollo.Elements {
             else raw = new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray();
 
             SysExMessage msg = new SysExMessage(raw);
-            try {
-                Output.Send(in msg);
-            } catch {};
             
+            bool done = false;
+
+            Task.Run(() => {
+                Output.Send(in msg);
+                done = true;
+            });
+
+            // This protects from deadlock for some reason
+            Task.Delay(1000).ContinueWith(_ => {
+                if (!done) Disconnect(false);
+            });
+
             return true;
         }
 
@@ -256,12 +263,14 @@ namespace Apollo.Elements {
             }
         }
 
-        public virtual void Disconnect() {
-            if (Input.IsOpen) Input.Close();
-            Input.Dispose();
+        public virtual void Disconnect(bool actuallyClose = true) {
+            if (actuallyClose) {
+                if (Input.IsOpen) Input.Close();
+                Input.Dispose();
 
-            if (Output.IsOpen) Output.Close();
-            Output.Dispose();
+                if (Output.IsOpen) Output.Close();
+                Output.Dispose();
+            }
 
             Dispatcher.UIThread.InvokeAsync(() => Window?.Close());
 
