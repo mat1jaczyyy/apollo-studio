@@ -157,7 +157,9 @@ namespace Apollo.Elements {
             }
         }
 
-        public Track Clone() => new Track(Chain.Clone(), null, Name);
+        public Track Clone() => new Track(Chain.Clone(), null, Name) {
+            Enabled = Enabled;
+        };
 
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
             Chain = init?? new Chain();
