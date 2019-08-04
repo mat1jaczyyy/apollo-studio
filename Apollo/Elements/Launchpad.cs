@@ -86,13 +86,12 @@ namespace Apollo.Elements {
         ConcurrentQueue<SysExMessage> buffer;
         object locker;
         int[] inputbuffer;
-        ulong signalCount;
+        ulong signalCount = 0;
 
         protected void CreateScreen() {
             screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
-            signalCount = 0;
             inputbuffer = (from i in Enumerable.Range(0, 101) select 0).ToArray();
         }
 
