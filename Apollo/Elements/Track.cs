@@ -158,7 +158,7 @@ namespace Apollo.Elements {
         }
 
         public Track Clone() => new Track(Chain.Clone(), null, Name) {
-            Enabled = Enabled;
+            Enabled = Enabled
         };
 
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
