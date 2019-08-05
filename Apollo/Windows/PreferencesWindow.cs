@@ -150,6 +150,7 @@ namespace Apollo.Windows {
             Preferences.Window = null;
 
             Timer.Stop();
+            Timer.Tick -= UpdateTime;
 
             MIDI.DevicesUpdated -= HandlePorts;
 

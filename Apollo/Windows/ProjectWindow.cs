@@ -164,6 +164,7 @@ namespace Apollo.Windows {
             Program.Project.Window = null;
 
             Timer.Stop();
+            Timer.Tick -= UpdateTime;
 
             Program.Project.PathChanged -= UpdateTitle;
             Program.Project.PageChanged -= HandlePage;
