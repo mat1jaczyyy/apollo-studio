@@ -103,7 +103,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
         
         public void Bounds_Updated(Rect bounds) {
@@ -129,14 +129,14 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Modifiers == Program.ControlKey && e.Key == Key.P) {
+            if (e.Modifiers == App.ControlKey && e.Key == Key.P) {
                 if (_track.Launchpad.Available && _track.Launchpad.GetType() != typeof(VirtualLaunchpad) || _track.Launchpad.Window != null)
                     LaunchpadWindow.Create(_track.Launchpad, this);
                 
                 return;
             }
 
-            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
             bool vertical = Selection.Start.GetType() == typeof(Chain);

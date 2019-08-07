@@ -7,9 +7,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Logging.Serilog;
 
 using Apollo.Binary;
 using Apollo.Elements;
@@ -26,8 +23,7 @@ namespace Apollo.Core {
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
-                .UsePlatformDetect()
-                .LogToDebug();
+                .UsePlatformDetect();
 
         public static string GetBaseFolder(string folder) => Path.Combine(
             Directory.GetParent(
@@ -65,61 +61,6 @@ namespace Apollo.Core {
                 ProjectLoaded = null;
             }
         }
-        
-        public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
-
-        public static bool WindowKey(Window sender, KeyEventArgs e) {
-            if (e.Modifiers == Program.ControlKey) {
-                if (e.Key == Key.W) sender.Close();
-                else if (e.Key == Key.OemComma) PreferencesWindow.Create(sender);
-                else if (e.Key == Key.M) sender.WindowState = WindowState.Minimized;
-                else return false;
-
-            } else return false;
-
-            return true;
-        }
-
-        public static void WindowClosed(Window sender) {
-            if (Project != null) {
-                if (Project.Window != null) return;
-
-                foreach (Track track in Project.Tracks)
-                    if (track.Window != null) return;
-            }
-
-            Type type = sender.GetType();
-            
-            if (type == typeof(PatternWindow)) return;
-
-            if (type == typeof(ProjectWindow)) {
-                Project.Dispose();
-                Project = null;
-
-                SplashWindow splash = new SplashWindow() {
-                    Owner = sender,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner
-                };
-                splash.Show();
-                splash.Owner = null;
-
-            } else if (type == typeof(TrackWindow)) {
-                ProjectWindow.Create(sender);
-            
-            } else if (type == typeof(SplashWindow)) {
-                Preferences.Window?.Close();
-                
-                foreach (Launchpad lp in MIDI.Devices)
-                    lp.Window?.Close();
-            }
-        }
-
-        public static void URL(string url) => Process.Start(new ProcessStartInfo() {
-            FileName = url,
-            UseShellExecute = true
-        });
-
-        public static string[] Args;
 
         [STAThread]
         static void Main(string[] args) {
@@ -162,80 +103,10 @@ namespace Apollo.Core {
             };
 
             TimeSpent.Start();
-
-            if (args.Length > 0 && args[0] == "--update")
-                BuildAvaloniaApp().Start<UpdateWindow>();
             
-            else {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { // USB Driver check
-                    IEnumerable<int> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
-                        where Path.GetFileName(j).StartsWith("nvnusbaudio.inf")
-                        select Convert.ToInt32((
-                            from i in File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
-                                where i.StartsWith("DriverVer=")
-                                select i
-                        ).First().Substring(10).Split(',')[1].Split('.')[1])
-                    );
-
-                    if (a.Count() == 0) {
-                        BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                            $"Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
-                            "computer.\n\n" +
-                            "Please install at least version 2.7 of the driver before launching Apollo Studio."
-                        )), args);
-                        return;
-                    }
-
-                    if (a.Max() < 7) {
-                        BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                            $"Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
-                            "installed on your computer.\n\n" +
-                            "Please install at least version 2.7 of the driver before launching Apollo Studio."
-                        )), args);
-                        return;
-                    }
-                }
-
-                if (!AbletonConnector.Connected) {
-                    BuildAvaloniaApp().Start((app, _) => app.Run(new MessageWindow(
-                        $"Another instance of Apollo Studio is currently running.\n\n" +
-                        "Please close other instances of Apollo Studio before launching Apollo Studio."
-                    )), args);
-                    return;
-                }
-
-                Args = args;
-
-                if (Preferences.DiscordPresence) Discord.Set(true);
-
-                MIDI.Start();
-                
-                Courier autosave = new Courier() { Interval = 180000 };
-                autosave.Elapsed += async (_, __) => {
-                    if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
-                        try {
-                            string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
-                            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-
-                            await Program.Project.WriteFile(
-                                Application.Current.MainWindow,
-                                Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
-                                false, false
-                            );
-                        } catch {}
-                    }
-
-                    Preferences.Save();
-                };
-                autosave.Start();
-
-                BuildAvaloniaApp().Start<SplashWindow>();
-
-                autosave.Dispose();
-                MIDI.Stop();
-                Discord.Set(false);
-                AbletonConnector.Dispose();
-            }
+            App.Args = args;
+            
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(null);
 
             TimeSpent.Stop();
 

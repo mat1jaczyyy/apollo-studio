@@ -116,7 +116,7 @@ namespace Apollo.Elements {
                     case 0x51: // Launchpad Pro
                         if (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'w') {
                             if (CFWIncompatible == CFWIncompatibleState.None) {
-                                if (Application.Current != null && Application.Current.MainWindow != null) CFWError(null);
+                                if (Application.Current != null && App.MainWindow != null) CFWError(null);
                                 else CFWIncompatible = CFWIncompatibleState.Show;
                             }
 

@@ -147,12 +147,12 @@ namespace Apollo.Helpers {
         }
 
         public bool HandleKey(KeyEventArgs e) {
-            if (e.Modifiers == Program.ControlKey) {
+            if (e.Modifiers == App.ControlKey) {
                 if (e.Key == Key.Z) Undo();
                 else if (e.Key == Key.Y) Redo();
                 else return false;
 
-            } else if (e.Modifiers == (Program.ControlKey | InputModifiers.Shift)) {
+            } else if (e.Modifiers == (App.ControlKey | InputModifiers.Shift)) {
                 if (e.Key == Key.Z) Redo();
                 else return false;
             

@@ -326,7 +326,7 @@ namespace Apollo.Components {
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
-                if (e.InputModifiers.HasFlag(Program.ControlKey)) {
+                if (e.InputModifiers.HasFlag(App.ControlKey)) {
                     if (UsingSteps) Length.Step = 5;
                     else RawValue = Default;
                     return;

@@ -43,7 +43,7 @@ namespace Apollo.Windows {
         void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in App.Windows)
                 if (!(window is MessageWindow))
                     window.IsVisible = false;
         }
@@ -51,8 +51,8 @@ namespace Apollo.Windows {
         void Unloaded(object sender, EventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
-            if (Application.Current.Windows.LongCount(i => i is MessageWindow) <= 1)
-                foreach (Window window in Application.Current.Windows)
+            if (App.Windows.Count(i => i is MessageWindow) <= 1)
+                foreach (Window window in App.Windows)
                     if (!(window is MessageWindow))
                         window.IsVisible = true;
 

@@ -317,7 +317,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
 
         public void Bounds_Updated(Rect bounds) {
@@ -457,7 +457,7 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
-                if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                     this.Focus();
                     return;
                 }
@@ -503,7 +503,7 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (mods.HasFlag(Program.ControlKey)) {
+            if (mods.HasFlag(App.ControlKey)) {
                 if (_pattern[_pattern.Expanded].Screen[signalIndex] != new Color(0)) {
                     Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
                     ColorPicker.SetColor(color.Clone());
@@ -1256,7 +1256,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlKey);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 

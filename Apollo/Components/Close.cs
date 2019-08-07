@@ -36,6 +36,6 @@ namespace Apollo.Components {
             Clicked = null;
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == Program.ControlKey);
+        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == App.ControlKey);
     }
 }

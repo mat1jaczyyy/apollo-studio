@@ -257,7 +257,7 @@ namespace Apollo.Windows {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
 
-            Program.URL(Program.CrashDir);
+            App.URL(Program.CrashDir);
         }
 
         void Launchpad_Add() {
@@ -266,7 +266,7 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
+            if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
 
