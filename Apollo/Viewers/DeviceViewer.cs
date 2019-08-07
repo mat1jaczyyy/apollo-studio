@@ -35,7 +35,7 @@ namespace Apollo.Viewers {
         }
 
         static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
-            foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
+            foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.ReflectedType == null && type.Namespace.StartsWith("Apollo.DeviceViewers") select type))
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
                     if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi" || device.DeviceIdentifier == "choke")
                         return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
