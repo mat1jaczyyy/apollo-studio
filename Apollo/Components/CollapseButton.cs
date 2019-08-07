@@ -9,7 +9,7 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
 
             Path = this.Get<Path>("Path");
-            Rotation = this.Get<RotateTransform>("Rotation");
+            Rotation = (RotateTransform)this.Get<LayoutTransformControl>("Layout").LayoutTransform;
         }
 
         Path Path;

@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -14,6 +16,8 @@ namespace Apollo.Viewers {
         public event SelectedEventHandler Selected;
 
         UndoEntry _entry;
+
+        public UndoEntryInfo() => new InvalidOperationException();
 
         public UndoEntryInfo(UndoEntry entry) {
             InitializeComponent();

@@ -4,6 +4,7 @@ using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -29,7 +30,7 @@ namespace Apollo.DeviceViewers {
             canvas = this.Get<Canvas>("Canvas");
             PickerContainer = this.Get<Grid>("PickerContainer");
             Picker = this.Get<ColorPicker>("Picker");
-            Gradient = this.Get<LinearGradientBrush>("Gradient");
+            Gradient = (LinearGradientBrush)this.Get<Rectangle>("Gradient").Fill;
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Duration = this.Get<Dial>("Duration");
@@ -78,6 +79,8 @@ namespace Apollo.DeviceViewers {
             canvas.Children.Remove(thumbs[index]);
             thumbs.RemoveAt(index);
         }
+
+        public FadeViewer() => new InvalidOperationException();
 
         public FadeViewer(Fade fade) {
             InitializeComponent();

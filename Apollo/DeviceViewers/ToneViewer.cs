@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -26,6 +27,8 @@ namespace Apollo.DeviceViewers {
         Tone _tone;
 
         Dial Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow;
+
+        public ToneViewer() => new InvalidOperationException();
 
         public ToneViewer(Tone tone) {
             InitializeComponent();

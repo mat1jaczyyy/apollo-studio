@@ -81,6 +81,8 @@ namespace Apollo.DeviceViewers {
             SetAlwaysShowing();
         }
 
+        public MultiViewer() => new InvalidOperationException();
+
         public MultiViewer(Multi multi, DeviceViewer parent) {
             InitializeComponent();
 

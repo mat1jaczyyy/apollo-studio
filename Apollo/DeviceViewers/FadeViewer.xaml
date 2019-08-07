@@ -10,11 +10,11 @@
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
         <StackPanel Margin="0 7 0 0" VerticalAlignment="Center" Spacing="5">
           <Canvas Background="Transparent" Width="214" Height="26" x:Name="Canvas">
-            <Rectangle Canvas.Left="7" Canvas.Top="7" Width="200" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1"
+            <Rectangle Canvas.Left="7" Canvas.Top="7" Width="200" Height="20" Stroke="{DynamicResource ThemeBorderHighBrush}" StrokeThickness="1" x:Name="Gradient"
               PointerPressed="Canvas_MouseDown">
               
               <Rectangle.Fill>
-                <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%" x:Name="Gradient" />
+                <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%" />
               </Rectangle.Fill>
             </Rectangle>
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 
 using Avalonia;
@@ -49,6 +50,8 @@ namespace Apollo.Windows {
 
         public SelectionManager Selection = new SelectionManager();
 
+        public TrackWindow() => new InvalidOperationException();
+
         public TrackWindow(Track track) {
             InitializeComponent();
             #if DEBUG
@@ -87,7 +90,7 @@ namespace Apollo.Windows {
             UpdateTitle();
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             _track.Window = null;
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;

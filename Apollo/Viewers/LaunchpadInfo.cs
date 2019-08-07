@@ -49,6 +49,8 @@ namespace Apollo.Viewers {
 
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
+        public LaunchpadInfo() => new InvalidOperationException();
+
         public LaunchpadInfo(Launchpad launchpad) {
             InitializeComponent();
             

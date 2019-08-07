@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -23,6 +24,8 @@ namespace Apollo.DeviceViewers {
         
         Delay _delay;
         Dial Duration, Gate;
+
+        public DelayViewer() => new InvalidOperationException();
 
         public DelayViewer(Delay delay) {
             InitializeComponent();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -133,7 +134,7 @@ namespace Apollo.Windows {
             }
         }
         
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Root.Children.Remove(SplashImage);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -245,10 +246,10 @@ namespace Apollo.Windows {
             Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
         }
 
-        async void Blogpost(object sender, RoutedEventArgs e)
+        async void Blogpost(object sender, PointerReleasedEventArgs e)
             => App.URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
 
-        async void Release(object sender, RoutedEventArgs e)
+        async void Release(object sender, PointerReleasedEventArgs e)
             => App.URL((await Github.LatestRelease()).HtmlUrl);
 
         void Restore(object sender, RoutedEventArgs e) {

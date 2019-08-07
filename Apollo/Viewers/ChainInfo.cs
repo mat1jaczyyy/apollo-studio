@@ -64,6 +64,8 @@ namespace Apollo.Viewers {
             selected = false;
         }
 
+        public ChainInfo() => new InvalidOperationException();
+
         public ChainInfo(Chain chain) {
             InitializeComponent();
             

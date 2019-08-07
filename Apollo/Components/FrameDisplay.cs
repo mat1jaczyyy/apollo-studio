@@ -60,6 +60,8 @@ namespace Apollo.Components {
             selected = false;
         }
 
+        public FrameDisplay() => throw new InvalidOperationException();
+
         public FrameDisplay(Frame frame, Pattern pattern) {
             InitializeComponent();
 

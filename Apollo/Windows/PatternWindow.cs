@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -217,6 +218,8 @@ namespace Apollo.Windows {
 
         public SelectionManager Selection = new SelectionManager();
 
+        public PatternWindow() => new InvalidOperationException();
+
         public PatternWindow(Pattern pattern) {
             InitializeComponent();
             #if DEBUG
@@ -282,7 +285,7 @@ namespace Apollo.Windows {
             ColorHistory.HistoryChanged += RenderHistory;
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Locked = false;
             
             foreach (Courier i in PlayTimers) i.Dispose();
@@ -651,7 +654,7 @@ namespace Apollo.Windows {
             }
         }
 
-        void Infinite_Changed(object sender, EventArgs e) {
+        void Infinite_Changed(object sender, RoutedEventArgs e) {
             bool value = Infinite.IsChecked.Value;
 
             if (_pattern.Infinite != value) {
@@ -989,7 +992,7 @@ namespace Apollo.Windows {
             );
         }
 
-        void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_pattern.Wrap != value) {

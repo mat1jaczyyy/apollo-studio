@@ -30,6 +30,8 @@ namespace Apollo.Viewers {
         TextBlock Filename, Folder;
         ContextMenu InfoContextMenu;
 
+        public RecentProjectInfo() => new InvalidOperationException();
+
         public RecentProjectInfo(string path) {
             InitializeComponent();
             

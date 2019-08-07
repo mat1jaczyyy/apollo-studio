@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
@@ -24,6 +25,8 @@ namespace Apollo.DeviceViewers {
         Rotate _rotate;
         ComboBox RotateMode;
         CheckBox Bypass;
+
+        public RotateViewer() => new InvalidOperationException();
 
         public RotateViewer(Rotate rotate) {
             InitializeComponent();
@@ -56,7 +59,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(RotateType mode) => RotateMode.SelectedIndex = (int)mode;
 
-        void Bypass_Changed(object sender, EventArgs e) {
+        void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
             if (_rotate.Bypass != value) {

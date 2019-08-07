@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -28,6 +29,8 @@ namespace Apollo.DeviceViewers {
         ColorFilter _filter;
 
         Dial Hue, Saturation, Value, HueTolerance, SaturationTolerance, ValueTolerance;
+
+        public ColorFilterViewer() => new InvalidOperationException();
 
         public ColorFilterViewer(ColorFilter filter) {
             InitializeComponent();

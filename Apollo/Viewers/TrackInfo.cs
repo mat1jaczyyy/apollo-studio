@@ -80,6 +80,8 @@ namespace Apollo.Viewers {
             selected = false;
         }
 
+        public TrackInfo() => new InvalidOperationException();
+
         public TrackInfo(Track track) {
             InitializeComponent();
             

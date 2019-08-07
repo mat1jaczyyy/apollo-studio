@@ -39,7 +39,14 @@
               <Setter Property="Cursor" Value="Hand" />
             </Style>
 
-            <Style Selector="Path.square, Path.circle, Path.corner">
+            <Style Selector="Path.square, Path.circle">
+              <Setter Property="Fill" Value="Transparent" />
+              <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
+              <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+              <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
+            </Style>
+
+            <Style Selector="Path.corner"> <!-- TODO: Avalonia fix triple styling bug -->
               <Setter Property="Fill" Value="Transparent" />
               <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
               <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />

@@ -162,8 +162,8 @@ namespace Apollo.Core {
             }
         }
 
-        static Themes _Theme = Themes.Dark;
-        public static Themes Theme {
+        static ThemeType _Theme = ThemeType.Dark;
+        public static ThemeType Theme {
             get => _Theme;
             set {
                 _Theme = value;

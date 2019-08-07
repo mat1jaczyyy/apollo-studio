@@ -77,6 +77,8 @@ namespace Apollo.DeviceViewers {
             SetAlwaysShowing();
         }
 
+        public GroupViewer() => new InvalidOperationException();
+
         public GroupViewer(Group group, DeviceViewer parent) {
             InitializeComponent();
 

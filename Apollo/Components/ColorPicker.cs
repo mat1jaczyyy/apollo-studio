@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
+using LinearGradientBrush = Avalonia.Media.LinearGradientBrush;
 using GradientStop = Avalonia.Media.GradientStop;
 using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
@@ -27,7 +28,7 @@ namespace Apollo.Components {
             MainThumb = this.Get<Thumb>("MainThumb");
             HueThumb = this.Get<Thumb>("HueThumb");
 
-            MainColor = this.Get<GradientStop>("MainColor");
+            MainColor = ((LinearGradientBrush)this.Get<Grid>("MainColor").Background).GradientStops[1];
             
             Hex = this.Get<TextBox>("Hex");
         }

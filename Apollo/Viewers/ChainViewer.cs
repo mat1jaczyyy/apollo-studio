@@ -69,6 +69,8 @@ namespace Apollo.Viewers {
             SetAlwaysShowing();
         }
 
+        public ChainViewer() => new InvalidOperationException();
+
         public ChainViewer(Chain chain, bool backgroundBorder = false) {
             InitializeComponent();
 

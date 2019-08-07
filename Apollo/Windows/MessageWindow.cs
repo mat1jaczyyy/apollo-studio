@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,8 @@ namespace Apollo.Windows {
         public TaskCompletionSource<string> Completed = new TaskCompletionSource<string>();
         
         void UpdateTopmost(bool value) => Topmost = value;
+
+        public MessageWindow() => new InvalidOperationException();
 
         public MessageWindow(string message, string[] options = null) {
             InitializeComponent();
@@ -48,7 +51,7 @@ namespace Apollo.Windows {
                     window.IsVisible = false;
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
             if (App.Windows.Count(i => i is MessageWindow) <= 1)
