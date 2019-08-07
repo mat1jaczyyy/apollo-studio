@@ -17,18 +17,11 @@ using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Themes;
 using Apollo.Windows;
 
 namespace Apollo.Core {
     public class App: Application {
-        StyleInclude Dark = new StyleInclude(new Uri("resm:Styles?assembly=Apollo")) {
-            Source = new Uri("avares://Apollo/Themes/Dark.xaml")
-        };
-
-        StyleInclude Light = new StyleInclude(new Uri("resm:Styles?assembly=Apollo")) {
-            Source = new Uri("avares://Apollo/Themes/Light.xaml")
-        };
-
         static App instance;
 
         public static Window MainWindow => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).MainWindow;
@@ -95,8 +88,8 @@ namespace Apollo.Core {
 
             instance = this;
 
-            if (Preferences.Theme == Themes.Dark) Styles.Add(Dark);
-            else if (Preferences.Theme == Themes.Light) Styles.Add(Light);
+            if (Preferences.Theme == ThemeType.Dark) Styles.Add(new Dark());
+            else if (Preferences.Theme == ThemeType.Light) Styles.Add(new Light());
         }
 
         public override void OnFrameworkInitializationCompleted() {
