@@ -46,10 +46,7 @@ namespace Apollo.Core {
         public static bool LaunchUpdater = false;
         
         public static Stopwatch TimeSpent = new Stopwatch();
-        public static void Log(string text) {
-            if (text == "") Console.Write(text);
-            else Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
-        }
+        public static void Log(string text) => Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
 
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
