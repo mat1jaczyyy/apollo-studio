@@ -147,10 +147,10 @@ namespace Apollo.Components {
             this.Resources["PadCut2"] = 12 * EffectiveScale;
             this.Resources["ModeWidth"] = 4 * EffectiveScale;
             this.Resources["ModeHeight"] = 2 * EffectiveScale;
-            this.Resources["TopMargin"] = new Thickness(7 * EffectiveScale, 7 * EffectiveScale, 7 * EffectiveScale, 0);
-            this.Resources["PadMargin"] = new Thickness(1 * EffectiveScale);
-            this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
-            this.Resources["CornerRadius"] = new CornerRadius(1 * EffectiveScale);
+            this.Resources["TopMargin"] = new Thickness((int)(7 * EffectiveScale), (int)(7 * EffectiveScale), (int)(7 * EffectiveScale), 0);
+            this.Resources["PadMargin"] = new Thickness((int)(1 * EffectiveScale));
+            this.Resources["ModeMargin"] = new Thickness(0, (int)(5 * EffectiveScale), 0, 0);
+            this.Resources["CornerRadius"] = new CornerRadius((int)(1 * EffectiveScale));
 
             string gridSize = (17 * EffectiveScale).ToString();
             string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select gridSize).ToArray());
