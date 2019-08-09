@@ -145,7 +145,7 @@ namespace Apollo.Viewers {
             DataObject dragData = new DataObject();
             dragData.Set("track", Program.Project.Window?.Selection.Selection);
 
-            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
