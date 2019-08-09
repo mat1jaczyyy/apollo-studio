@@ -22,8 +22,14 @@
       <Setter Property="IsHitTestVisible" Value="false" />
       <Setter Property="Margin" Value="3 0" />
     </Style>
+    
+    <!-- TODO: Unify these when Avalonia fixes double styling bug: Selector="Path, Ellipse" -->
 
-    <Style Selector="Path, Ellipse">
+    <Style Selector="Path">
+      <Setter Property="Fill" Value="{DynamicResource ThemeForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Ellipse">
       <Setter Property="Fill" Value="{DynamicResource ThemeForegroundBrush}" />
     </Style>
   </UserControl.Styles>
