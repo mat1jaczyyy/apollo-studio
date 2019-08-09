@@ -14,7 +14,7 @@ using Apollo.Structures;
 
 namespace Apollo.Components {
     public class Dial: UserControl {
-        void InitializeComponent() {
+        protected virtual void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             ArcCanvas = this.Get<Canvas>("ArcCanvas");
@@ -300,8 +300,6 @@ namespace Apollo.Components {
 
         public Dial() {
             InitializeComponent();
-
-            if (this.GetType() != typeof(Dial)) return;
 
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
