@@ -39,12 +39,6 @@
               </Style>
             </StackPanel.Styles>
 
-            <TextBlock Classes="heading" Text="Theme" x:Name="ThemeHeader" />
-            <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
-            <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
-            
-            <Border />
-
             <TextBlock Classes="heading" Text="Appearance" />
             <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
             <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
@@ -60,6 +54,25 @@
                 <ComboBoxItem>Sanded</ComboBoxItem>
               </ComboBox>
             </Grid>
+            
+            <Border />
+        
+            <TextBlock Classes="heading" Text="Launchpad Configuration" />
+            <StackPanel x:Name="Contents">
+              <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
+            </StackPanel>
+
+            <Border />
+            
+            <TextBlock Classes="heading" Text="Processing" />
+            <Components:HorizontalDial HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
+                                       ValueChanged="FadeSmoothness_Changed"/>
+
+            <Border />
+
+            <TextBlock Classes="heading" Text="Theme" x:Name="ThemeHeader" />
+            <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
+            <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
             
             <Border />
 
@@ -85,12 +98,6 @@
             <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Load Custom Retina Palette" Click="BrowseCustomPalette" />
 
             <Border />
-            
-            <TextBlock Classes="heading" Text="Processing" />
-            <Components:HorizontalDial Margin="5 0" HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
-                                        ValueChanged="FadeSmoothness_Changed"/>
-
-            <Border />
 
             <TextBlock Classes="heading" Text="File Management" />
             <CheckBox Click="Backup_Changed" x:Name="Backup">Create a Backup when saving</CheckBox>
@@ -101,13 +108,6 @@
 
             <TextBlock Classes="heading" Text="Undo History" />
             <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 150 entries</CheckBox>
-
-            <Border />
-        
-            <TextBlock Classes="heading" Text="Launchpad Configuration" />
-            <StackPanel x:Name="Contents">
-              <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
-            </StackPanel>
 
             <Border />
 
