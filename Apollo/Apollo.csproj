@@ -18,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.8.999-cibuild0003524-beta" />
     <PackageReference Include="Avalonia.Desktop" Version="0.8.999-cibuild0003524-beta" />
-    <PackageReference Include="DiscordRichPresence" Version="1.0.118">
+    <PackageReference Include="DiscordRichPresence" Version="1.0.121">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
