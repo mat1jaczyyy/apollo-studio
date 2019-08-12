@@ -4,8 +4,8 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner" CanResize="false"
         Icon="/Resources/WindowIcon.png"
-        Width="750" MinWidth="750" MaxWidth="750"
-        Height="616" MinHeight="616" MaxHeight="616"
+        Width="420" MinWidth="420" MaxWidth="420"
+        Height="640" MinHeight="640" MaxHeight="640"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown">
   
@@ -23,127 +23,114 @@
     </Grid>
 
     <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
-      <Grid ColumnDefinitions="*,*" Margin="10 5"> 
-        <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
-          <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0 0 10 0">
-            <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
-              <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Theme" x:Name="ThemeHeader" />
-                <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
-                <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
-              </StackPanel>
-            </Border>
+      <Grid RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0">
+          <StackPanel Spacing="5" Margin="10 5">
+            <StackPanel.Styles>
+              <Style Selector="StackPanel > Border">
+                <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="Height" Value="2" />
+                <Setter Property="BorderThickness" Value="0 0 0 1" />
+              </Style>
 
-            <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-              <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Appearance" />
-                <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
-                <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-                <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto,Auto">
-                  <TextBlock Grid.Column="0" Text="On-screen Launchpad Style" />
-                  <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
-                    <ComboBoxItem>Standard</ComboBoxItem>
-                    <ComboBoxItem>Diagonal</ComboBoxItem>
-                  </ComboBox>
-                  <ComboBox Grid.Column="2" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
-                    <ComboBoxItem>Stock</ComboBoxItem>
-                    <ComboBoxItem>Phantom</ComboBoxItem>
-                    <ComboBoxItem>Sanded</ComboBoxItem>
-                  </ComboBox>
-                </Grid>
-              </StackPanel>
-            </Border>
+              <Style Selector="TextBlock.heading">
+                <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightMidBrush}" />
+              </Style>
+            </StackPanel.Styles>
 
-            <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-              <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Group Behavior" />
-                <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create Key Filter in new Group Chain</CheckBox>
-                <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create Page Filter in new Group Chain</CheckBox>
-                <CheckBox Click="AutoCreatePattern_Changed" x:Name="AutoCreatePattern">Auto create Pattern in new Group Chain</CheckBox>
-              </StackPanel>
-            </Border>
+            <TextBlock Classes="heading" Text="Theme" x:Name="ThemeHeader" />
+            <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
+            <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
+            
+            <Border />
 
-            <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-              <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern Editor" />
-                <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
-                <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
-                <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
-                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
-              </StackPanel>
-            </Border>
-
-            <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-              <StackPanel Spacing="5">
-                <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Pattern MIDI Import Palette" />
-                <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
-                <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
-                <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
-                <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Load Custom Retina Palette" Click="BrowseCustomPalette" />
-              </StackPanel>
-            </Border>
-
-            <StackPanel Grid.Row="5" Margin="0 5" Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Processing" />
-              <Components:HorizontalDial Margin="5 0" HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
-                                         ValueChanged="FadeSmoothness_Changed"/>
-            </StackPanel>
-          </Grid>
-        </Border>
-
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto" Margin="10 0 0 0">
-          <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 0 0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="File Management" />
-              <CheckBox Click="Backup_Changed" x:Name="Backup">Create a Backup when saving</CheckBox>
-              <CheckBox Click="Autosave_Changed" x:Name="Autosave">Autosave every 3 minutes</CheckBox>
-              <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Recent Projects" Click="ClearRecentProjects" />
-            </StackPanel>
-          </Border>
-
-          <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Undo History" />
-              <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 150 entries</CheckBox>
-            </StackPanel>
-          </Border>
-          
-          <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <Grid RowDefinitions="Auto,*">
-              <TextBlock Grid.Row="0" Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Launchpad Configuration" />
-              <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
-                <StackPanel x:Name="Contents">
-                  <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
-                </StackPanel>
-              </ScrollViewer>
+            <TextBlock Classes="heading" Text="Appearance" />
+            <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
+            <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
+            <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto,Auto">
+              <TextBlock Grid.Column="0" Text="On-screen Launchpad Style" />
+              <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
+                <ComboBoxItem>Standard</ComboBoxItem>
+                <ComboBoxItem>Diagonal</ComboBoxItem>
+              </ComboBox>
+              <ComboBox Grid.Column="2" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
+                <ComboBoxItem>Stock</ComboBoxItem>
+                <ComboBoxItem>Phantom</ComboBoxItem>
+                <ComboBoxItem>Sanded</ComboBoxItem>
+              </ComboBox>
             </Grid>
-          </Border>
+            
+            <Border />
 
-          <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Discord Rich Presence" />
-              <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
-              <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
+            <TextBlock Classes="heading" Text="Group Behavior" />
+            <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create Key Filter in new Group Chain</CheckBox>
+            <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create Page Filter in new Group Chain</CheckBox>
+            <CheckBox Click="AutoCreatePattern_Changed" x:Name="AutoCreatePattern">Auto create Pattern in new Group Chain</CheckBox>
+            
+            <Border />
+
+            <TextBlock Classes="heading" Text="Pattern Editor" />
+            <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
+            <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
+            <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
+
+            <Border />
+
+            <TextBlock Classes="heading" Text="Pattern MIDI Import Palette" />
+            <RadioButton GroupName="ImportPalette" Click="Monochrome_Changed" x:Name="Monochrome">Monochrome White</RadioButton>
+            <RadioButton GroupName="ImportPalette" Click="NovationPalette_Changed" x:Name="NovationPalette">Stock Novation Palette</RadioButton>
+            <RadioButton GroupName="ImportPalette" Click="CustomPalette_Changed" x:Name="CustomPalette"></RadioButton>
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Load Custom Retina Palette" Click="BrowseCustomPalette" />
+
+            <Border />
+            
+            <TextBlock Classes="heading" Text="Processing" />
+            <Components:HorizontalDial Margin="5 0" HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
+                                        ValueChanged="FadeSmoothness_Changed"/>
+
+            <Border />
+
+            <TextBlock Classes="heading" Text="File Management" />
+            <CheckBox Click="Backup_Changed" x:Name="Backup">Create a Backup when saving</CheckBox>
+            <CheckBox Click="Autosave_Changed" x:Name="Autosave">Autosave every 3 minutes</CheckBox>
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Recent Projects" Click="ClearRecentProjects" />
+
+            <Border />
+
+            <TextBlock Classes="heading" Text="Undo History" />
+            <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 150 entries</CheckBox>
+
+            <Border />
+        
+            <TextBlock Classes="heading" Text="Launchpad Configuration" />
+            <StackPanel x:Name="Contents">
+              <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
             </StackPanel>
-          </Border>
 
-          <Border Grid.Row="4" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Application Management" />
-              <CheckBox Click="CheckForUpdates_Changed" x:Name="CheckForUpdates">Check for Updates on Startup</CheckBox>
-              <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Crashes Folder" Click="OpenCrashesFolder" />
-            </StackPanel>
-          </Border>
+            <Border />
 
-          <Border Grid.Row="5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Padding="0 5" BorderThickness="0 0 0 1">
-            <StackPanel Spacing="5">
-              <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" Text="Usage Statistics" />
-              <TextBlock x:Name="CurrentSession" />
-              <TextBlock x:Name="AllTime" />
-            </StackPanel>
-          </Border>
+            <TextBlock Classes="heading" Text="Discord Rich Presence" />
+            <CheckBox Click="DiscordPresence_Changed" x:Name="DiscordPresence">Enable Discord Rich Presence</CheckBox>
+            <CheckBox Click="DiscordFilename_Changed" x:Name="DiscordFilename">Display Project Name</CheckBox>
 
-          <Grid Grid.Row="6" Margin="10" ColumnDefinitions="*,Auto">
+            <Border />
+
+            <TextBlock Classes="heading" Text="Application Management" />
+            <CheckBox Click="CheckForUpdates_Changed" x:Name="CheckForUpdates">Check for Updates on Startup</CheckBox>
+            <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Open Crashes Folder" Click="OpenCrashesFolder" />
+
+            <Border />
+
+            <TextBlock Classes="heading" Text="Usage Statistics" />
+            <TextBlock x:Name="CurrentSession" />
+            <TextBlock x:Name="AllTime" />
+          </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0" Padding="20 15">
+          <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" HorizontalAlignment="Center">
               <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
               <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
@@ -151,7 +138,7 @@
 
             <Components:Patreon Grid.Column="1" VerticalAlignment="Center" />
           </Grid>
-        </Grid>
+        </Border>
       </Grid>
     </Border>
   </Grid>
