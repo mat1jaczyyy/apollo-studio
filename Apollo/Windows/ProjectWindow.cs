@@ -294,10 +294,12 @@ namespace Apollo.Windows {
         public void SetBPM(string bpm) {
             if (BPM_Ignore) return;
 
-            BPM.Text = bpm;
-            BPM_Dirty = false;
+            Dispatcher.UIThread.InvokeAsync(() => {
+                BPM.Text = bpm;
+                BPM_Dirty = false;
 
-            this.Focus();
+                this.Focus();
+            });
         }
 
         bool Author_Dirty = false;

@@ -37,7 +37,9 @@ namespace Apollo.Helpers {
                 } else if (message[0] == 245) {
                     MIDI.Disconnect(portMap[source]);
                     portMap.Remove(source);
-                }
+                
+                } else if (message[0] == 246 && Program.Project != null)
+                    Program.Project.BPM = BitConverter.ToUInt16(message, 1);
             }
         }
 
