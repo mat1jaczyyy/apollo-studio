@@ -41,8 +41,14 @@ namespace Apollo.Helpers {
             }
         }
 
+        private static void Send(AbletonLaunchpad source, byte[] data) =>
+            connection?.SendAsync(data, data.Length, portMap.First(x => x.Value == source).Key);
+
         public static void Send(AbletonLaunchpad source, Signal n) =>
-            connection?.SendAsync(new byte[] {Converter.XYtoDR(n.Index), (byte)(n.Color.Max * 127.0 / 63)}, 2, portMap.First(x => x.Value == source).Key);
+            Send(source, new byte[] {Converter.XYtoDR(n.Index), (byte)(n.Color.Max * 127.0 / 63)});
+
+        public static void SendClear(AbletonLaunchpad source) =>
+            Send(source, new byte[] {0xB0, 0x78, 0x00});
 
         public static bool Connected => connection != null;
 

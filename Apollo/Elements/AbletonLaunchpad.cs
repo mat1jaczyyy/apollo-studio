@@ -50,7 +50,7 @@ namespace Apollo.Elements {
                 Window?.SignalRender(n);
             }
 
-            AbletonConnector.Send(this, n);
+            AbletonConnector.SendClear(this);
         }
 
         public override void Render(Signal n) => Target?.Render(n);
