@@ -119,8 +119,7 @@ namespace Apollo.Core {
                         }
 
                     } else {
-                        Devices.Add(ret = new AbletonLaunchpad(name));
-                        ret.Version = version;
+                        Devices.Add(ret = new AbletonLaunchpad(name) { Version = version });
                         ret.Connect(null, null);
                         updated = true;
                         return (AbletonLaunchpad)ret;
