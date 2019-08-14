@@ -102,7 +102,7 @@ namespace Apollo.Core {
             }
         }
 
-        public static AbletonLaunchpad ConnectAbleton() {
+        public static AbletonLaunchpad ConnectAbleton(int version) {
             lock (locker) {
                 Launchpad ret = null;
             
@@ -112,6 +112,7 @@ namespace Apollo.Core {
                     ret = Devices.Find((lp) => lp.Name == name);
                     if (ret != null) {
                         if (ret is AbletonLaunchpad alp && !alp.Available) {
+                            alp.Version = version;
                             alp.Connect(null, null);
                             updated = true;
                             return alp;
@@ -119,6 +120,7 @@ namespace Apollo.Core {
 
                     } else {
                         Devices.Add(ret = new AbletonLaunchpad(name));
+                        ret.Version = version;
                         ret.Connect(null, null);
                         updated = true;
                         return (AbletonLaunchpad)ret;
