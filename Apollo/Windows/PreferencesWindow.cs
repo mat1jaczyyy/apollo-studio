@@ -15,8 +15,10 @@ using Humanizer.Localisation;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -61,6 +63,8 @@ namespace Apollo.Windows {
 
             CurrentSession = this.Get<TextBlock>("CurrentSession");
             AllTime = this.Get<TextBlock>("AllTime");
+
+            Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
@@ -70,6 +74,25 @@ namespace Apollo.Windows {
         HorizontalDial FadeSmoothness;
         Controls Contents;
         DispatcherTimer Timer;
+        LaunchpadGrid Preview;
+
+        Fade fade = new Fade(
+            new Time(false),
+            colors: new List<Color>() {
+                new Color(1, 0, 0),
+                new Color(63, 0, 0),
+                new Color(63, 63, 0),
+                new Color(0, 63, 0),
+                new Color(0, 63, 63),
+                new Color(0, 0, 63),
+                new Color(63, 0, 63),
+                new Color(63, 0, 0),
+                new Color(1, 0, 0)
+            },
+            positions: new List<double>() {
+                0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1
+            }
+        );
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -142,6 +165,8 @@ namespace Apollo.Windows {
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
+
+            fade.MIDIExit = FadeExit;
         }
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
@@ -157,6 +182,9 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             this.Content = null;
+            
+            Preview = null;
+            fade.Dispose();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
@@ -259,6 +287,13 @@ namespace Apollo.Windows {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);
             MIDI.Update();
         }
+
+        void Preview_Pressed(int index) =>
+            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color(63)));
+
+        void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+            Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        });
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))

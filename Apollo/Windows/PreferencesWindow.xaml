@@ -92,7 +92,7 @@
 
               <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
                 <TextBlock Classes="heading" Text="Launchpad Preview" />
-                <Components:LaunchpadGrid />
+                <Components:LaunchpadGrid x:Name="Preview" PadPressed="Preview_Pressed" />
               </StackPanel>
             </Grid>
             

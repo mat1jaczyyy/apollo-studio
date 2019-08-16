@@ -213,6 +213,8 @@ namespace Apollo.Devices {
         }
 
         void Initialize() {
+            if (Disposed) return;
+
             Generate();
             Program.Project.BPMChanged += Generate;
         }
@@ -314,7 +316,9 @@ namespace Apollo.Devices {
 
             Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
-            Program.Project.BPMChanged -= Generate;
+
+            if (Program.Project != null)
+                Program.Project.BPMChanged -= Generate;
 
             Time.Dispose();
             base.Dispose();
