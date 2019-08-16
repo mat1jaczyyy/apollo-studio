@@ -139,6 +139,8 @@ namespace Apollo.Windows {
             if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
+            if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
+
             bool vertical = Selection.Start.GetType() == typeof(Chain);
 
             if (vertical) {

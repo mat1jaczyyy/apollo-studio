@@ -448,7 +448,8 @@ namespace Apollo.Windows {
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter || e.Key == Key.Space) {
                 if (e.Modifiers == InputModifiers.Shift) PatternFire(Fire, null);
-                else PatternPlay(Play, null);
+                else if (e.Modifiers == InputModifiers.None) PatternPlay(Play, null);
+                return;
             }
 
             if (Locked) return;
@@ -461,6 +462,8 @@ namespace Apollo.Windows {
                     this.Focus();
                     return;
                 }
+
+                if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
 
                 bool shift = e.Modifiers == InputModifiers.Shift;
 

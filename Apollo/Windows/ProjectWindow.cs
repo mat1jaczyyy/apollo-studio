@@ -215,6 +215,8 @@ namespace Apollo.Windows {
             if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
+            if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
+            
             if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
             else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
             else if (e.Key == Key.Enter)
