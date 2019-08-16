@@ -504,11 +504,9 @@ namespace Apollo.Windows {
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
             if (mods.HasFlag(Program.ControlKey)) {
-                if (_pattern[_pattern.Expanded].Screen[signalIndex] != new Color(0)) {
-                    Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
-                    ColorPicker.SetColor(color.Clone());
-                    ColorHistory.Select(color.Clone(), true);
-                }
+                Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
+                ColorPicker.SetColor(color.Clone());
+                ColorHistory.Select(color.Clone(), true);
                 return;
             }
 
