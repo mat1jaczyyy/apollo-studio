@@ -39,20 +39,61 @@
               </Style>
             </StackPanel.Styles>
 
-            <TextBlock Classes="heading" Text="Appearance" />
-            <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
-            <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-            <Grid Margin="22 0 5 0" ColumnDefinitions="*,Auto,Auto">
-              <TextBlock Grid.Column="0" Text="On-screen Launchpad Style" />
-              <ComboBox Grid.Column="1" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
-                <ComboBoxItem>Standard</ComboBoxItem>
-                <ComboBoxItem>Diagonal</ComboBoxItem>
-              </ComboBox>
-              <ComboBox Grid.Column="2" BorderThickness="0" Padding="0" Background="Transparent" HorizontalAlignment="Right" x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
-                <ComboBoxItem>Stock</ComboBoxItem>
-                <ComboBoxItem>Phantom</ComboBoxItem>
-                <ComboBoxItem>Sanded</ComboBoxItem>
-              </ComboBox>
+            <Grid ColumnDefinitions="*,Auto,Auto">
+              <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center">
+                <TextBlock Classes="heading" Text="Appearance" />
+                <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
+                <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
+
+                <Border />
+
+                <Grid ColumnDefinitions="Auto,*">
+                  <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Classes="heading" Text="Theme" />
+                    <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
+                    <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
+                  </StackPanel>
+
+                  <TextBlock Grid.Column="1" Classes="heading" Margin="5 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="ThemeHeader" />
+                </Grid>
+
+                <Border />
+                
+                <TextBlock Classes="heading" Text="Processing" />
+                <Components:HorizontalDial HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
+                                           ValueChanged="FadeSmoothness_Changed"/>
+
+                <Border />
+
+                <TextBlock Classes="heading" Text="On-screen Launchpad Style" />
+                <StackPanel Orientation="Horizontal">
+                  <StackPanel.Styles>
+                    <Style Selector="ComboBox">
+                      <Setter Property="BorderThickness" Value="0" />
+                      <Setter Property="Padding" Value="0" />
+                      <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                  </StackPanel.Styles>
+
+                  <ComboBox x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
+                    <ComboBoxItem>Standard</ComboBoxItem>
+                    <ComboBoxItem>Diagonal</ComboBoxItem>
+                  </ComboBox>
+
+                  <ComboBox x:Name="LaunchpadStyle" SelectionChanged="LaunchpadStyle_Changed">
+                    <ComboBoxItem>Stock</ComboBoxItem>
+                    <ComboBoxItem>Phantom</ComboBoxItem>
+                    <ComboBoxItem>Sanded</ComboBoxItem>
+                  </ComboBox>
+                </StackPanel>
+              </StackPanel>
+
+              <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Margin="10 0" VerticalAlignment="Stretch" Width="2" BorderThickness="0 0 1 0" />
+
+              <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
+                <TextBlock Classes="heading" Text="Launchpad Preview" />
+                <Components:LaunchpadGrid />
+              </StackPanel>
             </Grid>
             
             <Border />
@@ -61,18 +102,6 @@
             <StackPanel x:Name="Contents">
               <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
             </StackPanel>
-
-            <Border />
-            
-            <TextBlock Classes="heading" Text="Processing" />
-            <Components:HorizontalDial HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
-                                       ValueChanged="FadeSmoothness_Changed"/>
-
-            <Border />
-
-            <TextBlock Classes="heading" Text="Theme" x:Name="ThemeHeader" />
-            <RadioButton GroupName="Theme" Click="Dark_Changed" x:Name="Dark">Dark</RadioButton>
-            <RadioButton GroupName="Theme" Click="Light_Changed" x:Name="Light">Light</RadioButton>
             
             <Border />
 

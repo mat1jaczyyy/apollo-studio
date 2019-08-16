@@ -225,19 +225,14 @@ namespace Apollo.Windows {
             }
         }
 
-        void Dark_Changed(object sender, EventArgs e) {
-            if (Preferences.Theme != Themes.Dark)
-                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
-
-            Preferences.Theme = Themes.Dark;
+        void SetTheme(Themes theme) {
+            ThemeHeader.Text = (Preferences.Theme != theme)? "You must restart\nApollo Studio to\napply this change." : "";
+            Preferences.Theme = theme;
         }
 
-        void Light_Changed(object sender, EventArgs e) {
-            if (Preferences.Theme != Themes.Light)
-                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
-            
-            Preferences.Theme = Themes.Light;
-        }
+        void Dark_Changed(object sender, EventArgs e) => SetTheme(Themes.Dark);
+
+        void Light_Changed(object sender, EventArgs e) => SetTheme(Themes.Light);
 
         void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
