@@ -194,7 +194,10 @@ namespace Apollo.Elements {
             } else n.Index = 99;
 
             int offset = 0;
-            if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
+            if (Type == LaunchpadType.MK2) {
+                if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
+                if (91 <= n.Index && n.Index <= 98) offset = 13;
+            }
 
             SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue});
         }
