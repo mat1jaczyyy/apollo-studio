@@ -142,6 +142,7 @@ namespace Apollo.Helpers {
             } else {
                 if (e.Key == Key.Delete || e.Key == Key.Back) Action("Delete");
                 else if (e.Key == Key.D0 || e.Key == Key.NumPad0) Action("Mute");
+                else if (e.Key == Key.F2) Action("Rename");
                 else return false;
             }
 
