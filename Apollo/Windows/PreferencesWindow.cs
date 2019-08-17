@@ -107,6 +107,9 @@ namespace Apollo.Windows {
 
         void UpdateTime(object sender, EventArgs e) {
             CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
+
+            if (Preferences.Time >= (int)TimeSpan.MaxValue.TotalSeconds) Preferences.BaseTime = 0;
+
             AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
         }
 
