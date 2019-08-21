@@ -188,6 +188,18 @@ namespace Apollo.Components {
             }
         }
 
+        bool _fillstart = true;
+        public bool FillStart {
+            get => _fillstart;
+            set {
+                if (value != _fillstart) {
+                    _fillstart = value;
+
+                    DrawArcAuto();
+                }
+            }
+        }
+
         bool _enabled = true;
         public bool Enabled {
             get => _enabled;
@@ -250,12 +262,16 @@ namespace Apollo.Components {
         string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
-            double angle_starting = (_centered && !overrideBase)? angle_center: angle_start;
+            double angle_starting = FillStart
+                ? (_centered? angle_center: angle_start)
+                : angle_start - Math.Abs(angle_end - angle_start) * value * 0.94;
+
+            if (overrideBase) angle_starting = angle_start;
 
             double x_start = (radius * (Math.Cos(angle_starting) + 1) + strokeHalf) * _scale;
             double y_start = (radius * (-Math.Sin(angle_starting) + 1) + strokeHalf) * _scale;
             
-            double angle_point = angle_start - Math.Abs(angle_end - angle_start) * (_centered && !overrideBase? value : (1 - (1 - value) * 0.98));
+            double angle_point = angle_start - Math.Abs(angle_end - angle_start) * (_centered && !overrideBase? value : (1 - (1 - value) * 0.94));
 
             double x_end = (radius * (Math.Cos(angle_point) + 1) + strokeHalf) * _scale;
             double y_end = (radius * (-Math.Sin(angle_point) + 1) + strokeHalf) * _scale;
