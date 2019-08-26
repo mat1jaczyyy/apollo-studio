@@ -243,10 +243,12 @@ namespace Apollo.DeviceViewers {
         }
 
         void Gradient_Generate() {
-            Gradient.GradientStops.Clear();
+            Dispatcher.UIThread.InvokeAsync(() => {
+                Gradient.GradientStops.Clear();
 
-            for (int i = 0; i < _fade.Count; i++)
-                Gradient.GradientStops.Add(new GradientStop(_fade.GetColor(i).ToAvaloniaColor(), _fade.GetPosition(i)));
+                for (int i = 0; i < _fade.Count; i++)
+                    Gradient.GradientStops.Add(new GradientStop(_fade.GetColor(i).ToAvaloniaColor(), _fade.GetPosition(i)));
+            });
         }
 
         void Duration_Changed(double value, double? old) {
