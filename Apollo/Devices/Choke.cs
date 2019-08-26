@@ -44,7 +44,7 @@ namespace Apollo.Devices {
 
         bool choked = true;
         object locker = new object();
-        ConcurrentDictionary<(int, int), Signal> signals = new ConcurrentDictionary<(int, int), Signal>();
+        ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
 
         void HandleChoke(Choke sender, int index) {
             if (Target == index && sender != this && !choked) {
@@ -57,7 +57,7 @@ namespace Apollo.Devices {
                         MIDIExit?.Invoke(i);
                     }
 
-                    signals = new ConcurrentDictionary<(int, int), Signal>();
+                    signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace Apollo.Devices {
                 MIDIExit?.Invoke(n.Clone());
                 
                 lock (locker) {
-                    (int, int) index = (n.Index, -n.Layer);
+                    (Launchpad, int, int) index = (n.Source, n.Index, -n.Layer);
                     if (n.Color.Lit) signals[index] = n.Clone();
                     else if (signals.ContainsKey(index)) signals.TryRemove(index, out Signal _);
                 }
