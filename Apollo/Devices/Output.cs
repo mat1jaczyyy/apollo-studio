@@ -35,7 +35,7 @@ namespace Apollo.Devices {
         }
 
         void IndexRemoved() {
-            if (Program.Project.TrackOperation) return;
+            if (Program.Project.TrackOperation || Program.Project.IsDisposing) return;
 
             bool redoing = false;
 
@@ -48,9 +48,7 @@ namespace Apollo.Devices {
                 int u = Target;
                 List<int> path = Track.GetPath(this);
 
-                Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => {
-                    ((Output)Track.TraversePath(path)).Target = u;
-                };
+                Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => ((Output)Track.TraversePath(path)).Target = u;
             }
 
             Target = Track.Get(this).ParentIndex.Value;

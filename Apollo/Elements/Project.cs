@@ -31,6 +31,8 @@ namespace Apollo.Elements {
 
         public ProjectWindow Window;
 
+        public bool IsDisposing { get; private set; } = false;
+
         public List<Track> Tracks;
 
         public delegate void ChangedEventHandler();
@@ -260,6 +262,8 @@ namespace Apollo.Elements {
         }
 
         public void Dispose() {
+            IsDisposing = true;
+
             Undo?.Dispose();
             Undo = null;
 
