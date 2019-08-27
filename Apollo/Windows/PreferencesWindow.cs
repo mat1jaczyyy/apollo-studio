@@ -277,7 +277,7 @@ namespace Apollo.Windows {
 
         void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
-        void CheckForUpdates_Changed(object sender, EventArgs e) => Preferences.CheckForUpdates = DiscordFilename.IsChecked.Value;
+        void CheckForUpdates_Changed(object sender, EventArgs e) => Preferences.CheckForUpdates = CheckForUpdates.IsChecked.Value;
 
         void OpenCrashesFolder(object sender, RoutedEventArgs e) {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
