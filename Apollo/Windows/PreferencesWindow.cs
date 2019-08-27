@@ -286,6 +286,14 @@ namespace Apollo.Windows {
             Program.URL(Program.CrashDir);
         }
 
+        void LocateApolloConnector(object sender, RoutedEventArgs e) {
+            string m4l = Program.GetBaseFolder("M4L");
+
+            if (!Directory.Exists(m4l)) Directory.CreateDirectory(m4l);
+
+            Program.URL(m4l);
+        }
+
         void Launchpad_Add() {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);
             MIDI.Update();
