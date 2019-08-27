@@ -64,6 +64,19 @@ namespace Apollo.Windows {
             Directory.Move(directory, path);
         }
 
+        void MergeM4L(string source, string dest) {
+            string[] destfiles = Directory.GetFiles(dest).Select(x => Path.GetFileName(x)).ToArray();
+
+            foreach (string srcpath in Directory.GetFiles(source)) {
+                string srcfile = Path.GetFileName(srcpath);
+                
+                if (!destfiles.Contains(srcfile))
+                    File.Copy(srcpath, Path.Combine(dest, srcfile));
+            }
+
+            Directory.Delete(source, true);
+        }
+
         public UpdateWindow() {
             InitializeComponent();
             #if DEBUG
@@ -107,12 +120,17 @@ namespace Apollo.Windows {
                 
             string updatepath = Program.GetBaseFolder("Update");
             string temppath = Program.GetBaseFolder("Temp");
+            string m4l = Program.GetBaseFolder("M4L");
+            string m4lnew = Program.GetBaseFolder("M4L_New");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 ZipArchive zip = new ZipArchive(new MemoryStream(result));
 
                 ExtractWin(GetZipFolder(zip, "Update"), updatepath);
                 ExtractWin(GetZipFolder(zip, "Apollo"), temppath);
+                ExtractWin(GetZipFolder(zip, "M4L"), m4lnew);
+
+                MergeM4L(m4lnew, m4l);
 
             } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
                 string zippath = Program.GetBaseFolder("Zip");
@@ -134,6 +152,9 @@ namespace Apollo.Windows {
 
                 ExtractMac(Path.Combine(zippath, foldername, "Update"), updatepath);
                 ExtractMac(Path.Combine(zippath, foldername, "Apollo"), temppath);
+                ExtractMac(Path.Combine(zippath, foldername, "M4L"), m4lnew);
+
+                MergeM4L(m4lnew, m4l);
 
                 Directory.Delete(zippath, true);
             }
