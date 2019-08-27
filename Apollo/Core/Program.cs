@@ -228,6 +228,7 @@ namespace Apollo.Core {
 
                 BuildAvaloniaApp().Start<SplashWindow>();
 
+                Preferences.Save();
                 autosave.Dispose();
                 MIDI.Stop();
                 Discord.Set(false);
