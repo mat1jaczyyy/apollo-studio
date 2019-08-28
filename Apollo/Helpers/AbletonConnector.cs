@@ -27,10 +27,11 @@ namespace Apollo.Helpers {
             connection?.BeginReceive(new AsyncCallback(Receive), connection);
 
             if (source.Address.Equals(localhost)) {
-                if (!portMap.ContainsKey(source) && message[0] >= 243 && message[0] <= 244)
-                    connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
+                if (!portMap.ContainsKey(source)) {
+                    if (message[0] >= 243 && message[0] <= 244)
+                        connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
 
-                if (message[0] < 128) {
+                } else if (message[0] < 128) {
                     NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
                     portMap[source].NoteOn(null, in msg);
                     
