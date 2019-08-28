@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
+using RtMidi.Core;
 using RtMidi.Core.Devices;
 using RtMidi.Core.Devices.Infos;
 using RtMidi.Core.Messages;
@@ -289,6 +290,24 @@ namespace Apollo.Elements {
             Program.Log($"MIDI Disconnected {Name}");
 
             Available = false;
+        }
+
+        public void Reconnect() {
+            if (this.GetType() != typeof(Launchpad) || Type == LaunchpadType.Unknown || !Available) return;
+
+            IMidiInputDeviceInfo input = MidiDeviceManager.Default.InputDevices.FirstOrDefault(i => i.Name == Input.Name);
+            IMidiOutputDeviceInfo output = MidiDeviceManager.Default.OutputDevices.FirstOrDefault(o => o.Name == Output.Name);
+
+            if (input == null || output == null) return;
+
+            Input.Close();
+            Output.Close();
+
+            Input = input.CreateDevice();
+            Output = output.CreateDevice();
+
+            Input.Open();
+            Output.Open();
         }
 
         public void HandleMessage(Signal n, bool rotated = false) {
