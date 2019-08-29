@@ -210,6 +210,7 @@ namespace Apollo.Components {
 
                 InputX.SelectionStart = 0;
                 InputX.SelectionEnd = InputX.Text.Length;
+                InputX.CaretIndex = InputX.Text.Length;
 
                 Display.Opacity = 0;
                 Display.IsHitTestVisible = false;

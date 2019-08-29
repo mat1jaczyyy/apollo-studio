@@ -392,6 +392,7 @@ namespace Apollo.DeviceViewers {
 
                 Input.SelectionStart = 0;
                 Input.SelectionEnd = Input.Text.Length;
+                Input.CaretIndex = Input.Text.Length;
 
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
