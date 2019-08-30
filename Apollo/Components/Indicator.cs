@@ -6,6 +6,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
+using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -34,6 +35,8 @@ namespace Apollo.Components {
         }
 
         public void Trigger() {
+            if (!Preferences.DisplaySignalIndicators) return;
+
             lock (locker) {
                 if (Disposed) return;
 
