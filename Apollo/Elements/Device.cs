@@ -61,6 +61,7 @@ namespace Apollo.Elements {
 
             if (n is StopSignal) Stop();
             else if (Enabled) {
+                Viewer?.Indicator.Trigger();
                 MIDIProcess(n);
                 return;
             }
