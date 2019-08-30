@@ -98,7 +98,7 @@ namespace Apollo.Devices {
                     Math.Abs(value - Value) <= ValueTolerance)) return;
             }
 
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

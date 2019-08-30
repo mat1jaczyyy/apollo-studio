@@ -29,7 +29,7 @@ namespace Apollo.Devices {
                 else MIDI.ClearState(Mode == ClearType.Both);
             }
 
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

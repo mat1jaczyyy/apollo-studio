@@ -54,7 +54,7 @@ namespace Apollo.Devices {
                 lock (locker) {
                     foreach (Signal i in signals.Values) {
                         i.Color = new Color(0);
-                        MIDIExit?.Invoke(i);
+                        InvokeExit(i);
                     }
 
                     signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
@@ -76,7 +76,7 @@ namespace Apollo.Devices {
 
         void ChainExit(Signal n) {
             if (!choked) {
-                MIDIExit?.Invoke(n.Clone());
+                InvokeExit(n.Clone());
                 
                 lock (locker) {
                     (Launchpad, int, int) index = (n.Source, n.Index, -n.Layer);

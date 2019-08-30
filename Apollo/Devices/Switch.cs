@@ -28,7 +28,7 @@ namespace Apollo.Devices {
             if (!n.Color.Lit)
                 Program.Project.Page = Page;
             
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

@@ -77,7 +77,7 @@ namespace Apollo.Devices {
             
             lock (locker) {
                 if (buffer.TryDequeue(out Signal n))
-                    MIDIExit?.Invoke(n);
+                    InvokeExit(n);
                 
                 timers.Remove(courier);
             }

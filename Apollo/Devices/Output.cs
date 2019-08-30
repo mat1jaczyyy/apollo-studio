@@ -78,7 +78,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             n.Source = Launchpad;
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
 
         public override void Dispose() {

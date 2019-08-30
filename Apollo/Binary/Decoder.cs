@@ -57,6 +57,10 @@ namespace Apollo.Binary {
                 Preferences.AlwaysOnTop = reader.ReadBoolean();
                 Preferences.CenterTrackContents = reader.ReadBoolean();
 
+                if (version >= 23) {
+                    Preferences.DisplaySignalIndicators = reader.ReadBoolean();
+                }
+
                 if (version >= 9) {
                     Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
                 }

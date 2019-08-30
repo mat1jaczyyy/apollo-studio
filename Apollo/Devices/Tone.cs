@@ -87,7 +87,7 @@ namespace Apollo.Devices {
                 n.Color = Color.FromHSV(hue, saturation, value);
             }
 
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

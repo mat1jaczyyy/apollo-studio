@@ -30,6 +30,8 @@ namespace Apollo.Viewers {
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
             Draggable = this.Get<Grid>("Draggable");
 
+            Indicator = this.Get<Indicator>("Indicator");
+
             DeviceMute = this.Get<MenuItem>("DeviceMute");
             GroupMute = this.Get<MenuItem>("DeviceMute");
         }
@@ -65,6 +67,7 @@ namespace Apollo.Viewers {
         public StackPanel Root;
         public Border Border, Header;
         public DeviceAdd DeviceAdd { get; protected set; }
+        public Indicator Indicator { get; private set; }
 
         protected TextBlock TitleText;
         protected Grid Draggable;

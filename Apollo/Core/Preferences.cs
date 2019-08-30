@@ -39,6 +39,15 @@ namespace Apollo.Core {
             }
         }
 
+        static bool _DisplaySignalIndicators = true;
+        public static bool DisplaySignalIndicators {
+            get => _DisplaySignalIndicators;
+            set {
+                _DisplaySignalIndicators = value;
+                Save();
+            }
+        }
+
         public static event Changed LaunchpadStyleChanged;
         static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
         public static LaunchpadStyles LaunchpadStyle {
