@@ -233,6 +233,10 @@ namespace Apollo.Binary {
             
             for (int i = 0; i < o.Count; i++)
                 writer.Write(o.GetPosition(i));
+            
+            writer.Write(o.Expanded.HasValue);
+            if (o.Expanded.HasValue)
+                writer.Write(o.Expanded.Value);
         }
 
         static void Encode(BinaryWriter writer, Flip o) {

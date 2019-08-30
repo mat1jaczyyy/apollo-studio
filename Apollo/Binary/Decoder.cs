@@ -327,7 +327,12 @@ namespace Apollo.Binary {
                 List<Color> colors = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList();
                 List<double> positions = (from i in Enumerable.Range(0, count) select (version <= 13)? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
 
-                return new Fade(time, gate, playmode, colors, positions);
+                int? expanded = null;
+                if (version >= 23) {
+                    expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+                }
+
+                return new Fade(time, gate, playmode, colors, positions, expanded);
 
             } else if (t == typeof(Flip))
                 return new Flip(
