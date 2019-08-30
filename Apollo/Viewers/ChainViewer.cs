@@ -34,6 +34,8 @@ namespace Apollo.Viewers {
 
             Contents = this.Get<StackPanel>("Contents").Children;
             DeviceAdd = this.Get<DeviceAdd>("DeviceAdd");
+
+            Indicator = this.Get<Indicator>("Indicator");
         }
         
         Chain _chain;
@@ -43,6 +45,7 @@ namespace Apollo.Viewers {
 
         Controls Contents;
         DeviceAdd DeviceAdd;
+        public Indicator Indicator { get; private set; }
 
         void SetAlwaysShowing() {
             bool RootChain = _chain.Parent.GetType() == typeof(Track);
