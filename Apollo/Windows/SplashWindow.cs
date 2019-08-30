@@ -103,7 +103,7 @@ namespace Apollo.Windows {
 
             Preferences.RecentsCleared += Clear;
 
-            if (Preferences.CrashName != "") {
+            if (Preferences.Crashed) {
                 CrashPanel.Opacity = 1;
                 CrashPanel.IsHitTestVisible = true;
                 CrashPanel.ZIndex = 1;
@@ -258,14 +258,15 @@ namespace Apollo.Windows {
             CrashPanel.IsHitTestVisible = false;
             CrashPanel.ZIndex = -1;
 
-            ReadFile(Preferences.CrashName + ".approj", true);
+            ReadFile(Program.CrashProject, true);
 
             if (Program.Project != null) {
                 Program.Project.FilePath = Preferences.CrashPath;
                 Program.Project.Undo.Clear("Project Restored");
             }
 
-            Preferences.CrashName = Preferences.CrashPath = "";
+            Preferences.Crashed = false;
+            Preferences.CrashPath = "";
         }
 
         void Ignore(object sender, RoutedEventArgs e) {
@@ -273,7 +274,8 @@ namespace Apollo.Windows {
             CrashPanel.IsHitTestVisible = false;
             CrashPanel.ZIndex = -1;
 
-            Preferences.CrashName = Preferences.CrashPath = "";
+            Preferences.Crashed = false;
+            Preferences.CrashPath = "";
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

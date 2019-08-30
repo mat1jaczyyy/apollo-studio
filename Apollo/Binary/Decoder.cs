@@ -120,7 +120,15 @@ namespace Apollo.Binary {
 
                 if (version >= 15) {
                     Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
-                    Preferences.CrashName = reader.ReadString();
+                }
+
+                if (15 <= version && version <= 22) {
+                    reader.ReadString();
+                    reader.ReadString();
+                }
+
+                if (version >= 23) {
+                    Preferences.Crashed = reader.ReadBoolean();
                     Preferences.CrashPath = reader.ReadString();
                 }
 
