@@ -102,7 +102,7 @@ namespace Apollo.Devices {
             
             lock (queuelocker) {
                 if (buffer.TryDequeue(out Signal n))
-                    MIDIExit?.Invoke(n);
+                    InvokeExit(n);
             }
         }
 
@@ -137,7 +137,7 @@ namespace Apollo.Devices {
                     }
 
                     n.Color = color;
-                    MIDIExit?.Invoke(n);
+                    InvokeExit(n);
                 }
             }
         }

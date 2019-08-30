@@ -55,7 +55,7 @@ namespace Apollo.Devices {
             n.BlendingMode = BlendingMode;
             n.BlendingRange = Range;
 
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

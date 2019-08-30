@@ -222,7 +222,7 @@ namespace Apollo.Devices {
                     if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
                         Signal m = info.n.Clone();
                         m.Index = (byte)info.offsets[info.index];
-                        MIDIExit?.Invoke(m);
+                        InvokeExit(m);
 
                         if (info.index == info.offsets.Count - 1)
                             poly.Remove(info);
@@ -252,7 +252,7 @@ namespace Apollo.Devices {
                     Signal o = original.Clone();
                     o.Index = (byte)offsets[buffer[n]];
                     o.Color = new Color(0);
-                    MIDIExit?.Invoke(o);
+                    InvokeExit(o);
 
                     if (m.Color.Lit) {
                         if (offsets.Count > 1) {
@@ -266,7 +266,7 @@ namespace Apollo.Devices {
                 }
 
                 if (buffer.ContainsKey(n)) {
-                    MIDIExit?.Invoke(m);
+                    InvokeExit(m);
                     FireCourier((original, offsets), _time * _gate);
                 } else {
                     timers[n].Dispose();
@@ -277,7 +277,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             if (n.Index == 100) {
-                MIDIExit?.Invoke(n);
+                InvokeExit(n);
                 return;
             }
 
@@ -320,20 +320,20 @@ namespace Apollo.Devices {
             if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
 
             if (CopyMode == CopyType.Static) {
-                MIDIExit?.Invoke(n.Clone());
+                InvokeExit(n.Clone());
 
                 for (int i = 1; i < validOffsets.Count; i++) {
                     Signal m = n.Clone();
                     m.Index = (byte)validOffsets[i];
 
-                    MIDIExit?.Invoke(m);
+                    InvokeExit(m);
                 }
 
             } else if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
                 
                 lock (locker[n]) {
-                    MIDIExit?.Invoke(n.Clone());
+                    InvokeExit(n.Clone());
                     
                     PolyInfo info = new PolyInfo(n, validOffsets);
                     poly.Add(info);
@@ -355,7 +355,7 @@ namespace Apollo.Devices {
                     if (!m.Color.Lit) buffer.Remove(n, out int _);
                 }
 
-                MIDIExit?.Invoke(m);
+                InvokeExit(m);
 
             } else if (CopyMode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }

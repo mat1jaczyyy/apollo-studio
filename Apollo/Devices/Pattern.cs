@@ -252,18 +252,18 @@ namespace Apollo.Devices {
                     if (++buffer[n] < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
                             if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
-                                    MIDIExit?.Invoke(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
+                                    InvokeExit(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
 
                     } else if (Mode == PlaybackType.Mono) {
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                    MIDIExit?.Invoke(n.With((byte)index, new Color(0)));
+                                    InvokeExit(n.With((byte)index, new Color(0)));
 
                     } else if (Mode == PlaybackType.Loop) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
-                                MIDIExit?.Invoke(n.With((byte)index, Frames[0].Screen[i].Clone()));
+                                InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
 
                         buffer[n] = 0;
                         double time = 0;
@@ -284,14 +284,14 @@ namespace Apollo.Devices {
                     if (++info.index < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
                             if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
-                                MIDIExit?.Invoke(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
+                                InvokeExit(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
                     } else {
                         poly.Remove(info);
 
                         if (!Infinite)
                             for (int i = 0; i < Frames.Last().Screen.Length; i++)
                                 if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
-                                    MIDIExit?.Invoke(info.n.With((byte)index, new Color(0)));
+                                    InvokeExit(info.n.With((byte)index, new Color(0)));
                     }
                 }
             }
@@ -311,7 +311,7 @@ namespace Apollo.Devices {
 
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
                             if (Frames[buffer[n] % Frames.Count].Screen[i].Lit && ApplyRootKey(i, originalIndex, out int index))
-                                MIDIExit?.Invoke(n.With((byte)index, new Color(0)));
+                                InvokeExit(n.With((byte)index, new Color(0)));
                     }
 
                     buffer.Remove(n, out int _);
@@ -337,7 +337,7 @@ namespace Apollo.Devices {
                     if (lit) {
                         for (int i = 0; i < Frames[0].Screen.Length; i++)
                             if (Frames[0].Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                MIDIExit?.Invoke(n.With((byte)index, Frames[0].Screen[i].Clone()));
+                                InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
                         
                         double time = 0;
                         PolyInfo info = new PolyInfo(n);

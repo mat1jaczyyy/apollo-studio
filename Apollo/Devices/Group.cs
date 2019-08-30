@@ -97,7 +97,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        void ChainExit(Signal n) => MIDIExit?.Invoke(n);
+        void ChainExit(Signal n) => InvokeExit(n);
 
         public override void MIDIProcess(Signal n) {
             if (Chains.Count == 0) ChainExit(n);

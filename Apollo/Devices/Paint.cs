@@ -25,7 +25,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             if (n.Color.Lit) n.Color = Color.Clone();
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

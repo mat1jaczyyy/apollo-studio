@@ -33,6 +33,11 @@ namespace Apollo.Elements {
         public int? ParentIndex;
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
+        protected void InvokeExit(Signal n) {
+            Viewer?.Indicator.Trigger();
+            MIDIExit?.Invoke(n);
+        }
+
         public bool Collapsed = false;
         
         bool _enabled = true;
@@ -61,12 +66,11 @@ namespace Apollo.Elements {
 
             if (n is StopSignal) Stop();
             else if (Enabled) {
-                Viewer?.Indicator.Trigger();
                 MIDIProcess(n);
                 return;
             }
             
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
 
         protected virtual void Stop() {}

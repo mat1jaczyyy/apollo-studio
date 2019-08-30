@@ -253,7 +253,7 @@ namespace Apollo.Devices {
                     if (buffer[n] < fade.Count) {
                         Signal m = n.Clone();
                         m.Color = fade[buffer[n]].Color.Clone();
-                        MIDIExit?.Invoke(m);
+                        InvokeExit(m);
                     }
                 }
             }
@@ -270,7 +270,7 @@ namespace Apollo.Devices {
                 if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
                     Signal m = n.Clone();
                     m.Color = fade.Last().Color.Clone();
-                    MIDIExit?.Invoke(m);
+                    InvokeExit(m);
                 }
 
                 timers[n] = new List<Courier>();
@@ -291,7 +291,7 @@ namespace Apollo.Devices {
                     if (lit) {
                         Signal m = n.Clone();
                         m.Color = fade[0].Color.Clone();
-                        MIDIExit?.Invoke(m);
+                        InvokeExit(m);
                         
                         for (int i = 1; i < fade.Count; i++)
                             FireCourier(n, fade[i].Time);
