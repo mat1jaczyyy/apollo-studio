@@ -15,27 +15,39 @@ namespace Apollo.Components {
 
             Display = this.Get<Ellipse>("Display");
         }
-        
+
         Ellipse Display;
         Courier Timer;
+        object locker = new object();
+        
+        bool Disposed = false;
 
         void SetIndicator(bool state) => Dispatcher.UIThread.InvokeAsync(() => Display.Opacity = Convert.ToInt32(state));
 
         public Indicator() => InitializeComponent();
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Timer?.Dispose();
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            lock (locker) {
+                Timer?.Dispose();
+                Disposed = true;
+            }
+        }
 
         public void Trigger() {
-            Timer?.Dispose();
+            lock (locker) {
+                if (Disposed) return;
 
-            Timer = new Courier() {
-                Interval = 200
-            };
+                Timer?.Dispose();
 
-            Timer.Elapsed += (_, __) => SetIndicator(false);
-            Timer.Start();
+                Timer = new Courier() {
+                    Interval = 200
+                };
 
-            SetIndicator(true);
+                Timer.Elapsed += (_, __) => SetIndicator(false);
+                Timer.Start();
+
+                SetIndicator(true);
+            }
         }
     }
 }
