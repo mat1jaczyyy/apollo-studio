@@ -198,13 +198,16 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null): base("fade") {
+        public int? Expanded;
+
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, int? expanded = null): base("fade") {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
+            Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;
 
