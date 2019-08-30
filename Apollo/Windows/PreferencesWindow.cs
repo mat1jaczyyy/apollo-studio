@@ -257,7 +257,9 @@ namespace Apollo.Windows {
         }
 
         void SetTheme(Themes theme) {
-            ThemeHeader.Text = (Preferences.Theme != theme)? "You must restart\nApollo Studio to\napply this change." : "";
+            if (Preferences.Theme != theme)
+                ThemeHeader.Text = "You must restart\nApollo Studio to\napply this change.";
+            
             Preferences.Theme = theme;
         }
 
