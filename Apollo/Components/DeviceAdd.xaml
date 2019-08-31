@@ -15,6 +15,7 @@
         <MenuItem Header="Page Filter" />
         <MenuItem Header="Key Filter" />
         <MenuItem Header="Color Filter" />
+        <MenuItem Header="Layer Filter" />
       </MenuItem>
 
       <MenuItem Header="Timing">
