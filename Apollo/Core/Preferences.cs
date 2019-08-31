@@ -266,11 +266,13 @@ namespace Apollo.Core {
             Save();
         }
 
-        static bool _crashed = false;
+        static bool _crashed = true;
         public static bool Crashed {
             get => _crashed;
             set {
-                _crashed = value;
+                if (!(_crashed = value))
+                    CrashPath = "";
+                    
                 Save();
             }
         }

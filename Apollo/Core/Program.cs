@@ -43,6 +43,8 @@ namespace Apollo.Core {
         public static readonly string CrashDir = Path.Combine(UserPath, "Crashes");
         public static readonly string CrashProject = Path.Combine(CrashDir, "crash.approj");
 
+        public static bool HadCrashed = false;
+
         public static bool LaunchAdmin = false;
         public static bool LaunchUpdater = false;
         
@@ -57,10 +59,14 @@ namespace Apollo.Core {
             get => _project;
             set {
                 _project?.Dispose();
-                _project = value;
 
-                ProjectLoaded?.Invoke();
-                ProjectLoaded = null;
+                if ((_project = value) == null) File.Delete(Program.CrashProject);
+                else {
+                    _project.WriteCrashBackup();
+
+                    ProjectLoaded?.Invoke();
+                    ProjectLoaded = null;
+                }
             }
         }
         
@@ -216,6 +222,9 @@ namespace Apollo.Core {
 
                 Args = args;
 
+                HadCrashed = Preferences.Crashed;
+                Preferences.Crashed = true;
+
                 if (Preferences.DiscordPresence) Discord.Set(true);
 
                 MIDI.Start();
@@ -228,9 +237,9 @@ namespace Apollo.Core {
                             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
                             await Program.Project.WriteFile(
-                                Application.Current.MainWindow,
+                                null,
                                 Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
-                                false, false
+                                false
                             );
                         } catch {}
                     }
@@ -241,11 +250,13 @@ namespace Apollo.Core {
 
                 BuildAvaloniaApp().Start<SplashWindow>();
 
-                Preferences.Save();
                 autosave.Dispose();
                 MIDI.Stop();
                 Discord.Set(false);
                 AbletonConnector.Dispose();
+                Preferences.Crashed = HadCrashed;
+                
+                Preferences.Save();
             }
 
             TimeSpent.Stop();
