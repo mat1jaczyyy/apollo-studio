@@ -164,8 +164,7 @@
 
             <TextBlock Classes="heading" Text="Thanks to our Patreon supporters:" />
             <StackPanel>
-              <TextBlock Text="Shakkar, AlexayForest, Tuchan, QuarkDrop, T4sh, Xiao Meng," />
-              <TextBlock Text="OmegaVibe" />
+              <TextBlock Text="Shakkar, AlexayForest, Tuchan, T4sh, Xiao Meng, OmegaVibe" />
             </StackPanel>
           </StackPanel>
         </ScrollViewer>
