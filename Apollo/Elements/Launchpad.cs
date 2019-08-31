@@ -303,11 +303,20 @@ namespace Apollo.Elements {
             Input.Close();
             Output.Close();
 
+            Input.Dispose();
+            Output.Dispose();
+
             Input = input.CreateDevice();
             Output = output.CreateDevice();
 
             Input.Open();
             Output.Open();
+
+            Clear();
+
+            Input.NoteOn += NoteOn;
+            Input.NoteOff += NoteOff;
+            Input.ControlChange += ControlChange;
         }
 
         public void HandleMessage(Signal n, bool rotated = false) {
