@@ -5,19 +5,21 @@
              DetachedFromVisualTree="Unloaded">
   
   <Grid Margin="5 0">
-    <Grid ColumnDefinitions="Auto,*,Auto,93" VerticalAlignment="Center">
+    <Grid ColumnDefinitions="Auto,Auto,*,Auto,93" VerticalAlignment="Center">
       <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Name="Name" />
 
-      <Components:Popout Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
+      <Components:Reconnect Grid.Column="1" Margin="5 0" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Reconnect" Clicked="Launchpad_Reconnect" />
 
-      <ComboBox Grid.Column="2" VerticalAlignment="Center" BorderThickness="0" x:Name="Rotation" SelectionChanged="Rotation_Changed">
+      <Components:Popout Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
+
+      <ComboBox Grid.Column="3" VerticalAlignment="Center" BorderThickness="0" x:Name="Rotation" SelectionChanged="Rotation_Changed">
         <ComboBoxItem>0°</ComboBoxItem>
         <ComboBoxItem>90°</ComboBoxItem>
         <ComboBoxItem>180°</ComboBoxItem>
         <ComboBoxItem>270°</ComboBoxItem>
       </ComboBox>
 
-      <StackPanel Grid.Column="3">
+      <StackPanel Grid.Column="4">
         <ComboBox VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" x:Name="InputFormatSelector" SelectionChanged="InputFormat_Changed">
           <ComboBoxItem>XY Layout</ComboBoxItem>
           <ComboBoxItem>Drum Rack</ComboBoxItem>
