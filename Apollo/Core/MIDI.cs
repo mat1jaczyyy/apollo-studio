@@ -72,11 +72,6 @@ namespace Apollo.Core {
             lock (locker) {
                 if (updated) {
                     updated = false;
-
-                    foreach (Launchpad lp in Devices) {
-                        lp.Reconnect();
-                    }
-
                     DevicesUpdated?.Invoke();
                 }
             }
