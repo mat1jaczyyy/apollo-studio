@@ -1,18 +1,18 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.RedoButton"
-             ToolTip.Tip="Redo"
+             x:Class="Apollo.Components.Reconnect"
+             ToolTip.Tip="Reconnect Launchpad"
              DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
     <SolidColorBrush x:Key="Brush" />
   </UserControl.Resources>
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
+  <Canvas Width="12" Height="12" Background="Transparent" x:Name="Icon"
           PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Path Stroke="{DynamicResource Brush}" StrokeThickness="2"
-          Data="M 12.95,3.05 A 7,7 270 1 0 12.95,12.95" />
+          Data="M 9.7125,2.2875 A 5,5 270 1 0 9.7125,9.7125" />
     <Path Fill="{DynamicResource Brush}"
-          Data="M 16,0 L 10,6 16,6 Z" />
+          Data="M 12,0 L 7.5,4.5 12,4.5 Z" />
   </Canvas>
 </UserControl>
