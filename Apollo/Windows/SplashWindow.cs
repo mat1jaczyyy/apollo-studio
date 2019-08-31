@@ -103,11 +103,13 @@ namespace Apollo.Windows {
 
             Preferences.RecentsCleared += Clear;
 
-            if (Preferences.CrashName != "") {
-                CrashPanel.Opacity = 1;
-                CrashPanel.IsHitTestVisible = true;
-                CrashPanel.ZIndex = 1;
-            }
+            if (Program.HadCrashed)
+                if (File.Exists(Program.CrashProject)) {
+                    CrashPanel.Opacity = 1;
+                    CrashPanel.IsHitTestVisible = true;
+                    CrashPanel.ZIndex = 1;
+
+                } else ResolveCrash();
         }
 
         async void Loaded(object sender, EventArgs e) {
@@ -162,6 +164,7 @@ namespace Apollo.Windows {
         void New(object sender, RoutedEventArgs e) {
             Program.Project?.Dispose();
             Program.Project = new Project();
+
             ProjectWindow.Create(this);
             Close();
         }
@@ -253,19 +256,26 @@ namespace Apollo.Windows {
         async void Release(object sender, RoutedEventArgs e)
             => Program.URL((await Github.LatestRelease()).HtmlUrl);
 
+        void ResolveCrash() {
+            File.Delete(Program.CrashProject);
+            Program.HadCrashed = false;
+        }
+
         void Restore(object sender, RoutedEventArgs e) {
             CrashPanel.Opacity = 0;
             CrashPanel.IsHitTestVisible = false;
             CrashPanel.ZIndex = -1;
 
-            ReadFile(Preferences.CrashName + ".approj", true);
+            string originalPath = Preferences.CrashPath;
+
+            ReadFile(Program.CrashProject, true);
 
             if (Program.Project != null) {
-                Program.Project.FilePath = Preferences.CrashPath;
+                Program.Project.FilePath = originalPath;
                 Program.Project.Undo.Clear("Project Restored");
             }
 
-            Preferences.CrashName = Preferences.CrashPath = "";
+            ResolveCrash();
         }
 
         void Ignore(object sender, RoutedEventArgs e) {
@@ -273,7 +283,7 @@ namespace Apollo.Windows {
             CrashPanel.IsHitTestVisible = false;
             CrashPanel.ZIndex = -1;
 
-            Preferences.CrashName = Preferences.CrashPath = "";
+            ResolveCrash();
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

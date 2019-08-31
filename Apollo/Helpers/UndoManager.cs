@@ -81,6 +81,8 @@ namespace Apollo.Helpers {
             Position = History.Count - 1;
 
             if (Preferences.UndoLimit) Limit();
+
+            Program.Project.WriteCrashBackup();
         }
 
         public void Select(int index) {

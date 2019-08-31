@@ -84,7 +84,7 @@ namespace Apollo.Binary {
                 for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
                 
-                writer.Write(Preferences.CrashName);
+                writer.Write(Preferences.Crashed);
                 writer.Write(Preferences.CrashPath);
                 
                 writer.Write(Preferences.CheckForUpdates);
