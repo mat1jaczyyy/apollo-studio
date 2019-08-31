@@ -11,7 +11,7 @@
         <Components:Dial Grid.Column="0" x:Name="Target" Title="Target" Minimum="-100" Maximum="100" Default="100" Exponent="1" Round="0" Unit="" Centered="true"
                          ValueChanged="Target_Changed" />
 
-        <Components:Dial Grid.Column="1" x:Name="Range" Title="Range" Minimum="1" Maximum="200" Default="200" Exponent="1" Round="0" Unit="" Centered="false" DisabledText="Unused"
+        <Components:Dial Grid.Column="1" x:Name="Range" Title="Range" Minimum="1" Maximum="200" Default="200" Exponent="1" Round="0" Unit="" DisabledText="Unused"
                          ValueChanged="Range_Changed" />
       </Grid>
     </Border>
