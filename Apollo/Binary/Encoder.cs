@@ -271,6 +271,13 @@ namespace Apollo.Binary {
             writer.Write(o.Range);
         }
 
+        static void Encode(BinaryWriter writer, LayerFilter o) {
+            EncodeID(writer, typeof(LayerFilter));
+
+            writer.Write(o.Target);
+            writer.Write(o.Range);
+        }
+
         static void Encode(BinaryWriter writer, Move o) {
             EncodeID(writer, typeof(Move));
 

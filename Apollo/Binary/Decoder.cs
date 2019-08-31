@@ -405,7 +405,13 @@ namespace Apollo.Binary {
 
                 return new Layer(target, blending, range);
 
-            } else if (t == typeof(Move))
+            } else if (t == typeof(LayerFilter))
+                return new LayerFilter(
+                    reader.ReadInt32(),
+                    reader.ReadInt32()
+                );
+
+            else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
                     (GridType)reader.ReadInt32(),
