@@ -19,6 +19,8 @@ namespace Apollo.Viewers {
             
             Draggable = this.Get<Grid>("Draggable");
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
+            Indicator = this.Get<Indicator>("Indicator");
+
             TitleText = this.Get<TextBlock>("Title");
 
             DeviceMute = this.Get<MenuItem>("DeviceMute");

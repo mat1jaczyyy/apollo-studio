@@ -67,7 +67,7 @@ namespace Apollo.Viewers {
         public StackPanel Root;
         public Border Border, Header;
         public DeviceAdd DeviceAdd { get; protected set; }
-        public Indicator Indicator { get; private set; }
+        public Indicator Indicator { get; protected set; }
 
         protected TextBlock TitleText;
         protected Grid Draggable;
