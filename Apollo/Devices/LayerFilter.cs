@@ -36,7 +36,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public LayerFilter(int target = 0, int range = 0): base("layerfilter") {
+        public LayerFilter(int target = 0, int range = 0): base("layerfilter", "Layer Filter") {
             Target = target;
             Range = range;
         }
