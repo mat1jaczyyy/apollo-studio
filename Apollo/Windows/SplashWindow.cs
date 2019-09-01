@@ -296,5 +296,7 @@ namespace Apollo.Windows {
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        
+        void Minimize() => WindowState = WindowState.Minimized;
     }
 }
