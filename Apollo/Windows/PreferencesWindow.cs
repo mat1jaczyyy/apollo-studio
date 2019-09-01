@@ -194,8 +194,6 @@ namespace Apollo.Windows {
             fade.Dispose();
         }
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
-
         void AlwaysOnTop_Changed(object sender, EventArgs e) {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
             Activate();
@@ -318,6 +316,10 @@ namespace Apollo.Windows {
             if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
+
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        
+        void Minimize() => WindowState = WindowState.Minimized;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {
