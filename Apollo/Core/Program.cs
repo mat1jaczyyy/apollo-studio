@@ -19,7 +19,7 @@ using Apollo.Windows;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Version 1.0.3";
+        public static readonly string Version = "Version 1.1.0";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
@@ -36,16 +36,16 @@ namespace Apollo.Core {
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
         ), ".apollostudio");
 
-        public static readonly string CrashDir = Path.Combine(Program.UserPath, "Crashes");
+        public static readonly string CrashDir = Path.Combine(UserPath, "Crashes");
+        public static readonly string CrashProject = Path.Combine(CrashDir, "crash.approj");
+
+        public static bool HadCrashed = false;
 
         public static bool LaunchAdmin = false;
         public static bool LaunchUpdater = false;
         
         public static Stopwatch TimeSpent = new Stopwatch();
-        public static void Log(string text) {
-            if (text == "") Console.Write(text);
-            else Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
-        }
+        public static void Log(string text) => Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
 
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
@@ -55,10 +55,14 @@ namespace Apollo.Core {
             get => _project;
             set {
                 _project?.Dispose();
-                _project = value;
 
-                ProjectLoaded?.Invoke();
-                ProjectLoaded = null;
+                if ((_project = value) == null) File.Delete(Program.CrashProject);
+                else {
+                    _project.WriteCrashBackup();
+
+                    ProjectLoaded?.Invoke();
+                    ProjectLoaded = null;
+                }
             }
         }
 
@@ -66,27 +70,39 @@ namespace Apollo.Core {
         static void Main(string[] args) {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 if (!Directory.Exists(CrashDir)) Directory.CreateDirectory(CrashDir);
-                string crashName = Path.Combine(CrashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
-
+                
                 using (MemoryStream memoryStream = new MemoryStream()) {
+                    string crashName = Path.Combine(CrashDir, $"Crash-{DateTimeOffset.Now.ToUnixTimeSeconds()}");
+
                     using (ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
+                        string additional = "";
+                        
                         if (Project != null) {
-                            byte[] project = null;
+                            try {
+                                byte[] project = Encoder.Encode(Project).ToArray();
 
-                            File.WriteAllBytes(crashName + ".approj", project = Encoder.Encode(Project).ToArray());
+                                File.WriteAllBytes(CrashProject, project);
 
-                            if (project != null)
-                                using (Stream writer = archive.CreateEntry("project.approj").Open())
-                                    writer.Write(project);
+                                if (project != null)
+                                    using (Stream writer = archive.CreateEntry("project.approj").Open())
+                                        writer.Write(project);
+
+                            } catch (Exception ex) {
+                                additional = "\r\n\r\n" + 
+                                    "There was an additional exception while attempting to store the project for the crash log:\r\n\r\n" +
+                                    ex.ToString();
+                            }
                         }
 
                         using (Stream log = archive.CreateEntry("exception.log").Open())
-                            using (StreamWriter writer = new StreamWriter(log))
+                            using (StreamWriter writer = new StreamWriter(log)) {
                                 writer.Write(
-                                    $"Apollo Version: {Version}\n" +
-                                    $"Operating System: {RuntimeInformation.OSDescription}\n\n" +
-                                    e.ExceptionObject.ToString()
+                                    $"Apollo Version: {Version}\r\n" +
+                                    $"Operating System: {RuntimeInformation.OSDescription}\r\n\r\n" +
+                                    e.ExceptionObject.ToString() +
+                                    additional
                                 );
+                            }
                     }
 
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
@@ -95,7 +111,7 @@ namespace Apollo.Core {
                 if (TimeSpent.IsRunning) TimeSpent.Stop();
 
                 if (e.IsTerminating && Project != null) {
-                    Preferences.CrashName = crashName;
+                    Preferences.Crashed = true;
                     Preferences.CrashPath = Project.FilePath;
                 }
 

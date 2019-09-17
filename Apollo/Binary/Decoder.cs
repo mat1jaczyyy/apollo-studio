@@ -57,6 +57,10 @@ namespace Apollo.Binary {
                 Preferences.AlwaysOnTop = reader.ReadBoolean();
                 Preferences.CenterTrackContents = reader.ReadBoolean();
 
+                if (version >= 23) {
+                    Preferences.DisplaySignalIndicators = reader.ReadBoolean();
+                }
+
                 if (version >= 9) {
                     Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
                 }
@@ -116,7 +120,15 @@ namespace Apollo.Binary {
 
                 if (version >= 15) {
                     Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
-                    Preferences.CrashName = reader.ReadString();
+                }
+
+                if (15 <= version && version <= 22) {
+                    reader.ReadString();
+                    reader.ReadString();
+                }
+
+                if (version >= 23) {
+                    Preferences.Crashed = reader.ReadBoolean();
                     Preferences.CrashPath = reader.ReadString();
                 }
 
@@ -323,7 +335,12 @@ namespace Apollo.Binary {
                 List<Color> colors = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList();
                 List<double> positions = (from i in Enumerable.Range(0, count) select (version <= 13)? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
 
-                return new Fade(time, gate, playmode, colors, positions);
+                int? expanded = null;
+                if (version >= 23) {
+                    expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+                }
+
+                return new Fade(time, gate, playmode, colors, positions, expanded);
 
             } else if (t == typeof(Flip))
                 return new Flip(
@@ -388,7 +405,13 @@ namespace Apollo.Binary {
 
                 return new Layer(target, blending, range);
 
-            } else if (t == typeof(Move))
+            } else if (t == typeof(LayerFilter))
+                return new LayerFilter(
+                    reader.ReadInt32(),
+                    reader.ReadInt32()
+                );
+
+            else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
                     (GridType)reader.ReadInt32(),

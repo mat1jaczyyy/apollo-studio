@@ -97,6 +97,22 @@ namespace ApolloUpdate {
             
             Directory.Move(temppath, apollopath);
 
+            string tempm4lpath = Program.GetBaseFolder("TempM4L");
+
+            if (Directory.Exists(tempm4lpath)) {
+                string m4lpath = Program.GetBaseFolder("M4L");
+                string[] m4lfiles = Directory.GetFiles(m4lpath).Select(x => Path.GetFileName(x)).ToArray();
+
+                foreach (string newpath in Directory.GetFiles(tempm4lpath)) {
+                    string newfile = Path.GetFileName(newpath);
+                    
+                    if (!m4lfiles.Contains(newpath))
+                        File.Copy(newpath, Path.Combine(m4lpath, newfile));
+                }
+
+                Directory.Delete(tempm4lpath, true);
+            }
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 Process.Start(Path.Combine(apollopath, "Apollo.exe"));
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))

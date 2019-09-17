@@ -36,7 +36,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-            if (Bypass) MIDIExit?.Invoke(n.Clone());
+            if (Bypass) InvokeExit(n.Clone());
             
             if (Mode == RotateType.D90) {
                 n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
@@ -48,7 +48,7 @@ namespace Apollo.Devices {
                 n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
             }
 
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
         }
     }
 }

@@ -35,7 +35,7 @@ mkdir Update
 
 cp -r ../Apollo/bin/Release/netcoreapp2.2/osx.10.11-x64/publish/* Apollo
 cp -r ../ApolloUpdate/bin/Release/netcoreapp2.2/osx.10.11-x64/publish/* Update
-cp "../M4L/Apollo Connector.amxd" M4L
+cp ../M4L/*.amxd M4L
 
 echo Creating macOS Package...
 

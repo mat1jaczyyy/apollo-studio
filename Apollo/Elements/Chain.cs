@@ -61,6 +61,11 @@ namespace Apollo.Elements {
             }
         }
 
+        void InvokeExit(Signal n) {
+            Info?.Indicator.Trigger();
+            MIDIExit?.Invoke(n);
+        }
+
         public List<Device> Devices = new List<Device>();
         Action<Signal> _chainenter = null;
 
@@ -71,7 +76,7 @@ namespace Apollo.Elements {
             }
             
             if (Devices.Count == 0)
-                _chainenter = _midiexit;
+                _chainenter = InvokeExit;
 
             else {
                 _chainenter = Devices[0].MIDIEnter;
@@ -79,7 +84,7 @@ namespace Apollo.Elements {
                 for (int i = 1; i < Devices.Count; i++)
                     Devices[i - 1].MIDIExit = Devices[i].MIDIEnter;
                 
-                Devices[Devices.Count - 1].MIDIExit = _midiexit;
+                Devices[Devices.Count - 1].MIDIExit = InvokeExit;
             }
         }
 
@@ -159,7 +164,11 @@ namespace Apollo.Elements {
         }
 
         public void MIDIEnter(Signal n) {
-            if (Enabled || n is StopSignal) _chainenter?.Invoke(n);
+            if (n is StopSignal) _chainenter?.Invoke(n);
+            else if (Enabled) {
+                Viewer?.Indicator.Trigger();
+                _chainenter?.Invoke(n);
+            }
         }
 
         public void Dispose() {

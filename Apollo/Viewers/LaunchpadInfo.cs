@@ -19,6 +19,7 @@ namespace Apollo.Viewers {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
+            Reconnect = this.Get<Reconnect>("Reconnect");
             Popout = this.Get<Popout>("Popout");
             Rotation = this.Get<ComboBox>("Rotation");
             InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
@@ -27,6 +28,7 @@ namespace Apollo.Viewers {
         
         Launchpad _launchpad;
 
+        Reconnect Reconnect;
         Popout Popout;
         ComboBox Rotation, InputFormatSelector, TargetPortSelector;
 
@@ -62,8 +64,8 @@ namespace Apollo.Viewers {
             InputFormatSelector.SelectedIndex = (int)_launchpad.InputFormat;
 
             if (_launchpad.GetType() != typeof(Launchpad)) {
-                Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
-                Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
+                Reconnect.IsEnabled = Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
+                Reconnect.Opacity = Reconnect.Width = Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
             }
 
             if (_launchpad.GetType() == typeof(VirtualLaunchpad)) {
@@ -86,6 +88,8 @@ namespace Apollo.Viewers {
             
             _launchpad = null;
         }
+
+        void Launchpad_Reconnect() => _launchpad.Reconnect();
 
         void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
 

@@ -13,8 +13,13 @@
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
         <Components:PreferencesButton Grid.Column="0" Margin="5 5" x:Name="PreferencesButton" />
+        
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow" />
-        <Components:Close Grid.Column="2" Margin="5 5" Clicked="Close" />
+        
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:Minimize Clicked="Minimize" />
+          <Components:Close Clicked="Close" />
+        </StackPanel>
       </Grid>
 
       <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="10 0 10 10">
@@ -60,8 +65,9 @@
 
         <Grid Grid.Column="1" Background="{DynamicResource ThemeSplashBrush}" Opacity="0" IsHitTestVisible="false" ZIndex="-1" x:Name="CrashPanel">
           <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Your previous Apollo session has closed unexpectedly" />
+            <TextBlock Text="Your previous Apollo session was closed unexpectedly" />
             <TextBlock Text="due to a problem." />
+            <TextBlock Text=" " />
             <TextBlock Text="Apollo Studio can recover your unsaved work." />
 
             <Grid Margin="0 10 0 0" ColumnDefinitions="*,*">

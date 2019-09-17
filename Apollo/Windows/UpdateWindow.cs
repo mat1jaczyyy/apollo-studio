@@ -107,12 +107,14 @@ namespace Apollo.Windows {
                 
             string updatepath = Program.GetBaseFolder("Update");
             string temppath = Program.GetBaseFolder("Temp");
+            string tempm4lpath = Program.GetBaseFolder("TempM4L");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 ZipArchive zip = new ZipArchive(new MemoryStream(result));
 
                 ExtractWin(GetZipFolder(zip, "Update"), updatepath);
                 ExtractWin(GetZipFolder(zip, "Apollo"), temppath);
+                ExtractWin(GetZipFolder(zip, "M4L"), tempm4lpath);
 
             } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
                 string zippath = Program.GetBaseFolder("Zip");
@@ -134,6 +136,7 @@ namespace Apollo.Windows {
 
                 ExtractMac(Path.Combine(zippath, foldername, "Update"), updatepath);
                 ExtractMac(Path.Combine(zippath, foldername, "Apollo"), temppath);
+                ExtractMac(Path.Combine(zippath, foldername, "M4L"), tempm4lpath);
 
                 Directory.Delete(zippath, true);
             }

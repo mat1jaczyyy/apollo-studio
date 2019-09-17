@@ -38,6 +38,8 @@ namespace Apollo.Binary {
 
                 writer.Write(Preferences.AlwaysOnTop);
                 writer.Write(Preferences.CenterTrackContents);
+                writer.Write(Preferences.DisplaySignalIndicators);
+
                 writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
 
@@ -82,7 +84,7 @@ namespace Apollo.Binary {
                 for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
                 
-                writer.Write(Preferences.CrashName);
+                writer.Write(Preferences.Crashed);
                 writer.Write(Preferences.CrashPath);
                 
                 writer.Write(Preferences.CheckForUpdates);
@@ -231,6 +233,10 @@ namespace Apollo.Binary {
             
             for (int i = 0; i < o.Count; i++)
                 writer.Write(o.GetPosition(i));
+            
+            writer.Write(o.Expanded.HasValue);
+            if (o.Expanded.HasValue)
+                writer.Write(o.Expanded.Value);
         }
 
         static void Encode(BinaryWriter writer, Flip o) {
@@ -262,6 +268,13 @@ namespace Apollo.Binary {
 
             writer.Write(o.Target);
             writer.Write((int)o.BlendingMode);
+            writer.Write(o.Range);
+        }
+
+        static void Encode(BinaryWriter writer, LayerFilter o) {
+            EncodeID(writer, typeof(LayerFilter));
+
+            writer.Write(o.Target);
             writer.Write(o.Range);
         }
 

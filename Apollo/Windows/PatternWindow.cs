@@ -453,6 +453,7 @@ namespace Apollo.Windows {
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter || e.Key == Key.Space) {
                 if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
+                else if (e.KeyModifiers == KeyModifiers.None) PatternPlay(Play, null);
                 else PatternPlay(Play, null);
             }
 
@@ -466,6 +467,8 @@ namespace Apollo.Windows {
                     this.Focus();
                     return;
                 }
+
+                if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
                 bool shift = e.KeyModifiers == KeyModifiers.Shift;
 
@@ -509,11 +512,9 @@ namespace Apollo.Windows {
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
             if (mods.HasFlag(App.ControlKey)) {
-                if (_pattern[_pattern.Expanded].Screen[signalIndex] != new Color(0)) {
-                    Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
-                    ColorPicker.SetColor(color.Clone());
-                    ColorHistory.Select(color.Clone(), true);
-                }
+                Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
+                ColorPicker.SetColor(color.Clone());
+                ColorHistory.Select(color.Clone(), true);
                 return;
             }
 

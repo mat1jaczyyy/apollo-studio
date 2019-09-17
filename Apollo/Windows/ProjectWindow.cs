@@ -215,8 +215,11 @@ namespace Apollo.Windows {
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
+            if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
+
             if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
             else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+
             else if (e.Key == Key.Enter)
                 foreach (ISelect i in Selection.Selection)
                     TrackWindow.Create((Track)i, this);
@@ -294,10 +297,12 @@ namespace Apollo.Windows {
         public void SetBPM(string bpm) {
             if (BPM_Ignore) return;
 
-            BPM.Text = bpm;
-            BPM_Dirty = false;
+            Dispatcher.UIThread.InvokeAsync(() => {
+                BPM.Text = bpm;
+                BPM_Dirty = false;
 
-            this.Focus();
+                this.Focus();
+            });
         }
 
         bool Author_Dirty = false;

@@ -67,12 +67,26 @@ namespace Apollo.Components {
 
             MainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
             HueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            
+            MainThumb.AddHandler(InputElement.PointerPressedEvent, Thumb_Down, RoutingStrategies.Tunnel);
+            MainThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
+
+            HueThumb.AddHandler(InputElement.PointerPressedEvent, Thumb_Down, RoutingStrategies.Tunnel);
+            HueThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
 
             hexValidation = true;
             Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => ColorChanged = null;
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            ColorChanged = null;
+            
+            MainThumb.RemoveHandler(InputElement.PointerPressedEvent, Thumb_Down);
+            MainThumb.RemoveHandler(InputElement.PointerReleasedEvent, Thumb_Up);
+
+            HueThumb.RemoveHandler(InputElement.PointerPressedEvent, Thumb_Down);
+            HueThumb.RemoveHandler(InputElement.PointerReleasedEvent, Thumb_Up);
+        }
 
         public void Bounds_Updated(Rect bounds) {
             if (!bounds.IsEmpty) InitCanvas();
@@ -130,6 +144,16 @@ namespace Apollo.Components {
             else if (hi == 3) MainColor.Color = new AvaloniaColor(255, p, q, v);
             else if (hi == 4) MainColor.Color = new AvaloniaColor(255, t, p, v);
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
+        }
+
+        void Thumb_Down(object sender, PointerPressedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left))
+                oldColor = Color.Clone();
+        }
+
+        void Thumb_Up(object sender, PointerReleasedEventArgs e) {
+            if (e.MouseButton.HasFlag(MouseButton.Left) && oldColor != Color)
+                ColorChanged?.Invoke(Color, oldColor);
         }
 
         void MainThumb_Move(object sender, VectorEventArgs e) {

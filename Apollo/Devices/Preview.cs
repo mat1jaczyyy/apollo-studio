@@ -33,7 +33,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
-            MIDIExit?.Invoke(n);
+            InvokeExit(n);
             screen.MIDIEnter(m);
         }
 

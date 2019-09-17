@@ -27,22 +27,31 @@ namespace Apollo.Helpers {
             connection?.BeginReceive(new AsyncCallback(Receive), connection);
 
             if (source.Address.Equals(localhost)) {
-                if (!portMap.ContainsKey(source))
-                    connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton()).Name.Substring(18))}, 2, source);
+                if (!portMap.ContainsKey(source)) {
+                    if (message[0] >= 243 && message[0] <= 244)
+                        connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
 
-                if (message[0] < 128) {
+                } else if (message[0] < 128) {
                     NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
                     portMap[source].NoteOn(null, in msg);
                     
                 } else if (message[0] == 245) {
                     MIDI.Disconnect(portMap[source]);
                     portMap.Remove(source);
-                }
+                
+                } else if (message[0] == 246 && Program.Project != null)
+                    Program.Project.BPM = BitConverter.ToUInt16(message, 1);
             }
         }
 
+        private static void Send(AbletonLaunchpad source, byte[] data) =>
+            connection?.SendAsync(data, data.Length, portMap.First(x => x.Value == source).Key);
+
         public static void Send(AbletonLaunchpad source, Signal n) =>
-            connection?.SendAsync(new byte[] {Converter.XYtoDR(n.Index), (byte)(n.Color.Max * 127.0 / 63)}, 2, portMap.First(x => x.Value == source).Key);
+            Send(source, new byte[] {Converter.XYtoDR(n.Index), (byte)(n.Color.Max * 127.0 / 63)});
+
+        public static void SendClear(AbletonLaunchpad source) =>
+            Send(source, new byte[] {0xB0, 0x78, 0x00});
 
         public static bool Connected => connection != null;
 

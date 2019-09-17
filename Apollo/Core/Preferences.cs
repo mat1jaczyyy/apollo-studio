@@ -39,6 +39,15 @@ namespace Apollo.Core {
             }
         }
 
+        static bool _DisplaySignalIndicators = true;
+        public static bool DisplaySignalIndicators {
+            get => _DisplaySignalIndicators;
+            set {
+                _DisplaySignalIndicators = value;
+                Save();
+            }
+        }
+
         public static event Changed LaunchpadStyleChanged;
         static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
         public static LaunchpadStyles LaunchpadStyle {
@@ -257,14 +266,17 @@ namespace Apollo.Core {
             Save();
         }
 
-        static string _CrashName = "";
-        public static string CrashName {
-            get => _CrashName;
+        static bool _crashed = true;
+        public static bool Crashed {
+            get => _crashed;
             set {
-                _CrashName = value;
+                if (!(_crashed = value))
+                    CrashPath = "";
+                    
                 Save();
             }
         }
+
         static string _CrashPath = "";
         public static string CrashPath {
             get => _CrashPath;

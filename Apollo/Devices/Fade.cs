@@ -198,13 +198,16 @@ namespace Apollo.Devices {
             Generate();
         }
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null): base("fade") {
+        public int? Expanded;
+
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, int? expanded = null): base("fade") {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
 
             _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
+            Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;
 
@@ -213,6 +216,8 @@ namespace Apollo.Devices {
         }
 
         void Initialize() {
+            if (Disposed) return;
+
             Generate();
             Program.Project.BPMChanged += Generate;
         }
@@ -251,7 +256,7 @@ namespace Apollo.Devices {
                     if (buffer[n] < fade.Count) {
                         Signal m = n.Clone();
                         m.Color = fade[buffer[n]].Color.Clone();
-                        MIDIExit?.Invoke(m);
+                        InvokeExit(m);
                     }
                 }
             }
@@ -268,7 +273,7 @@ namespace Apollo.Devices {
                 if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
                     Signal m = n.Clone();
                     m.Color = fade.Last().Color.Clone();
-                    MIDIExit?.Invoke(m);
+                    InvokeExit(m);
                 }
 
                 timers[n] = new List<Courier>();
@@ -289,7 +294,7 @@ namespace Apollo.Devices {
                     if (lit) {
                         Signal m = n.Clone();
                         m.Color = fade[0].Color.Clone();
-                        MIDIExit?.Invoke(m);
+                        InvokeExit(m);
                         
                         for (int i = 1; i < fade.Count; i++)
                             FireCourier(n, fade[i].Time);
@@ -314,7 +319,9 @@ namespace Apollo.Devices {
 
             Generated = null;
             Preferences.FadeSmoothnessChanged -= Generate;
-            Program.Project.BPMChanged -= Generate;
+
+            if (Program.Project != null)
+                Program.Project.BPMChanged -= Generate;
 
             Time.Dispose();
             base.Dispose();

@@ -16,8 +16,10 @@ using Humanizer.Localisation;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
@@ -27,6 +29,8 @@ namespace Apollo.Windows {
 
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
+            DisplaySignalIndicators = this.Get<CheckBox>("DisplaySignalIndicators");
+
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
 
@@ -62,15 +66,36 @@ namespace Apollo.Windows {
 
             CurrentSession = this.Get<TextBlock>("CurrentSession");
             AllTime = this.Get<TextBlock>("AllTime");
+
+            Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
+        CheckBox AlwaysOnTop, CenterTrackContents, DisplaySignalIndicators, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         HorizontalDial FadeSmoothness;
         Controls Contents;
         DispatcherTimer Timer;
+        LaunchpadGrid Preview;
+
+        Fade fade = new Fade(
+            new Time(false),
+            colors: new List<Color>() {
+                new Color(1, 0, 0),
+                new Color(63, 0, 0),
+                new Color(63, 63, 0),
+                new Color(0, 63, 0),
+                new Color(0, 63, 63),
+                new Color(0, 0, 63),
+                new Color(63, 0, 63),
+                new Color(63, 0, 0),
+                new Color(1, 0, 0)
+            },
+            positions: new List<double>() {
+                0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1
+            }
+        );
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -85,6 +110,9 @@ namespace Apollo.Windows {
 
         void UpdateTime(object sender, EventArgs e) {
             CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
+
+            if (Preferences.Time >= (long)TimeSpan.MaxValue.TotalSeconds) Preferences.BaseTime = 0;
+
             AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
         }
 
@@ -103,6 +131,8 @@ namespace Apollo.Windows {
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
+            DisplaySignalIndicators.IsChecked = Preferences.DisplaySignalIndicators;
+
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
 
@@ -143,6 +173,8 @@ namespace Apollo.Windows {
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
+
+            fade.MIDIExit = FadeExit;
         }
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
@@ -158,9 +190,10 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             this.Content = null;
+            
+            Preview = null;
+            fade.Dispose();
         }
-
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
 
         void AlwaysOnTop_Changed(object sender, RoutedEventArgs e) {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
@@ -169,6 +202,8 @@ namespace Apollo.Windows {
 
         void CenterTrackContents_Changed(object sender, RoutedEventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
+        void DisplaySignalIndicators_Changed(object sender, EventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
+        
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
         void LaunchpadGridRotation_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
@@ -226,19 +261,16 @@ namespace Apollo.Windows {
             }
         }
 
-        void Dark_Changed(object sender, RoutedEventArgs e) {
-            if (Preferences.Theme != ThemeType.Dark)
-                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
-
-            Preferences.Theme = ThemeType.Dark;
-        }
-
-        void Light_Changed(object sender, RoutedEventArgs e) {
-            if (Preferences.Theme != ThemeType.Light)
-                ThemeHeader.Text = "Theme     You must restart Apollo to apply this change.";
+        void SetTheme(Themes theme) {
+            if (Preferences.Theme != theme)
+                ThemeHeader.Text = "You must restart\nApollo Studio to\napply this change.";
             
-            Preferences.Theme = ThemeType.Light;
+            Preferences.Theme = theme;
         }
+
+        void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(Themes.Dark);
+
+        void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(Themes.Light);
 
         void Backup_Changed(object sender, RoutedEventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
@@ -252,7 +284,7 @@ namespace Apollo.Windows {
 
         void DiscordFilename_Changed(object sender, RoutedEventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
-        void CheckForUpdates_Changed(object sender, RoutedEventArgs e) => Preferences.CheckForUpdates = DiscordFilename.IsChecked.Value;
+        void CheckForUpdates_Changed(object sender, RoutedEventArgs e) => Preferences.CheckForUpdates = CheckForUpdates.IsChecked.Value;
 
         void OpenCrashesFolder(object sender, RoutedEventArgs e) {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
@@ -261,15 +293,34 @@ namespace Apollo.Windows {
             App.URL(Program.CrashDir);
         }
 
+        void LocateApolloConnector(object sender, RoutedEventArgs e) {
+            string m4l = Program.GetBaseFolder("M4L");
+
+            if (!Directory.Exists(m4l)) Directory.CreateDirectory(m4l);
+
+            Program.URL(m4l);
+        }
+
         void Launchpad_Add() {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);
             MIDI.Update();
         }
 
+        void Preview_Pressed(int index) =>
+            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color(63)));
+
+        void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+            Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        });
+
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
+
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        
+        void Minimize() => WindowState = WindowState.Minimized;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {

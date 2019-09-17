@@ -133,7 +133,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        void ChainExit(Signal n) => MIDIExit?.Invoke(n);
+        void ChainExit(Signal n) => InvokeExit(n);
 
         public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
@@ -172,7 +172,7 @@ namespace Apollo.Devices {
 
             int target = n.MultiTarget.Pop();
             
-            if (Chains.Count == 0) MIDIExit?.Invoke(n);
+            if (Chains.Count == 0) InvokeExit(n);
             else Chains[target].MIDIEnter(n);
         }
         

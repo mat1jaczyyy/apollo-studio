@@ -12,8 +12,8 @@
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-    <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
-      <StackPanel Grid.Row="0" MinWidth="105" MaxWidth="105" x:Name="Contents">
+    <Grid RowDefinitions="Auto,*" Margin="5 5" x:Name="Layout">
+      <StackPanel Grid.Row="0" MinWidth="112" MaxWidth="112" x:Name="Contents">
         <Components:VerticalAdd AlwaysShowing="true" Actions="PasteAndImport" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
       </StackPanel>
 

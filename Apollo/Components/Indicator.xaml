@@ -1,0 +1,12 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.Indicator"
+             IsHitTestVisible="false"
+             DetachedFromVisualTree="Unloaded">
+
+  <Grid>
+    <TextBlock MaxWidth="4" Text=" " />
+
+    <Ellipse Width="4" Height="4" Fill="{DynamicResource ThemeAccentBrush}" Opacity="0" x:Name="Display" />
+  </Grid>
+</UserControl>

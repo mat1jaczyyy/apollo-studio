@@ -10,6 +10,8 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class AbletonLaunchpad: Launchpad {
+        public int Version = 0;
+
         Launchpad _target = null;
         public Launchpad Target {
             get => _target;
@@ -50,7 +52,8 @@ namespace Apollo.Elements {
                 Window?.SignalRender(n);
             }
 
-            AbletonConnector.Send(this, n);
+            if (Version >= 1)
+                AbletonConnector.SendClear(this);
         }
 
         public override void Render(Signal n) => Target?.Render(n);

@@ -72,6 +72,11 @@ namespace Apollo.Core {
             lock (locker) {
                 if (updated) {
                     updated = false;
+
+                    foreach (Launchpad lp in Devices) {
+                        lp.Reconnect();
+                    }
+
                     DevicesUpdated?.Invoke();
                 }
             }
@@ -102,7 +107,7 @@ namespace Apollo.Core {
             }
         }
 
-        public static AbletonLaunchpad ConnectAbleton() {
+        public static AbletonLaunchpad ConnectAbleton(int version) {
             lock (locker) {
                 Launchpad ret = null;
             
@@ -112,13 +117,14 @@ namespace Apollo.Core {
                     ret = Devices.Find((lp) => lp.Name == name);
                     if (ret != null) {
                         if (ret is AbletonLaunchpad alp && !alp.Available) {
+                            alp.Version = version;
                             alp.Connect(null, null);
                             updated = true;
                             return alp;
                         }
 
                     } else {
-                        Devices.Add(ret = new AbletonLaunchpad(name));
+                        Devices.Add(ret = new AbletonLaunchpad(name) { Version = version });
                         ret.Connect(null, null);
                         updated = true;
                         return (AbletonLaunchpad)ret;
@@ -171,7 +177,7 @@ namespace Apollo.Core {
                     if (device.GetType() == typeof(Launchpad) && device.Available)
                         Disconnect(device);
 
-                Program.Log("");
+                Program.Log($"Rescan");
 
                 if (updated) Update();
             }

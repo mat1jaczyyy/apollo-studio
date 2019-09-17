@@ -83,13 +83,13 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             if (n.Index == 100) {
-                MIDIExit?.Invoke(n);
+                InvokeExit(n);
                 return;
             }
 
             if (ApplyOffset(n.Index, out int result)) {
                 n.Index = (byte)result;
-                MIDIExit?.Invoke(n);
+                InvokeExit(n);
             }
         }
 

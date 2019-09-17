@@ -27,6 +27,7 @@ namespace Apollo.Viewers {
             Draggable = this.Get<Grid>("Draggable");
             MuteItem = this.Get<MenuItem>("MuteItem");
             Input = this.Get<TextBox>("Input");
+            Indicator = this.Get<Indicator>("Indicator");
         }
 
         public delegate void ChainAddedEventHandler(int index);
@@ -41,6 +42,7 @@ namespace Apollo.Viewers {
         Grid Root;
         TextBlock NameText;
         public VerticalAdd ChainAdd;
+        public Indicator Indicator { get; private set; }
 
         Grid Draggable;
         ContextMenu ChainContextMenu;
@@ -324,12 +326,13 @@ namespace Apollo.Viewers {
             Input.Text = _chain.Name;
             Input.SelectionStart = 0;
             Input.SelectionEnd = Input.Text.Length;
+            Input.CaretIndex = Input.Text.Length;
 
             Input.Opacity = 1;
             Input.IsHitTestVisible = true;
             Input.Focus();
         }
-        
+
         void Input_LostFocus(object sender, RoutedEventArgs e) {
             Input.Text = _chain.Name;
 
