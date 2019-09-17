@@ -122,7 +122,7 @@ namespace Apollo.Windows {
 
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void Maximize(IPointerDevice e) {
+        void Maximize(PointerEventArgs e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;

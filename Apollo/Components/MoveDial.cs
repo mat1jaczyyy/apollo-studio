@@ -122,7 +122,7 @@ namespace Apollo.Components {
                 }
 
                 mouseHeld = true;
-                e.Device.Capture(PlaneCanvas);
+                e.Pointer.Capture(PlaneCanvas);
 
                 lastX = e.GetPosition(PlaneCanvas).X;
                 lastY = e.GetPosition(PlaneCanvas).Y;
@@ -136,7 +136,7 @@ namespace Apollo.Components {
         void MouseUp(object sender, PointerReleasedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
 
                 if (old_x != X || old_y != Y)
                     Changed?.Invoke(X, Y, old_x, old_y);

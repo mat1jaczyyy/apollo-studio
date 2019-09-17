@@ -116,7 +116,7 @@ namespace Apollo.Viewers {
 
         void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Track.Get(_chain)?.Window?.Selection.Select(_chain, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                Track.Get(_chain)?.Window?.Selection.Select(_chain, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
@@ -171,7 +171,7 @@ namespace Apollo.Viewers {
                 return;
             }
 
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
             bool result;
 
             if (e.Data.Contains("chain")) {

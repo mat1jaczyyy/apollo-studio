@@ -450,7 +450,7 @@ namespace Apollo.Windows {
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter || e.Key == Key.Space) {
-                if (e.Modifiers == InputModifiers.Shift) PatternFire(Fire, null);
+                if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
                 else PatternPlay(Play, null);
             }
 
@@ -465,7 +465,7 @@ namespace Apollo.Windows {
                     return;
                 }
 
-                bool shift = e.Modifiers == InputModifiers.Shift;
+                bool shift = e.KeyModifiers == KeyModifiers.Shift;
 
                 if (e.Key == Key.Up || e.Key == Key.Left) {
                     if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
@@ -501,7 +501,7 @@ namespace Apollo.Windows {
             oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
     
-        void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
+        void PadPressed(int index, KeyModifiers mods = KeyModifiers.None) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
@@ -1259,7 +1259,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 
@@ -1498,7 +1498,7 @@ namespace Apollo.Windows {
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void Maximize(IPointerDevice e) {
+        void Maximize(PointerEventArgs e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;

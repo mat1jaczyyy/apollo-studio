@@ -150,7 +150,7 @@ namespace Apollo.Components {
         void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = true;
-                e.Device.Capture(MainCanvas);
+                e.Pointer.Capture(MainCanvas);
 
                 oldColor = Color.Clone();
 
@@ -165,7 +165,7 @@ namespace Apollo.Components {
         void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (main_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 main_mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
 
                 if (oldColor != Color)
                     ColorChanged?.Invoke(Color, oldColor);
@@ -196,7 +196,7 @@ namespace Apollo.Components {
         void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = true;
-                e.Device.Capture(HueCanvas);
+                e.Pointer.Capture(HueCanvas);
 
                 oldColor = Color.Clone();
 
@@ -210,7 +210,7 @@ namespace Apollo.Components {
         void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
             if (hue_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
                 hue_mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
                 
                 if (oldColor != Color)
                     ColorChanged?.Invoke(Color, oldColor);

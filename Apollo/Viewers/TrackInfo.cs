@@ -136,7 +136,7 @@ namespace Apollo.Viewers {
 
         void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Program.Project.Window?.Selection.Select(_track, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                Program.Project.Window?.Selection.Select(_track, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
@@ -193,7 +193,7 @@ namespace Apollo.Viewers {
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
             int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

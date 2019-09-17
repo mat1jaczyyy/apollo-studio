@@ -7,7 +7,7 @@ namespace Apollo.Components {
     public class Expand: IconButton {
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        public new delegate void ClickedEventHandler(IPointerDevice e);
+        public new delegate void ClickedEventHandler(PointerEventArgs e);
         public new event ClickedEventHandler Clicked;
 
         protected override IBrush Fill {
@@ -26,6 +26,6 @@ namespace Apollo.Components {
             Clicked = null;
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.Device);
+        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e);
     }
 }

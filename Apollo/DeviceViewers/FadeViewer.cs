@@ -147,7 +147,7 @@ namespace Apollo.DeviceViewers {
         void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
                 int index;
-                double x = e.Device.GetPosition(canvas).X - 7;
+                double x = e.GetPosition(canvas).X - 7;
 
                 for (index = 0; index < thumbs.Count; index++)
                     if (x < Canvas.GetLeft(thumbs[index])) break;

@@ -187,7 +187,7 @@ namespace Apollo.Viewers {
             Chain source_parent = moving[0].Parent;
             int before = moving[0].IParentIndex.Value - 1;
 
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Device.Move(moving, _chain, after, copy);
             

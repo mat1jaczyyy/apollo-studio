@@ -101,7 +101,7 @@ namespace Apollo.Components {
 
         void Select(PointerPressedEventArgs e) {
             if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                _pattern.Window?.Selection.Select(Viewer.Frame, e.InputModifiers.HasFlag(InputModifiers.Shift));
+                _pattern.Window?.Selection.Select(Viewer.Frame, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {

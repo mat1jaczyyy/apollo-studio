@@ -28,10 +28,11 @@ namespace Apollo.Core {
         public static IReadOnlyList<Window> Windows => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Windows;
         public static void Shutdown() => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Shutdown();
         
-        public static readonly InputModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
+        public static readonly InputModifiers ControlInput = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
+        public static readonly KeyModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? KeyModifiers.Meta : KeyModifiers.Control;
 
         public static bool WindowKey(Window sender, KeyEventArgs e) {
-            if (e.Modifiers == ControlKey) {
+            if (e.KeyModifiers == ControlKey) {
                 if (e.Key == Key.W) sender.Close();
                 else if (e.Key == Key.OemComma) PreferencesWindow.Create(sender);
                 else if (e.Key == Key.M) sender.WindowState = WindowState.Minimized;

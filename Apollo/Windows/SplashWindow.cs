@@ -278,7 +278,7 @@ namespace Apollo.Windows {
         void Window_KeyDown(object sender, KeyEventArgs e) {
             if (App.WindowKey(this, e)) return;
 
-            if (e.Modifiers == App.ControlKey) {
+            if (e.KeyModifiers == App.ControlKey) {
                 if (e.Key == Key.N) New(sender, e);
                 else if (e.Key == Key.O) Open(sender, e);
             }

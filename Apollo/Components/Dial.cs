@@ -324,7 +324,7 @@ namespace Apollo.Components {
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
             if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
-                if (e.InputModifiers.HasFlag(App.ControlKey)) {
+                if (e.KeyModifiers.HasFlag(App.ControlKey)) {
                     if (UsingSteps) Length.Step = 5;
                     else RawValue = Default;
                     return;
@@ -336,7 +336,7 @@ namespace Apollo.Components {
                 }
 
                 mouseHeld = true;
-                e.Device.Capture(ArcCanvas);
+                e.Pointer.Capture(ArcCanvas);
 
                 lastY = e.GetPosition(ArcCanvas).Y;
                 if (UsingSteps) oldStep = Length.Step;
@@ -353,7 +353,7 @@ namespace Apollo.Components {
             
             if (e.MouseButton.HasFlag(MouseButton.Left)) {
                 mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
 
                 if (UsingSteps) StepChanged?.Invoke(Length.Step, oldStep);
                 else ValueChanged?.Invoke(RawValue, oldValue);

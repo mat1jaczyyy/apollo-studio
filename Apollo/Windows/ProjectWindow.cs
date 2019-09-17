@@ -215,8 +215,8 @@ namespace Apollo.Windows {
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
-            if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-            else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+            if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+            else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
             else if (e.Key == Key.Enter)
                 foreach (ISelect i in Selection.Selection)
                     TrackWindow.Create((Track)i, this);
@@ -437,7 +437,7 @@ namespace Apollo.Windows {
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
 
             int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

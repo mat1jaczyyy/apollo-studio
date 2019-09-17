@@ -242,7 +242,7 @@ namespace Apollo.DeviceViewers {
                 return;
             }
 
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
             bool result;
 
             if (e.Data.Contains("chain")) {
