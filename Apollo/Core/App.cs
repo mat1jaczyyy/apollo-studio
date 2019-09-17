@@ -10,9 +10,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Styling;
-
-using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;

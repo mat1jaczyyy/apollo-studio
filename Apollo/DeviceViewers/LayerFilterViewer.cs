@@ -9,7 +9,6 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Enums;
 
 namespace Apollo.DeviceViewers {
     public class LayerFilterViewer: UserControl {

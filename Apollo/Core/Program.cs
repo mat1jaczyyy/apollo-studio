@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 using Avalonia;
 
 using Apollo.Binary;
 using Apollo.Elements;
-using Apollo.Helpers;
-using Apollo.Structures;
-using Apollo.Windows;
 
 // Suppresses readonly suggestion
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier")]
