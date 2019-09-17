@@ -202,7 +202,7 @@ namespace Apollo.Windows {
 
         void CenterTrackContents_Changed(object sender, RoutedEventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        void DisplaySignalIndicators_Changed(object sender, EventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
+        void DisplaySignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
         
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
@@ -261,16 +261,16 @@ namespace Apollo.Windows {
             }
         }
 
-        void SetTheme(Themes theme) {
+        void SetTheme(ThemeType theme) {
             if (Preferences.Theme != theme)
                 ThemeHeader.Text = "You must restart\nApollo Studio to\napply this change.";
-            
+
             Preferences.Theme = theme;
         }
 
-        void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(Themes.Dark);
+        void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Dark);
 
-        void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(Themes.Light);
+        void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Light);
 
         void Backup_Changed(object sender, RoutedEventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
@@ -298,7 +298,7 @@ namespace Apollo.Windows {
 
             if (!Directory.Exists(m4l)) Directory.CreateDirectory(m4l);
 
-            Program.URL(m4l);
+            App.URL(m4l);
         }
 
         void Launchpad_Add() {

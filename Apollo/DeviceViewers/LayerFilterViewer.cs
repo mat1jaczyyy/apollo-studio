@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -24,6 +25,8 @@ namespace Apollo.DeviceViewers {
         LayerFilter _filter;
         
         Dial Target, Range;
+
+        public LayerFilterViewer() => new InvalidOperationException();
 
         public LayerFilterViewer(LayerFilter filter) {
             InitializeComponent();

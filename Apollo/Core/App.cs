@@ -77,7 +77,6 @@ namespace Apollo.Core {
         }
 
         public static string[] Args;
-        public static bool FullyInitialized = false;
 
         public static void URL(string url) => Process.Start(new ProcessStartInfo() {
             FileName = url,
@@ -114,7 +113,8 @@ namespace Apollo.Core {
                             "computer.\n\n" +
                             "Please install at least version 2.7 of the driver before launching Apollo Studio."
                         );
-                        //return;
+                        base.OnFrameworkInitializationCompleted();
+                        return;
                     }
 
                     if (a.Max() < 7) {
@@ -123,7 +123,8 @@ namespace Apollo.Core {
                             "installed on your computer.\n\n" +
                             "Please install at least version 2.7 of the driver before launching Apollo Studio."
                         );
-                        //return;
+                        base.OnFrameworkInitializationCompleted();
+                        return;
                     }
                 }
 
@@ -132,10 +133,12 @@ namespace Apollo.Core {
                         $"Another instance of Apollo Studio is currently running.\n\n" +
                         "Please close other instances of Apollo Studio before launching Apollo Studio."
                     );
-                    //return;
+                    base.OnFrameworkInitializationCompleted();
+                    return;
                 }
 
-                FullyInitialized = true;
+                Program.HadCrashed = Preferences.Crashed;
+                Preferences.Crashed = true;
 
                 if (Preferences.DiscordPresence) Discord.Set(true);
 
@@ -149,9 +152,9 @@ namespace Apollo.Core {
                             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
                             await Program.Project.WriteFile(
-                                App.MainWindow,
+                                null,
                                 Path.Join(dir, $"{Program.Project.FileName} Autosave {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.approj"),
-                                false, false
+                                false
                             );
                         } catch {}
                     }
@@ -160,8 +163,17 @@ namespace Apollo.Core {
                 };
                 autosave.Start();
 
-                lifetime.MainWindow = new SplashWindow();
+                lifetime.Exit += (_, __) => {
+                    autosave.Dispose();
+                    MIDI.Stop();
+                    Discord.Set(false);
+                    AbletonConnector.Dispose();
+                    Preferences.Crashed = Program.HadCrashed;
 
+                    Preferences.Save();
+                };
+
+                lifetime.MainWindow = new SplashWindow();
                 base.OnFrameworkInitializationCompleted();
             }
         }
