@@ -148,7 +148,9 @@ namespace Apollo.Components {
         }
 
         void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 main_mouseHeld = true;
                 e.Pointer.Capture(MainCanvas);
 
@@ -163,7 +165,9 @@ namespace Apollo.Components {
         }
 
         void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (main_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (main_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 main_mouseHeld = false;
                 e.Pointer.Capture(null);
 
@@ -194,7 +198,9 @@ namespace Apollo.Components {
         }
 
         void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 hue_mouseHeld = true;
                 e.Pointer.Capture(HueCanvas);
 
@@ -208,7 +214,9 @@ namespace Apollo.Components {
         }
 
         void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (hue_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (hue_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 hue_mouseHeld = false;
                 e.Pointer.Capture(null);
                 

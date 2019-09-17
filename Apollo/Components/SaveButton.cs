@@ -71,8 +71,10 @@ namespace Apollo.Components {
         }
 
         protected override async void Click(PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) await Program.Project.Save((Window)this.GetVisualRoot());
-            else if (e.MouseButton == MouseButton.Right) SaveContextMenu.Open(this);
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) await Program.Project.Save((Window)this.GetVisualRoot());
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) SaveContextMenu.Open(this);
         }
     }
 }

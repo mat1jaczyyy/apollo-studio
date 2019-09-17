@@ -398,7 +398,9 @@ namespace Apollo.Windows {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 TrackContextMenu.Open((Control)sender);
 
             e.Handled = true;

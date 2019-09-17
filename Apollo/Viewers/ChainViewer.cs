@@ -146,7 +146,9 @@ namespace Apollo.Viewers {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right) 
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
                 else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
 

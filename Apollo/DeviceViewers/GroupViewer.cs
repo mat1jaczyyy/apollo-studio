@@ -183,7 +183,9 @@ namespace Apollo.DeviceViewers {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 ChainContextMenu.Open((Control)sender);
 
             e.Handled = true;

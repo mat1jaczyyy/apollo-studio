@@ -232,7 +232,9 @@ namespace Apollo.Components {
         Shape mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 mouseHeld = true;
 
                 e.Pointer.Capture(Root);
@@ -244,7 +246,9 @@ namespace Apollo.Components {
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 MouseMove(sender, e);
                 PadFinished?.Invoke(Array.IndexOf(Elements, (IControl)sender));
 

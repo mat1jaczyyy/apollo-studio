@@ -323,7 +323,9 @@ namespace Apollo.Components {
         double lastY;
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left) && Enabled) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && Enabled) {
                 if (e.KeyModifiers.HasFlag(App.ControlKey)) {
                     if (UsingSteps) Length.Step = 5;
                     else RawValue = Default;
@@ -349,9 +351,11 @@ namespace Apollo.Components {
         }
 
         protected void MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (!Enabled) return;
             
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 mouseHeld = false;
                 e.Pointer.Capture(null);
 
@@ -360,7 +364,7 @@ namespace Apollo.Components {
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
-            } else if (!mouseHeld && e.MouseButton.HasFlag(MouseButton.Right)) {
+            } else if (!mouseHeld && MouseButton == PointerUpdateKind.RightButtonReleased) {
                 Started?.Invoke();
                 
                 UsingSteps = !UsingSteps;
@@ -434,7 +438,9 @@ namespace Apollo.Components {
         }
 
         protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2 && !UsingSteps && Enabled) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled) {
                 Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 

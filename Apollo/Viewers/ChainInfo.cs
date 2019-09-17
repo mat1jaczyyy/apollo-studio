@@ -115,11 +115,15 @@ namespace Apollo.Viewers {
         }
 
         void Select(PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
                 Track.Get(_chain)?.Window?.Selection.Select(_chain, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
@@ -130,10 +134,10 @@ namespace Apollo.Viewers {
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
                 
-                if (e.MouseButton == MouseButton.Left)
+                if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                     ChainExpanded?.Invoke(_chain.ParentIndex.Value);
                 
-                if (e.MouseButton == MouseButton.Right) {
+                if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                     MuteItem.Header = ((Chain)Track.Get(_chain)?.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
                     ChainContextMenu.Open(Draggable);
                 }

@@ -80,8 +80,10 @@ namespace Apollo.Components {
         }
 
         protected override void Click(PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) InvokeAdded();
-            else if (e.MouseButton == MouseButton.Right) ActionContextMenu?.Open(Icon);
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) InvokeAdded();
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) ActionContextMenu?.Open(Icon);
         }
     }
 }

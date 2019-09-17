@@ -45,7 +45,9 @@ namespace Apollo.Components {
         }
 
         protected void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (AllowRightClick && e.MouseButton == MouseButton.Right)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (AllowRightClick && MouseButton == PointerUpdateKind.RightButtonPressed)) {
                 mouseHeld = true;
 
                 if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonDownBrush");
@@ -53,7 +55,9 @@ namespace Apollo.Components {
         }
 
         protected void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (mouseHeld && (e.MouseButton == MouseButton.Left || (AllowRightClick && e.MouseButton == MouseButton.Right))) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (mouseHeld && (MouseButton == PointerUpdateKind.LeftButtonReleased || (AllowRightClick && MouseButton == PointerUpdateKind.RightButtonReleased))) {
                 mouseHeld = false;
 
                 MouseEnter(sender, null);

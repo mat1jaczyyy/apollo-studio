@@ -82,13 +82,17 @@ namespace Apollo.Viewers {
         void MouseLeave(object sender, PointerEventArgs e) => mouseHeld = false;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || MouseButton == PointerUpdateKind.RightButtonPressed)
                 mouseHeld = true;
         }
 
         async void MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (mouseHeld) {
-                if (e.MouseButton == MouseButton.Left) {
+                if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                     bool remove = false;
 
                     if (File.Exists(_path)) Opened?.Invoke(_path);
@@ -102,7 +106,7 @@ namespace Apollo.Viewers {
                 
                     if (remove) Removed?.Invoke(this, _path);
 
-                } else if (e.MouseButton == MouseButton.Right) InfoContextMenu.Open((Control)sender);
+                } else if (MouseButton == PointerUpdateKind.RightButtonReleased) InfoContextMenu.Open((Control)sender);
 
                 mouseHeld = false;
             }

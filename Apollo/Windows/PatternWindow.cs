@@ -442,7 +442,9 @@ namespace Apollo.Windows {
         }
         
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 FrameContextMenu.Open((Control)sender);
 
             e.Handled = true;
