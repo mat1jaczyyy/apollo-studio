@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -26,6 +27,8 @@ namespace Apollo.DeviceViewers {
         
         Dial Target, Range;
         ComboBox BlendingMode;
+
+        public LayerViewer() => new InvalidOperationException();
 
         public LayerViewer(Layer layer) {
             InitializeComponent();

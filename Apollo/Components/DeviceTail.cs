@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -18,6 +20,8 @@ namespace Apollo.Components {
         
         DeviceViewer Owner;
         public Border Border, Header;
+
+        public DeviceTail() => throw new InvalidOperationException();
 
         public DeviceTail(Device owner, DeviceViewer ownerviewer) {
             InitializeComponent();

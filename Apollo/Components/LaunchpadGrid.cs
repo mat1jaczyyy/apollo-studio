@@ -37,7 +37,7 @@ namespace Apollo.Components {
         public event PadChangedEventHandler PadPressed;
         public event PadChangedEventHandler PadReleased;
 
-        public delegate void PadModsChangedEventHandler(int index, InputModifiers mods);
+        public delegate void PadModsChangedEventHandler(int index, KeyModifiers mods);
         public event PadModsChangedEventHandler PadModsPressed;
 
         public static int GridToSignal(int index) => (index == -1)? 100 : ((9 - (index / 10)) * 10 + index % 10);
@@ -147,10 +147,10 @@ namespace Apollo.Components {
             this.Resources["PadCut2"] = 12 * EffectiveScale;
             this.Resources["ModeWidth"] = 4 * EffectiveScale;
             this.Resources["ModeHeight"] = 2 * EffectiveScale;
-            this.Resources["TopMargin"] = new Thickness(7 * EffectiveScale, 7 * EffectiveScale, 7 * EffectiveScale, 0);
-            this.Resources["PadMargin"] = new Thickness(1 * EffectiveScale);
-            this.Resources["ModeMargin"] = new Thickness(0, 5 * EffectiveScale, 0, 0);
-            this.Resources["CornerRadius"] = new CornerRadius(1 * EffectiveScale);
+            this.Resources["TopMargin"] = new Thickness((int)(7 * EffectiveScale), (int)(7 * EffectiveScale), (int)(7 * EffectiveScale), 0);
+            this.Resources["PadMargin"] = new Thickness((int)(1 * EffectiveScale));
+            this.Resources["ModeMargin"] = new Thickness(0, (int)(5 * EffectiveScale), 0, 0);
+            this.Resources["CornerRadius"] = new CornerRadius((int)(1 * EffectiveScale));
 
             string gridSize = (17 * EffectiveScale).ToString();
             string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select gridSize).ToArray());
@@ -232,10 +232,12 @@ namespace Apollo.Components {
         Shape mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 mouseHeld = true;
 
-                e.Device.Capture(Root);
+                e.Pointer.Capture(Root);
                 Root.Cursor = new Cursor(StandardCursorType.Hand);
 
                 PadStarted?.Invoke(Array.IndexOf(Elements, (IControl)sender));
@@ -244,7 +246,9 @@ namespace Apollo.Components {
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 MouseMove(sender, e);
                 PadFinished?.Invoke(Array.IndexOf(Elements, (IControl)sender));
 
@@ -252,12 +256,12 @@ namespace Apollo.Components {
                 if (mouseOver != null) MouseLeave(mouseOver);
                 mouseOver = null;
 
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
                 Root.Cursor = new Cursor(StandardCursorType.Arrow);
             }
         }
 
-        void MouseEnter(Shape control, InputModifiers mods) {
+        void MouseEnter(Shape control, KeyModifiers mods) {
             int index = Array.IndexOf(Elements, (IControl)control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
@@ -267,13 +271,13 @@ namespace Apollo.Components {
 
         void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
-                IInputElement _over = Root.InputHitTest(e.Device.GetPosition(Root));
+                IInputElement _over = Root.InputHitTest(e.GetPosition(Root));
 
                 if (_over is Shape over) {
-                    if (mouseOver == null) MouseEnter(over, e.InputModifiers);
+                    if (mouseOver == null) MouseEnter(over, e.KeyModifiers);
                     else if (mouseOver != over) {
                         MouseLeave(mouseOver);
-                        MouseEnter(over, e.InputModifiers);
+                        MouseEnter(over, e.KeyModifiers);
                     }
 
                     mouseOver = over;

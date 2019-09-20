@@ -4,6 +4,7 @@ using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -29,7 +30,7 @@ namespace Apollo.DeviceViewers {
             canvas = this.Get<Canvas>("Canvas");
             PickerContainer = this.Get<Grid>("PickerContainer");
             Picker = this.Get<ColorPicker>("Picker");
-            Gradient = this.Get<LinearGradientBrush>("Gradient");
+            Gradient = (LinearGradientBrush)this.Get<Rectangle>("Gradient").Fill;
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Duration = this.Get<Dial>("Duration");
@@ -76,6 +77,8 @@ namespace Apollo.DeviceViewers {
             canvas.Children.Remove(thumbs[index]);
             thumbs.RemoveAt(index);
         }
+
+        public FadeViewer() => new InvalidOperationException();
 
         public FadeViewer(Fade fade) {
             InitializeComponent();
@@ -145,9 +148,11 @@ namespace Apollo.DeviceViewers {
         }
 
         void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 int index;
-                double x = e.Device.GetPosition(canvas).X - 7;
+                double x = e.GetPosition(canvas).X - 7;
 
                 for (index = 0; index < thumbs.Count; index++)
                     if (x < Canvas.GetLeft(thumbs[index])) break;
@@ -389,7 +394,9 @@ namespace Apollo.DeviceViewers {
         double oldValue;
 
         void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 oldValue = Math.Round(_fade.GetPosition(_fade.Expanded.Value) * 1000) / 10;
                 Input.Text = oldValue.ToString();
 

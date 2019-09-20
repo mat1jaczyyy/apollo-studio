@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -24,6 +25,8 @@ namespace Apollo.Components {
         Offset _offset;
         Copy _copy;
         MoveDial _viewer;
+
+        public CopyOffset() => throw new InvalidOperationException();
 
         public CopyOffset(Offset offset, Copy copy) {
             InitializeComponent();

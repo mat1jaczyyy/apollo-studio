@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -28,6 +29,8 @@ namespace Apollo.DeviceViewers {
         MoveDial Offset;
         ComboBox GridMode;
         CheckBox Wrap;
+
+        public MoveViewer() => new InvalidOperationException();
 
         public MoveViewer(Move move) {
             InitializeComponent();
@@ -99,7 +102,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
-        void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_move.Wrap != value) {

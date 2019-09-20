@@ -37,7 +37,7 @@ namespace Apollo.Viewers {
         }
 
         static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
-            foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.Namespace.StartsWith("Apollo.DeviceViewers") select type))      
+            foreach (Type deviceViewer in (from type in Assembly.GetExecutingAssembly().GetTypes() where type.ReflectedType == null && type.Namespace.StartsWith("Apollo.DeviceViewers") select type))
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
                     if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi" || device.DeviceIdentifier == "choke")
                         return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
@@ -173,22 +173,26 @@ namespace Apollo.Viewers {
         }
 
         void Select(PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Track.Get(_device)?.Window?.Selection.Select(_device, e.InputModifiers.HasFlag(InputModifiers.Shift));
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
+                Track.Get(_device)?.Window?.Selection.Select(_device, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
             dragData.Set("device", Track.Get(_device)?.Window?.Selection.Selection);
 
-            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
                 
-                if (e.MouseButton == MouseButton.Right) {
+                if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                     ContextMenu menu = DeviceContextMenu;
                     List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
 
@@ -199,7 +203,7 @@ namespace Apollo.Viewers {
 
                     menu.Open(Draggable);
                 
-                } else if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+                } else if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                     _device.Collapsed = !_device.Collapsed;
                     DeviceCollapsed?.Invoke(_device.ParentIndex.Value);
                 }
@@ -243,7 +247,7 @@ namespace Apollo.Viewers {
             Chain source_parent = moving[0].Parent;
             int before = moving[0].IParentIndex.Value - 1;
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Device.Move(moving, _chain, after, copy);
 

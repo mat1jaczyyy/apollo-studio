@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -34,6 +35,8 @@ namespace Apollo.Windows {
 
         void UpdateTopmost(bool value) => Topmost = value;
 
+        public LaunchpadWindow() => new InvalidOperationException();
+
         public LaunchpadWindow(Launchpad launchpad) {
             InitializeComponent();
             #if DEBUG
@@ -59,7 +62,7 @@ namespace Apollo.Windows {
             CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             _launchpad.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -104,7 +107,7 @@ namespace Apollo.Windows {
         });
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
+            if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
 
@@ -119,7 +122,7 @@ namespace Apollo.Windows {
 
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void Maximize(IPointerDevice e) {
+        void Maximize(PointerEventArgs e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;

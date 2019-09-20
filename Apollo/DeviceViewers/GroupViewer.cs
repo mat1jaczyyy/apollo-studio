@@ -77,6 +77,8 @@ namespace Apollo.DeviceViewers {
             SetAlwaysShowing();
         }
 
+        public GroupViewer() => new InvalidOperationException();
+
         public GroupViewer(Group group, DeviceViewer parent) {
             InitializeComponent();
 
@@ -181,7 +183,9 @@ namespace Apollo.DeviceViewers {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 ChainContextMenu.Open((Control)sender);
 
             e.Handled = true;
@@ -215,7 +219,7 @@ namespace Apollo.DeviceViewers {
                 return;
             }
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
             bool result;
 
             if (e.Data.Contains("chain")) {

@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -15,6 +17,8 @@ namespace Apollo.Viewers {
 
         UndoEntry _entry;
 
+        public UndoEntryInfo() => new InvalidOperationException();
+
         public UndoEntryInfo(UndoEntry entry) {
             InitializeComponent();
             
@@ -29,7 +33,9 @@ namespace Apollo.Viewers {
         }
 
         void Click(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
         }
     }
 }

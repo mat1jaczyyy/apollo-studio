@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -23,6 +24,8 @@ namespace Apollo.DeviceViewers {
         Choke _choke;
 
         Dial Target;
+
+        public ChokeViewer() => new InvalidOperationException();
 
         public ChokeViewer(Choke choke, DeviceViewer parent) {
             InitializeComponent();

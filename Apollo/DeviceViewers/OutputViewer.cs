@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -25,7 +26,9 @@ namespace Apollo.DeviceViewers {
         void Update_Maximum(int value) {
             Target.Enabled = (value != 1);
             if (Target.Enabled) Target.Maximum = value;
-        } 
+        }
+
+        public OutputViewer() => new InvalidOperationException();
 
         public OutputViewer(Output output) {
             InitializeComponent();

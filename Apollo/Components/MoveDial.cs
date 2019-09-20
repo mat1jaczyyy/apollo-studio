@@ -115,14 +115,16 @@ namespace Apollo.Components {
         double lastX, lastY;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 if (e.ClickCount == 2) {
                     DisplayPressed(sender, e);
                     return;
                 }
 
                 mouseHeld = true;
-                e.Device.Capture(PlaneCanvas);
+                e.Pointer.Capture(PlaneCanvas);
 
                 lastX = e.GetPosition(PlaneCanvas).X;
                 lastY = e.GetPosition(PlaneCanvas).Y;
@@ -134,9 +136,11 @@ namespace Apollo.Components {
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
 
                 if (old_x != X || old_y != Y)
                     Changed?.Invoke(X, Y, old_x, old_y);
@@ -204,7 +208,9 @@ namespace Apollo.Components {
         }
 
         void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 InputX.Text = X.ToString();
                 InputY.Text = Y.ToString();
 

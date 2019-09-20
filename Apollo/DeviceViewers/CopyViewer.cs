@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -51,6 +52,8 @@ namespace Apollo.DeviceViewers {
             Contents.RemoveAt(index + 1);
             if (Contents.Count == 1) OffsetAdd.AlwaysShowing = true;
         }
+
+        public CopyViewer() => new InvalidOperationException();
 
         public CopyViewer(Copy copy) {
             InitializeComponent();
@@ -186,7 +189,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
-        void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_copy.Wrap != value) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -22,6 +23,8 @@ namespace Apollo.DeviceViewers {
         
         Paint _paint;
         ColorPicker Picker;
+
+        public PaintViewer() => new InvalidOperationException();
 
         public PaintViewer(Paint paint) {
             InitializeComponent();

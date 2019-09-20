@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
+using LinearGradientBrush = Avalonia.Media.LinearGradientBrush;
 using GradientStop = Avalonia.Media.GradientStop;
 using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
@@ -27,7 +28,7 @@ namespace Apollo.Components {
             MainThumb = this.Get<Thumb>("MainThumb");
             HueThumb = this.Get<Thumb>("HueThumb");
 
-            MainColor = this.Get<GradientStop>("MainColor");
+            MainColor = ((LinearGradientBrush)this.Get<Grid>("MainColor").Background).GradientStops[1];
             
             Hex = this.Get<TextBox>("Hex");
         }
@@ -171,9 +172,11 @@ namespace Apollo.Components {
         }
 
         void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 main_mouseHeld = true;
-                e.Device.Capture(MainCanvas);
+                e.Pointer.Capture(MainCanvas);
 
                 oldColor = Color.Clone();
 
@@ -186,9 +189,11 @@ namespace Apollo.Components {
         }
 
         void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (main_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (main_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 main_mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
 
                 if (oldColor != Color)
                     ColorChanged?.Invoke(Color, oldColor);
@@ -217,9 +222,11 @@ namespace Apollo.Components {
         }
 
         void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
                 hue_mouseHeld = true;
-                e.Device.Capture(HueCanvas);
+                e.Pointer.Capture(HueCanvas);
 
                 oldColor = Color.Clone();
 
@@ -231,9 +238,11 @@ namespace Apollo.Components {
         }
 
         void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            if (hue_mouseHeld && e.MouseButton.HasFlag(MouseButton.Left)) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (hue_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 hue_mouseHeld = false;
-                e.Device.Capture(null);
+                e.Pointer.Capture(null);
                 
                 if (oldColor != Color)
                     ColorChanged?.Invoke(Color, oldColor);

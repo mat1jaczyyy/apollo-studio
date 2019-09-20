@@ -3,9 +3,9 @@
              x:Class="Apollo.Components.CollapseButton"
              DetachedFromVisualTree="Unloaded">
 
-  <LayoutTransformControl Width="16" Height="16">
+  <LayoutTransformControl Width="16" Height="16" x:Name="Layout">
     <LayoutTransformControl.LayoutTransform>
-      <RotateTransform Angle="0" x:Name="Rotation" />
+      <RotateTransform Angle="0" />
     </LayoutTransformControl.LayoutTransform>
 
     <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"

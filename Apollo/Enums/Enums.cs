@@ -3,7 +3,7 @@ namespace Apollo.Enums {
         Monochrome, NovationPalette, CustomPalette
     }
 
-    public enum Themes {
+    public enum ThemeType {
         Dark, Light
     }
 

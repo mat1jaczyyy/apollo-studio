@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -49,7 +50,7 @@ namespace Apollo.Windows {
             if (index < saved) saved--;
             else if (index == saved) saved = null;
         }
-        
+
         public UndoWindow() {
             InitializeComponent();
             #if DEBUG
@@ -69,7 +70,7 @@ namespace Apollo.Windows {
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Program.Project.Undo.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -100,7 +101,7 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
                 this.Focus();
                 return;
             }

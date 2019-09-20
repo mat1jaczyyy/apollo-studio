@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -21,6 +22,8 @@ namespace Apollo.DeviceViewers {
         
         Clear _clear;
         ComboBox ClearMode;
+
+        public ClearViewer() => new InvalidOperationException();
 
         public ClearViewer(Clear clear) {
             InitializeComponent();

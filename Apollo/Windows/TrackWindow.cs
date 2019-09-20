@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 
 using Avalonia;
@@ -49,6 +50,8 @@ namespace Apollo.Windows {
 
         public SelectionManager Selection = new SelectionManager();
 
+        public TrackWindow() => new InvalidOperationException();
+
         public TrackWindow(Track track) {
             InitializeComponent();
             #if DEBUG
@@ -87,7 +90,7 @@ namespace Apollo.Windows {
             UpdateTitle();
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             _track.Window = null;
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
@@ -103,7 +106,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
         
         public void Bounds_Updated(Rect bounds) {
@@ -129,19 +132,19 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (e.Modifiers == Program.ControlKey && e.Key == Key.P) {
+            if (e.KeyModifiers == App.ControlKey && e.Key == Key.P) {
                 if (_track.Launchpad.Available && _track.Launchpad.GetType() != typeof(VirtualLaunchpad) || _track.Launchpad.Window != null)
                     LaunchpadWindow.Create(_track.Launchpad, this);
                 
                 return;
             }
 
-            if (e.Modifiers == (Program.ControlKey | InputModifiers.Shift) && e.Key == Key.R) {
+            if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift) && e.Key == Key.R) {
                 _track.Launchpad.Reconnect();
                 return;
             }
 
-            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
             if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
@@ -149,8 +152,8 @@ namespace Apollo.Windows {
             bool vertical = Selection.Start.GetType() == typeof(Chain);
 
             if (vertical) {
-                if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-                else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+                else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
                 else if (e.Key == Key.Right) Selection.MoveChild();
                 else if (e.Key == Key.Enter) Selection.Expand();
                 else if (e.Key == Key.Left && Selection.Start.IParent.GetType() == typeof(Multi))
@@ -161,29 +164,29 @@ namespace Apollo.Windows {
 
                 if (left.IParentIndex.Value == 0) {
                     if (InChoke()) {
-                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.Modifiers == InputModifiers.Shift);
+                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.KeyModifiers == KeyModifiers.Shift);
                         return;
 
                     } else if (InMultiPreprocess()) return;
                 }
                 
-                Selection.Move(false, e.Modifiers == InputModifiers.Shift);
+                Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
             
             } else if (e.Key == Key.Right) {
                 ISelect right = Selection.Selection.Last();
 
                 if (right.IParentIndex.Value == right.IParent.IChildren.Count - 1) {
                     if (InChoke()) {
-                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.Modifiers == InputModifiers.Shift);
-                        e.Modifiers = InputModifiers.None;
+                        Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.KeyModifiers == KeyModifiers.Shift);
+                        e.KeyModifiers = KeyModifiers.None;
 
                     } else if (InMultiPreprocess()) {
-                        Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.Modifiers == InputModifiers.Shift);
+                        Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.KeyModifiers == KeyModifiers.Shift);
                         return;
                     }
                 }
                 
-                Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+                Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
 
             } else if (e.Key == Key.Down) {
                 if (Selection.Start.GetType() == typeof(Choke)) {
@@ -198,7 +201,7 @@ namespace Apollo.Windows {
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         void MoveWindow(object sender, PointerPressedEventArgs e) {
-            if (e.ClickCount == 2) Expand(e.Device);
+            if (e.ClickCount == 2) Expand(e);
             else BeginMoveDrag();
 
             Topmost = false;
@@ -208,7 +211,7 @@ namespace Apollo.Windows {
 
         void Minimize() => WindowState = WindowState.Minimized;
         
-        void Expand(IPointerDevice e) {
+        void Expand(PointerEventArgs e) {
             Point pointerRelative = e.GetPosition(this);
 
             PixelPoint pointerAbsolute = new PixelPoint(

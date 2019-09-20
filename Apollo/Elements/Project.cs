@@ -245,12 +245,12 @@ namespace Apollo.Elements {
         }
         
         public async Task<bool> HandleKey(Window sender, KeyEventArgs e) {
-            if (e.Modifiers == Program.ControlKey) {
+            if (e.KeyModifiers == App.ControlKey) {
                 if (e.Key == Key.S) await Save(sender);
                 else if (e.Key == Key.F) MIDI.ClearState();
                 else return false;
 
-            } else if (e.Modifiers == (Program.ControlKey | InputModifiers.Shift)) {
+            } else if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift)) {
                 if (e.Key == Key.S) await Save(sender, true);
                 else if (e.Key == Key.W) {
                     if (Window == null) ProjectWindow.Create(sender);

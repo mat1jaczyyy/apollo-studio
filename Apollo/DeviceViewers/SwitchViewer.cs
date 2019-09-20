@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -22,6 +23,8 @@ namespace Apollo.DeviceViewers {
         Switch _switch;
         
         Dial Page;
+
+        public SwitchViewer() => new InvalidOperationException();
 
         public SwitchViewer(Switch pageswitch) {
             InitializeComponent();

@@ -163,10 +163,12 @@ namespace Apollo.Components {
         }
 
         void Clicked(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             int index = Grid.Children.IndexOf((IControl)sender);
 
-            if (e.MouseButton.HasFlag(MouseButton.Left)) Input(index);
-            else if (e.MouseButton.HasFlag(MouseButton.Right)) {
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) Input(index);
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) {
                 if ((index = (CurrentIndex == -1)? (index - 1) : index) == -1) return;
                 
                 History.RemoveAt(index);

@@ -72,6 +72,8 @@ namespace Apollo.Viewers {
             SetAlwaysShowing();
         }
 
+        public ChainViewer() => new InvalidOperationException();
+
         public ChainViewer(Chain chain, bool backgroundBorder = false) {
             InitializeComponent();
 
@@ -147,7 +149,9 @@ namespace Apollo.Viewers {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right) 
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
                 else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
 
@@ -188,7 +192,7 @@ namespace Apollo.Viewers {
             Chain source_parent = moving[0].Parent;
             int before = moving[0].IParentIndex.Value - 1;
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Device.Move(moving, _chain, after, copy);
             

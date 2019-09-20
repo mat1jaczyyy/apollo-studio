@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -28,6 +29,8 @@ namespace Apollo.DeviceViewers {
 
         Dial Duration, Gate;
         CheckBox Infinite, Release;
+
+        public HoldViewer() => new InvalidOperationException();
 
         public HoldViewer(Hold hold) {
             InitializeComponent();
@@ -117,7 +120,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
-        void Infinite_Changed(object sender, EventArgs e) {
+        void Infinite_Changed(object sender, RoutedEventArgs e) {
             bool value = Infinite.IsChecked.Value;
 
             if (_hold.Infinite != value) {
@@ -140,7 +143,7 @@ namespace Apollo.DeviceViewers {
             Duration.Enabled = Gate.Enabled = !value;
         }
 
-        void Release_Changed(object sender, EventArgs e) {
+        void Release_Changed(object sender, RoutedEventArgs e) {
             bool value = Release.IsChecked.Value;
 
             if (_hold.Release != value) {

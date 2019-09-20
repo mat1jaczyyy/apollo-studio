@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -117,18 +118,16 @@ namespace Apollo.Windows {
 
             if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
 
-            if (Program.Args?.Length > 0)
-                ReadFile(Program.Args[0]);
+            if (App.Args?.Length > 0)
+                ReadFile(App.Args[0]);
             
-            Program.Args = null;
+            App.Args = null;
 
             UpdateBlogpost();
             UpdateRelease();
 
             if (IsVisible && !openDialog && await Github.ShouldUpdate()) {
-                Window[] windows = Application.Current.Windows.ToArray();
-                
-                foreach (Window window in windows)
+                foreach (Window window in App.Windows)
                     if (window.GetType() != typeof(MessageWindow))
                         window.Close();
                 
@@ -137,14 +136,14 @@ namespace Apollo.Windows {
             }
         }
         
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Root.Children.Remove(SplashImage);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
 
         void TabChanged(int tab) {
@@ -153,7 +152,7 @@ namespace Apollo.Windows {
                     RecentProjectInfo viewer = new RecentProjectInfo(Preferences.Recents[i]);
                     viewer.Opened += ReadFile;
                     viewer.Removed += Remove;
-                    viewer.Showed += Program.URL;
+                    viewer.Showed += App.URL;
 
                     Recents.Children.Add(viewer);
                 }
@@ -250,11 +249,11 @@ namespace Apollo.Windows {
             Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
         }
 
-        async void Blogpost(object sender, RoutedEventArgs e)
-            => Program.URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
+        async void Blogpost(object sender, PointerReleasedEventArgs e)
+            => App.URL($"https://apollo.mat1jaczyyy.com/post/{Path.GetFileNameWithoutExtension((await Github.LatestBlogpost()).Name)}");
 
-        async void Release(object sender, RoutedEventArgs e)
-            => Program.URL((await Github.LatestRelease()).HtmlUrl);
+        async void Release(object sender, PointerReleasedEventArgs e)
+            => App.URL((await Github.LatestRelease()).HtmlUrl);
 
         void ResolveCrash() {
             File.Delete(Program.CrashProject);
@@ -287,9 +286,9 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.WindowKey(this, e)) return;
+            if (App.WindowKey(this, e)) return;
 
-            if (e.Modifiers == Program.ControlKey) {
+            if (e.KeyModifiers == App.ControlKey) {
                 if (e.Key == Key.N) New(sender, e);
                 else if (e.Key == Key.O) Open(sender, e);
             }

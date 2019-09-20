@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,8 @@ namespace Apollo.Windows {
         public TaskCompletionSource<string> Completed = new TaskCompletionSource<string>();
         
         void UpdateTopmost(bool value) => Topmost = value;
+
+        public MessageWindow() => new InvalidOperationException();
 
         public MessageWindow(string message, string[] options = null) {
             InitializeComponent();
@@ -43,16 +46,16 @@ namespace Apollo.Windows {
         void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in App.Windows)
                 if (!(window is MessageWindow))
                     window.IsVisible = false;
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
-            if (Application.Current.Windows.LongCount(i => i is MessageWindow) <= 1)
-                foreach (Window window in Application.Current.Windows)
+            if (App.Windows.Count(i => i is MessageWindow) <= 1)
+                foreach (Window window in App.Windows)
                     if (!(window is MessageWindow))
                         window.IsVisible = true;
 

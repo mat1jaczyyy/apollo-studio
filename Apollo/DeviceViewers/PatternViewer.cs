@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -13,6 +15,8 @@ namespace Apollo.DeviceViewers {
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         Pattern _pattern;
+
+        public PatternViewer() => new InvalidOperationException();
 
         public PatternViewer(Pattern pattern) {
             InitializeComponent();

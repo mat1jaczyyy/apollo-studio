@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Avalonia;
@@ -25,6 +26,8 @@ namespace Apollo.DeviceViewers {
         LaunchpadGrid Grid;
 
         SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+
+        public KeyFilterViewer() => new InvalidOperationException();
 
         public KeyFilterViewer(KeyFilter filter) {
             InitializeComponent();

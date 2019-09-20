@@ -1,13 +1,10 @@
-﻿using System;
-
-using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 
 namespace Apollo.Components {
     public class HorizontalDial: Dial {
-        void InitializeComponent() {
+        protected override void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             ArcCanvas = this.Get<Canvas>("ArcCanvas");
@@ -33,10 +30,6 @@ namespace Apollo.Components {
             }
         }
 
-        public HorizontalDial() {
-            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
-
-            DrawArcBase();
-        }
+        public HorizontalDial() {}
     }
 }

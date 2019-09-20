@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -217,6 +218,8 @@ namespace Apollo.Windows {
 
         public SelectionManager Selection = new SelectionManager();
 
+        public PatternWindow() => new InvalidOperationException();
+
         public PatternWindow(Pattern pattern) {
             InitializeComponent();
             #if DEBUG
@@ -282,7 +285,7 @@ namespace Apollo.Windows {
             ColorHistory.HistoryChanged += RenderHistory;
         }
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Locked = false;
             
             foreach (Courier i in PlayTimers) i.Dispose();
@@ -317,7 +320,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
 
         public void Bounds_Updated(Rect bounds) {
@@ -439,7 +442,9 @@ namespace Apollo.Windows {
         }
         
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 FrameContextMenu.Open((Control)sender);
 
             e.Handled = true;
@@ -447,9 +452,9 @@ namespace Apollo.Windows {
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter || e.Key == Key.Space) {
-                if (e.Modifiers == InputModifiers.Shift) PatternFire(Fire, null);
-                else if (e.Modifiers == InputModifiers.None) PatternPlay(Play, null);
-                return;
+                if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
+                else if (e.KeyModifiers == KeyModifiers.None) PatternPlay(Play, null);
+                else PatternPlay(Play, null);
             }
 
             if (Locked) return;
@@ -458,14 +463,14 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
             else {
-                if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
                     this.Focus();
                     return;
                 }
 
-                if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
+                if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
-                bool shift = e.Modifiers == InputModifiers.Shift;
+                bool shift = e.KeyModifiers == KeyModifiers.Shift;
 
                 if (e.Key == Key.Up || e.Key == Key.Left) {
                     if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
@@ -501,12 +506,12 @@ namespace Apollo.Windows {
             oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
     
-        void PadPressed(int index, InputModifiers mods = InputModifiers.None) {
+        void PadPressed(int index, KeyModifiers mods = KeyModifiers.None) {
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            if (mods.HasFlag(Program.ControlKey)) {
+            if (mods.HasFlag(App.ControlKey)) {
                 Color color = _pattern[_pattern.Expanded].Screen[signalIndex];
                 ColorPicker.SetColor(color.Clone());
                 ColorHistory.Select(color.Clone(), true);
@@ -652,7 +657,7 @@ namespace Apollo.Windows {
             }
         }
 
-        void Infinite_Changed(object sender, EventArgs e) {
+        void Infinite_Changed(object sender, RoutedEventArgs e) {
             bool value = Infinite.IsChecked.Value;
 
             if (_pattern.Infinite != value) {
@@ -990,7 +995,7 @@ namespace Apollo.Windows {
             );
         }
 
-        void Wrap_Changed(object sender, EventArgs e) {
+        void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
             if (_pattern.Wrap != value) {
@@ -1257,7 +1262,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 
@@ -1496,7 +1501,7 @@ namespace Apollo.Windows {
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void Maximize(IPointerDevice e) {
+        void Maximize(PointerEventArgs e) {
             WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;

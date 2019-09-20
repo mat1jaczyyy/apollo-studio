@@ -180,7 +180,7 @@ namespace Apollo.Windows {
 
             this.Content = null;
 
-            Program.WindowClosed(this);
+            App.WindowClosed(this);
         }
         
         public void Bounds_Updated(Rect bounds) {
@@ -212,13 +212,14 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (Program.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
-            if (e.Modifiers != InputModifiers.None && e.Modifiers != InputModifiers.Shift) return;
-            
-            if (e.Key == Key.Up) Selection.Move(false, e.Modifiers == InputModifiers.Shift);
-            else if (e.Key == Key.Down) Selection.Move(true, e.Modifiers == InputModifiers.Shift);
+            if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
+
+            if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+            else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+
             else if (e.Key == Key.Enter)
                 foreach (ISelect i in Selection.Selection)
                     TrackWindow.Create((Track)i, this);
@@ -402,7 +403,9 @@ namespace Apollo.Windows {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Right)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.RightButtonReleased)
                 TrackContextMenu.Open((Control)sender);
 
             e.Handled = true;
@@ -441,7 +444,7 @@ namespace Apollo.Windows {
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
 
             int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

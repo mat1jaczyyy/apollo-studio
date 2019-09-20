@@ -21,6 +21,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Program.URL(URL);
+        protected override void Click(PointerReleasedEventArgs e) => App.URL(URL);
     }
 }

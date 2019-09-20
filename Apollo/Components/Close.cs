@@ -15,8 +15,11 @@ namespace Apollo.Components {
             Path = this.Get<Path>("Path");
         }
 
-        public new delegate void ClickedEventHandler(bool force);
+        public new delegate void ClickedEventHandler();
         public new event ClickedEventHandler Clicked;
+
+        public delegate void ForceEventHandler(bool force);
+        public event ForceEventHandler ClickedWithForce;
 
         Path Path;
 
@@ -36,6 +39,9 @@ namespace Apollo.Components {
             Clicked = null;
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => Clicked?.Invoke(e.InputModifiers == Program.ControlKey);
+        protected override void Click(PointerReleasedEventArgs e) {
+            Clicked?.Invoke();
+            ClickedWithForce?.Invoke(e.KeyModifiers == App.ControlKey);
+        }
     }
 }

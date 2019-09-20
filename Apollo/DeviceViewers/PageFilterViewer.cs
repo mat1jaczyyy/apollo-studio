@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -26,6 +27,8 @@ namespace Apollo.DeviceViewers {
         UniformGrid PagesGrid;
 
         void Set(PageRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
+
+        public PageFilterViewer() => new InvalidOperationException();
 
         public PageFilterViewer(PageFilter filter) {
             InitializeComponent();

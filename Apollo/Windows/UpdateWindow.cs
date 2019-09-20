@@ -144,7 +144,7 @@ namespace Apollo.Windows {
             Program.LaunchUpdater = true;
 
             exiting = true;
-            Application.Current.Exit();
+            App.Shutdown();
         }
         
         void Minimize() => WindowState = WindowState.Minimized;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
@@ -24,6 +25,8 @@ namespace Apollo.DeviceViewers {
         Flip _flip;
         ComboBox FlipMode;
         CheckBox Bypass;
+
+        public FlipViewer() => new InvalidOperationException();
 
         public FlipViewer(Flip flip) {
             InitializeComponent();
@@ -56,7 +59,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetMode(FlipType mode) => FlipMode.SelectedIndex = (int)mode;
 
-        void Bypass_Changed(object sender, EventArgs e) {
+        void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
             if (_flip.Bypass != value) {

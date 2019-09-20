@@ -43,7 +43,9 @@ namespace Apollo.Components {
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left) Clicked?.Invoke();
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) Clicked?.Invoke();
         }
     }
 }

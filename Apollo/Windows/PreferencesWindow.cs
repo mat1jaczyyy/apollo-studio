@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -150,8 +151,8 @@ namespace Apollo.Windows {
             CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
             CustomPalette.IsChecked = Preferences.ImportPalette == Palettes.CustomPalette;
 
-            Dark.IsChecked = Preferences.Theme == Themes.Dark;
-            Light.IsChecked = Preferences.Theme == Themes.Light;
+            Dark.IsChecked = Preferences.Theme == ThemeType.Dark;
+            Light.IsChecked = Preferences.Theme == ThemeType.Light;
 
             Backup.IsChecked = Preferences.Backup;
             Autosave.IsChecked = Preferences.Autosave;
@@ -178,7 +179,7 @@ namespace Apollo.Windows {
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        void Unloaded(object sender, EventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e) {
             Preferences.Window = null;
 
             Timer.Stop();
@@ -194,40 +195,40 @@ namespace Apollo.Windows {
             fade.Dispose();
         }
 
-        void AlwaysOnTop_Changed(object sender, EventArgs e) {
+        void AlwaysOnTop_Changed(object sender, RoutedEventArgs e) {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
             Activate();
         }
 
-        void CenterTrackContents_Changed(object sender, EventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
+        void CenterTrackContents_Changed(object sender, RoutedEventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        void DisplaySignalIndicators_Changed(object sender, EventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
+        void DisplaySignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
         
-        void LaunchpadStyle_Changed(object sender, EventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
+        void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
-        void LaunchpadGridRotation_Changed(object sender, EventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
+        void LaunchpadGridRotation_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
 
-        void AutoCreateKeyFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
+        void AutoCreateKeyFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
-        void AutoCreatePageFilter_Changed(object sender, EventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
+        void AutoCreatePageFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
 
-        void AutoCreatePattern_Changed(object sender, EventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
+        void AutoCreatePattern_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
         void FadeSmoothness_Changed(double value, double? old) => Preferences.FadeSmoothness = value / 100;
 
-        void CaptureLaunchpad_Changed(object sender, EventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
+        void CaptureLaunchpad_Changed(object sender, RoutedEventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 
-        void CopyPreviousFrame_Changed(object sender, EventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
+        void CopyPreviousFrame_Changed(object sender, RoutedEventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
 
-        void EnableGestures_Changed(object sender, EventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
+        void EnableGestures_Changed(object sender, RoutedEventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
 
         void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
 
-        void Monochrome_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.Monochrome;
+        void Monochrome_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.Monochrome;
 
-        void NovationPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.NovationPalette;
+        void NovationPalette_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.NovationPalette;
 
-        void CustomPalette_Changed(object sender, EventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
+        void CustomPalette_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
         async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -260,36 +261,36 @@ namespace Apollo.Windows {
             }
         }
 
-        void SetTheme(Themes theme) {
+        void SetTheme(ThemeType theme) {
             if (Preferences.Theme != theme)
                 ThemeHeader.Text = "You must restart\nApollo Studio to\napply this change.";
-            
+
             Preferences.Theme = theme;
         }
 
-        void Dark_Changed(object sender, EventArgs e) => SetTheme(Themes.Dark);
+        void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Dark);
 
-        void Light_Changed(object sender, EventArgs e) => SetTheme(Themes.Light);
+        void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Light);
 
-        void Backup_Changed(object sender, EventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
+        void Backup_Changed(object sender, RoutedEventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 
-        void Autosave_Changed(object sender, EventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
+        void Autosave_Changed(object sender, RoutedEventArgs e) => Preferences.Autosave = Autosave.IsChecked.Value;
 
         void ClearRecentProjects(object sender, RoutedEventArgs e) => Preferences.RecentsClear();
 
-        void UndoLimit_Changed(object sender, EventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
+        void UndoLimit_Changed(object sender, RoutedEventArgs e) => Preferences.UndoLimit = UndoLimit.IsChecked.Value;
 
-        void DiscordPresence_Changed(object sender, EventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
+        void DiscordPresence_Changed(object sender, RoutedEventArgs e) => Preferences.DiscordPresence = DiscordPresence.IsChecked.Value;
 
-        void DiscordFilename_Changed(object sender, EventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
+        void DiscordFilename_Changed(object sender, RoutedEventArgs e) => Preferences.DiscordFilename = DiscordFilename.IsChecked.Value;
 
-        void CheckForUpdates_Changed(object sender, EventArgs e) => Preferences.CheckForUpdates = CheckForUpdates.IsChecked.Value;
+        void CheckForUpdates_Changed(object sender, RoutedEventArgs e) => Preferences.CheckForUpdates = CheckForUpdates.IsChecked.Value;
 
         void OpenCrashesFolder(object sender, RoutedEventArgs e) {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
 
-            Program.URL(Program.CrashDir);
+            App.URL(Program.CrashDir);
         }
 
         void LocateApolloConnector(object sender, RoutedEventArgs e) {
@@ -297,7 +298,7 @@ namespace Apollo.Windows {
 
             if (!Directory.Exists(m4l)) Directory.CreateDirectory(m4l);
 
-            Program.URL(m4l);
+            App.URL(m4l);
         }
 
         void Launchpad_Add() {
@@ -313,7 +314,7 @@ namespace Apollo.Windows {
         });
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
-            if (!Program.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
+            if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
 

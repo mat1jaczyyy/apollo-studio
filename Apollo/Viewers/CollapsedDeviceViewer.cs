@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -33,6 +34,8 @@ namespace Apollo.Viewers {
             if (IsArrangeValid) Header.Background = brush;
             else this.Resources["TitleBrush"] = brush;
         }
+
+        public CollapsedDeviceViewer() => new InvalidOperationException();
 
         public CollapsedDeviceViewer(Device device) {
             TitleText.Text = device.GetType().ToString().Split(".").Last();

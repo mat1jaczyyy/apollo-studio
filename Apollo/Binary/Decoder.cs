@@ -90,7 +90,7 @@ namespace Apollo.Binary {
                     Preferences.CustomPalette = new Palette((from i in Enumerable.Range(0, 128) select (Color)Decode(reader, version)).ToArray());
                     Preferences.ImportPalette = (Palettes)reader.ReadInt32();
 
-                    Preferences.Theme = (Themes)reader.ReadInt32();
+                    Preferences.Theme = (ThemeType)reader.ReadInt32();
                 }
 
                 if (version >= 10) {

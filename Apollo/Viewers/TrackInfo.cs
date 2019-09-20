@@ -80,6 +80,8 @@ namespace Apollo.Viewers {
             selected = false;
         }
 
+        public TrackInfo() => new InvalidOperationException();
+
         public TrackInfo(Track track) {
             InitializeComponent();
             
@@ -133,25 +135,29 @@ namespace Apollo.Viewers {
         }
 
         void Select(PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                Program.Project.Window?.Selection.Select(_track, e.InputModifiers.HasFlag(InputModifiers.Shift));
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
+                Program.Project.Window?.Selection.Select(_track, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
             dragData.Set("track", Program.Project.Window?.Selection.Selection);
 
-            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
                 
-                if (e.MouseButton == MouseButton.Left && e.ClickCount == 2) 
+                if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) 
                     TrackWindow.Create(_track, (Window)this.GetVisualRoot());
                 
-                if (e.MouseButton == MouseButton.Right) {
+                if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                     MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
                     TrackContextMenu.Open(Draggable);
                 }
@@ -191,7 +197,7 @@ namespace Apollo.Viewers {
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
             int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

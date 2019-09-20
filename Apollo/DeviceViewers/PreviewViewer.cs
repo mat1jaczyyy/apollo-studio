@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -20,6 +22,8 @@ namespace Apollo.DeviceViewers {
         
         Preview _preview;
         LaunchpadGrid Grid;
+
+        public PreviewViewer() => new InvalidOperationException();
 
         public PreviewViewer(Preview preview) {
             InitializeComponent();

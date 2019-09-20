@@ -60,6 +60,8 @@ namespace Apollo.Components {
             selected = false;
         }
 
+        public FrameDisplay() => throw new InvalidOperationException();
+
         public FrameDisplay(Frame frame, Pattern pattern) {
             InitializeComponent();
 
@@ -98,25 +100,29 @@ namespace Apollo.Components {
         }
 
         void Select(PointerPressedEventArgs e) {
-            if (e.MouseButton == MouseButton.Left || (e.MouseButton == MouseButton.Right && !selected))
-                _pattern.Window?.Selection.Select(Viewer.Frame, e.InputModifiers.HasFlag(InputModifiers.Shift));
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
+                _pattern.Window?.Selection.Select(Viewer.Frame, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
             dragData.Set("frame", _pattern.Window?.Selection.Selection);
 
-            DragDropEffects result = await DragDrop.DoDragDrop(dragData, DragDropEffects.Move);
+            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
                 
-                if (e.MouseButton == MouseButton.Left)
+                if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                     FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
         
-                if (e.MouseButton == MouseButton.Right)
+                if (MouseButton == PointerUpdateKind.RightButtonPressed)
                     FrameContextMenu.Open(Viewer);
             }
         }
@@ -149,7 +155,7 @@ namespace Apollo.Components {
             int after = Viewer.Frame.ParentIndex.Value;
             if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
 
-            bool copy = e.Modifiers.HasFlag(Program.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlKey);
             
             bool result = Frame.Move(moving, _pattern, after, copy);
 
