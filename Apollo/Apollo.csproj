@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeIdentifiers>win10-x64;osx.10.11-x64</RuntimeIdentifiers>
+    <RuntimeFrameworkVersion>3.0.0</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;osx.10.13-x64</RuntimeIdentifiers>
     <LangVersion>7.2</LangVersion>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ApplicationIcon>icon.ico</ApplicationIcon>
