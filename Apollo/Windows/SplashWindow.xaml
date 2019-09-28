@@ -12,7 +12,10 @@
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
-        <Components:PreferencesButton Grid.Column="0" Margin="5 5" x:Name="PreferencesButton" />
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="5 5" Spacing="5">
+          <Components:PreferencesButton x:Name="PreferencesButton" />
+          <Components:UpdateButton x:Name="UpdateButton" Clicked="Update" />
+        </StackPanel>
         
         <Grid Grid.Column="1" Background="Transparent" PointerPressed="MoveWindow" />
         

@@ -43,12 +43,15 @@ namespace Apollo.Windows {
             ReleaseVersion = this.Get<TextBlock>("ReleaseVersion");
             ReleaseBody = this.Get<TextBlock>("ReleaseBody");
             ReleaseLink = this.Get<TextBlock>("ReleaseLink");
+
+            UpdateButton = this.Get<UpdateButton>("UpdateButton");
         }
 
         Grid Root, CrashPanel;
         TabControl TabControl;
         StackPanel Recents;
         TextBlock BlogpostBody, BlogpostLink, ReleaseVersion, ReleaseBody, ReleaseLink;
+        UpdateButton UpdateButton;
 
         bool openDialog = false;
 
@@ -113,7 +116,7 @@ namespace Apollo.Windows {
                 } else ResolveCrash();
         }
 
-        async void Loaded(object sender, EventArgs e) {
+        void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
@@ -126,14 +129,7 @@ namespace Apollo.Windows {
             UpdateBlogpost();
             UpdateRelease();
 
-            if (IsVisible && !openDialog && await Github.ShouldUpdate()) {
-                foreach (Window window in App.Windows)
-                    if (window.GetType() != typeof(MessageWindow))
-                        window.Close();
-                
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
-                else UpdateWindow.Create(this);
-            }
+            if (!Program.HadCrashed) CheckUpdate();
         }
         
         void Unloaded(object sender, CancelEventArgs e) {
@@ -144,6 +140,26 @@ namespace Apollo.Windows {
             this.Content = null;
 
             App.WindowClosed(this);
+        }
+
+        async void CheckUpdate() {
+            if (true|| await Github.ShouldUpdate())
+                UpdateButton.Enable();
+        }
+
+        async void Update() {
+            if (IsVisible && !openDialog && await MessageWindow.Create(
+                $"A new version of Apollo Studio is available ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).\n\n" +
+                "Do you want to update to the latest version?",
+                new string[] { "Yes", "No" }, null
+            ) == "Yes") {
+                foreach (Window window in App.Windows)
+                    if (window.GetType() != typeof(MessageWindow))
+                        window.Close();
+                
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
+                else UpdateWindow.Create(this);
+            }
         }
 
         void TabChanged(int tab) {
@@ -283,6 +299,7 @@ namespace Apollo.Windows {
             CrashPanel.ZIndex = -1;
 
             ResolveCrash();
+            CheckUpdate();
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

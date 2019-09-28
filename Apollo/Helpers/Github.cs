@@ -4,10 +4,7 @@ using System.Threading.Tasks;
 
 using Octokit;
 
-using Humanizer;
-
 using Apollo.Core;
-using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public static class Github {
@@ -61,25 +58,14 @@ namespace Apollo.Helpers {
         }
 
         public static async Task<bool> ShouldUpdate() {
-            if (UpdateChecked) return false;
-
             if (release == null)
                 try {
                     await LatestRelease();
                 } catch {
                     return false;
                 }
-            
-            UpdateChecked = true;
 
-            if (Preferences.CheckForUpdates && release.Name != Program.Version && download != null)
-                return await MessageWindow.Create(
-                    $"A new version of Apollo Studio is available ({release.Name} - {download.Size.Bytes().Humanize("#.##")}).\n\n" +
-                    "Do you want to update to the latest version?",
-                    new string[] { "Yes", "No" }, null
-                ) == "Yes";
-
-            return false;
+            return Preferences.CheckForUpdates && release.Name != Program.Version && download != null;
         }
     }
 }
