@@ -147,12 +147,16 @@ namespace Apollo.Components {
         }
 
         void Thumb_Down(object sender, PointerPressedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left))
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                 oldColor = Color.Clone();
         }
 
         void Thumb_Up(object sender, PointerReleasedEventArgs e) {
-            if (e.MouseButton.HasFlag(MouseButton.Left) && oldColor != Color)
+            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased && oldColor != Color)
                 ColorChanged?.Invoke(Color, oldColor);
         }
 
