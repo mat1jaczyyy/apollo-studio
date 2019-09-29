@@ -143,7 +143,7 @@ namespace Apollo.Windows {
         }
 
         async void CheckUpdate() {
-            if (true|| await Github.ShouldUpdate())
+            if (await Github.ShouldUpdate())
                 UpdateButton.Enable();
         }
 
