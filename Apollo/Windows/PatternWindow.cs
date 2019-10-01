@@ -451,6 +451,8 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Enter || e.Key == Key.Space) {
                 if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
                 else if (e.KeyModifiers == KeyModifiers.None) PatternPlay(Play, null);

@@ -212,6 +212,8 @@ namespace Apollo.Windows {
         }
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
                 return;
 
@@ -271,13 +273,19 @@ namespace Apollo.Windows {
         }
         
         void Text_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Return) 
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        void Text_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Text_KeyUp(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
+            e.Key = Key.None;
+        }
 
         void BPM_Unfocus(object sender, RoutedEventArgs e) {
             if (BPM_Clean != Program.Project.BPM) {

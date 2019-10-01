@@ -28,6 +28,8 @@ namespace Apollo.Core {
         public static readonly InputModifiers ControlInput = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? InputModifiers.Windows : InputModifiers.Control;
         public static readonly KeyModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? KeyModifiers.Meta : KeyModifiers.Control;
 
+        public static bool Dragging = false;
+
         public static bool WindowKey(Window sender, KeyEventArgs e) {
             if (e.KeyModifiers == ControlKey) {
                 if (e.Key == Key.W) sender.Close();

@@ -484,13 +484,19 @@ namespace Apollo.Components {
         }
 
         protected void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        protected void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        protected void Input_KeyUp(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
+            e.Key = Key.None;
+        }
 
         protected void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }

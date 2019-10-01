@@ -131,7 +131,9 @@ namespace Apollo.Viewers {
             DataObject dragData = new DataObject();
             dragData.Set("chain", Track.Get(_chain)?.Window?.Selection.Selection);
 
+            App.Dragging = true;
             DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
+            App.Dragging = false;
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);
@@ -385,13 +387,19 @@ namespace Apollo.Viewers {
         }
 
         void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
+            e.Key = Key.None;
+        }
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
     }

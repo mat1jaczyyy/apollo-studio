@@ -9,6 +9,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+using Apollo.Core;
+
 namespace Apollo.Components {
     public class MoveDial: UserControl {
         void InitializeComponent() {
@@ -251,13 +253,19 @@ namespace Apollo.Components {
         }
 
         void Input_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Return)
                 this.Focus();
 
             e.Key = Key.None;
         }
 
-        void Input_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Input_KeyUp(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
+            e.Key = Key.None;
+        }
 
         void Input_MouseDown(object sender, PointerPressedEventArgs e) {
             TextBox Input = (TextBox)sender;

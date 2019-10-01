@@ -107,6 +107,8 @@ namespace Apollo.Windows {
         });
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }

@@ -132,6 +132,8 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
         async void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.KeyModifiers == App.ControlKey && e.Key == Key.P) {
                 if (_track.Launchpad.Available && _track.Launchpad.GetType() != typeof(VirtualLaunchpad) || _track.Launchpad.Window != null)
                     LaunchpadWindow.Create(_track.Launchpad, this);

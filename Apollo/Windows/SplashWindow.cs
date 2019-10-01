@@ -303,6 +303,8 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (App.WindowKey(this, e)) return;
 
             if (e.KeyModifiers == App.ControlKey) {

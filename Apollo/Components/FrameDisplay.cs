@@ -114,7 +114,9 @@ namespace Apollo.Components {
             DataObject dragData = new DataObject();
             dragData.Set("frame", _pattern.Window?.Selection.Selection);
 
+            App.Dragging = true;
             DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
+            App.Dragging = false;
 
             if (result == DragDropEffects.None) {
                 if (selected) Select(e);

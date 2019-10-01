@@ -13,6 +13,7 @@ using GradientStop = Avalonia.Media.GradientStop;
 using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
 
+using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -310,13 +311,19 @@ namespace Apollo.Components {
         }
         
         void Hex_KeyDown(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
             if (e.Key == Key.Return)
                 this.Focus();
             
             e.Key = Key.None;
         }
         
-        void Hex_KeyUp(object sender, KeyEventArgs e) => e.Key = Key.None;
+        void Hex_KeyUp(object sender, KeyEventArgs e) {
+            if (App.Dragging) return;
+
+            e.Key = Key.None;
+        }
 
         void Hex_Unfocus(object sender, RoutedEventArgs e) {
             if (oldColor != Color)
