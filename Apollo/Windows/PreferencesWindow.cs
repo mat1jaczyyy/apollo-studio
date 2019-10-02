@@ -97,7 +97,7 @@ namespace Apollo.Windows {
             }
         );
 
-        void UpdateTopmost(bool value) => Topmost = value;
+        void UpdateTopmost(bool value) => AlwaysOnTop.IsChecked = Topmost = value;
 
         void UpdatePorts() {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
