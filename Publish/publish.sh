@@ -3,11 +3,7 @@
 cd ../Apollo
 rm -rf bin/Release/netcoreapp3.0/osx-x64/publish
 dotnet publish -r osx-x64 -c Release
-sips -i icon.ico > /dev/null
-DeRez -only icns icon.ico > tmpicns.rsrc
-Rez -append tmpicns.rsrc -o bin/Release/netcoreapp3.0/osx-x64/publish/Apollo > /dev/null
-SetFile -a C bin/Release/netcoreapp3.0/osx-x64/publish/Apollo > /dev/null
-rm tmpicns.rsrc > /dev/null
+fileicon set bin/Release/netcoreapp3.0/osx-x64/publish/Apollo icon.ico
 rm bin/Release/netcoreapp3.0/osx-x64/publish/Apollo.config > /dev/null 2>&1
 
 echo
@@ -15,11 +11,7 @@ echo
 cd ../ApolloUpdate
 rm -rf bin/Release/netcoreapp3.0/osx-x64/publish
 dotnet publish -r osx-x64 -c Release
-sips -i icon.ico > /dev/null
-DeRez -only icns icon.ico > tmpicns.rsrc
-Rez -append tmpicns.rsrc -o bin/Release/netcoreapp3.0/osx-x64/publish/ApolloUpdate >/dev/null
-SetFile -a C bin/Release/netcoreapp3.0/osx-x64/publish/ApolloUpdate >/dev/null
-rm tmpicns.rsrc > /dev/null
+fileicon set bin/Release/netcoreapp3.0/osx-x64/publish/ApolloUpdate icon.ico
 
 echo
 echo Merging...
