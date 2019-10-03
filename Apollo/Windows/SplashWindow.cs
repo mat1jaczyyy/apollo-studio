@@ -272,7 +272,9 @@ namespace Apollo.Windows {
             => App.URL((await Github.LatestRelease()).HtmlUrl);
 
         void ResolveCrash() {
-            File.Delete(Program.CrashProject);
+            if (File.Exists(Program.CrashProject))
+                File.Delete(Program.CrashProject);
+                
             Program.HadCrashed = false;
         }
 
