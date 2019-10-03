@@ -266,7 +266,7 @@ namespace Apollo.Core {
             Save();
         }
 
-        static bool _crashed = true;
+        static bool _crashed = false;
         public static bool Crashed {
             get => _crashed;
             set {
