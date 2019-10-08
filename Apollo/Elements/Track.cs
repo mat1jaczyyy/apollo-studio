@@ -24,6 +24,8 @@ namespace Apollo.Elements {
 
         public TrackInfo Info;
         public TrackWindow Window;
+        
+        public bool IsDisposing { get; private set; } = false;
 
         public delegate void ParentIndexChangedEventHandler(int index);
         public event ParentIndexChangedEventHandler ParentIndexChanged;
@@ -177,6 +179,8 @@ namespace Apollo.Elements {
         }
 
         public void Dispose() {
+            IsDisposing = true;
+
             Disposing?.Invoke();
             Disposing = null;
             NameChanged = null;

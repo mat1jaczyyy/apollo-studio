@@ -28,14 +28,14 @@ namespace Apollo.Devices {
         }
 
         void IndexChanged(int value) {
-            if (Program.Project.TrackOperation) return;
-            
+            if (Track.Get(this)?.IsDisposing != false) return;
+
             _target = value;
             if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
         }
 
         void IndexRemoved() {
-            if (Program.Project.TrackOperation || Program.Project.IsDisposing) return;
+            if (Program.Project.IsDisposing || Track.Get(this)?.IsDisposing != false) return;
 
             bool redoing = false;
 

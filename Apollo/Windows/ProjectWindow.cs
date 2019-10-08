@@ -556,7 +556,6 @@ namespace Apollo.Windows {
 
             Program.Project.Undo.Add($"Track Removed", () => {
                 for (int i = left; i <= right; i++) {
-                    Program.Project.TrackOperation = true;
                     Track restored = ut[i - left].Clone();
                     restored.Launchpad = ul[i - left];
                     Program.Project.Insert(i, restored);
