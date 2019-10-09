@@ -131,7 +131,7 @@ namespace Apollo.Windows {
             ((ISelect)Selection.Start.IParent).IParentIndex == null &&
             ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
 
-        async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (e.KeyModifiers == App.ControlKey && e.Key == Key.P) {
@@ -198,6 +198,11 @@ namespace Apollo.Windows {
                 }
                 Selection.MoveChild();
             }
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
+            this.Focus();
         }
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();

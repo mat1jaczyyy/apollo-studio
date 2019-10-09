@@ -211,7 +211,7 @@ namespace Apollo.Windows {
             Program.Project.Insert(index, track);
         }
 
-        async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
@@ -225,6 +225,11 @@ namespace Apollo.Windows {
             else if (e.Key == Key.Enter)
                 foreach (ISelect i in Selection.Selection)
                     TrackWindow.Create((Track)i, this);
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
+            this.Focus();
         }
 
         void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;

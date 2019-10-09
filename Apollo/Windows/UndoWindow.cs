@@ -100,7 +100,7 @@ namespace Apollo.Windows {
                 HighlightSaved(Program.Project.Undo.SavedPosition.Value);
         }
 
-        async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
@@ -111,6 +111,11 @@ namespace Apollo.Windows {
             if (e.Key == Key.Up) Program.Project.Undo.Undo();
             else if (e.Key == Key.Down) Program.Project.Undo.Redo();
 
+            this.Focus();
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
             this.Focus();
         }
 

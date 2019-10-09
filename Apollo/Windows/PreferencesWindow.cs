@@ -313,11 +313,16 @@ namespace Apollo.Windows {
             Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
-        async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
+            this.Focus();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

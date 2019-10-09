@@ -304,7 +304,7 @@ namespace Apollo.Windows {
             CheckUpdate();
         }
 
-        void Window_KeyDown(object sender, KeyEventArgs e) {
+        void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (App.WindowKey(this, e)) return;
@@ -313,6 +313,11 @@ namespace Apollo.Windows {
                 if (e.Key == Key.N) New(sender, e);
                 else if (e.Key == Key.O) Open(sender, e);
             }
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
+            this.Focus();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();

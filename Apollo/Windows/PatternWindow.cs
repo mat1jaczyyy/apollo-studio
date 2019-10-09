@@ -453,7 +453,7 @@ namespace Apollo.Windows {
             e.Handled = true;
         }
 
-        async void Window_KeyDown(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (e.Key == Key.Enter || e.Key == Key.Space) {
@@ -486,6 +486,11 @@ namespace Apollo.Windows {
                     else Frame_Insert(_pattern.Count);
                 }
             }
+        }
+
+        void Window_KeyDown(object sender, KeyEventArgs e) {
+            HandleKey(sender, e);
+            this.Focus();
         }
 
         void ColorPicker_Changed(Color color, Color old) => ColorHistory.Select(color.Clone());
