@@ -48,7 +48,7 @@ namespace Apollo.Windows {
 
         void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
 
-        public SelectionManager Selection = new SelectionManager();
+        public SelectionManager Selection;
 
         public TrackWindow() => new InvalidOperationException();
 
@@ -65,6 +65,8 @@ namespace Apollo.Windows {
 
             ChainViewer chainViewer = new ChainViewer(_track.Chain);
             chainViewer.PointerWheelChanged += Track_Scroll;
+
+            Selection = new SelectionManager(() => _track.Chain.Devices.FirstOrDefault());
 
             Root = chainViewer.Get<Grid>("Layout");
             UpdateContentAlignment(Preferences.CenterTrackContents);

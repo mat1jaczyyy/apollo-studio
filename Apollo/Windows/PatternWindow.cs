@@ -216,7 +216,7 @@ namespace Apollo.Windows {
             if (Contents.Count == 2) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
         }
 
-        public SelectionManager Selection = new SelectionManager();
+        public SelectionManager Selection;
 
         public PatternWindow() => new InvalidOperationException();
 
@@ -256,6 +256,8 @@ namespace Apollo.Windows {
                 Contents_Insert(i, _pattern[i], true);
             
             if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
+
+            Selection = new SelectionManager(() => _pattern.Frames.FirstOrDefault());
 
             Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 

@@ -29,6 +29,13 @@ namespace Apollo.Helpers {
             }
         }
 
+        Func<ISelect> TargetDefault;
+
+        public SelectionManager(Func<ISelect> targetDefault) {
+            TargetDefault = targetDefault;
+            SelectDefault();
+        }
+
         public void Select(ISelect select, bool shift = false) {
             if (Start != null)
                 if (End != null)
@@ -51,6 +58,12 @@ namespace Apollo.Helpers {
                 else Start.IInfo?.Select();
         }
 
+        public void SelectDefault() {
+            ISelect target = TargetDefault.Invoke();
+            
+            if (target != null) Select(target, false);
+        }
+
         public void SelectAll() {
             ISelectParent target = Start.IParent;
             Select(target.IChildren.First());
@@ -59,7 +72,11 @@ namespace Apollo.Helpers {
 
         public bool Move(bool right, bool shift = false) {
             ISelect target = (shift? (End?? Start) : Start);
-            if (target == null) return false;
+            
+            if (target == null) {
+                SelectDefault();
+                return true;
+            }
 
             try {
                 if (right) {
@@ -124,7 +141,10 @@ namespace Apollo.Helpers {
         }
 
         public bool HandleKey(KeyEventArgs e) {
-            if (Start == null) return true;
+            if (Start == null) {
+                SelectDefault();
+                return true;
+            }
 
             if (e.KeyModifiers == App.ControlKey) {
                 if (e.Key == Key.X) Action("Cut");

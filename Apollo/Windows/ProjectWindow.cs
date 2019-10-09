@@ -99,7 +99,7 @@ namespace Apollo.Windows {
             SetAlwaysShowing();
         }
 
-        public SelectionManager Selection = new SelectionManager();
+        public SelectionManager Selection;
         
         public ProjectWindow() {
             InitializeComponent();
@@ -118,6 +118,8 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
+
+            Selection = new SelectionManager(() => Program.Project.Tracks.FirstOrDefault());
             
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
