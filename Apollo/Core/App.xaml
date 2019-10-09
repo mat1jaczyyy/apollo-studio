@@ -14,6 +14,10 @@
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
 
+    <Style Selector=":is(Control):not(:is(MenuItem))">
+      <Setter Property="Focusable" Value="false"/>
+    </Style>
+
     <Style Selector="TextBlock">
       <Setter Property="FontFamily" Value="{DynamicResource Font}" />
     </Style>
