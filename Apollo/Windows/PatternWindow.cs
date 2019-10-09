@@ -291,6 +291,9 @@ namespace Apollo.Windows {
             foreach (Courier i in PlayTimers) i.Dispose();
             PlayTimers.Clear();
 
+            foreach (Frame frame in _pattern.Frames)
+                frame.Info = null;
+
             _pattern.Window = null;
             _pattern = null;
 
