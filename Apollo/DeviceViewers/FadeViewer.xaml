@@ -46,7 +46,7 @@
       </StackPanel>
     </Grid>
 
-    <Grid Grid.Column="1" ColumnDefinitions="0" x:Name="PickerContainer">
+    <Grid Grid.Column="1" MaxWidth="0" x:Name="PickerContainer">
       <Border Margin="5 0 0 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
         <Components:ColorPicker Margin="5 0 0 0" x:Name="Picker" ColorChanged="Color_Changed" />
       </Border>

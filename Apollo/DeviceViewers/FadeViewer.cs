@@ -120,7 +120,7 @@ namespace Apollo.DeviceViewers {
 
         public void Expand(int? index) {
             if (_fade.Expanded != null) {
-                PickerContainer.ColumnDefinitions[0].Width = new GridLength(0);
+                PickerContainer.MaxWidth = 0;
                 thumbs[_fade.Expanded.Value].Unselect();
 
                 PositionText.Text = "";
@@ -133,7 +133,7 @@ namespace Apollo.DeviceViewers {
             }
 
             if (index != null) {
-                PickerContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                PickerContainer.MaxWidth = double.PositiveInfinity;
                 thumbs[index.Value].Select();
 
                 if (index != 0 && index != _fade.Count - 1) {
