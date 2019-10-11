@@ -157,7 +157,7 @@ namespace Apollo.Components {
             int after = Viewer.Frame.ParentIndex.Value;
             if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
 
-            bool copy = e.Modifiers.HasFlag(App.ControlKey);
+            bool copy = e.Modifiers.HasFlag(App.ControlInput);
             
             bool result = Frame.Move(moving, _pattern, after, copy);
 
