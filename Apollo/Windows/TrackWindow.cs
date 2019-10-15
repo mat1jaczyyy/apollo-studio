@@ -211,7 +211,7 @@ namespace Apollo.Windows {
 
         void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Expand(e);
-            else BeginMoveDrag();
+            else BeginMoveDrag(e);
 
             Topmost = false;
             Topmost = Preferences.AlwaysOnTop;
@@ -242,9 +242,9 @@ namespace Apollo.Windows {
             }
         }
 
-        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West, e);
 
-        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East, e);
 
         public static void Create(Track track, Window owner) {
             if (track.Window == null) {

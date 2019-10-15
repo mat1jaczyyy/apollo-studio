@@ -320,7 +320,7 @@ namespace Apollo.Windows {
             this.Focus();
         }
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         void Minimize() => WindowState = WindowState.Minimized;
     }

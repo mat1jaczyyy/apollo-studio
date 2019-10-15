@@ -149,7 +149,7 @@ namespace Apollo.Windows {
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         public static void Create(Window owner) {
             UpdateWindow window = new UpdateWindow() {Owner = owner};
