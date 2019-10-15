@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.8.999-cibuild0004405-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.8.999-cibuild0004405-beta" />
+    <PackageReference Include="Avalonia" Version="0.9.0-preview1" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.9.0-preview1" />
     <PackageReference Include="DiscordRichPresence" Version="1.0.121">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
