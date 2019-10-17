@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -115,8 +117,11 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
+            List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-            this.Focus();
+            
+            if (windows.SequenceEqual(App.Windows))
+                this.Focus();
         }
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();

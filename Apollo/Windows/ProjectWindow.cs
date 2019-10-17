@@ -230,8 +230,11 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
+            List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-            this.Focus();
+            
+            if (windows.SequenceEqual(App.Windows))
+                this.Focus();
         }
 
         void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
