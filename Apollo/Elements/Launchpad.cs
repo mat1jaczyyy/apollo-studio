@@ -123,6 +123,12 @@ namespace Apollo.Elements {
                             break;
                         }
                         return (response.Data[12] == 'c' && response.Data[13] == 'f' && response.Data[14] == 'x')? LaunchpadType.CFW : LaunchpadType.PRO;
+
+                    case 0x13: // Launchpad X
+                        return LaunchpadType.X;
+                    
+                    case 0x03: // Launchpad Mini MK3
+                        return LaunchpadType.MiniMK3;
                 }
             }
 
