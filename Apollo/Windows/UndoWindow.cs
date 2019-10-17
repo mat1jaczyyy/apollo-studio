@@ -121,13 +121,13 @@ namespace Apollo.Windows {
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North, e);
 
-        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South, e);
 
         public static void Create(Window owner) {
             if (Program.Project.Undo.Window == null) {

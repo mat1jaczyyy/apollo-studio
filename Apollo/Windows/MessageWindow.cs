@@ -69,7 +69,7 @@ namespace Apollo.Windows {
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
-        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag();
+        void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
 
         void Close(object sender, RoutedEventArgs e) => Close();
 

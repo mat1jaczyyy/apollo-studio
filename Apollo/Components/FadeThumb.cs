@@ -58,13 +58,13 @@ namespace Apollo.Components {
         }
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton != PointerUpdateKind.LeftButtonPressed) e.Handled = true;
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased) {
                 Deleted?.Invoke(this);

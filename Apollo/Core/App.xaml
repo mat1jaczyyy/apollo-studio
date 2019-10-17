@@ -14,7 +14,7 @@
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
 
-    <Style Selector=":is(Control):not(:is(MenuItem))">
+    <Style Selector=":is(Control)">
       <Setter Property="Focusable" Value="false"/>
     </Style>
 

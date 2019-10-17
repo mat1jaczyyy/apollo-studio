@@ -37,7 +37,7 @@ namespace Apollo.Components {
         }
 
         protected override void Click(PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) Program.Project.Undo.Undo();
             else if (MouseButton == PointerUpdateKind.RightButtonReleased) UndoWindow.Create((Window)this.GetVisualRoot());
