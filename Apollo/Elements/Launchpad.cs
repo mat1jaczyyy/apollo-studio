@@ -50,6 +50,16 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
+        bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
+
+        static Dictionary<LaunchpadType, byte> LaunchpadByte = new Dictionary<LaunchpadType, byte>() {
+            {LaunchpadType.MK2, 0x18},
+            {LaunchpadType.PRO, 0x10},
+            {LaunchpadType.CFW, 0x6F},
+            {LaunchpadType.X, 0x0C},
+            {LaunchpadType.MiniMK3, 0x0D}
+        };
+
         InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
@@ -158,8 +168,8 @@ namespace Apollo.Elements {
         bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
-            if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = 0x6F;
-            else raw = new byte[] {0x00, 0x20, 0x29, 0x02, (byte)((Type == LaunchpadType.MK2)? 0x18 : 0x10)}.Concat(raw).ToArray();
+            if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = LaunchpadByte[Type];
+            else raw = new byte[] {0x00, 0x20, 0x29, 0x02, LaunchpadByte[Type]}.Concat(raw).ToArray();
 
             buffer.Enqueue(new SysExMessage(raw));
             ulong current = signalCount;
@@ -184,7 +194,7 @@ namespace Apollo.Elements {
 
         public virtual void Send(Signal n) {
             if (!Available || Type == LaunchpadType.Unknown) return;
-            if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
+            if (n.Index == 0 || n.Index == 9 || n.Index == 90 || (!IsGenerationX && n.Index == 99)) return;
 
             Signal m = n.Clone();
             Window?.SignalRender(m);
@@ -200,9 +210,9 @@ namespace Apollo.Elements {
             } else n.Index = 99;
 
             int offset = 0;
-            if (Type == LaunchpadType.MK2) {
+            if (Type == LaunchpadType.MK2 || IsGenerationX) {
                 if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
-                if (91 <= n.Index && n.Index <= 98) offset = 13;
+                if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
             }
 
             SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue});
