@@ -82,14 +82,14 @@ namespace Apollo.Viewers {
         void MouseLeave(object sender, PointerEventArgs e) => mouseHeld = false;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed || MouseButton == PointerUpdateKind.RightButtonPressed)
                 mouseHeld = true;
         }
 
         async void MouseUp(object sender, PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (mouseHeld) {
                 if (MouseButton == PointerUpdateKind.LeftButtonReleased) {

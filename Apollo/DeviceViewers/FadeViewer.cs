@@ -148,7 +148,7 @@ namespace Apollo.DeviceViewers {
         }
 
         void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 int index;
@@ -394,7 +394,7 @@ namespace Apollo.DeviceViewers {
         double oldValue;
 
         void DisplayPressed(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 oldValue = Math.Round(_fade.GetPosition(_fade.Expanded.Value) * 1000) / 10;

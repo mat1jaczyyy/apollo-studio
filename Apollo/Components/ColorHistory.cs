@@ -163,7 +163,7 @@ namespace Apollo.Components {
         }
 
         void Clicked(object sender, PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             int index = Grid.Children.IndexOf((IControl)sender);
 

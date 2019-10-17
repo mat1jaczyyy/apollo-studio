@@ -33,7 +33,7 @@ namespace Apollo.Viewers {
         }
 
         void Click(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetPointerPoint(this).Properties.PointerUpdateKind;
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed) Selected?.Invoke(Program.Project.Undo.History.IndexOf(_entry));
         }
