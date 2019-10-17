@@ -233,12 +233,12 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void Window_LostFocus(object sender, RoutedEventArgs e) {
-            if (FocusManager.Instance.Current.GetType() == typeof(ComboBox))
+            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
                 this.Focus();
         }
 
