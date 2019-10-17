@@ -110,7 +110,11 @@ namespace Apollo.Elements {
             }
         }
 
-        public async void WriteCrashBackup() => await WriteFile(null, Program.CrashProject, false);
+        public async void WriteCrashBackup() {
+            if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
+            
+            await WriteFile(null, Program.CrashProject, false);
+        }
 
         public async Task<bool> WriteFile(Window sender, string path = null, bool store = true) {
             if (path == null) path = FilePath;
