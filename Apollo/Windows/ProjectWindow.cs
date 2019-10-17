@@ -237,6 +237,11 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
+        void Window_LostFocus(object sender, RoutedEventArgs e) {
+            if (FocusManager.Instance.Current.GetType() == typeof(ComboBox))
+                this.Focus();
+        }
+
         void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
 
         Action BPM_Update;

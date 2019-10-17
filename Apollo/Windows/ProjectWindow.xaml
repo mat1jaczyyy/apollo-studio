@@ -7,7 +7,7 @@
         Width="350" MinWidth="350" MaxWidth="350"
         Height="400" MinHeight="250"
         Opened="Loaded" Closing="Unloaded"
-        KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
+        KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">
   
   <Window.Resources>
     <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
