@@ -244,8 +244,15 @@ namespace Apollo.Elements {
         }
 
         public virtual void Render(Signal n) {
-            if (PatternWindow == null || n.Origin == PatternWindow)
+            if (PatternWindow == null || n.Origin == PatternWindow) {
+                if (!IsGenerationX) {
+                    n.Color.Red /= 2;
+                    n.Color.Green /= 2;
+                    n.Color.Blue /= 2;
+                }
+
                 screen?.MIDIEnter(n);
+            }
         }
 
         public Launchpad() => CreateScreen();
