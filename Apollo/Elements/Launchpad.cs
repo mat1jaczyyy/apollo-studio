@@ -50,6 +50,7 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
+        bool HasModeLight => Type == LaunchpadType.PRO || Type == LaunchpadType.CFW;
         bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
 
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
@@ -60,6 +61,14 @@ namespace Apollo.Elements {
             {LaunchpadType.CFW, new byte[] {0x6F}},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
             {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()}
+        };
+
+        static Dictionary<LaunchpadType, byte[]> ClearMessage = new Dictionary<LaunchpadType, byte[]>() {
+            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
@@ -218,7 +227,7 @@ namespace Apollo.Elements {
         }
 
         public virtual void Clear(bool manual = false) {
-            if (!Available || (manual && PatternWindow != null)) return;
+            if (!Available || Type == LaunchpadType.Unknown || (manual && PatternWindow != null)) return;
 
             CreateScreen();
 
@@ -229,8 +238,9 @@ namespace Apollo.Elements {
                 Window?.SignalRender(n.Clone());
             }
 
-            //SysExSend(new byte[] {0x0E, 0x00});
-            Send(n);
+            SysExSend(ClearMessage[Type]);
+            
+            if (HasModeLight) Send(n); // Clear Mode Light
         }
 
         public virtual void Render(Signal n) {
