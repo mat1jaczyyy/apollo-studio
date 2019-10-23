@@ -411,6 +411,17 @@ namespace Apollo.Elements {
                         new Color((byte)(e.Value >> 1))
                     ));
                     break;
+
+                case LaunchpadType.X:
+                case LaunchpadType.MiniMK3:
+                    HandleMessage(new Signal(
+                        InputType.XY,
+                        this,
+                        this,
+                        (byte)e.Control,
+                        new Color((byte)(e.Value >> 1))
+                    ));
+                    break;
             }
         }
 
