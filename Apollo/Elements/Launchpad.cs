@@ -202,7 +202,6 @@ namespace Apollo.Elements {
 
         public virtual void Send(Signal n) {
             if (!Available || Type == LaunchpadType.Unknown) return;
-            if (n.Index == 0 || n.Index == 9 || n.Index == 90 || (!IsGenerationX && n.Index == 99)) return;
 
             Signal m = n.Clone();
             Window?.SignalRender(m);
@@ -215,12 +214,25 @@ namespace Apollo.Elements {
                 else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
                 else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-            } else n.Index = 99;
+            } else if (HasModeLight) n.Index = 99;
 
             int offset = 0;
-            if (Type == LaunchpadType.MK2 || IsGenerationX) {
-                if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
-                if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
+
+            switch (Type) {
+                case LaunchpadType.MK2:
+                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 99 || n.Index == 100) return;
+                    if (91 <= n.Index && n.Index <= 98) offset = 13;
+                    break;
+                
+                case LaunchpadType.PRO:
+                case LaunchpadType.CFW:
+                    if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
+                    break;
+
+                case LaunchpadType.X:
+                case LaunchpadType.MiniMK3:
+                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
+                    break;
             }
 
             SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue}).ToArray());
