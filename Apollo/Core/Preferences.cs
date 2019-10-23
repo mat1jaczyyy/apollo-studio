@@ -48,6 +48,17 @@ namespace Apollo.Core {
             }
         }
 
+        public static event Changed LaunchpadModelChanged;
+        static LaunchpadModels _LaunchpadModel = LaunchpadModels.Pro;
+        public static LaunchpadModels LaunchpadModel {
+            get => _LaunchpadModel;
+            set {
+                _LaunchpadModel = value;
+                LaunchpadModelChanged?.Invoke();
+                Save();
+            }
+        }
+
         public static event Changed LaunchpadStyleChanged;
         static LaunchpadStyles _LaunchpadStyle = LaunchpadStyles.Stock;
         public static LaunchpadStyles LaunchpadStyle {

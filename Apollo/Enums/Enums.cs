@@ -7,6 +7,10 @@ namespace Apollo.Enums {
         Dark, Light
     }
 
+    public enum LaunchpadModels {
+        MK2, Pro, X
+    }
+
     public enum LaunchpadStyles {
         Stock, Phantom, Sanded
     }

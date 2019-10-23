@@ -42,6 +42,7 @@ namespace Apollo.Binary {
 
                 writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
+                writer.Write((int)Preferences.LaunchpadModel);
 
                 writer.Write(Preferences.AutoCreateKeyFilter);
                 writer.Write(Preferences.AutoCreatePageFilter);
