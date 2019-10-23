@@ -52,12 +52,14 @@ namespace Apollo.Elements {
 
         bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
 
-        static Dictionary<LaunchpadType, byte> LaunchpadByte = new Dictionary<LaunchpadType, byte>() {
-            {LaunchpadType.MK2, 0x18},
-            {LaunchpadType.PRO, 0x10},
-            {LaunchpadType.CFW, 0x6F},
-            {LaunchpadType.X, 0x0C},
-            {LaunchpadType.MiniMK3, 0x0D}
+        static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
+
+        static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
+            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0B}).ToArray()},
+            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
+            {LaunchpadType.CFW, new byte[] {0x6F}},
+            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
@@ -168,9 +170,6 @@ namespace Apollo.Elements {
         bool SysExSend(byte[] raw) {
             if (!Available || Type == LaunchpadType.Unknown) return false;
 
-            if (raw[0] == 0x0B && Type == LaunchpadType.CFW) raw[0] = LaunchpadByte[Type];
-            else raw = new byte[] {0x00, 0x20, 0x29, 0x02, LaunchpadByte[Type]}.Concat(raw).ToArray();
-
             buffer.Enqueue(new SysExMessage(raw));
             ulong current = signalCount;
 
@@ -215,7 +214,7 @@ namespace Apollo.Elements {
                 if (Type == LaunchpadType.MK2 && 91 <= n.Index && n.Index <= 98) offset = 13;
             }
 
-            SysExSend(new byte[] {0x0B, (byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue});
+            SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue}).ToArray());
         }
 
         public virtual void Clear(bool manual = false) {
@@ -230,7 +229,7 @@ namespace Apollo.Elements {
                 Window?.SignalRender(n.Clone());
             }
 
-            SysExSend(new byte[] {0x0E, 0x00});
+            //SysExSend(new byte[] {0x0E, 0x00});
             Send(n);
         }
 
