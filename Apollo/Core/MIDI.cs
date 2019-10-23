@@ -133,6 +133,9 @@ namespace Apollo.Core {
             }
         }
 
+        static bool PortsMatch(string input, string output)
+            => input.ToUpper().Replace("IN", "").Replace("OUT", "") == output.ToUpper().Replace("IN", "").Replace("OUT", "");
+
         public static Launchpad Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
             lock (locker) {
                 Launchpad ret = null;
@@ -159,7 +162,7 @@ namespace Apollo.Core {
             lock (locker) {
                 if (lp.GetType() != typeof(VirtualLaunchpad))
                     foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices)
-                        if (lp.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", "")) return;
+                        if (PortsMatch(lp.Name, output.Name)) return;
 
                 lp.Disconnect();
                 updated = true;
@@ -170,7 +173,7 @@ namespace Apollo.Core {
             lock (locker) {
                 foreach (IMidiInputDeviceInfo input in MidiDeviceManager.Default.InputDevices)
                     foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices)
-                        if (input.Name.Replace("MIDIIN", "") == output.Name.Replace("MIDIOUT", ""))
+                        if (PortsMatch(input.Name, output.Name))
                             Connect(input, output);
 
                 foreach (Launchpad device in Devices)
