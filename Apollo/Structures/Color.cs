@@ -10,7 +10,7 @@ namespace Apollo.Structures {
     public class Color {
         byte _r, _g, _b;
 
-        bool IsValid(byte value) => 0 <= value && value <= 63;
+        bool IsValid(byte value) => 0 <= value && value <= 127;
 
         public byte Red {
             get => _r;
@@ -43,13 +43,13 @@ namespace Apollo.Structures {
 
         public Color Clone() => new Color(_r, _g, _b);
 
-        public Color(byte bright = 63) {
-            if (!IsValid(bright)) bright = 63;
+        public Color(byte bright = 127) {
+            if (!IsValid(bright)) bright = 127;
             _r = _g = _b = bright;
         }
 
         public Color(byte red, byte green, byte blue) {
-            _r = _g = _b = 63;
+            _r = _g = _b = 127;
             Red = red;
             Green = green;
             Blue = blue;
@@ -57,20 +57,20 @@ namespace Apollo.Structures {
 
         public void Mix(Color other, bool multiply) {
             if (multiply) {
-                Red = (byte)((double)Red * other.Red / 63);
-                Green = (byte)((double)Green * other.Green / 63);
-                Blue = (byte)((double)Blue * other.Blue / 63);
+                Red = (byte)((double)Red * other.Red / 127);
+                Green = (byte)((double)Green * other.Green / 127);
+                Blue = (byte)((double)Blue * other.Blue / 127);
             } else {
-                Red = (byte)(63 - (double)(63 - Red) * (63 - other.Red) / 63);
-                Green = (byte)(63 - (double)(63 - Green) * (63 - other.Green) / 63);
-                Blue = (byte)(63 - (double)(63 - Blue) * (63 - other.Blue) / 63);
+                Red = (byte)(127 - (double)(127 - Red) * (127 - other.Red) / 127);
+                Green = (byte)(127 - (double)(127 - Green) * (127 - other.Green) / 127);
+                Blue = (byte)(127 - (double)(127 - Blue) * (127 - other.Blue) / 127);
             }
         }
 
         public (double, double, double) ToHSV() {
-            double r = Red / 63.0;
-            double g = Green / 63.0;
-            double b = Blue / 63.0;
+            double r = Red / 127.0;
+            double g = Green / 127.0;
+            double b = Blue / 127.0;
             double[] colors = new double[] {r, g, b};
 
             double min = colors.Min();
@@ -101,7 +101,7 @@ namespace Apollo.Structures {
 
             int hi = Convert.ToInt32(Math.Floor(hue)) % 6;
             double f = hue - Math.Floor(hue);
-            value *= 63;
+            value *= 127;
 
             byte v = Convert.ToByte(value);
             byte p = Convert.ToByte(value * (1 - saturation));
@@ -131,9 +131,9 @@ namespace Apollo.Structures {
 
         public AvaloniaColor ToAvaloniaColor() => new AvaloniaColor(
             255,
-            (byte)(_r * (255.0 / 63)),
-            (byte)(_g * (255.0 / 63)),
-            (byte)(_b * (255.0 / 63))
+            (byte)(_r * (255.0 / 127)),
+            (byte)(_g * (255.0 / 127)),
+            (byte)(_b * (255.0 / 127))
         );
 
         public SolidColorBrush ToBrush() => new SolidColorBrush(ToAvaloniaColor());

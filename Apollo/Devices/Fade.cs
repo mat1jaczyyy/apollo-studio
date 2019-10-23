@@ -205,7 +205,7 @@ namespace Apollo.Devices {
             Gate = gate;
             PlayMode = playmode;
 
-            _colors = colors?? new List<Color>() {new Color(63), new Color(0)};
+            _colors = colors?? new List<Color>() {new Color(), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
             Expanded = expanded;
 

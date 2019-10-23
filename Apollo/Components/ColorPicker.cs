@@ -284,9 +284,9 @@ namespace Apollo.Components {
             int g = Convert.ToInt32(text.Substring(3, 2), 16);
             int b = Convert.ToInt32(text.Substring(5, 2), 16);
 
-            r = (r > 63)? 63 : r;
-            g = (g > 63)? 63 : g;
-            b = (b > 63)? 63 : b;
+            r = (r > 127)? 127 : r;
+            g = (g > 127)? 127 : g;
+            b = (b > 127)? 127 : b;
 
             if (!Hex_Dirty) {
                 oldColor = Color.Clone();

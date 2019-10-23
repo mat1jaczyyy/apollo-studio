@@ -83,13 +83,13 @@ namespace Apollo.Windows {
             new Time(false),
             colors: new List<Color>() {
                 new Color(1, 0, 0),
-                new Color(63, 0, 0),
-                new Color(63, 63, 0),
-                new Color(0, 63, 0),
-                new Color(0, 63, 63),
-                new Color(0, 0, 63),
-                new Color(63, 0, 63),
-                new Color(63, 0, 0),
+                new Color(127, 0, 0),
+                new Color(127, 127, 0),
+                new Color(0, 127, 0),
+                new Color(0, 127, 127),
+                new Color(0, 0, 127),
+                new Color(127, 0, 127),
+                new Color(127, 0, 0),
                 new Color(1, 0, 0)
             },
             positions: new List<double>() {
@@ -307,7 +307,7 @@ namespace Apollo.Windows {
         }
 
         void Preview_Pressed(int index) =>
-            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color(63)));
+            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color()));
 
         void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
