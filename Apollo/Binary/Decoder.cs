@@ -57,8 +57,11 @@ namespace Apollo.Binary {
                 Preferences.AlwaysOnTop = reader.ReadBoolean();
                 Preferences.CenterTrackContents = reader.ReadBoolean();
 
-                if (version >= 23) {
-                    Preferences.DisplaySignalIndicators = reader.ReadBoolean();
+                if (version >= 24) {
+                    Preferences.ChainSignalIndicators = reader.ReadBoolean();
+                    Preferences.DeviceSignalIndicators = reader.ReadBoolean();
+                } else if (version >= 23) {
+                    Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
                 }
 
                 if (version >= 9) {

@@ -39,11 +39,20 @@ namespace Apollo.Core {
             }
         }
 
-        static bool _DisplaySignalIndicators = true;
-        public static bool DisplaySignalIndicators {
-            get => _DisplaySignalIndicators;
+        static bool _ChainSignalIndicators = true;
+        public static bool ChainSignalIndicators {
+            get => _ChainSignalIndicators;
             set {
-                _DisplaySignalIndicators = value;
+                _ChainSignalIndicators = value;
+                Save();
+            }
+        }
+
+        static bool _DeviceSignalIndicators = true;
+        public static bool DeviceSignalIndicators {
+            get => _DeviceSignalIndicators;
+            set {
+                _DeviceSignalIndicators = value;
                 Save();
             }
         }

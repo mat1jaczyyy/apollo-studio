@@ -17,6 +17,8 @@ namespace Apollo.Components {
             Display = this.Get<Ellipse>("Display");
         }
 
+        public bool ChainKind { get; set; } = false;
+
         Ellipse Display;
         Courier Timer;
         object locker = new object();
@@ -35,7 +37,7 @@ namespace Apollo.Components {
         }
 
         public void Trigger() {
-            if (!Preferences.DisplaySignalIndicators) return;
+            if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
 
             lock (locker) {
                 if (Disposed) return;
