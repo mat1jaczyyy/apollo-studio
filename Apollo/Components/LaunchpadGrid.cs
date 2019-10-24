@@ -177,10 +177,42 @@ namespace Apollo.Components {
             ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
-        public Geometry NovationGeometry => Geometry.Parse(/*String.Format(*/"F1 M 10.08,0 L 0.8,0 C 0.32,0 0,0.32 0,0.8 L 0,10.08 C 0,10.56 0.32,10.88 0.8,10.88 L 10.08,10.88 C 10.56,10.88 10.88,10.56 10.88,10.08 L 10.88,0.8 C 10.88,0.32 10.56,0 0,0 z M 0.96,5.28 L 5.6,0.48 7.84,2.72 3.2,7.52 z M 9.76,6.08 C 9.6,6.56 9.44,6.88 9.12,7.2 L 5.92,10.24 3.68,8 8.32,3.2 8.96,3.84 C 9.28,4.16 9.6,4.48 9.76,4.96 9.76,5.28 9.92,5.76 9.76,6.08 z"/*,
-            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
-            ((double)this.Resources["PadThickness"] / 2).ToString()
-        )*/);
+        public Geometry NovationGeometry => Geometry.Parse(String.Format("F1 M {0},0 L {1},0 C {2},0 0,{2} 0,{1} L 0,{0} C 0,{3} {2},{4} {1},{4} L {0},{4} C {3},{4} {4},{3} {4},{0} L {4},{1} C {4},{2} {3},0 {0},0 Z M {5},{6} L {7},{8} {9},{10} {11},{12} Z M {13},{14} C {15},{16} {17},{18} {19},{20} L {21},{22} {23},{24} {25},{11} {26},{27} C {28},{29} {15},{30} {13},{31} {13},{6} {32},{33} {13},{14} Z",
+            (((double)this.Resources["NovationSize"]) / 11 * 10.08).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 0.8).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 0.32).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 10.56).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 10.88).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 0.96).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 5.28).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 5.6).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 0.48).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 7.84).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 2.72).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 3.2).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 7.52).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.76).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 6.08).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.6).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 6.56).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.44).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 6.88).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.12).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 7.2).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 5.92).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 10.24).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 3.68).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 8).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 8.32).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 8.96).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 3.84).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.28).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 4.16).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 4.48).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 4.96).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 9.92).ToString(),
+            (((double)this.Resources["NovationSize"]) / 11 * 5.76).ToString()
+        ));
 
         public void DrawPath() {
             this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
