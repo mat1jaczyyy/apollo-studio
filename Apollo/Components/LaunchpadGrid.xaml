@@ -84,7 +84,7 @@
             </Viewbox.Styles>
           </Viewbox>
 
-          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
+          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" Cursor="Hand" x:Name="ModeLight"
                      PointerPressed="MouseDown" />
         </StackPanel>
       </Grid>

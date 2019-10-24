@@ -223,7 +223,8 @@ namespace Apollo.Components {
 
             for (int i = 0; i < 100; i++) Grid.Children.Add(Elements[i]);
 
-            ModeLight.Opacity = Back.Opacity = Convert.ToInt32(!LowQuality);
+            Back.Opacity = Convert.ToInt32(!LowQuality);
+            ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = (!LowQuality && Preferences.LaunchpadModel == LaunchpadModels.Pro));
             
             DrawPath();
         }
