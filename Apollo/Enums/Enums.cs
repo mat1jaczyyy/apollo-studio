@@ -8,7 +8,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadModels {
-        MK2, Pro, X
+        MK2, Pro, X, All
     }
 
     public enum LaunchpadStyles {

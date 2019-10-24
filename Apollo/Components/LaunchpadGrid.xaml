@@ -8,6 +8,8 @@
   <UserControl.Resources>
     <sys:Double x:Key="CanvasSize">184</sys:Double>
     <sys:Double x:Key="PadSize">15</sys:Double>
+    <sys:Double x:Key="NovationSize">11</sys:Double>
+    <sys:Double x:Key="HiddenSize">7</sys:Double>
     <sys:Double x:Key="PadThickness">1</sys:Double>
     <sys:Double x:Key="PadCut1">3</sys:Double>
     <sys:Double x:Key="PadCut2">12</sys:Double>
@@ -21,6 +23,8 @@
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
     <media:StreamGeometry x:Key="NovationGeometry" />
+    <media:StreamGeometry x:Key="HiddenGeometry" />
+
     <media:SolidColorBrush x:Key="ModeBrush" />
     <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
@@ -63,6 +67,13 @@
               <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
             </Style>
 
+            <Style Selector="Path.hidden">
+              <Setter Property="Fill" Value="Transparent" />
+              <Setter Property="StrokeThickness" Value="{DynamicResource PadThickness}" />
+              <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+              <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
+            </Style>
+
             <Style Selector="Path.novation">
               <Setter Property="Fill" Value="Transparent" />
               <Setter Property="StrokeThickness" Value="0" />
@@ -88,6 +99,12 @@
                 <Setter Property="Width" Value="{DynamicResource NovationSize}" />
                 <Setter Property="Height" Value="{DynamicResource NovationSize}" />
                 <Setter Property="Data" Value="{DynamicResource NovationGeometry}" />
+              </Style>
+
+              <Style Selector="Path.hidden">
+                <Setter Property="Width" Value="{DynamicResource HiddenSize}" />
+                <Setter Property="Height" Value="{DynamicResource HiddenSize}" />
+                <Setter Property="Data" Value="{DynamicResource HiddenGeometry}" />
               </Style>
 
               <Style Selector="Path.empty">

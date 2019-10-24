@@ -94,6 +94,7 @@
                     <ComboBoxItem>MK2</ComboBoxItem>
                     <ComboBoxItem>Pro</ComboBoxItem>
                     <ComboBoxItem>X</ComboBoxItem>
+                    <ComboBoxItem>All</ComboBoxItem>
                   </ComboBox>
                 </StackPanel>
               </StackPanel>
