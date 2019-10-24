@@ -203,7 +203,7 @@ namespace Apollo.Devices {
         bool ApplyRootKey(int index, int trigger, out int result) {
             if (RootKey == null) {
                 result = index;
-                return result != 0 && result != 9 && result != 90 && result != 99;
+                return true;
             }
 
             int x = index % 10 + trigger % 10 - RootKey.Value % 10;
