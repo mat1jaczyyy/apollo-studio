@@ -29,7 +29,9 @@ namespace Apollo.Windows {
 
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
             CenterTrackContents = this.Get<CheckBox>("CenterTrackContents");
-            DisplaySignalIndicators = this.Get<CheckBox>("DisplaySignalIndicators");
+
+            ChainSignalIndicators = this.Get<CheckBox>("ChainSignalIndicators");
+            DeviceSignalIndicators = this.Get<CheckBox>("DeviceSignalIndicators");
 
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
@@ -71,7 +73,7 @@ namespace Apollo.Windows {
             Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, DisplaySignalIndicators, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
+        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
@@ -132,7 +134,9 @@ namespace Apollo.Windows {
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
-            DisplaySignalIndicators.IsChecked = Preferences.DisplaySignalIndicators;
+
+            ChainSignalIndicators.IsChecked = Preferences.ChainSignalIndicators;
+            DeviceSignalIndicators.IsChecked = Preferences.DeviceSignalIndicators;
 
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
@@ -204,7 +208,9 @@ namespace Apollo.Windows {
 
         void CenterTrackContents_Changed(object sender, RoutedEventArgs e) => Preferences.CenterTrackContents = CenterTrackContents.IsChecked.Value;
 
-        void DisplaySignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DisplaySignalIndicators = DisplaySignalIndicators.IsChecked.Value;
+        void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
+
+        void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
         
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 

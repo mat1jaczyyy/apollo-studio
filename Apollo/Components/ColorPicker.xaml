@@ -76,7 +76,7 @@
 
     <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 5 0 0">
       <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="70" Padding="2" x:Name="Hex"
-              KeyDown="Hex_KeyDown" LostFocus="Hex_Unfocus" />
+               KeyDown="Hex_KeyDown" LostFocus="Hex_Unfocus" PointerReleased="Hex_MouseUp" />
       
       <Canvas Margin="5 0 0 0" Width="15" Height="15" VerticalAlignment="Center">
         <Ellipse Width="15" Height="15" x:Name="Color" Fill="White" />

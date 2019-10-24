@@ -51,8 +51,11 @@ namespace Apollo.Core {
             set {
                 _project?.Dispose();
 
-                if ((_project = value) == null) File.Delete(Program.CrashProject);
-                else {
+                if ((_project = value) == null) {
+                    if (Directory.Exists(Program.CrashDir))
+                        File.Delete(Program.CrashProject);
+                
+                } else {
                     _project.WriteCrashBackup();
 
                     ProjectLoaded?.Invoke();

@@ -286,6 +286,8 @@ namespace Apollo.Windows {
                 BPM_Update = null;
             });
         }
+
+        void Text_MouseUp(object sender, PointerReleasedEventArgs e) => ((TextBox)sender).Focus();
         
         void Text_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;

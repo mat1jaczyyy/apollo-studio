@@ -47,7 +47,8 @@
                 <TextBlock Classes="heading" Text="Appearance" />
                 <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
                 <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
-                <CheckBox Click="DisplaySignalIndicators_Changed" x:Name="DisplaySignalIndicators">Display Signal Indicators</CheckBox>
+                <CheckBox Click="ChainSignalIndicators_Changed" x:Name="ChainSignalIndicators">Chain Signal Indicators</CheckBox>
+                <CheckBox Click="DeviceSignalIndicators_Changed" x:Name="DeviceSignalIndicators">Device Signal Indicators</CheckBox>
 
                 <Border />
 

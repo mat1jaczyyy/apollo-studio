@@ -89,6 +89,19 @@ namespace Apollo.Devices {
             }
         }
 
+        double _pinch;
+        public double Pinch {
+            get => _pinch;
+            set {
+                if (-2 <= value && value <= 2) {
+                    _pinch = value;
+                    
+                    Window?.SetPinch(_pinch);
+                }
+            }
+        }
+        double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
+
         class PolyInfo {
             public Signal n;
             public int index = 0;
@@ -157,7 +170,7 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
+        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -171,11 +184,12 @@ namespace Apollo.Devices {
             }
         }
 
-        public Pattern(int repeats = 1, double gate = 1, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
+        public Pattern(int repeats = 1, double gate = 1, double pinch = 0, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Repeats = repeats;
             Gate = gate;
+            Pinch = pinch;
             Frames = frames;
             Mode = mode;
             Infinite = infinite;
@@ -340,13 +354,17 @@ namespace Apollo.Devices {
                                 InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
                         
                         double time = 0;
+                        double total = Enumerable.Sum(Frames.Select(i => (double)i.Time)) * AdjustedRepeats * _gate;
+
                         PolyInfo info = new PolyInfo(n);
                         poly.Add(info);
 
                         for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
                             time += Frames[i % Frames.Count].Time * _gate;
-                            if (Mode == PlaybackType.Poly) FireCourier(info, time);
-                            else FireCourier(n, time);
+                            double pinched = (1 - Math.Pow(1 - Math.Pow(time / total, ActualPinch), 1 / ActualPinch)) * total;
+
+                            if (Mode == PlaybackType.Poly) FireCourier(info, pinched);
+                            else FireCourier(n, pinched);
                         }
                     }
                 }

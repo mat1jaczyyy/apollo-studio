@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -211,7 +212,10 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
-        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+        void Window_LostFocus(object sender, RoutedEventArgs e) {
+            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
+                this.Focus();
+        }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) {
             if (e.ClickCount == 2) Expand(e);
@@ -221,6 +225,8 @@ namespace Apollo.Windows {
             Topmost = Preferences.AlwaysOnTop;
             Activate();
         }
+
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         void Minimize() => WindowState = WindowState.Minimized;
         

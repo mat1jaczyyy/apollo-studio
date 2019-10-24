@@ -94,6 +94,10 @@ namespace Apollo.Devices {
 
             if (!choked) Chain.MIDIEnter(n.Clone());
         }
+        
+        protected override void Stop() {
+            Chain.MIDIEnter(new StopSignal());
+        }
 
         public override void Dispose() {
             if (Disposed) return;

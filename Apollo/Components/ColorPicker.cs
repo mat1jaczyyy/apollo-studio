@@ -309,6 +309,8 @@ namespace Apollo.Components {
 
             Dispatcher.UIThread.InvokeAsync(HexAction(text.ToUpper()));
         }
+
+        void Hex_MouseUp(object sender, PointerReleasedEventArgs e) => Hex.Focus();
         
         void Hex_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;

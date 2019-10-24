@@ -64,7 +64,7 @@
                   <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <TextBlock VerticalAlignment="Center" Text="BPM: " />
                     <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="BPM"
-                             KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="BPM_Unfocus" />
+                             KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="BPM_Unfocus" PointerReleased="Text_MouseUp" />
                   </StackPanel>
                 </Grid>
 
@@ -76,7 +76,7 @@
               <Grid ColumnDefinitions="Auto,*" Margin="0 5 0 0">
                 <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Author: " />
                 <TextBox Grid.Column="1" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" Padding="2" x:Name="Author"
-                         KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="Author_Unfocus" />
+                         KeyDown="Text_KeyDown" KeyUp="Text_KeyDown" LostFocus="Author_Unfocus" PointerReleased="Text_MouseUp" />
               </Grid>
 
               <Grid ColumnDefinitions="*,Auto" Margin="0 2">

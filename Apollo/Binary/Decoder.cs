@@ -57,8 +57,11 @@ namespace Apollo.Binary {
                 Preferences.AlwaysOnTop = reader.ReadBoolean();
                 Preferences.CenterTrackContents = reader.ReadBoolean();
 
-                if (version >= 23) {
-                    Preferences.DisplaySignalIndicators = reader.ReadBoolean();
+                if (version >= 24) {
+                    Preferences.ChainSignalIndicators = reader.ReadBoolean();
+                    Preferences.DeviceSignalIndicators = reader.ReadBoolean();
+                } else if (version >= 23) {
+                    Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
                 }
 
                 if (version >= 9) {
@@ -458,6 +461,11 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
+                double pinch = 0;
+                if (version >= 24) {
+                    pinch = reader.ReadDouble();
+                }
+
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
                 PlaybackType mode = (PlaybackType)reader.ReadInt32();
 
@@ -492,7 +500,7 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = new Pattern(repeats, gate, frames, mode, infinite, rootkey, wrap, expanded);
+                Pattern ret = new Pattern(repeats, gate, pinch, frames, mode, infinite, rootkey, wrap, expanded);
 
                 if (chokeenabled) {
                     return new Choke(choke, new Chain(new List<Device>() {ret}));
