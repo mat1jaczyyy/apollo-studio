@@ -82,6 +82,8 @@ namespace Apollo.Components {
         }
 
         void Update_LaunchpadModel() {
+            ApplyScale();
+
             for (int i = 0; i < 100; i++) {
                 int x = i % 10;
                 int y = i / 10;
@@ -187,7 +189,7 @@ namespace Apollo.Components {
 
         void ApplyScale() {
             this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality)? -45.0 : 0.0;
-            this.Resources["CanvasSize"] = 184 * Scale;
+            this.Resources["CanvasSize"] = ((Preferences.LaunchpadModel == LaunchpadModels.Pro)? 184 : 167) * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
             this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
             this.Resources["PadCut1"] = 3 * EffectiveScale;
@@ -199,14 +201,24 @@ namespace Apollo.Components {
             this.Resources["ModeMargin"] = new Thickness(0, (int)(5 * EffectiveScale), 0, 0);
             this.Resources["CornerRadius"] = new CornerRadius((int)(1 * EffectiveScale));
 
+            int buttons = (Preferences.LaunchpadModel == LaunchpadModels.Pro)? 10 : 9;
             string gridSize = (17 * EffectiveScale).ToString();
-            string GridDefinitions = String.Join(",", (from i in Enumerable.Range(0, 10) select gridSize).ToArray());
-
+            
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
 
             View.Child = Grid = new Grid() {
-                RowDefinitions = RowDefinitions.Parse(GridDefinitions),
-                ColumnDefinitions = ColumnDefinitions.Parse(GridDefinitions)
+                RowDefinitions = RowDefinitions.Parse(
+                    String.Join(
+                        ",",
+                        (from i in Enumerable.Range(0, buttons) select gridSize).Concat(from i in Enumerable.Range(0, 10 - buttons) select "0").ToArray()
+                    )
+                ),
+                ColumnDefinitions = ColumnDefinitions.Parse(
+                    String.Join(
+                        ",",
+                        (from i in Enumerable.Range(0, 10 - buttons) select "0").Concat(from i in Enumerable.Range(0, buttons) select gridSize).ToArray()
+                    )
+                )
             };
 
             for (int i = 0; i < 100; i++) Grid.Children.Add(Elements[i]);
