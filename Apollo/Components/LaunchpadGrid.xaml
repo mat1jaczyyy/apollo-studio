@@ -20,6 +20,7 @@
 
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
+    <media:StreamGeometry x:Key="NovationGeometry" />
     <media:SolidColorBrush x:Key="ModeBrush" />
     <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
@@ -61,21 +62,32 @@
               <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
               <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
             </Style>
+
+            <Style Selector="Path.novation">
+              <Setter Property="Fill" Value="Transparent" />
+              <Setter Property="StrokeThickness" Value="0" />
+              <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
+            </Style>
           </StackPanel.Styles>
 
           <Viewbox Margin="{DynamicResource TopMargin}" Stretch="None" x:Name="View">
             <Viewbox.Styles>
-              <Style Selector="Path">
+              <Style Selector="Path.square">
                 <Setter Property="Width" Value="{DynamicResource PadSize}" />
                 <Setter Property="Height" Value="{DynamicResource PadSize}" />
-              </Style>
-
-              <Style Selector="Path.square">
                 <Setter Property="Data" Value="{DynamicResource SquareGeometry}" />
               </Style>
 
               <Style Selector="Path.circle">
+                <Setter Property="Width" Value="{DynamicResource PadSize}" />
+                <Setter Property="Height" Value="{DynamicResource PadSize}" />
                 <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
+              </Style>
+
+              <Style Selector="Path.novation">
+                <Setter Property="Width" Value="{DynamicResource NovationSize}" />
+                <Setter Property="Height" Value="{DynamicResource NovationSize}" />
+                <Setter Property="Data" Value="{DynamicResource NovationGeometry}" />
               </Style>
 
               <Style Selector="Path.empty">

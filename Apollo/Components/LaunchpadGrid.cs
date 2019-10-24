@@ -45,6 +45,8 @@ namespace Apollo.Components {
 
         bool IsPhantom(int index) {
             if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
+                if (index == 0 || index == 9 || index == 90 || index == 99) return false;
+
                 int x = index % 10;
                 int y = index / 10;
 
@@ -55,8 +57,6 @@ namespace Apollo.Components {
         }
 
         public void SetColor(int index, SolidColorBrush color) {
-            if (index == 0 || index == 9 || index == 90 || index == 99) return;
-
             if (index == -1) {
                 if (IsArrangeValid) ModeLight.Fill = color;
                 else this.Resources["ModeBrush"] = color;
@@ -177,9 +177,15 @@ namespace Apollo.Components {
             ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
+        public Geometry NovationGeometry => Geometry.Parse(/*String.Format(*/"F1 M 10.08,0 L 0.8,0 C 0.32,0 0,0.32 0,0.8 L 0,10.08 C 0,10.56 0.32,10.88 0.8,10.88 L 10.08,10.88 C 10.56,10.88 10.88,10.56 10.88,10.08 L 10.88,0.8 C 10.88,0.32 10.56,0 0,0 z M 0.96,5.28 L 5.6,0.48 7.84,2.72 3.2,7.52 z M 9.76,6.08 C 9.6,6.56 9.44,6.88 9.12,7.2 L 5.92,10.24 3.68,8 8.32,3.2 8.96,3.84 C 9.28,4.16 9.6,4.48 9.76,4.96 9.76,5.28 9.92,5.76 9.76,6.08 z"/*,
+            ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
+            ((double)this.Resources["PadThickness"] / 2).ToString()
+        )*/);
+
         public void DrawPath() {
             this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
             this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
+            this.Resources["NovationGeometry"] = LowQuality? LowQualityGeometry : NovationGeometry;
 
             Elements[44].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
             Elements[45].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
@@ -191,6 +197,7 @@ namespace Apollo.Components {
             this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality)? -45.0 : 0.0;
             this.Resources["CanvasSize"] = ((Preferences.LaunchpadModel == LaunchpadModels.Pro)? 184 : 167) * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
+            this.Resources["NovationSize"] = 11 * EffectiveScale;
             this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
             this.Resources["PadCut1"] = 3 * EffectiveScale;
             this.Resources["PadCut2"] = 12 * EffectiveScale;
