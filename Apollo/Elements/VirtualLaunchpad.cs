@@ -15,12 +15,10 @@ namespace Apollo.Elements {
 
             Signal n = new Signal(this, this, 0, new Color(0));
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 101; i++) {
                 n.Index = (byte)i;
-                Window?.SignalRender(n);
+                Window?.SignalRender(n.Clone());
             }
-
-            Send(n);
         }
 
         public VirtualLaunchpad(string name) {
