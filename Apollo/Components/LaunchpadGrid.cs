@@ -81,6 +81,53 @@ namespace Apollo.Components {
             }
         }
 
+        void Update_LaunchpadModel() {
+            for (int i = 0; i < 100; i++) {
+                int x = i % 10;
+                int y = i / 10;
+
+                if (!Elements[i].Classes.Contains("empty"))
+                    Elements[i].PointerPressed -= MouseDown;
+
+                Elements[i].Classes.Clear();
+
+                switch (Preferences.LaunchpadModel) {
+                    case LaunchpadModels.MK2:
+                        if (x == 0 || y == 9 || i == 9) Elements[i].Classes.Add("empty");
+                        else {
+                            Elements[i].PointerPressed += MouseDown;
+
+                            if (x == 9 || y == 0) Elements[i].Classes.Add("circle");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
+                            else Elements[i].Classes.Add("square");
+                        }
+                        break;
+
+                    case LaunchpadModels.Pro:
+                        if (i == 0 || i == 9 || i == 90 || i == 99) Elements[i].Classes.Add("empty");
+                        else {
+                            Elements[i].PointerPressed += MouseDown;
+
+                            if (x == 0 || x == 9 || y == 0 || y == 9) Elements[i].Classes.Add("circle");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
+                            else Elements[i].Classes.Add("square");
+                        }
+                        break;
+
+                    case LaunchpadModels.X:
+                        if (x == 0 || y == 9) Elements[i].Classes.Add("empty");
+                        else {
+                            Elements[i].PointerPressed += MouseDown;
+
+                            if (i == 9) Elements[i].Classes.Add("novation");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
+                            else Elements[i].Classes.Add("square");
+                        }
+                        break;
+                }
+            }
+        }
+
         double _scale = 1;
         public double Scale {
             get => _scale;
@@ -171,7 +218,7 @@ namespace Apollo.Components {
 
         public LaunchpadGrid() {
             InitializeComponent();
-
+            
             View.Child = Grid = new Grid() {
                 RowDefinitions = RowDefinitions.Parse("*,*,*,*,*,*,*,*,*,*"),
                 ColumnDefinitions = ColumnDefinitions.Parse("*,*,*,*,*,*,*,*,*,*")
@@ -181,24 +228,17 @@ namespace Apollo.Components {
             for (int i = 0; i < 100; i++) {
                 Grid.Children.Add(Elements[i] = new Path());
 
-                int x = i % 10;
-                int y = i / 10;
+                Grid.SetRow(Elements[i], i / 10);
+                Grid.SetColumn(Elements[i], i % 10);
 
-                Grid.SetRow(Elements[i], y);
-                Grid.SetColumn(Elements[i], x);
-
-                if (i == 0 || i == 9 || i == 90 || i == 99) Elements[i].Classes.Add("empty");
-                else {
-                    Elements[i].PointerPressed += MouseDown;
-
-                    if (x == 0 || x == 9 || y == 0 || y == 9) Elements[i].Classes.Add("circle");
-                    else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
-                    else Elements[i].Classes.Add("square");
-                }
+                Elements[i].Classes.Add("empty");
             }
 
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged += ApplyScale;
+            Preferences.LaunchpadModelChanged += Update_LaunchpadModel;
+
+            Update_LaunchpadModel();
 
             Clear();
             ApplyScale();
@@ -212,11 +252,12 @@ namespace Apollo.Components {
             PadModsPressed = null;
 
             for (int i = 0; i < 100; i++)
-                if (!(i == 0 || i == 9 || i == 90 || i == 99)) 
+                if (!Elements[i].Classes.Contains("empty"))
                     Elements[i].PointerPressed -= MouseDown;
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged -= ApplyScale;
+            Preferences.LaunchpadModelChanged -= Update_LaunchpadModel;
 
             Clear();
         }
