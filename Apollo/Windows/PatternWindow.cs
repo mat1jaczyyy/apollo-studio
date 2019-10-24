@@ -48,6 +48,7 @@ namespace Apollo.Windows {
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
+            Pinch = this.Get<Dial>("Pinch");
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
@@ -108,7 +109,7 @@ namespace Apollo.Windows {
         ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate, Repeats;
+        Dial Duration, Gate, Repeats, Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Wrap, Infinite;
 
@@ -241,6 +242,7 @@ namespace Apollo.Windows {
 
             Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = _pattern.Gate * 100;
+            Pinch.RawValue = _pattern.Pinch;
 
             PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
@@ -963,6 +965,24 @@ namespace Apollo.Windows {
         }
 
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
+
+        void Pinch_Changed(double value, double? old) {
+            if (old != null && old != value) {
+                double u = old.Value;
+                double r = value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Pinch Changed to {value}{Pinch.Unit}", () => {
+                    ((Pattern)Track.TraversePath(path)).Pinch = u;
+                }, () => {
+                    ((Pattern)Track.TraversePath(path)).Pinch = r;
+                });
+            }
+
+            _pattern.Pinch = value;
+        }
+
+        public void SetPinch(double pinch) => Pinch.RawValue = pinch;
 
         int? oldRootKey = -1;
 
