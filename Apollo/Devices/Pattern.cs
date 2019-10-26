@@ -361,7 +361,7 @@ namespace Apollo.Devices {
 
                         for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
                             time += Frames[i % Frames.Count].Time * _gate;
-                            double pinched = (1 - Math.Pow(1 - Math.Pow(time / total, ActualPinch), 1 / ActualPinch)) * total;
+                            double pinched = (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
 
                             if (Mode == PlaybackType.Poly) FireCourier(info, pinched);
                             else FireCourier(n, pinched);
