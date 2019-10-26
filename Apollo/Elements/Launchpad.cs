@@ -214,7 +214,7 @@ namespace Apollo.Elements {
                 else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
                 else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-            } else if (HasModeLight) n.Index = 99;
+            }
 
             int offset = 0;
 
@@ -227,6 +227,7 @@ namespace Apollo.Elements {
                 case LaunchpadType.PRO:
                 case LaunchpadType.CFW:
                     if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
+                    else if (n.Index == 100) offset = -1;
                     break;
 
                 case LaunchpadType.X:
