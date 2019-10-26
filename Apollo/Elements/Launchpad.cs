@@ -213,7 +213,6 @@ namespace Apollo.Elements {
                 if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
                 else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
                 else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
-
             }
 
             int offset = 0;
@@ -259,9 +258,9 @@ namespace Apollo.Elements {
         public virtual void Render(Signal n) {
             if (PatternWindow == null || n.Origin == PatternWindow) {
                 if (!IsGenerationX) {
-                    n.Color.Red /= 2;
-                    n.Color.Green /= 2;
-                    n.Color.Blue /= 2;
+                    if (n.Color.Red > 0) n.Color.Red = (byte)((n.Color.Red - 1) * 62.0 / 126 + 1);
+                    if (n.Color.Green > 0) n.Color.Green = (byte)((n.Color.Green - 1) * 62.0 / 126 + 1);
+                    if (n.Color.Blue > 0) n.Color.Blue = (byte)((n.Color.Blue - 1) * 62.0 / 126 + 1);
                 }
 
                 screen?.MIDIEnter(n);
