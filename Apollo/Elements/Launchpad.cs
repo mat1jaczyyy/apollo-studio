@@ -22,7 +22,7 @@ using Apollo.Windows;
 
 namespace Apollo.Elements {
     public class Launchpad {
-        public static PortWarning MK2FirmwareOld = new PortWarning(
+        public static PortWarning MK2FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad MK2s are running an older version of the\n" + 
             "official Novation firmware which is not compatible with Apollo Studio.\n\n" +
             "Update these to the latest version of the firmware to use them with Apollo\n" +
@@ -33,7 +33,7 @@ namespace Apollo.Elements {
                 : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg"
         );
 
-        public static PortWarning ProFirmwareOld = new PortWarning(
+        public static PortWarning ProFirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
             "version is known to cause performance issues and lags.\n\n" +
@@ -45,7 +45,7 @@ namespace Apollo.Elements {
                 : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg"
         );
 
-        public static PortWarning CFWIncompatible = new PortWarning(
+        public static PortWarning CFWIncompatible { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "performance-optimized custom firmware which is not compatible with\n" +
             "Apollo Studio.\n\n" +
@@ -55,7 +55,7 @@ namespace Apollo.Elements {
             "https://github.com/mat1jaczyyy/lpp-performance-cfw"
         );
 
-        public static PortWarning XFirmwareOld = new PortWarning(
+        public static PortWarning XFirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Xs are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
             "version is known to cause performance issues and lags.\n\n" +
