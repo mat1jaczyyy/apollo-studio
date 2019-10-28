@@ -418,6 +418,8 @@ namespace Apollo.DeviceViewers {
             Copyable_Insert(paste, right, false);
         }
 
+        public void Replace(int left, int right) {}
+
         public void Duplicate(int left, int right) {
             List<int> path = Track.GetPath(_multi);
 

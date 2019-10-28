@@ -131,6 +131,7 @@ namespace Apollo.Helpers {
             else if (action == "Copy") parent.IViewer?.Copy(left, right);
             else if (action == "Duplicate") parent.IViewer?.Duplicate(left, right);
             else if (action == "Paste") parent.IViewer?.Paste(right);
+            else if (action == "Replace") parent.IViewer?.Replace(left, right);
             else if (action == "Delete") parent.IViewer?.Delete(left, right);
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
@@ -146,7 +147,11 @@ namespace Apollo.Helpers {
                 return true;
             }
 
-            if (e.KeyModifiers == App.ControlKey) {
+            if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift)) {
+                if (e.Key == Key.V) Action("Replace");
+                else return false;
+            
+            } else if (e.KeyModifiers == App.ControlKey) {
                 if (e.Key == Key.X) Action("Cut");
                 else if (e.Key == Key.C) Action("Copy");
                 else if (e.Key == Key.D) Action("Duplicate");

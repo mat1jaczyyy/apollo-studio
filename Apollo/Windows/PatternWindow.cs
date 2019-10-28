@@ -1420,6 +1420,8 @@ namespace Apollo.Windows {
             Frame_Select(_pattern.Expanded);
         }
 
+        public void Replace(int left, int right) {}
+
         public void Duplicate(int left, int right) {
             if (Locked) return;
 

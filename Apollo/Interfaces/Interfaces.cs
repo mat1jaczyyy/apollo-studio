@@ -49,6 +49,7 @@ namespace Apollo.Interfaces {
         void Copy(int left, int right, bool cut = false);
         void Duplicate(int left, int right);
         void Paste(int right);
+        void Replace(int left, int right);
         void Delete(int left, int right);
         void Group(int left, int right);
         void Ungroup(int left);
