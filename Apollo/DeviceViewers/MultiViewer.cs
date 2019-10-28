@@ -359,63 +359,59 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        void Copyable_Insert(Copyable paste, int right, bool imported) {
+        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
+            undo = redo = dispose = null;
+
             List<Chain> pasted;
             try {
                 pasted = paste.Contents.Cast<Chain>().ToList();
             } catch (InvalidCastException) {
-                return;
+                return false;
             }
             
             List<int> path = Track.GetPath(_multi);
 
-            Program.Project.Undo.Add($"Chain {(imported? "Imported" : "Pasted")}", () => {
+            undo = () => {
                 Multi multi = ((Multi)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     multi.Remove(right + i + 1);
-
-            }, () => {
+            };
+            
+            redo = () => {
                 Multi multi = ((Multi)Track.TraversePath(path));
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     multi.Insert(right + i + 1, pasted[i].Clone());
-
-            }, () => {
+            };
+            
+            dispose = () => {
                 foreach (Chain chain in pasted) chain.Dispose();      
                 pasted = null;
-            });
+            };
 
             for (int i = 0; i < paste.Contents.Count; i++)
                 _multi.Insert(right + i + 1, pasted[i].Clone());
+            
+            return true;
         }
 
-        public async void Copy(int left, int right, bool cut = false) {
+        public void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
             for (int i = left; i <= right; i++)
                 copy.Contents.Add(_multi[i]);
 
-            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
+            copy.StoreToClipboard();
 
             if (cut) Delete(left, right);
-            
-            await Application.Current.Clipboard.SetTextAsync(b64);
         }
 
         public async void Paste(int right) {
-            string b64 = await Application.Current.Clipboard.GetTextAsync();
-            
-            if (b64 == null) return;
-            
-            Copyable paste;
-            try {
-                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            } catch (Exception) {
-                return;
-            }
+            Copyable paste = await Copyable.DecodeClipboard();
 
-            Copyable_Insert(paste, right, false);
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);
         }
 
         public void Replace(int left, int right) {}
@@ -558,24 +554,10 @@ namespace Apollo.DeviceViewers {
                 else return;
             }
 
-            Copyable loaded;
-
-            try {
-                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    loaded = await Decoder.Decode(file, typeof(Copyable));
-
-            } catch {
-                await MessageWindow.Create(
-                    $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or\n" +
-                    "the file you're attempting to read is invalid.",
-                    null, sender
-                );
-
-                return;
-            }
+            Copyable loaded = await Copyable.DecodeFile(path, sender);
             
-            Copyable_Insert(loaded, right, true);
+            if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Chain Imported", undo, redo, dispose);
         }
     }
 }
