@@ -434,10 +434,14 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = 0; i <= right - left; i++)
                     multi.Insert(right + i + 1, multi[left + i].Clone());
+            
+                Track.Get(multi).Window?.Selection.Select(multi[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 _multi.Insert(right + i + 1, _multi[left + i].Clone());
+            
+            Track.Get(_multi).Window?.Selection.Select(_multi[right + 1], true);
         }
 
         public void Delete(int left, int right) {

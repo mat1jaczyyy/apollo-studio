@@ -409,10 +409,14 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = 0; i <= right - left; i++)
                     group.Insert(right + i + 1, group[left + i].Clone());
+            
+                Track.Get(group).Window?.Selection.Select(group[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 _group.Insert(right + i + 1, _group[left + i].Clone());
+            
+            Track.Get(_group).Window?.Selection.Select(_group[right + 1], true);
         }
 
         public void Delete(int left, int right) {

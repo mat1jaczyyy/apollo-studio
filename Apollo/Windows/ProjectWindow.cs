@@ -563,10 +563,14 @@ namespace Apollo.Windows {
             }, () => {
                 for (int i = 0; i <= right - left; i++)
                     Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            
+                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            
+            Selection.Select(Program.Project[right + 1], true);
         }
 
         public void Delete(int left, int right) {

@@ -309,10 +309,14 @@ namespace Apollo.Viewers {
 
                 for (int i = 0; i <= right - left; i++)
                     chain.Insert(right + i + 1, chain[left + i].Clone());
+            
+                Track.Get(chain).Window?.Selection.Select(chain[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 _chain.Insert(right + i + 1, _chain[left + i].Clone());
+            
+            Track.Get(_chain).Window?.Selection.Select(_chain[right + 1], true);
         }
 
         public void Delete(int left, int right) {
