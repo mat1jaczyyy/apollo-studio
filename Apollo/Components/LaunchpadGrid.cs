@@ -92,17 +92,17 @@ namespace Apollo.Components {
                 int x = i % 10;
                 int y = i / 10;
 
-                if (!Elements[i].Classes.Contains("empty"))
-                    Elements[i].PointerPressed -= MouseDown;
+                if (!Canvases[i].Classes.Contains("empty"))
+                    Canvases[i].PointerPressed -= MouseDown;
 
                 Canvases[i].Classes.Clear();
                 Elements[i].Classes.Clear();
 
                 switch (Preferences.LaunchpadModel) {
                     case LaunchpadModels.MK2:
-                        if (x == 0 || y == 9 || i == 9) Elements[i].Classes.Add("empty");
+                        if (x == 0 || y == 9 || i == 9) AddClass(i, "empty");
                         else {
-                            Elements[i].PointerPressed += MouseDown;
+                            Canvases[i].PointerPressed += MouseDown;
 
                             if (x == 9 || y == 0) AddClass(i, "circle");
                             else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
@@ -111,9 +111,9 @@ namespace Apollo.Components {
                         break;
 
                     case LaunchpadModels.Pro:
-                        if (i == 0 || i == 9 || i == 90 || i == 99) Elements[i].Classes.Add("empty");
+                        if (i == 0 || i == 9 || i == 90 || i == 99) AddClass(i, "empty");
                         else {
-                            Elements[i].PointerPressed += MouseDown;
+                            Canvases[i].PointerPressed += MouseDown;
 
                             if (x == 0 || x == 9 || y == 0 || y == 9) AddClass(i, "circle");
                             else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
@@ -122,9 +122,9 @@ namespace Apollo.Components {
                         break;
 
                     case LaunchpadModels.X:
-                        if (x == 0 || y == 9) Elements[i].Classes.Add("empty");
+                        if (x == 0 || y == 9) AddClass(i, "empty");
                         else {
-                            Elements[i].PointerPressed += MouseDown;
+                            Canvases[i].PointerPressed += MouseDown;
 
                             if (i == 9) AddClass(i, "novation");
                             else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
@@ -133,7 +133,7 @@ namespace Apollo.Components {
                         break;
 
                     case LaunchpadModels.All:
-                        Elements[i].PointerPressed += MouseDown;
+                        Canvases[i].PointerPressed += MouseDown;
 
                         if (i == 0 || i == 9 || i == 90 || i == 99) AddClass(i, "hidden");
                         else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
@@ -309,7 +309,7 @@ namespace Apollo.Components {
                 Grid.SetRow(Canvases[i], i / 10);
                 Grid.SetColumn(Canvases[i], i % 10);
 
-                Elements[i].Classes.Add("empty");
+                AddClass(i, "empty");
             }
 
             Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
@@ -330,8 +330,8 @@ namespace Apollo.Components {
             PadModsPressed = null;
 
             for (int i = 0; i < 100; i++)
-                if (!Elements[i].Classes.Contains("empty"))
-                    Elements[i].PointerPressed -= MouseDown;
+                if (!Canvases[i].Classes.Contains("empty"))
+                    Canvases[i].PointerPressed -= MouseDown;
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged -= ApplyScale;
@@ -348,7 +348,7 @@ namespace Apollo.Components {
         }
 
         bool mouseHeld = false;
-        Shape mouseOver = null;
+        Canvas mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -359,7 +359,7 @@ namespace Apollo.Components {
                 e.Pointer.Capture(Root);
                 Root.Cursor = new Cursor(StandardCursorType.Hand);
 
-                PadStarted?.Invoke(Array.IndexOf(Elements, (IControl)sender));
+                PadStarted?.Invoke(Array.IndexOf(Canvases, (IControl)sender));
                 MouseMove(sender, e);
             }
         }
@@ -369,7 +369,7 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 MouseMove(sender, e);
-                PadFinished?.Invoke(Array.IndexOf(Elements, (IControl)sender));
+                PadFinished?.Invoke(Array.IndexOf(Canvases, (IControl)sender));
 
                 mouseHeld = false;
                 if (mouseOver != null) MouseLeave(mouseOver);
@@ -380,19 +380,22 @@ namespace Apollo.Components {
             }
         }
 
-        void MouseEnter(Shape control, KeyModifiers mods) {
-            int index = Array.IndexOf(Elements, (IControl)control);
+        void MouseEnter(Canvas control, KeyModifiers mods) {
+            int index = Array.IndexOf(Canvases, control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
         }
 
-        void MouseLeave(Shape control) => PadReleased?.Invoke(Array.IndexOf(Elements, (IControl)control));
+        void MouseLeave(Canvas control) => PadReleased?.Invoke(Array.IndexOf(Canvases, control));
 
         void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
                 IInputElement _over = Root.InputHitTest(e.GetPosition(Root));
 
-                if (_over is Shape over) {
+                if (_over is Shape overPath)
+                    _over = overPath.Parent;
+                
+                if (_over is Canvas over) {
                     if (mouseOver == null) MouseEnter(over, e.KeyModifiers);
                     else if (mouseOver != over) {
                         MouseLeave(mouseOver);

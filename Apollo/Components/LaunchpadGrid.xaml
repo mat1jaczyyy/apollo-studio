@@ -45,6 +45,7 @@
             </Style>
 
             <Style Selector="Canvas">
+              <Setter Property="Cursor" Value="Hand" />
               <Setter Property="Margin" Value="{DynamicResource PadMargin}" />
             </Style>
 
