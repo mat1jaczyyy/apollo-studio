@@ -28,6 +28,7 @@ namespace Apollo.Components {
         Viewbox View;
         Grid Grid;
         Border Back;
+        Canvas[] Canvases;
         Path[] Elements;
         Rectangle ModeLight;
 
@@ -71,6 +72,11 @@ namespace Apollo.Components {
             for (int i = -1; i < 100; i++) SetColor(i, color);
         }
 
+        void AddClass(int index, string className) {
+            Canvases[index].Classes.Add(className);
+            Elements[index].Classes.Add(className);
+        }
+
         void Update_LaunchpadStyle() {
             if (LowQuality) return;
 
@@ -89,6 +95,7 @@ namespace Apollo.Components {
                 if (!Elements[i].Classes.Contains("empty"))
                     Elements[i].PointerPressed -= MouseDown;
 
+                Canvases[i].Classes.Clear();
                 Elements[i].Classes.Clear();
 
                 switch (Preferences.LaunchpadModel) {
@@ -97,9 +104,9 @@ namespace Apollo.Components {
                         else {
                             Elements[i].PointerPressed += MouseDown;
 
-                            if (x == 9 || y == 0) Elements[i].Classes.Add("circle");
-                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
-                            else Elements[i].Classes.Add("square");
+                            if (x == 9 || y == 0) AddClass(i, "circle");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
+                            else AddClass(i, "square");
                         }
                         break;
 
@@ -108,9 +115,9 @@ namespace Apollo.Components {
                         else {
                             Elements[i].PointerPressed += MouseDown;
 
-                            if (x == 0 || x == 9 || y == 0 || y == 9) Elements[i].Classes.Add("circle");
-                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
-                            else Elements[i].Classes.Add("square");
+                            if (x == 0 || x == 9 || y == 0 || y == 9) AddClass(i, "circle");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
+                            else AddClass(i, "square");
                         }
                         break;
 
@@ -119,18 +126,18 @@ namespace Apollo.Components {
                         else {
                             Elements[i].PointerPressed += MouseDown;
 
-                            if (i == 9) Elements[i].Classes.Add("novation");
-                            else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
-                            else Elements[i].Classes.Add("square");
+                            if (i == 9) AddClass(i, "novation");
+                            else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
+                            else AddClass(i, "square");
                         }
                         break;
 
                     case LaunchpadModels.All:
                         Elements[i].PointerPressed += MouseDown;
 
-                        if (i == 0 || i == 9 || i == 90 || i == 99) Elements[i].Classes.Add("hidden");
-                        else if (i == 44 || i == 45 || i == 54 || i == 55) Elements[i].Classes.Add("corner");
-                        else Elements[i].Classes.Add("square");
+                        if (i == 0 || i == 9 || i == 90 || i == 99) AddClass(i, "hidden");
+                        else if (i == 44 || i == 45 || i == 54 || i == 55) AddClass(i, "corner");
+                        else AddClass(i, "square");
                         break;
                 }
             }
@@ -277,7 +284,7 @@ namespace Apollo.Components {
                 )
             };
 
-            for (int i = 0; i < 100; i++) Grid.Children.Add(Elements[i]);
+            for (int i = 0; i < 100; i++) Grid.Children.Add(Canvases[i]);
 
             Back.Opacity = Convert.ToInt32(!LowQuality);
             ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = (!LowQuality && is10x10));
@@ -293,12 +300,14 @@ namespace Apollo.Components {
                 ColumnDefinitions = ColumnDefinitions.Parse("*,*,*,*,*,*,*,*,*,*")
             };
 
+            Canvases = new Canvas[100];
             Elements = new Path[100];
             for (int i = 0; i < 100; i++) {
-                Grid.Children.Add(Elements[i] = new Path());
+                Grid.Children.Add(Canvases[i] = new Canvas());
+                Canvases[i].Children.Add(Elements[i] = new Path());
 
-                Grid.SetRow(Elements[i], i / 10);
-                Grid.SetColumn(Elements[i], i % 10);
+                Grid.SetRow(Canvases[i], i / 10);
+                Grid.SetColumn(Canvases[i], i % 10);
 
                 Elements[i].Classes.Add("empty");
             }
