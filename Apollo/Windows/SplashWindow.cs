@@ -119,7 +119,7 @@ namespace Apollo.Windows {
         void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
+            Launchpad.DisplayWarnings(this);
 
             if (App.Args?.Length > 0)
                 ReadFile(App.Args[0]);

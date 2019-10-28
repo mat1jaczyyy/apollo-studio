@@ -65,7 +65,7 @@ namespace Apollo.Enums {
         D270
     }
 
-    public enum CFWIncompatibleState {
+    public enum PortWarningType {
         None, Show, Done
     }
 
