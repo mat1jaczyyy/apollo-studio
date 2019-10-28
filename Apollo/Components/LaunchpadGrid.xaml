@@ -102,6 +102,7 @@
               <Style Selector="Canvas.novation">
                 <Setter Property="Width" Value="{DynamicResource NovationSize}" />
                 <Setter Property="Height" Value="{DynamicResource NovationSize}" />
+                <Setter Property="Background" Value="Transparent" />
               </Style>
               <Style Selector="Path.novation">
                 <Setter Property="Data" Value="{DynamicResource NovationGeometry}" />
