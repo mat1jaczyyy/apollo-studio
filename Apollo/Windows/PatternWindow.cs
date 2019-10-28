@@ -1339,45 +1339,19 @@ namespace Apollo.Windows {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        public async void Copy(int left, int right, bool cut = false) {
-            if (Locked) return;
-
-            Copyable copy = new Copyable();
-            
-            for (int i = left; i <= right; i++)
-                copy.Contents.Add(_pattern[i]);
-
-            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
-
-            if (cut) Delete(left, right);
-            
-            await Application.Current.Clipboard.SetTextAsync(b64);
-        }
-
-        public async void Paste(int right) {
-            if (Locked) return;
-
-            string b64 = await Application.Current.Clipboard.GetTextAsync();
-            
-            if (b64 == null) return;
-            
-            Copyable paste;
-            try {
-                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            } catch (Exception) {
-                return;
-            }
+        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
+            undo = redo = dispose = null;
 
             List<Frame> pasted;
             try {
                 pasted = paste.Contents.Cast<Frame>().ToList();
             } catch (InvalidCastException) {
-                return;
+                return false;
             }
             
             List<int> path = Track.GetPath(_pattern);
 
-            Program.Project.Undo.Add($"Pattern Frame Pasted", () => {
+            undo = () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
@@ -1390,8 +1364,9 @@ namespace Apollo.Windows {
 
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
-
-            }, () => {
+            };
+            
+            redo = () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
@@ -1404,11 +1379,12 @@ namespace Apollo.Windows {
 
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
+            };
             
-            }, () => {
+            dispose = () => {
                 foreach (Frame frame in pasted) frame.Dispose();
                 pasted = null;
-            });
+            };
 
             Draw = false;
 
@@ -1418,6 +1394,30 @@ namespace Apollo.Windows {
             Draw = true;
 
             Frame_Select(_pattern.Expanded);
+            
+            return true;
+        }
+
+        public void Copy(int left, int right, bool cut = false) {
+            if (Locked) return;
+
+            Copyable copy = new Copyable();
+            
+            for (int i = left; i <= right; i++)
+                copy.Contents.Add(_pattern[i]);
+            
+            copy.StoreToClipboard();
+
+            if (cut) Delete(left, right);
+        }
+
+        public async void Paste(int right) {
+            if (Locked) return;
+
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Device Pasted", undo, redo, dispose);
         }
 
         public void Replace(int left, int right) {}
