@@ -1378,6 +1378,7 @@ namespace Apollo.Windows {
                     pattern.Window.Draw = true;
 
                     pattern.Window.Frame_Select(pattern.Expanded);
+                    pattern.Window.Selection.Select(pattern[right + 1], true);
                 }
             };
             
@@ -1394,6 +1395,7 @@ namespace Apollo.Windows {
             Draw = true;
 
             Frame_Select(_pattern.Expanded);
+            Selection.Select(_pattern[right + 1], true);
             
             return true;
         }
