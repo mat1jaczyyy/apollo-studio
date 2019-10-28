@@ -518,6 +518,8 @@ namespace Apollo.Windows {
             redo = () => {
                 for (int i = 0; i < paste.Contents.Count; i++)
                     Program.Project.Insert(right + i + 1, pasted[i].Clone());
+                
+                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
             };
             
             dispose = () => {
@@ -527,6 +529,8 @@ namespace Apollo.Windows {
             
             for (int i = 0; i < paste.Contents.Count; i++)
                 Program.Project.Insert(right + i + 1, pasted[i].Clone());
+            
+            Selection.Select(Program.Project[right + 1], true);
 
             return true;
         }

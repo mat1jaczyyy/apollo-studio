@@ -383,6 +383,8 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     multi.Insert(right + i + 1, pasted[i].Clone());
+            
+                Track.Get(multi).Window?.Selection.Select(multi[right + 1], true);
             };
             
             dispose = () => {
@@ -392,6 +394,8 @@ namespace Apollo.DeviceViewers {
 
             for (int i = 0; i < paste.Contents.Count; i++)
                 _multi.Insert(right + i + 1, pasted[i].Clone());
+            
+            Track.Get(_multi).Window?.Selection.Select(_multi[right + 1], true);
             
             return true;
         }

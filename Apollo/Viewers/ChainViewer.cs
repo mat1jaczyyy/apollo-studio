@@ -258,6 +258,8 @@ namespace Apollo.Viewers {
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     chain.Insert(right + i + 1, pasted[i].Clone());
+            
+                Track.Get(chain).Window?.Selection.Select(chain[right + 1], true);
             };
             
             dispose = () => {
@@ -267,6 +269,8 @@ namespace Apollo.Viewers {
 
             for (int i = 0; i < paste.Contents.Count; i++)
                 _chain.Insert(right + i + 1, pasted[i].Clone());
+            
+            Track.Get(_chain).Window?.Selection.Select(_chain[right + 1], true);
             
             return true;
         }
