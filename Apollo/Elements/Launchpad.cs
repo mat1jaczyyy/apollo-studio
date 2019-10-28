@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -25,7 +26,11 @@ namespace Apollo.Elements {
             "One or more connected Launchpad MK2s are running an older version of the\n" + 
             "official Novation firmware which is not compatible with Apollo Studio.\n\n" +
             "Update these to the latest version of the firmware to use them with Apollo\n" +
-            "Studio."
+            "Studio.",
+            "Download Official Updater",
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater.exe"
+                : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg"
         );
 
         public static PortWarning ProFirmwareOld = new PortWarning(
@@ -33,7 +38,11 @@ namespace Apollo.Elements {
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
             "version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using the official\n" +
-            "Novation updater to avoid any potential issues with Apollo Studio."
+            "Novation updater to avoid any potential issues with Apollo Studio.",
+            "Download Official Updater",
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.exe"
+                : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg"
         );
 
         public static PortWarning CFWIncompatible = new PortWarning(
@@ -41,7 +50,9 @@ namespace Apollo.Elements {
             "performance-optimized custom firmware which is not compatible with\n" +
             "Apollo Studio.\n\n" +
             "Update these to the latest version of the firmware or switch back to stock\n" +
-            "firmware to use them with Apollo Studio."
+            "firmware to use them with Apollo Studio.",
+            "Custom Firmware Main Page",
+            "https://github.com/mat1jaczyyy/lpp-performance-cfw"
         );
 
         public static PortWarning XFirmwareOld = new PortWarning(
@@ -49,7 +60,9 @@ namespace Apollo.Elements {
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
             "version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using the Novation\n" +
-            "Components app to avoid any potential issues with Apollo Studio."
+            "Components app to avoid any potential issues with Apollo Studio.",
+            "Launch Components Online (requires Chrome)",
+            "https://circuit-librarian-staging.herokuapp.com/launchpad-x/firmware"
         );
 
         public static void DisplayWarnings(Window sender) {

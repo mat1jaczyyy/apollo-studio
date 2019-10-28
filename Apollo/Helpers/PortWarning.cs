@@ -12,9 +12,13 @@ using Apollo.Windows;
 namespace Apollo.Helpers {
     public class PortWarning {
         PortWarningType State = PortWarningType.None;
-        string message = "";
+        string message, action, url;
 
-        public PortWarning(string msg) => message = msg;
+        public PortWarning(string msg, string button, string location) {
+            message = msg;
+            action = button;
+            url = location;
+        }
 
         public void Set() {
             if (State == PortWarningType.None) {
@@ -30,7 +34,8 @@ namespace Apollo.Helpers {
             State = PortWarningType.Done;
 
             Action DisplayMessage = async () => {
-                await MessageWindow.Create(message, null, sender);
+                if (await MessageWindow.Create(message, new string[] {action, "OK"}, sender) == action)
+                    App.URL(url);
 
                 Launchpad.DisplayWarnings(sender);
             };
