@@ -500,57 +500,99 @@ namespace Apollo.Windows {
             } else e.DragEffects = DragDropEffects.None;
         }
 
-        void Copyable_Insert(Copyable paste, int right, bool imported) {
+        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
+            undo = redo = dispose = null;
+
             List<Track> pasted;
             try {
                 pasted = paste.Contents.Cast<Track>().ToList();
             } catch (InvalidCastException) {
-                return;
+                return false;
             }
 
-            Program.Project.Undo.Add($"Track {(imported? "Imported" : "Pasted")}", () => {
+            undo = () => {
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     Program.Project.Remove(right + i + 1);
-
-            }, () => {
+            };
+            
+            redo = () => {
                 for (int i = 0; i < paste.Contents.Count; i++)
                     Program.Project.Insert(right + i + 1, pasted[i].Clone());
+                
+                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
+            };
             
-            }, () => {
+            dispose = () => {
                 foreach (Track track in pasted) track.Dispose();
                 pasted = null;
-            });
+            };
             
             for (int i = 0; i < paste.Contents.Count; i++)
                 Program.Project.Insert(right + i + 1, pasted[i].Clone());
+            
+            Selection.Select(Program.Project[right + 1], true);
+
+            return true;
         }
 
-        public async void Copy(int left, int right, bool cut = false) {
+        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
+
+            undo = () => {
+                for (int i = left; i <= right; i++) {
+                    Track restored = ut[i - left].Clone();
+                    restored.Launchpad = ul[i - left];
+                    Program.Project.Insert(i, restored);
+                }
+            };
+            
+            redo = () => {
+                for (int i = right; i >= left; i--)
+                    Program.Project.Remove(i);
+            };
+            
+            dispose = () => {
+                foreach (Track track in ut) track.Dispose();
+                ut = null;
+            };
+
+            for (int i = right; i >= left; i--)
+                Program.Project.Remove(i);
+        }
+
+        public void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
             for (int i = left; i <= right; i++)
                 copy.Contents.Add(Program.Project[i]);
 
-            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
+            copy.StoreToClipboard();
 
             if (cut) Delete(left, right);
-            
-            await Application.Current.Clipboard.SetTextAsync(b64);
         }
 
-        public async void Paste(int right) {
-            string b64 = await Application.Current.Clipboard.GetTextAsync();
+        public async void Paste(int right) {            
+            Copyable paste = await Copyable.DecodeClipboard();
 
-            if (b64 == null) return;
-            
-            Copyable paste;
-            try {
-                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            } catch (Exception) {
-                return;
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Track Pasted", undo, redo, dispose);
+        }
+
+        public async void Replace(int left, int right) {
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
+                Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
+
+                Program.Project.Undo.Add("Track Replaced",
+                    undo2 + undo,
+                    redo + redo2 + (() => Program.Project.Window?.Selection.Select(Program.Project[left + paste.Contents.Count - 1], true)),
+                    dispose2 + dispose
+                );
+                
+                Selection.Select(Program.Project[left + paste.Contents.Count - 1], true);
             }
-
-            Copyable_Insert(paste, right, false);
         }
 
         public void Duplicate(int left, int right) {
@@ -561,34 +603,19 @@ namespace Apollo.Windows {
             }, () => {
                 for (int i = 0; i <= right - left; i++)
                     Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            
+                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
+            
+            Selection.Select(Program.Project[right + 1], true);
         }
 
         public void Delete(int left, int right) {
-            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
-            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
-
-            Program.Project.Undo.Add($"Track Removed", () => {
-                for (int i = left; i <= right; i++) {
-                    Track restored = ut[i - left].Clone();
-                    restored.Launchpad = ul[i - left];
-                    Program.Project.Insert(i, restored);
-                }
-                
-            }, () => {
-                for (int i = right; i >= left; i--)
-                    Program.Project.Remove(i);
-            
-            }, () => {
-                foreach (Track track in ut) track.Dispose();
-                ut = null;
-            });
-
-            for (int i = right; i >= left; i--)
-                Program.Project.Remove(i);
+            Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
+            Program.Project.Undo.Add($"Track Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {}
@@ -673,24 +700,10 @@ namespace Apollo.Windows {
                 else return;
             }
 
-            Copyable loaded;
+            Copyable loaded = await Copyable.DecodeFile(path, this);
 
-            try {
-                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    loaded = await Decoder.Decode(file, typeof(Copyable));
-
-            } catch {
-                await MessageWindow.Create(
-                    $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or\n" +
-                    "the file you're attempting to read is invalid.",
-                    null, this
-                );
-
-                return;
-            }
-            
-            Copyable_Insert(loaded, right, true);
+            if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Track Imported", undo, redo, dispose);
         }
     }
 }

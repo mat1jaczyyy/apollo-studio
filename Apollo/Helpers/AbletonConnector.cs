@@ -15,32 +15,35 @@ namespace Apollo.Helpers {
     public static class AbletonConnector {
         static readonly IPAddress localhost = new IPAddress(new byte[] {127, 0, 0, 1});
         static UdpClient connection;
+        static object locker = new object();
 
         static Dictionary<IPEndPoint, AbletonLaunchpad> portMap = new Dictionary<IPEndPoint, AbletonLaunchpad>();
 
         static void Receive(IAsyncResult result) {
-            if (connection == null || result == null) return;
+            lock (locker) {
+                if (connection == null || result == null) return;
 
-            IPEndPoint source = null;
-            byte[] message = connection?.EndReceive(result, ref source);
+                IPEndPoint source = null;
+                byte[] message = connection?.EndReceive(result, ref source);
 
-            connection?.BeginReceive(new AsyncCallback(Receive), connection);
+                connection?.BeginReceive(new AsyncCallback(Receive), connection);
 
-            if (source.Address.Equals(localhost)) {
-                if (!portMap.ContainsKey(source)) {
-                    if (message[0] >= 243 && message[0] <= 244)
-                        connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
+                if (source.Address.Equals(localhost)) {
+                    if (!portMap.ContainsKey(source)) {
+                        if (message[0] >= 243 && message[0] <= 244)
+                            connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
 
-                } else if (message[0] < 128) {
-                    NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
-                    portMap[source].NoteOn(null, in msg);
+                    } else if (message[0] < 128) {
+                        NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
+                        portMap[source].NoteOn(null, in msg);
+                        
+                    } else if (message[0] == 245) {
+                        MIDI.Disconnect(portMap[source]);
+                        portMap.Remove(source);
                     
-                } else if (message[0] == 245) {
-                    MIDI.Disconnect(portMap[source]);
-                    portMap.Remove(source);
-                
-                } else if (message[0] == 246 && Program.Project != null)
-                    Program.Project.BPM = BitConverter.ToUInt16(message, 1);
+                    } else if (message[0] == 246 && Program.Project != null)
+                        Program.Project.BPM = BitConverter.ToUInt16(message, 1);
+                }
             }
         }
 
@@ -64,8 +67,10 @@ namespace Apollo.Helpers {
         }
 
         public static void Dispose() {
-            connection?.Close();
-            connection = null;
+            lock (locker) {
+                connection?.Close();
+                connection = null;
+            }
         }
     }
 }

@@ -334,63 +334,113 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        void Copyable_Insert(Copyable paste, int right, bool imported) {
+        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
+            undo = redo = dispose = null;
+
             List<Chain> pasted;
             try {
                 pasted = paste.Contents.Cast<Chain>().ToList();
             } catch (InvalidCastException) {
-                return;
+                return false;
             }
 
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain {(imported? "Imported" : "Pasted")}", () => {
+            undo = () => {
                 Group group = ((Group)Track.TraversePath(path));
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     group.Remove(right + i + 1);
-
-            }, () => {
+            };
+            
+            redo = () => {
                 Group group = ((Group)Track.TraversePath(path));
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     group.Insert(right + i + 1, pasted[i].Clone());
             
-            }, () => {
+                Track.Get(group).Window?.Selection.Select(group[right + 1], true);
+            };
+            
+            dispose = () => {
                 foreach (Chain chain in pasted) chain.Dispose();
                 pasted = null;
-            });
+            };
 
             for (int i = 0; i < paste.Contents.Count; i++)
                 _group.Insert(right + i + 1, pasted[i].Clone());
+            
+            Track.Get(_group).Window?.Selection.Select(_group[right + 1], true);
+            
+            return true;
         }
 
-        public async void Copy(int left, int right, bool cut = false) {
+        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+            List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_group);
+
+            undo = () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    group.Insert(i, u[i - left].Clone());
+            };
+            
+            redo = () => {
+                Group group = ((Group)Track.TraversePath(path));
+
+                for (int i = right; i >= left; i--)
+                    group.Remove(i);
+            };
+            
+            dispose = () => {
+                foreach (Chain chain in u) chain.Dispose();
+                u = null;
+            };
+
+            for (int i = right; i >= left; i--)
+                _group.Remove(i);
+        }
+
+        public void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
             for (int i = left; i <= right; i++)
                 copy.Contents.Add(_group[i]);
 
-            string b64 = Convert.ToBase64String(Encoder.Encode(copy).ToArray());
+            copy.StoreToClipboard();
 
             if (cut) Delete(left, right);
-            
-            await Application.Current.Clipboard.SetTextAsync(b64);
         }
 
-        public async void Paste(int right) {
-            string b64 = await Application.Current.Clipboard.GetTextAsync();
-            
-            if (b64 == null) return;
-            
-            Copyable paste;
-            try {
-                paste = await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            } catch (Exception) {
-                return;
-            }
+        public async void Paste(int right) {            
+            Copyable paste = await Copyable.DecodeClipboard();
 
-            Copyable_Insert(paste, right, false);
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);
+        }
+
+        public async void Replace(int left, int right) {
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
+                Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
+
+                List<int> path = Track.GetPath(_group);
+
+                Program.Project.Undo.Add("Chain Replaced",
+                    undo2 + undo,
+                    redo + redo2 + (() => {
+                        Group group = ((Group)Track.TraversePath(path));
+
+                        Track.Get(group).Window?.Selection.Select(group[left + paste.Contents.Count - 1], true);
+                    }),
+                    dispose2 + dispose
+                );
+                
+                Track.Get(_group).Window?.Selection.Select(_group[left + paste.Contents.Count - 1], true);
+            }
         }
 
         public void Duplicate(int left, int right) {
@@ -407,36 +457,19 @@ namespace Apollo.DeviceViewers {
 
                 for (int i = 0; i <= right - left; i++)
                     group.Insert(right + i + 1, group[left + i].Clone());
+            
+                Track.Get(group).Window?.Selection.Select(group[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 _group.Insert(right + i + 1, _group[left + i].Clone());
+            
+            Track.Get(_group).Window?.Selection.Select(_group[right + 1], true);
         }
 
         public void Delete(int left, int right) {
-            List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
-
-            List<int> path = Track.GetPath(_group);
-
-            Program.Project.Undo.Add($"Chain Removed", () => {
-                Group group = ((Group)Track.TraversePath(path));
-
-                for (int i = left; i <= right; i++)
-                    group.Insert(i, u[i - left].Clone());
-
-            }, () => {
-                Group group = ((Group)Track.TraversePath(path));
-
-                for (int i = right; i >= left; i--)
-                    group.Remove(i);
-
-            }, () => {
-                foreach (Chain chain in u) chain.Dispose();
-                u = null;
-            });
-
-            for (int i = right; i >= left; i--)
-                _group.Remove(i);
+            Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
+            Program.Project.Undo.Add($"Chain Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {}
@@ -531,24 +564,10 @@ namespace Apollo.DeviceViewers {
                 else return;
             }
 
-            Copyable loaded;
-
-            try {
-                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    loaded = await Decoder.Decode(file, typeof(Copyable));
-
-            } catch {
-                await MessageWindow.Create(
-                    $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or\n" +
-                    "the file you're attempting to read is invalid.",
-                    null, sender
-                );
-
-                return;
-            }
+            Copyable loaded = await Copyable.DecodeFile(path, sender);
             
-            Copyable_Insert(loaded, right, true);
+            if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add("Chain Imported", undo, redo, dispose);
         }
     }
 }
