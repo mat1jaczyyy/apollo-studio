@@ -275,6 +275,34 @@ namespace Apollo.Viewers {
             return true;
         }
 
+        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+            List<Device> u = (from i in Enumerable.Range(left, right - left + 1) select _chain[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_chain);
+
+            undo = () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = left; i <= right; i++)
+                    chain.Insert(i, u[i - left].Clone());
+            };
+
+            redo = () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = right; i >= left; i--)
+                    chain.Remove(i);
+            };
+
+            dispose = () => {
+               foreach (Device device in u) device.Dispose();
+               u = null;
+            };
+
+            for (int i = right; i >= left; i--)
+                _chain.Remove(i);
+        }
+
         public void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
@@ -293,7 +321,27 @@ namespace Apollo.Viewers {
                 Program.Project.Undo.Add("Device Pasted", undo, redo, dispose);
         }
 
-        public void Replace(int left, int right) {}
+        public async void Replace(int left, int right) {
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
+                Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
+
+                List<int> path = Track.GetPath(_chain);
+
+                Program.Project.Undo.Add("Device Replaced",
+                    undo2 + undo,
+                    redo + redo2 + (() => {
+                        Chain chain = ((Chain)Track.TraversePath(path));
+
+                        Track.Get(chain).Window?.Selection.Select(chain[left + paste.Contents.Count - 1], true);
+                    }),
+                    dispose2 + dispose
+                );
+                
+                Track.Get(_chain).Window?.Selection.Select(_chain[left + paste.Contents.Count - 1], true);
+            }
+        }
 
         public void Duplicate(int left, int right) {
             List<int> path = Track.GetPath(_chain);
@@ -320,29 +368,8 @@ namespace Apollo.Viewers {
         }
 
         public void Delete(int left, int right) {
-            List<Device> u = (from i in Enumerable.Range(left, right - left + 1) select _chain[i].Clone()).ToList();
-
-            List<int> path = Track.GetPath(_chain);
-
-            Program.Project.Undo.Add($"Device Removed", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
-
-                for (int i = left; i <= right; i++)
-                    chain.Insert(i, u[i - left].Clone());
-
-            }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
-
-                for (int i = right; i >= left; i--)
-                    chain.Remove(i);
-            
-            }, () => {
-               foreach (Device device in u) device.Dispose();
-               u = null;
-            });
-
-            for (int i = right; i >= left; i--)
-                _chain.Remove(i);
+            Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
+            Program.Project.Undo.Add($"Device Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {

@@ -1400,6 +1400,62 @@ namespace Apollo.Windows {
             return true;
         }
 
+        bool Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+            undo = redo = dispose = null;
+
+            if (_pattern.Count - (right - left + 1) == 0) return false;
+
+            List<Frame> u = (from i in Enumerable.Range(left, right - left + 1) select _pattern[i].Clone()).ToList();
+
+            List<int> path = Track.GetPath(_pattern);
+
+            undo = () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
+                for (int i = left; i <= right; i++)
+                    pattern.Insert(i, u[i - left].Clone());
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
+            };
+            
+            redo = () => {
+                Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                if (pattern.Window != null) pattern.Window.Draw = false;
+
+                for (int i = right; i >= left; i--)
+                    pattern.Remove(i);
+
+                if (pattern.Window != null) {
+                    pattern.Window.Draw = true;
+
+                    pattern.Window.Frame_Select(pattern.Expanded);
+                }
+            };
+            
+            dispose = () => {
+                foreach (Frame frame in u) frame.Dispose();
+                u = null;
+            };
+
+            Draw = false;
+
+            for (int i = right; i >= left; i--)
+                _pattern.Remove(i);
+
+            Draw = true;
+
+            Frame_Select(_pattern.Expanded);
+
+            return true;
+        }
+
         public void Copy(int left, int right, bool cut = false) {
             if (Locked) return;
 
@@ -1419,10 +1475,40 @@ namespace Apollo.Windows {
             Copyable paste = await Copyable.DecodeClipboard();
 
             if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Device Pasted", undo, redo, dispose);
+                Program.Project.Undo.Add("Pattern Frame Pasted", undo, redo, dispose);
         }
 
-        public void Replace(int left, int right) {}
+        public async void Replace(int left, int right) {
+            if (Locked) return;
+
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
+                if (Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2)) {
+
+                    List<int> path = Track.GetPath(_pattern);
+
+                    Program.Project.Undo.Add("Pattern Frame Replaced",
+                        undo2 + undo,
+                        redo + redo2 + (() => {
+                            Pattern pattern = ((Pattern)Track.TraversePath(path));
+
+                            Track.Get(pattern).Window?.Selection.Select(pattern[left + paste.Contents.Count - 1], true);
+                        }),
+                        dispose2 + dispose + (() => {
+                            foreach (Frame frame in paste.Contents) frame.Dispose();
+                            paste = null;
+                        })
+                    );
+                    
+                    Track.Get(_pattern).Window?.Selection.Select(_pattern[left + paste.Contents.Count - 1], true);
+                
+                } else {
+                    undo.Invoke();
+                    dispose.Invoke();
+                }
+            }
+        }
 
         public void Duplicate(int left, int right) {
             if (Locked) return;
@@ -1473,53 +1559,8 @@ namespace Apollo.Windows {
         public void Delete(int left, int right) {
             if (Locked) return;
 
-            if (_pattern.Count - (right - left + 1) == 0) return;
-
-            List<Frame> u = (from i in Enumerable.Range(left, right - left + 1) select _pattern[i].Clone()).ToList();
-
-            List<int> path = Track.GetPath(_pattern);
-
-            Program.Project.Undo.Add($"Pattern Frame Removed", () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = left; i <= right; i++)
-                    pattern.Insert(i, u[i - left].Clone());
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-
-            }, () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = right; i >= left; i--)
-                    pattern.Remove(i);
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-            
-            }, () => {
-                foreach (Frame frame in u) frame.Dispose();
-                u = null;
-            });
-
-            Draw = false;
-
-            for (int i = right; i >= left; i--)
-                _pattern.Remove(i);
-
-            Draw = true;
-
-            Frame_Select(_pattern.Expanded);
+            if (Region_Delete(left, right, out Action undo, out Action redo, out Action dispose))
+                Program.Project.Undo.Add($"Pattern Frame Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {}

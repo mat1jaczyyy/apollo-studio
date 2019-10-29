@@ -535,6 +535,32 @@ namespace Apollo.Windows {
             return true;
         }
 
+        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
+            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
+
+            undo = () => {
+                for (int i = left; i <= right; i++) {
+                    Track restored = ut[i - left].Clone();
+                    restored.Launchpad = ul[i - left];
+                    Program.Project.Insert(i, restored);
+                }
+            };
+            
+            redo = () => {
+                for (int i = right; i >= left; i--)
+                    Program.Project.Remove(i);
+            };
+            
+            dispose = () => {
+                foreach (Track track in ut) track.Dispose();
+                ut = null;
+            };
+
+            for (int i = right; i >= left; i--)
+                Program.Project.Remove(i);
+        }
+
         public void Copy(int left, int right, bool cut = false) {
             Copyable copy = new Copyable();
             
@@ -553,7 +579,21 @@ namespace Apollo.Windows {
                 Program.Project.Undo.Add("Track Pasted", undo, redo, dispose);
         }
 
-        public void Replace(int left, int right) {}
+        public async void Replace(int left, int right) {
+            Copyable paste = await Copyable.DecodeClipboard();
+
+            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
+                Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
+
+                Program.Project.Undo.Add("Track Replaced",
+                    undo2 + undo,
+                    redo + redo2 + (() => Program.Project.Window?.Selection.Select(Program.Project[left + paste.Contents.Count - 1], true)),
+                    dispose2 + dispose
+                );
+                
+                Selection.Select(Program.Project[left + paste.Contents.Count - 1], true);
+            }
+        }
 
         public void Duplicate(int left, int right) {
             Program.Project.Undo.Add($"Track Duplicated", () => {
@@ -574,27 +614,8 @@ namespace Apollo.Windows {
         }
 
         public void Delete(int left, int right) {
-            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
-            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
-
-            Program.Project.Undo.Add($"Track Removed", () => {
-                for (int i = left; i <= right; i++) {
-                    Track restored = ut[i - left].Clone();
-                    restored.Launchpad = ul[i - left];
-                    Program.Project.Insert(i, restored);
-                }
-                
-            }, () => {
-                for (int i = right; i >= left; i--)
-                    Program.Project.Remove(i);
-            
-            }, () => {
-                foreach (Track track in ut) track.Dispose();
-                ut = null;
-            });
-
-            for (int i = right; i >= left; i--)
-                Program.Project.Remove(i);
+            Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
+            Program.Project.Undo.Add($"Track Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {}
