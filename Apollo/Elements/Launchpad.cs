@@ -65,12 +65,23 @@ namespace Apollo.Elements {
             "https://circuit-librarian-staging.herokuapp.com/launchpad-x/firmware"
         );
 
+        public static PortWarning MiniMK3FirmwareOld { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Mini MK3s are running an older version of the\n" + 
+            "official Novation firmware. While they will work with Apollo Studio, this\n" +
+            "version is known to cause performance issues and lags.\n\n" +
+            "Update these to the latest version of the firmware using the Novation\n" +
+            "Components app to avoid any potential issues with Apollo Studio.",
+            "Launch Components Online (requires Chrome)",
+            "https://circuit-librarian-staging.herokuapp.com/launchpad-mini-mk3/firmware"
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
-                XFirmwareOld.DisplayWarning(sender);
+                if (XFirmwareOld.DisplayWarning(sender)) return;
+                MiniMK3FirmwareOld.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -232,6 +243,9 @@ namespace Apollo.Elements {
                         if (response.Data[8] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
+                        if (versionInt < 341) // Old Firmware
+                            MiniMK3FirmwareOld.Set();
+
                         return LaunchpadType.MiniMK3;
                 }
             }
