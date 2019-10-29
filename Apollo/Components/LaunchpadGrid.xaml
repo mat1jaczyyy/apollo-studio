@@ -40,7 +40,11 @@
 
         <StackPanel>
           <StackPanel.Styles>
-            <Style Selector="Path, Rectangle">
+            <Style Selector="Path">
+              <Setter Property="Cursor" Value="Hand" />
+            </Style>
+
+            <Style Selector="Rectangle">
               <Setter Property="Cursor" Value="Hand" />
             </Style>
 
@@ -83,7 +87,7 @@
 
           <Viewbox Margin="{DynamicResource TopMargin}" Stretch="None" x:Name="View">
             <Viewbox.Styles>
-              <Style Selector="Canvas.square, Canvas.corner">
+              <Style Selector="Canvas.square">
                 <Setter Property="Width" Value="{DynamicResource PadSize}" />
                 <Setter Property="Height" Value="{DynamicResource PadSize}" />
               </Style>
@@ -97,6 +101,11 @@
               </Style>
               <Style Selector="Path.circle">
                 <Setter Property="Data" Value="{DynamicResource CircleGeometry}" />
+              </Style>
+
+              <Style Selector="Canvas.corner">
+                <Setter Property="Width" Value="{DynamicResource PadSize}" />
+                <Setter Property="Height" Value="{DynamicResource PadSize}" />
               </Style>
 
               <Style Selector="Canvas.novation">
@@ -118,7 +127,7 @@
             </Viewbox.Styles>
           </Viewbox>
 
-          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" Cursor="Hand" x:Name="ModeLight"
+          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
                      PointerPressed="MouseDown" />
         </StackPanel>
       </Grid>
