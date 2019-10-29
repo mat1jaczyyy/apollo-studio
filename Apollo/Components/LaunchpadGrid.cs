@@ -348,7 +348,7 @@ namespace Apollo.Components {
         }
 
         bool mouseHeld = false;
-        Canvas mouseOver = null;
+        IControl mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -380,22 +380,24 @@ namespace Apollo.Components {
             }
         }
 
-        void MouseEnter(Canvas control, KeyModifiers mods) {
+        void MouseEnter(IControl control, KeyModifiers mods) {
             int index = Array.IndexOf(Canvases, control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
         }
 
-        void MouseLeave(Canvas control) => PadReleased?.Invoke(Array.IndexOf(Canvases, control));
+        void MouseLeave(IControl control) => PadReleased?.Invoke(Array.IndexOf(Canvases, control));
 
         void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
                 IInputElement _over = Root.InputHitTest(e.GetPosition(Root));
 
-                if (_over is Shape overPath)
+                if (_over is Shape overPath && !(_over is Rectangle))
                     _over = overPath.Parent;
                 
-                if (_over is Canvas over) {
+                if (_over is Canvas || _over is Rectangle) {
+                    IControl over = (IControl)_over;
+
                     if (mouseOver == null) MouseEnter(over, e.KeyModifiers);
                     else if (mouseOver != over) {
                         MouseLeave(mouseOver);
