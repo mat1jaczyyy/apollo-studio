@@ -229,6 +229,9 @@ namespace Apollo.Elements {
                         return LaunchpadType.X;
                     
                     case 0x13: // Launchpad Mini MK3
+                        if (response.Data[8] == 17) // Bootloader
+                            return LaunchpadType.Unknown;
+                        
                         return LaunchpadType.MiniMK3;
                 }
             }
