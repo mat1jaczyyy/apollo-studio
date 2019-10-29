@@ -99,7 +99,7 @@ namespace Apollo.Elements {
             {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, new byte[] {0x6F}},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()}
         };
 
         static Dictionary<LaunchpadType, byte[]> ClearMessage = new Dictionary<LaunchpadType, byte[]>() {
@@ -107,7 +107,7 @@ namespace Apollo.Elements {
             {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()}
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
