@@ -99,13 +99,16 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
+            Preferences.RecentsCleared += Clear;
+
+            TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
+            
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+
             this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
             
             Root.Children.Add(SplashImage);
-
-            TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
-
-            Preferences.RecentsCleared += Clear;
 
             if (Program.HadCrashed)
                 if (File.Exists(Program.CrashProject)) {
@@ -134,6 +137,9 @@ namespace Apollo.Windows {
         
         void Unloaded(object sender, CancelEventArgs e) {
             Root.Children.Remove(SplashImage);
+
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.RecentsCleared += Clear;
@@ -322,6 +328,23 @@ namespace Apollo.Windows {
             
             if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
+        }
+
+        void DragOver(object sender, DragEventArgs e) {
+            e.Handled = true;
+            if (CrashPanel.IsHitTestVisible || !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
+        }
+
+        void Drop(object sender, DragEventArgs e) {
+            e.Handled = true;
+
+            if (e.Data.Contains(DataFormats.FileNames)) {
+                string path = e.Data.GetFileNames().FirstOrDefault();
+
+                if (path != null) ReadFile(path);
+
+                return;
+            }
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);

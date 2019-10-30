@@ -6,6 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="640" MinWidth="640" MaxWidth="640"
         Height="320" MinHeight="320" MaxHeight="320"
+        DragDrop.AllowDrop="true"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown">
 
