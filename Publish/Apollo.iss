@@ -16,8 +16,8 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=auto
 DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
-LicenseFile=C:\Users\mat1jaczyyy\Desktop\apollo-studio\LICENSE
-OutputDir=C:\Users\mat1jaczyyy\Desktop\apollo-studio\Dist\
+LicenseFile=..\LICENSE
+OutputDir=..\Dist\
 OutputBaseFilename=Apollo-{#MyAppVersion}-Win
 Compression=lzma
 SolidCompression=yes
@@ -34,8 +34,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "clearpreferences"; Description: "Clear Preferences"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\mat1jaczyyy\Downloads\novation-usb-driver-2.12.exe"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: "C:\Users\mat1jaczyyy\Desktop\apollo-studio\Build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "nvnusbaudio-2.15.5.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "..\Build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Registry]
 Root: HKLM; Subkey: "Software\Classes\.approj"; ValueType: string; ValueName: ""; ValueData: "ApolloStudioProject"; Flags: uninsdeletevalue 
@@ -63,5 +63,5 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\novation-usb-driver-2.12.exe"; StatusMsg: Installing Novation USB Driver...
+Filename: "{tmp}\nvnusbaudio-2.15.5.exe"; StatusMsg: Installing Novation USB Driver...
 Filename: "{app}\Apollo\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

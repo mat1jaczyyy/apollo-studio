@@ -35,6 +35,7 @@ namespace Apollo.Windows {
 
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
+            LaunchpadModel = this.Get<ComboBox>("LaunchpadModel");
 
             AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
             AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
@@ -73,7 +74,7 @@ namespace Apollo.Windows {
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
-        ComboBox LaunchpadStyle, LaunchpadGridRotation;
+        ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         HorizontalDial FadeSmoothness;
@@ -85,13 +86,13 @@ namespace Apollo.Windows {
             new Time(false),
             colors: new List<Color>() {
                 new Color(1, 0, 0),
-                new Color(63, 0, 0),
-                new Color(63, 63, 0),
-                new Color(0, 63, 0),
-                new Color(0, 63, 63),
-                new Color(0, 0, 63),
-                new Color(63, 0, 63),
-                new Color(63, 0, 0),
+                new Color(127, 0, 0),
+                new Color(127, 127, 0),
+                new Color(0, 127, 0),
+                new Color(0, 127, 127),
+                new Color(0, 0, 127),
+                new Color(127, 0, 127),
+                new Color(127, 0, 0),
                 new Color(1, 0, 0)
             },
             positions: new List<double>() {
@@ -139,6 +140,7 @@ namespace Apollo.Windows {
 
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
+            LaunchpadModel.SelectedIndex = (int)Preferences.LaunchpadModel;
 
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
             AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
@@ -213,6 +215,8 @@ namespace Apollo.Windows {
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
         void LaunchpadGridRotation_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
+
+        void LaunchpadModel_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadModel = (LaunchpadModels)LaunchpadModel.SelectedIndex;
 
         void AutoCreateKeyFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
@@ -313,7 +317,7 @@ namespace Apollo.Windows {
         }
 
         void Preview_Pressed(int index) =>
-            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color(63)));
+            fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color()));
 
         void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
             Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());

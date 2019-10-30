@@ -59,7 +59,7 @@ namespace Apollo.Structures {
             Origin = origin;
             Source = source;
             Index = index;
-            Color = color?? new Color(63);
+            Color = color?? new Color();
             Page = page;
             Layer = layer;
             BlendingMode = blending;

@@ -72,6 +72,10 @@ namespace Apollo.Binary {
                     Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
                 }
 
+                if (version >= 24) {
+                    Preferences.LaunchpadModel = (LaunchpadModels)reader.ReadInt32();
+                }
+
                 Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
                 Preferences.AutoCreatePageFilter = reader.ReadBoolean();
 
@@ -534,14 +538,14 @@ namespace Apollo.Binary {
                     reader.ReadDouble()
                 );
             
-            else if (t == typeof(Color))
-                return new Color(
-                    reader.ReadByte(),
-                    reader.ReadByte(),
-                    reader.ReadByte()
-                );
+            else if (t == typeof(Color)) {
+                byte[] colors = reader.ReadBytes(3);
+                if (version <= 23)
+                    colors = colors.Select(i => (byte)((double)i * 127.0 / 63)).ToArray();
+
+                return new Color(colors[0], colors[1], colors[2]);
             
-            else if (t == typeof(Frame)) {
+            } else if (t == typeof(Frame)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(

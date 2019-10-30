@@ -21,7 +21,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public Paint(Color color = null): base("paint") => Color = color?? new Color(63);
+        public Paint(Color color = null): base("paint") => Color = color?? new Color();
 
         public override void MIDIProcess(Signal n) {
             if (n.Color.Lit) n.Color = Color.Clone();

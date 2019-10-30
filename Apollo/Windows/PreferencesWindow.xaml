@@ -90,6 +90,13 @@
                     <ComboBoxItem>Phantom</ComboBoxItem>
                     <ComboBoxItem>Sanded</ComboBoxItem>
                   </ComboBox>
+
+                  <ComboBox x:Name="LaunchpadModel" SelectionChanged="LaunchpadModel_Changed">
+                    <ComboBoxItem>MK2</ComboBoxItem>
+                    <ComboBoxItem>Pro</ComboBoxItem>
+                    <ComboBoxItem>X</ComboBoxItem>
+                    <ComboBoxItem>All</ComboBoxItem>
+                  </ComboBox>
                 </StackPanel>
               </StackPanel>
 

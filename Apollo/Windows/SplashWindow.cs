@@ -20,7 +20,6 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Viewers;
 
@@ -122,7 +121,7 @@ namespace Apollo.Windows {
         void Loaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-            if (Launchpad.CFWIncompatible == CFWIncompatibleState.Show) Launchpad.CFWError(this);
+            Launchpad.DisplayWarnings(this);
 
             if (App.Args?.Length > 0)
                 ReadFile(App.Args[0]);

@@ -7,6 +7,10 @@ namespace Apollo.Enums {
         Dark, Light
     }
 
+    public enum LaunchpadModels {
+        MK2, Pro, X, All
+    }
+
     public enum LaunchpadStyles {
         Stock, Phantom, Sanded
     }
@@ -61,12 +65,12 @@ namespace Apollo.Enums {
         D270
     }
 
-    public enum CFWIncompatibleState {
+    public enum PortWarningType {
         None, Show, Done
     }
 
     public enum LaunchpadType {
-        MK2, PRO, CFW, Unknown
+        MK2, PRO, CFW, X, MiniMK3, Unknown
     }
 
     public enum InputType {
