@@ -136,6 +136,7 @@ namespace Apollo.Windows {
             Root.Children.Remove(SplashImage);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
+            Preferences.RecentsCleared += Clear;
 
             this.Content = null;
 
