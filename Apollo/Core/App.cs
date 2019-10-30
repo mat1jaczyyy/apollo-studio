@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
@@ -55,6 +56,27 @@ namespace Apollo.Core {
 
             public static bool operator >(DriverVersion a, DriverVersion b) 
                 => a.CompareTo(b) == 1;
+        }
+
+        MessageWindow CreateDriverError(bool IsOldVersion) {
+            MessageWindow ret = new MessageWindow(
+                (IsOldVersion
+                    ? "Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
+                      "installed on your computer.\n\n"
+                    : "Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
+                      "computer.\n\n"
+                ) +
+                "Please install at least version 2.15.5 of the driver before launching Apollo\n" +
+                "Studio.",
+                new string[] {"Download Driver", "OK"}
+            );
+
+            ret.Completed.Task.ContinueWith(result => {
+                if (result.Result == "Download Driver")
+                    URL("https://customer.novationmusic.com/sites/customer/files/downloads/Novation%20USB%20Driver-2.15.5.exe");
+            });
+
+            return ret;
         }
 
         public static bool WindowKey(Window sender, KeyEventArgs e) {
@@ -134,23 +156,15 @@ namespace Apollo.Core {
                     );
 
                     if (a.Count() == 0) {
-                        lifetime.MainWindow = new MessageWindow(
-                            $"Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
-                            "computer.\n\n" +
-                            "Please install at least version 2.15.5 of the driver before launching Apollo\n" +
-                            "Studio."
-                        );
+                        lifetime.MainWindow = CreateDriverError(false);
+
                         base.OnFrameworkInitializationCompleted();
                         return;
                     }
 
                     if (a.Max() < new DriverVersion(new int[] {15, 5})) {
-                        lifetime.MainWindow = new MessageWindow(
-                            $"Apollo Studio requires a newer version of the Novation USB Driver than is\n" +
-                            "installed on your computer.\n\n" +
-                            "Please install at least version 2.15.5 of the driver before launching Apollo\n" +
-                            "Studio."
-                        );
+                        lifetime.MainWindow = CreateDriverError(true);
+
                         base.OnFrameworkInitializationCompleted();
                         return;
                     }
