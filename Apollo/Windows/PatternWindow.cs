@@ -13,7 +13,6 @@ using FontWeight = Avalonia.Media.FontWeight;
 using SolidColorBrush = Avalonia.Media.SolidColorBrush;
 using Avalonia.Threading;
 
-using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
