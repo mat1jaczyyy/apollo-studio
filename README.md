@@ -4,26 +4,26 @@
 
 ![Logo](Assets/readme.png)
 
-Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 262k of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
+Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 2M of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
 
 Apollo Studio solves all the problems we experience every day in Live including the unintuitive workflow, limited color palette, inconsistent undo behavior, differences between Launchpad models, CPU lag, large RAM usage and more; while bringing new and revolutionary features to the table.
 
 ## Demonstration
 
-Here are a few Launchpad covers created by early testers entirely in Apollo Studio. See for yourself what our software is capable of even when using early, unfinished versions.
+Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apollo Studio. See for yourself what our software is capable of.
 
-[![Owl City - Fireflies](http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg)](http://www.youtube.com/watch?v=DDJ0JPgd8fw "Owl City - Fireflies") [![Geoxor - Moonlight](http://img.youtube.com/vi/PoIOjavPprw/mqdefault.jpg)](http://www.youtube.com/watch?v=PoIOjavPprw "Geoxor - Moonlight") [![ARMNHMR & Convex - Won't Come Back (feat. Jex)](http://img.youtube.com/vi/l6mjEfLrWr4/mqdefault.jpg)](http://www.youtube.com/watch?v=l6mjEfLrWr4 "ARMNHMR & Convex - Won't Come Back (feat. Jex)") [![Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)](http://img.youtube.com/vi/EnGCZJjy3_g/mqdefault.jpg)](https://www.youtube.com/watch?v=EnGCZJjy3_g "Dodge & Fuski X PhaseOne Ft. The Arcturians - Mistakes (Chime Remix)") [![Teminite & MDK - Space Invaders](http://img.youtube.com/vi/l5rQk0G3YBo/mqdefault.jpg)](http://www.youtube.com/watch?v=l5rQk0G3YBo "Teminite & MDK - Space Invaders") [![Dodge & Fuski - Mistakes (Chime Remix)](http://img.youtube.com/vi/1cGd6CvrV0A/mqdefault.jpg)](http://www.youtube.com/watch?v=1cGd6CvrV0A "Dodge & Fuski - Mistakes (Chime Remix)")
+[![Terravita x Chime x Akylla - Go Higher](http://img.youtube.com/vi/a-MwTVH-wX8/mqdefault.jpg)](https://www.youtube.com/watch?v=a-MwTVH-wX8 "Terravita x Chime x Akylla - Go Higher")
+[![Owl City - Fireflies](http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg)](http://www.youtube.com/watch?v=DDJ0JPgd8fw "Owl City - Fireflies")
+[![Borgeous, Taylr Renee - Sweeter Without You](http://img.youtube.com/vi/yA-bFsYRG4I/mqdefault.jpg)](http://www.youtube.com/watch?v=yA-bFsYRG4I "Borgeous, Taylr Renee - Sweeter Without You")
+[![Denking x NEKT - Paint in the Sky](http://img.youtube.com/vi/XdBOQ_Z8oaU/mqdefault.jpg)](http://www.youtube.com/watch?v=XdBOQ_Z8oaU "Denking x NEKT - Paint in the Sky")
 
 ## Getting Started
 
 Download Apollo Studio from the [Releases](https://github.com/mat1jaczyyy/apollo-studio/releases) page. Configure your Launchpads in the Preferences and start a new Project to begin working. We recommend you read the [Documentation](https://github.com/mat1jaczyyy/apollo-studio/wiki) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
 ## Documentation and Support
-i) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
-## Documentation and Support
-
-You can take a look at the [GitHub Wikis](https://github.com/mat1jaczyyy/apollo-studio/wiki) for all documentation on Apollo Studio. Everything you might ask for should be documented there. If it isn't, feel free to ask in our Discord server, or open an issue.
+You can take a look at the [GitHub Wikis](https://github.com/mat1jaczyyy/apollo-studio/wiki) for all documentation on Apollo Studio. Everything you might ask for should be documented there. If it isn't, feel free to ask in our Discord server, or open an issue. You can also check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
 ## Special thanks
 
