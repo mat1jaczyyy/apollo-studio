@@ -107,7 +107,7 @@ namespace Apollo.Components {
             Canvas.SetTop(MainThumb, (1 - value) * mainHeight);
 
             UpdateCanvas();
-            UpdateText();
+            Hex.Text = Color.ToHex();
         }
 
         void UpdateText() {
@@ -125,7 +125,7 @@ namespace Apollo.Components {
 
             Preview.Fill = Color.ToScreenBrush();
 
-            UpdateText();
+            Hex.Text = Color.ToHex();
         }
 
         void UpdateCanvas() {
@@ -266,19 +266,19 @@ namespace Apollo.Components {
         bool Hex_Dirty = false;
 
         Action HexAction(string text) {
-            Action update = () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+            Action update = () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
 
             foreach (char i in text.Substring(1))
                 if (!"0123456789ABCDEF".Contains(i))
-                    return update + (() => { UpdateText(); });
+                    return update + (() => UpdateText());
 
             if (text == "#") return () => {
                 Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
                 Hex.Text = text;
             };
 
-            if (text[0] != '#' || text.Length > 7) return update + (() => { UpdateText(); });
-            if (text.Length < 7) return () => { Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+            if (text[0] != '#' || text.Length > 7) return update + (() => UpdateText());
+            if (text.Length < 7) return () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
 
             int r = Convert.ToInt32(text.Substring(1, 2), 16);
             int g = Convert.ToInt32(text.Substring(3, 2), 16);
