@@ -61,6 +61,8 @@ namespace Apollo.Components {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton != PointerUpdateKind.LeftButtonPressed) e.Handled = true;
+            
+            ((Window)this.GetVisualRoot()).Focus();
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {
