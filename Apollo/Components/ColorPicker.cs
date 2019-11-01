@@ -297,7 +297,10 @@ namespace Apollo.Components {
                 Color = new Color((byte)r, (byte)g, (byte)b);
 
                 Preview.Fill = Color.ToScreenBrush();
+                
+                hexValidation = false;
                 InitCanvas();
+                hexValidation = true;
             });
         }
 
