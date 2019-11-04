@@ -57,12 +57,7 @@ namespace Apollo.Core {
             if (type == typeof(ProjectWindow)) {
                 Program.Project = null;
 
-                SplashWindow splash = new SplashWindow() {
-                    Owner = sender,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner
-                };
-                splash.Show();
-                splash.Owner = null;
+                SplashWindow.Create(sender);
 
             } else if (type == typeof(TrackWindow)) {
                 ProjectWindow.Create(sender);

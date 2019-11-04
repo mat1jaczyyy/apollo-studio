@@ -153,9 +153,16 @@ namespace Apollo.Windows {
 
         public static void Create(Launchpad launchpad, Window owner) {
             if (launchpad.Window == null) {
-                launchpad.Window = new LaunchpadWindow(launchpad) {Owner = owner};
+                launchpad.Window = new LaunchpadWindow(launchpad);
+                
+                if (owner.WindowState == WindowState.Minimized) 
+                    launchpad.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                else
+                    launchpad.Window.Owner = owner;
+
                 launchpad.Window.Show();
                 launchpad.Window.Owner = null;
+                
             } else {
                 launchpad.Window.WindowState = WindowState.Normal;
                 launchpad.Window.Activate();

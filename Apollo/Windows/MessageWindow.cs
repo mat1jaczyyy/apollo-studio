@@ -74,7 +74,12 @@ namespace Apollo.Windows {
         void Close(object sender, RoutedEventArgs e) => Close();
 
         public static async Task<string> Create(string message, string[] options, Window owner) {
-            MessageWindow window = new MessageWindow(message, options) {Owner = owner};
+            MessageWindow window = new MessageWindow(message, options);
+            
+            if (owner.WindowState == WindowState.Minimized) 
+                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            else
+                window.Owner = owner;
 
             window.Show();
             window.Owner = null;

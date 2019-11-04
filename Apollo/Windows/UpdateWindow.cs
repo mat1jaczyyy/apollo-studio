@@ -152,7 +152,13 @@ namespace Apollo.Windows {
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         public static void Create(Window owner) {
-            UpdateWindow window = new UpdateWindow() {Owner = owner};
+            UpdateWindow window = new UpdateWindow();
+                
+            if (owner.WindowState == WindowState.Minimized) 
+                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            else
+                window.Owner = owner;
+
             window.Show();
             window.Owner = null;
         }

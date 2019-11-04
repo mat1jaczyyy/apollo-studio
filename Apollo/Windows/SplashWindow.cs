@@ -349,5 +349,17 @@ namespace Apollo.Windows {
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         void Minimize() => WindowState = WindowState.Minimized;
+
+        public static void Create(Window owner) {
+            SplashWindow window = new SplashWindow();
+        
+            if (owner.WindowState != WindowState.Minimized) {
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                window.Owner = owner;
+            }
+
+            window.Show();
+            window.Owner = null;
+        }
     }
 }
