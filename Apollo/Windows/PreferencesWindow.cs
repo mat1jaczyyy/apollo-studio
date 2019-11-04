@@ -346,7 +346,7 @@ namespace Apollo.Windows {
             if (Preferences.Window == null) {
                 Preferences.Window = new PreferencesWindow();
                 
-                if (owner.WindowState == WindowState.Minimized)
+                if (owner == null || owner.WindowState == WindowState.Minimized)
                     Preferences.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     Preferences.Window.Owner = owner;

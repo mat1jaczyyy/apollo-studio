@@ -353,7 +353,7 @@ namespace Apollo.Windows {
         public static void Create(Window owner) {
             SplashWindow window = new SplashWindow();
         
-            if (owner.WindowState != WindowState.Minimized) {
+            if (owner == null || owner.WindowState != WindowState.Minimized) {
                 window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 window.Owner = owner;
             }

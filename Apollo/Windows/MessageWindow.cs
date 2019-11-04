@@ -76,7 +76,7 @@ namespace Apollo.Windows {
         public static async Task<string> Create(string message, string[] options, Window owner) {
             MessageWindow window = new MessageWindow(message, options);
             
-            if (owner.WindowState == WindowState.Minimized) 
+            if (owner == null || owner.WindowState == WindowState.Minimized)
                 window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             else
                 window.Owner = owner;

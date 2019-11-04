@@ -1603,7 +1603,7 @@ namespace Apollo.Windows {
             if (pattern.Window == null) {
                 pattern.Window = new PatternWindow(pattern);
                 
-                if (owner.WindowState == WindowState.Minimized) 
+                if (owner == null || owner.WindowState == WindowState.Minimized) 
                     pattern.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     pattern.Window.Owner = owner;

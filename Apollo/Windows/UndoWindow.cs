@@ -138,7 +138,7 @@ namespace Apollo.Windows {
             if (Program.Project.Undo.Window == null) {
                 Program.Project.Undo.Window = new UndoWindow();
                 
-                if (owner.WindowState == WindowState.Minimized) 
+                if (owner == null || owner.WindowState == WindowState.Minimized) 
                     Program.Project.Undo.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     Program.Project.Undo.Window.Owner = owner;

@@ -260,7 +260,7 @@ namespace Apollo.Windows {
             if (track.Window == null) {
                 track.Window = new TrackWindow(track);
                 
-                if (owner.WindowState == WindowState.Minimized) 
+                if (owner == null || owner.WindowState == WindowState.Minimized) 
                     track.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     track.Window.Owner = owner;

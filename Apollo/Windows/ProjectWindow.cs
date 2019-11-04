@@ -409,7 +409,7 @@ namespace Apollo.Windows {
             if (Program.Project.Window == null) {
                 Program.Project.Window = new ProjectWindow();
                 
-                if (owner.WindowState == WindowState.Minimized) 
+                if (owner == null || owner.WindowState == WindowState.Minimized) 
                     Program.Project.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     Program.Project.Window.Owner = owner;
