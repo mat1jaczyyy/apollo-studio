@@ -48,7 +48,10 @@ namespace Apollo.Windows {
 
         void UpdateTopmost(bool value) => Topmost = value;
 
-        void UpdateContentAlignment(bool value) => Root.ColumnDefinitions[0] = new ColumnDefinition(1, value? GridUnitType.Star : GridUnitType.Auto);
+        void UpdateContentAlignment(bool value) {
+            Root.ColumnDefinitions = new ColumnDefinitions($"{(value? "*" : "Auto")},Auto,*");
+            Root.InvalidateMeasure();
+        }
 
         public SelectionManager Selection;
 
