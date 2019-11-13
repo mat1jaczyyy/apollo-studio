@@ -5,6 +5,13 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
 
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="TitleBrush" />
+    
+    
+
+  </UserControl.Resources>
+
   <Grid ColumnDefinitions="Auto,Auto">
     <Grid Grid.Column="0" RowDefinitions="*,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
@@ -18,11 +25,11 @@
               </Rectangle.Fill>
             </Rectangle>
 
-            <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" />
+            <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" MenuOpened="Thumb_OpenMenu"/>
             <Components:FadeThumb Canvas.Left="200" x:Name="ThumbEnd" Focused="Thumb_Focus" />
           </Canvas>
 
-          <Grid ColumnDefinitions="Auto,*,Auto" Margin="7 0">
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto" Margin="0 0 7 0">
             <TextBlock Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" x:Name="PositionText" />
 
             <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Display" PointerPressed="DisplayPressed" />
@@ -35,6 +42,8 @@
               <ComboBoxItem>Loop</ComboBoxItem>
             </ComboBox>
           </Grid>
+
+          
         </StackPanel>
       </Border>
 
