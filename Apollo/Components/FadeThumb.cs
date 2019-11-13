@@ -117,8 +117,6 @@ namespace Apollo.Components
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
             {
-
-                // Deleted?.Invoke(this);
                 MenuOpened?.Invoke(this);
                 e.Handled = true;
             }

@@ -25,19 +25,21 @@
               </Rectangle.Fill>
             </Rectangle>
 
-            <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" MenuOpened="Thumb_OpenMenu"/>
+            <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" MenuOpened="Thumb_OpenMenu" FadeTypeChanged="Thumb_ChangeFadeType"/>
             <Components:FadeThumb Canvas.Left="200" x:Name="ThumbEnd" Focused="Thumb_Focus" />
           </Canvas>
 
-          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto" Margin="0 0 7 0">
-            <TextBlock Grid.Column="0" Margin="0 0 5 0" VerticalAlignment="Center" x:Name="PositionText" />
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" Margin="0 0 7 0">
+            <Button BorderThickness="0" x:Name="DeleteThumb" Grid.Column="0" Click="TriggerThumbDelete">☒</Button>
 
-            <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="Display" PointerPressed="DisplayPressed" />
+            <TextBlock Grid.Column="1" Margin="0 0 5 0" VerticalAlignment="Center" x:Name="PositionText" />
 
-            <TextBox Grid.Column="1" Margin="0 2 0 0" Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" Padding="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="43" x:Name="Input"
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" x:Name="Display" PointerPressed="DisplayPressed" />
+
+            <TextBox Grid.Column="2" Margin="0 2 0 0" Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" Padding="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="43" x:Name="Input"
                       LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
 
-            <ComboBox Grid.Column="2" BorderThickness="0" Background="Transparent" VerticalAlignment="Center" x:Name="PlaybackMode" SelectionChanged="PlaybackMode_Changed">
+            <ComboBox Grid.Column="3" BorderThickness="0" Background="Transparent" VerticalAlignment="Center" x:Name="PlaybackMode" SelectionChanged="PlaybackMode_Changed">
               <ComboBoxItem>Mono</ComboBoxItem>
               <ComboBoxItem>Loop</ComboBoxItem>
             </ComboBox>

@@ -168,16 +168,19 @@ namespace Apollo.Devices
                 switch (_types[i])
                 {
                     case FadeTypeEnum.Linear:
-                        _steps.AddRange(generateLinear(_colors[i], _colors[i + 1], max));
+                        _steps.AddRange(GenerateLinear(_colors[i], _colors[i + 1], max));
                         break;
                     case FadeTypeEnum.Smooth:
+                        _steps.AddRange(GenerateSmooth(_colors[i], _colors[i + 1], max));
                         break;
                     case FadeTypeEnum.Slow:
+                        _steps.AddRange(GenerateSlow(_colors[i], _colors[i + 1], max));
                         break;
                     case FadeTypeEnum.Fast:
+                        _steps.AddRange(GenerateFast(_colors[i], _colors[i + 1], max));
                         break;
                     case FadeTypeEnum.Hold:
-                        _steps.Add(_colors[i]);
+                        _steps.AddRange(GenerateHold(_colors[i], max));
                         break;
                 }
 
@@ -399,7 +402,7 @@ namespace Apollo.Devices
             base.Dispose();
         }
 
-        List<Color> generateLinear(Color start, Color end, int max)
+        List<Color> GenerateLinear(Color start, Color end, int max)
         {
             List<Color> steps = new List<Color>();
 
@@ -414,6 +417,83 @@ namespace Apollo.Devices
 
             return steps;
         }
+
+        List<Color> GenerateHold(Color color, int duration)
+        {
+
+            List<Color> steps = new List<Color>();
+
+            for (int k = 0; k < duration; k++)
+            {
+                steps.Add(color);
+            }
+
+            return steps;
+        }
+
+        List<Color> GenerateSmooth(Color start, Color end, int max)
+        {
+            List<Color> steps = new List<Color>();
+
+            for (double k = 0; k < max; k++)
+            {
+                double slowFactor = Math.Pow(k / max, 3.0);
+                double fastFactor = 1 - Math.Pow(1 - (k / max), 3.0);
+
+                double factor = slowFactor + (fastFactor - slowFactor) * k / max;
+
+                System.Console.WriteLine(factor);
+
+                steps.Add(new Color(
+                    (byte)(start.Red + (end.Red - start.Red) * factor),
+                    (byte)(start.Green + (end.Green - start.Green) * factor),
+                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
+                ));
+            }
+
+            return steps;
+        }
+
+        List<Color> GenerateFast(Color start, Color end, int max)
+        {
+            List<Color> steps = new List<Color>();
+
+            for (double k = 0; k < max; k++)
+            {
+                double factor = 1 - Math.Pow(1 - (k / max), 3.0);
+
+                System.Console.WriteLine(factor);
+
+                steps.Add(new Color(
+                    (byte)(start.Red + (end.Red - start.Red) * factor),
+                    (byte)(start.Green + (end.Green - start.Green) * factor),
+                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
+                ));
+            }
+
+            return steps;
+        }
+
+        List<Color> GenerateSlow(Color start, Color end, int max)
+        {
+            List<Color> steps = new List<Color>();
+
+            for (double k = 0; k < max; k++)
+            {
+                double factor = Math.Pow(k / max, 3.0);
+
+                System.Console.WriteLine(factor);
+
+                steps.Add(new Color(
+                    (byte)(start.Red + (end.Red - start.Red) * factor),
+                    (byte)(start.Green + (end.Green - start.Green) * factor),
+                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
+                ));
+            }
+
+            return steps;
+        }
+
     }
 
 }

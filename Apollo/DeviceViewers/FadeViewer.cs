@@ -42,6 +42,8 @@ namespace Apollo.DeviceViewers
             PositionText = this.Get<TextBlock>("PositionText");
             Display = this.Get<TextBlock>("Display");
             Input = this.Get<TextBox>("Input");
+
+            DeleteThumb = this.Get<Button>("DeleteThumb");
         }
 
         Fade _fade;
@@ -54,9 +56,11 @@ namespace Apollo.DeviceViewers
         Grid PickerContainer;
         ColorPicker Picker;
         LinearGradientBrush Gradient;
-
+        Button DeleteThumb;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
+
+        int currentThumbIndex = -1;
 
         public void Contents_Insert(int index, Color color)
         {
@@ -93,8 +97,6 @@ namespace Apollo.DeviceViewers
         {
             InitializeComponent();
 
-
-
             _fade = fade;
             _fade.Generated += Gradient_Generate;
 
@@ -103,6 +105,8 @@ namespace Apollo.DeviceViewers
             Duration.UsingSteps = _fade.Time.Mode;
             Duration.Length = _fade.Time.Length;
             Duration.RawValue = _fade.Time.Free;
+
+            DeleteThumb.IsVisible = false;
 
             Gate.RawValue = _fade.Gate * 100;
 
@@ -190,6 +194,9 @@ namespace Apollo.DeviceViewers
                 });
 
                 _fade.Insert(index, new Color(), pos);
+
+                currentThumbIndex = index;
+                DeleteThumb.IsVisible = true;
             }
         }
 
@@ -270,7 +277,20 @@ namespace Apollo.DeviceViewers
                 Display.Text = $"{(Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString()}%";
         }
 
-        void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
+        void Thumb_Focus(FadeThumb sender)
+        {
+            currentThumbIndex = thumbs.IndexOf(sender);
+            if (currentThumbIndex != 0 && currentThumbIndex != thumbs.Count - 1)
+            {
+                DeleteThumb.IsVisible = true;
+            }
+            else
+            {
+                DeleteThumb.IsVisible = false;
+
+            }
+            Expand(currentThumbIndex);
+        }
 
         void Color_Changed(Color color, Color old)
         {
@@ -539,5 +559,14 @@ namespace Apollo.DeviceViewers
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
 
+        void TriggerThumbDelete(object Sender, RoutedEventArgs e)
+        {
+            if (currentThumbIndex != -1)
+            {
+                Thumb_Delete(thumbs[currentThumbIndex]);
+            }
+            currentThumbIndex = -1;
+            DeleteThumb.IsVisible = false;
+        }
     }
 }
