@@ -329,15 +329,22 @@ namespace Apollo.Components {
             PadReleased = null;
             PadModsPressed = null;
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++) {
                 if (!Canvases[i].Classes.Contains("empty"))
                     Canvases[i].PointerPressed -= MouseDown;
+
+                if (!Elements[i].Classes.Contains("empty"))
+                    Elements[i].PointerPressed -= MouseDown;
+                
+                Canvases[i] = null;
+                Elements[i] = null;
+            }
+
+            Grid.Children.Clear();
 
             Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
             Preferences.LaunchpadGridRotationChanged -= ApplyScale;
             Preferences.LaunchpadModelChanged -= Update_LaunchpadModel;
-
-            Clear();
         }
 
         void LayoutChanged(object sender, EventArgs e) => DrawPath();
