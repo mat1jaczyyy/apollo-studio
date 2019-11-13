@@ -28,7 +28,7 @@ namespace Apollo.Devices
         List<Color> _colors = new List<Color>();
         List<double> _positions = new List<double>();
 
-        List<FadeTypeEnum> _types = new List<FadeTypeEnum>();
+        List<FadeTypes> _types = new List<FadeTypes>();
         List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
@@ -55,8 +55,8 @@ namespace Apollo.Devices
             }
         }
 
-        public FadeTypeEnum GetFadeType(int index) => _types[index];
-        public void SetFadeType(int index, FadeTypeEnum type)
+        public FadeTypes GetFadeType(int index) => _types[index];
+        public void SetFadeType(int index, FadeTypes type)
         {
             if (_types[index] != type)
             {
@@ -168,19 +168,22 @@ namespace Apollo.Devices
 
                 switch (_types[i])
                 {
-                    case FadeTypeEnum.Linear:
+                    case FadeTypes.Linear:
                         _steps.AddRange(GenerateLinear(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypeEnum.Smooth:
+                    case FadeTypes.Smooth:
                         _steps.AddRange(GenerateSmooth(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypeEnum.Slow:
+                    case FadeTypes.Sharp:
+                        _steps.AddRange(GenerateSharp(_colors[i], _colors[i + 1], max));
+                        break;
+                    case FadeTypes.Slow:
                         _steps.AddRange(GenerateSlow(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypeEnum.Fast:
+                    case FadeTypes.Fast:
                         _steps.AddRange(GenerateFast(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypeEnum.Hold:
+                    case FadeTypes.Hold:
                         _steps.AddRange(GenerateHold(_colors[i], max));
                         break;
                 }
@@ -227,7 +230,7 @@ namespace Apollo.Devices
             Enabled = Enabled
         };
 
-        public void Insert(int index, Color color, double position, FadeTypeEnum type)
+        public void Insert(int index, Color color, double position, FadeTypes type)
         {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
@@ -256,7 +259,7 @@ namespace Apollo.Devices
 
         public int? Expanded;
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeTypeEnum> types = null, int? expanded = null) : base("fade")
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeTypes> types = null, int? expanded = null) : base("fade")
         {
             Time = time ?? new Time();
             Gate = gate;
@@ -264,7 +267,7 @@ namespace Apollo.Devices
 
             _colors = colors ?? new List<Color>() { new Color(), new Color(0) };
             _positions = positions ?? new List<double>() { 0, 1 };
-            _types = types ?? new List<FadeTypeEnum>() { FadeTypeEnum.Linear };
+            _types = types ?? new List<FadeTypes>() { FadeTypes.Linear };
             Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;
@@ -480,6 +483,27 @@ namespace Apollo.Devices
             for (double k = 0; k < max; k++)
             {
                 double factor = Math.Pow(k / max, 3.0);
+
+                steps.Add(new Color(
+                    (byte)(start.Red + (end.Red - start.Red) * factor),
+                    (byte)(start.Green + (end.Green - start.Green) * factor),
+                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
+                ));
+            }
+
+            return steps;
+        }
+
+        List<Color> GenerateSharp(Color start, Color end, int max)
+        {
+            List<Color> steps = new List<Color>();
+
+            for (double k = 0; k < max; k++)
+            {
+                double slowFactor = Math.Pow(k / max, 3.0);
+                double fastFactor = 1 - Math.Pow(1 - (k / max), 3.0);
+
+                double factor = fastFactor + (slowFactor - fastFactor) * k / max;
 
                 steps.Add(new Color(
                     (byte)(start.Red + (end.Red - start.Red) * factor),

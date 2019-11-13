@@ -14,6 +14,7 @@
     <ContextMenu x:Key="ThumbContextMenu" Cursor="Arrow" >
       <MenuItem Header="Linear"/>
       <MenuItem Header="Smooth" />
+      <MenuItem Header="Sharp" />
       <MenuItem Header="Fast" />
       <MenuItem Header="Slow" />
       <MenuItem Header="Hold" />

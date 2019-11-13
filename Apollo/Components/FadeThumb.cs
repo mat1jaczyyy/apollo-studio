@@ -11,20 +11,6 @@ using System;
 
 using Apollo.Enums;
 
-namespace Apollo.Enums
-{
-    public enum FadeTypeEnum
-    {
-        Linear = 0,
-        Smooth = 1,
-        Fast = 2,
-        Slow = 3,
-        Hold = 4
-    };
-}
-
-
-
 namespace Apollo.Components
 {
     public class FadeThumb : UserControl
@@ -45,7 +31,7 @@ namespace Apollo.Components
         public event FadeThumbEventHandler Deleted;
         public event FadeThumbEventHandler MenuOpened;
         public event FadeThumbEventHandler FadeTypeChanged;
-        public FadeTypeEnum FadeType = FadeTypeEnum.Linear;
+        public FadeTypes FadeType = FadeTypes.Linear;
         ContextMenu ThumbContextMenu;
         public Thumb Base;
         public MenuItem Delete;

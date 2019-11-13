@@ -412,7 +412,7 @@ namespace Apollo.Binary
                 int count;
                 List<Color> colors = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList();
                 List<double> positions = (from i in Enumerable.Range(0, count) select (version <= 13) ? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
-                List<FadeTypeEnum> types = (from i in Enumerable.Range(0, count - 1) select (version <= 24) ? FadeTypeEnum.Linear : (FadeTypeEnum)reader.ReadInt32()).ToList();
+                List<FadeTypes> types = (from i in Enumerable.Range(0, count - 1) select (version <= 24) ? FadeTypes.Linear : (FadeTypes)reader.ReadInt32()).ToList();
 
                 int? expanded = null;
                 if (version >= 23)

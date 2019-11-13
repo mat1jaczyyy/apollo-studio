@@ -188,10 +188,10 @@ namespace Apollo.DeviceViewers
                     ((Fade)Track.TraversePath(path)).Remove(index);
                 }, () =>
                 {
-                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos, FadeTypeEnum.Linear);
+                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos, FadeTypes.Linear);
                 });
 
-                _fade.Insert(index, new Color(), pos, FadeTypeEnum.Linear);
+                _fade.Insert(index, new Color(), pos, FadeTypes.Linear);
             }
         }
 
@@ -201,7 +201,7 @@ namespace Apollo.DeviceViewers
 
             Color uc = _fade.GetColor(index).Clone();
             double up = _fade.GetPosition(index);
-            FadeTypeEnum ut = _fade.GetFadeType(index);
+            FadeTypes ut = _fade.GetFadeType(index);
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () =>
@@ -235,8 +235,8 @@ namespace Apollo.DeviceViewers
         {
             int index = thumbs.IndexOf(sender);
 
-            FadeTypeEnum oldType = _fade.GetFadeType(index);
-            FadeTypeEnum newType = sender.FadeType;
+            FadeTypes oldType = _fade.GetFadeType(index);
+            FadeTypes newType = sender.FadeType;
 
             List<int> path = Track.GetPath(_fade);
 
