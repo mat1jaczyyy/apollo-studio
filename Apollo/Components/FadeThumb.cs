@@ -34,6 +34,7 @@ namespace Apollo.Components
             AvaloniaXamlLoader.Load(this);
 
             Base = this.Get<Thumb>("Thumb");
+            Delete = this.Get<MenuItem>("Delete");
         }
 
         public delegate void MovedEventHandler(FadeThumb sender, double change, double? total);
@@ -47,6 +48,7 @@ namespace Apollo.Components
         public FadeTypeEnum FadeType = FadeTypeEnum.Linear;
         ContextMenu ThumbContextMenu;
         public Thumb Base;
+        public MenuItem Delete;
 
         public IBrush Fill
         {
@@ -61,8 +63,6 @@ namespace Apollo.Components
             ThumbContextMenu = (ContextMenu)this.Resources["ThumbContextMenu"];
 
             ThumbContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-
-            UpdateSelectedMenu(FadeTypeEnum.Linear);
 
             Base.AddHandler(InputElement.PointerPressedEvent, MouseDown, RoutingStrategies.Tunnel);
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
@@ -108,6 +108,18 @@ namespace Apollo.Components
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
             {
+                MenuItem selectedItem = null;
+                foreach (Control item in ThumbContextMenu.Items)
+                {
+                    if (item.GetType() != typeof(MenuItem)) break;
+                    MenuItem menuItem = (MenuItem)item;
+                    menuItem.Icon = "";
+                    if (menuItem.Header.ToString() == FadeType.ToString())
+                    {
+                        selectedItem = menuItem;
+                    }
+                }
+                selectedItem.Icon = this.Resources["SelectedIcon"];
                 MenuOpened?.Invoke(this);
                 e.Handled = true;
             }
@@ -138,34 +150,18 @@ namespace Apollo.Components
             if (item.GetType() == typeof(MenuItem))
             {
                 MenuItem selectedItem = (MenuItem)item;
-                Enum.TryParse(selectedItem.Header.ToString(), out FadeType);
-                UpdateSelectedMenu(FadeType);
-                FadeTypeChanged?.Invoke(this);
-            }
-        }
+                string header = selectedItem.Header.ToString();
 
-        public void UpdateSelectedMenu(FadeTypeEnum type)
-        {
-            MenuItem selectedMenu = null;
-            foreach (MenuItem item in ThumbContextMenu.Items)
-            {
-                //TODO Fix crash on redo as menu hasn't been loaded yet 
-                item.Icon = "";
-                if (item.Header.ToString() == type.ToString())
+                if (header == "Delete")
                 {
-                    selectedMenu = item;
+                    Deleted?.Invoke(this);
+                }
+                else
+                {
+                    Enum.TryParse(header, out FadeType);
+                    FadeTypeChanged?.Invoke(this);
                 }
             }
-            selectedMenu.Icon = this.Resources["SeletedIcon"];
-        }
-
-        public MenuItem GetMenuItem(FadeTypeEnum type)
-        {
-            foreach (MenuItem item in ThumbContextMenu.Items)
-            {
-                if (item.Header.ToString() == type.ToString()) return item;
-            }
-            return null;
         }
     }
 }

@@ -42,8 +42,6 @@ namespace Apollo.DeviceViewers
             PositionText = this.Get<TextBlock>("PositionText");
             Display = this.Get<TextBlock>("Display");
             Input = this.Get<TextBox>("Input");
-
-            DeleteThumb = this.Get<Button>("DeleteThumb");
         }
 
         Fade _fade;
@@ -59,8 +57,6 @@ namespace Apollo.DeviceViewers
         Button DeleteThumb;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
-
-        int currentThumbIndex = -1;
 
         public void Contents_Insert(int index, Color color)
         {
@@ -106,8 +102,6 @@ namespace Apollo.DeviceViewers
             Duration.Length = _fade.Time.Length;
             Duration.RawValue = _fade.Time.Free;
 
-            DeleteThumb.IsVisible = false;
-
             Gate.RawValue = _fade.Gate * 100;
 
             int? temp = _fade.Expanded;
@@ -125,11 +119,6 @@ namespace Apollo.DeviceViewers
 
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
             thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
-
-            for (int i = 0; i < _fade.Count - 1; i++)
-            {
-                thumbs[i].UpdateSelectedMenu(thumbs[i].FadeType);
-            }
 
             Expand(temp);
 
@@ -203,9 +192,6 @@ namespace Apollo.DeviceViewers
                 });
 
                 _fade.Insert(index, new Color(), pos, FadeTypeEnum.Linear);
-
-                currentThumbIndex = index;
-                DeleteThumb.IsVisible = true;
             }
         }
 
@@ -237,6 +223,10 @@ namespace Apollo.DeviceViewers
             {
                 return;
             }
+            if (index == 0)
+            {
+                sender.Delete.IsVisible = false;
+            }
 
             sender.OpenMenu();
         }
@@ -253,15 +243,14 @@ namespace Apollo.DeviceViewers
             Program.Project.Undo.Add($"Fade Type Changed to {newType}", () =>
             {
                 ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
-                sender.UpdateSelectedMenu(oldType);
+                thumbs[index].FadeType = oldType;
             }, () =>
             {
                 ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
-                sender.UpdateSelectedMenu(newType);
+                thumbs[index].FadeType = newType;
             });
 
             _fade.SetFadeType(index, newType);
-            sender.UpdateSelectedMenu(newType);
         }
 
         void Thumb_Move(FadeThumb sender, double change, double? total)
@@ -307,17 +296,7 @@ namespace Apollo.DeviceViewers
 
         void Thumb_Focus(FadeThumb sender)
         {
-            currentThumbIndex = thumbs.IndexOf(sender);
-            if (currentThumbIndex != 0 && currentThumbIndex != thumbs.Count - 1)
-            {
-                DeleteThumb.IsVisible = true;
-            }
-            else
-            {
-                DeleteThumb.IsVisible = false;
-
-            }
-            Expand(currentThumbIndex);
+            Expand(thumbs.IndexOf(sender));
         }
 
         void Color_Changed(Color color, Color old)
@@ -586,15 +565,5 @@ namespace Apollo.DeviceViewers
         }
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
-
-        void TriggerThumbDelete(object Sender, RoutedEventArgs e)
-        {
-            if (currentThumbIndex != -1)
-            {
-                Thumb_Delete(thumbs[currentThumbIndex]);
-            }
-            currentThumbIndex = -1;
-            DeleteThumb.IsVisible = false;
-        }
     }
 }
