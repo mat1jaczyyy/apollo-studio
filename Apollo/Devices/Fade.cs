@@ -55,6 +55,7 @@ namespace Apollo.Devices
             }
         }
 
+        public FadeTypeEnum GetFadeType(int index) => _types[index];
         public void SetFadeType(int index, FadeTypeEnum type)
         {
             if (_types[index] != type)
@@ -220,17 +221,17 @@ namespace Apollo.Devices
             get => _colors.Count;
         }
 
-        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList())
+        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList(), _types.ToList())
         {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public void Insert(int index, Color color, double position)
+        public void Insert(int index, Color color, double position, FadeTypeEnum type)
         {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
-            _types.Insert(index, FadeTypeEnum.Linear);
+            _types.Insert(index, type);
 
             if (Viewer?.SpecificViewer != null)
             {
@@ -255,7 +256,7 @@ namespace Apollo.Devices
 
         public int? Expanded;
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, int? expanded = null) : base("fade")
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeTypeEnum> types = null, int? expanded = null) : base("fade")
         {
             Time = time ?? new Time();
             Gate = gate;
@@ -263,7 +264,7 @@ namespace Apollo.Devices
 
             _colors = colors ?? new List<Color>() { new Color(), new Color(0) };
             _positions = positions ?? new List<double>() { 0, 1 };
-            _types = new List<FadeTypeEnum>() { FadeTypeEnum.Linear };
+            _types = types ?? new List<FadeTypeEnum>() { FadeTypeEnum.Linear };
             Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;
@@ -442,7 +443,6 @@ namespace Apollo.Devices
 
                 double factor = slowFactor + (fastFactor - slowFactor) * k / max;
 
-                System.Console.WriteLine(factor);
 
                 steps.Add(new Color(
                     (byte)(start.Red + (end.Red - start.Red) * factor),
@@ -462,7 +462,6 @@ namespace Apollo.Devices
             {
                 double factor = 1 - Math.Pow(1 - (k / max), 3.0);
 
-                System.Console.WriteLine(factor);
 
                 steps.Add(new Color(
                     (byte)(start.Red + (end.Red - start.Red) * factor),
@@ -481,8 +480,6 @@ namespace Apollo.Devices
             for (double k = 0; k < max; k++)
             {
                 double factor = Math.Pow(k / max, 3.0);
-
-                System.Console.WriteLine(factor);
 
                 steps.Add(new Color(
                     (byte)(start.Red + (end.Red - start.Red) * factor),

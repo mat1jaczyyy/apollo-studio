@@ -115,12 +115,21 @@ namespace Apollo.DeviceViewers
 
             thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
             thumbs[0].Fill = _fade.GetColor(0).ToBrush();
+            thumbs[0].FadeType = _fade.GetFadeType(0);
 
             for (int i = 1; i < _fade.Count - 1; i++)
+            {
                 Contents_Insert(i, _fade.GetColor(i));
+                thumbs[i].FadeType = _fade.GetFadeType(i);
+            }
 
             thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
             thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
+
+            for (int i = 0; i < _fade.Count - 1; i++)
+            {
+                thumbs[i].UpdateSelectedMenu(thumbs[i].FadeType);
+            }
 
             Expand(temp);
 
@@ -190,10 +199,10 @@ namespace Apollo.DeviceViewers
                     ((Fade)Track.TraversePath(path)).Remove(index);
                 }, () =>
                 {
-                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos);
+                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos, FadeTypeEnum.Linear);
                 });
 
-                _fade.Insert(index, new Color(), pos);
+                _fade.Insert(index, new Color(), pos, FadeTypeEnum.Linear);
 
                 currentThumbIndex = index;
                 DeleteThumb.IsVisible = true;
@@ -206,11 +215,12 @@ namespace Apollo.DeviceViewers
 
             Color uc = _fade.GetColor(index).Clone();
             double up = _fade.GetPosition(index);
+            FadeTypeEnum ut = _fade.GetFadeType(index);
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () =>
             {
-                ((Fade)Track.TraversePath(path)).Insert(index, uc, up);
+                ((Fade)Track.TraversePath(path)).Insert(index, uc, up, ut);
             }, () =>
             {
                 ((Fade)Track.TraversePath(path)).Remove(index);
@@ -234,7 +244,24 @@ namespace Apollo.DeviceViewers
         void Thumb_ChangeFadeType(FadeThumb sender)
         {
             int index = thumbs.IndexOf(sender);
-            _fade.SetFadeType(index, sender.FadeType);
+
+            FadeTypeEnum oldType = _fade.GetFadeType(index);
+            FadeTypeEnum newType = sender.FadeType;
+
+            List<int> path = Track.GetPath(_fade);
+
+            Program.Project.Undo.Add($"Fade Type Changed to {newType}", () =>
+            {
+                ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
+                sender.UpdateSelectedMenu(oldType);
+            }, () =>
+            {
+                ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
+                sender.UpdateSelectedMenu(newType);
+            });
+
+            _fade.SetFadeType(index, newType);
+            sender.UpdateSelectedMenu(newType);
         }
 
         void Thumb_Move(FadeThumb sender, double change, double? total)
@@ -260,6 +287,7 @@ namespace Apollo.DeviceViewers
                 Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () =>
                 {
                     ((Fade)Track.TraversePath(path)).SetPosition(i, u / 200);
+
                 }, () =>
                 {
                     ((Fade)Track.TraversePath(path)).SetPosition(i, pos);

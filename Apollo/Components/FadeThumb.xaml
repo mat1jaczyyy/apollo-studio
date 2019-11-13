@@ -8,16 +8,14 @@
     <SolidColorBrush x:Key="Outline">#00FFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="Color">#FFFFFFFF</SolidColorBrush>
 
+     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" x:Key="SeletedIcon">X</TextBlock>
+
     <ContextMenu x:Key="ThumbContextMenu" Cursor="Arrow" >
-      <MenuItem  Header="Linear" >
-        <MenuItem.Icon>
-           X 
-        </MenuItem.Icon>
-      </MenuItem>
-      <MenuItem  Header="Smooth" />
-      <MenuItem  Header="Fast" />
-      <MenuItem  Header="Slow" />
-      <MenuItem  Header="Hold" />
+      <MenuItem Header="Linear" />
+      <MenuItem Header="Smooth" />
+      <MenuItem Header="Fast" />
+      <MenuItem Header="Slow" />
+      <MenuItem Header="Hold" />
     </ContextMenu>
   </UserControl.Resources>
 

@@ -22,9 +22,12 @@ using Apollo.Helpers;
 using Apollo.Structures;
 using Apollo.Viewers;
 
-namespace Apollo.Windows {
-    public class PreferencesWindow: Window {
-        void InitializeComponent() {
+namespace Apollo.Windows
+{
+    public class PreferencesWindow : Window
+    {
+        void InitializeComponent()
+        {
             AvaloniaXamlLoader.Load(this);
 
             AlwaysOnTop = this.Get<CheckBox>("AlwaysOnTop");
@@ -97,12 +100,24 @@ namespace Apollo.Windows {
             },
             positions: new List<double>() {
                 0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1
+            },
+            types: new List<FadeTypeEnum>{
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear,
+                FadeTypeEnum.Linear
             }
         );
 
         void UpdateTopmost(bool value) => AlwaysOnTop.IsChecked = Topmost = value;
 
-        void UpdatePorts() {
+        void UpdatePorts()
+        {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
 
             foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new LaunchpadInfo(i)))
@@ -111,7 +126,8 @@ namespace Apollo.Windows {
 
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
 
-        void UpdateTime(object sender, EventArgs e) {
+        void UpdateTime(object sender, EventArgs e)
+        {
             CurrentSession.Text = $"Current session: {Program.TimeSpent.Elapsed.Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
 
             if (Preferences.Time >= (long)TimeSpan.MaxValue.TotalSeconds) Preferences.BaseTime = 0;
@@ -119,12 +135,13 @@ namespace Apollo.Windows {
             AllTime.Text = $"All time: {Preferences.Time.Seconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour)}";
         }
 
-        public PreferencesWindow() {
+        public PreferencesWindow()
+        {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
-            
+#if DEBUG
+            this.AttachDevTools();
+#endif
+
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
@@ -171,7 +188,8 @@ namespace Apollo.Windows {
             CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
 
             UpdateTime(null, EventArgs.Empty);
-            Timer = new DispatcherTimer() {
+            Timer = new DispatcherTimer()
+            {
                 Interval = new TimeSpan(0, 0, 1)
             };
             Timer.Tick += UpdateTime;
@@ -185,7 +203,8 @@ namespace Apollo.Windows {
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void Unloaded(object sender, CancelEventArgs e)
+        {
             Preferences.Window = null;
 
             Timer.Stop();
@@ -196,12 +215,13 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             this.Content = null;
-            
+
             Preview = null;
             fade.Dispose();
         }
 
-        void AlwaysOnTop_Changed(object sender, RoutedEventArgs e) {
+        void AlwaysOnTop_Changed(object sender, RoutedEventArgs e)
+        {
             Preferences.AlwaysOnTop = AlwaysOnTop.IsChecked.Value;
             Activate();
         }
@@ -211,7 +231,7 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
-        
+
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
         void LaunchpadGridRotation_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
@@ -240,8 +260,10 @@ namespace Apollo.Windows {
 
         void CustomPalette_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
-        async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
-            OpenFileDialog ofd = new OpenFileDialog() {
+        async void BrowseCustomPalette(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog()
+            {
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>() {
                     new FileDialogFilter() {
@@ -256,13 +278,15 @@ namespace Apollo.Windows {
 
             string[] result = await ofd.ShowAsync(this);
 
-            if (result.Length > 0) {
+            if (result.Length > 0)
+            {
                 Palette loaded;
 
                 using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                     loaded = Palette.Decode(file);
-                
-                if (loaded != null) {
+
+                if (loaded != null)
+                {
                     Preferences.CustomPalette = loaded;
                     CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
                     CustomPalette.IsChecked = true;
@@ -271,7 +295,8 @@ namespace Apollo.Windows {
             }
         }
 
-        void SetTheme(ThemeType theme) {
+        void SetTheme(ThemeType theme)
+        {
             if (Preferences.Theme != theme)
                 ThemeHeader.Text = "You must restart\nApollo Studio to\napply this change.";
 
@@ -296,14 +321,16 @@ namespace Apollo.Windows {
 
         void CheckForUpdates_Changed(object sender, RoutedEventArgs e) => Preferences.CheckForUpdates = CheckForUpdates.IsChecked.Value;
 
-        void OpenCrashesFolder(object sender, RoutedEventArgs e) {
+        void OpenCrashesFolder(object sender, RoutedEventArgs e)
+        {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
 
             App.URL(Program.CrashDir);
         }
 
-        void LocateApolloConnector(object sender, RoutedEventArgs e) {
+        void LocateApolloConnector(object sender, RoutedEventArgs e)
+        {
             string m4l = Program.GetBaseFolder("M4L");
 
             if (!Directory.Exists(m4l)) Directory.CreateDirectory(m4l);
@@ -311,7 +338,8 @@ namespace Apollo.Windows {
             App.URL(m4l);
         }
 
-        void Launchpad_Add() {
+        void Launchpad_Add()
+        {
             LaunchpadWindow.Create(MIDI.ConnectVirtual(), this);
             MIDI.Update();
         }
@@ -319,33 +347,38 @@ namespace Apollo.Windows {
         void Preview_Pressed(int index) =>
             fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color()));
 
-        void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
+        void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() =>
+        {
             Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
-        async void HandleKey(object sender, KeyEventArgs e) {
+        async void HandleKey(object sender, KeyEventArgs e)
+        {
             if (App.Dragging) return;
 
             if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
                 Program.Project?.Undo.HandleKey(e);
         }
 
-        void Window_KeyDown(object sender, KeyEventArgs e) {
+        void Window_KeyDown(object sender, KeyEventArgs e)
+        {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-            
+
             if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
-        
+
         void Minimize() => WindowState = WindowState.Minimized;
 
-        public static void Create(Window owner) {
-            if (Preferences.Window == null) {
+        public static void Create(Window owner)
+        {
+            if (Preferences.Window == null)
+            {
                 Preferences.Window = new PreferencesWindow();
-                
+
                 if (owner == null || owner.WindowState == WindowState.Minimized)
                     Preferences.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
@@ -354,7 +387,9 @@ namespace Apollo.Windows {
                 Preferences.Window.Show();
                 Preferences.Window.Owner = null;
 
-            } else {
+            }
+            else
+            {
                 Preferences.Window.WindowState = WindowState.Normal;
                 Preferences.Window.Activate();
             }

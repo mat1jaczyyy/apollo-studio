@@ -30,7 +30,7 @@
           </Canvas>
 
           <Grid ColumnDefinitions="Auto,Auto,*,Auto" Margin="0 0 7 0">
-            <Button BorderThickness="0" x:Name="DeleteThumb" Grid.Column="0" Click="TriggerThumbDelete">☒</Button>
+            <Button Height="22" Width="22" Margin="0 0 5 0" Padding="0" x:Name="DeleteThumb" Grid.Column="0" Click="TriggerThumbDelete">x</Button>
 
             <TextBlock Grid.Column="1" Margin="0 0 5 0" VerticalAlignment="Center" x:Name="PositionText" />
 
