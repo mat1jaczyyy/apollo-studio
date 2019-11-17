@@ -57,7 +57,54 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+    
+        static Dictionary<FadeType, Func<double, double, double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double, double, double>>(){
+            {FadeType.Linear, (double start, double end, double val) => val}, 
+            {FadeType.Fast, (double start, double end, double val) => {
+                double relativeVal = val - start;
+                double duration = end - start;
+                double proportion = relativeVal/duration;
+                
+                double factor = Math.Pow(proportion, 3);
+                
+                return start + duration*factor;
+            }},
+            {FadeType.Slow, (double start, double end, double val) => {
+                double relativeVal = val - start;
+                double duration = end - start;
+                double proportion = relativeVal/duration;
 
+                double factor = Math.Cbrt(proportion);
+                
+                return start + duration*factor;
+            }},
+            {FadeType.Sharp, (double start, double end, double val) => {
+                double relativeVal = val - start;
+                double duration = end - start;
+                double proportion = relativeVal/duration;
+                
+                double factor = Math.Pow(2*proportion-1, 3)/2 + 0.5;
+                
+                return start + duration*factor;
+            }},
+            {FadeType.Smooth, (double start, double end, double val) => {
+                double relativeVal = val - start;
+                double duration = end - start;
+                double proportion = relativeVal/duration;
+
+                double factor;
+                if(proportion < 0.5){
+                    factor = Math.Pow(2*proportion,3)/2;
+                } else {
+                    factor = Math.Pow(2*(proportion - 1),3)/2 + 1;
+                }
+                
+                
+                return start + duration*factor;
+            }},
+            {FadeType.Hold, (double start, double end, double val) => start}
+        };
+    
         Time _time;
         public Time Time {
             get => _time;
@@ -141,25 +188,17 @@ namespace Apollo.Devices {
                     1
                 }.Max();
 
-                switch (_types[i]) {
-                    case FadeType.Linear:
-                        _steps.AddRange(GenerateLinear(_colors[i], _colors[i + 1], max));
-                        break;
-                    case FadeType.Smooth:
-                        _steps.AddRange(GenerateSmooth(_colors[i], _colors[i + 1], max));
-                        break;
-                    case FadeType.Sharp:
-                        _steps.AddRange(GenerateSharp(_colors[i], _colors[i + 1], max));
-                        break;
-                    case FadeType.Slow:
-                        _steps.AddRange(GenerateSlow(_colors[i], _colors[i + 1], max));
-                        break;
-                    case FadeType.Fast:
-                        _steps.AddRange(GenerateFast(_colors[i], _colors[i + 1], max));
-                        break;
-                    case FadeType.Hold:
-                        _steps.AddRange(GenerateHold(_colors[i], max));
-                        break;
+                if(_types[i] == FadeType.Hold) {
+                    _steps.Add(_colors[i]);
+                } else{
+                    for (double k = 0; k < max; k++) {
+                        double factor = k/max;
+                        _steps.Add(new Color(
+                            (byte)(_colors[i].Red + (_colors[i+1].Red - _colors[i].Red) * factor),
+                            (byte)(_colors[i].Green + (_colors[i+1].Green - _colors[i].Green) * factor),
+                            (byte)(_colors[i].Blue + (_colors[i+1].Blue - _colors[i].Blue) * factor)
+                        ));
+                    }
                 }
 
                 _counts.Add(max);
@@ -180,7 +219,12 @@ namespace Apollo.Devices {
                 if (_cutoffs[j + 1] == i) j++;
 
                 if (j < _colors.Count - 1) {
-                    double time = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
+                    double prevTime = j != 0 ? _positions[j-1] * _time * _gate : 0;
+                    double currTime = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
+                    double nextTime = _positions[j+1] * _time * _gate;
+                    
+                    double time = TimeEasing[_types[j]].Invoke(prevTime, nextTime, currTime);
+                    
                     if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
                 }
             }
@@ -353,19 +397,6 @@ namespace Apollo.Devices {
             base.Dispose();
         }
 
-        List<Color> GenerateLinear(Color start, Color end, int max) {
-            List<Color> steps = new List<Color>();
-
-            for (int k = 0; k < max; k++) {
-                steps.Add(new Color(
-                    (byte)(start.Red + (end.Red - start.Red) * k / max),
-                    (byte)(start.Green + (end.Green - start.Green) * k / max),
-                    (byte)(start.Blue + (end.Blue - start.Blue) * k / max)
-                ));
-            }
-
-            return steps;
-        }
 
         List<Color> GenerateHold(Color color, int duration) {
 
@@ -397,60 +428,6 @@ namespace Apollo.Devices {
 
             return steps;
         }
-
-        List<Color> GenerateFast(Color start, Color end, int max) {
-            List<Color> steps = new List<Color>();
-
-            for (double k = 0; k < max; k++) {
-                double factor = 1 - Math.Pow(1 - (k / max), 3.0);
-
-
-                steps.Add(new Color(
-                    (byte)(start.Red + (end.Red - start.Red) * factor),
-                    (byte)(start.Green + (end.Green - start.Green) * factor),
-                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
-                ));
-            }
-
-            return steps;
-        }
-
-        List<Color> GenerateSlow(Color start, Color end, int max) {
-            List<Color> steps = new List<Color>();
-
-            for (double k = 0; k < max; k++) {
-                double factor = Math.Pow(k / max, 3.0);
-
-                steps.Add(new Color(
-                    (byte)(start.Red + (end.Red - start.Red) * factor),
-                    (byte)(start.Green + (end.Green - start.Green) * factor),
-                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
-                ));
-            }
-
-            return steps;
-        }
-
-        List<Color> GenerateSharp(Color start, Color end, int max) {
-            List<Color> steps = new List<Color>();
-
-            for (double k = 0; k < max; k++) {
-                double slowFactor = Math.Pow(k / max, 3.0);
-                double fastFactor = 1 - Math.Pow(1 - (k / max), 3.0);
-
-                double factor = fastFactor + (slowFactor - fastFactor) * k / max;
-
-                steps.Add(new Color(
-                    (byte)(start.Red + (end.Red - start.Red) * factor),
-                    (byte)(start.Green + (end.Green - start.Green) * factor),
-                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
-                ));
-            }
-
-            return steps;
-        }
-
     }
-
 }
 
