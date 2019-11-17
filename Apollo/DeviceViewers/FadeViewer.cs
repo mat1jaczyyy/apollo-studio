@@ -201,7 +201,7 @@ namespace Apollo.DeviceViewers {
                 return;
             }
             if (index == 0) {
-                sender.Delete.IsVisible = false;
+                if(index == 0) sender.RemoveDelete();
             }
 
             sender.OpenMenu();

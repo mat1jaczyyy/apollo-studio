@@ -20,7 +20,6 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
 
             Base = this.Get<Thumb>("Thumb");
-            Delete = this.Get<MenuItem>("Delete");
         }
 
         public delegate void MovedEventHandler(FadeThumb sender, double change, double? total);
@@ -34,8 +33,13 @@ namespace Apollo.Components {
         public FadeType Type = FadeType.Linear;
         ContextMenu ThumbContextMenu;
         List<MenuItem> MenuItems;
+        Separator DeleteSeparator;
         public Thumb Base;
-        public MenuItem Delete;
+        
+        public void RemoveDelete(){
+            MenuItems.Last().IsVisible = false;
+            DeleteSeparator.IsVisible = false;
+        }
 
         public IBrush Fill {
             get => (IBrush)this.Resources["Color"];
@@ -47,6 +51,8 @@ namespace Apollo.Components {
 
             ThumbContextMenu = (ContextMenu)this.Resources["ThumbContextMenu"];
             MenuItems = ThumbContextMenu.Items.OfType<MenuItem>().ToList();
+            
+            DeleteSeparator = this.Get<Separator>("DeleteSeparator");
 
             ThumbContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
