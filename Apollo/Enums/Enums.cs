@@ -1,34 +1,27 @@
-namespace Apollo.Enums
-{
-    public enum Palettes
-    {
+namespace Apollo.Enums {
+    public enum Palettes {
         Monochrome, NovationPalette, CustomPalette
     }
 
-    public enum ThemeType
-    {
+    public enum ThemeType {
         Dark, Light
     }
 
-    public enum LaunchpadModels
-    {
+    public enum LaunchpadModels {
         MK2, Pro, X, All
     }
 
-    public enum LaunchpadStyles
-    {
+    public enum LaunchpadStyles {
         Stock, Phantom, Sanded
     }
 
-    public enum ClearType
-    {
+    public enum ClearType {
         Lights,
         Multi,
         Both
     }
 
-    public enum CopyType
-    {
+    public enum CopyType {
         Static,
         Animate,
         Interpolate,
@@ -36,81 +29,69 @@ namespace Apollo.Enums
         RandomLoop
     }
 
-    public enum GridType
-    {
+    public enum GridType {
         Full,
         Square
     }
 
-    public enum FadePlaybackType
-    {
+    public enum FadePlaybackType {
         Mono,
         Loop
     }
 
-    public enum FlipType
-    {
+    public enum FlipType {
         Horizontal,
         Vertical,
         Diagonal1,
         Diagonal2
     }
 
-    public enum MultiType
-    {
+    public enum MultiType {
         Forward,
         Backward,
         Random,
         RandomPlus
     }
 
-    public enum PlaybackType
-    {
+    public enum PlaybackType {
         Mono,
         Poly,
         Loop
     }
 
-    public enum RotateType
-    {
+    public enum RotateType {
         D90,
         D180,
         D270
     }
 
-    public enum PortWarningType
-    {
+    public enum PortWarningType {
         None, Show, Done
     }
 
-    public enum LaunchpadType
-    {
+    public enum LaunchpadType {
         MK2, PRO, CFW, X, MiniMK3, Unknown
     }
 
-    public enum InputType
-    {
+    public enum InputType {
         XY, DrumRack
     }
 
-    public enum RotationType
-    {
+    public enum RotationType {
         D0,
         D90,
         D180,
         D270
     }
 
-    public enum BlendingType
-    {
+    public enum BlendingType {
         Normal,
         Screen,
         Multiply,
         Mask
     }
 
-    public enum FadeTypes
-    {
+    public enum FadeTypes {
         Linear = 0,
         Smooth = 1,
         Fast = 2,

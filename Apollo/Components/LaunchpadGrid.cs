@@ -13,7 +13,7 @@ using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Components {
-    public class LaunchpadGrid: UserControl {
+    public class LaunchpadGrid : UserControl {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -23,7 +23,7 @@ namespace Apollo.Components {
 
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
-        
+
         LayoutTransformControl Root;
         Viewbox View;
         Grid Grid;
@@ -41,8 +41,8 @@ namespace Apollo.Components {
         public delegate void PadModsChangedEventHandler(int index, KeyModifiers mods);
         public event PadModsChangedEventHandler PadModsPressed;
 
-        public static int GridToSignal(int index) => (index == -1)? 100 : ((9 - (index / 10)) * 10 + index % 10);
-        public static int SignalToGrid(int index) => (index == 100)? -1 : ((9 - (index / 10)) * 10 + index % 10);
+        public static int GridToSignal(int index) => (index == -1) ? 100 : ((9 - (index / 10)) * 10 + index % 10);
+        public static int SignalToGrid(int index) => (index == 100) ? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
         bool IsPhantom(int index) {
             if (Preferences.LaunchpadModel == LaunchpadModels.X && index == 9) return false;
@@ -64,7 +64,7 @@ namespace Apollo.Components {
             }
 
             else if (LowQuality) Elements[index].Fill = color;
-            else Elements[index].Stroke = IsPhantom(index)? color : Elements[index].Fill = color;
+            else Elements[index].Stroke = IsPhantom(index) ? color : Elements[index].Fill = color;
         }
 
         public void Clear() {
@@ -81,7 +81,7 @@ namespace Apollo.Components {
             if (LowQuality) return;
 
             for (int i = 0; i < 100; i++) {
-                Elements[i].Fill = IsPhantom(i)? SolidColorBrush.Parse("Transparent") : Elements[i].Stroke;
+                Elements[i].Fill = IsPhantom(i) ? SolidColorBrush.Parse("Transparent") : Elements[i].Stroke;
             }
         }
 
@@ -157,8 +157,8 @@ namespace Apollo.Components {
             }
         }
 
-        double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
-        
+        double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality) ? 0.702 : 1);
+
         bool _lowQuality = false;
         public bool LowQuality {
             get => _lowQuality;
@@ -235,26 +235,26 @@ namespace Apollo.Components {
         ));
 
         public void DrawPath() {
-            this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
-            this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
-            this.Resources["NovationGeometry"] = LowQuality? LowQualityGeometry : NovationGeometry;
-            this.Resources["HiddenGeometry"] = LowQuality? LowQualityGeometry : HiddenGeometry;
+            this.Resources["SquareGeometry"] = LowQuality ? LowQualityGeometry : SquareGeometry;
+            this.Resources["CircleGeometry"] = LowQuality ? LowQualityGeometry : CircleGeometry;
+            this.Resources["NovationGeometry"] = LowQuality ? LowQualityGeometry : NovationGeometry;
+            this.Resources["HiddenGeometry"] = LowQuality ? LowQualityGeometry : HiddenGeometry;
 
-            Elements[44].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
-            Elements[45].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
-            Elements[54].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
-            Elements[55].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
+            Elements[44].Data = LowQuality ? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
+            Elements[45].Data = LowQuality ? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
+            Elements[54].Data = LowQuality ? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
+            Elements[55].Data = LowQuality ? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
         void ApplyScale() {
             bool is10x10 = Preferences.LaunchpadModel == LaunchpadModels.Pro || Preferences.LaunchpadModel == LaunchpadModels.All;
 
-            this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality)? -45.0 : 0.0;
-            this.Resources["CanvasSize"] = (is10x10? 184 : 167) * Scale;
+            this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality) ? -45.0 : 0.0;
+            this.Resources["CanvasSize"] = (is10x10 ? 184 : 167) * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
             this.Resources["NovationSize"] = 11 * EffectiveScale;
             this.Resources["HiddenSize"] = 7 * EffectiveScale;
-            this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
+            this.Resources["PadThickness"] = LowQuality ? 0 : 1 * EffectiveScale;
             this.Resources["PadCut1"] = 3 * EffectiveScale;
             this.Resources["PadCut2"] = 12 * EffectiveScale;
             this.Resources["ModeWidth"] = 4 * EffectiveScale;
@@ -264,9 +264,9 @@ namespace Apollo.Components {
             this.Resources["ModeMargin"] = new Thickness(0, (int)(5 * EffectiveScale), 0, 0);
             this.Resources["CornerRadius"] = new CornerRadius((int)(1 * EffectiveScale));
 
-            int buttons = is10x10? 10 : 9;
+            int buttons = is10x10 ? 10 : 9;
             string gridSize = (17 * EffectiveScale).ToString();
-            
+
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
 
             View.Child = Grid = new Grid() {
@@ -288,13 +288,13 @@ namespace Apollo.Components {
 
             Back.Opacity = Convert.ToInt32(!LowQuality);
             ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = (!LowQuality && is10x10));
-            
+
             DrawPath();
         }
 
         public LaunchpadGrid() {
             InitializeComponent();
-            
+
             View.Child = Grid = new Grid() {
                 RowDefinitions = RowDefinitions.Parse("*,*,*,*,*,*,*,*,*,*"),
                 ColumnDefinitions = ColumnDefinitions.Parse("*,*,*,*,*,*,*,*,*,*")
@@ -394,7 +394,7 @@ namespace Apollo.Components {
 
                 if (_over is Shape overPath && !(_over is Rectangle))
                     _over = overPath.Parent;
-                
+
                 if (_over is Canvas || _over is Rectangle) {
                     IControl over = (IControl)_over;
 
@@ -406,7 +406,8 @@ namespace Apollo.Components {
 
                     mouseOver = over;
 
-                } else if (mouseOver != null) {
+                }
+                else if (mouseOver != null) {
                     MouseLeave(mouseOver);
                     mouseOver = null;
                 }

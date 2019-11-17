@@ -344,3 +344,4 @@ ASALocalRun/
 
 # VS Code
 .vscode/
+omnisharp.json

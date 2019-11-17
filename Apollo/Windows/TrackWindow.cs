@@ -19,7 +19,7 @@ using Apollo.Interfaces;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
-    public class TrackWindow: Window {
+    public class TrackWindow : Window {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -36,20 +36,20 @@ namespace Apollo.Windows {
 
         ScrollViewer Contents;
         Grid Root;
-        
+
         TextBlock TitleText, TitleCenter;
         StackPanel CenteringLeft, CenteringRight;
-        
+
         void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
         void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
+            => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "") ? $" - {Program.Project.FileName}" : "")}";
 
         void UpdateTopmost(bool value) => Topmost = value;
 
         void UpdateContentAlignment(bool value) {
-            Root.ColumnDefinitions = new ColumnDefinitions($"{(value? "*" : "Auto")},Auto,*");
+            Root.ColumnDefinitions = new ColumnDefinitions($"{(value ? "*" : "Auto")},Auto,*");
             Root.InvalidateMeasure();
         }
 
@@ -59,9 +59,9 @@ namespace Apollo.Windows {
 
         public TrackWindow(Track track) {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
+#if DEBUG
+            this.AttachDevTools();
+#endif
 
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -104,7 +104,7 @@ namespace Apollo.Windows {
             _track = null;
 
             ((ChainViewer)Contents.Content).PointerWheelChanged -= Track_Scroll;
-            
+
             Program.Project.PathChanged -= UpdateTitle;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
@@ -115,7 +115,7 @@ namespace Apollo.Windows {
 
             App.WindowClosed(this);
         }
-        
+
         public void Bounds_Updated(Rect bounds) {
             if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
 
@@ -125,7 +125,7 @@ namespace Apollo.Windows {
             TitleCenter.Opacity = 1 - result;
         }
 
-        public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
+        public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled ? "ThemeControlMidBrush" : "ThemeControlLowBrush");
 
         void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
@@ -144,7 +144,7 @@ namespace Apollo.Windows {
             if (e.KeyModifiers == App.ControlKey && e.Key == Key.P) {
                 if (_track.Launchpad.Available && _track.Launchpad.GetType() != typeof(VirtualLaunchpad) || _track.Launchpad.Window != null)
                     LaunchpadWindow.Create(_track.Launchpad, this);
-                
+
                 return;
             }
 
@@ -168,7 +168,8 @@ namespace Apollo.Windows {
                 else if (e.Key == Key.Left && Selection.Start.IParent.GetType() == typeof(Multi))
                     Selection.Select(((Multi)Selection.Start.IParent).Preprocess.Devices.Last());
 
-            } else if (e.Key == Key.Left) {
+            }
+            else if (e.Key == Key.Left) {
                 ISelect left = Selection.Selection.First();
 
                 if (left.IParentIndex.Value == 0) {
@@ -176,12 +177,14 @@ namespace Apollo.Windows {
                         Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.KeyModifiers == KeyModifiers.Shift);
                         return;
 
-                    } else if (InMultiPreprocess()) return;
+                    }
+                    else if (InMultiPreprocess()) return;
                 }
-                
+
                 Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
-            
-            } else if (e.Key == Key.Right) {
+
+            }
+            else if (e.Key == Key.Right) {
                 ISelect right = Selection.Selection.Last();
 
                 if (right.IParentIndex.Value == right.IParent.IChildren.Count - 1) {
@@ -189,15 +192,17 @@ namespace Apollo.Windows {
                         Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.KeyModifiers == KeyModifiers.Shift);
                         e.KeyModifiers = KeyModifiers.None;
 
-                    } else if (InMultiPreprocess()) {
+                    }
+                    else if (InMultiPreprocess()) {
                         Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.KeyModifiers == KeyModifiers.Shift);
                         return;
                     }
                 }
-                
+
                 Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
 
-            } else if (e.Key == Key.Down) {
+            }
+            else if (e.Key == Key.Down) {
                 if (Selection.Start.GetType() == typeof(Choke)) {
                     Chain chain = ((Choke)Selection.Start).Chain;
                     if (chain.Count > 0) Selection.Select(chain[0]);
@@ -210,7 +215,7 @@ namespace Apollo.Windows {
         void Window_KeyDown(object sender, KeyEventArgs e) {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-            
+
             if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
         }
@@ -232,7 +237,7 @@ namespace Apollo.Windows {
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
         void Minimize() => WindowState = WindowState.Minimized;
-        
+
         void Expand(PointerEventArgs e) {
             Point pointerRelative = e.GetPosition(this);
 
@@ -262,16 +267,17 @@ namespace Apollo.Windows {
         public static void Create(Track track, Window owner) {
             if (track.Window == null) {
                 track.Window = new TrackWindow(track);
-                
-                if (owner == null || owner.WindowState == WindowState.Minimized) 
+
+                if (owner == null || owner.WindowState == WindowState.Minimized)
                     track.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     track.Window.Owner = owner;
-                
+
                 track.Window.Show();
                 track.Window.Owner = null;
-                
-            } else {
+
+            }
+            else {
                 track.Window.WindowState = WindowState.Normal;
                 track.Window.Activate();
             }
