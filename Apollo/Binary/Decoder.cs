@@ -48,7 +48,7 @@ namespace Apollo.Binary {
                 return Decode(reader, version, ensure, true);
             }
         }
-
+        
         static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) throw new InvalidDataException();
@@ -89,7 +89,7 @@ namespace Apollo.Binary {
                 if (version >= 7) {
                     Preferences.CaptureLaunchpad = reader.ReadBoolean();
                 }
-
+                
                 Preferences.EnableGestures = reader.ReadBoolean();
 
                 if (version >= 7) {
@@ -115,7 +115,7 @@ namespace Apollo.Binary {
                 } else {
                     Preferences.DiscordPresence = reader.ReadBoolean();
                 }
-
+                
                 Preferences.DiscordFilename = reader.ReadBoolean();
 
                 ColorHistory.Set(
@@ -144,7 +144,7 @@ namespace Apollo.Binary {
 
                 if (version >= 17)
                     Preferences.BaseTime = reader.ReadInt64();
-
+                
                 return null;
 
             } else if (t == typeof(Copyable)) {
@@ -168,7 +168,7 @@ namespace Apollo.Binary {
                 }
 
                 return new Project(bpm, page, tracks, author, time, started);
-
+            
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);
                 Launchpad lp = (Launchpad)Decode(reader, version);
@@ -212,7 +212,7 @@ namespace Apollo.Binary {
                 ret.Enabled = enabled;
 
                 return ret;
-
+            
             } else if (t == typeof(Launchpad)) {
                 string name = reader.ReadString();
                 if (name == "") return MIDI.NoOutput;
@@ -231,7 +231,7 @@ namespace Apollo.Binary {
                         }
                         return lp;
                     }
-
+                
                 Launchpad ret;
                 if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name);
                 else if (name.Contains("Ableton Connector ")) ret = new AbletonLaunchpad(name);
@@ -295,7 +295,7 @@ namespace Apollo.Binary {
                     reader.ReadBoolean(),
                     (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
                 );
-
+            
             } else if (t == typeof(Delay)) {
                 Time time;
                 if (version <= 2) {
@@ -316,7 +316,7 @@ namespace Apollo.Binary {
                 }
 
                 return new Delay(time, gate);
-
+            
             } else if (t == typeof(Fade)) {
                 Time time;
                 if (version <= 2) {
@@ -355,7 +355,7 @@ namespace Apollo.Binary {
                     (FlipType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
-
+            
             else if (t == typeof(Hold)) {
                 Time time;
                 if (version <= 2) {
@@ -381,7 +381,7 @@ namespace Apollo.Binary {
                     reader.ReadBoolean(),
                     reader.ReadBoolean()
                 );
-
+            
             } else if (t == typeof(KeyFilter)) {
                 bool[] filter;
                 if (version <= 18) {
@@ -425,7 +425,7 @@ namespace Apollo.Binary {
                     (GridType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
-
+            
             else if (t == typeof(Multi))
                 return new Multi(
                     Decode(reader, version),
@@ -433,22 +433,22 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
                     (MultiType)reader.ReadInt32()
                 );
-
+            
             else if (t == typeof(Output))
                 return new Output(
                     reader.ReadInt32()
                 );
-
+            
             else if (t == typeof(PageFilter))
                 return new PageFilter(
                     (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
-
+            
             else if (t == typeof(Paint))
                 return new Paint(
                     Decode(reader, version)
                 );
-
+            
             else if (t == typeof(Pattern)) {
                 int repeats = 1;
                 if (version >= 11) {
@@ -508,16 +508,16 @@ namespace Apollo.Binary {
                 }
 
                 return ret;
-
+            
             } else if (t == typeof(Preview))
                 return new Preview();
-
+            
             else if (t == typeof(Rotate))
                 return new Rotate(
                     (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
-
+            
             else if (t == typeof(Switch)) {
                 int page = reader.ReadInt32();
 
@@ -529,7 +529,7 @@ namespace Apollo.Binary {
                     });
 
                 return new Switch(page);
-
+            
             } else if (t == typeof(Tone))
                 return new Tone(
                     reader.ReadDouble(),
@@ -538,14 +538,14 @@ namespace Apollo.Binary {
                     reader.ReadDouble(),
                     reader.ReadDouble()
                 );
-
+            
             else if (t == typeof(Color)) {
                 byte[] colors = reader.ReadBytes(3);
                 if (version <= 23)
                     colors = colors.Select(i => (byte)((double)i * 127.0 / 63)).ToArray();
 
                 return new Color(colors[0], colors[1], colors[2]);
-
+            
             } else if (t == typeof(Frame)) {
                 Time time;
                 if (version <= 2) {
@@ -567,18 +567,18 @@ namespace Apollo.Binary {
                     screen = (from i in Enumerable.Range(0, 101) select (Color)Decode(reader, version)).ToArray();
 
                 return new Frame(time, screen);
-
+            
             } else if (t == typeof(Length))
                 return new Length(
                     reader.ReadInt32()
                 );
-
+            
             else if (t == typeof(Offset))
                 return new Offset(
                     reader.ReadInt32(),
                     reader.ReadInt32()
                 );
-
+            
             else if (t == typeof(Time))
                 return new Time(
                     reader.ReadBoolean(),

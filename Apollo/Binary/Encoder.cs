@@ -69,7 +69,7 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.Autosave);
 
                 writer.Write(Preferences.UndoLimit);
-
+                
                 writer.Write(Preferences.DiscordPresence);
                 writer.Write(Preferences.DiscordFilename);
 
@@ -77,19 +77,19 @@ namespace Apollo.Binary {
                 writer.Write(count = Math.Min(64, ColorHistory.Count));
                 for (int i = 0; i < count; i++)
                     Encode(writer, ColorHistory.GetColor(i));
-
+                
                 writer.Write(MIDI.Devices.Count(i => i.GetType() == typeof(Launchpad)));
                 for (int i = 0; i < MIDI.Devices.Count; i++)
                     if (MIDI.Devices[i].GetType() == typeof(Launchpad))
                         Encode(writer, MIDI.Devices[i]);
-
+                
                 writer.Write(Preferences.Recents.Count);
                 for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
-
+                
                 writer.Write(Preferences.Crashed);
                 writer.Write(Preferences.CrashPath);
-
+                
                 writer.Write(Preferences.CheckForUpdates);
 
                 writer.Write(Preferences.Time);
@@ -100,7 +100,7 @@ namespace Apollo.Binary {
 
         static void Encode(BinaryWriter writer, Copyable o) {
             EncodeID(writer, typeof(Copyable));
-
+            
             writer.Write(o.Contents.Count);
             for (int i = 0; i < o.Contents.Count; i++)
                 if (o.Contents[i] is Device d) Encode(writer, d);
@@ -127,7 +127,7 @@ namespace Apollo.Binary {
 
             Encode(writer, o.Chain);
             Encode(writer, o.Launchpad);
-
+            
             writer.Write(o.Name);
             writer.Write(o.Enabled);
         }
@@ -138,7 +138,7 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o[i]);
-
+            
             writer.Write(o.Name);
             writer.Write(o.Enabled);
         }
@@ -170,7 +170,7 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o[i]);
-
+            
             writer.Write(o.Expanded.HasValue);
             if (o.Expanded.HasValue)
                 writer.Write(o.Expanded.Value);
@@ -188,7 +188,7 @@ namespace Apollo.Binary {
 
             writer.Write((int)o.Mode);
         }
-
+        
         static void Encode(BinaryWriter writer, ColorFilter o) {
             EncodeID(writer, typeof(ColorFilter));
 
@@ -233,10 +233,10 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o.GetColor(i));
-
+            
             for (int i = 0; i < o.Count; i++)
                 writer.Write(o.GetPosition(i));
-
+            
             for (int i = 0; i < o.Count - 1; i++)
                 writer.Write((int)o.GetFadeType(i));
 
@@ -300,7 +300,7 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o[i]);
-
+            
             writer.Write(o.Expanded.HasValue);
             if (o.Expanded.HasValue)
                 writer.Write(o.Expanded.Value);
@@ -339,11 +339,11 @@ namespace Apollo.Binary {
             writer.Write(o.Repeats);
             writer.Write(o.Gate);
             writer.Write(o.Pinch);
-
+            
             writer.Write(o.Frames.Count);
             for (int i = 0; i < o.Frames.Count; i++)
                 Encode(writer, o.Frames[i]);
-
+            
             writer.Write((int)o.Mode);
             writer.Write(o.Infinite);
 

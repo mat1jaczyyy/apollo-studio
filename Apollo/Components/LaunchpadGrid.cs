@@ -158,7 +158,7 @@ namespace Apollo.Components {
         }
 
         double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
-
+        
         bool _lowQuality = false;
         public bool LowQuality {
             get => _lowQuality;
@@ -266,7 +266,7 @@ namespace Apollo.Components {
 
             int buttons = is10x10? 10 : 9;
             string gridSize = (17 * EffectiveScale).ToString();
-
+            
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
 
             View.Child = Grid = new Grid() {
@@ -288,7 +288,7 @@ namespace Apollo.Components {
 
             Back.Opacity = Convert.ToInt32(!LowQuality);
             ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = (!LowQuality && is10x10));
-
+            
             DrawPath();
         }
 
@@ -394,7 +394,7 @@ namespace Apollo.Components {
 
                 if (_over is Shape overPath && !(_over is Rectangle))
                     _over = overPath.Parent;
-
+                
                 if (_over is Canvas || _over is Rectangle) {
                     IControl over = (IControl)_over;
 

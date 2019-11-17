@@ -35,7 +35,7 @@ namespace Apollo.Components {
         List<MenuItem> MenuItems;
         Separator DeleteSeparator;
         public Thumb Base;
-        
+
         public void RemoveDelete(){
             MenuItems.Last().IsVisible = false;
             DeleteSeparator.IsVisible = false;
@@ -48,7 +48,7 @@ namespace Apollo.Components {
 
         public FadeThumb() {
             InitializeComponent();
-
+            
             ThumbContextMenu = (ContextMenu)this.Resources["ThumbContextMenu"];
             MenuItems = ThumbContextMenu.Items.OfType<MenuItem>().ToList();
             
@@ -86,7 +86,7 @@ namespace Apollo.Components {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton != PointerUpdateKind.LeftButtonPressed) e.Handled = true;
-
+            
             ((Window)this.GetVisualRoot()).Focus();
         }
 
@@ -111,7 +111,7 @@ namespace Apollo.Components {
             dragged = true;
             Moved?.Invoke(this, e.Vector.X, null);
         }
-
+        
         public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));
         public void Unselect() => this.Resources["Outline"] = new SolidColorBrush(new Color(0, 255, 255, 255));
 
