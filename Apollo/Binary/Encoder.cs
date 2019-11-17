@@ -12,7 +12,7 @@ using Apollo.Structures;
 namespace Apollo.Binary {
     public static class Encoder {
         static void EncodeHeader(BinaryWriter writer) {
-            writer.Write(new char[] { 'A', 'P', 'O', 'L' });
+            writer.Write(new char[] {'A', 'P', 'O', 'L'});
             writer.Write(Common.version);
         }
 

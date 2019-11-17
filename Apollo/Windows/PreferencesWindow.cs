@@ -23,7 +23,7 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
-    public class PreferencesWindow : Window {
+    public class PreferencesWindow: Window {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -98,16 +98,16 @@ namespace Apollo.Windows {
             positions: new List<double>() {
                 0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1
             },
-            types: new List<FadeTypes>{
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear,
-                FadeTypes.Linear
+            types: new List<FadeType>{
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear,
+                FadeType.Linear
             }
         );
 
@@ -132,10 +132,10 @@ namespace Apollo.Windows {
 
         public PreferencesWindow() {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
-
+            #if DEBUG
+                this.AttachDevTools();
+            #endif
+            
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
@@ -207,7 +207,7 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             this.Content = null;
-
+            
             Preview = null;
             fade.Dispose();
         }
@@ -222,7 +222,7 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
-
+        
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
         void LaunchpadGridRotation_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadGridRotation = LaunchpadGridRotation.SelectedIndex > 0;
@@ -272,7 +272,7 @@ namespace Apollo.Windows {
 
                 using (FileStream file = File.Open(result[0], FileMode.Open, FileAccess.Read))
                     loaded = Palette.Decode(file);
-
+                
                 if (loaded != null) {
                     Preferences.CustomPalette = loaded;
                     CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
@@ -344,19 +344,19 @@ namespace Apollo.Windows {
         void Window_KeyDown(object sender, KeyEventArgs e) {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-
+            
             if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
-
+        
         void Minimize() => WindowState = WindowState.Minimized;
 
         public static void Create(Window owner) {
             if (Preferences.Window == null) {
                 Preferences.Window = new PreferencesWindow();
-
+                
                 if (owner == null || owner.WindowState == WindowState.Minimized)
                     Preferences.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
@@ -365,8 +365,7 @@ namespace Apollo.Windows {
                 Preferences.Window.Show();
                 Preferences.Window.Owner = null;
 
-            }
-            else {
+            } else {
                 Preferences.Window.WindowState = WindowState.Normal;
                 Preferences.Window.Activate();
             }

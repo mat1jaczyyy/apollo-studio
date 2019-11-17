@@ -23,7 +23,7 @@ using Apollo.Interfaces;
 using Apollo.Structures;
 
 namespace Apollo.Windows {
-    public class PatternWindow : Window, ISelectParentViewer {
+    public class PatternWindow: Window, ISelectParentViewer {
         public int? IExpanded {
             get => _pattern.Expanded;
         }
@@ -33,7 +33,7 @@ namespace Apollo.Windows {
 
             TitleText = this.Get<TextBlock>("Title");
             TitleCenter = this.Get<TextBlock>("TitleCenter");
-
+            
             CenteringLeft = this.Get<StackPanel>("CenteringLeft");
             CenteringRight = this.Get<StackPanel>("CenteringRight");
 
@@ -70,7 +70,7 @@ namespace Apollo.Windows {
         Track _track;
 
         public Pattern Device { get => _pattern; }
-
+        
         Launchpad _launchpad;
         Launchpad Launchpad {
             get => _launchpad;
@@ -87,8 +87,7 @@ namespace Apollo.Windows {
                     _launchpad.PatternWindow = this;
                     _launchpad.Clear();
                     PlayExit = _launchpad.Send;
-                }
-                else PlayExit = null;
+                } else PlayExit = null;
 
                 origin = gesturePoint = -1;
 
@@ -149,7 +148,7 @@ namespace Apollo.Windows {
                 if (!_locked) {
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
                     Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
-                    Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop) ? "Infinite" : "1";
+                    Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
                     Repeats.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
@@ -157,7 +156,7 @@ namespace Apollo.Windows {
         }
 
         Action<Signal> PlayExit;
-
+        
         void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
         void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
@@ -177,7 +176,7 @@ namespace Apollo.Windows {
         }
 
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
-
+        
         void SetAlwaysShowing() {
             for (int i = 1; i < Contents.Count; i++)
                 ((FrameDisplay)Contents[i]).FrameAdd.AlwaysShowing = false;
@@ -223,9 +222,9 @@ namespace Apollo.Windows {
 
         public PatternWindow(Pattern pattern) {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
+            #if DEBUG
+                this.AttachDevTools();
+            #endif
 
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -256,19 +255,19 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < _pattern.Count; i++)
                 Contents_Insert(i, _pattern[i], true);
-
+            
             if (_pattern.Count == 1) ((FrameDisplay)Contents[1]).Remove.Opacity = 0;
 
             Selection = new SelectionManager(() => _pattern.Frames.FirstOrDefault());
 
-            Launchpad = Preferences.CaptureLaunchpad ? _track.Launchpad : MIDI.NoOutput;
+            Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
 
-            ColorPicker.SetColor(ColorHistory.GetColor(0) ?? new Color());
+            ColorPicker.SetColor(ColorHistory.GetColor(0)?? new Color());
             ColorHistory.Select(ColorPicker.Color.Clone(), true);
-
+            
             Frame_Select(_pattern.Expanded);
             Selection.Select(_pattern[_pattern.Expanded]);
 
@@ -291,7 +290,7 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, CancelEventArgs e) {
             Locked = false;
-
+            
             foreach (Courier i in PlayTimers) i.Dispose();
             PlayTimers.Clear();
 
@@ -311,7 +310,7 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated -= HandlePorts;
 
             Selection.Dispose();
-
+            
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
             _track = null;
@@ -374,7 +373,7 @@ namespace Apollo.Windows {
             if (Preferences.CopyPreviousFrame)
                 for (int i = 0; i < reference.Screen.Length; i++)
                     frame.Screen[i] = reference.Screen[i].Clone();
-
+            
             Frame r = frame.Clone();
             List<int> path = Track.GetPath(_pattern);
 
@@ -420,14 +419,14 @@ namespace Apollo.Windows {
             _pattern.Expanded = index;
 
             ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Time.FontWeight = FontWeight.Bold;
-
+            
             Duration.UsingSteps = _pattern[_pattern.Expanded].Time.Mode;
             Duration.Length = _pattern[_pattern.Expanded].Time.Length;
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
             Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
             Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
-            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop) ? "Infinite" : "1";
+            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
             if (Draw) {
                 Editor.RenderFrame(_pattern[_pattern.Expanded]);
@@ -438,7 +437,7 @@ namespace Apollo.Windows {
         }
 
         void Frame_Action(string action) => Frame_Action(action, false);
-        void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right ? _pattern.Count : 0) - 1);
+        void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
 
         void FrameContextMenu_Click(object sender, EventArgs e) {
             this.Focus();
@@ -447,7 +446,7 @@ namespace Apollo.Windows {
             if (item.GetType() == typeof(MenuItem))
                 Frame_Action((string)((MenuItem)item).Header, true);
         }
-
+        
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
@@ -467,7 +466,7 @@ namespace Apollo.Windows {
             }
 
             if (Locked) return;
-
+            
             if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
             else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
 
@@ -485,8 +484,7 @@ namespace Apollo.Windows {
                     if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
                     else Frame_Insert(0);
 
-                }
-                else if (e.Key == Key.Down || e.Key == Key.Right) {
+                } else if (e.Key == Key.Down || e.Key == Key.Right) {
                     if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
                     else Frame_Insert(_pattern.Count);
                 }
@@ -496,7 +494,7 @@ namespace Apollo.Windows {
         void Window_KeyDown(object sender, KeyEventArgs e) {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-
+            
             if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
                 this.Focus();
         }
@@ -515,14 +513,15 @@ namespace Apollo.Windows {
 
         Color drawingState;
         Color[] oldScreen;
+        
         void PadStarted(int index) {
             drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
                 ? new Color(0)
                 : ColorPicker.Color;
-
+            
             oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
         }
-
+    
         void PadPressed(int index, KeyModifiers mods = KeyModifiers.None) {
             if (Locked) return;
 
@@ -582,35 +581,31 @@ namespace Apollo.Windows {
                 if (_pattern.Expanded == 0) Frame_Insert(0);
                 else Frame_Select(_pattern.Expanded - 1);
 
-            }
-            else if (x == 1 && y == 0) { // Right
+            } else if (x == 1 && y == 0) { // Right
                 if (_pattern.Expanded == _pattern.Count - 1) Frame_Insert(_pattern.Count);
                 else Frame_Select(_pattern.Expanded + 1);
 
-            }
-            else if (x == 0 && y == 1) { // Up
+            } else if (x == 0 && y == 1) { // Up
                 if (Locked) return;
                 origin = -1;
                 historyShowing = Locked = true;
                 RenderHistory();
-
-            }
-            else if (x == 0 && y == -1) { // Down
+                
+            } else if (x == 0 && y == -1) { // Down
                 if (Locked) return;
                 PadStarted(-1);
                 PadPressed(-1);
                 PadFinished(-1);
-
-            }
-            else if (x == -1 && y == 1) // Up-Left
+                
+            } else if (x == -1 && y == 1) // Up-Left
                 PatternPlay(Play, null);
-
+                
             else if (x == 1 && y == -1) // Down-Right
                 PatternFire(Fire, null);
-
+                
             else if (x == 1 && y == 1) // Up-Right
                 Frame_Insert(_pattern.Expanded + 1);
-
+                
             else if (x == -1 && y == -1) // Down-Left
                 Frame_Remove(_pattern.Expanded);
         }
@@ -635,7 +630,7 @@ namespace Apollo.Windows {
                     int y = n.Index / 10;
 
                     if (x < 1 || 8 < x || y < 1 || 8 < y) return;
-
+                    
                     int i = 64 - y * 8 + x - 1;
 
                     if (i < ColorHistory.Count) Dispatcher.UIThread.InvokeAsync(() => {
@@ -645,17 +640,14 @@ namespace Apollo.Windows {
                         Frame_Select(_pattern.Expanded);
                     });
 
-                }
-                else if (origin == -1) {
+                } else if (origin == -1) {
                     origin = n.Index;
                     gestureUsed = false;
 
-                }
-                else if (gesturePoint == -1)
+                } else if (gesturePoint == -1)
                     gesturePoint = n.Index;
 
-            }
-            else {
+            } else {
                 if (historyShowing) return;
 
                 if (n.Index == origin) {
@@ -669,8 +661,7 @@ namespace Apollo.Windows {
                     origin = gesturePoint;
                     gesturePoint = -1;
 
-                }
-                else if (n.Index == gesturePoint) {
+                } else if (n.Index == gesturePoint) {
                     int x = gesturePoint % 10 - origin % 10;
                     int y = gesturePoint / 10 - origin / 10;
 
@@ -690,7 +681,7 @@ namespace Apollo.Windows {
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Infinite Changed to {(r ? "Enabled" : "Disabled")}", () => {
+                Program.Project.Undo.Add($"Pattern Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
                     ((Pattern)Track.TraversePath(path)).Infinite = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Infinite = r;
@@ -730,18 +721,18 @@ namespace Apollo.Windows {
 
                 Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {r}{Duration.Unit}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
-
+                    
                 }, () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++) {
                         pattern[left + i].Time.Free = r;
                         pattern[left + i].Time.Mode = false;
                     }
-
+                
                 }, () => {
                     foreach (Time time in u) time.Dispose();
                     u = null;
@@ -773,18 +764,18 @@ namespace Apollo.Windows {
 
                 Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {Length.Steps[r]}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
-
+                    
                 }, () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++) {
                         pattern[left + i].Time.Length.Step = r;
                         pattern[left + i].Time.Mode = true;
                     }
-
+                
                 }, () => {
                     foreach (Time time in u) time.Dispose();
                     u = null;
@@ -814,18 +805,18 @@ namespace Apollo.Windows {
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Switched to {(r ? "Steps" : "Free")}", () => {
+                Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Switched to {(r? "Steps" : "Free")}", () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
-
+                    
                 }, () => {
                     Pattern pattern = (Pattern)Track.TraversePath(path);
-
+                    
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time.Mode = r;
-
+                
                 }, () => {
                     foreach (Time time in u) time.Dispose();
                     u = null;
@@ -908,7 +899,7 @@ namespace Apollo.Windows {
             }
 
             Program.Project.Undo.Add($"Pattern Frames Inverted", ur, ur);
-
+            
             for (int i = left; i <= right; i++)
                 _pattern[i].Invert();
         }
@@ -935,7 +926,7 @@ namespace Apollo.Windows {
             PlaybackMode.SelectedIndex = (int)mode;
 
             Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
-            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop) ? "Infinite" : "1";
+            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
         }
 
         void Gate_Changed(double value, double? old) {
@@ -1005,7 +996,7 @@ namespace Apollo.Windows {
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);
 
-            _pattern.RootKey = (signalIndex == _pattern.RootKey) ? null : (int?)signalIndex;
+            _pattern.RootKey = (signalIndex == _pattern.RootKey)? null : (int?)signalIndex;
         }
 
         void RootKeyFinished(int _) {
@@ -1016,7 +1007,7 @@ namespace Apollo.Windows {
             if (oldRootKey != _pattern.RootKey) {
                 int? u = oldRootKey;
                 int? r = _pattern.RootKey;
-
+                
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Root Key Changed", () => {
@@ -1046,7 +1037,7 @@ namespace Apollo.Windows {
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Wrap Changed to {(r ? "Enabled" : "Disabled")}", () => {
+                Program.Project.Undo.Add($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
                     ((Pattern)Track.TraversePath(path)).Wrap = u;
                 }, () => {
                     ((Pattern)Track.TraversePath(path)).Wrap = r;
@@ -1088,8 +1079,7 @@ namespace Apollo.Windows {
                         if (_pattern[PlayIndex].Screen[i] != _pattern[PlayIndex - 1].Screen[i])
                             PlayColor(i, _pattern[PlayIndex].Screen[i]);
 
-                }
-                else {
+                } else {
                     for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
                         if (_pattern.Frames.Last().Screen[i].Lit)
                             PlayColor(i, new Color(0));
@@ -1112,7 +1102,7 @@ namespace Apollo.Windows {
             lock (PlayLocker) {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
-
+                
                 if (send && PlayIndex < _pattern.Count)
                     for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
                         if (_pattern[PlayIndex].Screen[i].Lit)
@@ -1140,7 +1130,7 @@ namespace Apollo.Windows {
                 button.IsEnabled = true;
                 button.Content = "Stop";
             });
-
+            
             PatternStop(false);
             _pattern.MIDIEnter(new StopSignal());
 
@@ -1213,7 +1203,7 @@ namespace Apollo.Windows {
                     "the file you're attempting to read is invalid.",
                     null, this
                 );
-
+                
                 return;
             }
 
@@ -1281,7 +1271,7 @@ namespace Apollo.Windows {
 
         public void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (!e.Data.Contains("frame")) e.DragEffects = DragDropEffects.None;
+            if (!e.Data.Contains("frame")) e.DragEffects = DragDropEffects.None; 
         }
 
         public void Drop(object sender, DragEventArgs e) {
@@ -1292,7 +1282,7 @@ namespace Apollo.Windows {
             IControl source = (IControl)e.Source;
             while (source.Name != "DropZoneAfter" && source.Name != "FrameAdd") {
                 source = source.Parent;
-
+                
                 if (source == this) {
                     e.Handled = false;
                     return;
@@ -1304,7 +1294,7 @@ namespace Apollo.Windows {
             Pattern source_parent = moving[0].Parent;
 
             int before = moving[0].IParentIndex.Value - 1;
-            int after = (source.Name == "DropZoneAfter") ? _pattern.Count - 1 : -1;
+            int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
             bool copy = e.Modifiers.HasFlag(App.ControlInput);
 
@@ -1317,11 +1307,11 @@ namespace Apollo.Windows {
 
                 if (source_parent == _pattern && after < before)
                     before_pos += count;
-
+                
                 List<int> sourcepath = Track.GetPath(source_parent);
                 List<int> targetpath = Track.GetPath(_pattern);
-
-                Program.Project.Undo.Add($"Pattern Frame {(copy ? "Copied" : "Moved")}", copy
+                
+                Program.Project.Undo.Add($"Pattern Frame {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
                         Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
 
@@ -1336,17 +1326,16 @@ namespace Apollo.Windows {
 
                         Frame.Move(umoving, sourcepattern, before_pos);
 
-                    }), () => {
-                        Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                }), () => {
+                    Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
+                    Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
 
-                        List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
+                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
 
-                        Frame.Move(rmoving, targetpattern, after, copy);
-                    });
-
-            }
-            else e.DragEffects = DragDropEffects.None;
+                    Frame.Move(rmoving, targetpattern, after, copy);
+                });
+            
+            } else e.DragEffects = DragDropEffects.None;
         }
 
         bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
@@ -1355,11 +1344,10 @@ namespace Apollo.Windows {
             List<Frame> pasted;
             try {
                 pasted = paste.Contents.Cast<Frame>().ToList();
-            }
-            catch (InvalidCastException) {
+            } catch (InvalidCastException) {
                 return false;
             }
-
+            
             List<int> path = Track.GetPath(_pattern);
 
             undo = () => {
@@ -1376,7 +1364,7 @@ namespace Apollo.Windows {
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
             };
-
+            
             redo = () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
@@ -1392,7 +1380,7 @@ namespace Apollo.Windows {
                     pattern.Window.Selection.Select(pattern[right + 1], true);
                 }
             };
-
+            
             dispose = () => {
                 foreach (Frame frame in pasted) frame.Dispose();
                 pasted = null;
@@ -1407,7 +1395,7 @@ namespace Apollo.Windows {
 
             Frame_Select(_pattern.Expanded);
             Selection.Select(_pattern[right + 1], true);
-
+            
             return true;
         }
 
@@ -1434,7 +1422,7 @@ namespace Apollo.Windows {
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
             };
-
+            
             redo = () => {
                 Pattern pattern = ((Pattern)Track.TraversePath(path));
 
@@ -1449,7 +1437,7 @@ namespace Apollo.Windows {
                     pattern.Window.Frame_Select(pattern.Expanded);
                 }
             };
-
+            
             dispose = () => {
                 foreach (Frame frame in u) frame.Dispose();
                 u = null;
@@ -1471,10 +1459,10 @@ namespace Apollo.Windows {
             if (Locked) return;
 
             Copyable copy = new Copyable();
-
+            
             for (int i = left; i <= right; i++)
                 copy.Contents.Add(_pattern[i]);
-
+            
             copy.StoreToClipboard();
 
             if (cut) Delete(left, right);
@@ -1511,11 +1499,10 @@ namespace Apollo.Windows {
                             paste = null;
                         })
                     );
-
+                    
                     Track.Get(_pattern).Window?.Selection.Select(_pattern[left + paste.Contents.Count - 1], true);
-
-                }
-                else {
+                
+                } else {
                     undo.Invoke();
                     dispose.Invoke();
                 }
@@ -1575,12 +1562,12 @@ namespace Apollo.Windows {
                 Program.Project.Undo.Add($"Pattern Frame Removed", undo, redo, dispose);
         }
 
-        public void Group(int left, int right) { }
-        public void Ungroup(int index) { }
-        public void Mute(int left, int right) { }
-        public void Rename(int left, int right) { }
-        public void Export(int left, int right) { }
-        public void Import(int right, string path = null) { }
+        public void Group(int left, int right) {}
+        public void Ungroup(int index) {}
+        public void Mute(int left, int right) {}
+        public void Rename(int left, int right) {}
+        public void Export(int left, int right) {}
+        public void Import(int right, string path = null) {}
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
@@ -1592,11 +1579,11 @@ namespace Apollo.Windows {
             Topmost = Preferences.AlwaysOnTop;
             Activate();
         }
-
+        
         void Minimize() => WindowState = WindowState.Minimized;
 
         void Maximize(PointerEventArgs e) {
-            WindowState = (WindowState == WindowState.Maximized) ? WindowState.Normal : WindowState.Maximized;
+            WindowState = (WindowState == WindowState.Maximized)? WindowState.Normal : WindowState.Maximized;
 
             Topmost = false;
             Topmost = Preferences.AlwaysOnTop;
@@ -1615,17 +1602,16 @@ namespace Apollo.Windows {
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {
                 pattern.Window = new PatternWindow(pattern);
-
-                if (owner == null || owner.WindowState == WindowState.Minimized)
+                
+                if (owner == null || owner.WindowState == WindowState.Minimized) 
                     pattern.Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 else
                     pattern.Window.Owner = owner;
 
                 pattern.Window.Show();
                 pattern.Window.Owner = null;
-
-            }
-            else {
+                
+            } else {
                 pattern.Window.WindowState = WindowState.Normal;
                 pattern.Window.Activate();
             }

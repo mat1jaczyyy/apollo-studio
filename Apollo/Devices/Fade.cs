@@ -10,7 +10,7 @@ using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Fade : Device {
+    public class Fade: Device {
         class FadeInfo {
             public Color Color;
             public double Time;
@@ -23,8 +23,7 @@ namespace Apollo.Devices {
 
         List<Color> _colors = new List<Color>();
         List<double> _positions = new List<double>();
-
-        List<FadeTypes> _types = new List<FadeTypes>();
+        List<FadeType> _types = new List<FadeType>();
         List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
@@ -42,19 +41,19 @@ namespace Apollo.Devices {
             if (_positions[index] != position) {
                 _positions[index] = position;
                 Generate();
-
+                
                 if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetPosition(index, _positions[index]);
             }
         }
-
-        public FadeTypes GetFadeType(int index) => _types[index];
-        public void SetFadeType(int index, FadeTypes type) {
+        
+        public FadeType GetFadeType(int index) => _types[index];
+        public void SetFadeType(int index, FadeType type) {
             if (_types[index] != type) {
                 _types[index] = type;
                 Generate();
             }
         }
-
+        
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
@@ -104,7 +103,7 @@ namespace Apollo.Devices {
                 if (0.01 <= value && value <= 4) {
                     _gate = value;
                     Generate();
-
+                    
                     if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).SetGate(Gate);
                 }
             }
@@ -133,7 +132,7 @@ namespace Apollo.Devices {
             List<int> _counts = new List<int>();
             List<int> _cutoffs = new List<int>() { 0 };
 
-
+            
             for (int i = 0; i < _colors.Count - 1; i++) {
                 int max = new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
@@ -143,22 +142,22 @@ namespace Apollo.Devices {
                 }.Max();
 
                 switch (_types[i]) {
-                    case FadeTypes.Linear:
+                    case FadeType.Linear:
                         _steps.AddRange(GenerateLinear(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypes.Smooth:
+                    case FadeType.Smooth:
                         _steps.AddRange(GenerateSmooth(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypes.Sharp:
+                    case FadeType.Sharp:
                         _steps.AddRange(GenerateSharp(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypes.Slow:
+                    case FadeType.Slow:
                         _steps.AddRange(GenerateSlow(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypes.Fast:
+                    case FadeType.Fast:
                         _steps.AddRange(GenerateFast(_colors[i], _colors[i + 1], max));
                         break;
-                    case FadeTypes.Hold:
+                    case FadeType.Hold:
                         _steps.AddRange(GenerateHold(_colors[i], max));
                         break;
                 }
@@ -187,7 +186,7 @@ namespace Apollo.Devices {
             }
 
             fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
-
+            
             Generated?.Invoke();
         }
 
@@ -200,7 +199,7 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public void Insert(int index, Color color, double position, FadeTypes type) {
+        public void Insert(int index, Color color, double position, FadeType type) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
             _types.Insert(index, type);
@@ -226,14 +225,14 @@ namespace Apollo.Devices {
 
         public int? Expanded;
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeTypes> types = null, int? expanded = null) : base("fade") {
-            Time = time ?? new Time();
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeType> types = null, int? expanded = null) : base("fade") {
+            Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
 
-            _colors = colors ?? new List<Color>() { new Color(), new Color(0) };
-            _positions = positions ?? new List<double>() { 0, 1 };
-            _types = types ?? new List<FadeTypes>() { FadeTypes.Linear };
+            _colors = colors?? new List<Color>() {new Color(), new Color(0)};
+            _positions = positions?? new List<double>() {0, 1};
+            _types = types ?? new List<FadeType>() {FadeType.Linear};
             Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;
@@ -275,11 +274,11 @@ namespace Apollo.Devices {
 
                     if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
                         Stop(n);
-
+                        
                         for (int i = 1; i < fade.Count; i++)
                             FireCourier(n, fade[i].Time);
                     }
-
+                    
                     if (buffer[n] < fade.Count) {
                         Signal m = n.Clone();
                         m.Color = fade[buffer[n]].Color.Clone();
@@ -296,7 +295,7 @@ namespace Apollo.Devices {
                 if (timers.ContainsKey(n))
                     for (int i = 0; i < timers[n].Count; i++)
                         timers[n][i].Dispose();
-
+                
                 if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
                     Signal m = n.Clone();
                     m.Color = fade.Last().Color.Clone();
@@ -322,7 +321,7 @@ namespace Apollo.Devices {
                         Signal m = n.Clone();
                         m.Color = fade[0].Color.Clone();
                         InvokeExit(m);
-
+                        
                         for (int i = 1; i < fade.Count; i++)
                             FireCourier(n, fade[i].Time);
                     }

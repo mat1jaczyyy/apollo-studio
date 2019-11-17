@@ -12,7 +12,7 @@ using System;
 using Apollo.Enums;
 
 namespace Apollo.Components {
-    public class FadeThumb : UserControl {
+    public class FadeThumb: UserControl {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -28,7 +28,7 @@ namespace Apollo.Components {
         public event FadeThumbEventHandler Deleted;
         public event FadeThumbEventHandler MenuOpened;
         public event FadeThumbEventHandler FadeTypeChanged;
-        public FadeTypes FadeType = FadeTypes.Linear;
+        public FadeType Type = FadeType.Linear;
         ContextMenu ThumbContextMenu;
         public Thumb Base;
         public MenuItem Delete;
@@ -88,7 +88,7 @@ namespace Apollo.Components {
                     if (item.GetType() != typeof(MenuItem)) break;
                     MenuItem menuItem = (MenuItem)item;
                     menuItem.Icon = "";
-                    if (menuItem.Header.ToString() == FadeType.ToString()) {
+                    if (menuItem.Header.ToString() == Type.ToString()) {
                         selectedItem = menuItem;
                     }
                 }
@@ -125,7 +125,7 @@ namespace Apollo.Components {
                     Deleted?.Invoke(this);
                 }
                 else {
-                    Enum.TryParse(header, out FadeType);
+                    Enum.TryParse(header, out Type);
                     FadeTypeChanged?.Invoke(this);
                 }
             }

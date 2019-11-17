@@ -28,7 +28,7 @@ namespace Apollo.Enums {
         RandomSingle,
         RandomLoop
     }
-
+        
     public enum GridType {
         Full,
         Square
@@ -45,7 +45,7 @@ namespace Apollo.Enums {
         Diagonal1,
         Diagonal2
     }
-
+        
     public enum MultiType {
         Forward,
         Backward,
@@ -83,21 +83,20 @@ namespace Apollo.Enums {
         D180,
         D270
     }
-
+    
     public enum BlendingType {
         Normal,
         Screen,
         Multiply,
         Mask
     }
-
-    public enum FadeTypes {
+    
+    public enum FadeType {
         Linear = 0,
         Smooth = 1,
         Fast = 2,
         Slow = 3,
         Sharp = 4,
-        Hold = 5,
-
-    };
+        Hold = 5
+    }
 }
