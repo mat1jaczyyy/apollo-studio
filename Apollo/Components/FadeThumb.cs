@@ -8,8 +8,11 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 using System;
+using System.Linq;
+
 
 using Apollo.Enums;
+using System.Collections.Generic;
 
 namespace Apollo.Components {
     public class FadeThumb: UserControl {
@@ -30,6 +33,7 @@ namespace Apollo.Components {
         public event FadeThumbEventHandler FadeTypeChanged;
         public FadeType Type = FadeType.Linear;
         ContextMenu ThumbContextMenu;
+        List<MenuItem> MenuItems;
         public Thumb Base;
         public MenuItem Delete;
 
@@ -42,6 +46,7 @@ namespace Apollo.Components {
             InitializeComponent();
 
             ThumbContextMenu = (ContextMenu)this.Resources["ThumbContextMenu"];
+            MenuItems = ThumbContextMenu.Items.OfType<MenuItem>().ToList();
 
             ThumbContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
@@ -83,16 +88,9 @@ namespace Apollo.Components {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased) {
-                MenuItem selectedItem = null;
-                foreach (Control item in ThumbContextMenu.Items) {
-                    if (item.GetType() != typeof(MenuItem)) break;
-                    MenuItem menuItem = (MenuItem)item;
-                    menuItem.Icon = "";
-                    if (menuItem.Header.ToString() == Type.ToString()) {
-                        selectedItem = menuItem;
-                    }
-                }
-                selectedItem.Icon = this.Resources["SelectedIcon"];
+                MenuItems.ForEach(i => i.Icon = "");
+                MenuItems[(int)Type].Icon = this.Resources["SelectedIcon"];
+                System.Console.WriteLine((int)Type);
                 MenuOpened?.Invoke(this);
                 e.Handled = true;
             }
@@ -117,9 +115,9 @@ namespace Apollo.Components {
         public void ContextMenu_Click(object sender, EventArgs e) {
             IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem)) {
-                MenuItem selectedItem = (MenuItem)item;
+            if (item is MenuItem selectedItem ) {
                 string header = selectedItem.Header.ToString();
+                Console.WriteLine(header);
 
                 if (header == "Delete") {
                     Deleted?.Invoke(this);

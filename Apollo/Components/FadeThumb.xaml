@@ -8,7 +8,7 @@
     <SolidColorBrush x:Key="Outline">#00FFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="Color">#FFFFFFFF</SolidColorBrush>
 
-    <Ellipse x:Key="SelectedIcon" Margin="7 0 0 0" Fill="{DynamicResource AccentColor}" Height="10" Width="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Ellipse x:Key="SelectedIcon" Margin="7 0 0 0" Fill="{DynamicResource ThemeAccentBrush}" Height="10" Width="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
     <ContextMenu x:Key="ThumbContextMenu" Cursor="Arrow">
       <MenuItem Header="Linear"/>

@@ -92,11 +92,11 @@ namespace Apollo.Enums {
     }
     
     public enum FadeType {
-        Linear = 0,
-        Smooth = 1,
-        Fast = 2,
-        Slow = 3,
-        Sharp = 4,
-        Hold = 5
+        Linear,
+        Smooth,
+        Sharp,
+        Fast,
+        Slow,
+        Hold
     }
 }
