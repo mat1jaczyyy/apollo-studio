@@ -96,7 +96,6 @@ namespace Apollo.Components {
             if (MouseButton == PointerUpdateKind.RightButtonReleased) {
                 MenuItems.ForEach(i => i.Icon = "");
                 MenuItems[(int)Type].Icon = this.Resources["SelectedIcon"];
-                System.Console.WriteLine((int)Type);
                 MenuOpened?.Invoke(this);
                 e.Handled = true;
             }
@@ -123,7 +122,6 @@ namespace Apollo.Components {
 
             if (item is MenuItem selectedItem ) {
                 string header = selectedItem.Header.ToString();
-                Console.WriteLine(header);
 
                 if (header == "Delete") {
                     Deleted?.Invoke(this);

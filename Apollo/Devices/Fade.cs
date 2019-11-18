@@ -11,9 +11,11 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Fade: Device {
-        class FadeInfo {
+        public class FadeInfo {
             public Color Color;
             public double Time;
+            
+            public FadeType Type;
 
             public FadeInfo(Color color, double time) {
                 Color = color;
@@ -24,7 +26,7 @@ namespace Apollo.Devices {
         List<Color> _colors = new List<Color>();
         List<double> _positions = new List<double>();
         List<FadeType> _types = new List<FadeType>();
-        List<FadeInfo> fade;
+        public List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
         public void SetColor(int index, Color color) {
@@ -65,7 +67,7 @@ namespace Apollo.Devices {
                 double duration = end - start;
                 double proportion = relativeVal/duration;
                 
-                double factor = Math.Pow(proportion, 3);
+                double factor = Math.Pow(proportion, 2);
                 
                 return start + duration*factor;
             }},
@@ -74,7 +76,7 @@ namespace Apollo.Devices {
                 double duration = end - start;
                 double proportion = relativeVal/duration;
 
-                double factor = Math.Cbrt(proportion);
+                double factor = 1 - Math.Pow(1 - proportion, 2);
                 
                 return start + duration*factor;
             }},
@@ -83,7 +85,13 @@ namespace Apollo.Devices {
                 double duration = end - start;
                 double proportion = relativeVal/duration;
                 
-                double factor = Math.Pow(2*proportion-1, 3)/2 + 0.5;
+                double factor;
+                if(proportion < 0.5){
+                    factor = Math.Pow(proportion - 0.5,2)*-2 + 0.5;
+                    
+                } else {
+                    factor = Math.Pow(proportion - 0.5,2)*2 + 0.5;
+                }
                 
                 return start + duration*factor;
             }},
@@ -94,9 +102,9 @@ namespace Apollo.Devices {
 
                 double factor;
                 if(proportion < 0.5){
-                    factor = Math.Pow(2*proportion,3)/2;
+                    factor = Math.Pow(proportion,2)*2;
                 } else {
-                    factor = Math.Pow(2*(proportion - 1),3)/2 + 1;
+                    factor = Math.Pow(proportion - 1,2)*-2 + 1;
                 }
                 
                 
@@ -177,9 +185,8 @@ namespace Apollo.Devices {
 
             List<Color> _steps = new List<Color>();
             List<int> _counts = new List<int>();
-            List<int> _cutoffs = new List<int>() { 0 };
+            List<int> _cutoffs = new List<int>(){0};
 
-            
             for (int i = 0; i < _colors.Count - 1; i++) {
                 int max = new int[] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
@@ -190,19 +197,20 @@ namespace Apollo.Devices {
 
                 if(_types[i] == FadeType.Hold) {
                     _steps.Add(_colors[i]);
+                    _counts.Add(1);
+                    _cutoffs.Add(1 + _cutoffs.Last());
                 } else{
                     for (double k = 0; k < max; k++) {
                         double factor = k/max;
                         _steps.Add(new Color(
-                            (byte)(_colors[i].Red + (_colors[i+1].Red - _colors[i].Red) * factor),
-                            (byte)(_colors[i].Green + (_colors[i+1].Green - _colors[i].Green) * factor),
-                            (byte)(_colors[i].Blue + (_colors[i+1].Blue - _colors[i].Blue) * factor)
+                            (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * factor),
+                            (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * factor),
+                            (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * factor)
                         ));
                     }
+                    _counts.Add(max);
+                    _cutoffs.Add(max + _cutoffs.Last());
                 }
-
-                _counts.Add(max);
-                _cutoffs.Add(max + _cutoffs.Last());
             }
 
             _steps.Add(_colors.Last());
@@ -212,15 +220,17 @@ namespace Apollo.Devices {
                 _cutoffs[_cutoffs.Count - 1]++;
             }
 
-            fade = new List<FadeInfo>() { new FadeInfo(_steps[0], 0) };
+            fade = new List<FadeInfo>() { new FadeInfo(_steps[0], 0){Type = _types[0]} };
 
             int j = 0;
             for (int i = 1; i < _steps.Count; i++) {
-                if (_cutoffs[j + 1] == i) j++;
-
+                if(_types[j] == FadeType.Hold) fade.Add(new FadeInfo(_steps[i - 1], GetPosition(j+1)*_time*_gate-0.001));
+                
+                if(_cutoffs[ j + 1] == i)j++;
+                
                 if (j < _colors.Count - 1) {
-                    double prevTime = j != 0 ? _positions[j-1] * _time * _gate : 0;
-                    double currTime = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
+                    double prevTime = j != 0 ? _positions[j] * _time * _gate : 0;
+                    double currTime = (_positions[j] + (_positions[j + 1] - _positions[j]) *(i - _cutoffs[j]) / _counts[j]) * _time * _gate;
                     double nextTime = _positions[j+1] * _time * _gate;
                     
                     double time = TimeEasing[_types[j]].Invoke(prevTime, nextTime, currTime);
@@ -229,7 +239,7 @@ namespace Apollo.Devices {
                 }
             }
 
-            fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
+            fade.Add(new FadeInfo(_steps.Last(), _time * _gate){Type = FadeType.Linear});
             
             Generated?.Invoke();
         }
@@ -261,6 +271,7 @@ namespace Apollo.Devices {
         public void Remove(int index) {
             _colors.RemoveAt(index);
             _positions.RemoveAt(index);
+            _types.RemoveAt(index);
 
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).Contents_Remove(index);
 
