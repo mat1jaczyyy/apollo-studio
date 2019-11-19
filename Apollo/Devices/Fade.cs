@@ -14,12 +14,12 @@ namespace Apollo.Devices {
         public class FadeInfo {
             public Color Color;
             public double Time;
-            
-            public FadeType Type;
+            public bool IsHold;
 
-            public FadeInfo(Color color, double time) {
+            public FadeInfo(Color color, double time, bool isHold = false) {
                 Color = color;
                 Time = time;
+                IsHold = isHold;
             }
         }
 
@@ -189,9 +189,7 @@ namespace Apollo.Devices {
             }
 
             fade = new List<FadeInfo>() {
-                new FadeInfo(_steps[0], 0) {
-                    Type = _types[0]
-                }
+                new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
             };
 
             int j = 0;
@@ -205,11 +203,13 @@ namespace Apollo.Devices {
                     
                     double time = EaseTime(_types[j], prevTime, nextTime, currTime);
                     
-                    if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
+                    if (fade.Last().Time + smoothness < time) fade.Add(
+                        new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold)
+                    );
                 }
             }
 
-            fade.Add(new FadeInfo(_steps.Last(), _time * _gate){Type = FadeType.Linear});
+            fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
             
             Generated?.Invoke(fade);
         }

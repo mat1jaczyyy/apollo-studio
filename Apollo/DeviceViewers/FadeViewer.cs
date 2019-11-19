@@ -284,8 +284,12 @@ namespace Apollo.DeviceViewers {
 
                 if (_fade == null) return;
 
-                foreach (Fade.FadeInfo info in points)
-                    Gradient.GradientStops.Add(new GradientStop(info.Color.ToAvaloniaColor(), info.Time / _fade.Time.Length));
+                for (int i = 0; i < points.Count; i++) {
+                    if (i > 0 && points[i - 1].IsHold)
+                        Gradient.GradientStops.Add(new GradientStop(points[i - 1].Color.ToAvaloniaColor(), (points[i].Time - .0001) / _fade.Time.Length));
+
+                    Gradient.GradientStops.Add(new GradientStop(points[i].Color.ToAvaloniaColor(), points[i].Time / _fade.Time.Length));
+                }
             });
         }
 
