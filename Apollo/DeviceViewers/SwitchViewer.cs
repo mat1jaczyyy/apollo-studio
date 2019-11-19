@@ -17,12 +17,15 @@ namespace Apollo.DeviceViewers {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
-            Macro = this.Get<Dial>("Macro");
+            Target = this.Get<Dial>("Target");
+            Value = this.Get<Dial>("Value");
         }
         
         Switch _switch;
         
-        Dial Macro;
+        Dial Target;
+        Dial Value;
+
 
         public SwitchViewer() => new InvalidOperationException();
 
@@ -31,27 +34,47 @@ namespace Apollo.DeviceViewers {
 
             _switch = macroswitch;
 
-            Macro.RawValue = _switch.Macro;
+            Target.RawValue = _switch.Target;
+            Value.RawValue = _switch.Value;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
-        void Macro_Changed(double value, double? old) {
+        void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
                 List<int> path = Track.GetPath(_switch);
 
-                Program.Project.Undo.Add($"Switch Macro Changed to {r}{Macro.Unit}", () => {
-                    ((Switch)Track.TraversePath(path)).Macro = u;
+                Program.Project.Undo.Add($"Switch Target Changed to {r}{Target.Unit}", () => {
+                    ((Switch)Track.TraversePath(path)).Target = u;
                 }, () => {
-                    ((Switch)Track.TraversePath(path)).Macro = r;
+                    ((Switch)Track.TraversePath(path)).Target = r;
                 });
             }
 
-            _switch.Macro = (int)value;
+            _switch.Target = (int)value;
         }
+        
+        void Value_Changed(Dial sender, double value, double? old){
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_switch);
 
-        public void SetMacro(int value) => Macro.RawValue = value;
+                Program.Project.Undo.Add($"Switch Value Changed to {r}{Target.Unit}", () => {
+                    ((Switch)Track.TraversePath(path)).Value = u;
+                }, () => {
+                    ((Switch)Track.TraversePath(path)).Value = r;
+                });
+            }
+
+            _switch.Value = (int)value;
+        }
+       
+
+        public void SetTargetDial(int target) => Target.RawValue = target;
+        
+        public void SetValueDial(int value) => Value.RawValue = value;
     }
 }

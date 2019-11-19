@@ -155,14 +155,18 @@ namespace Apollo.Elements {
         protected Screen screen;
         ConcurrentQueue<SysExMessage> buffer;
         object locker;
-        int[] inputbuffer;
+        int[][] inputbuffer;
         ulong signalCount = 0;
 
         protected void CreateScreen() {
             screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
-            inputbuffer = (from i in Enumerable.Range(0, 101) select 0).ToArray();
+            inputbuffer = new int[101][];
+            
+            for(int i = 0; i < 101; i++){
+              inputbuffer[i] = new int[4]{0, 0, 0, 0};
+            }
         }
 
         public Color GetColor(int index) => (PatternWindow == null)
@@ -465,14 +469,14 @@ namespace Apollo.Elements {
 
                 if (PatternWindow == null) {
                     if (n.Color.Lit) {
-                        if (inputbuffer[n.Index] == 0)
-                            inputbuffer[n.Index] = Program.Project.Macro;
-                        
-                    } else if (inputbuffer[n.Index] == 0) return;
+                      if (inputbuffer[n.Index] == null){
+                          inputbuffer[n.Index] = Program.Project.Macros;
+                      }
+                    } else if (inputbuffer[n.Index] == null) return;
                     
-                    n.Macro = inputbuffer[n.Index];
+                    n.Macros = (int[])inputbuffer[n.Index].Clone();
 
-                    if (!n.Color.Lit) inputbuffer[n.Index] = 0;
+                    if (!n.Color.Lit) inputbuffer[n.Index] = null;
 
                     Receive?.Invoke(n);
                 } else PatternWindow.MIDIEnter(n);

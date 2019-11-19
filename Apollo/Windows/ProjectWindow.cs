@@ -43,7 +43,11 @@ namespace Apollo.Windows {
             TrackAdd = this.Get<TrackAdd>("TrackAdd");
 
             BPM = this.Get<TextBox>("BPM");
-            Macro = this.Get<HorizontalDial>("Macro");
+            
+            for(int i = 1; i < 5; i++){
+                MacroDials.Add(this.Get<Dial>("Macro" + i));
+            }
+            
             Author = this.Get<TextBox>("Author");
 
             BottomPane = this.Get<StackPanel>("BottomPane");
@@ -62,14 +66,19 @@ namespace Apollo.Windows {
         TrackAdd TrackAdd;
 
         TextBox BPM, Author;
-        HorizontalDial Macro;
+        List<Dial> MacroDials = new List<Dial>(4);
 
         DispatcherTimer Timer;
         bool SafeClose = false;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        void UpdateMacro() => Macro.RawValue = Program.Project.Macro;
+        void UpdateMacro(){
+          for(int i = 0; i < 4; i++){
+            MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
+          }
+        }
+        
         void HandleMacro() => Dispatcher.UIThread.InvokeAsync((Action)UpdateMacro);
 
         void UpdateTopmost(bool value) => Topmost = value;
@@ -124,7 +133,9 @@ namespace Apollo.Windows {
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
-            Macro.RawValue = Program.Project.Macro;
+            for(int i = 0; i < 4; i++){
+              MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
+            }
             
             Author.Text = Program.Project.Author.ToString();
             Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);

@@ -6,6 +6,10 @@
              DetachedFromVisualTree="Unloaded">
   
   <StackPanel Orientation="Horizontal">
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0" Margin="0 0 10 0">
+      <Components:Dial x:Name="MacroDial" Title="Macro" Minimum="1" Maximum="4" Margin="5 0 15 0" Default="1" ValueChanged="Target_Changed"/>
+    </Border>
+    <UniformGrid Rows="10" Columns="10" VerticalAlignment="Center" x:Name="MacrosGrid">
       <Components:MacroRectangle PointerReleased="Clicked" />
       <Components:MacroRectangle PointerReleased="Clicked" />
       <Components:MacroRectangle PointerReleased="Clicked" />

@@ -101,6 +101,13 @@ namespace Apollo.Elements {
 
         int[] _macros;
         
+        public int[] Macros{ 
+            get => _macros;
+            set {
+              _macros = value;
+            }
+        }
+        
         public void SetMacro(int target, int value){
             if (1 <= value && value <= 100) {
                 _macros[target - 1] = value;
@@ -237,11 +244,8 @@ namespace Apollo.Elements {
 
             BPM = bpm;
             
-            if(macros == null){
-                _macros = new int[4]{1, 1, 1, 1};
-            } else {
-                _macros = macros;
-            }
+            if(macros == null) _macros = new int[4]{1, 1, 1, 1};
+            else _macros = macros;
            
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             Author = author;

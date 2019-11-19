@@ -8,6 +8,7 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class MacroFilter: Device {
         bool[] _filter;
+        public int Target;
 
         public override Device Clone() => new MacroFilter(_filter.ToArray()) {
             Collapsed = Collapsed,
@@ -25,16 +26,17 @@ namespace Apollo.Devices {
             }
         }
 
-        public MacroFilter(bool[] init = null): base("macrofilter", "Macro Filter") {
+        public MacroFilter(bool[] init = null, int target = 1): base("macrofilter", "Macro Filter") {
+            Target = target;
             if (init == null || init.Length != 100) {
                 init = new bool[100];
-                init[Program.Project.Macro - 1] = true;
+                init[0] = true;
             }
             _filter = init;
         }
 
         public override void MIDIProcess(Signal n) {
-            if (_filter[n.Macro - 1])
+            if (_filter[n.GetMacro(Target) - 1])
                 InvokeExit(n);
         }
     }

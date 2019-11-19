@@ -111,7 +111,9 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Project));
 
             writer.Write(o.BPM);
-            writer.Write(o.Macro);
+            writer.Write(1);
+            writer.Write(o.GetMacro(1));
+            
 
             writer.Write(o.Tracks.Count);
             for (int i = 0; i < o.Tracks.Count; i++)
@@ -324,7 +326,8 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, Switch o) {
             EncodeID(writer, typeof(Switch));
 
-            writer.Write(o.Macro);
+            writer.Write(o.Target);
+            writer.Write(o.Value);
         }
 
         static void Encode(BinaryWriter writer, Paint o) {

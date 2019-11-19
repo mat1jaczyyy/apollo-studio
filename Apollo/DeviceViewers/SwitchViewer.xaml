@@ -5,6 +5,11 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   
-  <Components:Dial VerticalAlignment="Center" x:Name="Target" Title="Target" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
-                   ValueChanged="Macro_Changed" />
+  <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+    <Components:Dial x:Name="Target" Title="Macro" Minimum="1" Maximum="4" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
+                   ValueChanged="Target_Changed" />
+    <Components:Dial x:Name="Value" Title="Value" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
+                   ValueChanged="Value_Changed" />
+  </StackPanel>
+  
 </UserControl>

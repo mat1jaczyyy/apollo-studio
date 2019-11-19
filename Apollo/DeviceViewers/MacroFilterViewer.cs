@@ -21,10 +21,12 @@ namespace Apollo.DeviceViewers {
             AvaloniaXamlLoader.Load(this);
 
             MacrosGrid = this.Get<UniformGrid>("MacrosGrid");
+            MacroDial = this.Get<Dial>("MacroDial");
         }
         
         MacroFilter _filter;
         UniformGrid MacrosGrid;
+        Dial MacroDial;
 
         void Set(MacroRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
 
@@ -34,6 +36,8 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _filter = filter;
+            
+            MacroDial.RawValue = _filter.Target;
 
             for (int i = 0; i < MacrosGrid.Children.Count; i++) {
                 MacroRectangle Rect = (MacroRectangle)MacrosGrid.Children[i];
@@ -41,7 +45,9 @@ namespace Apollo.DeviceViewers {
                 Rect.Index = i + 1;
             }
         }
-
+        void Target_Changed(Dial sender, double value, double? old){
+            _filter.Target = (int)value;
+        }
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Clicked(object sender, PointerReleasedEventArgs e) {
@@ -59,6 +65,7 @@ namespace Apollo.DeviceViewers {
 
             _filter[index] = !_filter[index];
         }
+
 
         public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);
     }
