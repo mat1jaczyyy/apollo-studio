@@ -92,30 +92,21 @@ namespace Apollo.Elements {
             }
         }
 
-        public string FileName {
-            get => Path.GetFileNameWithoutExtension(FilePath);
-        }
+        public string FileName => Path.GetFileNameWithoutExtension(FilePath);
 
         public delegate void MacroChangedEventHandler();
         public event MacroChangedEventHandler MacroChanged;
 
-        int[] _macros;
+        public int[] Macros;
         
-        public int[] Macros{ 
-            get => _macros;
-            set {
-              _macros = value;
-            }
-        }
-        
-        public void SetMacro(int target, int value){
+        public void SetMacro(int target, int value) {
             if (1 <= value && value <= 100) {
-                _macros[target - 1] = value;
+                Macros[target - 1] = value;
                 MacroChanged?.Invoke();
             }
         }
         
-        public int GetMacro(int target) => _macros[target - 1];
+        public int GetMacro(int target) => Macros[target - 1];
 
         public async void WriteCrashBackup() {
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
@@ -243,10 +234,7 @@ namespace Apollo.Elements {
             TimeSpent.Start();
 
             BPM = bpm;
-            
-            if(macros == null) _macros = new int[4]{1, 1, 1, 1};
-            else _macros = macros;
-           
+            Macros = macros?? new int[4] {1, 1, 1, 1};
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             Author = author;
             BaseTime = basetime;

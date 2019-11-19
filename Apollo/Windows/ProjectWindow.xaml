@@ -42,7 +42,7 @@
         <TextBlock Margin="0 7" IsHitTestVisible="false" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="TitleCenter" />
       </Grid>   
       
-      <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
+      <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1 0 1 1">
         <Grid RowDefinitions="*,Auto,Auto">
           <ScrollViewer Padding="5" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
             <Grid RowDefinitions="Auto,*" x:Name="Layout">

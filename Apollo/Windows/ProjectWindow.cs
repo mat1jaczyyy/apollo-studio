@@ -73,10 +73,9 @@ namespace Apollo.Windows {
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        void UpdateMacro(){
-          for(int i = 0; i < 4; i++){
-            MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
-          }
+        void UpdateMacro() {
+            for (int i = 0; i < 4; i++)
+                MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
         }
         
         void HandleMacro() => Dispatcher.UIThread.InvokeAsync((Action)UpdateMacro);
@@ -133,9 +132,8 @@ namespace Apollo.Windows {
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
-            for(int i = 0; i < 4; i++){
-              MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
-            }
+            for (int i = 0; i < 4; i++)
+                MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
             
             Author.Text = Program.Project.Author.ToString();
             Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);
@@ -253,10 +251,8 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
-        void Macro_Changed(Dial sender, double value, double? old){
-          int index = MacroDials.IndexOf(sender);
-          Program.Project.SetMacro(index + 1, (int)value);
-        }
+        void Macro_Changed(Dial sender, double value, double? old) =>
+            Program.Project.SetMacro(MacroDials.IndexOf(sender) + 1, (int)value);
 
         Action BPM_Update;
         bool BPM_Dirty = false;

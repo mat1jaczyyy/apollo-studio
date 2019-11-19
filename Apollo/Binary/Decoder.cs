@@ -154,7 +154,7 @@ namespace Apollo.Binary {
 
             } else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
-                int[] macros = (version >= 25)? (from i in Enumerable.Range(0, 4) select reader.ReadInt32()).ToArray() : new int[4]{reader.ReadInt32(), 1, 1, 1};
+                int[] macros = (version >= 25)? (from i in Enumerable.Range(0, 4) select reader.ReadInt32()).ToArray() : new int[4] {reader.ReadInt32(), 1, 1, 1};
                 List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
 
                 string author = "";
@@ -519,6 +519,7 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Switch)) {
+                int target = (version >= 25)? reader.ReadInt32() : 1;
                 int value = reader.ReadInt32();
 
                 if (18 <= version && version <= 21 && reader.ReadBoolean())
@@ -527,8 +528,6 @@ namespace Apollo.Binary {
                             new Switch(1, value), new Clear(ClearType.Multi)
                         }, "Switch Reset")
                     });
-                    
-                int target = (version >= 25)? reader.ReadInt32() : 1;
 
                 return new Switch(target, value);
             

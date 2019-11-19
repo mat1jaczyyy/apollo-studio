@@ -28,10 +28,12 @@ namespace Apollo.Devices {
 
         public MacroFilter(int target = 1, bool[] init = null): base("macrofilter", "Macro Filter") {
             Target = target;
+
             if (init == null || init.Length != 100) {
                 init = new bool[100];
                 init[0] = true;
             }
+            
             _filter = init;
         }
 

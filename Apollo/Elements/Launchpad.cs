@@ -162,11 +162,7 @@ namespace Apollo.Elements {
             screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
-            inputbuffer = new int[101][];
-            
-            for(int i = 0; i < 101; i++){
-              inputbuffer[i] = new int[4]{0, 0, 0, 0};
-            }
+            inputbuffer = (from i in Enumerable.Range(0, 101) select new int[4] {0, 0, 0, 0}).ToArray();
         }
 
         public Color GetColor(int index) => (PatternWindow == null)
@@ -469,9 +465,9 @@ namespace Apollo.Elements {
 
                 if (PatternWindow == null) {
                     if (n.Color.Lit) {
-                      if (inputbuffer[n.Index] == null){
-                          inputbuffer[n.Index] = Program.Project.Macros;
-                      }
+                        if (inputbuffer[n.Index] == null)
+                            inputbuffer[n.Index] = Program.Project.Macros;
+                            
                     } else if (inputbuffer[n.Index] == null) return;
                     
                     n.Macros = (int[])inputbuffer[n.Index].Clone();
