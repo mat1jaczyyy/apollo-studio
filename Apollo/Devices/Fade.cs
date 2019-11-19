@@ -407,37 +407,5 @@ namespace Apollo.Devices {
             Time.Dispose();
             base.Dispose();
         }
-
-
-        List<Color> GenerateHold(Color color, int duration) {
-
-            List<Color> steps = new List<Color>();
-
-            for (int k = 0; k < duration; k++) {
-                steps.Add(color);
-            }
-
-            return steps;
-        }
-
-        List<Color> GenerateSmooth(Color start, Color end, int max) {
-            List<Color> steps = new List<Color>();
-
-            for (double k = 0; k < max; k++) {
-                double slowFactor = Math.Pow(k / max, 3.0);
-                double fastFactor = 1 - Math.Pow(1 - (k / max), 3.0);
-
-                double factor = slowFactor + (fastFactor - slowFactor) * k / max;
-
-
-                steps.Add(new Color(
-                    (byte)(start.Red + (end.Red - start.Red) * factor),
-                    (byte)(start.Green + (end.Green - start.Green) * factor),
-                    (byte)(start.Blue + (end.Blue - start.Blue) * factor)
-                ));
-            }
-
-            return steps;
-        }
     }
 }
