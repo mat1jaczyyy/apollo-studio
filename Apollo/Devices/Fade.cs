@@ -184,8 +184,12 @@ namespace Apollo.Devices {
             _steps.Add(_colors.Last());
 
             if (_steps.Last().Lit) {
-                _steps.Add(new Color(0));
                 _cutoffs[_cutoffs.Count - 1]++;
+                _counts[_counts.Count - 1]++;
+            
+                _steps.Add(new Color(0));
+                _counts.Add(1);
+                _cutoffs.Add(1 + _cutoffs.Last());
             }
 
             List<FadeInfo> fullFade = new List<FadeInfo>() {
@@ -213,8 +217,7 @@ namespace Apollo.Devices {
                 }
             }
 
-            fullFade.Add(new FadeInfo(_steps.Last(), _time * _gate));
-            fade.Add(fullFade.Last());
+            fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
             
             Generated?.Invoke(fullFade);
         }
