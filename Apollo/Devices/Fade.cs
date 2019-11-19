@@ -188,9 +188,12 @@ namespace Apollo.Devices {
                 _cutoffs[_cutoffs.Count - 1]++;
             }
 
-            fade = new List<FadeInfo>() {
+            List<FadeInfo> fullFade = new List<FadeInfo>() {
                 new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
             };
+            
+            fade = new List<FadeInfo>();
+            fade.Add(fullFade.Last());
 
             int j = 0;
             for (int i = 1; i < _steps.Count; i++) {
@@ -203,15 +206,17 @@ namespace Apollo.Devices {
                     
                     double time = EaseTime(_types[j], prevTime, nextTime, currTime);
                     
-                    if (fade.Last().Time + smoothness < time) fade.Add(
-                        new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold)
-                    );
+                    fullFade.Add(new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold));
+
+                    if (fade.Last().Time + smoothness < time)
+                        fade.Add(fullFade.Last());
                 }
             }
 
-            fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
+            fullFade.Add(new FadeInfo(_steps.Last(), _time * _gate));
+            fade.Add(fullFade.Last());
             
-            Generated?.Invoke(fade);
+            Generated?.Invoke(fullFade);
         }
 
         public int Count => _colors.Count;
