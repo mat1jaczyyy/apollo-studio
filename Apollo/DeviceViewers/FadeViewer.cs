@@ -56,16 +56,17 @@ namespace Apollo.DeviceViewers {
         List<FadeThumb> thumbs = new List<FadeThumb>();
 
         public void Contents_Insert(int index, Color color) {
-            FadeThumb thumb = new FadeThumb();
+            FadeThumb thumb = new FadeThumb() {
+                Owner = this,
+                Fill = color.ToBrush()
+            };
             thumbs.Insert(index, thumb);
             Canvas.SetLeft(thumb, _fade.GetPosition(index) * 200);
 
             thumb.Moved += Thumb_Move;
             thumb.Focused += Thumb_Focus;
             thumb.Deleted += Thumb_Delete;
-            thumb.MenuOpened += Thumb_OpenMenu;
-            thumb.FadeTypeChanged += Thumb_ChangeFadeType;
-            thumb.Fill = color.ToBrush();
+            thumb.TypeChanged += Thumb_ChangeFadeType;
             
             canvas.Children.Add(thumb);
             if (_fade.Expanded != null && index <= _fade.Expanded) _fade.Expanded++;
@@ -100,18 +101,19 @@ namespace Apollo.DeviceViewers {
             int? temp = _fade.Expanded;
             _fade.Expanded = null;
             
-            thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
-            thumbs[0].Fill = _fade.GetColor(0).ToBrush();
-            thumbs[0].Type = _fade.GetFadeType(0);
+            FadeThumb ThumbStart, ThumbEnd;
 
-            for (int i = 1; i < _fade.Count - 1; i++) {
+            thumbs.Add(ThumbStart = this.Get<FadeThumb>("ThumbStart"));
+            ThumbStart.Fill = _fade.GetColor(0).ToBrush();
+
+            for (int i = 1; i < _fade.Count - 1; i++)
                 Contents_Insert(i, _fade.GetColor(i));
-                thumbs[i].Type = _fade.GetFadeType(i);
-            }
 
-            thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
-            thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
-            
+            thumbs.Add(ThumbEnd = this.Get<FadeThumb>("ThumbEnd"));
+            ThumbEnd.Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
+
+            ThumbStart.Owner = ThumbEnd.Owner = this;
+
             Expand(temp);
 
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
@@ -194,37 +196,23 @@ namespace Apollo.DeviceViewers {
             _fade.Remove(index);
         }
 
-        void Thumb_OpenMenu(FadeThumb sender) {
-            int index = thumbs.IndexOf(sender);
-
-            if (index == thumbs.Count - 1) {
-                return;
-            }
-            if (index == 0) {
-                if(index == 0) sender.RemoveDelete();
-            }
-
-            sender.OpenMenu();
-        }
-
-        void Thumb_ChangeFadeType(FadeThumb sender) {
+        void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) {
             int index = thumbs.IndexOf(sender);
 
             FadeType oldType = _fade.GetFadeType(index);
-            FadeType newType = sender.Type;
 
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Type {index + 1} Changed to {newType}", () => {
                 ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
-                thumbs[index].Type = oldType;
             }, () => {
                 ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
-                thumbs[index].Type = newType;
             });
 
             _fade.SetFadeType(index, newType);
         }
+
+        public FadeType GetFadeType(FadeThumb sender) => _fade.GetFadeType(thumbs.IndexOf(sender));
 
         void Thumb_Move(FadeThumb sender, double change, double? total) {
             int i = thumbs.IndexOf(sender);
