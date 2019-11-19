@@ -51,7 +51,6 @@ namespace Apollo.DeviceViewers {
         Grid PickerContainer;
         ColorPicker Picker;
         LinearGradientBrush Gradient;
-        Button DeleteThumb;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
 
@@ -118,7 +117,7 @@ namespace Apollo.DeviceViewers {
 
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
-            Gradient_Generate();
+            _fade.Generate();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -277,17 +276,16 @@ namespace Apollo.DeviceViewers {
             thumbs[index].Fill = color.ToBrush();
         }
 
-        void Gradient_Generate() {
+        void Gradient_Generate(List<Fade.FadeInfo> points) {
             if (Program.Project.IsDisposing) return;
             
             Dispatcher.UIThread.InvokeAsync(() => {
                 Gradient.GradientStops.Clear();
 
-                if (_fade != null)
-                    for (int i = 0; i < _fade.fade.Count; i++){
-                        Fade.FadeInfo info = _fade.fade[i];
-                        Gradient.GradientStops.Add(new GradientStop(info.Color.ToAvaloniaColor(), info.Time/_fade.Time.Length));
-                    }
+                if (_fade == null) return;
+
+                foreach (Fade.FadeInfo info in points)
+                    Gradient.GradientStops.Add(new GradientStop(info.Color.ToAvaloniaColor(), info.Time / _fade.Time.Length));
             });
         }
 
