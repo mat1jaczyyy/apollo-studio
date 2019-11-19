@@ -237,6 +237,9 @@ namespace Apollo.Binary {
             for (int i = 0; i < o.Count; i++)
                 writer.Write(o.GetPosition(i));
             
+            for (int i = 0; i < o.Count - 1; i++)
+                writer.Write((int)o.GetFadeType(i));
+
             writer.Write(o.Expanded.HasValue);
             if (o.Expanded.HasValue)
                 writer.Write(o.Expanded.Value);

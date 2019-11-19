@@ -1,4 +1,8 @@
-﻿using Avalonia;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -7,12 +11,16 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
+using Apollo.DeviceViewers;
+using Apollo.Enums;
+
 namespace Apollo.Components {
     public class FadeThumb: UserControl {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Base = this.Get<Thumb>("Thumb");
+            DeleteSeparator = this.Get<Separator>("DeleteSeparator");
         }
 
         public delegate void MovedEventHandler(FadeThumb sender, double change, double? total);
@@ -21,8 +29,26 @@ namespace Apollo.Components {
         public delegate void FadeThumbEventHandler(FadeThumb sender);
         public event FadeThumbEventHandler Focused;
         public event FadeThumbEventHandler Deleted;
+        
+        public delegate void TypeChangedEventHandler(FadeThumb sender, FadeType type);
+        public event TypeChangedEventHandler TypeChanged;
 
-        public Thumb Base;
+        public FadeViewer Owner;
+
+        ContextMenu ThumbContextMenu;
+        List<MenuItem> MenuItems;
+        Separator DeleteSeparator;
+        Thumb Base;
+
+        public bool NoDelete {
+            get => !DeleteSeparator.IsVisible;
+            set {
+                MenuItems.Last().IsVisible = !value;
+                DeleteSeparator.IsVisible = !value;
+            }
+        }
+
+        public bool NoMenu { get; set; } = false;
 
         public IBrush Fill {
             get => (IBrush)this.Resources["Color"];
@@ -31,7 +57,12 @@ namespace Apollo.Components {
 
         public FadeThumb() {
             InitializeComponent();
-            
+
+            ThumbContextMenu = (ContextMenu)this.Resources["ThumbContextMenu"];
+            ThumbContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+
+            MenuItems = ThumbContextMenu.Items.OfType<MenuItem>().ToList();
+
             Base.AddHandler(InputElement.PointerPressedEvent, MouseDown, RoutingStrategies.Tunnel);
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
         }
@@ -40,6 +71,8 @@ namespace Apollo.Components {
             Moved = null;
             Focused = null;
             Deleted = null;
+
+            ThumbContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
 
             Base.RemoveHandler(InputElement.PointerPressedEvent, MouseDown);
             Base.RemoveHandler(InputElement.PointerReleasedEvent, MouseUp);
@@ -68,8 +101,14 @@ namespace Apollo.Components {
         void MouseUp(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.RightButtonReleased) {
-                Deleted?.Invoke(this);
+            if (!NoMenu && MouseButton == PointerUpdateKind.RightButtonReleased) {
+                if (Owner == null) throw new InvalidOperationException("FadeThumb doesn't have an Owner");
+
+                MenuItems.ForEach(i => i.Icon = null);
+                MenuItems[(int)Owner.GetFadeType(this)].Icon = this.Resources["SelectedIcon"];
+
+                ThumbContextMenu.Open(Base);
+
                 e.Handled = true;
             }
         }
@@ -86,5 +125,16 @@ namespace Apollo.Components {
         
         public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));
         public void Unselect() => this.Resources["Outline"] = new SolidColorBrush(new Color(0, 255, 255, 255));
+        
+        public void ContextMenu_Click(object sender, EventArgs e) {
+            IInteractive item = ((RoutedEventArgs)e).Source;
+
+            if (item is MenuItem selectedItem) {
+                string header = selectedItem.Header.ToString();
+
+                if (header == "Delete") Deleted?.Invoke(this);
+                else TypeChanged?.Invoke(this, (FadeType)ThumbContextMenu.Items.OfType<MenuItem>().ToList().IndexOf(selectedItem));
+            }
+        }
     }
 }

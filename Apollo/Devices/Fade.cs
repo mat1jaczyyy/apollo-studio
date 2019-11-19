@@ -11,18 +11,21 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Fade: Device {
-        class FadeInfo {
+        public class FadeInfo {
             public Color Color;
             public double Time;
+            public bool IsHold;
 
-            public FadeInfo(Color color, double time) {
+            public FadeInfo(Color color, double time, bool isHold = false) {
                 Color = color;
                 Time = time;
+                IsHold = isHold;
             }
         }
 
         List<Color> _colors = new List<Color>();
         List<double> _positions = new List<double>();
+        List<FadeType> _types = new List<FadeType>();
         List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
@@ -45,10 +48,39 @@ namespace Apollo.Devices {
             }
         }
         
+        public FadeType GetFadeType(int index) => _types[index];
+        public void SetFadeType(int index, FadeType type) {
+            if (_types[index] != type) {
+                _types[index] = type;
+                Generate();
+            }
+        }
+        
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
+        static Dictionary<FadeType, Func<double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double>>() { 
+            {FadeType.Fast, proportion => Math.Pow(proportion, 2)},
+            {FadeType.Slow, proportion => 1 - Math.Pow(1 - proportion, 2)},
+            {FadeType.Sharp, proportion => (proportion < 0.5)
+                ? Math.Pow(proportion - 0.5, 2) * -2 + 0.5
+                : Math.Pow(proportion - 0.5, 2) * 2 + 0.5
+            },
+            {FadeType.Smooth, proportion => (proportion < 0.5)
+                ? Math.Pow(proportion, 2) * 2
+                : Math.Pow(proportion - 1, 2) * -2 + 1
+            }
+        };
+
+        double EaseTime(FadeType type, double start, double end, double val) {
+            if (type == FadeType.Linear) return val;
+            if (type == FadeType.Hold) return start;
+
+            double duration = end - start;
+            return start + duration * TimeEasing[type].Invoke((val - start) / duration);
+        }
+    
         Time _time;
         public Time Time {
             get => _time;
@@ -110,17 +142,18 @@ namespace Apollo.Devices {
             }
         }
 
-        public delegate void GeneratedEventHandler();
+        public delegate void GeneratedEventHandler(List<FadeInfo> points);
         public event GeneratedEventHandler Generated;
 
-        void Generate() => Generate(Preferences.FadeSmoothness);
+        public void Generate() => Generate(Preferences.FadeSmoothness);
 
         void Generate(double smoothness) {
             if (_colors.Count < 2 || _positions.Count < 2) return;
+            if (_types.Count < _colors.Count - 1) return;
 
             List<Color> _steps = new List<Color>();
             List<int> _counts = new List<int>();
-            List<int> _cutoffs = new List<int>() {0};
+            List<int> _cutoffs = new List<int>(){0};
 
             for (int i = 0; i < _colors.Count - 1; i++) {
                 int max = new int[] {
@@ -130,16 +163,22 @@ namespace Apollo.Devices {
                     1
                 }.Max();
 
-                for (int k = 0; k < max; k++) {
-                    _steps.Add(new Color(
-                        (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * k / max),
-                        (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * k / max),
-                        (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * k / max)
-                    ));
+                if(_types[i] == FadeType.Hold) {
+                    _steps.Add(_colors[i]);
+                    _counts.Add(1);
+                    _cutoffs.Add(1 + _cutoffs.Last());
+                } else{
+                    for (double k = 0; k < max; k++) {
+                        double factor = k/max;
+                        _steps.Add(new Color(
+                            (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * factor),
+                            (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * factor),
+                            (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * factor)
+                        ));
+                    }
+                    _counts.Add(max);
+                    _cutoffs.Add(max + _cutoffs.Last());
                 }
-
-                _counts.Add(max);
-                _cutoffs.Add(max + _cutoffs.Last());
             }
 
             _steps.Add(_colors.Last());
@@ -149,35 +188,43 @@ namespace Apollo.Devices {
                 _cutoffs[_cutoffs.Count - 1]++;
             }
 
-            fade = new List<FadeInfo>() {new FadeInfo(_steps[0], 0)};
+            fade = new List<FadeInfo>() {
+                new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
+            };
 
             int j = 0;
             for (int i = 1; i < _steps.Count; i++) {
                 if (_cutoffs[j + 1] == i) j++;
-
+                
                 if (j < _colors.Count - 1) {
-                    double time = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
-                    if (fade.Last().Time + smoothness < time) fade.Add(new FadeInfo(_steps[i], time));
+                    double prevTime = (j != 0)? _positions[j] * _time * _gate : 0;
+                    double currTime = (_positions[j] + (_positions[j + 1] - _positions[j]) * (i - _cutoffs[j]) / _counts[j]) * _time * _gate;
+                    double nextTime = _positions[j + 1] * _time * _gate;
+                    
+                    double time = EaseTime(_types[j], prevTime, nextTime, currTime);
+                    
+                    if (fade.Last().Time + smoothness < time) fade.Add(
+                        new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold)
+                    );
                 }
             }
 
             fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
             
-            Generated?.Invoke();
+            Generated?.Invoke(fade);
         }
 
-        public int Count {
-            get => _colors.Count;
-        }
+        public int Count => _colors.Count;
 
-        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList()) {
+        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList(), _types.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public void Insert(int index, Color color, double position) {
+        public void Insert(int index, Color color, double position, FadeType type) {
             _colors.Insert(index, color);
             _positions.Insert(index, position);
+            _types.Insert(index, type);
 
             if (Viewer?.SpecificViewer != null) {
                 FadeViewer SpecificViewer = ((FadeViewer)Viewer.SpecificViewer);
@@ -192,6 +239,7 @@ namespace Apollo.Devices {
         public void Remove(int index) {
             _colors.RemoveAt(index);
             _positions.RemoveAt(index);
+            _types.RemoveAt(index);
 
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).Contents_Remove(index);
 
@@ -200,13 +248,14 @@ namespace Apollo.Devices {
 
         public int? Expanded;
 
-        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, int? expanded = null): base("fade") {
+        public Fade(Time time = null, double gate = 1, FadePlaybackType playmode = FadePlaybackType.Mono, List<Color> colors = null, List<double> positions = null, List<FadeType> types = null, int? expanded = null) : base("fade") {
             Time = time?? new Time();
             Gate = gate;
             PlayMode = playmode;
 
             _colors = colors?? new List<Color>() {new Color(), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
+            _types = types ?? new List<FadeType>() {FadeType.Linear};
             Expanded = expanded;
 
             Preferences.FadeSmoothnessChanged += Generate;

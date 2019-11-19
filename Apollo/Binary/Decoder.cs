@@ -341,13 +341,14 @@ namespace Apollo.Binary {
                 int count;
                 List<Color> colors = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Color)Decode(reader, version)).ToList();
                 List<double> positions = (from i in Enumerable.Range(0, count) select (version <= 13)? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
+                List<FadeType> types = (from i in Enumerable.Range(0, count - 1) select (version <= 24) ? FadeType.Linear : (FadeType)reader.ReadInt32()).ToList();
 
                 int? expanded = null;
                 if (version >= 23) {
                     expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 }
 
-                return new Fade(time, gate, playmode, colors, positions, expanded);
+                return new Fade(time, gate, playmode, colors, positions, types, expanded);
 
             } else if (t == typeof(Flip))
                 return new Flip(

@@ -18,8 +18,8 @@
               </Rectangle.Fill>
             </Rectangle>
 
-            <Components:FadeThumb Canvas.Left="0" x:Name="ThumbStart" Focused="Thumb_Focus" />
-            <Components:FadeThumb Canvas.Left="200" x:Name="ThumbEnd" Focused="Thumb_Focus" />
+            <Components:FadeThumb Canvas.Left="0" NoDelete="true" x:Name="ThumbStart" Focused="Thumb_Focus" TypeChanged="Thumb_ChangeFadeType"/>
+            <Components:FadeThumb Canvas.Left="200" NoMenu="true" x:Name="ThumbEnd" Focused="Thumb_Focus" />
           </Canvas>
 
           <Grid ColumnDefinitions="Auto,*,Auto" Margin="7 0">

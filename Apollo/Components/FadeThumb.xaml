@@ -7,6 +7,19 @@
   <UserControl.Resources>
     <SolidColorBrush x:Key="Outline">#00FFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="Color">#FFFFFFFF</SolidColorBrush>
+
+    <Ellipse x:Key="SelectedIcon" Margin="7 0 0 0" Fill="{DynamicResource ThemeAccentBrush}" Height="10" Width="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+    <ContextMenu x:Key="ThumbContextMenu" Cursor="Arrow">
+      <MenuItem Header="Linear"/>
+      <MenuItem Header="Smooth" />
+      <MenuItem Header="Sharp" />
+      <MenuItem Header="Fast" />
+      <MenuItem Header="Slow" />
+      <MenuItem Header="Hold" />
+      <Separator x:Name="DeleteSeparator" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1"/>
+      <MenuItem x:Name="Delete" Header="Delete"/>
+    </ContextMenu>
   </UserControl.Resources>
 
   <Thumb Width="14" x:Name="Thumb" Height="18" Background="Transparent" Cursor="Hand"

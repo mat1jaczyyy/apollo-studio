@@ -55,14 +55,17 @@ namespace Apollo.DeviceViewers {
         List<FadeThumb> thumbs = new List<FadeThumb>();
 
         public void Contents_Insert(int index, Color color) {
-            FadeThumb thumb = new FadeThumb();
+            FadeThumb thumb = new FadeThumb() {
+                Owner = this,
+                Fill = color.ToBrush()
+            };
             thumbs.Insert(index, thumb);
             Canvas.SetLeft(thumb, _fade.GetPosition(index) * 200);
 
             thumb.Moved += Thumb_Move;
             thumb.Focused += Thumb_Focus;
             thumb.Deleted += Thumb_Delete;
-            thumb.Fill = color.ToBrush();
+            thumb.TypeChanged += Thumb_ChangeFadeType;
             
             canvas.Children.Add(thumb);
             if (_fade.Expanded != null && index <= _fade.Expanded) _fade.Expanded++;
@@ -97,20 +100,24 @@ namespace Apollo.DeviceViewers {
             int? temp = _fade.Expanded;
             _fade.Expanded = null;
             
-            thumbs.Add(this.Get<FadeThumb>("ThumbStart"));
-            thumbs[0].Fill = _fade.GetColor(0).ToBrush();
+            FadeThumb ThumbStart, ThumbEnd;
 
-            for (int i = 1; i < _fade.Count - 1; i++) 
+            thumbs.Add(ThumbStart = this.Get<FadeThumb>("ThumbStart"));
+            ThumbStart.Fill = _fade.GetColor(0).ToBrush();
+
+            for (int i = 1; i < _fade.Count - 1; i++)
                 Contents_Insert(i, _fade.GetColor(i));
 
-            thumbs.Add(this.Get<FadeThumb>("ThumbEnd"));
-            thumbs.Last().Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
-            
+            thumbs.Add(ThumbEnd = this.Get<FadeThumb>("ThumbEnd"));
+            ThumbEnd.Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
+
+            ThumbStart.Owner = ThumbEnd.Owner = this;
+
             Expand(temp);
 
             Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
-            Gradient_Generate();
+            _fade.Generate();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -164,10 +171,10 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
                     ((Fade)Track.TraversePath(path)).Remove(index);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos);
+                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos, FadeType.Linear);
                 });
 
-                _fade.Insert(index, new Color(), pos);
+                _fade.Insert(index, new Color(), pos, FadeType.Linear);
             }
         }
 
@@ -176,16 +183,35 @@ namespace Apollo.DeviceViewers {
 
             Color uc = _fade.GetColor(index).Clone();
             double up = _fade.GetPosition(index);
+            FadeType ut = _fade.GetFadeType(index);
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () => {
-                ((Fade)Track.TraversePath(path)).Insert(index, uc, up);
+                ((Fade)Track.TraversePath(path)).Insert(index, uc, up, ut);
             }, () => {
                 ((Fade)Track.TraversePath(path)).Remove(index);
             });
 
             _fade.Remove(index);
         }
+
+        void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) {
+            int index = thumbs.IndexOf(sender);
+
+            FadeType oldType = _fade.GetFadeType(index);
+
+            List<int> path = Track.GetPath(_fade);
+
+            Program.Project.Undo.Add($"Fade Type {index + 1} Changed to {newType}", () => {
+                ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
+            }, () => {
+                ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
+            });
+
+            _fade.SetFadeType(index, newType);
+        }
+
+        public FadeType GetFadeType(FadeThumb sender) => _fade.GetFadeType(thumbs.IndexOf(sender));
 
         void Thumb_Move(FadeThumb sender, double change, double? total) {
             int i = thumbs.IndexOf(sender);
@@ -250,15 +276,20 @@ namespace Apollo.DeviceViewers {
             thumbs[index].Fill = color.ToBrush();
         }
 
-        void Gradient_Generate() {
+        void Gradient_Generate(List<Fade.FadeInfo> points) {
             if (Program.Project.IsDisposing) return;
             
             Dispatcher.UIThread.InvokeAsync(() => {
                 Gradient.GradientStops.Clear();
 
-                if (_fade != null)
-                    for (int i = 0; i < _fade.Count; i++)
-                        Gradient.GradientStops.Add(new GradientStop(_fade.GetColor(i).ToAvaloniaColor(), _fade.GetPosition(i)));
+                if (_fade == null) return;
+
+                for (int i = 0; i < points.Count; i++) {
+                    if (i > 0 && points[i - 1].IsHold)
+                        Gradient.GradientStops.Add(new GradientStop(points[i - 1].Color.ToAvaloniaColor(), (points[i].Time - .0001) / _fade.Time.Length));
+
+                    Gradient.GradientStops.Add(new GradientStop(points[i].Color.ToAvaloniaColor(), points[i].Time / _fade.Time.Length));
+                }
             });
         }
 

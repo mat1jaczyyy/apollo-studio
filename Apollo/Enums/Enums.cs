@@ -90,4 +90,13 @@ namespace Apollo.Enums {
         Multiply,
         Mask
     }
+    
+    public enum FadeType {
+        Linear,
+        Smooth,
+        Sharp,
+        Fast,
+        Slow,
+        Hold
+    }
 }
