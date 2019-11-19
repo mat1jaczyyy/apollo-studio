@@ -293,7 +293,7 @@ namespace Apollo.DeviceViewers {
             });
         }
 
-        void Duration_Changed(double value, double? old) {
+        void Duration_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -345,7 +345,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
-        void Gate_Changed(double value, double? old) {
+        void Gate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;

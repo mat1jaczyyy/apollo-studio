@@ -44,7 +44,7 @@ namespace Apollo.DeviceViewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
 
-        void Hue_Changed(double value, double? old) {
+        void Hue_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;
@@ -62,7 +62,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetHue(double value) => Hue.RawValue = value;
 
-        void SaturationHigh_Changed(double value, double? old) {
+        void SaturationHigh_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -80,7 +80,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
 
-        void SaturationLow_Changed(double value, double? old) {
+        void SaturationLow_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -98,7 +98,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
 
-        void ValueHigh_Changed(double value, double? old) {
+        void ValueHigh_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -116,7 +116,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
 
-        void ValueLow_Changed(double value, double? old) {
+        void ValueLow_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;

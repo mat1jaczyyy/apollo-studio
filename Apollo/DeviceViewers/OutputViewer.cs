@@ -46,7 +46,7 @@ namespace Apollo.DeviceViewers {
             _output = null;
         }
 
-        void Target_Changed(double value, double? old) {
+        void Target_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value - 1;
                 int r = (int)value - 1;

@@ -235,7 +235,7 @@ namespace Apollo.Windows {
 
         void AutoCreatePattern_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
-        void FadeSmoothness_Changed(double value, double? old) => Preferences.FadeSmoothness = value / 100;
+        void FadeSmoothness_Changed(Dial sender, double value, double? old) => Preferences.FadeSmoothness = value / 100;
 
         void CaptureLaunchpad_Changed(object sender, RoutedEventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 

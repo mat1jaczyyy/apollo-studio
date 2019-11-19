@@ -154,7 +154,7 @@ namespace Apollo.Binary {
 
             } else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
-                int macro = reader.ReadInt32();
+                int[] macros = new int[4]{reader.ReadInt32(), 1, 1, 1};
                 List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
 
                 string author = "";
@@ -167,7 +167,7 @@ namespace Apollo.Binary {
                     started = reader.ReadInt64();
                 }
 
-                return new Project(bpm, macro, tracks, author, time, started);
+                return new Project(bpm, macros, tracks, author, time, started);
             
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);

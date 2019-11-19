@@ -38,7 +38,7 @@ namespace Apollo.DeviceViewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
-        void Target_Changed(double value, double? old) {
+        void Target_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -56,7 +56,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetTarget(int value) => Target.RawValue = value;
 
-        void Range_Changed(double value, double? old) {
+        void Range_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;

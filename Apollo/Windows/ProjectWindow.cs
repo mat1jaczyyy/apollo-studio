@@ -242,7 +242,10 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
-        void Macro_Changed(double value, double? old) => Program.Project.Macro = (int)value;
+        void Macro_Changed(Dial sender, double value, double? old){
+          int index = MacroDials.IndexOf(sender);
+          Program.Project.SetMacro(index + 1, (int)value);
+        }
 
         Action BPM_Update;
         bool BPM_Dirty = false;
