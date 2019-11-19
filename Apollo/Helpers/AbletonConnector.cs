@@ -30,7 +30,7 @@ namespace Apollo.Helpers {
 
                 if (source.Address.Equals(localhost)) {
                     if (!portMap.ContainsKey(source)) {
-                        if (message[0] >= 243 && message[0] <= 244)
+                        if (message[0] >= 242 && message[0] <= 244)
                             connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
 
                     } else if (message[0] < 128) {
@@ -68,6 +68,9 @@ namespace Apollo.Helpers {
 
         public static void Dispose() {
             lock (locker) {
+                portMap.Where(i => i.Value.Version >= 2).ToList()
+                    .ForEach(i => connection?.SendAsync(new byte[] {245}, 1, i.Key));
+
                 connection?.Close();
                 connection = null;
             }
