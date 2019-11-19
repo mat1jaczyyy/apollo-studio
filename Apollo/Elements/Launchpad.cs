@@ -308,12 +308,10 @@ namespace Apollo.Elements {
                 alp.Window?.SignalRender(m);
 
             n = n.Clone();
-            
-            if (!IsGenerationX) {
-                if (n.Color.Red > 0) n.Color.Red = (byte)((n.Color.Red - 1) * 62.0 / 126 + 1);
-                if (n.Color.Green > 0) n.Color.Green = (byte)((n.Color.Green - 1) * 62.0 / 126 + 1);
-                if (n.Color.Blue > 0) n.Color.Blue = (byte)((n.Color.Blue - 1) * 62.0 / 126 + 1);
-            }
+
+            byte r = (byte)(n.Color.Red * (IsGenerationX? 2 : 1));
+            byte g = (byte)(n.Color.Green * (IsGenerationX? 2 : 1));
+            byte b = (byte)(n.Color.Blue * (IsGenerationX? 2 : 1));
 
             if (n.Index != 100) {
                 if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
@@ -341,7 +339,7 @@ namespace Apollo.Elements {
                     break;
             }
 
-            SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), n.Color.Red, n.Color.Green, n.Color.Blue}).ToArray());
+            SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), r, g, b}).ToArray());
         }
 
         public virtual void Clear(bool manual = false) {
