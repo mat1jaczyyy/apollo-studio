@@ -119,7 +119,7 @@
 
             <TextBlock Classes="heading" Text="Group Behavior" />
             <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create Key Filter in new Group Chain</CheckBox>
-            <CheckBox Click="AutoCreatePageFilter_Changed" x:Name="AutoCreatePageFilter">Auto create Page Filter in new Group Chain</CheckBox>
+            <CheckBox Click="AutoCreateMacroFilter_Changed" x:Name="AutoCreateMacroFilter">Auto create Macro Filter in new Group Chain</CheckBox>
             <CheckBox Click="AutoCreatePattern_Changed" x:Name="AutoCreatePattern">Auto create Pattern in new Group Chain</CheckBox>
             
             <Border />

@@ -43,7 +43,7 @@ namespace Apollo.Windows {
             TrackAdd = this.Get<TrackAdd>("TrackAdd");
 
             BPM = this.Get<TextBox>("BPM");
-            Page = this.Get<HorizontalDial>("Page");
+            Macro = this.Get<HorizontalDial>("Macro");
             Author = this.Get<TextBox>("Author");
 
             BottomPane = this.Get<StackPanel>("BottomPane");
@@ -62,15 +62,15 @@ namespace Apollo.Windows {
         TrackAdd TrackAdd;
 
         TextBox BPM, Author;
-        HorizontalDial Page;
+        HorizontalDial Macro;
 
         DispatcherTimer Timer;
         bool SafeClose = false;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        void UpdatePage() => Page.RawValue = Program.Project.Page;
-        void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
+        void UpdateMacro() => Macro.RawValue = Program.Project.Macro;
+        void HandleMacro() => Dispatcher.UIThread.InvokeAsync((Action)UpdateMacro);
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -124,7 +124,7 @@ namespace Apollo.Windows {
             BPM.Text = Program.Project.BPM.ToString();
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
-            Page.RawValue = Program.Project.Page;
+            Macro.RawValue = Program.Project.Macro;
             
             Author.Text = Program.Project.Author.ToString();
             Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);
@@ -151,8 +151,8 @@ namespace Apollo.Windows {
             Program.Project.PathChanged += UpdateTitle;
             UpdateTitle();
 
-            Program.Project.PageChanged += HandlePage;
-            UpdatePage();
+            Program.Project.MacroChanged += HandleMacro;
+            UpdateMacro();
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
@@ -169,7 +169,7 @@ namespace Apollo.Windows {
             Timer.Tick -= UpdateTime;
 
             Program.Project.PathChanged -= UpdateTitle;
-            Program.Project.PageChanged -= HandlePage;
+            Program.Project.MacroChanged -= HandleMacro;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Selection.Dispose();
@@ -242,7 +242,7 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
-        void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
+        void Macro_Changed(double value, double? old) => Program.Project.Macro = (int)value;
 
         Action BPM_Update;
         bool BPM_Dirty = false;

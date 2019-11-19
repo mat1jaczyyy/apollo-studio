@@ -11,7 +11,7 @@ namespace Apollo.Structures {
         public object Origin;
         public Launchpad Source;
         byte _index = 11;
-        int _page = 1;
+        int _macro = 1;
         public Color Color;
         public int Layer;
         public BlendingType BlendingMode;
@@ -27,13 +27,13 @@ namespace Apollo.Structures {
             }
         }
 
-        public int Page {
-            get => _page;
+        public int Macro {
+            get => _macro;
             set {
                 if (1 <= value && value <= 100)
-                    _page = value;
+                    _macro = value;
                 else if (value == 0)
-                    _page = Program.Project?.Page?? _page;
+                    _macro = Program.Project?.Macro?? _macro;
             }
         }
 
@@ -49,30 +49,30 @@ namespace Apollo.Structures {
 
         public Stack<int> CopyMultiTarget() => new Stack<int>(MultiTarget.ToArray());
 
-        public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
+        public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), Macro, Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
             HashIndex = HashIndex
         };
 
-        public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, Page, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
+        public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, Macro, Layer, BlendingMode, BlendingRange, CopyMultiTarget());
 
-        public Signal(object origin, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
+        public Signal(object origin, Launchpad source, byte index = 11, Color color = null, int macro = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null) {
             Origin = origin;
             Source = source;
             Index = index;
             Color = color?? new Color();
-            Page = page;
+            Macro = macro;
             Layer = layer;
             BlendingMode = blending;
             BlendingRange = blendingrange;
             MultiTarget = multiTarget?? new Stack<int>();
         }
 
-        public Signal(InputType input, object origin, Launchpad source, byte index = 11, Color color = null, int page = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null): this(
+        public Signal(InputType input, object origin, Launchpad source, byte index = 11, Color color = null, int macro = 0, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<int> multiTarget = null): this(
             origin,
             source,
             (input == InputType.DrumRack)? Converter.DRtoXY(index) : ((index == 99)? (byte)100 : index),
             color,
-            page,
+            macro,
             layer,
             blending,
             blendingrange,
@@ -84,10 +84,10 @@ namespace Apollo.Structures {
             return this == (Signal)obj;
         }
 
-        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && ((a.HashIndex && b.HashIndex)? a.Index == b.Index : true) && a.Color == b.Color && a.Page == b.Page && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.PeekMultiTarget == b.PeekMultiTarget;
+        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && ((a.HashIndex && b.HashIndex)? a.Index == b.Index : true) && a.Color == b.Color && a.Macro == b.Macro && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.PeekMultiTarget == b.PeekMultiTarget;
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
-        public override int GetHashCode() => HashCode.Combine(Source, HashIndex? Index : 11, Color, Page, Layer, BlendingMode, BlendingRange, PeekMultiTarget);
+        public override int GetHashCode() => HashCode.Combine(Source, HashIndex? Index : 11, Color, Macro, Layer, BlendingMode, BlendingRange, PeekMultiTarget);
         
         public override string ToString() => $"{((Source == null)? "null" : Source.Name )} -> {Index} @ {Layer} + {BlendingMode} & {MultiTarget} = {Color}";
     }

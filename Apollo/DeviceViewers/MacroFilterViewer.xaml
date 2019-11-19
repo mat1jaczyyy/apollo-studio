@@ -1,0 +1,120 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.MacroFilterViewer"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
+  
+  <StackPanel Orientation="Horizontal">
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerReleased="Clicked" />
+    </UniformGrid>
+  </StackPanel>
+</UserControl>

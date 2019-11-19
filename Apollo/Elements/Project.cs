@@ -96,16 +96,16 @@ namespace Apollo.Elements {
             get => Path.GetFileNameWithoutExtension(FilePath);
         }
 
-        public delegate void PageChangedEventHandler();
-        public event PageChangedEventHandler PageChanged;
+        public delegate void MacroChangedEventHandler();
+        public event MacroChangedEventHandler MacroChanged;
 
-        int _page;
-        public int Page {
-            get => _page;
+        int _macro;
+        public int Macro {
+            get => _macro;
             set {
                 if (1 <= value && value <= 100) {
-                    _page = value;
-                    PageChanged?.Invoke();
+                    _macro = value;
+                    MacroChanged?.Invoke();
                 }
             }
         }
@@ -232,11 +232,11 @@ namespace Apollo.Elements {
             TrackOperation = false;
         }
 
-        public Project(int bpm = 150, int page = 1, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {
+        public Project(int bpm = 150, int macro = 1, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {
             TimeSpent.Start();
 
             BPM = bpm;
-            Page = page;
+            Macro = macro;
             Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
             Author = author;
             BaseTime = basetime;
@@ -273,7 +273,7 @@ namespace Apollo.Elements {
             Undo?.Dispose();
             Undo = null;
 
-            PageChanged = null;
+            MacroChanged = null;
             PathChanged = null;
             TrackCountChanged = null;
 

@@ -6,10 +6,10 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class PageFilter: Device {
+    public class MacroFilter: Device {
         bool[] _filter;
 
-        public override Device Clone() => new PageFilter(_filter.ToArray()) {
+        public override Device Clone() => new MacroFilter(_filter.ToArray()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -20,21 +20,21 @@ namespace Apollo.Devices {
                 if (0 <= index && index <= 99 && _filter[index] != value) {
                     _filter[index] = value;
                     
-                    if (Viewer?.SpecificViewer != null) ((PageFilterViewer)Viewer.SpecificViewer).Set(index, _filter[index]);
+                    if (Viewer?.SpecificViewer != null) ((MacroFilterViewer)Viewer.SpecificViewer).Set(index, _filter[index]);
                 }
             }
         }
 
-        public PageFilter(bool[] init = null): base("pagefilter", "Page Filter") {
+        public MacroFilter(bool[] init = null): base("macrofilter", "Macro Filter") {
             if (init == null || init.Length != 100) {
                 init = new bool[100];
-                init[Program.Project.Page - 1] = true;
+                init[Program.Project.Macro - 1] = true;
             }
             _filter = init;
         }
 
         public override void MIDIProcess(Signal n) {
-            if (_filter[n.Page - 1])
+            if (_filter[n.Macro - 1])
                 InvokeExit(n);
         }
     }

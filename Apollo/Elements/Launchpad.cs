@@ -466,11 +466,11 @@ namespace Apollo.Elements {
                 if (PatternWindow == null) {
                     if (n.Color.Lit) {
                         if (inputbuffer[n.Index] == 0)
-                            inputbuffer[n.Index] = Program.Project.Page;
+                            inputbuffer[n.Index] = Program.Project.Macro;
                         
                     } else if (inputbuffer[n.Index] == 0) return;
                     
-                    n.Page = inputbuffer[n.Index];
+                    n.Macro = inputbuffer[n.Index];
 
                     if (!n.Color.Lit) inputbuffer[n.Index] = 0;
 

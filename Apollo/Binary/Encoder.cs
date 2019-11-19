@@ -47,7 +47,7 @@ namespace Apollo.Binary {
                 writer.Write((int)Preferences.LaunchpadModel);
 
                 writer.Write(Preferences.AutoCreateKeyFilter);
-                writer.Write(Preferences.AutoCreatePageFilter);
+                writer.Write(Preferences.AutoCreateMacroFilter);
                 writer.Write(Preferences.AutoCreatePattern);
 
                 writer.Write(Preferences.FadeSmoothnessSlider);
@@ -111,7 +111,7 @@ namespace Apollo.Binary {
             EncodeID(writer, typeof(Project));
 
             writer.Write(o.BPM);
-            writer.Write(o.Page);
+            writer.Write(o.Macro);
 
             writer.Write(o.Tracks.Count);
             for (int i = 0; i < o.Tracks.Count; i++)
@@ -314,8 +314,8 @@ namespace Apollo.Binary {
             writer.Write(o.Target);
         }
 
-        static void Encode(BinaryWriter writer, PageFilter o) {
-            EncodeID(writer, typeof(PageFilter));
+        static void Encode(BinaryWriter writer, MacroFilter o) {
+            EncodeID(writer, typeof(MacroFilter));
 
             for (int i = 0; i < 100; i++)
                 writer.Write(o[i]);
@@ -324,7 +324,7 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, Switch o) {
             EncodeID(writer, typeof(Switch));
 
-            writer.Write(o.Page);
+            writer.Write(o.Macro);
         }
 
         static void Encode(BinaryWriter writer, Paint o) {

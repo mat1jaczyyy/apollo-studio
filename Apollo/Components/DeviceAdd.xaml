@@ -12,7 +12,7 @@
       </MenuItem>
 
       <MenuItem Header="Filters">
-        <MenuItem Header="Page Filter" />
+        <MenuItem Header="Macro Filter" />
         <MenuItem Header="Key Filter" />
         <MenuItem Header="Color Filter" />
         <MenuItem Header="Layer Filter" />
