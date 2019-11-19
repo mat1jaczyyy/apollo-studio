@@ -466,7 +466,7 @@ namespace Apollo.Elements {
                 if (PatternWindow == null) {
                     if (n.Color.Lit) {
                         if (inputbuffer[n.Index] == null)
-                            inputbuffer[n.Index] = Program.Project.Macros;
+                            inputbuffer[n.Index] = (int[])Program.Project.Macros.Clone();
                             
                     } else if (inputbuffer[n.Index] == null) return;
                     
