@@ -75,7 +75,7 @@ namespace Apollo.Devices {
 
         double EaseTime(FadeType type, double start, double end, double val) {
             if (type == FadeType.Linear) return val;
-            if (type == FadeType.Hold) return start;
+            if (type == FadeType.Hold) return (start != val)? end - 0.1 : start;
 
             double duration = end - start;
             return start + duration * TimeEasing[type].Invoke((val - start) / duration);
