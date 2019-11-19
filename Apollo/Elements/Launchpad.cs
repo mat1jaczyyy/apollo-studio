@@ -484,7 +484,7 @@ namespace Apollo.Elements {
             this,
             this,
             (byte)e.Key,
-            new Color((byte)(e.Velocity))
+            new Color((byte)(e.Velocity >> 1))
         ));
 
         void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
@@ -504,7 +504,7 @@ namespace Apollo.Elements {
                             this,
                             this,
                             (byte)(e.Control - 13),
-                            new Color((byte)(e.Value))
+                            new Color((byte)(e.Value >> 1))
                         ));
                     break;
 
@@ -520,7 +520,7 @@ namespace Apollo.Elements {
                         this,
                         this,
                         (byte)e.Control,
-                        new Color((byte)(e.Value))
+                        new Color((byte)(e.Value >> 1))
                     ));
                     break;
 
@@ -531,7 +531,7 @@ namespace Apollo.Elements {
                         this,
                         this,
                         (byte)e.Control,
-                        new Color((byte)(e.Value))
+                        new Color((byte)(e.Value >> 1))
                     ));
                     break;
             }
