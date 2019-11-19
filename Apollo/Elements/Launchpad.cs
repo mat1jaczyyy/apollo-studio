@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -477,12 +478,14 @@ namespace Apollo.Elements {
             }
         }
 
+        byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
+
         public void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(
             InputFormat,
             this,
             this,
             (byte)e.Key,
-            new Color((byte)(e.Velocity >> 1))
+            new Color(InputColor(e.Velocity))
         ));
 
         void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
@@ -502,7 +505,7 @@ namespace Apollo.Elements {
                             this,
                             this,
                             (byte)(e.Control - 13),
-                            new Color((byte)(e.Value >> 1))
+                            new Color(InputColor(e.Value))
                         ));
                     break;
 
@@ -518,7 +521,7 @@ namespace Apollo.Elements {
                         this,
                         this,
                         (byte)e.Control,
-                        new Color((byte)(e.Value >> 1))
+                        new Color(InputColor(e.Value))
                     ));
                     break;
 
@@ -529,7 +532,7 @@ namespace Apollo.Elements {
                         this,
                         this,
                         (byte)e.Control,
-                        new Color((byte)(e.Value >> 1))
+                        new Color(InputColor(e.Value))
                     ));
                     break;
             }
