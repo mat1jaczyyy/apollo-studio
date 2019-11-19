@@ -86,13 +86,13 @@ namespace Apollo.Windows {
             new Time(false),
             colors: new List<Color>() {
                 new Color(1, 0, 0),
-                new Color(127, 0, 0),
-                new Color(127, 127, 0),
-                new Color(0, 127, 0),
-                new Color(0, 127, 127),
-                new Color(0, 0, 127),
-                new Color(127, 0, 127),
-                new Color(127, 0, 0),
+                new Color(63, 0, 0),
+                new Color(63, 63, 0),
+                new Color(0, 63, 0),
+                new Color(0, 63, 63),
+                new Color(0, 0, 63),
+                new Color(63, 0, 63),
+                new Color(63, 0, 0),
                 new Color(1, 0, 0)
             },
             positions: new List<double>() {

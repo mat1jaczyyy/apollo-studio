@@ -93,7 +93,7 @@ namespace Apollo.Windows {
         }
 
         void PadChanged(int index, bool state) {
-            Signal n = new Signal(_launchpad, _launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 127 : 0)));
+            Signal n = new Signal(_launchpad, _launchpad, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0)));
 
             if (_launchpad is AbletonLaunchpad abletonLaunchpad)
                 AbletonConnector.Send(abletonLaunchpad, n);
