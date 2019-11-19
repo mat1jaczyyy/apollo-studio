@@ -125,7 +125,8 @@ namespace Apollo.Components {
 
             Preview.Fill = Color.ToScreenBrush();
 
-            Hex.Text = Color.ToHex();
+            UpdateText();
+            Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
         }
 
         void UpdateCanvas() {
