@@ -154,7 +154,7 @@ namespace Apollo.Binary {
 
             } else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
-                int[] macros = new int[4]{reader.ReadInt32(), 1, 1, 1};
+                int[] macros = (version >= 25)? (from i in Enumerable.Range(0, 3) select reader.ReadInt32()).ToArray() : new int[4]{reader.ReadInt32(), 1, 1, 1};
                 List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
 
                 string author = "";
@@ -441,7 +441,7 @@ namespace Apollo.Binary {
             
             else if (t == typeof(MacroFilter))
                 return new MacroFilter(
-                    (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
+                    reader.ReadInt32(), (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
             
             else if (t == typeof(Paint))
@@ -519,16 +519,18 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Switch)) {
-                int macro = reader.ReadInt32();
+                int value = reader.ReadInt32();
 
                 if (18 <= version && version <= 21 && reader.ReadBoolean())
                     return new Group(new List<Chain>() {
                         new Chain(new List<Device>() {
-                            new Switch(macro), new Clear(ClearType.Multi)
+                            new Switch(1, value), new Clear(ClearType.Multi)
                         }, "Switch Reset")
                     });
+                    
+                int target = reader.ReadInt32();
 
-                return new Switch(macro);
+                return new Switch(target, value);
             
             } else if (t == typeof(Tone))
                 return new Tone(

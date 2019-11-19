@@ -10,7 +10,7 @@ namespace Apollo.Devices {
         bool[] _filter;
         public int Target;
 
-        public override Device Clone() => new MacroFilter(_filter.ToArray()) {
+        public override Device Clone() => new MacroFilter(Target, _filter.ToArray()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -26,7 +26,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public MacroFilter(bool[] init = null, int target = 1): base("macrofilter", "Macro Filter") {
+        public MacroFilter(int target = 1, bool[] init = null): base("macrofilter", "Macro Filter") {
             Target = target;
             if (init == null || init.Length != 100) {
                 init = new bool[100];
