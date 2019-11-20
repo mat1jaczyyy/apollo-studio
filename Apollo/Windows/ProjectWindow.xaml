@@ -55,7 +55,7 @@
           </ScrollViewer>
           
           <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="0 1 0 0">
-            <StackPanel Margin="0 10" Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="20">
+            <StackPanel x:Name="MacroDials" Margin="0 10" Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="20">
               <Components:Dial x:Name="Macro1" Title="Macro 1" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false" Scale="0.7"
                                ValueChanged="Macro_Changed" />
               <Components:Dial x:Name="Macro2" Title="Macro 2" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false" Scale="0.7"

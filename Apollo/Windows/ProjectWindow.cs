@@ -41,12 +41,10 @@ namespace Apollo.Windows {
 
             Contents = this.Get<StackPanel>("Contents").Children;
             TrackAdd = this.Get<TrackAdd>("TrackAdd");
+            
+            MacroDials = this.Get<StackPanel>("MacroDials");
 
             BPM = this.Get<TextBox>("BPM");
-            
-            for(int i = 1; i < 5; i++){
-                MacroDials.Add(this.Get<Dial>("Macro" + i));
-            }
             
             Author = this.Get<TextBox>("Author");
 
@@ -66,7 +64,7 @@ namespace Apollo.Windows {
         TrackAdd TrackAdd;
 
         TextBox BPM, Author;
-        List<Dial> MacroDials = new List<Dial>(4);
+        StackPanel MacroDials;
 
         DispatcherTimer Timer;
         bool SafeClose = false;
@@ -75,7 +73,7 @@ namespace Apollo.Windows {
 
         void UpdateMacro(){
           for(int i = 0; i < 4; i++){
-            MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
+            ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
           }
         }
         
@@ -134,7 +132,7 @@ namespace Apollo.Windows {
             BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
 
             for(int i = 0; i < 4; i++){
-              MacroDials[i].RawValue = Program.Project.GetMacro(i + 1);
+                ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
             }
             
             Author.Text = Program.Project.Author.ToString();
@@ -254,7 +252,7 @@ namespace Apollo.Windows {
         }
 
         void Macro_Changed(Dial sender, double value, double? old){
-          int index = MacroDials.IndexOf(sender);
+          int index = MacroDials.Children.IndexOf(sender);
           Program.Project.SetMacro(index + 1, (int)value);
         }
 
