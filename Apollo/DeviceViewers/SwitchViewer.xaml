@@ -5,13 +5,13 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   
-  <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+  <Grid RowDefinitions="*,*" Width="60">
+    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
       <Components:Dial x:Name="Target" Margin="0 0 0 5" Title="Macro" Minimum="1" Maximum="4" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
-                     ValueChanged="Target_Changed" />
+                       ValueChanged="Target_Changed" />
     </Border>
-    <Components:Dial x:Name="Value" Margin="0 5 0 0" Title="Value" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
-                   ValueChanged="Value_Changed" />
-  </StackPanel>
-  
+
+    <Components:Dial Grid.Row="1" x:Name="Value" Margin="0 5 0 0" Title="Value" Minimum="1" Maximum="100" Default="1" Exponent="1" Round="0" Unit="" FillStart="false"
+                     ValueChanged="Value_Changed" />
+  </Grid>
 </UserControl>

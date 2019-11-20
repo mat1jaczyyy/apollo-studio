@@ -26,7 +26,6 @@ namespace Apollo.DeviceViewers {
         Dial Target;
         Dial Value;
 
-
         public SwitchViewer() => new InvalidOperationException();
 
         public SwitchViewer(Switch macroswitch) {
@@ -55,6 +54,8 @@ namespace Apollo.DeviceViewers {
 
             _switch.Target = (int)value;
         }
+       
+        public void SetTarget(int target) => Target.RawValue = target;
         
         void Value_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {
@@ -71,10 +72,7 @@ namespace Apollo.DeviceViewers {
 
             _switch.Value = (int)value;
         }
-       
-
-        public void SetTargetDial(int target) => Target.RawValue = target;
         
-        public void SetValueDial(int value) => Value.RawValue = value;
+        public void SetValue(int value) => Value.RawValue = value;
     }
 }

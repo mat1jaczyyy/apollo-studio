@@ -252,8 +252,7 @@ namespace Apollo.Windows {
         }
 
         void Macro_Changed(Dial sender, double value, double? old){
-          int index = MacroDials.Children.IndexOf(sender);
-          Program.Project.SetMacro(index + 1, (int)value);
+          Program.Project.SetMacro(MacroDials.Children.IndexOf(sender) + 1, (int)value);
         }
 
         Action BPM_Update;
