@@ -37,7 +37,7 @@ namespace Apollo.DeviceViewers {
 
             _filter = filter;
             
-            MacroDial.RawValue = _filter.Target;
+            MacroDial.RawValue = _filter.Macro;
 
             for (int i = 0; i < MacrosGrid.Children.Count; i++) {
                 MacroRectangle Rect = (MacroRectangle)MacrosGrid.Children[i];
@@ -46,7 +46,19 @@ namespace Apollo.DeviceViewers {
             }
         }
         void Target_Changed(Dial sender, double value, double? old){
-            _filter.Target = (int)value;
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_filter);
+
+                Program.Project.Undo.Add($"MacroFilter Target Changed to {r}", () => {
+                    ((MacroFilter)Track.TraversePath(path)).Macro = u;
+                }, () => {
+                    ((MacroFilter)Track.TraversePath(path)).Macro = r;
+                });
+            }
+
+            _filter.Macro = (int)value;
         }
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
@@ -68,5 +80,7 @@ namespace Apollo.DeviceViewers {
 
 
         public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);
+        
+        public void SetMacro (int macro) => MacroDial.RawValue = macro;
     }
 }

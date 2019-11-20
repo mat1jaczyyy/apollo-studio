@@ -319,7 +319,7 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, MacroFilter o) {
             EncodeID(writer, typeof(MacroFilter));
 
-            writer.Write(o.Target);
+            writer.Write(o.Macro);
             
             for (int i = 0; i < 100; i++)
                 writer.Write(o[i]);
