@@ -38,7 +38,7 @@ namespace Apollo.DeviceViewers {
 
         void PadChanged(int index, bool state) {
             Launchpad lp = Track.Get(_preview)?.Launchpad;
-            _preview.MIDIEnter(new Signal(lp, lp, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 127 : 0))));
+            _preview.MIDIEnter(new Signal(lp, lp, (byte)LaunchpadGrid.GridToSignal(index), new Color((byte)(state? 63 : 0))));
         }
 
         void PadPressed(int index) => PadChanged(index, true);

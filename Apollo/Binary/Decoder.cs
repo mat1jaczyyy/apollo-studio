@@ -541,11 +541,17 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Color)) {
-                byte[] colors = reader.ReadBytes(3);
-                if (version <= 23)
-                    colors = colors.Select(i => (byte)((double)i * 127.0 / 63)).ToArray();
+                byte red = reader.ReadByte();
+                byte green = reader.ReadByte();
+                byte blue = reader.ReadByte();
 
-                return new Color(colors[0], colors[1], colors[2]);
+                if (version == 24) {
+                    if (red > 0) red = (byte)((red - 1) * 62.0 / 126 + 1);
+                    if (green > 0) green = (byte)((green - 1) * 62.0 / 126 + 1);
+                    if (blue > 0) blue = (byte)((blue - 1) * 62.0 / 126 + 1);
+                }
+
+                return new Color(red, green, blue);
             
             } else if (t == typeof(Frame)) {
                 Time time;

@@ -75,7 +75,7 @@ namespace Apollo.Devices {
 
         double EaseTime(FadeType type, double start, double end, double val) {
             if (type == FadeType.Linear) return val;
-            if (type == FadeType.Hold) return start;
+            if (type == FadeType.Hold) return (start != val)? end - 0.1 : start;
 
             double duration = end - start;
             return start + duration * TimeEasing[type].Invoke((val - start) / duration);
@@ -184,13 +184,20 @@ namespace Apollo.Devices {
             _steps.Add(_colors.Last());
 
             if (_steps.Last().Lit) {
-                _steps.Add(new Color(0));
                 _cutoffs[_cutoffs.Count - 1]++;
+                _counts[_counts.Count - 1]++;
+            
+                _steps.Add(new Color(0));
+                _counts.Add(1);
+                _cutoffs.Add(1 + _cutoffs.Last());
             }
 
-            fade = new List<FadeInfo>() {
+            List<FadeInfo> fullFade = new List<FadeInfo>() {
                 new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
             };
+            
+            fade = new List<FadeInfo>();
+            fade.Add(fullFade.Last());
 
             int j = 0;
             for (int i = 1; i < _steps.Count; i++) {
@@ -203,15 +210,16 @@ namespace Apollo.Devices {
                     
                     double time = EaseTime(_types[j], prevTime, nextTime, currTime);
                     
-                    if (fade.Last().Time + smoothness < time) fade.Add(
-                        new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold)
-                    );
+                    fullFade.Add(new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold));
+
+                    if (fade.Last().Time + smoothness < time)
+                        fade.Add(fullFade.Last());
                 }
             }
 
             fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
             
-            Generated?.Invoke(fade);
+            Generated?.Invoke(fullFade);
         }
 
         public int Count => _colors.Count;
