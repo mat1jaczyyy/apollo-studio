@@ -56,7 +56,7 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText, TitleCenter, TimeSpent, Started;
-        StackPanel CenteringLeft, CenteringRight, BottomPane;
+        StackPanel CenteringLeft, CenteringRight, MacroDials, BottomPane;
         CollapseButton CollapseButton;
 
         ContextMenu TrackContextMenu;
@@ -64,17 +64,15 @@ namespace Apollo.Windows {
         TrackAdd TrackAdd;
 
         TextBox BPM, Author;
-        StackPanel MacroDials;
 
         DispatcherTimer Timer;
         bool SafeClose = false;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        void UpdateMacro(){
-          for(int i = 0; i < 4; i++){
-            ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
-          }
+        void UpdateMacro() {
+            for (int i = 0; i < 4; i++)
+                ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
         }
         
         void HandleMacro() => Dispatcher.UIThread.InvokeAsync((Action)UpdateMacro);

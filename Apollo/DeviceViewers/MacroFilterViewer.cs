@@ -45,6 +45,9 @@ namespace Apollo.DeviceViewers {
                 Rect.Index = i + 1;
             }
         }
+        
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+
         void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {
                 int u = (int)old.Value;
@@ -60,7 +63,8 @@ namespace Apollo.DeviceViewers {
 
             _filter.Macro = (int)value;
         }
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+        
+        public void SetMacro(int macro) => MacroDial.RawValue = macro;
 
         void Clicked(object sender, PointerReleasedEventArgs e) {
             int index = MacrosGrid.Children.IndexOf((IControl)sender);
@@ -78,9 +82,6 @@ namespace Apollo.DeviceViewers {
             _filter[index] = !_filter[index];
         }
 
-
         public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);
-        
-        public void SetMacro (int macro) => MacroDial.RawValue = macro;
     }
 }
