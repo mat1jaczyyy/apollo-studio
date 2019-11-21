@@ -42,7 +42,7 @@ namespace Apollo.Devices {
 
             if (init == null || init.Length != 100) {
                 init = new bool[100];
-                init[0] = true;
+                init[Program.Project.GetMacro(Macro) - 1] = true;
             }
             
             _filter = init;
