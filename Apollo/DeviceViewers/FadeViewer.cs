@@ -170,13 +170,11 @@ namespace Apollo.DeviceViewers {
                 double time = pos * _fade.Time;
                 
                 int fadeIndex = 0;
-                for(int i = 0; i < fullFade.Count; i++){
-                    if(Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time)){
+                for (int i = 0; i < fullFade.Count; i++)
+                    if (Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time))
                         fadeIndex = i;
-                    }
-                }
                 
-                Color thumbColor = fullFade[fadeIndex].Color;
+                Color thumbColor = fullFade[fadeIndex].Color.Clone();
                 
                 List<int> path = Track.GetPath(_fade);
 
@@ -186,7 +184,7 @@ namespace Apollo.DeviceViewers {
                     ((Fade)Track.TraversePath(path)).Insert(index, thumbColor, pos, FadeType.Linear);
                 });
 
-                _fade.Insert(index, thumbColor, pos, FadeType.Linear);
+                _fade.Insert(index, thumbColor.Clone(), pos, FadeType.Linear);
             }
         }
 
@@ -493,6 +491,5 @@ namespace Apollo.DeviceViewers {
         }
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
-        
     }
 }
