@@ -53,6 +53,8 @@ namespace Apollo.Windows {
             Started = this.Get<TextBlock>("Started");
         }
 
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+
         TextBlock TitleText, TitleCenter, TimeSpent, Started;
         StackPanel CenteringLeft, CenteringRight, BottomPane;
         CollapseButton CollapseButton;
@@ -122,12 +124,12 @@ namespace Apollo.Windows {
             Selection = new SelectionManager(() => Program.Project.Tracks.FirstOrDefault());
             
             BPM.Text = Program.Project.BPM.ToString();
-            BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed);
+            observables.Add(BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed));
 
             Page.RawValue = Program.Project.Page;
             
             Author.Text = Program.Project.Author.ToString();
-            Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed);
+            observables.Add(Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed));
 
             UpdateTime(null, EventArgs.Empty);
             Timer = new DispatcherTimer() {
@@ -138,11 +140,11 @@ namespace Apollo.Windows {
 
             Started.Text = $"Started {Program.Project.Started.LocalDateTime.ToString("MM/dd/yyyy HH:mm")}";
 
-            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            observables.Add(this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
         
         void Loaded(object sender, EventArgs e) {
@@ -179,6 +181,9 @@ namespace Apollo.Windows {
 
             TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
             TrackContextMenu = null;
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
 
             this.Content = null;
 

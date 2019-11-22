@@ -66,6 +66,8 @@ namespace Apollo.Windows {
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
         }
 
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+
         Pattern _pattern;
         Track _track;
 
@@ -234,7 +236,7 @@ namespace Apollo.Windows {
 
             _track = Track.Get(_pattern);
 
-            Editor.GetObservable(Visual.BoundsProperty).Subscribe(Editor_Updated);
+            observables.Add(Editor.GetObservable(Visual.BoundsProperty).Subscribe(Editor_Updated));
 
             SetRootKey(_pattern.RootKey);
             Wrap.IsChecked = _pattern.Wrap;
@@ -271,11 +273,11 @@ namespace Apollo.Windows {
             Frame_Select(_pattern.Expanded);
             Selection.Select(_pattern[_pattern.Expanded]);
 
-            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            observables.Add(this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
         void Loaded(object sender, EventArgs e) {
@@ -323,6 +325,9 @@ namespace Apollo.Windows {
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             ColorHistory.HistoryChanged -= RenderHistory;
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
 
             this.Content = null;
 
@@ -1569,7 +1574,7 @@ namespace Apollo.Windows {
 
         public void Mute(int left, int right) {}
         public void Rename(int left, int right) {}
-        
+
         public void Export(int left, int right) {}
         public void Import(int right, string path = null) {}
 

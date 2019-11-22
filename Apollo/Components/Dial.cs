@@ -26,6 +26,8 @@ namespace Apollo.Components {
 
             Input = this.Get<TextBox>("Input");
         }
+        
+        IDisposable observable;
 
         public delegate void DialStartedEventHandler();
         public event DialStartedEventHandler Started;
@@ -317,7 +319,7 @@ namespace Apollo.Components {
         public Dial() {
             InitializeComponent();
 
-            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             DrawArcBase();
         }
@@ -329,6 +331,8 @@ namespace Apollo.Components {
             ModeChanged = null;
 
             _length = null;
+
+            observable.Dispose();
         }
 
         protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
