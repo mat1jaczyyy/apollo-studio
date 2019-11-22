@@ -474,6 +474,8 @@ namespace Apollo.DeviceViewers {
 
         public void Group(int left, int right) {}
         public void Ungroup(int index) {}
+        public void Choke(int left, int right) {}
+        public void Unchoke(int index) {}
         
         public void Mute(int left, int right) {
             List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Enabled).ToList();

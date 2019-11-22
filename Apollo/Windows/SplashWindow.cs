@@ -45,6 +45,8 @@ namespace Apollo.Windows {
 
             UpdateButton = this.Get<UpdateButton>("UpdateButton");
         }
+        
+        IDisposable observable;
 
         Grid Root, CrashPanel;
         TabControl TabControl;
@@ -100,7 +102,7 @@ namespace Apollo.Windows {
 
             Preferences.RecentsCleared += Clear;
 
-            TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
+            observable = TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -142,6 +144,8 @@ namespace Apollo.Windows {
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.RecentsCleared += Clear;
+
+            observable.Dispose();
 
             this.Content = null;
 

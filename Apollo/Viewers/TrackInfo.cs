@@ -32,6 +32,8 @@ namespace Apollo.Viewers {
             MuteItem = this.Get<MenuItem>("MuteItem");
             Input = this.Get<TextBox>("Input");
         }
+        
+        IDisposable observable;
 
         public delegate void AddedEventHandler(int index);
         public event AddedEventHandler Added;
@@ -101,7 +103,7 @@ namespace Apollo.Viewers {
             
             Deselect();
 
-            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
         }
@@ -117,6 +119,8 @@ namespace Apollo.Viewers {
 
             TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             TrackContextMenu = null;
+
+            observable.Dispose();
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);

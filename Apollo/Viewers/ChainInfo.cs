@@ -29,6 +29,8 @@ namespace Apollo.Viewers {
             Input = this.Get<TextBox>("Input");
             Indicator = this.Get<Indicator>("Indicator");
         }
+        
+        IDisposable observable;
 
         public delegate void ChainAddedEventHandler(int index);
         public event ChainAddedEventHandler ChainAdded;
@@ -84,7 +86,7 @@ namespace Apollo.Viewers {
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
-            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
         }
@@ -99,6 +101,8 @@ namespace Apollo.Viewers {
 
             ChainContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             ChainContextMenu = null;
+
+            observable.Dispose();
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);

@@ -29,6 +29,8 @@ namespace Apollo.Windows {
             Grid = this.Get<LaunchpadGrid>("Grid");
         }
 
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+
         Launchpad _launchpad;
         LaunchpadGrid Grid;
         
@@ -55,13 +57,13 @@ namespace Apollo.Windows {
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), launchpad.GetColor(i).ToScreenBrush());
             
-            Grid.GetObservable(Visual.BoundsProperty).Subscribe(Grid_Updated);
+            observables.Add(Grid.GetObservable(Visual.BoundsProperty).Subscribe(Grid_Updated));
 
-            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            observables.Add(this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
@@ -73,6 +75,9 @@ namespace Apollo.Windows {
                 MIDI.Disconnect(_launchpad);
             
             _launchpad = null;
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
 
             this.Content = null;
         }

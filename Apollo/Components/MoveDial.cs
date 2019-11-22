@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -27,6 +28,8 @@ namespace Apollo.Components {
             InputX = this.Get<TextBox>("InputX");
             InputY = this.Get<TextBox>("InputY");
         }
+
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
 
         public delegate void MoveDialChangedEventHandler(int x, int y, int? old_x, int? old_y);
         public event MoveDialChangedEventHandler Changed;
@@ -94,10 +97,10 @@ namespace Apollo.Components {
         public MoveDial() {
             InitializeComponent();
 
-            InputX.GetObservable(TextBox.TextProperty).Subscribe(InputX_Changed);
+            observables.Add(InputX.GetObservable(TextBox.TextProperty).Subscribe(InputX_Changed));
             InputX.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
 
-            InputY.GetObservable(TextBox.TextProperty).Subscribe(InputY_Changed);
+            observables.Add(InputY.GetObservable(TextBox.TextProperty).Subscribe(InputY_Changed));
             InputY.AddHandler(InputElement.PointerPressedEvent, Input_MouseDown, RoutingStrategies.Tunnel);
 
             DrawX();
@@ -110,6 +113,9 @@ namespace Apollo.Components {
 
             InputX.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
             InputY.RemoveHandler(InputElement.PointerPressedEvent, Input_MouseDown);
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
         }
 
         bool mouseHeld = false;

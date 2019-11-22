@@ -71,7 +71,7 @@ namespace Apollo.Viewers {
 
         protected TextBlock TitleText;
         protected Grid Draggable;
-        protected ContextMenu DeviceContextMenu, GroupContextMenu;
+        protected ContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
         protected MenuItem DeviceMute, GroupMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
@@ -118,9 +118,11 @@ namespace Apollo.Viewers {
 
             DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
+            ChokeContextMenu = (ContextMenu)this.Resources["ChokeContextMenu"];
             
             DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            ChokeContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -142,7 +144,8 @@ namespace Apollo.Viewers {
 
             DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            DeviceContextMenu = GroupContextMenu = null;
+            ChokeContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            DeviceContextMenu = GroupContextMenu = ChokeContextMenu = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
@@ -198,8 +201,13 @@ namespace Apollo.Viewers {
                     ContextMenu menu = DeviceContextMenu;
                     List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
 
-                    if (selection.Count == 1 && selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
-                        menu = GroupContextMenu;
+                    if (selection.Count == 1) {
+                        if (selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
+                            menu = GroupContextMenu;
+
+                        else if (selection[0].GetType() == typeof(Choke))
+                            menu = ChokeContextMenu;
+                    } 
                     
                     DeviceMute.Header = GroupMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 

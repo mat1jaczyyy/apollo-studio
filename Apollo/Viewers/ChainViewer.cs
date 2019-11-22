@@ -411,9 +411,9 @@ namespace Apollo.Viewers {
         }
 
         public void Ungroup(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Group)) return;
+            if (_chain.Devices[index].GetType() != typeof(Group) || ((Group)_chain.Devices[index]).Count != 1) return;
 
-            List<Device> init = (from i in ((Group)_chain.Devices[index])[0].Devices select i.Clone()).ToList();
+            Chain init = ((Group)_chain.Devices[index])[0].Clone();
 
             List<int> path = Track.GetPath(_chain);
 
@@ -423,12 +423,7 @@ namespace Apollo.Viewers {
                 for (int i = index + init.Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                Chain group = new Chain();
-
-                for (int i = 0; i < init.Count; i++)
-                    group.Add(init[i].Clone());
-                
-                chain.Insert(index, new Group(new List<Chain>() {group}) {Expanded = 0});
+                chain.Insert(index, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
 
             }, () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
@@ -441,8 +436,7 @@ namespace Apollo.Viewers {
                 Track.Get(chain).Window?.Selection.Select(chain[index], true);
                 
             }, () => {
-                foreach (Device device in init) device.Dispose();
-                init = null;
+                init.Dispose();
             });
 
             _chain.Remove(index);
@@ -453,6 +447,81 @@ namespace Apollo.Viewers {
             Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
         }
         
+        public void Choke(int left, int right) {
+            Chain init = new Chain();
+
+            for (int i = left; i <= right; i++)
+                init.Add(_chain.Devices[i].Clone());
+
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Choked", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                chain.Remove(left);
+
+                for (int i = left; i <= right; i++)
+                    chain.Insert(i, init[i - left].Clone());
+                
+                Track track = Track.Get(chain);
+                track?.Window?.Selection.Select(chain[left]);
+                track?.Window?.Selection.Select(chain[right], true);
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+                
+                for (int i = right; i >= left; i--)
+                    chain.Remove(i);
+                
+                chain.Insert(left, new Choke(1, init.Clone()));
+            
+            }, () => {
+                init.Dispose();
+            });
+            
+            for (int i = right; i >= left; i--)
+                _chain.Remove(i);
+
+            _chain.Insert(left, new Choke(1, init.Clone()));
+        }
+
+        public void Unchoke(int index) {
+            if (_chain.Devices[index].GetType() != typeof(Choke)) return;
+
+            Chain init = ((Choke)_chain.Devices[index]).Chain.Clone();
+
+            List<int> path = Track.GetPath(_chain);
+
+            Program.Project.Undo.Add($"Device Unchoked", () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+
+                for (int i = index + init.Count - 1; i >= index; i--)
+                    chain.Remove(i);
+                
+                chain.Insert(index, new Choke(1, init.Clone()));
+
+            }, () => {
+                Chain chain = ((Chain)Track.TraversePath(path));
+                
+                chain.Remove(index);
+            
+                for (int i = 0; i < init.Count; i++)
+                    chain.Insert(index + i, init[i].Clone());
+
+                Track.Get(chain).Window?.Selection.Select(chain[index], true);
+                
+            }, () => {
+                init.Dispose();
+            });
+
+            _chain.Remove(index);
+            
+            for (int i = 0; i < init.Count; i++)
+                _chain.Insert(index + i, init[i].Clone());
+
+            Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
+        }
+
         public void Mute(int left, int right) {
             List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _chain[i].Enabled).ToList();
             bool r = !_chain[left].Enabled;

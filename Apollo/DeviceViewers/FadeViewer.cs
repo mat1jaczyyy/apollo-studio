@@ -41,6 +41,8 @@ namespace Apollo.DeviceViewers {
             Input = this.Get<TextBox>("Input");
         }
         
+        IDisposable observable;
+        
         Fade _fade;
         
         Dial Duration, Gate;
@@ -115,7 +117,7 @@ namespace Apollo.DeviceViewers {
 
             Expand(temp);
 
-            Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
+            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             _fade.Generate();
         }
@@ -123,6 +125,8 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _fade.Generated -= Gradient_Generate;
             _fade = null;
+
+            observable.Dispose();
         }
 
         public void Expand(int? index) {

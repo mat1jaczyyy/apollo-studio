@@ -51,10 +51,15 @@ namespace Apollo.Interfaces {
         void Paste(int right);
         void Replace(int left, int right);
         void Delete(int left, int right);
+
         void Group(int left, int right);
         void Ungroup(int left);
+        void Choke(int left, int right);
+        void Unchoke(int left);
+
         void Mute(int left, int right);
         void Rename(int left, int right);
+        
         void Export(int left, int right);
         void Import(int right, string path = null);
     }

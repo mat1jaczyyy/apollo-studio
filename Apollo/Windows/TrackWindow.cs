@@ -32,6 +32,8 @@ namespace Apollo.Windows {
             Contents = this.Get<ScrollViewer>("Contents");
         }
 
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+
         Track _track;
 
         ScrollViewer Contents;
@@ -81,11 +83,11 @@ namespace Apollo.Windows {
 
             SetEnabled();
 
-            this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            observables.Add(this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(TitleCenter.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringLeft.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
         void Loaded(object sender, EventArgs e) {
@@ -110,6 +112,9 @@ namespace Apollo.Windows {
             Preferences.CenterTrackContentsChanged -= UpdateContentAlignment;
 
             Selection.Dispose();
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
 
             this.Content = null;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -33,6 +34,8 @@ namespace Apollo.Components {
             
             Hex = this.Get<TextBox>("Hex");
         }
+
+        HashSet<IDisposable> observables = new HashSet<IDisposable>();
         
         public delegate void ColorChangedEventHandler(Color value, Color old);
         public event ColorChangedEventHandler ColorChanged;
@@ -66,8 +69,8 @@ namespace Apollo.Components {
         public ColorPicker() {
             InitializeComponent();
 
-            MainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
-            HueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated);
+            observables.Add(MainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
+            observables.Add(HueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
             
             MainThumb.AddHandler(InputElement.PointerPressedEvent, Thumb_Down, RoutingStrategies.Tunnel);
             MainThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
@@ -76,7 +79,7 @@ namespace Apollo.Components {
             HueThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
 
             hexValidation = true;
-            Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed);
+            observables.Add(Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed));
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -87,6 +90,9 @@ namespace Apollo.Components {
 
             HueThumb.RemoveHandler(InputElement.PointerPressedEvent, Thumb_Down);
             HueThumb.RemoveHandler(InputElement.PointerReleasedEvent, Thumb_Up);
+
+            foreach (IDisposable observable in observables)
+                observable.Dispose();
         }
 
         public void Bounds_Updated(Rect bounds) {

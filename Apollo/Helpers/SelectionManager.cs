@@ -135,6 +135,8 @@ namespace Apollo.Helpers {
             else if (action == "Delete") parent.IViewer?.Delete(left, right);
             else if (action == "Group") parent.IViewer?.Group(left, right);
             else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
+            else if (action == "Choke") parent.IViewer?.Choke(left, right);
+            else if (action == "Unchoke") parent.IViewer?.Unchoke(left);
             else if (action == "Mute" || action == "Unmute") parent.IViewer?.Mute(left, right);
             else if (action == "Rename") parent.IViewer?.Rename(left, right);
             else if (action == "Export") parent.IViewer?.Export(left, right);
@@ -149,6 +151,8 @@ namespace Apollo.Helpers {
 
             if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift)) {
                 if (e.Key == Key.V) Action("Replace");
+                else if (e.Key == Key.G) Action("Choke");
+                else if (e.Key == Key.U) Action("Unchoke");
                 else return false;
             
             } else if (e.KeyModifiers == App.ControlKey) {
