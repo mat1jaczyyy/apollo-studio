@@ -1564,8 +1564,12 @@ namespace Apollo.Windows {
 
         public void Group(int left, int right) {}
         public void Ungroup(int index) {}
+        public void Choke(int left, int right) {}
+        public void Unchoke(int index) {}
+
         public void Mute(int left, int right) {}
         public void Rename(int left, int right) {}
+        
         public void Export(int left, int right) {}
         public void Import(int right, string path = null) {}
 
