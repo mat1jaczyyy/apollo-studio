@@ -49,7 +49,7 @@ namespace Apollo.Structures {
 
         public Stack<int> CopyMultiTarget() => new Stack<int>(MultiTarget.ToArray());
 
-        public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), (int[])Macros.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
+        public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), (int[])Macros?.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
             HashIndex = HashIndex
         };
 
