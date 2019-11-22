@@ -411,7 +411,7 @@ namespace Apollo.Viewers {
         }
 
         public void Ungroup(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Group)) return;
+            if (_chain.Devices[index].GetType() != typeof(Group) || ((Group)_chain.Devices[index]).Count != 1) return;
 
             Chain init = ((Group)_chain.Devices[index])[0].Clone();
 
