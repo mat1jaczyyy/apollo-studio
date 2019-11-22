@@ -163,7 +163,7 @@ namespace Apollo.Elements {
             screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
-            inputbuffer = (from i in Enumerable.Range(0, 101) select new int[4] {0, 0, 0, 0}).ToArray();
+            inputbuffer = (from i in Enumerable.Range(0, 101) select (int[])null).ToArray();
         }
 
         public Color GetColor(int index) => (PatternWindow == null)
