@@ -55,6 +55,7 @@ namespace Apollo.DeviceViewers {
         LinearGradientBrush Gradient;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
+        List<Fade.FadeInfo> fullFade;
 
         public void Contents_Insert(int index, Color color) {
             FadeThumb thumb = new FadeThumb() {
@@ -169,16 +170,25 @@ namespace Apollo.DeviceViewers {
                     if (x < Canvas.GetLeft(thumbs[index])) break;
                 
                 double pos = x / 200;
-
+                
+                double time = pos * _fade.Time;
+                
+                int fadeIndex = 0;
+                for (int i = 0; i < fullFade.Count; i++)
+                    if (Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time))
+                        fadeIndex = i;
+                
+                Color thumbColor = fullFade[fadeIndex].Color.Clone();
+                
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
                     ((Fade)Track.TraversePath(path)).Remove(index);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Insert(index, new Color(), pos, FadeType.Linear);
+                    ((Fade)Track.TraversePath(path)).Insert(index, thumbColor, pos, FadeType.Linear);
                 });
 
-                _fade.Insert(index, new Color(), pos, FadeType.Linear);
+                _fade.Insert(index, thumbColor.Clone(), pos, FadeType.Linear);
             }
         }
 
@@ -282,6 +292,8 @@ namespace Apollo.DeviceViewers {
 
         void Gradient_Generate(List<Fade.FadeInfo> points) {
             if (Program.Project.IsDisposing) return;
+            
+            fullFade = points;
             
             Dispatcher.UIThread.InvokeAsync(() => {
                 Gradient.GradientStops.Clear();
