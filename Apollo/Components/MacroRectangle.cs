@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 namespace Apollo.Components {
-    public class PageRectangle: UserControl {
+    public class MacroRectangle: UserControl {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -23,6 +23,6 @@ namespace Apollo.Components {
             set => Text.Text = value.ToString();
         }
 
-        public PageRectangle() => InitializeComponent();
+        public MacroRectangle() => InitializeComponent();
     }
 }

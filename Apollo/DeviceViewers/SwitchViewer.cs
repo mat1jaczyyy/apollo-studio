@@ -17,41 +17,62 @@ namespace Apollo.DeviceViewers {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
             
-            Page = this.Get<Dial>("Page");
+            Target = this.Get<Dial>("Target");
+            Value = this.Get<Dial>("Value");
         }
         
         Switch _switch;
         
-        Dial Page;
+        Dial Target;
+        Dial Value;
 
         public SwitchViewer() => new InvalidOperationException();
 
-        public SwitchViewer(Switch pageswitch) {
+        public SwitchViewer(Switch macroswitch) {
             InitializeComponent();
 
-            _switch = pageswitch;
+            _switch = macroswitch;
 
-            Page.RawValue = _switch.Page;
+            Target.RawValue = _switch.Target;
+            Value.RawValue = _switch.Value;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
-        void Page_Changed(double value, double? old) {
+        void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
                 List<int> path = Track.GetPath(_switch);
 
-                Program.Project.Undo.Add($"Switch Page Changed to {r}{Page.Unit}", () => {
-                    ((Switch)Track.TraversePath(path)).Page = u;
+                Program.Project.Undo.Add($"Switch Target Changed to {r}{Target.Unit}", () => {
+                    ((Switch)Track.TraversePath(path)).Target = u;
                 }, () => {
-                    ((Switch)Track.TraversePath(path)).Page = r;
+                    ((Switch)Track.TraversePath(path)).Target = r;
                 });
             }
 
-            _switch.Page = (int)value;
+            _switch.Target = (int)value;
         }
+       
+        public void SetTarget(int target) => Target.RawValue = target;
+        
+        void Value_Changed(Dial sender, double value, double? old){
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_switch);
 
-        public void SetPage(int value) => Page.RawValue = value;
+                Program.Project.Undo.Add($"Switch Value Changed to {r}{Target.Unit}", () => {
+                    ((Switch)Track.TraversePath(path)).Value = u;
+                }, () => {
+                    ((Switch)Track.TraversePath(path)).Value = r;
+                });
+            }
+
+            _switch.Value = (int)value;
+        }
+        
+        public void SetValue(int value) => Value.RawValue = value;
     }
 }

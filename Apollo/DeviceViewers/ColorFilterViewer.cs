@@ -48,7 +48,7 @@ namespace Apollo.DeviceViewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
-        void Hue_Changed(double value, double? old) {
+        void Hue_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;
@@ -66,7 +66,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetHue(double value) => Hue.RawValue = value;
 
-        void Saturation_Changed(double value, double? old) {
+        void Saturation_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -84,7 +84,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetSaturation(double value) => Saturation.RawValue = value * 100;
 
-        void Value_Changed(double value, double? old) {
+        void Value_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -102,7 +102,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetValue(double value) => Value.RawValue = value * 100;
 
-        void HueTolerance_Changed(double value, double? old) {
+        void HueTolerance_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -120,7 +120,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetHueTolerance(double value) => HueTolerance.RawValue = value * 100;
 
-        void SaturationTolerance_Changed(double value, double? old) {
+        void SaturationTolerance_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -138,7 +138,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetSaturationTolerance(double value) => SaturationTolerance.RawValue = value * 100;
 
-        void ValueTolerance_Changed(double value, double? old) {
+        void ValueTolerance_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;

@@ -714,7 +714,7 @@ namespace Apollo.Windows {
                 oldTime.Add(frame.Time.Clone());
         }
 
-        void Duration_Changed(double value, double? old) {
+        void Duration_Changed(Dial sender, double value, double? old) {
             if (oldTime == null) return;
 
             if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
@@ -934,7 +934,7 @@ namespace Apollo.Windows {
             Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
         }
 
-        void Gate_Changed(double value, double? old) {
+        void Gate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -952,7 +952,7 @@ namespace Apollo.Windows {
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
-        void Repeats_Changed(double value, double? old) {
+        void Repeats_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -970,7 +970,7 @@ namespace Apollo.Windows {
 
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
 
-        void Pinch_Changed(double value, double? old) {
+        void Pinch_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;

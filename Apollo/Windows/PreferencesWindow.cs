@@ -38,7 +38,7 @@ namespace Apollo.Windows {
             LaunchpadModel = this.Get<ComboBox>("LaunchpadModel");
 
             AutoCreateKeyFilter = this.Get<CheckBox>("AutoCreateKeyFilter");
-            AutoCreatePageFilter = this.Get<CheckBox>("AutoCreatePageFilter");
+            AutoCreateMacroFilter = this.Get<CheckBox>("AutoCreateMacroFilter");
             AutoCreatePattern = this.Get<CheckBox>("AutoCreatePattern");
 
             FadeSmoothness = this.Get<HorizontalDial>("FadeSmoothness");
@@ -73,7 +73,7 @@ namespace Apollo.Windows {
             Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreatePageFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
+        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
@@ -154,7 +154,7 @@ namespace Apollo.Windows {
             LaunchpadModel.SelectedIndex = (int)Preferences.LaunchpadModel;
 
             AutoCreateKeyFilter.IsChecked = Preferences.AutoCreateKeyFilter;
-            AutoCreatePageFilter.IsChecked = Preferences.AutoCreatePageFilter;
+            AutoCreateMacroFilter.IsChecked = Preferences.AutoCreateMacroFilter;
             AutoCreatePattern.IsChecked = Preferences.AutoCreatePattern;
 
             FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
@@ -231,11 +231,11 @@ namespace Apollo.Windows {
 
         void AutoCreateKeyFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreateKeyFilter = AutoCreateKeyFilter.IsChecked.Value;
 
-        void AutoCreatePageFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePageFilter = AutoCreatePageFilter.IsChecked.Value;
+        void AutoCreateMacroFilter_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreateMacroFilter = AutoCreateMacroFilter.IsChecked.Value;
 
         void AutoCreatePattern_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
-        void FadeSmoothness_Changed(double value, double? old) => Preferences.FadeSmoothness = value / 100;
+        void FadeSmoothness_Changed(Dial sender, double value, double? old) => Preferences.FadeSmoothness = value / 100;
 
         void CaptureLaunchpad_Changed(object sender, RoutedEventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 

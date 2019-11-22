@@ -77,7 +77,7 @@ namespace Apollo.Binary {
                 }
 
                 Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
-                Preferences.AutoCreatePageFilter = reader.ReadBoolean();
+                Preferences.AutoCreateMacroFilter = reader.ReadBoolean();
 
                 if (version >= 11) {
                     Preferences.AutoCreatePattern = reader.ReadBoolean();
@@ -154,7 +154,7 @@ namespace Apollo.Binary {
 
             } else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
-                int page = reader.ReadInt32();
+                int[] macros = (version >= 25)? (from i in Enumerable.Range(0, 4) select reader.ReadInt32()).ToArray() : new int[4] {reader.ReadInt32(), 1, 1, 1};
                 List<Track> tracks = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Track)Decode(reader, version)).ToList();
 
                 string author = "";
@@ -167,7 +167,7 @@ namespace Apollo.Binary {
                     started = reader.ReadInt64();
                 }
 
-                return new Project(bpm, page, tracks, author, time, started);
+                return new Project(bpm, macros, tracks, author, time, started);
             
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);
@@ -439,9 +439,9 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
             
-            else if (t == typeof(PageFilter))
-                return new PageFilter(
-                    (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
+            else if (t == typeof(MacroFilter))
+                return new MacroFilter(
+                    (version >= 25)? reader.ReadInt32() : 1, (from i in Enumerable.Range(0, 100) select reader.ReadBoolean()).ToArray()
                 );
             
             else if (t == typeof(Paint))
@@ -519,16 +519,17 @@ namespace Apollo.Binary {
                 );
             
             else if (t == typeof(Switch)) {
-                int page = reader.ReadInt32();
+                int target = (version >= 25)? reader.ReadInt32() : 1;
+                int value = reader.ReadInt32();
 
                 if (18 <= version && version <= 21 && reader.ReadBoolean())
                     return new Group(new List<Chain>() {
                         new Chain(new List<Device>() {
-                            new Switch(page), new Clear(ClearType.Multi)
+                            new Switch(1, value), new Clear(ClearType.Multi)
                         }, "Switch Reset")
                     });
 
-                return new Switch(page);
+                return new Switch(target, value);
             
             } else if (t == typeof(Tone))
                 return new Tone(

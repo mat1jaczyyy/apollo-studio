@@ -32,7 +32,7 @@ namespace Apollo.Components {
         public delegate void DialStartedEventHandler();
         public event DialStartedEventHandler Started;
 
-        public delegate void DialValueChangedEventHandler(double NewValue, double? OldValue);
+        public delegate void DialValueChangedEventHandler(Dial sender, double NewValue, double? OldValue);
         public event DialValueChangedEventHandler ValueChanged;
 
         public delegate void DialStepChangedEventHandler(int NewValue, int? OldValue);
@@ -132,7 +132,7 @@ namespace Apollo.Components {
                     Value = ToValue(_raw);
                     Display.Text = ValueString;
 
-                    ValueChanged?.Invoke(_raw, null);
+                    ValueChanged?.Invoke(this, _raw, null);
 
                     _rawchanging = false;
                 }
@@ -380,7 +380,7 @@ namespace Apollo.Components {
                 e.Pointer.Capture(null);
 
                 if (UsingSteps) StepChanged?.Invoke(Length.Step, oldStep);
-                else ValueChanged?.Invoke(RawValue, oldValue);
+                else ValueChanged?.Invoke(this, RawValue, oldValue);
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
 
@@ -484,7 +484,7 @@ namespace Apollo.Components {
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
 
-            ValueChanged?.Invoke(_raw, oldValue);
+            ValueChanged?.Invoke(this, _raw, oldValue);
         }
 
         protected void Input_KeyDown(object sender, KeyEventArgs e) {
