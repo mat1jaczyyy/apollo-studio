@@ -3,7 +3,7 @@
   xmlns:Components="clr-namespace:Apollo.Components" Cursor="Hand" DetachedFromVisualTree="Unloaded">
 
   <StackPanel Spacing="2" Background="Transparent" Orientation="Horizontal" PointerReleased="Click">
-    <Image x:Name="FrameImage" Width="12" Height="12"/>
+    <Image x:Name="FrameImage" Width="10" Height="10"/>
     <TextBlock VerticalAlignment="Center" x:Name="Time" />
   </StackPanel>
 </UserControl>
