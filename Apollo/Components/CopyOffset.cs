@@ -41,7 +41,7 @@ namespace Apollo.Components {
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;
             
-            AngleDial.RawValue = 0;
+            AngleDial.RawValue = offset.Angle/180*Math.PI;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -88,19 +88,28 @@ namespace Apollo.Components {
             _viewer.Y = y;
         }
     
+        public void SetAngle(double angle){
+            AngleDial.RawValue = angle;
+        }
+        
         public void Angle_Changed(Dial sender, double angle, double? old){
             int index = _copy.Offsets.IndexOf(_offset);
             
-            if(old != null){
+            if(old != null && old.Value != angle){
                 List<int> path = Track.GetPath(_copy);
+                
+                double a = angle;
+                double o = old.Value;
 
                 Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}°", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].Angle = old.Value/180*Math.PI;
+                    SetAngle(o);
 
                 }, () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].Angle = angle/180*Math.PI;
+                    SetAngle(a);
                 });
             }
             
