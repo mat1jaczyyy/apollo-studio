@@ -550,6 +550,8 @@ namespace Apollo.Windows {
             SolidColorBrush brush = (SolidColorBrush)padColor.ToScreenBrush();
 
             Editor.SetColor(index, brush);
+            
+            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw_Launchpad();
 
             Launchpad?.Send(new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
@@ -571,8 +573,6 @@ namespace Apollo.Windows {
 
                 });
             }
-            
-            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw_Launchpad();
             
             oldScreen = null;
         }
