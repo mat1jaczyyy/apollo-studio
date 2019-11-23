@@ -29,13 +29,11 @@ namespace Apollo.Components
         public TextBlock Time;
 
         Image FrameImage;
-        WriteableBitmap bitmap;
 
         public Frame Frame
         {
             get => _frame;
-            set
-            {
+            set {
                 _frame = value;
                 Time.Text = _frame.ToString();
                 Draw_Launchpad();
@@ -45,10 +43,6 @@ namespace Apollo.Components
         public FrameThumbnail()
         {
             InitializeComponent();
-            
-            bitmap = new WriteableBitmap(new PixelSize(10, 10), new Vector(96, 96), PixelFormat.Rgba8888);
-            
-            FrameImage.Source = bitmap;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e)
@@ -59,6 +53,8 @@ namespace Apollo.Components
         }
         
         public unsafe void Draw_Launchpad(){
+            WriteableBitmap bitmap = new WriteableBitmap(new PixelSize(10, 10), new Vector(96, 96), PixelFormat.Rgba8888);
+            
             using(ILockedFramebuffer l = bitmap.Lock()){
                 uint* start = (uint*)l.Address;
                 

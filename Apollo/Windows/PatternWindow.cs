@@ -571,6 +571,9 @@ namespace Apollo.Windows {
 
                 });
             }
+            
+            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw_Launchpad();
+            
             oldScreen = null;
         }
 
