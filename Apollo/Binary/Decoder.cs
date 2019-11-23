@@ -583,7 +583,8 @@ namespace Apollo.Binary {
             else if (t == typeof(Offset))
                 return new Offset(
                     reader.ReadInt32(),
-                    reader.ReadInt32()
+                    reader.ReadInt32(),
+                    (version >= 24) ? reader.ReadInt32() : 0
                 );
             
             else if (t == typeof(Time))

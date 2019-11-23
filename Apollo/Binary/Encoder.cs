@@ -412,6 +412,7 @@ namespace Apollo.Binary {
 
             writer.Write(o.X);
             writer.Write(o.Y);
+            writer.Write(o.Angle);
         }
 
         static void Encode(BinaryWriter writer, Time o) {
