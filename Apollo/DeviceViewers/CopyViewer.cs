@@ -29,7 +29,7 @@ namespace Apollo.DeviceViewers {
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
         }
-        
+
         Copy _copy;
 
         ComboBox CopyMode, GridMode;

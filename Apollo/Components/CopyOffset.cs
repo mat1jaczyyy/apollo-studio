@@ -16,6 +16,8 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
             
             _viewer = this.Get<MoveDial>("Offset");
+            
+            AngleDial = this.Get<Dial>("OffsetAngle");
         }
 
         public delegate void OffsetEventHandler(int index);
@@ -25,6 +27,7 @@ namespace Apollo.Components {
         Offset _offset;
         Copy _copy;
         MoveDial _viewer;
+        Dial AngleDial;
 
         public CopyOffset() => throw new InvalidOperationException();
 
@@ -37,6 +40,8 @@ namespace Apollo.Components {
             _viewer.X = _offset.X;
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;
+            
+            AngleDial.RawValue = 0;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -81,6 +86,25 @@ namespace Apollo.Components {
         public void SetOffset(int x, int y) {
             _viewer.X = x;
             _viewer.Y = y;
+        }
+    
+        public void Angle_Changed(Dial sender, double angle, double? old){
+            int index = _copy.Offsets.IndexOf(_offset);
+            
+            if(old != null){
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}°", () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.Offsets[index].Angle = old.Value/180*Math.PI;
+
+                }, () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.Offsets[index].Angle = angle/180*Math.PI;
+                });
+            }
+            
+            _copy.Offsets[index].Angle = angle/180*Math.PI;
         }
     }
 }

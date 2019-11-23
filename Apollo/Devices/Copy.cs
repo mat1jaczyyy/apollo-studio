@@ -12,7 +12,7 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class Copy: Device {
         Random RNG = new Random();
-
+        
         public List<Offset> Offsets;
 
         public void Insert(int index, Offset offset = null) {
@@ -292,25 +292,41 @@ namespace Apollo.Devices {
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
-                    List<(int X, int Y)> points = new List<(int, int)>();
 
                     int dx = x - px;
                     int dy = y - py;
-
+                    
+                    double angle = Offsets[i].Angle;
+                    
+                    double magnitude = Math.Sqrt(Math.Pow(Offsets[i].X, 2)+ Math.Pow(Offsets[i].Y, 2));
+                    
+                    DoubleTuple relMidPoint = new DoubleTuple(Offsets[i].X / 2.0, Offsets[i].Y / 2.0);
+                    
+                    DoubleTuple cp1 = new DoubleTuple(relMidPoint.X * Math.Cos(angle) + relMidPoint.Y * Math.Sin(angle) + px, 
+                                                    (-relMidPoint.X * Math.Sin(angle) + relMidPoint.Y * Math.Cos(angle)) + py);
+                                              
+                    DoubleTuple translatedMidPoint = new DoubleTuple(relMidPoint.X - Offsets[i].X, relMidPoint.Y - Offsets[i].Y);
+                    
+                    DoubleTuple cp2 = new DoubleTuple(px + Offsets[i].X + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
+                                                      py + Offsets[i].Y + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle));
+                                                      
+                    DoubleTuple end = new DoubleTuple(px + Offsets[i].X, py + Offsets[i].Y);
+                    
                     int ax = Math.Abs(dx);
                     int ay = Math.Abs(dy);
 
                     int bx = (dx < 0)? -1 : 1;
                     int by = (dy < 0)? -1 : 1;
-
-                    if (ax > ay) for (int j = 1; j <= ax; j++)
-                        points.Add((px + j * bx, py + (int)Math.Round((double)j / ax * ay) * by));
-
-                    else for (int j = 1; j <= ay; j++)
-                        points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
                     
-                    foreach ((int ix, int iy) in points)
-                        interpolatedOffsets.Add(Validate(ix, iy, out int iresult)? iresult : -1);
+                    int pointCount = (int)magnitude * 3;
+                    
+                    for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
+                        IntTuple point = CubicBezierInterp(new DoubleTuple(px, py), cp1, cp2, end, pointIndex/pointCount).Round();
+                        bool valid = Validate(point.X, point.Y, out int iresult);
+                        if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
+                            interpolatedOffsets.Add(valid ? iresult : -1);
+                        }
+                    }
                 }
 
                 px = x;
@@ -383,5 +399,18 @@ namespace Apollo.Devices {
             Time.Dispose();
             base.Dispose();
         }
+    
+        DoubleTuple CubicBezierInterp(DoubleTuple start, DoubleTuple cp1, DoubleTuple cp2, DoubleTuple end, double t){
+            DoubleTuple A = Lerp(start, cp1, t);
+            DoubleTuple B = Lerp(cp1, cp2, t);
+            DoubleTuple C = Lerp(cp2, end, t);
+            
+            DoubleTuple D = Lerp(A, B, t);
+            DoubleTuple E = Lerp(B, C, t);
+            
+            return Lerp(D, E, t);
+        }
+        
+        DoubleTuple Lerp(DoubleTuple p1, DoubleTuple p2, double t) => p1 * (1.0 - t) + p2 * t;
     }
 }

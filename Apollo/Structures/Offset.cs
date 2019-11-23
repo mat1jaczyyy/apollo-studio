@@ -24,13 +24,16 @@ namespace Apollo.Structures {
                 }
             }
         }
-
+        
+        public double Angle = 0;
         public Offset Clone() => new Offset(X, Y);
 
         public Offset(int x = 0, int y = 0) {
             X = x;
             Y = y;
         }
+        
+        public DoubleTuple ToTuple() => new DoubleTuple((double)_x, (double)_y);
 
         public void Dispose() => Changed = null;
     }
