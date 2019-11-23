@@ -27,7 +27,7 @@ namespace Apollo.Components {
         Offset _offset;
         Copy _copy;
         MoveDial _viewer;
-        Dial AngleDial;
+        public Dial AngleDial;
 
         public CopyOffset() => throw new InvalidOperationException();
 
@@ -42,6 +42,8 @@ namespace Apollo.Components {
             _viewer.Changed += Offset_Changed;
             
             AngleDial.RawValue = offset.Angle/180*Math.PI;
+            
+            AngleDial.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {

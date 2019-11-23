@@ -66,8 +66,9 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = _copy.Gate * 100;
 
-            CopyMode.SelectedIndex = (int)_copy.CopyMode;
             GridMode.SelectedIndex = (int)_copy.GridMode;
+            
+            SetCopyMode(_copy.CopyMode);
 
             Wrap.IsChecked = _copy.Wrap;
 
@@ -167,7 +168,17 @@ namespace Apollo.DeviceViewers {
             Rate.Enabled = Gate.Enabled = selected != CopyType.Static && selected != CopyType.RandomSingle;
         }
 
-        public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
+        public void SetCopyMode(CopyType mode) { 
+            CopyMode.SelectedIndex = (int)mode;
+            
+            for(int i = 1; i < Contents.Count; i++){
+                if(mode == CopyType.Interpolate){
+                    ((CopyOffset)Contents[i]).AngleDial.Enabled = true;
+                } else {
+                    ((CopyOffset)Contents[i]).AngleDial.Enabled = false;
+                }
+            }
+        }
 
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
             GridType selected = (GridType)GridMode.SelectedIndex;
