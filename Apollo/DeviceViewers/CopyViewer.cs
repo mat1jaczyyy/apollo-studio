@@ -250,5 +250,7 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetOffset(int index, int x, int y) => ((CopyOffset)Contents[index + 1]).SetOffset(x, y);
+        
+        public void SetOffsetAngle(int index, double angle) => ((CopyOffset)Contents[index + 1]).SetAngle(angle);
     }
 }

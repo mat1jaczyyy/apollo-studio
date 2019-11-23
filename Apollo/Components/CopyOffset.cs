@@ -90,8 +90,12 @@ namespace Apollo.Components {
             _viewer.Y = y;
         }
     
-        public void SetAngle(double angle){
-            AngleDial.RawValue = angle;
+        public void SetAngle(double angle, bool isRadians = true){
+            if(isRadians){
+                AngleDial.RawValue = angle/Math.PI*180;
+            } else {
+                AngleDial.RawValue = angle;
+            }
         }
         
         public void Angle_Changed(Dial sender, double angle, double? old){
@@ -106,12 +110,10 @@ namespace Apollo.Components {
                 Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}°", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].Angle = old.Value/180*Math.PI;
-                    SetAngle(o);
 
                 }, () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].Angle = angle/180*Math.PI;
-                    SetAngle(a);
                 });
             }
             

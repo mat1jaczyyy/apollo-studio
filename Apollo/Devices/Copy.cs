@@ -18,6 +18,7 @@ namespace Apollo.Devices {
         public void Insert(int index, Offset offset = null) {
             Offsets.Insert(index, offset?? new Offset());
             Offsets.Last().Changed += OffsetChanged;
+            Offsets.Last().AngleChanged += OffsetAngleChanged;
 
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index]);
         }
@@ -26,11 +27,16 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Remove(index);
 
             Offsets[index].Changed -= OffsetChanged;
+            Offsets[index].AngleChanged -= OffsetAngleChanged;
             Offsets.RemoveAt(index);
         }
 
         void OffsetChanged(Offset sender) {
             if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
+        }
+        
+        void OffsetAngleChanged(Offset sender) {
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffsetAngle(Offsets.IndexOf(sender), sender.Angle);
         }
 
         Time _time;
