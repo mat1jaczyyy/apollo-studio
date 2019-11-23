@@ -545,10 +545,11 @@ namespace Apollo.Windows {
 
             _pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
 
-            SolidColorBrush brush = (SolidColorBrush)_pattern[_pattern.Expanded].Screen[signalIndex].ToScreenBrush();
+            Color padColor = _pattern[_pattern.Expanded].Screen[signalIndex];
+
+            SolidColorBrush brush = (SolidColorBrush)padColor.ToScreenBrush();
 
             Editor.SetColor(index, brush);
-            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Launchpad.SetColor(index, brush);
 
             Launchpad?.Send(new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
@@ -564,11 +565,12 @@ namespace Apollo.Windows {
 
                 Program.Project.Undo.Add($"Pattern Frame {index + 1} Changed", () => {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
+
                 }, () => {
                     ((Pattern)Track.TraversePath(path))[index].Screen = (from i in r select i.Clone()).ToArray();
+
                 });
             }
-
             oldScreen = null;
         }
 

@@ -13,8 +13,7 @@ namespace Apollo.Structures {
             set {
                 if (_screen == null || !_screen.SequenceEqual(value)) {
                     _screen = value;
-
-                    Info?.Viewer?.Launchpad.RenderFrame(this);
+                    
                     Parent?.Window?.SetGrid(ParentIndex.Value, this);
                 }
             }
