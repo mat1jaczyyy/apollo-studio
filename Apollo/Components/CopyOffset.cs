@@ -41,7 +41,7 @@ namespace Apollo.Components {
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;
             
-            AngleDial.RawValue = offset.Angle/180*Math.PI;
+            AngleDial.RawValue = offset.Angle/Math.PI*180;
             
             AngleDial.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
         }
