@@ -1,3 +1,5 @@
+using System;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -5,13 +7,13 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Flip: Device {
-        FlipType _mode;
-        public FlipType Mode {
-            get => _mode;
+        double _angle;
+        public double Angle {
+            get => _angle;
             set {
-                _mode = value;
+                _angle = value;
 
-                if (Viewer?.SpecificViewer != null) ((FlipViewer)Viewer.SpecificViewer).SetMode(Mode);
+                if (Viewer?.SpecificViewer != null) ((FlipViewer)Viewer.SpecificViewer).SetAngle(Angle);
             }
         }
 
@@ -25,42 +27,39 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Flip(Mode, Bypass) {
+        public override Device Clone() => new Flip(Angle, Bypass) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base("flip") {
-            Mode = mode;
+        public Flip(double angle = 0, bool bypass = false): base("flip") {
+            Angle = angle;
             Bypass = bypass;
         }
 
         public override void MIDIProcess(Signal n) {
             if (Bypass) InvokeExit(n.Clone());
             
-            int x = n.Index % 10;
-            int y = n.Index / 10;
+            int preX, preY;
+            preX = n.Index % 10;
+            preY = n.Index / 10;
 
-            if (Mode == FlipType.Horizontal) x = 9 - x;
-            else if (Mode == FlipType.Vertical) y = 9 - y;
-
-            else if (Mode == FlipType.Diagonal1) {
-                int temp = x;
-                x = y;
-                y = temp;
+            double relX, relY;
+            relX = (preX <= 4) ? preX - 5 : preX - 4;
+            relY = (preY <= 4) ? preY - 5 : preY - 4;
             
-            } else if (Mode == FlipType.Diagonal2) {
-                x = 9 - x;
-                y = 9 - y;
+            double m11 = Math.Pow(Math.Cos(Angle), 2) - Math.Pow(Math.Sin(Angle), 2);
+            double m12 = 2 * Math.Cos(Angle) * Math.Sin(Angle);
+            double m22 = Math.Pow(Math.Sin(Angle), 2) - Math.Pow(Math.Cos(Angle), 2);
 
-                int temp = x;
-                x = y;
-                y = temp;
-            }
+            double x = Math.Round(m11 * relX + m12 * relY);
+            double y = Math.Round(m12 * relX + m22 * relY);
 
-            int result = y * 10 + x;
+            int bx = (x > 0) ? 4 : 5;
+            int by = (y > 0) ? 4 : 5;
+
+            n.Index = (byte)(x + bx + (y + by) * 10);
             
-            n.Index = (byte)result;
             InvokeExit(n);
         }
     }

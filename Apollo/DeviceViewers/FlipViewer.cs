@@ -10,6 +10,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Components;
 
 namespace Apollo.DeviceViewers {
     public class FlipViewer: UserControl {
@@ -18,13 +19,14 @@ namespace Apollo.DeviceViewers {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
-            FlipMode = this.Get<ComboBox>("FlipMode");
+            AngleDial = this.Get<Dial>("AngleDial");
             Bypass = this.Get<CheckBox>("Bypass");
         }
         
         Flip _flip;
         ComboBox FlipMode;
         CheckBox Bypass;
+        Dial AngleDial;
 
         public FlipViewer() => new InvalidOperationException();
 
@@ -32,32 +34,29 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _flip = flip;
-
-            FlipMode.SelectedIndex = (int)_flip.Mode;
+            
             Bypass.IsChecked = _flip.Bypass;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
 
-        void Mode_Changed(object sender, SelectionChangedEventArgs e) {
-            FlipType selected = (FlipType)FlipMode.SelectedIndex;
-
-            if (_flip.Mode != selected) {
-                FlipType u = _flip.Mode;
-                FlipType r = selected;
+        void Angle_Changed(Dial sender, double angle, double? old) {
+            if (old != null && old != angle) {
+                double a = angle;
+                double o = old.Value;
                 List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Orientation Changed to {((ComboBoxItem)FlipMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Flip)Track.TraversePath(path)).Mode = u;
+                Program.Project.Undo.Add($"Flip Angle Changed to {a}°", () => {
+                    ((Flip)Track.TraversePath(path)).Angle = o / 180 * Math.PI;
                 }, () => {
-                    ((Flip)Track.TraversePath(path)).Mode = r;
+                    ((Flip)Track.TraversePath(path)).Angle = a / 180 * Math.PI;
                 });
 
-                _flip.Mode = selected;
+                _flip.Angle = a / 180 * Math.PI;
             }
         }
 
-        public void SetMode(FlipType mode) => FlipMode.SelectedIndex = (int)mode;
+        public void SetAngle(double angle) => AngleDial.RawValue = angle / Math.PI * 180;
 
         void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
