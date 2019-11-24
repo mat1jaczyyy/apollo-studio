@@ -40,6 +40,7 @@ namespace Apollo.Windows {
             UndoButton = this.Get<UndoButton>("UndoButton");
             RedoButton = this.Get<RedoButton>("RedoButton");
 
+            FrameList = this.Get<ScrollViewer>("FrameList");
             Editor = this.Get<LaunchpadGrid>("Editor");
             RootKey = this.Get<LaunchpadGrid>("RootKey");
             Wrap = this.Get<CheckBox>("Wrap");
@@ -104,6 +105,7 @@ namespace Apollo.Windows {
         StackPanel CenteringLeft, CenteringRight;
         UndoButton UndoButton;
         RedoButton RedoButton;
+        ScrollViewer FrameList;
         ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor, RootKey;
         Controls Contents;
@@ -492,6 +494,24 @@ namespace Apollo.Windows {
                 } else if (e.Key == Key.Down || e.Key == Key.Right) {
                     if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
                     else Frame_Insert(_pattern.Count);
+
+                } else if (e.Key == Key.Home) {
+                    Selection.Select(_pattern[0], shift);
+                    Frame_Select(0);
+
+                } else if (e.Key == Key.End) {
+                    Selection.Select(_pattern[_pattern.Count - 1], shift);
+                    Frame_Select(_pattern.Count - 1);
+
+                } else if (e.Key == Key.PageUp) {
+                    int target = Math.Max(0, Selection.Start.IParentIndex.Value - (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                    Selection.Select(_pattern[target], shift);
+                    Frame_Select(target);
+                    
+                } else if (e.Key == Key.PageDown) {
+                    int target = Math.Min(_pattern.Count - 1, Selection.Start.IParentIndex.Value + (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                    Selection.Select(_pattern[target], shift);
+                    Frame_Select(target);
                 }
             }
         }

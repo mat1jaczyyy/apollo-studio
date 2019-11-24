@@ -48,7 +48,7 @@
               <Button Margin="7" Content="Import" x:Name="Import" Click="ImportDialog" />
             </Border>
 
-            <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible">
+            <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible" x:Name="FrameList">
               <Grid RowDefinitions="Auto,*">
                 <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
                   <Components:VerticalAdd Actions="Paste" Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
