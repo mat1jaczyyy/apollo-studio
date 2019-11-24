@@ -350,13 +350,31 @@ namespace Apollo.Binary {
 
                 return new Fade(time, gate, playmode, colors, positions, types, expanded);
 
-            } else if (t == typeof(Flip))
+            } else if (t == typeof(Flip)){
+                double angle = 0;
+                if(version <= 24){
+                    FlipType type = (FlipType)reader.ReadInt32();
+                    
+                    switch(type){
+                    case FlipType.Vertical:
+                        angle = 0;
+                        break;
+                    case FlipType.Horizontal:
+                        angle = Math.PI/2;
+                        break;
+                    case FlipType.Diagonal1:
+                        angle = Math.PI/4;
+                        break;
+                    case FlipType.Diagonal2:
+                        angle = -Math.PI/4;
+                        break;
+                    }
+                } else angle = reader.ReadDouble();
                 return new Flip(
-                    (FlipType)reader.ReadInt32(),
+                    angle,
                     reader.ReadBoolean()
                 );
-            
-            else if (t == typeof(Hold)) {
+            } else if (t == typeof(Hold)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(

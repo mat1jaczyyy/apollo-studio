@@ -250,7 +250,7 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, Flip o) {
             EncodeID(writer, typeof(Flip));
 
-            writer.Write((int)o.Mode);
+            writer.Write(o.Angle);
             writer.Write(o.Bypass);
         }
 
