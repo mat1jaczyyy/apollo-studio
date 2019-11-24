@@ -7,11 +7,7 @@
 
   <StackPanel VerticalAlignment="Center">
     <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <ComboBox BorderThickness="0" Background="Transparent" HorizontalAlignment="Right" x:Name="RotateMode" SelectionChanged="Mode_Changed">
-        <ComboBoxItem>90°</ComboBoxItem>
-        <ComboBoxItem>180°</ComboBoxItem>
-        <ComboBoxItem>270°</ComboBoxItem>
-      </ComboBox>
+      <Components:Dial Minimum="-180" Maximum="180" Title="Angle" x:Name="AngleDial" Unit="°" ValueChanged="Angle_Changed" Centered="true"/>
     </Border>
 
     <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Bypass" Click="Bypass_Changed">Bypass</CheckBox>
