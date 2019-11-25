@@ -467,9 +467,12 @@ namespace Apollo.Windows {
             if (App.Dragging) return;
 
             if (e.Key == Key.Enter || e.Key == Key.Space) {
-                if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
-                else if (e.KeyModifiers == KeyModifiers.None) PatternPlay(Play, null);
-                else PatternPlay(Play, null);
+                KeyModifiers mods = e.KeyModifiers & ~App.ControlKey;
+                int start = ((e.KeyModifiers & ~KeyModifiers.Shift) == App.ControlKey)? _pattern.Expanded : 0;
+
+                if (mods == KeyModifiers.Shift) PatternFire(start);
+                else if (mods == KeyModifiers.None) PatternPlay(Play, start);
+                return;
             }
 
             if (Locked) return;
@@ -623,10 +626,10 @@ namespace Apollo.Windows {
                 PadFinished(-1);
                 
             } else if (x == -1 && y == 1) // Up-Left
-                PatternPlay(Play, null);
+                PatternPlay(Play);
                 
             else if (x == 1 && y == -1) // Down-Right
-                PatternFire(Fire, null);
+                PatternFire();
                 
             else if (x == 1 && y == 1) // Up-Right
                 Frame_Insert(_pattern.Expanded + 1);
@@ -1123,7 +1126,7 @@ namespace Apollo.Windows {
         object PlayLocker = new object();
         List<Courier> PlayTimers = new List<Courier>();
 
-        void PatternStop(bool send = true) {
+        void PatternStop(bool send = true, int start = 0) {
             lock (PlayLocker) {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
@@ -1134,11 +1137,11 @@ namespace Apollo.Windows {
                             PlayColor(i, new Color(0));
 
                 PlayTimers = new List<Courier>();
-                PlayIndex = 0;
+                PlayIndex = start;
             }
         }
 
-        void PatternPlay(object sender, RoutedEventArgs e) {
+        void PatternPlay(Button sender, int start = 0) {
             if (Locked) {
                 PatternStop();
                 _pattern.MIDIEnter(new StopSignal());
@@ -1156,29 +1159,29 @@ namespace Apollo.Windows {
                 button.Content = "Stop";
             });
             
-            PatternStop(false);
+            PatternStop(false, start);
             _pattern.MIDIEnter(new StopSignal());
 
             foreach (Launchpad lp in MIDI.Devices)
                 if (lp.Available && lp.Type != LaunchpadType.Unknown)
                     lp.Clear();
 
-            Editor.RenderFrame(_pattern[0]);
+            Editor.RenderFrame(_pattern[start]);
 
-            for (int i = 0; i < _pattern[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
+            for (int i = 0; i < _pattern[start].Screen.Length; i++)
+                PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[start].Screen[i].Clone()));
 
             double time = 0;
 
-            for (int i = 0; i < _pattern.Count; i++) {
+            for (int i = start; i < _pattern.Count; i++) {
                 time += _pattern[i].Time * _pattern.Gate;
                 FireCourier(time);
             }
         }
 
-        void PatternFire(object sender, RoutedEventArgs e) {
+        void PatternFire(int start = 0) {
             PlayExit = _pattern.MIDIExit;
-            PatternPlay(sender, e);
+            PatternPlay(Fire, start);
         }
 
         void PatternFinish() {
@@ -1198,6 +1201,17 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
                 Launchpad?.Send(new Signal(this, _track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+        }
+
+        void PlayButton(object sender, RoutedEventArgs e) => PatternPlay(Play);
+
+        void FireButton(object sender, RoutedEventArgs e) => PatternFire();
+
+        public void PlayFrom(FrameDisplay sender, bool fire = false) {
+            int start = Contents.IndexOf(sender) - 1;
+
+            if (fire) PatternFire(start);
+            else PatternPlay(Play, start);
         }
 
         static void ImportFrames(Pattern pattern, int repeats, double gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
