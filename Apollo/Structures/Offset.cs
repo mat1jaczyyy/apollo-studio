@@ -26,12 +26,48 @@ namespace Apollo.Structures {
                 }
             }
         }
-        
-        public Offset Clone() => new Offset(X, Y);
 
-        public Offset(int x = 0, int y = 0) {
+        bool _absolute = false;
+        public bool IsAbsolute {
+            get => _absolute;
+            set {
+                if (_absolute != value) {
+                    _absolute = value;
+                    Changed?.Invoke(this);
+                }
+            }
+        }
+
+        int _ax = 5;
+        public int AbsoluteX {
+            get => _ax;
+            set {
+                if (0 <= value && value <= 9 && _ax != value) {
+                    _ax = value;
+                    Changed?.Invoke(this);
+                }
+            }
+        }
+
+        int _ay = 5;
+        public int AbsoluteY {
+            get => _ay;
+            set {
+                if (0 <= value && value <= 9 && _ay != value) {
+                    _ay = value;
+                    Changed?.Invoke(this);
+                }
+            }
+        }
+        
+        public Offset Clone() => new Offset(X, Y, IsAbsolute, AbsoluteX, AbsoluteY);
+
+        public Offset(int x = 0, int y = 0, bool absolute = false, int ax = 5, int ay = 5) {
             X = x;
             Y = y;
+            IsAbsolute = absolute;
+            AbsoluteX = ax;
+            AbsoluteY = ay;
         }
         
         static int Wrap(int coord, GridType gridMode) => (gridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
@@ -61,6 +97,12 @@ namespace Apollo.Structures {
         }
 
         public bool Apply(int index, GridType gridMode, bool wrap, out int x, out int y, out int result) {
+            if (IsAbsolute) {
+                x = AbsoluteX;
+                y = AbsoluteY;
+                return Validate(x, y, gridMode, wrap, out result);
+            }
+
             x = index % 10;
             y = index / 10;
 

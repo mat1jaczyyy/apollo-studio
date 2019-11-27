@@ -8,7 +8,7 @@
     <Grid RowDefinitions="*,*" Width="64">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
         <Grid VerticalAlignment="Center">
-          <Components:MoveDial x:Name="Offset" Title="Offset" />
+          <Components:MoveDial x:Name="Offset" />
 
           <Components:Remove HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 5 2 0" Clicked="Offset_Remove" />
         </Grid>

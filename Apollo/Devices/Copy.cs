@@ -35,7 +35,7 @@ namespace Apollo.Devices {
         }
 
         void OffsetChanged(Offset sender) {
-            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender);
         }
 
         public int GetAngle(int index) => Angles[index];
@@ -291,29 +291,28 @@ namespace Apollo.Devices {
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
-
                     int dx = x - px;
                     int dy = y - py;
                     
                     double angle = Angles[i] * Math.PI / 180;
                     
-                    double magnitude = Math.Sqrt(Math.Pow(Offsets[i].X, 2) + Math.Pow(Offsets[i].Y, 2));
+                    double magnitude = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
                     
-                    DoubleTuple relMidPoint = new DoubleTuple(Offsets[i].X / 2.0, Offsets[i].Y / 2.0);
+                    DoubleTuple relMidPoint = new DoubleTuple(dx / 2.0, dy / 2.0);
                     
                     DoubleTuple cp1 = new DoubleTuple(
                         relMidPoint.X * Math.Cos(angle) + relMidPoint.Y * Math.Sin(angle) + px, 
                         (-relMidPoint.X * Math.Sin(angle) + relMidPoint.Y * Math.Cos(angle)) + py
                     );
                                               
-                    DoubleTuple translatedMidPoint = new DoubleTuple(relMidPoint.X - Offsets[i].X, relMidPoint.Y - Offsets[i].Y);
+                    DoubleTuple translatedMidPoint = new DoubleTuple(relMidPoint.X - dx, relMidPoint.Y - dy);
                     
                     DoubleTuple cp2 = new DoubleTuple(
-                        px + Offsets[i].X + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
-                        py + Offsets[i].Y + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle)
+                        px + dx + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
+                        py + dy + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle)
                     );
                                                       
-                    DoubleTuple end = new DoubleTuple(px + Offsets[i].X, py + Offsets[i].Y);
+                    DoubleTuple end = new DoubleTuple(x, y);
                     
                     int ax = Math.Abs(dx);
                     int ay = Math.Abs(dy);

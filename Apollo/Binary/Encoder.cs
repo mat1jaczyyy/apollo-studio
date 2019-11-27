@@ -415,6 +415,10 @@ namespace Apollo.Binary {
 
             writer.Write(o.X);
             writer.Write(o.Y);
+
+            writer.Write(o.IsAbsolute);
+            writer.Write(o.AbsoluteX);
+            writer.Write(o.AbsoluteY);
         }
 
         static void Encode(BinaryWriter writer, Time o) {

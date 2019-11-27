@@ -18,7 +18,7 @@ namespace Apollo.Devices {
         public Offset Offset;
 
         void OffsetChanged(Offset sender) {
-            if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetOffset(Offset.X, Offset.Y);
+            if (Viewer?.SpecificViewer != null) ((MoveViewer)Viewer.SpecificViewer).SetOffset(Offset);
         }
 
         bool _wrap;
