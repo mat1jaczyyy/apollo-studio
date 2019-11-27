@@ -5,7 +5,7 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
 
-  <Grid RowDefinitions="*,Auto">
+  <Grid RowDefinitions="*,Auto" Width="60">
     <Components:MoveDial Grid.Row="0" x:Name="Offset" />
 
     <StackPanel Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" Spacing="5">
