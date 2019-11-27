@@ -182,6 +182,9 @@ namespace Apollo.Devices {
             Wrap = wrap;
             Offsets = offsets?? new List<Offset>();
             Angles = angles?? new List<int>();
+
+            foreach (Offset offset in Offsets)
+                offset.Changed += OffsetChanged;
         }
 
         void FireCourier(PolyInfo info, double time) {
