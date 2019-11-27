@@ -1,3 +1,5 @@
+using Apollo.Enums;
+
 namespace Apollo.Structures {
     public class Offset {
         public delegate void ChangedEventHandler(Offset sender);
@@ -30,6 +32,47 @@ namespace Apollo.Structures {
         public Offset(int x = 0, int y = 0) {
             X = x;
             Y = y;
+        }
+        
+        static int Wrap(int coord, GridType gridMode) => (gridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+
+        public static bool Validate(int x, int y, GridType gridMode, bool wrap, out int result) {
+            if (wrap) {
+                x = Wrap(x, gridMode);
+                y = Wrap(y, gridMode);
+            }
+
+            result = y * 10 + x;
+
+            if (gridMode == GridType.Full) {
+                if (0 <= x && x <= 9 && 0 <= y && y <= 9)
+                    return true;
+                
+                if (y == -1 && 4 <= x && x <= 5) {
+                    result = 100;
+                    return true;
+                }
+
+            } else if (gridMode == GridType.Square)
+                if (1 <= x && x <= 8 && 1 <= y && y <= 8)
+                    return true;
+             
+            return false;
+        }
+
+        public bool Apply(int index, GridType gridMode, bool wrap, out int x, out int y, out int result) {
+            x = index % 10;
+            y = index / 10;
+
+            if (gridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
+                result = 0;
+                return false;
+            }
+
+            x += X;
+            y += Y;
+
+            return Validate(x, y, gridMode, wrap, out result);
         }
 
         public void Dispose() => Changed = null;

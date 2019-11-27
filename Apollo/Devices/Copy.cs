@@ -183,47 +183,6 @@ namespace Apollo.Devices {
             Offsets = offsets?? new List<Offset>();
             Angles = angles?? new List<int>();
         }
-        
-        int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
-
-        bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
-            x = index % 10;
-            y = index / 10;
-
-            if (GridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
-                result = 0;
-                return false;
-            }
-
-            x += offset.X;
-            y += offset.Y;
-
-            return Validate(x, y, out result);
-        }
-
-        bool Validate(int x, int y, out int result) {
-            if (Wrap) {
-                x = ApplyWrap(x);
-                y = ApplyWrap(y);
-            }
-
-            result = y * 10 + x;
-
-            if (GridMode == GridType.Full) {
-                if (0 <= x && x <= 9 && 0 <= y && y <= 9)
-                    return true;
-                
-                if (y == -1 && 4 <= x && x <= 5) {
-                    result = 100;
-                    return true;
-                }
-
-            } else if (GridMode == GridType.Square)
-                if (1 <= x && x <= 8 && 1 <= y && y <= 8)
-                    return true;
-             
-            return false;
-        }
 
         void FireCourier(PolyInfo info, double time) {
             Courier courier;
@@ -328,7 +287,7 @@ namespace Apollo.Devices {
             List<int> interpolatedOffsets = new List<int>() {n.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
-                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result))
+                if (Offsets[i].Apply(n.Index, GridMode, Wrap, out int x, out int y, out int result))
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
@@ -342,13 +301,17 @@ namespace Apollo.Devices {
                     
                     DoubleTuple relMidPoint = new DoubleTuple(Offsets[i].X / 2.0, Offsets[i].Y / 2.0);
                     
-                    DoubleTuple cp1 = new DoubleTuple(relMidPoint.X * Math.Cos(angle) + relMidPoint.Y * Math.Sin(angle) + px, 
-                                                     (-relMidPoint.X * Math.Sin(angle) + relMidPoint.Y * Math.Cos(angle)) + py);
+                    DoubleTuple cp1 = new DoubleTuple(
+                        relMidPoint.X * Math.Cos(angle) + relMidPoint.Y * Math.Sin(angle) + px, 
+                        (-relMidPoint.X * Math.Sin(angle) + relMidPoint.Y * Math.Cos(angle)) + py
+                    );
                                               
                     DoubleTuple translatedMidPoint = new DoubleTuple(relMidPoint.X - Offsets[i].X, relMidPoint.Y - Offsets[i].Y);
                     
-                    DoubleTuple cp2 = new DoubleTuple(px + Offsets[i].X + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
-                                                      py + Offsets[i].Y + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle));
+                    DoubleTuple cp2 = new DoubleTuple(
+                        px + Offsets[i].X + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
+                        py + Offsets[i].Y + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle)
+                    );
                                                       
                     DoubleTuple end = new DoubleTuple(px + Offsets[i].X, py + Offsets[i].Y);
                     
@@ -360,12 +323,12 @@ namespace Apollo.Devices {
                     
                     int pointCount = (int)magnitude * 3;
                     
-                    for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
-                        IntTuple point = CubicBezierInterp(new DoubleTuple(px, py), cp1, cp2, end, pointIndex/pointCount).Round();
-                        bool valid = Validate(point.X, point.Y, out int iresult);
-                        if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
-                            interpolatedOffsets.Add(valid ? iresult : -1);
-                        }
+                    for (double pointIndex = 1; pointIndex <= pointCount; pointIndex++) {
+                        IntTuple point = CubicBezierInterp(new DoubleTuple(px, py), cp1, cp2, end, pointIndex / pointCount).Round();
+                        bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
+
+                        if (iresult != interpolatedOffsets[interpolatedOffsets.Count - 1])
+                            interpolatedOffsets.Add(valid? iresult : -1);
                     }
                 }
 
