@@ -1,12 +1,7 @@
-using System;
-
 namespace Apollo.Structures {
     public class Offset {
         public delegate void ChangedEventHandler(Offset sender);
         public event ChangedEventHandler Changed;
-        
-        public delegate void AngleChangedEventHandler(Offset sender);
-        public event AngleChangedEventHandler AngleChanged;
 
         int _x = 0;
         public int X {
@@ -30,26 +25,12 @@ namespace Apollo.Structures {
             }
         }
         
-        double _angle = 0;
-        public double Angle {
-            get => _angle;
-            set {
-                if(-Math.PI <= value && value <= Math.PI && value != _angle){
-                    _angle = value;
-                    AngleChanged?.Invoke(this);
-                }
-            }
-        }
-        
-        public Offset Clone() => new Offset(X, Y, Angle);
+        public Offset Clone() => new Offset(X, Y);
 
-        public Offset(int x = 0, int y = 0, double angle = 0) {
+        public Offset(int x = 0, int y = 0) {
             X = x;
             Y = y;
-            Angle = angle;
         }
-        
-        public DoubleTuple ToTuple() => new DoubleTuple((double)_x, (double)_y);
 
         public void Dispose() => Changed = null;
     }

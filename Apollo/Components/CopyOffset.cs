@@ -17,7 +17,7 @@ namespace Apollo.Components {
             
             _viewer = this.Get<MoveDial>("Offset");
             
-            AngleDial = this.Get<Dial>("OffsetAngle");
+            Angle = this.Get<Dial>("Angle");
         }
 
         public delegate void OffsetEventHandler(int index);
@@ -27,11 +27,16 @@ namespace Apollo.Components {
         Offset _offset;
         Copy _copy;
         MoveDial _viewer;
-        public Dial AngleDial;
+        Dial Angle;
+
+        public bool AngleEnabled {
+            get => Angle.Enabled;
+            set => Angle.Enabled = value;
+        }
 
         public CopyOffset() => throw new InvalidOperationException();
 
-        public CopyOffset(Offset offset, Copy copy) {
+        public CopyOffset(Offset offset, int angle, Copy copy) {
             InitializeComponent();
 
             _offset = offset;
@@ -41,9 +46,8 @@ namespace Apollo.Components {
             _viewer.Y = _offset.Y;
             _viewer.Changed += Offset_Changed;
             
-            AngleDial.RawValue = offset.Angle/Math.PI*180;
-            
-            AngleDial.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
+            Angle.RawValue = angle;
+            Angle.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -89,14 +93,6 @@ namespace Apollo.Components {
             _viewer.X = x;
             _viewer.Y = y;
         }
-    
-        public void SetAngle(double angle, bool isRadians = true){
-            if(isRadians){
-                AngleDial.RawValue = angle/Math.PI*180;
-            } else {
-                AngleDial.RawValue = angle;
-            }
-        }
         
         public void Angle_Changed(Dial sender, double angle, double? old){
             int index = _copy.Offsets.IndexOf(_offset);
@@ -104,20 +100,22 @@ namespace Apollo.Components {
             if(old != null && old.Value != angle){
                 List<int> path = Track.GetPath(_copy);
                 
-                double a = angle;
-                double o = old.Value;
+                int u = (int)old.Value;
+                int r = (int)angle;
 
-                Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}°", () => {
+                Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}{Angle.Unit}", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
-                    copy.Offsets[index].Angle = old.Value/180*Math.PI;
+                    copy.SetAngle(index, u);
 
                 }, () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
-                    copy.Offsets[index].Angle = angle/180*Math.PI;
+                    copy.SetAngle(index, r);
                 });
             }
             
-            _copy.Offsets[index].Angle = angle/180*Math.PI;
+            _copy.SetAngle(index, (int)angle);
         }
+    
+        public void SetAngle(double angle) => Angle.RawValue = angle;
     }
 }

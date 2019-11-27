@@ -5,13 +5,17 @@
              DetachedFromVisualTree="Unloaded">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" MaxHeight="223">
-    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Spacing="5">
-      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="3 0 0 0">
-        <Components:MoveDial x:Name="Offset" Title="Offset" />
-        <Components:Remove VerticalAlignment="Top" Margin="0 5 0 0" Clicked="Offset_Remove" />
-      </StackPanel>
-      <Components:Dial Title="Angle" x:Name="OffsetAngle" Minimum="-180" Maximum="180" Exponent="1" Round="0" Unit="°" Centered="true" ValueChanged="Angle_Changed"/>
-    </StackPanel>
+    <Grid RowDefinitions="*,*" Width="64">
+      <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+        <Grid VerticalAlignment="Center">
+          <Components:MoveDial x:Name="Offset" Title="Offset" />
+
+          <Components:Remove HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 5 2 0" Clicked="Offset_Remove" />
+        </Grid>
+      </Border>
+
+      <Components:Dial Grid.Row="1" Margin="0 5 0 0" VerticalAlignment="Center" Title="Angle" x:Name="Angle" Minimum="-180" Maximum="180" Exponent="1" Round="0" Unit="°" Centered="true" ValueChanged="Angle_Changed" />
+    </Grid>
 
     <Components:HorizontalAdd Added="Offset_Add" />
   </StackPanel>

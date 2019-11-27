@@ -216,6 +216,9 @@ namespace Apollo.Binary {
             writer.Write(o.Offsets.Count);
             for (int i = 0; i < o.Offsets.Count; i++)
                 Encode(writer, o.Offsets[i]);
+
+            for (int i = 0; i < o.Offsets.Count; i++)
+                writer.Write(o.GetAngle(i));
         }
 
         static void Encode(BinaryWriter writer, Delay o) {
@@ -412,7 +415,6 @@ namespace Apollo.Binary {
 
             writer.Write(o.X);
             writer.Write(o.Y);
-            writer.Write(o.Angle);
         }
 
         static void Encode(BinaryWriter writer, Time o) {
