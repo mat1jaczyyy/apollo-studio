@@ -136,7 +136,7 @@ namespace Apollo.Devices {
             public int X;
             public int Y;
 
-            public IntTuple(int x, int y){
+            public IntTuple(int x, int y) {
                 X = x;
                 Y = y;
             }
