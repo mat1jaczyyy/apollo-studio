@@ -215,7 +215,7 @@ namespace Apollo.Components {
                 double y = e.GetPosition(CurrentCanvas).Y;
 
                 if (Math.Abs(x - lastX) >= 4) {
-                    int change = (int)((x - lastX) / (AbsoluteCanvas.IsVisible? 8 : 4));
+                    int change = (int)((x - lastX) / 4);
 
                     if (AbsoluteCanvas.IsVisible) AbsoluteX += change;
                     else X += change;
@@ -224,7 +224,7 @@ namespace Apollo.Components {
                 }
 
                 if (Math.Abs(y - lastY) >= 4) {
-                    int change = -(int)((y - lastY) / (AbsoluteCanvas.IsVisible? 8 : 4));
+                    int change = -(int)((y - lastY) / 4);
 
                     if (AbsoluteCanvas.IsVisible) AbsoluteY += change;
                     else Y += change;
