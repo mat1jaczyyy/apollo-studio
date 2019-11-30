@@ -11,6 +11,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
     public class MoveViewer: UserControl {
@@ -37,9 +38,10 @@ namespace Apollo.DeviceViewers {
 
             _move = move;
 
-            Offset.X = _move.Offset.X;
-            Offset.Y = _move.Offset.Y;
+            SetOffset(_move.Offset);
             Offset.Changed += Offset_Changed;
+            Offset.AbsoluteChanged += Offset_AbsoluteChanged;
+            Offset.Switched += Offset_Switched;
 
             GridMode.SelectedIndex = (int)_move.GridMode;
 
@@ -48,6 +50,8 @@ namespace Apollo.DeviceViewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Offset.Changed -= Offset_Changed;
+            Offset.AbsoluteChanged -= Offset_AbsoluteChanged;
+            Offset.Switched -= Offset_Switched;
 
             _move = null;
         }
@@ -64,7 +68,7 @@ namespace Apollo.DeviceViewers {
 
                 List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Offset Changed to {rx},{ry}", () => {
+                Program.Project.Undo.Add($"Move Offset Relative Changed to {rx},{ry}", () => {
                     Move move = ((Move)Track.TraversePath(path));
                     move.Offset.X = ux;
                     move.Offset.Y = uy;
@@ -77,9 +81,52 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetOffset(int x, int y) {
-            Offset.X = x;
-            Offset.Y = y;
+        void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
+            _move.Offset.AbsoluteX = x;
+            _move.Offset.AbsoluteY = y;
+
+            if (old_x != null && old_y != null) {
+                int ux = old_x.Value;
+                int uy = old_y.Value;
+                int rx = x;
+                int ry = y;
+
+                List<int> path = Track.GetPath(_move);
+
+                Program.Project.Undo.Add($"Move Offset Absolute Changed to {rx},{ry}", () => {
+                    Move move = ((Move)Track.TraversePath(path));
+                    move.Offset.AbsoluteX = ux;
+                    move.Offset.AbsoluteY = uy;
+
+                }, () => {
+                    Move move = ((Move)Track.TraversePath(path));
+                    move.Offset.AbsoluteX = rx;
+                    move.Offset.AbsoluteY = ry;
+                });
+            }
+        }
+
+        void Offset_Switched() {
+            bool u = _move.Offset.IsAbsolute;
+            bool r = !_move.Offset.IsAbsolute;
+
+            List<int> path = Track.GetPath(_move);
+
+            Program.Project.Undo.Add($"Move Offset Switched to {(r? "Absolute" : "Relative")}", () => {
+                Move move = ((Move)Track.TraversePath(path));
+                move.Offset.IsAbsolute = u;
+
+            }, () => {
+                Move move = ((Move)Track.TraversePath(path));
+                move.Offset.IsAbsolute = r;
+            });
+
+            _move.Offset.IsAbsolute = !_move.Offset.IsAbsolute;
+        }
+
+        public void SetOffset(Offset offset) {
+            Offset.Update(offset);
+            Wrap.IsEnabled = !offset.IsAbsolute;
         }
         
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {

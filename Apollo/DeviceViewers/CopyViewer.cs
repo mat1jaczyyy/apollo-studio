@@ -39,8 +39,8 @@ namespace Apollo.DeviceViewers {
         Controls Contents;
         HorizontalAdd OffsetAdd;
 
-        public void Contents_Insert(int index, Offset offset) {
-            CopyOffset viewer = new CopyOffset(offset, _copy);
+        public void Contents_Insert(int index, Offset offset, int angle) {
+            CopyOffset viewer = new CopyOffset(offset, angle, _copy);
             viewer.OffsetAdded += Offset_Insert;
             viewer.OffsetRemoved += Offset_Remove;
 
@@ -73,7 +73,7 @@ namespace Apollo.DeviceViewers {
             Wrap.IsChecked = _copy.Wrap;
 
             for (int i = 0; i < _copy.Offsets.Count; i++)
-                Contents_Insert(i, _copy.Offsets[i]);
+                Contents_Insert(i, _copy.Offsets[i], _copy.GetAngle(i));
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
@@ -171,13 +171,8 @@ namespace Apollo.DeviceViewers {
         public void SetCopyMode(CopyType mode) { 
             CopyMode.SelectedIndex = (int)mode;
             
-            for(int i = 1; i < Contents.Count; i++){
-                if(mode == CopyType.Interpolate){
-                    ((CopyOffset)Contents[i]).AngleDial.Enabled = true;
-                } else {
-                    ((CopyOffset)Contents[i]).AngleDial.Enabled = false;
-                }
-            }
+            for (int i = 1; i < Contents.Count; i++)
+                ((CopyOffset)Contents[i]).AngleEnabled = mode == CopyType.Interpolate;
         }
 
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
@@ -249,7 +244,7 @@ namespace Apollo.DeviceViewers {
             _copy.Remove(index);
         }
 
-        public void SetOffset(int index, int x, int y) => ((CopyOffset)Contents[index + 1]).SetOffset(x, y);
+        public void SetOffset(int index, Offset offset) => ((CopyOffset)Contents[index + 1]).SetOffset(offset);
         
         public void SetOffsetAngle(int index, double angle) => ((CopyOffset)Contents[index + 1]).SetAngle(angle);
     }

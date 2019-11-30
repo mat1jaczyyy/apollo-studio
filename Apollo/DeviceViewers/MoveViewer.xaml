@@ -5,8 +5,8 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
 
-  <Grid RowDefinitions="*,Auto">
-    <Components:MoveDial Grid.Row="0" x:Name="Offset" Title="Offset" />
+  <Grid RowDefinitions="*,Auto" Width="60">
+    <Components:MoveDial Grid.Row="0" x:Name="Offset" />
 
     <StackPanel Grid.Row="1" Margin="0 5 0 0" HorizontalAlignment="Center" Spacing="5">
       <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
