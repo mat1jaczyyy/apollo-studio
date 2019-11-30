@@ -48,7 +48,7 @@
               <Button Margin="7" Content="Import" x:Name="Import" Click="ImportDialog" />
             </Border>
 
-            <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible">
+            <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible" x:Name="FrameList">
               <Grid RowDefinitions="Auto,*">
                 <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" x:Name="Frames">
                   <Components:VerticalAdd Actions="Paste" Added="Frame_InsertStart" Action="Frame_Action" DragDrop.AllowDrop="true" x:Name="FrameAdd" />
@@ -95,8 +95,8 @@
                 <CheckBox HorizontalAlignment="Center" x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
 
                 <Grid ColumnDefinitions="*,*">
-                  <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Play" x:Name="Play" Click="PatternPlay" />
-                  <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Fire" x:Name="Fire" Click="PatternFire" />
+                  <Button Grid.Column="0" Margin="0 0 2.5 0" Content="Play" x:Name="Play" Click="PlayButton" />
+                  <Button Grid.Column="1" Margin="2.5 0 0 0" Content="Fire" x:Name="Fire" Click="FireButton" />
                 </Grid>
               </StackPanel>
             </Border>

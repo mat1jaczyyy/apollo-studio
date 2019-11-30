@@ -95,8 +95,11 @@ namespace Apollo.Components {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                _pattern.Window?.Selection.Action((string)((MenuItem)item).Header);
+            if (item is MenuItem menuItem) {
+                if ((string)menuItem.Header == "Play Here") _pattern.Window?.PlayFrom(this);
+                else if ((string)menuItem.Header == "Fire Here") _pattern.Window?.PlayFrom(this, true);
+                else _pattern.Window?.Selection.Action((string)menuItem.Header);
+            }
         }
 
         void Select(PointerPressedEventArgs e) {
@@ -108,6 +111,11 @@ namespace Apollo.Components {
 
         public async void Drag(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if ((e.KeyModifiers & ~KeyModifiers.Shift) == KeyModifiers.Alt) {
+                _pattern.Window?.PlayFrom(this, (e.KeyModifiers & ~KeyModifiers.Alt) == KeyModifiers.Shift);
+                return;
+            }
 
             if (!selected) Select(e);
 
@@ -126,6 +134,9 @@ namespace Apollo.Components {
         
                 if (MouseButton == PointerUpdateKind.RightButtonPressed)
                     FrameContextMenu.Open(Viewer);
+
+                if (MouseButton == PointerUpdateKind.MiddleButtonPressed)
+                    _pattern.Window?.PlayFrom(this, e.KeyModifiers == KeyModifiers.Shift);
             }
         }
 
