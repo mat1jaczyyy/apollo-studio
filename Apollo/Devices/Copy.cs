@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -283,8 +283,8 @@ namespace Apollo.Devices {
                 return;
             }
 
-            double px = n.Index % 10;
-            double py = (int)(n.Index / 10);
+            int px = n.Index % 10;
+            int py = n.Index / 10;
 
             List<int> validOffsets = new List<int>() {n.Index};
             List<int> interpolatedOffsets = new List<int>() {n.Index};
@@ -294,59 +294,53 @@ namespace Apollo.Devices {
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
-                    
-                    double angle = 2.0 * Angles[i] / 180.0 * Math.PI;
-
+                    double angle = Angles[i] / 90.0 * Math.PI;
                     
                     double x = _x;
                     double y = _y;
                     
-                    if(angle != 0){
+                    int pointCount;
+                    Func<double, DoubleTuple> pointGenerator;
+
+                    DoubleTuple source = new DoubleTuple(px, py);
+                    DoubleTuple target = new DoubleTuple(_x, _y);
+
+                    if (angle != 0) {
                         double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
-                        
-                        DoubleTuple start = new DoubleTuple(px, py);
-                        
-                        DoubleTuple center = new DoubleTuple();
-                        
                         double commonTan = Math.Atan((px - x) / (y - py));
-                        center.X = (double)(px + x) / 2 + Math.Cos(commonTan) * diam / (2 * Math.Tan(Math.PI - angle / 2)) * Math.Sign(y - py);
-                        center.Y = (double)(py + y) / 2 + Math.Sin(commonTan) * diam / (2 * Math.Tan(Math.PI - angle / 2)) * Math.Sign(y - py);
+
+                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2));
+                        
+                        DoubleTuple center = new DoubleTuple(
+                            (px + x) / 2 + Math.Cos(commonTan) * cord * Math.Sign(y - py),
+                            (py + y) / 2 + Math.Sin(commonTan) * cord * Math.Sign(y - py)
+                        );
                         
                         double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
                         
-                        double u = (((1 - Math.Sign(angle)) / 2) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
-                        double v = (((1 - Math.Sign(angle)) / 2) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        double u = (Convert.ToInt32(angle < 0) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
+                        double v = (Convert.ToInt32(angle < 0) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        v += (u <= v)? 0 : 2 * Math.PI;
                         
-                        double w = (u <= v)? v : v + 2 * Math.PI;
+                        double startAngle = (angle < 0)? v : u;
+                        double endAngle = (angle < 0)? u : v;
 
-                        int pointCount = (int)Math.Abs(radius) * 10;
+                        pointCount = (int)Math.Abs(radius) * 10;
+                        pointGenerator = p => CircularInterp(center, radius, startAngle, endAngle, p / pointCount);
                         
-                        if(angle < 0){
-                            double tw = w;
-                            w = u;
-                            u = tw;
-                        }
-                        
-                        for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
-                            IntTuple point = CircularInterp(center, radius, u, w, pointIndex / pointCount).Round();
-                            bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
-                            if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
-                                interpolatedOffsets.Add(valid ? iresult : -1);
-                            }
-                        }
                     } else {
-                        int pointCount = (int)Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
-                        
-                        for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
-                            IntTuple point = Lerp(new DoubleTuple(px, py), new DoubleTuple(_x, _y), pointIndex / pointCount).Round();
-                            bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
-                            if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
-                                interpolatedOffsets.Add(valid ? iresult : -1);
-                            }
-                        }
+                        pointCount = (int)Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
+                        pointGenerator = p => Lerp(source, target, p / pointCount);
                     }
-                                        
-                    
+                        
+                    for (int p = 1; p <= pointCount; p++) {
+                        IntTuple point = pointGenerator.Invoke(p).Round();
+
+                        bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
+
+                        if (iresult != interpolatedOffsets.Last())
+                            interpolatedOffsets.Add(valid? iresult : -1);
+                    }
                 }
 
                 px = _x;
@@ -420,13 +414,10 @@ namespace Apollo.Devices {
             base.Dispose();
         }
     
-        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t){
-            DoubleTuple result = new DoubleTuple();
-            result.X = center.X + radius * Math.Cos(startAngle + (endAngle - startAngle) * t);
-            result.Y = center.Y + radius * Math.Sin(startAngle + (endAngle - startAngle) * t);
-            
-            return result;
-        }
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t) => new DoubleTuple(
+            center.X + radius * Math.Cos(startAngle + (endAngle - startAngle) * t),
+            center.Y + radius * Math.Sin(startAngle + (endAngle - startAngle) * t)
+        );
         
         DoubleTuple Lerp(DoubleTuple p1, DoubleTuple p2, double t) => p1 * (1.0 - t) + p2 * t;
     }
