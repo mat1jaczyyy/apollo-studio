@@ -287,14 +287,15 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
-                return new Copy(
-                    time,
-                    gate,
-                    (CopyType)reader.ReadInt32(),
-                    (GridType)reader.ReadInt32(),
-                    reader.ReadBoolean(),
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList()
-                );
+                CopyType copyType = (CopyType)reader.ReadInt32();
+                GridType gridType = (GridType)reader.ReadInt32();
+                bool wrap = reader.ReadBoolean();
+
+                int count;
+                List<Offset> offsets = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList();
+                List<int> angles = (from i in Enumerable.Range(0, count) select (version >= 25)? reader.ReadInt32() : 0).ToList();
+
+                return new Copy(time, gate, copyType, gridType, wrap, offsets, angles);
             
             } else if (t == typeof(Delay)) {
                 Time time;
@@ -580,13 +581,22 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
             
-            else if (t == typeof(Offset))
-                return new Offset(
-                    reader.ReadInt32(),
-                    reader.ReadInt32()
-                );
+            else if (t == typeof(Offset)) {
+                int x = reader.ReadInt32();
+                int y = reader.ReadInt32();
+
+                bool absolute = false;
+                int ax = 5;
+                int ay = 5;
+                if (version >= 25) {
+                    absolute = reader.ReadBoolean();
+                    ax = reader.ReadInt32();
+                    ay = reader.ReadInt32();
+                }
+
+                return new Offset(x, y, absolute, ax, ay);
             
-            else if (t == typeof(Time))
+            } else if (t == typeof(Time))
                 return new Time(
                     reader.ReadBoolean(),
                     Decode(reader, version),

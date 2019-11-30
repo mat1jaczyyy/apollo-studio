@@ -16,6 +16,8 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
             
             _viewer = this.Get<MoveDial>("Offset");
+            
+            Angle = this.Get<Dial>("Angle");
         }
 
         public delegate void OffsetEventHandler(int index);
@@ -25,23 +27,37 @@ namespace Apollo.Components {
         Offset _offset;
         Copy _copy;
         MoveDial _viewer;
+        Dial Angle;
+
+        public bool AngleEnabled {
+            get => Angle.Enabled;
+            set => Angle.Enabled = value;
+        }
 
         public CopyOffset() => throw new InvalidOperationException();
 
-        public CopyOffset(Offset offset, Copy copy) {
+        public CopyOffset(Offset offset, int angle, Copy copy) {
             InitializeComponent();
 
             _offset = offset;
             _copy = copy;
 
-            _viewer.X = _offset.X;
-            _viewer.Y = _offset.Y;
+            _viewer.Update(_offset);
             _viewer.Changed += Offset_Changed;
+            _viewer.AbsoluteChanged += Offset_AbsoluteChanged;
+            _viewer.Switched += Offset_Switched;
+            
+            Angle.RawValue = angle;
+            Angle.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             OffsetAdded = null;
             OffsetRemoved = null;
+
+            _viewer.Changed -= Offset_Changed;
+            _viewer.AbsoluteChanged -= Offset_AbsoluteChanged;
+            _viewer.Switched -= Offset_Switched;
 
             _offset = null;
             _copy = null;
@@ -65,7 +81,7 @@ namespace Apollo.Components {
 
                 List<int> path = Track.GetPath(_copy);
 
-                Program.Project.Undo.Add($"Copy Offset {index + 1} Changed to {rx},{ry}", () => {
+                Program.Project.Undo.Add($"Copy Offset {index + 1} Relative Changed to {rx},{ry}", () => {
                     Copy copy = ((Copy)Track.TraversePath(path));
                     copy.Offsets[index].X = ux;
                     copy.Offsets[index].Y = uy;
@@ -78,9 +94,75 @@ namespace Apollo.Components {
             }
         }
 
-        public void SetOffset(int x, int y) {
-            _viewer.X = x;
-            _viewer.Y = y;
+        void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
+            _offset.AbsoluteX = x;
+            _offset.AbsoluteY = y;
+
+            if (old_x != null && old_y != null) {
+                int ux = old_x.Value;
+                int uy = old_y.Value;
+                int rx = x;
+                int ry = y;
+                int index = _copy.Offsets.IndexOf(_offset);
+
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Offset {index + 1} Absolute Changed to {rx},{ry}", () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.Offsets[index].AbsoluteX = ux;
+                    copy.Offsets[index].AbsoluteY = uy;
+
+                }, () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.Offsets[index].AbsoluteX = rx;
+                    copy.Offsets[index].AbsoluteY = ry;
+                });
+            }
         }
+
+        void Offset_Switched() {
+            bool u = _offset.IsAbsolute;
+            bool r = !_offset.IsAbsolute;
+            int index = _copy.Offsets.IndexOf(_offset);
+
+            List<int> path = Track.GetPath(_copy);
+
+            Program.Project.Undo.Add($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", () => {
+                Copy copy = ((Copy)Track.TraversePath(path));
+                copy.Offsets[index].IsAbsolute = u;
+
+            }, () => {
+                Copy copy = ((Copy)Track.TraversePath(path));
+                copy.Offsets[index].IsAbsolute = r;
+            });
+
+            _offset.IsAbsolute = !_offset.IsAbsolute;
+        }
+
+        public void SetOffset(Offset offset) => _viewer.Update(offset);
+        
+        public void Angle_Changed(Dial sender, double angle, double? old){
+            int index = _copy.Offsets.IndexOf(_offset);
+            
+            if(old != null && old.Value != angle){
+                List<int> path = Track.GetPath(_copy);
+                
+                int u = (int)old.Value;
+                int r = (int)angle;
+
+                Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}{Angle.Unit}", () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.SetAngle(index, u);
+
+                }, () => {
+                    Copy copy = ((Copy)Track.TraversePath(path));
+                    copy.SetAngle(index, r);
+                });
+            }
+            
+            _copy.SetAngle(index, (int)angle);
+        }
+    
+        public void SetAngle(double angle) => Angle.RawValue = angle;
     }
 }
