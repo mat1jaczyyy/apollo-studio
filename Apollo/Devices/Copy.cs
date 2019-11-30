@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Numerics;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -287,56 +287,73 @@ namespace Apollo.Devices {
                 return;
             }
 
-            int px = n.Index % 10;
-            int py = n.Index / 10;
+            double px = n.Index % 10;
+            double py = (int)(n.Index / 10);
 
             List<int> validOffsets = new List<int>() {n.Index};
             List<int> interpolatedOffsets = new List<int>() {n.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
-                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result))
+                if (ApplyOffset(n.Index, Offsets[i], out int _x, out int _y, out int result))
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
+                    
+                    double angle = 2 * Offsets[i].Angle;
+                    
+                    double x = _x;
+                    double y = _y;
+                    
+                    if(angle != 0){
+                        double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
+                        
+                        DoubleTuple start = new DoubleTuple(px, py);
+                        
+                        DoubleTuple center;
+                        
+                        double commonTan = Math.Atan((px - x) / (y - py));
+                        center.X = (double)(px + x) / 2 + Math.Cos(commonTan) * diam / (2 * Math.Tan(Math.PI - angle / 2)) * Math.Sign(y - py);
+                        center.Y = (double)(py + y) / 2 + Math.Sin(commonTan) * diam / (2 * Math.Tan(Math.PI - angle / 2)) * Math.Sign(y - py);
+                        
+                        double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
+                        
+                        double u = (((1 - Math.Sign(angle)) / 2) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
+                        double v = (((1 - Math.Sign(angle)) / 2) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        
+                        double w = (u <= v)? v : v + 2 * Math.PI;
 
-                    int dx = x - px;
-                    int dy = y - py;
-                    
-                    double angle = Offsets[i].Angle;
-                    
-                    double magnitude = Math.Sqrt(Math.Pow(Offsets[i].X, 2)+ Math.Pow(Offsets[i].Y, 2));
-                    
-                    DoubleTuple relMidPoint = new DoubleTuple(Offsets[i].X / 2.0, Offsets[i].Y / 2.0);
-                    
-                    DoubleTuple cp1 = new DoubleTuple(relMidPoint.X * Math.Cos(angle) + relMidPoint.Y * Math.Sin(angle) + px, 
-                                                    (-relMidPoint.X * Math.Sin(angle) + relMidPoint.Y * Math.Cos(angle)) + py);
-                                              
-                    DoubleTuple translatedMidPoint = new DoubleTuple(relMidPoint.X - Offsets[i].X, relMidPoint.Y - Offsets[i].Y);
-                    
-                    DoubleTuple cp2 = new DoubleTuple(px + Offsets[i].X + translatedMidPoint.X * Math.Cos(angle) - translatedMidPoint.Y * Math.Sin(angle), 
-                                                      py + Offsets[i].Y + translatedMidPoint.X * Math.Sin(angle) + translatedMidPoint.Y * Math.Cos(angle));
-                                                      
-                    DoubleTuple end = new DoubleTuple(px + Offsets[i].X, py + Offsets[i].Y);
-                    
-                    int ax = Math.Abs(dx);
-                    int ay = Math.Abs(dy);
-
-                    int bx = (dx < 0)? -1 : 1;
-                    int by = (dy < 0)? -1 : 1;
-                    
-                    int pointCount = (int)magnitude * 3;
-                    
-                    for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
-                        IntTuple point = CubicBezierInterp(new DoubleTuple(px, py), cp1, cp2, end, pointIndex/pointCount).Round();
-                        bool valid = Validate(point.X, point.Y, out int iresult);
-                        if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
-                            interpolatedOffsets.Add(valid ? iresult : -1);
+                        int pointCount = (int)Math.Abs(radius) * 10;
+                        
+                        if(angle < 0){
+                            double tw = w;
+                            w = u;
+                            u = tw;
+                        }
+                        
+                        for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
+                            IntTuple point = CircularInterp(center, radius, u, w, pointIndex / pointCount).Round();
+                            bool valid = Validate(point.X, point.Y, out int iresult);
+                            if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
+                                interpolatedOffsets.Add(valid ? iresult : -1);
+                            }
+                        }
+                    } else {
+                        int pointCount = (int)Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
+                        
+                        for(double pointIndex = 1; pointIndex <= pointCount; pointIndex++){
+                            IntTuple point = Lerp(new DoubleTuple(px, py), new DoubleTuple(_x, _y), pointIndex / pointCount).Round();
+                            bool valid = Validate(point.X, point.Y, out int iresult);
+                            if(iresult != interpolatedOffsets[interpolatedOffsets.Count - 1]){
+                                interpolatedOffsets.Add(valid ? iresult : -1);
+                            }
                         }
                     }
+                                        
+                    
                 }
 
-                px = x;
-                py = y;
+                px = _x;
+                py = _y;
             }
 
             if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
@@ -406,15 +423,12 @@ namespace Apollo.Devices {
             base.Dispose();
         }
     
-        DoubleTuple CubicBezierInterp(DoubleTuple start, DoubleTuple cp1, DoubleTuple cp2, DoubleTuple end, double t){
-            DoubleTuple A = Lerp(start, cp1, t);
-            DoubleTuple B = Lerp(cp1, cp2, t);
-            DoubleTuple C = Lerp(cp2, end, t);
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t){
+            DoubleTuple result;
+            result.X = center.X + radius * Math.Cos(startAngle + (endAngle - startAngle) * t);
+            result.Y = center.Y + radius * Math.Sin(startAngle + (endAngle - startAngle) * t);
             
-            DoubleTuple D = Lerp(A, B, t);
-            DoubleTuple E = Lerp(B, C, t);
-            
-            return Lerp(D, E, t);
+            return result;
         }
         
         DoubleTuple Lerp(DoubleTuple p1, DoubleTuple p2, double t) => p1 * (1.0 - t) + p2 * t;
