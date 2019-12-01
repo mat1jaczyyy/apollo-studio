@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -22,9 +21,6 @@ namespace Apollo.Components
             FrameImage = this.Get<Image>("FrameImage");
         }
 
-        public delegate void ClickedEventHandler();
-        public event ClickedEventHandler Clicked;
-
         Frame _frame = new Frame();
         public TextBlock Time;
 
@@ -44,7 +40,7 @@ namespace Apollo.Components
         {
             InitializeComponent();
         }
-
+        
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e)
         {
             Clicked = null;

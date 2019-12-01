@@ -41,9 +41,11 @@ namespace Apollo.Windows {
 
             Contents = this.Get<StackPanel>("Contents").Children;
             TrackAdd = this.Get<TrackAdd>("TrackAdd");
+            
+            MacroDials = this.Get<StackPanel>("MacroDials");
 
             BPM = this.Get<TextBox>("BPM");
-            Page = this.Get<HorizontalDial>("Page");
+            
             Author = this.Get<TextBox>("Author");
 
             BottomPane = this.Get<StackPanel>("BottomPane");
@@ -56,7 +58,7 @@ namespace Apollo.Windows {
         HashSet<IDisposable> observables = new HashSet<IDisposable>();
 
         TextBlock TitleText, TitleCenter, TimeSpent, Started;
-        StackPanel CenteringLeft, CenteringRight, BottomPane;
+        StackPanel CenteringLeft, CenteringRight, MacroDials, BottomPane;
         CollapseButton CollapseButton;
 
         ContextMenu TrackContextMenu;
@@ -64,15 +66,18 @@ namespace Apollo.Windows {
         TrackAdd TrackAdd;
 
         TextBox BPM, Author;
-        HorizontalDial Page;
 
         DispatcherTimer Timer;
         bool SafeClose = false;
 
         void UpdateTitle() => Title = TitleText.Text = TitleCenter.Text = (Program.Project.FilePath == "")? "New Project" : Program.Project.FileName;
 
-        void UpdatePage() => Page.RawValue = Program.Project.Page;
-        void HandlePage() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePage);
+        void UpdateMacro() {
+            for (int i = 0; i < 4; i++)
+                ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
+        }
+        
+        void HandleMacro() => Dispatcher.UIThread.InvokeAsync((Action)UpdateMacro);
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -126,7 +131,9 @@ namespace Apollo.Windows {
             BPM.Text = Program.Project.BPM.ToString();
             observables.Add(BPM.GetObservable(TextBox.TextProperty).Subscribe(BPM_Changed));
 
-            Page.RawValue = Program.Project.Page;
+            for(int i = 0; i < 4; i++){
+                ((Dial)MacroDials.Children[i]).RawValue = Program.Project.GetMacro(i + 1);
+            }
             
             Author.Text = Program.Project.Author.ToString();
             observables.Add(Author.GetObservable(TextBox.TextProperty).Subscribe(Author_Changed));
@@ -153,8 +160,8 @@ namespace Apollo.Windows {
             Program.Project.PathChanged += UpdateTitle;
             UpdateTitle();
 
-            Program.Project.PageChanged += HandlePage;
-            UpdatePage();
+            Program.Project.MacroChanged += HandleMacro;
+            UpdateMacro();
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
@@ -171,7 +178,7 @@ namespace Apollo.Windows {
             Timer.Tick -= UpdateTime;
 
             Program.Project.PathChanged -= UpdateTitle;
-            Program.Project.PageChanged -= HandlePage;
+            Program.Project.MacroChanged -= HandleMacro;
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
             Selection.Dispose();
@@ -247,7 +254,9 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
-        void Page_Changed(double value, double? old) => Program.Project.Page = (int)value;
+        void Macro_Changed(Dial sender, double value, double? old){
+          Program.Project.SetMacro(MacroDials.Children.IndexOf(sender) + 1, (int)value);
+        }
 
         Action BPM_Update;
         bool BPM_Dirty = false;

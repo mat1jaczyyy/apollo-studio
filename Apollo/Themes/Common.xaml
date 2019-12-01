@@ -32,5 +32,6 @@
     <sys:Double x:Key="FontSizeLarge">16</sys:Double>
 
     <sys:Double x:Key="ScrollBarThickness">10</sys:Double>
+    <sys:Double x:Key="ScrollBarThumbThickness">10</sys:Double>
   </Style.Resources>
 </Style>

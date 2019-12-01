@@ -12,14 +12,17 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class Copy: Device {
         Random RNG = new Random();
-
+        
         public List<Offset> Offsets;
+        List<int> Angles;
 
-        public void Insert(int index, Offset offset = null) {
+        public void Insert(int index, Offset offset = null, int angle = 0) {
             Offsets.Insert(index, offset?? new Offset());
             Offsets.Last().Changed += OffsetChanged;
 
-            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index]);
+            Angles.Insert(index, angle);
+
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).Contents_Insert(index, Offsets[index], Angles[index]);
         }
 
         public void Remove(int index) {
@@ -27,10 +30,21 @@ namespace Apollo.Devices {
 
             Offsets[index].Changed -= OffsetChanged;
             Offsets.RemoveAt(index);
+
+            Angles.RemoveAt(index);
         }
 
         void OffsetChanged(Offset sender) {
-            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender.X, sender.Y);
+            if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffset(Offsets.IndexOf(sender), sender);
+        }
+
+        public int GetAngle(int index) => Angles[index];
+        public void SetAngle(int index, int angle) {
+            if (-150 <= angle && angle <= 150 && angle != Angles[index]) {
+                Angles[index] = angle;
+
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetOffsetAngle(index, angle);
+            }
         }
 
         Time _time;
@@ -103,6 +117,31 @@ namespace Apollo.Devices {
             }
         }
 
+        class DoubleTuple {
+            public double X;
+            public double Y;
+
+            public DoubleTuple(double x = 0, double y = 0) {
+                X = x;
+                Y = y;
+            }
+
+            public IntTuple Round() => new IntTuple((int)Math.Round(X), (int)Math.Round(Y));
+
+            public static DoubleTuple operator *(DoubleTuple t, double f) => new DoubleTuple(t.X * f, t.Y * f);
+            public static DoubleTuple operator +(DoubleTuple a, DoubleTuple b) => new DoubleTuple(a.X + b.X, a.Y + b.Y);
+        };
+
+        class IntTuple {
+            public int X;
+            public int Y;
+
+            public IntTuple(int x, int y) {
+                X = x;
+                Y = y;
+            }
+        }
+
         CopyType _copymode;
         public CopyType CopyMode {
             get => _copymode;
@@ -130,59 +169,22 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList()) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, double gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null): base("copy") {
+        public Copy(Time time = null, double gate = 1, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
             Time = time?? new Time(free: 500);
             Gate = gate;
             CopyMode = copymode;
             GridMode = gridmode;
             Wrap = wrap;
             Offsets = offsets?? new List<Offset>();
-        }
-        
-        int ApplyWrap(int coord) => (GridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
+            Angles = angles?? new List<int>();
 
-        bool ApplyOffset(int index, Offset offset, out int x, out int y, out int result) {
-            x = index % 10;
-            y = index / 10;
-
-            if (GridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
-                result = 0;
-                return false;
-            }
-
-            x += offset.X;
-            y += offset.Y;
-
-            return Validate(x, y, out result);
-        }
-
-        bool Validate(int x, int y, out int result) {
-            if (Wrap) {
-                x = ApplyWrap(x);
-                y = ApplyWrap(y);
-            }
-
-            result = y * 10 + x;
-
-            if (GridMode == GridType.Full) {
-                if (0 <= x && x <= 9 && 0 <= y && y <= 9)
-                    return true;
-                
-                if (y == -1 && 4 <= x && x <= 5) {
-                    result = 100;
-                    return true;
-                }
-
-            } else if (GridMode == GridType.Square)
-                if (1 <= x && x <= 8 && 1 <= y && y <= 8)
-                    return true;
-             
-            return false;
+            foreach (Offset offset in Offsets)
+                offset.Changed += OffsetChanged;
         }
 
         void FireCourier(PolyInfo info, double time) {
@@ -288,33 +290,61 @@ namespace Apollo.Devices {
             List<int> interpolatedOffsets = new List<int>() {n.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
-                if (ApplyOffset(n.Index, Offsets[i], out int x, out int y, out int result))
+                if (Offsets[i].Apply(n.Index, GridMode, Wrap, out int _x, out int _y, out int result))
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
-                    List<(int X, int Y)> points = new List<(int, int)>();
-
-                    int dx = x - px;
-                    int dy = y - py;
-
-                    int ax = Math.Abs(dx);
-                    int ay = Math.Abs(dy);
-
-                    int bx = (dx < 0)? -1 : 1;
-                    int by = (dy < 0)? -1 : 1;
-
-                    if (ax > ay) for (int j = 1; j <= ax; j++)
-                        points.Add((px + j * bx, py + (int)Math.Round((double)j / ax * ay) * by));
-
-                    else for (int j = 1; j <= ay; j++)
-                        points.Add((px + (int)Math.Round((double)j / ay * ax) * bx, py + j * by));
+                    double angle = Angles[i] / 90.0 * Math.PI;
                     
-                    foreach ((int ix, int iy) in points)
-                        interpolatedOffsets.Add(Validate(ix, iy, out int iresult)? iresult : -1);
+                    double x = _x;
+                    double y = _y;
+                    
+                    int pointCount;
+                    Func<double, DoubleTuple> pointGenerator;
+
+                    DoubleTuple source = new DoubleTuple(px, py);
+                    DoubleTuple target = new DoubleTuple(_x, _y);
+
+                    if (angle != 0) {
+                        double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
+                        double commonTan = Math.Atan((px - x) / (y - py));
+
+                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2));
+                        
+                        DoubleTuple center = new DoubleTuple(
+                            (px + x) / 2 + Math.Cos(commonTan) * cord * Math.Sign(y - py),
+                            (py + y) / 2 + Math.Sin(commonTan) * cord * Math.Sign(y - py)
+                        );
+                        
+                        double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
+                        
+                        double u = (Convert.ToInt32(angle < 0) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
+                        double v = (Convert.ToInt32(angle < 0) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        v += (u <= v)? 0 : 2 * Math.PI;
+                        
+                        double startAngle = (angle < 0)? v : u;
+                        double endAngle = (angle < 0)? u : v;
+
+                        pointCount = (int)Math.Abs(radius) * 10;
+                        pointGenerator = p => CircularInterp(center, radius, startAngle, endAngle, p / pointCount);
+                        
+                    } else {
+                        pointCount = (int)Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
+                        pointGenerator = p => Lerp(source, target, p / pointCount);
+                    }
+                        
+                    for (int p = 1; p <= pointCount; p++) {
+                        IntTuple point = pointGenerator.Invoke(p).Round();
+
+                        bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
+
+                        if (iresult != interpolatedOffsets.Last())
+                            interpolatedOffsets.Add(valid? iresult : -1);
+                    }
                 }
 
-                px = x;
-                py = y;
+                px = _x;
+                py = _y;
             }
 
             if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
@@ -383,5 +413,12 @@ namespace Apollo.Devices {
             Time.Dispose();
             base.Dispose();
         }
+    
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t) => new DoubleTuple(
+            center.X + radius * Math.Cos(startAngle + (endAngle - startAngle) * t),
+            center.Y + radius * Math.Sin(startAngle + (endAngle - startAngle) * t)
+        );
+        
+        DoubleTuple Lerp(DoubleTuple p1, DoubleTuple p2, double t) => p1 * (1.0 - t) + p2 * t;
     }
 }

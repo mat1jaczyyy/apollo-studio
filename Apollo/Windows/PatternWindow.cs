@@ -40,6 +40,7 @@ namespace Apollo.Windows {
             UndoButton = this.Get<UndoButton>("UndoButton");
             RedoButton = this.Get<RedoButton>("RedoButton");
 
+            FrameList = this.Get<ScrollViewer>("FrameList");
             Editor = this.Get<LaunchpadGrid>("Editor");
             RootKey = this.Get<LaunchpadGrid>("RootKey");
             Wrap = this.Get<CheckBox>("Wrap");
@@ -104,6 +105,7 @@ namespace Apollo.Windows {
         StackPanel CenteringLeft, CenteringRight;
         UndoButton UndoButton;
         RedoButton RedoButton;
+        ScrollViewer FrameList;
         ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor, RootKey;
         Controls Contents;
@@ -465,9 +467,12 @@ namespace Apollo.Windows {
             if (App.Dragging) return;
 
             if (e.Key == Key.Enter || e.Key == Key.Space) {
-                if (e.KeyModifiers == KeyModifiers.Shift) PatternFire(Fire, null);
-                else if (e.KeyModifiers == KeyModifiers.None) PatternPlay(Play, null);
-                else PatternPlay(Play, null);
+                KeyModifiers mods = e.KeyModifiers & ~App.ControlKey;
+                int start = ((e.KeyModifiers & ~KeyModifiers.Shift) == App.ControlKey)? _pattern.Expanded : 0;
+
+                if (mods == KeyModifiers.Shift) PatternFire(start);
+                else if (mods == KeyModifiers.None) PatternPlay(Play, start);
+                return;
             }
 
             if (Locked) return;
@@ -492,6 +497,24 @@ namespace Apollo.Windows {
                 } else if (e.Key == Key.Down || e.Key == Key.Right) {
                     if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
                     else Frame_Insert(_pattern.Count);
+
+                } else if (e.Key == Key.Home) {
+                    Selection.Select(_pattern[0], shift);
+                    Frame_Select(0);
+
+                } else if (e.Key == Key.End) {
+                    Selection.Select(_pattern[_pattern.Count - 1], shift);
+                    Frame_Select(_pattern.Count - 1);
+
+                } else if (e.Key == Key.PageUp) {
+                    int target = Math.Max(0, Selection.Start.IParentIndex.Value - (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                    Selection.Select(_pattern[target], shift);
+                    Frame_Select(target);
+                    
+                } else if (e.Key == Key.PageDown) {
+                    int target = Math.Min(_pattern.Count - 1, Selection.Start.IParentIndex.Value + (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                    Selection.Select(_pattern[target], shift);
+                    Frame_Select(target);
                 }
             }
         }
@@ -608,10 +631,10 @@ namespace Apollo.Windows {
                 PadFinished(-1);
                 
             } else if (x == -1 && y == 1) // Up-Left
-                PatternPlay(Play, null);
+                PatternPlay(Play);
                 
             else if (x == 1 && y == -1) // Down-Right
-                PatternFire(Fire, null);
+                PatternFire();
                 
             else if (x == 1 && y == 1) // Up-Right
                 Frame_Insert(_pattern.Expanded + 1);
@@ -719,7 +742,7 @@ namespace Apollo.Windows {
                 oldTime.Add(frame.Time.Clone());
         }
 
-        void Duration_Changed(double value, double? old) {
+        void Duration_Changed(Dial sender, double value, double? old) {
             if (oldTime == null) return;
 
             if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
@@ -939,7 +962,7 @@ namespace Apollo.Windows {
             Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
         }
 
-        void Gate_Changed(double value, double? old) {
+        void Gate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
@@ -957,7 +980,7 @@ namespace Apollo.Windows {
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
-        void Repeats_Changed(double value, double? old) {
+        void Repeats_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -975,7 +998,7 @@ namespace Apollo.Windows {
 
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
 
-        void Pinch_Changed(double value, double? old) {
+        void Pinch_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;
@@ -1108,7 +1131,7 @@ namespace Apollo.Windows {
         object PlayLocker = new object();
         List<Courier> PlayTimers = new List<Courier>();
 
-        void PatternStop(bool send = true) {
+        void PatternStop(bool send = true, int start = 0) {
             lock (PlayLocker) {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
@@ -1119,11 +1142,11 @@ namespace Apollo.Windows {
                             PlayColor(i, new Color(0));
 
                 PlayTimers = new List<Courier>();
-                PlayIndex = 0;
+                PlayIndex = start;
             }
         }
 
-        void PatternPlay(object sender, RoutedEventArgs e) {
+        void PatternPlay(Button sender, int start = 0) {
             if (Locked) {
                 PatternStop();
                 _pattern.MIDIEnter(new StopSignal());
@@ -1141,29 +1164,29 @@ namespace Apollo.Windows {
                 button.Content = "Stop";
             });
             
-            PatternStop(false);
+            PatternStop(false, start);
             _pattern.MIDIEnter(new StopSignal());
 
             foreach (Launchpad lp in MIDI.Devices)
                 if (lp.Available && lp.Type != LaunchpadType.Unknown)
                     lp.Clear();
 
-            Editor.RenderFrame(_pattern[0]);
+            Editor.RenderFrame(_pattern[start]);
 
-            for (int i = 0; i < _pattern[0].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[0].Screen[i].Clone()));
+            for (int i = 0; i < _pattern[start].Screen.Length; i++)
+                PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[start].Screen[i].Clone()));
 
             double time = 0;
 
-            for (int i = 0; i < _pattern.Count; i++) {
+            for (int i = start; i < _pattern.Count; i++) {
                 time += _pattern[i].Time * _pattern.Gate;
                 FireCourier(time);
             }
         }
 
-        void PatternFire(object sender, RoutedEventArgs e) {
+        void PatternFire(int start = 0) {
             PlayExit = _pattern.MIDIExit;
-            PatternPlay(sender, e);
+            PatternPlay(Fire, start);
         }
 
         void PatternFinish() {
@@ -1183,6 +1206,17 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
                 Launchpad?.Send(new Signal(this, _track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i]));
+        }
+
+        void PlayButton(object sender, RoutedEventArgs e) => PatternPlay(Play);
+
+        void FireButton(object sender, RoutedEventArgs e) => PatternFire();
+
+        public void PlayFrom(FrameDisplay sender, bool fire = false) {
+            int start = Contents.IndexOf(sender) - 1;
+
+            if (fire) PatternFire(start);
+            else PatternPlay(Play, start);
         }
 
         static void ImportFrames(Pattern pattern, int repeats, double gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {

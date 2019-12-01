@@ -99,11 +99,11 @@ namespace Apollo.Core {
             }
         }
 
-        static bool _AutoCreatePageFilter = false;
-        public static bool AutoCreatePageFilter {
-            get => _AutoCreatePageFilter;
+        static bool _AutoCreateMacroFilter = false;
+        public static bool AutoCreateMacroFilter {
+            get => _AutoCreateMacroFilter;
             set {
-                _AutoCreatePageFilter = value;
+                _AutoCreateMacroFilter = value;
                 Save();
             }
         }
