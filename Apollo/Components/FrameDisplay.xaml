@@ -13,7 +13,13 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+
+      <Separator />
+
       <MenuItem Header="Delete" />
+
+      <Separator />
+
       <MenuItem Header="Play Here" />
       <MenuItem Header="Fire Here" />
     </ContextMenu>

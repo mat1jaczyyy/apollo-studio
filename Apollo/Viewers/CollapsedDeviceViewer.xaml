@@ -14,10 +14,19 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+
+      <Separator />
+
       <MenuItem Header="Delete" />
+      <MenuItem Header="Mute" x:Name="DeviceMute" />
+
+      <Separator />
+
       <MenuItem Header="Group" />
       <MenuItem Header="Choke" />
-      <MenuItem Header="Mute" x:Name="DeviceMute" />
+
+      <Separator />
+      
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>
@@ -28,11 +37,20 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+
+      <Separator />
+      
       <MenuItem Header="Delete" />
+      <MenuItem Header="Mute" x:Name="GroupMute" />
+
+      <Separator />
+      
       <MenuItem Header="Group" />
       <MenuItem Header="Ungroup" />
       <MenuItem Header="Choke" />
-      <MenuItem Header="Mute" x:Name="GroupMute" />
+
+      <Separator />
+      
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>
@@ -43,11 +61,20 @@
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+
+      <Separator />
+      
       <MenuItem Header="Delete" />
+      <MenuItem Header="Mute" x:Name="ChokeMute" />
+
+      <Separator />
+      
       <MenuItem Header="Group" />
       <MenuItem Header="Choke" />
       <MenuItem Header="Unchoke" />
-      <MenuItem Header="Mute" x:Name="ChokeMute" />
+
+      <Separator />
+      
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>

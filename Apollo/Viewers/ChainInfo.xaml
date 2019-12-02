@@ -8,14 +8,20 @@
     <SolidColorBrush x:Key="BackgroundBrush" />
 
     <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
-      <MenuItem Header="Rename" />
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+      
+      <Separator />
+
+      <MenuItem Header="Rename" />
       <MenuItem Header="Delete" />
       <MenuItem Header="Mute" x:Name="MuteItem" />
+
+      <Separator />
+
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
     </ContextMenu>

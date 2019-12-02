@@ -17,7 +17,9 @@
       <MenuItem Header="Fast" />
       <MenuItem Header="Slow" />
       <MenuItem Header="Hold" />
-      <Separator x:Name="DeleteSeparator" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1" Height="1" />
+
+      <Separator x:Name="DeleteSeparator" />
+      
       <MenuItem x:Name="Delete" Header="Delete" />
     </ContextMenu>
   </UserControl.Resources>

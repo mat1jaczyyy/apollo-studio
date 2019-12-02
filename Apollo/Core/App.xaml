@@ -58,5 +58,12 @@
     <Style Selector="ScrollBar /template/ RepeatButton.repeat">
       <Setter Property="IsVisible" Value="false" />
     </Style>
+
+    <Style Selector="Separator">
+      <Setter Property="Margin" Value="0 2" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Height" Value="1" />
+    </Style>
   </Application.Styles>
 </Application>
