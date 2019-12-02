@@ -172,6 +172,9 @@ namespace Apollo.Windows {
                 launchpad.Window.WindowState = WindowState.Normal;
                 launchpad.Window.Activate();
             }
+
+            launchpad.Window.Topmost = true;
+            launchpad.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }

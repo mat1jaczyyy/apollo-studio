@@ -435,6 +435,9 @@ namespace Apollo.Windows {
                 Program.Project.Window.WindowState = WindowState.Normal;
                 Program.Project.Window.Activate();
             }
+
+            Program.Project.Window.Topmost = true;
+            Program.Project.Window.Topmost = Preferences.AlwaysOnTop;
         }
 
         void Track_Action(string action) => Track_Action(action, false);

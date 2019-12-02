@@ -1657,6 +1657,9 @@ namespace Apollo.Windows {
                 pattern.Window.WindowState = WindowState.Normal;
                 pattern.Window.Activate();
             }
+
+            pattern.Window.Topmost = true;
+            pattern.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }
