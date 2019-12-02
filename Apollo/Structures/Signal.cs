@@ -30,7 +30,7 @@ namespace Apollo.Structures {
         
         public int[] Macros {
             get => _macros;
-            set => _macros = value?? Program.Project?.Macros?? _macros;
+            set => _macros = value?? Program.Project?.Macros?? new int[] {1, 1, 1, 1};
         }
 
         public int GetMacro(int target) => Macros[target - 1];
