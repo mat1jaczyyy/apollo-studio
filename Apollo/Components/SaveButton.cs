@@ -53,12 +53,11 @@ namespace Apollo.Components {
             SaveContextMenu = null;
         }
 
-        async void SaveContextMenu_Click(object sender, EventArgs e) {
+        async void SaveContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem)) {
-                switch (((MenuItem)item).Header) {
+            if (e.Source is MenuItem menuItem) {
+                switch (menuItem.Header) {
                     case "Save as...":
                         await Program.Project.Save((Window)this.GetVisualRoot(), true);
                         break;

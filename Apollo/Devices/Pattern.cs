@@ -257,11 +257,7 @@ namespace Apollo.Devices {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
 
-            Type infoType = courier.Info.GetType();
-            
-            if (infoType == typeof(Signal)) {
-                Signal n = (Signal)courier.Info;
-
+            if (courier.Info is Signal n) {
                 lock (locker[n]) {
                     if (++buffer[n] < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
@@ -291,9 +287,7 @@ namespace Apollo.Devices {
                     timers[n].Remove(courier);
                 }
 
-            } else if (infoType == typeof(PolyInfo)) {
-                PolyInfo info = (PolyInfo)courier.Info;
-                
+            } else if (courier.Info is PolyInfo info) {
                 lock (info.locker) {
                     if (++info.index < Frames.Count * AdjustedRepeats) {
                         for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)

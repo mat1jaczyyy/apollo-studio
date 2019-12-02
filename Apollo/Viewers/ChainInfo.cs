@@ -112,12 +112,11 @@ namespace Apollo.Viewers {
 
         void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, EventArgs e) {
+        void ContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Track.Get(_chain)?.Window?.Selection.Action((string)((MenuItem)item).Header);
+            if (e.Source is MenuItem menuItem)
+                Track.Get(_chain)?.Window?.Selection.Action((string)menuItem.Header);
         }
 
         void Select(PointerPressedEventArgs e) {

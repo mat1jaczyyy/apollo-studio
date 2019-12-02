@@ -48,7 +48,7 @@ namespace Apollo.Viewers {
         public Indicator Indicator { get; private set; }
 
         void SetAlwaysShowing() {
-            bool RootChain = _chain.Parent.GetType() == typeof(Track);
+            bool RootChain = _chain.Parent is Track;
 
             DeviceAdd.AlwaysShowing = Contents.Count == 1 || RootChain;
 
@@ -140,12 +140,12 @@ namespace Apollo.Viewers {
         void Device_Action(string action) => Device_Action(action, false);
         void Device_Action(string action, bool right) => Track.Get(_chain)?.Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
 
-        void DeviceContextMenu_Click(object sender, EventArgs e) {
+        void DeviceContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
             IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Device_Action((string)((MenuItem)item).Header, sender == DeviceContextMenuAfter);
+            if (e.Source is MenuItem menuItem)
+                Device_Action((string)menuItem.Header, sender == DeviceContextMenuAfter);
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {
@@ -411,9 +411,9 @@ namespace Apollo.Viewers {
         }
 
         public void Ungroup(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Group) || ((Group)_chain.Devices[index]).Count != 1) return;
+            if (!(_chain.Devices[index] is Group group) || group.Count != 1) return;
 
-            Chain init = ((Group)_chain.Devices[index])[0].Clone();
+            Chain init = group[0].Clone();
 
             List<int> path = Track.GetPath(_chain);
 
@@ -486,9 +486,9 @@ namespace Apollo.Viewers {
         }
 
         public void Unchoke(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Choke)) return;
+            if (!(_chain.Devices[index] is Choke choke))return;
 
-            Chain init = ((Choke)_chain.Devices[index]).Chain.Clone();
+            Chain init = choke.Chain.Clone();
 
             List<int> path = Track.GetPath(_chain);
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -71,12 +69,11 @@ namespace Apollo.Components {
             base.Unloaded(sender, e);
         }
 
-        void ActionContextMenu_Click(object sender, EventArgs e) {
+        void ActionContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Action?.Invoke((string)((MenuItem)item).Header);
+            if (e.Source is MenuItem menuItem)
+                Action?.Invoke((string)menuItem.Header);
         }
 
         protected override void Click(PointerReleasedEventArgs e) {

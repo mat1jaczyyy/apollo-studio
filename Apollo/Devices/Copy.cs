@@ -214,12 +214,8 @@ namespace Apollo.Devices {
 
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
-
-            Type infoType = courier.Info.GetType();
             
-            if ((CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) && infoType == typeof(PolyInfo)) {
-                PolyInfo info = (PolyInfo)courier.Info;
-
+            if ((CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) && courier.Info is PolyInfo info) {
                 lock (info.locker) {
                     if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
                         Signal m = info.n.Clone();
@@ -231,7 +227,7 @@ namespace Apollo.Devices {
                     }
                 }
 
-            } else if (CopyMode == CopyType.RandomLoop && infoType == typeof((Signal, List<int>))) {
+            } else if (CopyMode == CopyType.RandomLoop && courier.Info is Tuple<Signal, List<int>>) {
                 (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
                 HandleRandomLoop(n, offsets);
             }

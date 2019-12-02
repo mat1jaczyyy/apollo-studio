@@ -440,12 +440,11 @@ namespace Apollo.Windows {
         void Track_Action(string action) => Track_Action(action, false);
         void Track_Action(string action, bool right) => Program.Project.Window?.Selection.Action(action, Program.Project, (right? Program.Project.Count : 0) - 1);
 
-        void TrackContextMenu_Click(object sender, EventArgs e) {
+        void TrackContextMenu_Click(object sender, RoutedEventArgs e) {
             this.Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Track_Action((string)((MenuItem)item).Header, true);
+            if (e.Source is MenuItem menuItem)
+                Track_Action((string)menuItem.Header, true);
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {

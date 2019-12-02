@@ -77,18 +77,14 @@ namespace Apollo.Viewers {
         protected virtual void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
 
-            if (Root.Children[0].GetType() == typeof(DeviceHead)) {
-                DeviceHead target = ((DeviceHead)Root.Children[0]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
+            if (Root.Children[0] is DeviceHead targetHead) {
+                if (IsArrangeValid) targetHead.Header.Background = brush;
+                else targetHead.Resources["TitleBrush"] = brush;
             }
 
-            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail)) {
-                DeviceTail target = ((DeviceTail)Root.Children[Root.Children.Count - 2]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
+            if (Root.Children[Root.Children.Count - 2] is DeviceTail targetTail) {
+                if (IsArrangeValid) targetTail.Header.Background = brush;
+                else targetTail.Resources["TitleBrush"] = brush;
             }
 
             if (IsArrangeValid) Header.Background = brush;
@@ -156,23 +152,24 @@ namespace Apollo.Viewers {
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
             TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
-            if (Root.Children[0].GetType() == typeof(DeviceHead))
-                ((DeviceHead)Root.Children[0]).SetEnabled(_device.Enabled);
+            
 
-            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail))
-                ((DeviceTail)Root.Children[Root.Children.Count - 2]).SetEnabled(_device.Enabled);
+            if (Root.Children[0] is DeviceHead targetHead)
+                targetHead.SetEnabled(_device.Enabled);
+
+            if (Root.Children[Root.Children.Count - 2] is DeviceTail targetTail)
+                targetTail.SetEnabled(_device.Enabled);
         }
 
         protected void Device_Add(Type device) => Added?.Invoke(_device.ParentIndex.Value + 1, device);
 
         protected void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
-        protected void ContextMenu_Click(object sender, EventArgs e) {
+        protected void ContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Track.Get(_device)?.Window?.Selection.Action((string)((MenuItem)item).Header);
+            if (e.Source is MenuItem menuItem)
+                Track.Get(_device)?.Window?.Selection.Action((string)menuItem.Header);
         }
 
         void Select(PointerPressedEventArgs e) {
@@ -202,10 +199,10 @@ namespace Apollo.Viewers {
                     List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
 
                     if (selection.Count == 1) {
-                        if (selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
+                        if (selection[0] is Group group && group.Count == 1)
                             menu = GroupContextMenu;
 
-                        else if (selection[0].GetType() == typeof(Choke))
+                        else if (selection[0] is Choke)
                             menu = ChokeContextMenu;
                     } 
                     

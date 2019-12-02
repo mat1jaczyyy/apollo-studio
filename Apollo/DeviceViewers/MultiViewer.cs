@@ -179,12 +179,11 @@ namespace Apollo.DeviceViewers {
         void Chain_Action(string action) => Chain_Action(action, false);
         void Chain_Action(string action, bool right) => Track.Get(_multi)?.Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
 
-        void ChainContextMenu_Click(object sender, EventArgs e) {
+        void ChainContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Chain_Action((string)((MenuItem)item).Header, true);
+            if (e.Source is MenuItem menuItem)
+                Chain_Action((string)menuItem.Header, true);
         }
 
         void Click(object sender, PointerReleasedEventArgs e) {

@@ -168,7 +168,7 @@ namespace Apollo.Devices {
         }
 
         void PreprocessExit(Signal n) {
-            if (n.GetType() == typeof(StopSignal)) return;
+            if (n is StopSignal) return;
 
             int target = n.MultiTarget.Pop();
             

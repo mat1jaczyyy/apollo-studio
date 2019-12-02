@@ -91,14 +91,15 @@ namespace Apollo.Components {
 
         void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, EventArgs e) {
+        void ContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item is MenuItem menuItem) {
-                if ((string)menuItem.Header == "Play Here") _pattern.Window?.PlayFrom(this);
-                else if ((string)menuItem.Header == "Fire Here") _pattern.Window?.PlayFrom(this, true);
-                else _pattern.Window?.Selection.Action((string)menuItem.Header);
+            if (e.Source is MenuItem menuItem) {
+                string header = (string)menuItem.Header;
+
+                if (header == "Play Here") _pattern.Window?.PlayFrom(this);
+                else if (header == "Fire Here") _pattern.Window?.PlayFrom(this, true);
+                else _pattern.Window?.Selection.Action(header);
             }
         }
 

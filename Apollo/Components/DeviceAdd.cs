@@ -63,20 +63,18 @@ namespace Apollo.Components {
             base.Unloaded(sender, e);
         }
 
-        void AddContextMenu_Click(object sender, EventArgs e) {
+        void AddContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{((string)((MenuItem)item).Header).Replace(" ", "")}"));
+            if (e.Source is MenuItem menuItem)
+                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{((string)menuItem.Header).Replace(" ", "")}"));
         }
 
-        void DeviceContextMenu_Click(object sender, EventArgs e) {
+        void DeviceContextMenu_Click(object sender, RoutedEventArgs e) {
             ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Action?.Invoke((string)((MenuItem)item).Header);
+            if (e.Source is MenuItem menuItem)
+                Action?.Invoke((string)menuItem.Header);
         }
 
         protected override void Click(PointerReleasedEventArgs e) {

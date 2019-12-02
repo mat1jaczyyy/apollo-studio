@@ -48,14 +48,14 @@ namespace Apollo.Elements {
         }
 
         public static Track Get(Device device) => (device.Parent?.Parent != null)
-            ? ((device.Parent?.Parent.GetType() == typeof(Track))
-                ? (Track)device.Parent?.Parent
+            ? ((device.Parent?.Parent is Track track)
+                ? track
                 : Get((Device)device.Parent?.Parent)
             ) : null;
 
         public static Track Get(Chain chain) => (chain.Parent != null)
-            ? ((chain.Parent.GetType() == typeof(Track))
-                ? (Track)chain.Parent
+            ? ((chain.Parent is Track track)
+                ? track
                 : Get((Device)chain.Parent)
             ) : null;
 
@@ -63,14 +63,14 @@ namespace Apollo.Elements {
             ISelect last = child;
 
             while (true) {
-                if (last.GetType() == typeof(Chain) && ((Chain)last).IRoot)
-                    last = (ISelect)((Chain)last).Parent;
+                if (last is Chain chain && chain.IRoot)
+                    last = (ISelect)chain.Parent;
 
                 if (search.Contains(last)) return true;
 
-                if (last.GetType() == typeof(Track)) return false;
+                if (last is Track) return false;
                 
-                last = (last.GetType() == typeof(Chain) && ((Chain)last).Parent.GetType() == typeof(Choke))
+                last = (last is Chain _chain && _chain.Parent is Choke)  // Choke isn't an ISelectParent so IParent won't work!
                     ? (ISelect)((Chain)last).Parent
                     : (ISelect)last.IParent;
             }
@@ -81,12 +81,12 @@ namespace Apollo.Elements {
             ISelect last = child;
 
             while (true) {
-                if (last is Chain chain && (chain.Parent.GetType() == typeof(Choke) || chain.IRoot))
+                if (last is Chain chain && (chain.Parent is Choke || chain.IRoot))
                     last = (ISelect)chain.Parent;
 
                 path.Add(last.IParentIndex?? -1);
 
-                if (last.GetType() == typeof(Track)) break;
+                if (last is Track) break;
 
                 last = (ISelect)last.IParent;
             }

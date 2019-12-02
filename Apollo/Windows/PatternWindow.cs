@@ -446,12 +446,11 @@ namespace Apollo.Windows {
         void Frame_Action(string action) => Frame_Action(action, false);
         void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
 
-        void FrameContextMenu_Click(object sender, EventArgs e) {
+        void FrameContextMenu_Click(object sender, RoutedEventArgs e) {
             this.Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
 
-            if (item.GetType() == typeof(MenuItem))
-                Frame_Action((string)((MenuItem)item).Header, true);
+            if (e.Source is MenuItem menuItem)
+                Frame_Action((string)menuItem.Header, true);
         }
         
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
