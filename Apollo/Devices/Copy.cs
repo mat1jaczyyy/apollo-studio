@@ -302,14 +302,16 @@ namespace Apollo.Devices {
                     DoubleTuple target = new DoubleTuple(_x, _y);
 
                     if (angle != 0) {
+                        // https://www.desmos.com/calculator/hizsxmojxz
+
                         double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
                         double commonTan = Math.Atan((px - x) / (y - py));
 
-                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2));
+                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2)) * (((y - py) >= 0)? 1 : -1);
                         
                         DoubleTuple center = new DoubleTuple(
-                            (px + x) / 2 + Math.Cos(commonTan) * cord * Math.Sign(y - py),
-                            (py + y) / 2 + Math.Sin(commonTan) * cord * Math.Sign(y - py)
+                            (px + x) / 2 + Math.Cos(commonTan) * cord,
+                            (py + y) / 2 + Math.Sin(commonTan) * cord
                         );
                         
                         double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
