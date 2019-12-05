@@ -1101,10 +1101,10 @@ namespace Apollo.Windows {
             courier.Elapsed -= Tick;
 
             lock (PlayLocker) {
-                if (++PlayIndex < _pattern.Count) {
-                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
-                        if (_pattern[PlayIndex].Screen[i] != _pattern[PlayIndex - 1].Screen[i])
-                            PlayColor(i, _pattern[PlayIndex].Screen[i]);
+                if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
+                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                        if (_pattern[PlayIndex % _pattern.Count].Screen[i] != _pattern[(PlayIndex - 1) % _pattern.Count].Screen[i])
+                            PlayColor(i, _pattern[PlayIndex % _pattern.Count].Screen[i]);
 
                 } else {
                     for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
@@ -1130,9 +1130,9 @@ namespace Apollo.Windows {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
                 
-                if (send && PlayIndex < _pattern.Count)
-                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
-                        if (_pattern[PlayIndex].Screen[i].Lit)
+                if (send && PlayIndex < _pattern.Count * _pattern.AdjustedRepeats)
+                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                        if (_pattern[PlayIndex % _pattern.Count].Screen[i].Lit)
                             PlayColor(i, new Color(0));
 
                 PlayTimers = new List<Courier>();
@@ -1170,11 +1170,14 @@ namespace Apollo.Windows {
             for (int i = 0; i < _pattern[start].Screen.Length; i++)
                 PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[start].Screen[i].Clone()));
 
-            double time = 0;
+            double time = Enumerable.Sum(_pattern.Frames.Take(start).Select(i => (double)i.Time)) * _pattern.Gate;
+            double starttime = _pattern.ApplyPinch(time);
 
-            for (int i = start; i < _pattern.Count; i++) {
-                time += _pattern[i].Time * _pattern.Gate;
-                FireCourier(time);
+            for (int i = start; i < _pattern.Count * _pattern.AdjustedRepeats; i++) {
+                time += _pattern[i % _pattern.Count].Time * _pattern.Gate;
+                double pinched = _pattern.ApplyPinch(time);
+
+                FireCourier(pinched - starttime);
             }
         }
 
