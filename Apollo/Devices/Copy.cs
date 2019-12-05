@@ -140,6 +140,11 @@ namespace Apollo.Devices {
                 X = x;
                 Y = y;
             }
+
+            public IntTuple Apply(Func<int, int> action) => new IntTuple(
+                action.Invoke(X),
+                action.Invoke(Y)
+            );
         }
 
         CopyType _copymode;
@@ -296,7 +301,7 @@ namespace Apollo.Devices {
                     double y = _y;
                     
                     int pointCount;
-                    Func<double, DoubleTuple> pointGenerator;
+                    Func<int, DoubleTuple> pointGenerator;
 
                     DoubleTuple source = new DoubleTuple(px, py);
                     DoubleTuple target = new DoubleTuple(_x, _y);
@@ -324,11 +329,21 @@ namespace Apollo.Devices {
                         double endAngle = (angle < 0)? u : v;
 
                         pointCount = (int)(Math.Abs(radius) * Math.Abs(endAngle - startAngle) * 1.5);
-                        pointGenerator = p => CircularInterp(center, radius, startAngle, endAngle, p / pointCount);
+                        pointGenerator = t => CircularInterp(center, radius, startAngle, endAngle, t, pointCount);
                         
                     } else {
-                        pointCount = (int)Math.Sqrt(Math.Pow(x - px, 2) + Math.Pow(y - py, 2));
-                        pointGenerator = p => Lerp(source, target, p / pointCount);
+                        IntTuple p = new IntTuple(px, py);
+
+                        IntTuple d = new IntTuple(
+                            _x - px,
+                            _y - py
+                        );
+
+                        IntTuple a = d.Apply(v => Math.Abs(v));
+                        IntTuple b = d.Apply(v => (v < 0)? -1 : 1);
+
+                        pointCount = Math.Max(a.X, a.Y);
+                        pointGenerator = t => LineGenerator(p, a, b, t);
                     }
                         
                     for (int p = 1; p <= pointCount; p++) {
@@ -415,11 +430,23 @@ namespace Apollo.Devices {
             base.Dispose();
         }
     
-        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t) => new DoubleTuple(
-            center.X + radius * Math.Cos(startAngle + (endAngle - startAngle) * t),
-            center.Y + radius * Math.Sin(startAngle + (endAngle - startAngle) * t)
-        );
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t, double pointCount) {
+            double angle = startAngle + (endAngle - startAngle) * ((double)t / pointCount);
+
+            return new DoubleTuple(
+                center.X + radius * Math.Cos(angle),
+                center.Y + radius * Math.Sin(angle)
+            );
+        }
         
-        DoubleTuple Lerp(DoubleTuple p1, DoubleTuple p2, double t) => p1 * (1.0 - t) + p2 * t;
+        DoubleTuple LineGenerator(IntTuple p, IntTuple a, IntTuple b, int t) => (a.X > a.Y)
+            ? new DoubleTuple(
+                p.X + t * b.X,
+                p.Y + (int)Math.Round((double)t / a.X * a.Y) * b.Y
+            )
+            : new DoubleTuple(
+                p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
+                p.Y + t * b.Y
+            );
     }
 }
