@@ -128,7 +128,6 @@ namespace Apollo.Windows {
                 _locked = value;
 
                 if (Repeats.Enabled) Repeats.DisplayDisabledText = false;
-                if (Gate.Enabled) Gate.DisplayDisabledText = false;
                 if (Duration.Enabled) Duration.DisplayDisabledText = false;
 
                 UndoButton.IsEnabled =
@@ -136,6 +135,7 @@ namespace Apollo.Windows {
                 ImportButton.IsEnabled =
                 Repeats.Enabled =
                 Gate.Enabled =
+                Pinch.Enabled =
                 PlaybackMode.IsEnabled =
                 Wrap.IsEnabled =
                 Infinite.IsEnabled =
@@ -154,7 +154,7 @@ namespace Apollo.Windows {
                     Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
                     Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
-                    Repeats.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
+                    Repeats.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
             }
         }
