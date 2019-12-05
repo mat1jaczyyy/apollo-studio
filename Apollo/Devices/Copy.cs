@@ -323,7 +323,7 @@ namespace Apollo.Devices {
                         double startAngle = (angle < 0)? v : u;
                         double endAngle = (angle < 0)? u : v;
 
-                        pointCount = (int)Math.Abs(radius) * 10;
+                        pointCount = (int)(Math.Abs(radius) * Math.Abs(endAngle - startAngle) * 1.5);
                         pointGenerator = p => CircularInterp(center, radius, startAngle, endAngle, p / pointCount);
                         
                     } else {
@@ -332,7 +332,10 @@ namespace Apollo.Devices {
                     }
                         
                     for (int p = 1; p <= pointCount; p++) {
-                        IntTuple point = pointGenerator.Invoke(p).Round();
+                        DoubleTuple doublepoint = pointGenerator.Invoke(p);
+                        IntTuple point = doublepoint.Round();
+
+                        if (Math.Pow(doublepoint.X - point.X, 2.16) + Math.Pow(doublepoint.Y - point.Y, 2.16) > .25) continue;
 
                         bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
 
