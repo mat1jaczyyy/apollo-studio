@@ -32,7 +32,7 @@
     </Grid>
 
     <StackPanel>
-      <ComboBox Opacity="0" VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" IsVisible="false" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
+      <ComboBox VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" IsVisible="false" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
     </StackPanel>
   </Grid>
 </UserControl>
