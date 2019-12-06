@@ -20,6 +20,7 @@ namespace Apollo.Viewers {
             AvaloniaXamlLoader.Load(this);
 
             Reconnect = this.Get<Reconnect>("Reconnect");
+            LockToggle = this.Get<LockToggle>("LockToggle");
             Popout = this.Get<Popout>("Popout");
             Rotation = this.Get<ComboBox>("Rotation");
             InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
@@ -29,6 +30,7 @@ namespace Apollo.Viewers {
         Launchpad _launchpad;
 
         Reconnect Reconnect;
+        LockToggle LockToggle;
         Popout Popout;
         ComboBox Rotation, InputFormatSelector, TargetPortSelector;
 
@@ -57,25 +59,28 @@ namespace Apollo.Viewers {
             InitializeComponent();
             
             _launchpad = launchpad;
+            _launchpad.Info = this;
 
             this.Get<TextBlock>("Name").Text = _launchpad.Name.Trim();
 
             Rotation.SelectedIndex = (int)_launchpad.Rotation;
             InputFormatSelector.SelectedIndex = (int)_launchpad.InputFormat;
+            
+            Popout.IsVisible = _launchpad.Window == null;
 
             if (_launchpad.GetType() != typeof(Launchpad)) {
-                Reconnect.IsEnabled = Rotation.IsEnabled = InputFormatSelector.IsEnabled = false;
-                Reconnect.Opacity = Reconnect.Width = Rotation.Opacity = Rotation.Width = InputFormatSelector.Opacity = InputFormatSelector.Width = 0;
+                Reconnect.IsVisible = false;
+                Rotation.IsHitTestVisible = InputFormatSelector.IsHitTestVisible = false;
+                Rotation.Opacity = InputFormatSelector.Opacity = 0;
             }
 
-            if (_launchpad.GetType() == typeof(VirtualLaunchpad)) {
-                Popout.IsEnabled = false;
-                Popout.Opacity = Popout.Width = 0;
+            if (_launchpad is VirtualLaunchpad vlp) {
+                LockToggle.IsVisible = true;
+                LockToggle.SetState(Preferences.VirtualLaunchpads.Contains(vlp.VirtualIndex));
             }
 
-            if (_launchpad.GetType() == typeof(AbletonLaunchpad)) {
-                TargetPortSelector.IsEnabled = true;
-                TargetPortSelector.Opacity = 1;
+            if (_launchpad is AbletonLaunchpad) {
+                TargetPortSelector.IsVisible = true;
 
                 UpdatePorts();
                 MIDI.DevicesUpdated += HandlePorts;
@@ -86,12 +91,30 @@ namespace Apollo.Viewers {
             if (_launchpad.GetType() == typeof(AbletonLaunchpad))
                 MIDI.DevicesUpdated -= HandlePorts;
             
+            _launchpad.Info = null;
             _launchpad = null;
         }
 
+        public void SetPopout(bool value) => Popout.IsVisible = value;
+
         void Launchpad_Reconnect() => _launchpad.Reconnect();
 
-        void Launchpad_Popout() => LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
+        void Launchpad_LockToggle() {
+            VirtualLaunchpad lp = (VirtualLaunchpad)_launchpad;
+
+            Preferences.VirtualLaunchpadsToggle(lp.VirtualIndex);
+
+            bool state = Preferences.VirtualLaunchpads.Contains(lp.VirtualIndex);
+            LockToggle.SetState(state);
+
+            if (!state && lp.Window == null)
+                MIDI.Disconnect(lp);
+        }
+
+        void Launchpad_Popout() {
+            LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
+            Popout.IsVisible = false;
+        }
 
         void Rotation_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.Rotation = (RotationType)Rotation.SelectedIndex;
 

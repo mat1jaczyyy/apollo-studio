@@ -111,6 +111,11 @@ namespace Apollo.Core {
                 if (Preferences.DiscordPresence) Discord.Set(true);
 
                 MIDI.Start();
+
+                foreach (int i in Preferences.VirtualLaunchpads) {
+                    LaunchpadWindow.Create(MIDI.ConnectVirtual(i), null);
+                    MIDI.Update();
+                }
                 
                 Courier autosave = new Courier() { Interval = 180000 };
                 autosave.Elapsed += async (_, __) => {

@@ -8,7 +8,11 @@
     <Grid ColumnDefinitions="Auto,Auto,*,Auto,93" VerticalAlignment="Center">
       <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Name="Name" />
 
-      <Components:Reconnect Grid.Column="1" Margin="5 0" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Reconnect" Clicked="Launchpad_Reconnect" />
+      <Grid Grid.Column="1" Margin="5 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Components:Reconnect x:Name="Reconnect" Clicked="Launchpad_Reconnect" />
+
+        <Components:LockToggle IsVisible="false" x:Name="LockToggle" Clicked="Launchpad_LockToggle" />
+      </Grid>
 
       <Components:Popout Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="Popout" Clicked="Launchpad_Popout" />
 
@@ -27,8 +31,8 @@
       </StackPanel>
     </Grid>
 
-    <StackPanel ZIndex="-1">
-      <ComboBox Opacity="0" VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
+    <StackPanel>
+      <ComboBox Opacity="0" VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" IsVisible="false" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
     </StackPanel>
   </Grid>
 </UserControl>

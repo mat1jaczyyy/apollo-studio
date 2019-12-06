@@ -129,6 +129,10 @@ namespace Apollo.Binary {
                     Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
                 }
 
+                if (version >= 25) {
+                    Preferences.VirtualLaunchpads = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadInt32()).ToList();
+                }
+
                 if (15 <= version && version <= 22) {
                     reader.ReadString();
                     reader.ReadString();
@@ -233,7 +237,7 @@ namespace Apollo.Binary {
                     }
                 
                 Launchpad ret;
-                if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name);
+                if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name, Convert.ToInt32(name.Substring(18)));
                 else if (name.Contains("Ableton Connector ")) ret = new AbletonLaunchpad(name);
                 else ret = new Launchpad(name, format, rotation);
 
