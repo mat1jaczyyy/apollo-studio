@@ -25,7 +25,8 @@ namespace Apollo.Viewers {
             TitleText = this.Get<TextBlock>("Title");
 
             DeviceMute = this.Get<MenuItem>("DeviceMute");
-            GroupMute = this.Get<MenuItem>("DeviceMute");
+            GroupMute = this.Get<MenuItem>("GroupMute");
+            ChokeMute = this.Get<MenuItem>("ChokeMute");
         }
 
         protected override void ApplyHeaderBrush(string resource) {

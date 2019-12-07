@@ -33,7 +33,8 @@ namespace Apollo.Viewers {
             Indicator = this.Get<Indicator>("Indicator");
 
             DeviceMute = this.Get<MenuItem>("DeviceMute");
-            GroupMute = this.Get<MenuItem>("DeviceMute");
+            GroupMute = this.Get<MenuItem>("GroupMute");
+            ChokeMute = this.Get<MenuItem>("ChokeMute");
         }
 
         static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
@@ -72,7 +73,7 @@ namespace Apollo.Viewers {
         protected TextBlock TitleText;
         protected Grid Draggable;
         protected ContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
-        protected MenuItem DeviceMute, GroupMute;
+        protected MenuItem DeviceMute, GroupMute, ChokeMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -152,8 +153,6 @@ namespace Apollo.Viewers {
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
             TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
-            
-
             if (Root.Children[0] is DeviceHead targetHead)
                 targetHead.SetEnabled(_device.Enabled);
 
@@ -206,7 +205,7 @@ namespace Apollo.Viewers {
                             menu = ChokeContextMenu;
                     } 
                     
-                    DeviceMute.Header = GroupMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
+                    DeviceMute.Header = GroupMute.Header = ChokeMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 
                     menu.Open(Draggable);
                 
