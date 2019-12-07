@@ -232,7 +232,7 @@ namespace Apollo.Devices {
                     }
                 }
 
-            } else if (CopyMode == CopyType.RandomLoop && courier.Info is Tuple<Signal, List<int>>) {
+            } else if (CopyMode == CopyType.RandomLoop && courier.Info is ValueTuple<Signal, List<int>>) {
                 (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
                 HandleRandomLoop(n, offsets);
             }
