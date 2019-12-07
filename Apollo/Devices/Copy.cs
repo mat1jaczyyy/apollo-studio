@@ -205,7 +205,7 @@ namespace Apollo.Devices {
         }
 
         void FireCourier((Signal n, List<int>) info, double time) {
-            Courier courier = timers[info.n] = new Courier() {
+            Courier courier = timers[info.n.With(info.n.Index, new Color())] = new Courier() {
                 Info = info,
                 AutoReset = false,
                 Interval = time
@@ -239,9 +239,8 @@ namespace Apollo.Devices {
         }
 
         void HandleRandomLoop(Signal original, List<int> offsets) {
-            Signal n = original.Clone();
+            Signal n = original.With(original.Index, new Color());
             Signal m = original.Clone();
-            n.Color = new Color();
 
             if (!locker.ContainsKey(n)) locker[n] = new object();
 
