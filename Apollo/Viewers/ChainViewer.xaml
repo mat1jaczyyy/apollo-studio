@@ -6,15 +6,15 @@
              DetachedFromVisualTree="Unloaded">
   
   <UserControl.Resources>
-    <ContextMenu x:Key="DeviceContextMenuBefore" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="DeviceContextMenuBefore" MenuActionWithSender="ContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
 
-    <ContextMenu x:Key="DeviceContextMenuAfter" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="DeviceContextMenuAfter" MenuActionWithSender="ContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <Grid x:Name="Root">

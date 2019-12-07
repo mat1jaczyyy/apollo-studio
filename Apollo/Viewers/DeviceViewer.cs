@@ -72,7 +72,7 @@ namespace Apollo.Viewers {
 
         protected TextBlock TitleText;
         protected Grid Draggable;
-        protected ContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
+        protected ApolloContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
         protected MenuItem DeviceMute, GroupMute, ChokeMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
@@ -113,13 +113,9 @@ namespace Apollo.Viewers {
             _device.Viewer = this;
             Deselect();
 
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
-            GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
-            ChokeContextMenu = (ContextMenu)this.Resources["ChokeContextMenu"];
-            
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            DeviceContextMenu = (ApolloContextMenu)this.Resources["DeviceContextMenu"];
+            GroupContextMenu = (ApolloContextMenu)this.Resources["GroupContextMenu"];
+            ChokeContextMenu = (ApolloContextMenu)this.Resources["ChokeContextMenu"];
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -139,9 +135,6 @@ namespace Apollo.Viewers {
             _device.Viewer = null;
             _device = null;
 
-            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             DeviceContextMenu = GroupContextMenu = ChokeContextMenu = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -164,12 +157,7 @@ namespace Apollo.Viewers {
 
         protected void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
-        protected void ContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Track.Get(_device)?.Window?.Selection.Action((string)menuItem.Header);
-        }
+        protected void ContextMenu_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action);
 
         void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -194,7 +182,7 @@ namespace Apollo.Viewers {
                 if (selected) Select(e);
                 
                 if (MouseButton == PointerUpdateKind.RightButtonPressed) {
-                    ContextMenu menu = DeviceContextMenu;
+                    ApolloContextMenu menu = DeviceContextMenu;
                     List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
 
                     if (selection.Count == 1) {

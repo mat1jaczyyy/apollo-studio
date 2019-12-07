@@ -27,8 +27,6 @@ namespace Apollo.Components {
 
         Canvas Icon;
 
-        ContextMenu AddContextMenu, DeviceContextMenu;
-
         public override bool AlwaysShowing {
             set {
                 if (value != _always) {
@@ -42,46 +40,26 @@ namespace Apollo.Components {
             InitializeComponent();
 
             AllowRightClick = true;
+
             base.MouseLeave(this, null);
-
-            AddContextMenu = (ContextMenu)this.Resources["AddContextMenu"];
-            AddContextMenu.AddHandler(MenuItem.ClickEvent, AddContextMenu_Click);
-
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent,  DeviceContextMenu_Click);
         }
 
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
             Action = null;
 
-            AddContextMenu.RemoveHandler(MenuItem.ClickEvent, AddContextMenu_Click);
-            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-
-            AddContextMenu = DeviceContextMenu = null;
-
             base.Unloaded(sender, e);
         }
 
-        void AddContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
+        void AddContextMenu_Action(string action) => Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{action.Replace(" ", "")}"));
 
-            if (e.Source is MenuItem menuItem)
-                Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{((string)menuItem.Header).Replace(" ", "")}"));
-        }
-
-        void DeviceContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Action?.Invoke((string)menuItem.Header);
-        }
+        void DeviceContextMenu_Action(string action) => Action?.Invoke(action);
 
         protected override void Click(PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonReleased) AddContextMenu.Open(Icon);
-            else if (MouseButton == PointerUpdateKind.RightButtonReleased) DeviceContextMenu.Open(Icon);
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) ((ApolloContextMenu)this.Resources["AddContextMenu"]).Open(Icon);
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) ((ApolloContextMenu)this.Resources["DeviceContextMenu"]).Open(Icon);
         }
     }
 }

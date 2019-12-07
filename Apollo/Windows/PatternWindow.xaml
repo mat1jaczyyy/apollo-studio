@@ -10,9 +10,9 @@
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
   <Window.Resources>
-    <ContextMenu x:Key="FrameContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="FrameContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Paste" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </Window.Resources>
 
   <Grid>

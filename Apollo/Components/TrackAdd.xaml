@@ -1,13 +1,14 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.TrackAdd"
+             xmlns:Components="clr-namespace:Apollo.Components"
              DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
-    <ContextMenu x:Key="ActionContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="ActionContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
   
   <UserControl.Styles>

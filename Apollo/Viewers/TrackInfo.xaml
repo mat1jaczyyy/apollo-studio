@@ -7,7 +7,7 @@
   <UserControl.Resources>
     <SolidColorBrush x:Key="BackgroundBrush" />
     
-    <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="TrackContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
@@ -24,7 +24,7 @@
       
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <StackPanel VerticalAlignment="Stretch">

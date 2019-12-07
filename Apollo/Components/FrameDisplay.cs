@@ -43,7 +43,6 @@ namespace Apollo.Components {
         StackPanel Root;
         public Remove Remove;
         public VerticalAdd FrameAdd;
-        ContextMenu FrameContextMenu;
 
         void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -69,9 +68,6 @@ namespace Apollo.Components {
 
             Viewer.Frame = frame;
 
-            FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
         }
@@ -84,23 +80,14 @@ namespace Apollo.Components {
 
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             this.RemoveHandler(DragDrop.DropEvent, Drop);
-
-            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            FrameContextMenu = null;
         }
 
         void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem) {
-                string header = (string)menuItem.Header;
-
-                if (header == "Play Here") _pattern.Window?.PlayFrom(this);
-                else if (header == "Fire Here") _pattern.Window?.PlayFrom(this, true);
-                else _pattern.Window?.Selection.Action(header);
-            }
+        void ContextMenu_Action(string action) {
+            if (action == "Play Here") _pattern.Window?.PlayFrom(this);
+            else if (action == "Fire Here") _pattern.Window?.PlayFrom(this, true);
+            else _pattern.Window?.Selection.Action(action);
         }
 
         void Select(PointerPressedEventArgs e) {
@@ -134,7 +121,7 @@ namespace Apollo.Components {
                     FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
         
                 if (MouseButton == PointerUpdateKind.RightButtonPressed)
-                    FrameContextMenu.Open(Viewer);
+                    ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open(Viewer);
 
                 if (MouseButton == PointerUpdateKind.MiddleButtonPressed)
                     _pattern.Window?.PlayFrom(this, e.KeyModifiers == KeyModifiers.Shift);

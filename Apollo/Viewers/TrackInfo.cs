@@ -47,7 +47,6 @@ namespace Apollo.Viewers {
 
         Grid Draggable;
         Border DropZone;
-        ContextMenu TrackContextMenu;
         MenuItem MuteItem;
         TextBox Input;
         
@@ -95,9 +94,6 @@ namespace Apollo.Viewers {
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
 
-            TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
-            TrackContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             
@@ -117,9 +113,6 @@ namespace Apollo.Viewers {
             _track.Info = null;
             _track = null;
 
-            TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            TrackContextMenu = null;
-
             observable.Dispose();
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -130,12 +123,7 @@ namespace Apollo.Viewers {
         
         void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Program.Project.Window?.Selection.Action((string)menuItem.Header);
-        }
+        void ContextMenu_Action(string action) => Program.Project.Window?.Selection.Action(action);
 
         void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -164,7 +152,7 @@ namespace Apollo.Viewers {
                 
                 if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                     MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
-                    TrackContextMenu.Open(Draggable);
+                    ((ApolloContextMenu)this.Resources["TrackContextMenu"]).Open(Draggable);
                 }
             }
         }
