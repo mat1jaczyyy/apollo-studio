@@ -4,6 +4,8 @@
     <RuntimeFrameworkVersion>3.0.0</RuntimeFrameworkVersion>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
     <LangVersion>7.2</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject>ApolloUpdate.Program</StartupObject>
