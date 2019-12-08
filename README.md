@@ -29,6 +29,7 @@ You can take a look at the [GitHub Wikis](https://github.com/mat1jaczyyy/apollo-
 
 You are the people who make Apollo Studio possible.
 
+* [Brendonovich](https://github.com/Brendonovich) for actively contributing features to Apollo Studio.
 * [vaaski](https://vaa.ski/) for expressing interest early in the project, even if it didn't work out ultimately; and maintaining the website for the project.
 * [LaunchpadLights](http://www.launchpadlights.com/) for sparking some bright ideas and designing the logo and artwork for the project.
 * [rpg.aleksy](https://www.youtube.com/channel/UC209YLY-uQPy4U2Gu6sqaVw) for keeping me sane while I worked full days without a break.
