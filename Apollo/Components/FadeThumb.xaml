@@ -10,7 +10,7 @@
 
     <Ellipse x:Key="SelectedIcon" Margin="7 0 0 0" Fill="{DynamicResource ThemeAccentBrush}" Height="10" Width="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-    <ContextMenu x:Key="ThumbContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="ThumbContextMenu" MenuActionWithItem="ContextMenu_Action">
       <MenuItem Header="Linear"/>
       <MenuItem Header="Smooth" />
       <MenuItem Header="Sharp" />
@@ -21,7 +21,7 @@
       <Separator x:Name="DeleteSeparator" />
       
       <MenuItem x:Name="Delete" Header="Delete" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <Thumb Width="14" x:Name="Thumb" Height="18" Background="Transparent" Cursor="Hand"

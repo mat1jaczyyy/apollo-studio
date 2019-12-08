@@ -45,14 +45,10 @@ namespace Apollo.Viewers {
             _device.Viewer = this;
             Deselect();
 
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
-            GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
-            ChokeContextMenu = (ContextMenu)this.Resources["ChokeContextMenu"];
-            
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            
+            DeviceContextMenu = (ApolloContextMenu)this.Resources["DeviceContextMenu"];
+            GroupContextMenu = (ApolloContextMenu)this.Resources["GroupContextMenu"];
+            ChokeContextMenu = (ApolloContextMenu)this.Resources["ChokeContextMenu"];
+
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -66,9 +62,6 @@ namespace Apollo.Viewers {
             _device.Viewer = null;
             _device = null;
 
-            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             DeviceContextMenu = GroupContextMenu = ChokeContextMenu = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);

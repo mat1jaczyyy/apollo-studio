@@ -8,7 +8,7 @@
   <UserControl.Resources>
     <SolidColorBrush x:Key="TitleBrush" />
     
-    <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="DeviceContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
@@ -29,9 +29,9 @@
       
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
 
-    <ContextMenu x:Key="GroupContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="GroupContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
@@ -53,9 +53,9 @@
       
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
 
-    <ContextMenu x:Key="ChokeContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="ChokeContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
@@ -77,7 +77,7 @@
       
       <MenuItem Header="Export" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <StackPanel Orientation="Horizontal" MaxHeight="220" HorizontalAlignment="Center" VerticalAlignment="Stretch" x:Name="Root">

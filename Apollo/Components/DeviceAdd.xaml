@@ -1,10 +1,11 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.DeviceAdd"
+             xmlns:Components="clr-namespace:Apollo.Components"
              DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
-    <ContextMenu x:Key="AddContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="AddContextMenu" MenuAction="AddContextMenu_Action">
       <MenuItem Header="Containers">
         <MenuItem Header="Group" />
         <MenuItem Header="Multi" />
@@ -47,12 +48,12 @@
         <MenuItem Header="Switch" />
         <MenuItem Header="Clear" />
       </MenuItem>
-    </ContextMenu>
+    </Components:ApolloContextMenu>
 
-    <ContextMenu x:Key="DeviceContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="DeviceContextMenu" MenuAction="DeviceContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <UserControl.Styles>

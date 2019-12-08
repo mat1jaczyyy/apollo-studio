@@ -61,7 +61,6 @@ namespace Apollo.Windows {
         StackPanel CenteringLeft, CenteringRight, MacroDials, BottomPane;
         CollapseButton CollapseButton;
 
-        ContextMenu TrackContextMenu;
         Controls Contents;
         TrackAdd TrackAdd;
 
@@ -116,9 +115,6 @@ namespace Apollo.Windows {
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
-
-            TrackContextMenu = (ContextMenu)this.Resources["TrackContextMenu"];
-            TrackContextMenu.AddHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -185,9 +181,6 @@ namespace Apollo.Windows {
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-
-            TrackContextMenu.RemoveHandler(MenuItem.ClickEvent, TrackContextMenu_Click);
-            TrackContextMenu = null;
 
             foreach (IDisposable observable in observables)
                 observable.Dispose();
@@ -443,18 +436,13 @@ namespace Apollo.Windows {
         void Track_Action(string action) => Track_Action(action, false);
         void Track_Action(string action, bool right) => Program.Project.Window?.Selection.Action(action, Program.Project, (right? Program.Project.Count : 0) - 1);
 
-        void TrackContextMenu_Click(object sender, RoutedEventArgs e) {
-            this.Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Track_Action((string)menuItem.Header, true);
-        }
+        void ContextMenu_Action(string action) => Track_Action(action, true);
 
         void Click(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                TrackContextMenu.Open((Control)sender);
+                ((ApolloContextMenu)this.Resources["TrackContextMenu"]).Open((Control)sender);
 
             e.Handled = true;
         }

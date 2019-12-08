@@ -1,14 +1,15 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.SaveButton"
+             xmlns:Components="clr-namespace:Apollo.Components"
              ToolTip.Tip="Save Project"
              DetachedFromVisualTree="Unloaded">
   
   <UserControl.Resources>
-    <ContextMenu x:Key="SaveContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="SaveContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Save as..." />
       <MenuItem Header="Save a copy..." />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"

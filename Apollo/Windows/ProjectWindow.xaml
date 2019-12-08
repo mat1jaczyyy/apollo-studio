@@ -10,10 +10,10 @@
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">
   
   <Window.Resources>
-    <ContextMenu x:Key="TrackContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="TrackContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </Window.Resources>
 
   <Grid>

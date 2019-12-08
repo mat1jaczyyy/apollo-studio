@@ -41,7 +41,6 @@ namespace Apollo.Viewers {
         Chain _chain;
 
         Grid DropZoneBefore, DropZoneAfter;
-        ContextMenu DeviceContextMenuBefore, DeviceContextMenuAfter;
 
         Controls Contents;
         DeviceAdd DeviceAdd;
@@ -79,12 +78,6 @@ namespace Apollo.Viewers {
 
             _chain = chain;
             _chain.Viewer = this;
-            
-            DeviceContextMenuBefore = (ContextMenu)this.Resources["DeviceContextMenuBefore"];
-            DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            
-            DeviceContextMenuAfter = (ContextMenu)this.Resources["DeviceContextMenuAfter"];
-            DeviceContextMenuAfter.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -101,10 +94,6 @@ namespace Apollo.Viewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _chain.Viewer = null;
             _chain = null;
-
-            DeviceContextMenuBefore.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            DeviceContextMenuAfter.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            DeviceContextMenuBefore = DeviceContextMenuAfter = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
@@ -140,20 +129,15 @@ namespace Apollo.Viewers {
         void Device_Action(string action) => Device_Action(action, false);
         void Device_Action(string action, bool right) => Track.Get(_chain)?.Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
 
-        void DeviceContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (e.Source is MenuItem menuItem)
-                Device_Action((string)menuItem.Header, sender == DeviceContextMenuAfter);
-        }
+        void ContextMenu_Action(ApolloContextMenu sender, string action) =>
+            Device_Action(action, sender == (ApolloContextMenu)this.Resources["DeviceContextMenuAfter"]);
 
         void Click(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
-                else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
+                if (sender == DropZoneBefore) ((ApolloContextMenu)this.Resources["DeviceContextMenuBefore"]).Open((Control)sender);
+                else if (sender == DropZoneAfter) ((ApolloContextMenu)this.Resources["DeviceContextMenuAfter"]).Open((Control)sender);
 
             e.Handled = true;
         }

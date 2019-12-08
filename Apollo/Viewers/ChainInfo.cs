@@ -47,7 +47,6 @@ namespace Apollo.Viewers {
         public Indicator Indicator { get; private set; }
 
         Grid Draggable;
-        ContextMenu ChainContextMenu;
         MenuItem MuteItem;
         TextBox Input;
 
@@ -80,9 +79,6 @@ namespace Apollo.Viewers {
             UpdateText();
             _chain.ParentIndexChanged += UpdateText;
 
-            ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
-            ChainContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -99,9 +95,6 @@ namespace Apollo.Viewers {
             _chain.Info = null;
             _chain = null;
 
-            ChainContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChainContextMenu = null;
-
             observable.Dispose();
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -112,12 +105,7 @@ namespace Apollo.Viewers {
 
         void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Track.Get(_chain)?.Window?.Selection.Action((string)menuItem.Header);
-        }
+        void ContextMenu_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action);
 
         void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -146,7 +134,7 @@ namespace Apollo.Viewers {
                 
                 if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                     MuteItem.Header = ((Chain)Track.Get(_chain)?.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
-                    ChainContextMenu.Open(Draggable);
+                    ((ApolloContextMenu)this.Resources["ChainContextMenu"]).Open(Draggable);
                 }
             }
         }

@@ -109,7 +109,6 @@ namespace Apollo.Windows {
         ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor, RootKey;
         Controls Contents;
-        ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Repeats, Pinch;
@@ -251,9 +250,6 @@ namespace Apollo.Windows {
 
             Infinite.IsChecked = _pattern.Infinite;
 
-            FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
-
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
 
@@ -318,9 +314,6 @@ namespace Apollo.Windows {
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
             _track = null;
-
-            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
-            FrameContextMenu = null;
 
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -446,18 +439,13 @@ namespace Apollo.Windows {
         void Frame_Action(string action) => Frame_Action(action, false);
         void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
 
-        void FrameContextMenu_Click(object sender, RoutedEventArgs e) {
-            this.Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Frame_Action((string)menuItem.Header, true);
-        }
+        void ContextMenu_Action(string action) => Frame_Action(action, true);
         
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                FrameContextMenu.Open((Control)sender);
+                ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open((Control)sender);
 
             e.Handled = true;
         }

@@ -5,10 +5,10 @@
              DetachedFromVisualTree="Unloaded">
   
   <UserControl.Resources>
-    <ContextMenu x:Key="ChainContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="ChainContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Paste" />
       <MenuItem Header="Import" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
   
   <Grid RowDefinitions="*,Auto">

@@ -43,8 +43,6 @@ namespace Apollo.DeviceViewers {
         DeviceViewer _parent;
         Controls _root;
 
-        ContextMenu ChainContextMenu;
-
         Controls Contents;
         ComboBox MultiMode;
         VerticalAdd ChainAdd;
@@ -99,9 +97,6 @@ namespace Apollo.DeviceViewers {
 
             MultiMode.SelectedIndex = (int)_multi.Mode;
 
-            ChainContextMenu = (ContextMenu)this.Resources["ChainContextMenu"];
-            ChainContextMenu.AddHandler(MenuItem.ClickEvent, ChainContextMenu_Click);
-
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             
@@ -116,9 +111,6 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-
-            ChainContextMenu.RemoveHandler(MenuItem.ClickEvent, ChainContextMenu_Click);
-            ChainContextMenu = null;
 
             _multi = null;
             _parent = null;
@@ -179,18 +171,13 @@ namespace Apollo.DeviceViewers {
         void Chain_Action(string action) => Chain_Action(action, false);
         void Chain_Action(string action, bool right) => Track.Get(_multi)?.Window?.Selection.Action(action, _multi, (right? _multi.Count : 0) - 1);
 
-        void ChainContextMenu_Click(object sender, RoutedEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-
-            if (e.Source is MenuItem menuItem)
-                Chain_Action((string)menuItem.Header, true);
-        }
+        void ContextMenu_Action(string action) => Chain_Action(action, true);
 
         void Click(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                ChainContextMenu.Open((Control)sender);
+                ((ApolloContextMenu)this.Resources["ChainContextMenu"]).Open((Control)sender);
 
             e.Handled = true;
         }
