@@ -22,13 +22,14 @@ namespace Apollo.DeviceViewers {
 
             Rate = this.Get<Dial>("Rate");
             Gate = this.Get<Dial>("Gate");
+            Pinch = this.Get<Dial>("Pinch");
 
             CopyMode = this.Get<ComboBox>("CopyMode");
             GridMode = this.Get<ComboBox>("GridMode");
             Wrap = this.Get<CheckBox>("Wrap");
 
-            Pinch = this.Get<Dial>("Pinch");
             Reverse = this.Get<CheckBox>("Reverse");
+            Infinite = this.Get<CheckBox>("Infinite");
             
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
@@ -36,9 +37,9 @@ namespace Apollo.DeviceViewers {
 
         Copy _copy;
 
-        ComboBox CopyMode, GridMode;
-        CheckBox Wrap, Reverse;
         Dial Rate, Gate, Pinch;
+        ComboBox CopyMode, GridMode;
+        CheckBox Wrap, Reverse, Infinite;
 
         Controls Contents;
         HorizontalAdd OffsetAdd;
@@ -69,10 +70,10 @@ namespace Apollo.DeviceViewers {
             Rate.RawValue = _copy.Time.Free;
 
             Gate.RawValue = _copy.Gate * 100;
-
             Pinch.RawValue = _copy.Pinch;
 
             Reverse.IsChecked = _copy.Reverse;
+            Infinite.IsChecked = _copy.Infinite;
 
             GridMode.SelectedIndex = (int)_copy.GridMode;
             
@@ -174,7 +175,7 @@ namespace Apollo.DeviceViewers {
             }
 
             Rate.Enabled = Gate.Enabled = selected != CopyType.Static && selected != CopyType.RandomSingle;
-            Pinch.Enabled = Reverse.IsEnabled = selected == CopyType.Animate || selected == CopyType.Interpolate;
+            Pinch.Enabled = Reverse.IsEnabled = Infinite.IsEnabled = selected == CopyType.Animate || selected == CopyType.Interpolate;
             
             for (int i = 1; i < Contents.Count; i++)
                 ((CopyOffset)Contents[i]).AngleEnabled = selected == CopyType.Interpolate;
@@ -239,6 +240,26 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetReverse(bool value) => Reverse.IsChecked = value;
+
+        void Infinite_Changed(object sender, RoutedEventArgs e) {
+            bool value = Infinite.IsChecked.Value;
+
+            if (_copy.Infinite != value) {
+                bool u = _copy.Infinite;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    ((Copy)Track.TraversePath(path)).Infinite = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Infinite = r;
+                });
+
+                _copy.Infinite = value;
+            }
+        }
+
+        public void SetInfinite(bool value) => Infinite.IsChecked = value;
 
         void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;

@@ -190,7 +190,17 @@ namespace Apollo.Devices {
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetReverse(Reverse);
             }
         }
+        
+        bool _infinite;
+        public bool Infinite {
+            get => _infinite;
+            set {
+                _infinite = value;
 
+                if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetInfinite(Infinite);
+            }
+        }
+        
         double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
 
         double ApplyPinch(double time, double total) => (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
@@ -200,19 +210,23 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
+        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
             Time = time?? new Time(free: 500);
             Gate = gate;
             Pinch = pinch;
+
             Reverse = reverse;
+            Infinite = infinite;
+
             CopyMode = copymode;
             GridMode = gridmode;
             Wrap = wrap;
+
             Offsets = offsets?? new List<Offset>();
             Angles = angles?? new List<int>();
 
@@ -417,7 +431,8 @@ namespace Apollo.Devices {
                     double total = _time * _gate * (validOffsets.Count - 1);
 
                     for (int i = 1; i < validOffsets.Count; i++)
-                        FireCourier(info, ApplyPinch(_time * _gate * i, total));
+                        if (!Infinite || i < validOffsets.Count - 1 || n.Color.Lit)
+                            FireCourier(info, ApplyPinch(_time * _gate * i, total));
                 }
 
             } else if (CopyMode == CopyType.RandomSingle) {

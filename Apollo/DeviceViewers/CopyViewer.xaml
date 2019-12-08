@@ -22,7 +22,7 @@
 
             <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0 0 0 5">
               <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
-                <StackPanel Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
+                <StackPanel Margin="5 0 5 5" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
                   <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
                     <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
                       <ComboBoxItem>10x10</ComboBoxItem>
@@ -34,7 +34,11 @@
                 </StackPanel>
               </Border>
 
-              <CheckBox Grid.Column="1" Margin="5 0" HorizontalAlignment="Center" x:Name="Reverse" Click="Reverse_Changed">Reverse</CheckBox>
+              <StackPanel Grid.Column="1" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
+                <CheckBox x:Name="Reverse" Click="Reverse_Changed">Reverse</CheckBox>
+
+                <CheckBox x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
+              </StackPanel>
             </Grid>
           </Grid>
         </Border>
