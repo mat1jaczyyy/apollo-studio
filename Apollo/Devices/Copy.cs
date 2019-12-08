@@ -408,7 +408,8 @@ namespace Apollo.Devices {
                 lock (locker[n]) {
                     if (Reverse) validOffsets.Reverse();
 
-                    InvokeExit(n.With((byte)validOffsets[0], n.Color));
+                    if (validOffsets[0] != -1)
+                        InvokeExit(n.With((byte)validOffsets[0], n.Color));
                     
                     PolyInfo info = new PolyInfo(n, validOffsets);
                     poly.Add(info);
