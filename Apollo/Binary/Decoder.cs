@@ -291,6 +291,16 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
+                double pinch = 0;
+                if (version >= 26) {
+                    pinch = reader.ReadDouble();
+                }
+
+                bool reverse = false;
+                if (version >= 26) {
+                    reverse = reader.ReadBoolean();
+                }
+
                 CopyType copyType = (CopyType)reader.ReadInt32();
                 GridType gridType = (GridType)reader.ReadInt32();
                 bool wrap = reader.ReadBoolean();
@@ -299,7 +309,7 @@ namespace Apollo.Binary {
                 List<Offset> offsets = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList();
                 List<int> angles = (from i in Enumerable.Range(0, count) select (version >= 25)? reader.ReadInt32() : 0).ToList();
 
-                return new Copy(time, gate, copyType, gridType, wrap, offsets, angles);
+                return new Copy(time, gate, pinch, reverse, copyType, gridType, wrap, offsets, angles);
             
             } else if (t == typeof(Delay)) {
                 Time time;

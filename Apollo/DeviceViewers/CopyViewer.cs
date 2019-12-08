@@ -22,9 +22,13 @@ namespace Apollo.DeviceViewers {
 
             Rate = this.Get<Dial>("Rate");
             Gate = this.Get<Dial>("Gate");
+
             CopyMode = this.Get<ComboBox>("CopyMode");
             GridMode = this.Get<ComboBox>("GridMode");
             Wrap = this.Get<CheckBox>("Wrap");
+
+            Pinch = this.Get<Dial>("Pinch");
+            Reverse = this.Get<CheckBox>("Reverse");
             
             Contents = this.Get<StackPanel>("Contents").Children;
             OffsetAdd = this.Get<HorizontalAdd>("OffsetAdd");
@@ -33,8 +37,8 @@ namespace Apollo.DeviceViewers {
         Copy _copy;
 
         ComboBox CopyMode, GridMode;
-        CheckBox Wrap;
-        Dial Rate, Gate;
+        CheckBox Wrap, Reverse;
+        Dial Rate, Gate, Pinch;
 
         Controls Contents;
         HorizontalAdd OffsetAdd;
@@ -65,6 +69,10 @@ namespace Apollo.DeviceViewers {
             Rate.RawValue = _copy.Time.Free;
 
             Gate.RawValue = _copy.Gate * 100;
+
+            Pinch.RawValue = _copy.Pinch;
+
+            Reverse.IsChecked = _copy.Reverse;
 
             GridMode.SelectedIndex = (int)_copy.GridMode;
             
@@ -166,14 +174,13 @@ namespace Apollo.DeviceViewers {
             }
 
             Rate.Enabled = Gate.Enabled = selected != CopyType.Static && selected != CopyType.RandomSingle;
-        }
-
-        public void SetCopyMode(CopyType mode) { 
-            CopyMode.SelectedIndex = (int)mode;
+            Pinch.Enabled = Reverse.IsEnabled = selected == CopyType.Animate || selected == CopyType.Interpolate;
             
             for (int i = 1; i < Contents.Count; i++)
-                ((CopyOffset)Contents[i]).AngleEnabled = mode == CopyType.Interpolate;
+                ((CopyOffset)Contents[i]).AngleEnabled = selected == CopyType.Interpolate;
         }
+
+        public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
 
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
             GridType selected = (GridType)GridMode.SelectedIndex;
@@ -194,6 +201,44 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
+
+        void Pinch_Changed(Dial sender, double value, double? old) {
+            if (old != null && old != value) {
+                double u = old.Value;
+                double r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Pinch Changed to {value}{Pinch.Unit}", () => {
+                    ((Copy)Track.TraversePath(path)).Pinch = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Pinch = r;
+                });
+            }
+
+            _copy.Pinch = value;
+        }
+
+        public void SetPinch(double pinch) => Pinch.RawValue = pinch;
+
+        void Reverse_Changed(object sender, RoutedEventArgs e) {
+            bool value = Reverse.IsChecked.Value;
+
+            if (_copy.Reverse != value) {
+                bool u = _copy.Reverse;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    ((Copy)Track.TraversePath(path)).Reverse = u;
+                }, () => {
+                    ((Copy)Track.TraversePath(path)).Reverse = r;
+                });
+
+                _copy.Reverse = value;
+            }
+        }
+
+        public void SetReverse(bool value) => Reverse.IsChecked = value;
 
         void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
