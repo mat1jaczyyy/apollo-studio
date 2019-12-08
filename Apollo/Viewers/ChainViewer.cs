@@ -397,25 +397,25 @@ namespace Apollo.Viewers {
         public void Ungroup(int index) {
             if (!(_chain.Devices[index] is Group group) || group.Count != 1) return;
 
-            Chain init = group[0].Clone();
+            Group init = (Group)group.Clone();
 
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Ungrouped", () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
 
-                for (int i = index + init.Count - 1; i >= index; i--)
+                for (int i = index + init[0].Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                chain.Insert(index, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
+                chain.Insert(index, init.Clone());
 
             }, () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
                 
                 chain.Remove(index);
             
-                for (int i = 0; i < init.Count; i++)
-                    chain.Insert(index + i, init[i].Clone());
+                for (int i = 0; i < init[0].Count; i++)
+                    chain.Insert(index + i, init[0][i].Clone());
 
                 Track.Get(chain).Window?.Selection.Select(chain[index], true);
                 
@@ -425,8 +425,8 @@ namespace Apollo.Viewers {
 
             _chain.Remove(index);
             
-            for (int i = 0; i < init.Count; i++)
-                _chain.Insert(index + i, init[i].Clone());
+            for (int i = 0; i < init[0].Count; i++)
+                _chain.Insert(index + i, init[0][i].Clone());
 
             Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
         }
@@ -472,25 +472,25 @@ namespace Apollo.Viewers {
         public void Unchoke(int index) {
             if (!(_chain.Devices[index] is Choke choke))return;
 
-            Chain init = choke.Chain.Clone();
+            Choke init = (Choke)choke.Clone();
 
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Unchoked", () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
 
-                for (int i = index + init.Count - 1; i >= index; i--)
+                for (int i = index + init.Chain.Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                chain.Insert(index, new Choke(1, init.Clone()));
+                chain.Insert(index, init.Clone());
 
             }, () => {
                 Chain chain = ((Chain)Track.TraversePath(path));
                 
                 chain.Remove(index);
             
-                for (int i = 0; i < init.Count; i++)
-                    chain.Insert(index + i, init[i].Clone());
+                for (int i = 0; i < init.Chain.Count; i++)
+                    chain.Insert(index + i, init.Chain[i].Clone());
 
                 Track.Get(chain).Window?.Selection.Select(chain[index], true);
                 
@@ -500,8 +500,8 @@ namespace Apollo.Viewers {
 
             _chain.Remove(index);
             
-            for (int i = 0; i < init.Count; i++)
-                _chain.Insert(index + i, init[i].Clone());
+            for (int i = 0; i < init.Chain.Count; i++)
+                _chain.Insert(index + i, init.Chain[i].Clone());
 
             Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
         }
