@@ -406,8 +406,6 @@ namespace Apollo.Devices {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
                 
                 lock (locker[n]) {
-                    validOffsets.Insert(0, n.Index);
-
                     if (Reverse) validOffsets.Reverse();
 
                     InvokeExit(n.With((byte)validOffsets[0], n.Color));
