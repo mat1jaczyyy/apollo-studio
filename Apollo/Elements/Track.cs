@@ -105,7 +105,7 @@ namespace Apollo.Elements {
                 else ret = (ISelectParent)ret.IChildren[path[i]];
 
             if (path[0] == -1) return (T)(ISelect)((Multi)ret).Preprocess;
-            else if (ret.IChildren[path[0]] is Choke choke) return (T)(ISelect)choke.Chain;
+            else if (ret.IChildren[path[0]] is Choke choke && typeof(T) != typeof(Choke)) return (T)(ISelect)choke.Chain;
             else return (T)ret.IChildren[path[0]];
         }
 
