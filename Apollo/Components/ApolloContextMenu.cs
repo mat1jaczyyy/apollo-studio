@@ -25,9 +25,11 @@ namespace Apollo.Components {
             this.AddHandler(MenuItem.ClickEvent, Selected);
         }
 
+        string header;
+
         void Selected(object sender, RoutedEventArgs e) {
             if (e.Source is MenuItem menuItem) {
-                string header = (string)menuItem.Header;
+                header = (string)menuItem.Header;
 
                 MenuAction?.Invoke(header);
                 MenuActionWithItem?.Invoke(menuItem, header);
@@ -37,7 +39,9 @@ namespace Apollo.Components {
 
         Window owner;
 
-        void Closed(object sender, RoutedEventArgs e) => owner?.Focus();
+        void Closed(object sender, RoutedEventArgs e) {
+            if (header != "Rename") owner?.Focus();
+        }
 
         public new void Open(Control control) {
             owner = (Window)control.GetVisualRoot();
