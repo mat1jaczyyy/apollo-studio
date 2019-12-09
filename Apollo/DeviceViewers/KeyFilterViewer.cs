@@ -58,9 +58,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_filter);
 
             Program.Project.Undo.Add($"KeyFilter Changed", () => {
-                ((KeyFilter)Track.TraversePath(path)).Filter = u.ToArray();
+                Track.TraversePath<KeyFilter>(path).Filter = u.ToArray();
             }, () => {
-                ((KeyFilter)Track.TraversePath(path)).Filter = r.ToArray();
+                Track.TraversePath<KeyFilter>(path).Filter = r.ToArray();
             });
 
             old = null;

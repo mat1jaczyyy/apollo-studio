@@ -173,22 +173,22 @@ namespace Apollo.Components {
                 
                 Program.Project.Undo.Add(copy? $"Pattern Frame Copied" : $"Pattern Frame Moved", copy
                     ? new Action(() => {
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetpattern.Remove(i);
 
                     }) : new Action(() => {
-                        Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
 
                         Frame.Move(umoving, sourcepattern, before_pos);
 
                 }), () => {
-                    Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                    Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                     List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
 

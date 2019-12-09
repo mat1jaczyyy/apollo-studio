@@ -82,12 +82,12 @@ namespace Apollo.Components {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Offset {index + 1} Relative Changed to {rx},{ry}", () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.Offsets[index].X = ux;
                     copy.Offsets[index].Y = uy;
 
                 }, () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.Offsets[index].X = rx;
                     copy.Offsets[index].Y = ry;
                 });
@@ -108,12 +108,12 @@ namespace Apollo.Components {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Offset {index + 1} Absolute Changed to {rx},{ry}", () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.Offsets[index].AbsoluteX = ux;
                     copy.Offsets[index].AbsoluteY = uy;
 
                 }, () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.Offsets[index].AbsoluteX = rx;
                     copy.Offsets[index].AbsoluteY = ry;
                 });
@@ -128,11 +128,11 @@ namespace Apollo.Components {
             List<int> path = Track.GetPath(_copy);
 
             Program.Project.Undo.Add($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", () => {
-                Copy copy = ((Copy)Track.TraversePath(path));
+                Copy copy = Track.TraversePath<Copy>(path);
                 copy.Offsets[index].IsAbsolute = u;
 
             }, () => {
-                Copy copy = ((Copy)Track.TraversePath(path));
+                Copy copy = Track.TraversePath<Copy>(path);
                 copy.Offsets[index].IsAbsolute = r;
             });
 
@@ -151,11 +151,11 @@ namespace Apollo.Components {
                 int r = (int)angle;
 
                 Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}{Angle.Unit}", () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.SetAngle(index, u);
 
                 }, () => {
-                    Copy copy = ((Copy)Track.TraversePath(path));
+                    Copy copy = Track.TraversePath<Copy>(path);
                     copy.SetAngle(index, r);
                 });
             }

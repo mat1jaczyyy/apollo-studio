@@ -49,9 +49,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_layer);
 
                 Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    ((Layer)Track.TraversePath(path)).Target = u;
+                    Track.TraversePath<Layer>(path).Target = u;
                 }, () => {
-                    ((Layer)Track.TraversePath(path)).Target = r;
+                    Track.TraversePath<Layer>(path).Target = r;
                 });
             }
 
@@ -69,9 +69,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_layer);
 
                 Program.Project.Undo.Add($"Layer Blending Changed to {r}", () => {
-                    ((Layer)Track.TraversePath(path)).BlendingMode = u;
+                    Track.TraversePath<Layer>(path).BlendingMode = u;
                 }, () => {
-                    ((Layer)Track.TraversePath(path)).BlendingMode = r;
+                    Track.TraversePath<Layer>(path).BlendingMode = r;
                 });
 
                 _layer.BlendingMode = selected;
@@ -87,9 +87,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_layer);
 
                 Program.Project.Undo.Add($"Layer Range Changed to {r}{Range.Unit}", () => {
-                    ((Layer)Track.TraversePath(path)).Range = u;
+                    Track.TraversePath<Layer>(path).Range = u;
                 }, () => {
-                    ((Layer)Track.TraversePath(path)).Range = r;
+                    Track.TraversePath<Layer>(path).Range = r;
                 });
             }
 

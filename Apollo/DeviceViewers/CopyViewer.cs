@@ -94,9 +94,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Changed to {r}{Rate.Unit}", () => {
-                    ((Copy)Track.TraversePath(path)).Time.Free = u;
+                    Track.TraversePath<Copy>(path).Time.Free = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Time.Free = r;
+                    Track.TraversePath<Copy>(path).Time.Free = r;
                 });
             }
 
@@ -112,9 +112,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Switched to {(r? "Steps" : "Free")}", () => {
-                    ((Copy)Track.TraversePath(path)).Time.Mode = u;
+                    Track.TraversePath<Copy>(path).Time.Mode = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Time.Mode = r;
+                    Track.TraversePath<Copy>(path).Time.Mode = r;
                 });
             }
 
@@ -130,9 +130,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Rate Changed to {Length.Steps[r]}", () => {
-                    ((Copy)Track.TraversePath(path)).Time.Length.Step = u;
+                    Track.TraversePath<Copy>(path).Time.Length.Step = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Time.Length.Step = r;
+                    Track.TraversePath<Copy>(path).Time.Length.Step = r;
                 });
             }
         }
@@ -146,9 +146,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Copy)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Copy>(path).Gate = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Copy>(path).Gate = r;
                 });
             }
 
@@ -166,9 +166,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Mode Changed to {((ComboBoxItem)CopyMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Copy)Track.TraversePath(path)).CopyMode = u;
+                    Track.TraversePath<Copy>(path).CopyMode = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).CopyMode = r;
+                    Track.TraversePath<Copy>(path).CopyMode = r;
                 });
 
                 _copy.CopyMode = selected;
@@ -192,9 +192,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Grid Changed to {((ComboBoxItem)GridMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Copy)Track.TraversePath(path)).GridMode = u;
+                    Track.TraversePath<Copy>(path).GridMode = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).GridMode = r;
+                    Track.TraversePath<Copy>(path).GridMode = r;
                 });
 
                 _copy.GridMode = selected;
@@ -210,9 +210,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Pinch Changed to {value}{Pinch.Unit}", () => {
-                    ((Copy)Track.TraversePath(path)).Pinch = u;
+                    Track.TraversePath<Copy>(path).Pinch = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Pinch = r;
+                    Track.TraversePath<Copy>(path).Pinch = r;
                 });
             }
 
@@ -230,9 +230,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Copy)Track.TraversePath(path)).Reverse = u;
+                    Track.TraversePath<Copy>(path).Reverse = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Reverse = r;
+                    Track.TraversePath<Copy>(path).Reverse = r;
                 });
 
                 _copy.Reverse = value;
@@ -250,9 +250,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Copy)Track.TraversePath(path)).Infinite = u;
+                    Track.TraversePath<Copy>(path).Infinite = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Infinite = r;
+                    Track.TraversePath<Copy>(path).Infinite = r;
                 });
 
                 _copy.Infinite = value;
@@ -270,9 +270,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_copy);
 
                 Program.Project.Undo.Add($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Copy)Track.TraversePath(path)).Wrap = u;
+                    Track.TraversePath<Copy>(path).Wrap = u;
                 }, () => {
-                    ((Copy)Track.TraversePath(path)).Wrap = r;
+                    Track.TraversePath<Copy>(path).Wrap = r;
                 });
 
                 _copy.Wrap = value;
@@ -287,9 +287,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_copy);
 
             Program.Project.Undo.Add($"Copy Offset {index + 1} Inserted", () => {
-                ((Copy)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Copy>(path).Remove(index);
             }, () => {
-                ((Copy)Track.TraversePath(path)).Insert(index);
+                Track.TraversePath<Copy>(path).Insert(index);
             });
 
             _copy.Insert(index);
@@ -300,9 +300,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_copy);
 
             Program.Project.Undo.Add($"Copy Offset {index + 1} Removed", () => {
-                ((Copy)Track.TraversePath(path)).Insert(index, u.Clone());
+                Track.TraversePath<Copy>(path).Insert(index, u.Clone());
             }, () => {
-                ((Copy)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Copy>(path).Remove(index);
             }, () => {
                 u.Dispose();
             });

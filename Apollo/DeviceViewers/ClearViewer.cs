@@ -44,9 +44,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_clear);
 
                 Program.Project.Undo.Add($"Clear Orientation Changed to {((ComboBoxItem)ClearMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Clear)Track.TraversePath(path)).Mode = u;
+                    Track.TraversePath<Clear>(path).Mode = u;
                 }, () => {
-                    ((Clear)Track.TraversePath(path)).Mode = r;
+                    Track.TraversePath<Clear>(path).Mode = r;
                 });
 
                 _clear.Mode = selected;

@@ -182,9 +182,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
-                    ((Fade)Track.TraversePath(path)).Remove(index);
+                    Track.TraversePath<Fade>(path).Remove(index);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Insert(index, thumbColor, pos, FadeType.Linear);
+                    Track.TraversePath<Fade>(path).Insert(index, thumbColor, pos, FadeType.Linear);
                 });
 
                 _fade.Insert(index, thumbColor.Clone(), pos, FadeType.Linear);
@@ -200,9 +200,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () => {
-                ((Fade)Track.TraversePath(path)).Insert(index, uc, up, ut);
+                Track.TraversePath<Fade>(path).Insert(index, uc, up, ut);
             }, () => {
-                ((Fade)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Fade>(path).Remove(index);
             });
 
             _fade.Remove(index);
@@ -216,9 +216,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Type {index + 1} Changed to {newType}", () => {
-                ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
+                Track.TraversePath<Fade>(path).SetFadeType(index, oldType);
             }, () => {
-                ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
+                Track.TraversePath<Fade>(path).SetFadeType(index, newType);
             });
 
             _fade.SetFadeType(index, newType);
@@ -245,9 +245,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                    ((Fade)Track.TraversePath(path)).SetPosition(i, u / 200);
+                    Track.TraversePath<Fade>(path).SetPosition(i, u / 200);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).SetPosition(i, pos);
+                    Track.TraversePath<Fade>(path).SetPosition(i, pos);
                 });
             }
 
@@ -272,9 +272,9 @@ namespace Apollo.DeviceViewers {
                     List<int> path = Track.GetPath(_fade);
 
                     Program.Project.Undo.Add($"Fade Color {_fade.Expanded + 1} Changed to {r.ToHex()}", () => {
-                        ((Fade)Track.TraversePath(path)).SetColor(index, u.Clone());
+                        Track.TraversePath<Fade>(path).SetColor(index, u.Clone());
                     }, () => {
-                        ((Fade)Track.TraversePath(path)).SetColor(index, r.Clone());
+                        Track.TraversePath<Fade>(path).SetColor(index, r.Clone());
                     });
                 }
 
@@ -315,9 +315,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed to {r}{Duration.Unit}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Free = u;
+                    Track.TraversePath<Fade>(path).Time.Free = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Free = r;
+                    Track.TraversePath<Fade>(path).Time.Free = r;
                 });
             }
 
@@ -333,9 +333,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Mode = u;
+                    Track.TraversePath<Fade>(path).Time.Mode = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Mode = r;
+                    Track.TraversePath<Fade>(path).Time.Mode = r;
                 });
             }
 
@@ -351,9 +351,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed to {Length.Steps[r]}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Length.Step = u;
+                    Track.TraversePath<Fade>(path).Time.Length.Step = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Length.Step = r;
+                    Track.TraversePath<Fade>(path).Time.Length.Step = r;
                 });
             }
         }
@@ -367,9 +367,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Fade)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Fade>(path).Gate = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Fade>(path).Gate = r;
                 });
             }
 
@@ -387,9 +387,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Playback Mode Changed to {r}", () => {
-                    ((Fade)Track.TraversePath(path)).PlayMode = u;
+                    Track.TraversePath<Fade>(path).PlayMode = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).PlayMode = r;
+                    Track.TraversePath<Fade>(path).PlayMode = r;
                 });
 
                 _fade.PlayMode = selected;
@@ -472,9 +472,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                ((Fade)Track.TraversePath(path)).SetPosition(i, u);
+                Track.TraversePath<Fade>(path).SetPosition(i, u);
             }, () => {
-                ((Fade)Track.TraversePath(path)).SetPosition(i, r);
+                Track.TraversePath<Fade>(path).SetPosition(i, r);
             });
         }
 

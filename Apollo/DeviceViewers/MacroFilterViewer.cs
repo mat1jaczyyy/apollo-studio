@@ -55,9 +55,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"MacroFilter Target Changed to {r}", () => {
-                    ((MacroFilter)Track.TraversePath(path)).Macro = u;
+                    Track.TraversePath<MacroFilter>(path).Macro = u;
                 }, () => {
-                    ((MacroFilter)Track.TraversePath(path)).Macro = r;
+                    Track.TraversePath<MacroFilter>(path).Macro = r;
                 });
             }
 
@@ -74,9 +74,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_filter);
 
             Program.Project.Undo.Add($"MacroFilter {index + 1} Changed to {(r? "Allowed" : "Blocked")}", () => {
-                ((MacroFilter)Track.TraversePath(path))[index] = u;
+                Track.TraversePath<MacroFilter>(path)[index] = u;
             }, () => {
-                ((MacroFilter)Track.TraversePath(path))[index] = r;
+                Track.TraversePath<MacroFilter>(path)[index] = r;
             });
 
             _filter[index] = !_filter[index];

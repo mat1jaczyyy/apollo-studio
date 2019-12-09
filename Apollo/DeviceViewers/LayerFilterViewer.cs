@@ -45,9 +45,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    ((LayerFilter)Track.TraversePath(path)).Target = u;
+                    Track.TraversePath<LayerFilter>(path).Target = u;
                 }, () => {
-                    ((LayerFilter)Track.TraversePath(path)).Target = r;
+                    Track.TraversePath<LayerFilter>(path).Target = r;
                 });
             }
 
@@ -63,9 +63,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Layer Filter Range Changed to {r}{Range.Unit}", () => {
-                    ((LayerFilter)Track.TraversePath(path)).Range = u;
+                    Track.TraversePath<LayerFilter>(path).Range = u;
                 }, () => {
-                    ((LayerFilter)Track.TraversePath(path)).Range = r;
+                    Track.TraversePath<LayerFilter>(path).Range = r;
                 });
             }
 

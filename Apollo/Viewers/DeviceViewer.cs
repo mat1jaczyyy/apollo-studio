@@ -258,22 +258,22 @@ namespace Apollo.Viewers {
                 
                 Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetchain.Remove(i);
 
                     }) : new Action(() => {
-                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
 
                         Device.Move(umoving, sourcechain, before_pos);
 
                 }), () => {
-                    Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                    Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                    Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                     List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
 

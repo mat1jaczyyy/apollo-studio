@@ -94,19 +94,19 @@ namespace Apollo.Elements {
             return path;
         }
 
-        public static ISelect TraversePath(List<int> path) {
+        public static T TraversePath<T>(List<int> path) where T : ISelect {
             ISelectParent ret = Program.Project[path.Last()].Chain;
 
-            if (path.Count == 1) return (ISelect)ret;
+            if (path.Count == 1) return (T)ret;
 
             for (int i = path.Count - 2; i > 0; i--)
                 if (path[i] == -1) ret = ((Multi)ret).Preprocess;
                 else if (ret.IChildren[path[i]] is Choke choke) ret = choke.Chain;
                 else ret = (ISelectParent)ret.IChildren[path[i]];
 
-            if (path[0] == -1) return ((Multi)ret).Preprocess;
-            else if (ret.IChildren[path[0]] is Choke choke) return choke.Chain;
-            else return (ISelect)ret.IChildren[path[0]];
+            if (path[0] == -1) return (T)(ISelect)((Multi)ret).Preprocess;
+            else if (ret.IChildren[path[0]] is Choke choke) return (T)(ISelect)choke.Chain;
+            else return (T)ret.IChildren[path[0]];
         }
 
         public Chain Chain;

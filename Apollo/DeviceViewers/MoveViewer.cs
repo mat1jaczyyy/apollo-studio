@@ -69,12 +69,12 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_move);
 
                 Program.Project.Undo.Add($"Move Offset Relative Changed to {rx},{ry}", () => {
-                    Move move = ((Move)Track.TraversePath(path));
+                    Move move = Track.TraversePath<Move>(path);
                     move.Offset.X = ux;
                     move.Offset.Y = uy;
 
                 }, () => {
-                    Move move = ((Move)Track.TraversePath(path));
+                    Move move = Track.TraversePath<Move>(path);
                     move.Offset.X = rx;
                     move.Offset.Y = ry;
                 });
@@ -94,12 +94,12 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_move);
 
                 Program.Project.Undo.Add($"Move Offset Absolute Changed to {rx},{ry}", () => {
-                    Move move = ((Move)Track.TraversePath(path));
+                    Move move = Track.TraversePath<Move>(path);
                     move.Offset.AbsoluteX = ux;
                     move.Offset.AbsoluteY = uy;
 
                 }, () => {
-                    Move move = ((Move)Track.TraversePath(path));
+                    Move move = Track.TraversePath<Move>(path);
                     move.Offset.AbsoluteX = rx;
                     move.Offset.AbsoluteY = ry;
                 });
@@ -113,11 +113,11 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_move);
 
             Program.Project.Undo.Add($"Move Offset Switched to {(r? "Absolute" : "Relative")}", () => {
-                Move move = ((Move)Track.TraversePath(path));
+                Move move = Track.TraversePath<Move>(path);
                 move.Offset.IsAbsolute = u;
 
             }, () => {
-                Move move = ((Move)Track.TraversePath(path));
+                Move move = Track.TraversePath<Move>(path);
                 move.Offset.IsAbsolute = r;
             });
 
@@ -138,9 +138,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_move);
 
                 Program.Project.Undo.Add($"Move Grid Changed to {((ComboBoxItem)GridMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Move)Track.TraversePath(path)).GridMode = u;
+                    Track.TraversePath<Move>(path).GridMode = u;
                 }, () => {
-                    ((Move)Track.TraversePath(path)).GridMode = r;
+                    Track.TraversePath<Move>(path).GridMode = r;
                 });
 
                 _move.GridMode = selected;
@@ -158,9 +158,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_move);
 
                 Program.Project.Undo.Add($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Move)Track.TraversePath(path)).Wrap = u;
+                    Track.TraversePath<Move>(path).Wrap = u;
                 }, () => {
-                    ((Move)Track.TraversePath(path)).Wrap = r;
+                    Track.TraversePath<Move>(path).Wrap = r;
                 });
 
                 _move.Wrap = value;

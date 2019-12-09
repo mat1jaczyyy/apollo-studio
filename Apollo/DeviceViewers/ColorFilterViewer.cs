@@ -55,9 +55,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Hue Changed to {r}{Hue.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).Hue = u;
+                    Track.TraversePath<ColorFilter>(path).Hue = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).Hue = r;
+                    Track.TraversePath<ColorFilter>(path).Hue = r;
                 });
             }
 
@@ -73,9 +73,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Sat Changed to {r}{Saturation.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).Saturation = u;
+                    Track.TraversePath<ColorFilter>(path).Saturation = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).Saturation = r;
+                    Track.TraversePath<ColorFilter>(path).Saturation = r;
                 });
             }
 
@@ -91,9 +91,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Val Changed to {r}{Value.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).Value = u;
+                    Track.TraversePath<ColorFilter>(path).Value = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).Value = r;
+                    Track.TraversePath<ColorFilter>(path).Value = r;
                 });
             }
 
@@ -109,9 +109,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Hue Tol Changed to {r}{HueTolerance.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).HueTolerance = u;
+                    Track.TraversePath<ColorFilter>(path).HueTolerance = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).HueTolerance = r;
+                    Track.TraversePath<ColorFilter>(path).HueTolerance = r;
                 });
             }
 
@@ -127,9 +127,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Sat Tol Changed to {r}{SaturationTolerance.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).SaturationTolerance = u;
+                    Track.TraversePath<ColorFilter>(path).SaturationTolerance = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).SaturationTolerance = r;
+                    Track.TraversePath<ColorFilter>(path).SaturationTolerance = r;
                 });
             }
 
@@ -145,9 +145,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_filter);
 
                 Program.Project.Undo.Add($"Color Filter Val Tol Changed to {r}{ValueTolerance.Unit}", () => {
-                    ((ColorFilter)Track.TraversePath(path)).ValueTolerance = u;
+                    Track.TraversePath<ColorFilter>(path).ValueTolerance = u;
                 }, () => {
-                    ((ColorFilter)Track.TraversePath(path)).ValueTolerance = r;
+                    Track.TraversePath<ColorFilter>(path).ValueTolerance = r;
                 });
             }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Apollo.Elements;
 
 namespace Apollo.Interfaces {
-    public interface IChainParent {}
+    public interface IChainParent: ISelect {}
 
     public interface IMultipleChainParent: IChainParent {
         IMultipleChainParentViewer SpecificViewer { get; }

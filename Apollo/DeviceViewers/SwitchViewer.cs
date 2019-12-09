@@ -46,9 +46,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_switch);
 
                 Program.Project.Undo.Add($"Switch Target Changed to {r}{Target.Unit}", () => {
-                    ((Switch)Track.TraversePath(path)).Target = u;
+                    Track.TraversePath<Switch>(path).Target = u;
                 }, () => {
-                    ((Switch)Track.TraversePath(path)).Target = r;
+                    Track.TraversePath<Switch>(path).Target = r;
                 });
             }
 
@@ -64,9 +64,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_switch);
 
                 Program.Project.Undo.Add($"Switch Value Changed to {r}{Target.Unit}", () => {
-                    ((Switch)Track.TraversePath(path)).Value = u;
+                    Track.TraversePath<Switch>(path).Value = u;
                 }, () => {
-                    ((Switch)Track.TraversePath(path)).Value = r;
+                    Track.TraversePath<Switch>(path).Value = r;
                 });
             }
 
