@@ -8,8 +8,18 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class MacroFilter: Device {
         bool[] _filter;
+        public bool[] Filter {
+            get => _filter;
+            set {
+                if (value != null && value.Length == 100) {
+                    _filter = value;
+
+                    if (Viewer?.SpecificViewer != null) ((MacroFilterViewer)Viewer.SpecificViewer).Set(_filter);
+                }
+            }
+        }
+
         int _macro;
-        
         public int Macro {
             get => _macro;
             set {
@@ -29,11 +39,8 @@ namespace Apollo.Devices {
         public bool this[int index] {
             get => _filter[index];
             set {
-                if (0 <= index && index <= 99 && _filter[index] != value) {
+                if (0 <= index && index <= 99)
                     _filter[index] = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((MacroFilterViewer)Viewer.SpecificViewer).Set(index, _filter[index]);
-                }
             }
         }
 
