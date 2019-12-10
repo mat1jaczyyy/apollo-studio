@@ -35,6 +35,13 @@ namespace Apollo.Components {
             Hex = this.Get<TextBox>("Hex");
         }
 
+        enum MouseLock{
+            Horizontal,
+            Vertical,
+            None,
+            Ready
+        }
+        
         HashSet<IDisposable> observables = new HashSet<IDisposable>();
         
         public delegate void ColorChangedEventHandler(Color value, Color old);
@@ -64,6 +71,7 @@ namespace Apollo.Components {
         TextBox Hex;
 
         bool main_mouseHeld, hue_mouseHeld, hexValidation;
+        MouseLock mouseLock = MouseLock.None;
         Color oldColor;
 
         public ColorPicker() {
@@ -159,27 +167,70 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                 oldColor = Color.Clone();
+            else if(MouseButton == PointerUpdateKind.RightButtonPressed)
+                mouseLock = MouseLock.Ready;
         }
 
         void Thumb_Up(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+            
+            mouseLock = MouseLock.None;
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased && oldColor != Color)
                 ColorChanged?.Invoke(Color, oldColor);
         }
 
         void MainThumb_Move(object sender, VectorEventArgs e) {
-            double x = Canvas.GetLeft(MainThumb) + e.Vector.X;
-            x = (x < 0)? 0 : x;
-            x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;
+            double x, y;
+            
+            switch (mouseLock){
+            case MouseLock.Ready:
+                if(Math.Abs(e.Vector.X) > Math.Abs(e.Vector.Y)){
+                    mouseLock = MouseLock.Horizontal;
+                    
+                    x = Canvas.GetLeft(MainThumb) + e.Vector.X;
+                    x = (x < 0)? 0 : x;
+                    x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;    
+                        
+                    Canvas.SetLeft(MainThumb, x);
+                } else {
+                    mouseLock = MouseLock.Vertical;
+                    
+                    y = Canvas.GetTop(MainThumb) + e.Vector.Y;
+                    y = (y < 0)? 0 : y;
+                    y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
+                    
+                    Canvas.SetTop(MainThumb, y);
+                }
+                
+                break;
+            case MouseLock.None:
+                x = Canvas.GetLeft(MainThumb) + e.Vector.X;
+                x = (x < 0)? 0 : x;
+                x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;
 
-            double y = Canvas.GetTop(MainThumb) + e.Vector.Y;
-            y = (y < 0)? 0 : y;
-            y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
+                y = Canvas.GetTop(MainThumb) + e.Vector.Y;
+                y = (y < 0)? 0 : y;
+                y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
 
-            Canvas.SetLeft(MainThumb, x);
-            Canvas.SetTop(MainThumb, y);
-
+                Canvas.SetLeft(MainThumb, x);
+                Canvas.SetTop(MainThumb, y);
+                break;
+            case MouseLock.Horizontal:
+                x = Canvas.GetLeft(MainThumb) + e.Vector.X;
+                x = (x < 0)? 0 : x;
+                x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;        
+                Canvas.SetLeft(MainThumb, x);
+                break;
+            case MouseLock.Vertical:
+                y = Canvas.GetTop(MainThumb) + e.Vector.Y;
+                y = (y < 0)? 0 : y;
+                y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
+                
+                Canvas.SetTop(MainThumb, y);
+                break;
+            }
+            
             UpdateColor();
         }
 
