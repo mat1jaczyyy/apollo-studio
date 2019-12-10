@@ -40,7 +40,7 @@ namespace Apollo.Components {
             RightBar = this.Get<Rectangle>("RightBar");
         }
 
-        enum MouseLock{
+        enum MouseLock {
             Horizontal,
             Vertical,
             None,
@@ -173,7 +173,7 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                 oldColor = Color.Clone();
-            else if(MouseButton == PointerUpdateKind.RightButtonPressed)
+            else if (MouseButton == PointerUpdateKind.RightButtonPressed)
                 mouseLock = MouseLock.Ready;
         }
 
@@ -181,60 +181,42 @@ namespace Apollo.Components {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
             
             mouseLock = MouseLock.None;
-            HideAxes();
+            TopBar.IsVisible = BottomBar.IsVisible = LeftBar.IsVisible = RightBar.IsVisible = false;
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased && oldColor != Color)
                 ColorChanged?.Invoke(Color, oldColor);
         }
 
         void MainThumb_Move(object sender, VectorEventArgs e) {
-            double x, y;
+            double x = Canvas.GetLeft(MainThumb);
+            double y = Canvas.GetTop(MainThumb);
             
-            if (mouseLock == MouseLock.Ready){
-                if(Math.Abs(e.Vector.X) > Math.Abs(e.Vector.Y))
+            if (mouseLock == MouseLock.Ready)
+                if (Math.Abs(e.Vector.X) > Math.Abs(e.Vector.Y)) {
                     mouseLock = MouseLock.Horizontal;
-                else
+                    LeftBar.IsVisible = RightBar.IsVisible = true;
+                } else {
                     mouseLock = MouseLock.Vertical;
-            } else if(mouseLock == MouseLock.None){
-                x = Canvas.GetLeft(MainThumb) + e.Vector.X;
+                    TopBar.IsVisible = BottomBar.IsVisible = true;
+                }
+
+            if (mouseLock == MouseLock.None || mouseLock == MouseLock.Horizontal) {
+                x += e.Vector.X;
                 x = (x < 0)? 0 : x;
                 x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;
+            }
 
-                y = Canvas.GetTop(MainThumb) + e.Vector.Y;
+            if (mouseLock == MouseLock.None || mouseLock == MouseLock.Vertical) {
+                y += e.Vector.Y;
                 y = (y < 0)? 0 : y;
                 y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
-
-                Canvas.SetLeft(MainThumb, x);
-                Canvas.SetTop(MainThumb, y);
-                
-                UpdateColor();
-
-                return;
             }
-            
-            if(mouseLock == MouseLock.Horizontal){
-                x = Canvas.GetLeft(MainThumb) + e.Vector.X;
-                x = (x < 0)? 0 : x;
-                x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;        
-                Canvas.SetLeft(MainThumb, x);
-                
-                UpdateThumbAxes();
-                
-                LeftBar.IsVisible = true;
-                RightBar.IsVisible = true;
-            } else if(mouseLock == MouseLock.Vertical){
-                y = Canvas.GetTop(MainThumb) + e.Vector.Y;
-                y = (y < 0)? 0 : y;
-                y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
-                
-                Canvas.SetTop(MainThumb, y);
-                UpdateThumbAxes();
-                
-                TopBar.IsVisible = true;
-                BottomBar.IsVisible = true;
-            }
+
+            Canvas.SetLeft(MainThumb, x);
+            Canvas.SetTop(MainThumb, y);
             
             UpdateColor();
+            UpdateThumbAxes();
         }
 
         void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
@@ -398,7 +380,7 @@ namespace Apollo.Components {
             Hex_Dirty = false;
         }
     
-        void UpdateThumbAxes(){
+        void UpdateThumbAxes() {
             double ThumbLeft = MainThumb.GetValue(Canvas.LeftProperty);
             double ThumbTop = MainThumb.GetValue(Canvas.TopProperty);
             
@@ -413,14 +395,6 @@ namespace Apollo.Components {
             
             RightBar.SetValue(Canvas.LeftProperty, ThumbLeft + 4);
             RightBar.SetValue(Canvas.TopProperty, ThumbTop - 0.5);
-        }
-   
-        void HideAxes(){
-            TopBar.IsVisible = false;
-            BottomBar.IsVisible = false;
-            LeftBar.IsVisible = false;
-            RightBar.IsVisible = false;
-
         }
     }
 }

@@ -26,7 +26,7 @@
 
             <Canvas Background="Transparent" ClipToBounds="true" x:Name="MainCanvas"
                     PointerPressed="MainCanvas_MouseDown" PointerReleased="MainCanvas_MouseUp" PointerMoved="MainCanvas_MouseMove">
-              <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" Cursor="Hand" x:Name="MainThumb" Name="MainThumb" DragDelta="MainThumb_Move">
+              <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" Cursor="Hand" x:Name="MainThumb" DragDelta="MainThumb_Move">
                 <Thumb.Template>
                   <ControlTemplate>
                     <Canvas Background="Transparent">
