@@ -8,16 +8,6 @@ using Apollo.Structures;
 namespace Apollo.Devices {
     public class Loop: Device {
         
-        struct LoopCourierInfo{
-            public int count, amount;
-            public Signal signal;
-            
-            public LoopCourierInfo(int c, int a, Signal s){
-                count = c;
-                amount = a;
-                signal = s;
-            }
-        }
         Time _duration;
         public Time Duration {
             get => _duration;
@@ -53,7 +43,19 @@ namespace Apollo.Devices {
             }
         }
         
-        ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
+        double _gate;
+        public double Gate {
+            get => _gate;
+            set {
+                if (0.01 <= value && value <= 4) {
+                    _gate = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetGate(Gate);
+                }
+            }
+        }
+        
+        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
 
         void FreeChanged(int value) {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationValue(value);
@@ -67,47 +69,69 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
         
-        public Loop(Time duration = null, int amount = 0) : base("loop"){
+        public Loop(Time duration = null, double gate = 0, int amount = 0) : base("loop"){
             Duration = duration?? new Time();
             Amount = amount;
+            Gate = gate;
         }
         
         public override Device Clone() => new Loop(Duration, Amount);
         
-        public override void MIDIProcess(Signal n){
-            Courier courier;
-            timers[n] = courier = new Courier(){
-                Info = new LoopCourierInfo(0, Amount, n),
-                Interval = Duration,
-                AutoReset = true
-            };
+        void Stop(Signal n) {
+            if (timers.ContainsKey(n))
+                for (int i = 0; i < timers[n].Count; i++)
+                    timers[n][i].Dispose();
             
-            courier.Elapsed += Tick;
-            courier.Start();
+            timers[n] = new List<Courier>();
+        }
+        
+        public override void MIDIProcess(Signal n){
+            Stop(n);
+            
+            for(int i = 1; i <= Amount; i++){
+                Courier courier;
+                timers[n].Add(courier = new Courier(){
+                    AutoReset = false,
+                    Info = n,
+                    Interval = i * _duration * _gate
+                });
+                courier.Elapsed += Tick;
+                courier.Start();
+            }
             
             Signal m = n.Clone();
             InvokeExit(m);
         }
         
         void Tick(object sender, EventArgs e) {
+            if(Disposed) return;
+            
             Courier courier = (Courier)sender;
-            LoopCourierInfo info = (LoopCourierInfo) courier.Info;
+            courier.Elapsed -= Tick;
             
-            int count = info.count + 1;
-            
-            if(count > info.amount){
-                courier.Stop();
-                courier.Elapsed -= Tick;
+            if(courier.Info is Signal n){
+                timers[n].Remove(courier);
                 courier.Dispose();
-                return;
+            
+                Signal m = n.Clone();
+                InvokeExit(m);
+            }   
+        }
+        
+        protected override void Stop() {
+            foreach (List<Courier> i in timers.Values) {
+                foreach (Courier j in i) j.Dispose();
+                i.Clear();
             }
+            timers.Clear();
+        }
+        
+        public override void Dispose() {
+            if (Disposed) return;
             
-            info.count = count;
-            
-            timers[info.signal].Info = info;
-                        
-            Signal m = info.signal.Clone();
-            InvokeExit(m);
+            Stop();
+
+            base.Dispose();
         }
     }
 }

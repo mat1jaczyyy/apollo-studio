@@ -1,14 +1,15 @@
-using Avalonia.Markup.Xaml;
-using Avalonia.Controls;
-
-using Apollo.Devices;
-using Apollo.Components;
-using Apollo.Structures;
 using System;
-using Avalonia;
 using System.Collections.Generic;
-using Apollo.Elements;
+
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+
+using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
+using Apollo.Elements;
+using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
     public class LoopViewer: UserControl {
@@ -17,13 +18,14 @@ namespace Apollo.DeviceViewers {
         
         Loop _loop;
         
-        Dial Duration, Amount;
+        Dial Duration, Amount, Gate;
         
         void InitializeComponent(){
             AvaloniaXamlLoader.Load(this);
             
             Duration = this.Get<Dial>("Duration");
             Amount = this.Get<Dial>("Amount");
+            Gate = this.Get<Dial>("Gate");
         }
         
         public LoopViewer() => new InvalidOperationException();
@@ -37,6 +39,8 @@ namespace Apollo.DeviceViewers {
             Duration.RawValue = _loop.Duration.Free;
             
             Amount.RawValue = _loop.Amount;
+            
+            Gate.RawValue = _loop.Gate * 100;
         }
         
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
@@ -110,6 +114,23 @@ namespace Apollo.DeviceViewers {
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
         
         public void SetDurationStep(Length duration) => Duration.Length = duration;
+        
+        void Gate_Changed(Dial sender, double value, double? old){
+            if (old != null && old != value) {
+                double u = old.Value / 100;
+                double r = value / 100;
+                List<int> path = Track.GetPath(_loop);
 
+                Program.Project.Undo.Add($"Loop Gate Changed to {value}{Gate.Unit}", () => {
+                    Track.TraversePath<Loop>(path).Gate = u;
+                }, () => {
+                    Track.TraversePath<Loop>(path).Gate = r;
+                });
+            }
+
+            _loop.Gate = value / 100;
+        }
+        
+        public void SetGate(double gate) => Gate.RawValue = gate * 100;
     }   
 }
