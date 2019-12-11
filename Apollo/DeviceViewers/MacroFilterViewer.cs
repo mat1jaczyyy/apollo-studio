@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -28,7 +29,7 @@ namespace Apollo.DeviceViewers {
         UniformGrid MacrosGrid;
         Dial MacroDial;
 
-        void Set(MacroRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
+        void SetColor(MacroRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
 
         public MacroFilterViewer() => new InvalidOperationException();
 
@@ -41,7 +42,7 @@ namespace Apollo.DeviceViewers {
 
             for (int i = 0; i < MacrosGrid.Children.Count; i++) {
                 MacroRectangle Rect = (MacroRectangle)MacrosGrid.Children[i];
-                Set(Rect, _filter[i]);
+                SetColor(Rect, _filter[i]);
                 Rect.Index = i + 1;
             }
         }
@@ -66,7 +67,94 @@ namespace Apollo.DeviceViewers {
         
         public void SetMacro(int macro) => MacroDial.RawValue = macro;
 
-        void Clicked(object sender, PointerReleasedEventArgs e) {
+        bool drawingState;
+        bool[] old;        
+        bool mouseHeld = false;
+        IControl mouseOver = null;
+
+        void MouseDown(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
+                mouseHeld = true;
+
+                e.Pointer.Capture(MacrosGrid);
+                MacrosGrid.Cursor = new Cursor(StandardCursorType.Hand);
+
+                int index = MacrosGrid.Children.IndexOf((IControl)sender);
+                drawingState = !_filter[index];
+                old = _filter.Filter.ToArray();
+
+                MouseMove(sender, e);
+            }
+        }
+
+        void MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
+                MouseMove(sender, e);
+
+                if (old != null) {
+                    bool[] u = old.ToArray();
+                    bool[] r = _filter.Filter.ToArray();
+                    List<int> path = Track.GetPath(_filter);
+
+                    Program.Project.Undo.Add($"MacroFilter Changed", () => {
+                        Track.TraversePath<MacroFilter>(path).Filter = u.ToArray();
+                    }, () => {
+                        Track.TraversePath<MacroFilter>(path).Filter = r.ToArray();
+                    });
+
+                    old = null;
+                }
+
+                mouseHeld = false;
+                mouseOver = null;
+
+                e.Pointer.Capture(null);
+                MacrosGrid.Cursor = new Cursor(StandardCursorType.Arrow);
+            }
+        }
+
+        void MouseEnter(MacroRectangle rect) => SetColor(rect, _filter[MacrosGrid.Children.IndexOf(rect)] = drawingState);
+
+        void MouseMove(object sender, PointerEventArgs e) {
+            if (mouseHeld) {
+                IInputElement over = MacrosGrid.InputHitTest(e.GetPosition(MacrosGrid));
+
+                if (over is Grid grid) over = grid.Parent;
+
+                if (over is MacroRectangle rect) {
+                    if (mouseOver == null || mouseOver != rect)
+                        MouseEnter(rect);
+
+                    mouseOver = rect;
+
+                } else mouseOver = null;
+            }
+        }
+
+        public void Set(bool[] filter) {
+            for (int i = 0; i < 100; i++)
+                SetColor((MacroRectangle)MacrosGrid.Children[i], filter[i]);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*void Clicked(object sender, PointerReleasedEventArgs e) {
             int index = MacrosGrid.Children.IndexOf((IControl)sender);
 
             bool u = _filter[index];
@@ -82,6 +170,6 @@ namespace Apollo.DeviceViewers {
             _filter[index] = !_filter[index];
         }
 
-        public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);
+        public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);*/
     }
 }
