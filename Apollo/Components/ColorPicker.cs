@@ -211,7 +211,7 @@ namespace Apollo.Components {
                 y = (y < 0)? 0 : y;
                 y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
             }
-
+            
             Canvas.SetLeft(MainThumb, x);
             Canvas.SetTop(MainThumb, y);
             
@@ -384,17 +384,24 @@ namespace Apollo.Components {
             double ThumbLeft = MainThumb.GetValue(Canvas.LeftProperty);
             double ThumbTop = MainThumb.GetValue(Canvas.TopProperty);
             
+            double width = MainCanvas.Bounds.Width;
+            double height = MainCanvas.Bounds.Height;
+            
             TopBar.SetValue(Canvas.LeftProperty, ThumbLeft - 0.5);
-            TopBar.SetValue(Canvas.TopProperty, ThumbTop - 504);
+            TopBar.SetValue(Canvas.TopProperty, ThumbTop - 4 - height);
+            TopBar.SetValue(HeightProperty, height);
             
             BottomBar.SetValue(Canvas.LeftProperty, ThumbLeft - 0.5);
             BottomBar.SetValue(Canvas.TopProperty, ThumbTop + 4);
+            BottomBar.SetValue(HeightProperty, height);
             
-            LeftBar.SetValue(Canvas.LeftProperty, ThumbLeft - 504);
+            LeftBar.SetValue(Canvas.LeftProperty, ThumbLeft - 4 - width);
             LeftBar.SetValue(Canvas.TopProperty, ThumbTop - 0.5);
+            LeftBar.SetValue(WidthProperty, width);
             
             RightBar.SetValue(Canvas.LeftProperty, ThumbLeft + 4);
             RightBar.SetValue(Canvas.TopProperty, ThumbTop - 0.5);
+            RightBar.SetValue(WidthProperty, width);
         }
     }
 }

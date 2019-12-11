@@ -37,10 +37,10 @@
                 </Thumb.Template>
               </Thumb>
               
-              <Rectangle IsVisible="false" x:Name="TopBar" Fill="#FFFFFF" Width="1" Height="500"/>
-              <Rectangle IsVisible="false" x:Name="BottomBar" Fill="#FFFFFF" Width="1" Height="500"/>
-              <Rectangle IsVisible="false" x:Name="LeftBar" Fill="#FFFFFF" Width="500" Height="1"/>
-              <Rectangle IsVisible="false" x:Name="RightBar" Fill="#FFFFFF" Width="500" Height="1"/>
+              <Rectangle IsVisible="false" x:Name="TopBar" Fill="#FFFFFF" Width="1" />
+              <Rectangle IsVisible="false" x:Name="BottomBar" Fill="#FFFFFF" Width="1"/>
+              <Rectangle IsVisible="false" x:Name="LeftBar" Fill="#FFFFFF" Height="1"/>
+              <Rectangle IsVisible="false" x:Name="RightBar" Fill="#FFFFFF" Height="1"/>
             </Canvas>
           </Grid>
         </Grid>
