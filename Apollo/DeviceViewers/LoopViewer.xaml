@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.LoopViewer"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
+  <Grid RowDefinitions="*,*" Width="60">
+    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+      <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
+                         ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
+    </Border>
+
+    <Components:Dial Grid.Row="1" x:Name="Amount" Margin="0 5 0 0" Title="Amount" Minimum="0" Maximum="100" Default="1" Exponent="2" Round="0" Unit="" FillStart="false"
+                     ValueChanged="Amount_Changed" />
+  </Grid>
+</UserControl>

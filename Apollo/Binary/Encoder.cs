@@ -274,6 +274,13 @@ namespace Apollo.Binary {
             writer.Write(o.Infinite);
             writer.Write(o.Release);
         }
+        
+        static void Encode(BinaryWriter writer, Loop o){
+            EncodeID(writer, typeof(Loop));
+            
+            Encode(writer, o.Duration);
+            writer.Write(o.Amount);
+        }
 
         static void Encode(BinaryWriter writer, KeyFilter o) {
             EncodeID(writer, typeof(KeyFilter));
