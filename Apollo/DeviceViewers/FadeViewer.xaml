@@ -41,15 +41,22 @@
       <StackPanel Grid.Row="1" Margin="0 5 0 0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
         <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
                          ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
+
         <Components:Dial VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%"
                          ValueChanged="Gate_Changed" />
       </StackPanel>
     </Grid>
 
     <Grid Grid.Column="1" MaxWidth="0" x:Name="PickerContainer">
-      <Border Margin="5 0 0 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
-        <Components:ColorPicker Margin="5 0 0 0" x:Name="Picker" ColorChanged="Color_Changed" />
-      </Border>
+      <StackPanel Margin="3 0 0 0" Orientation="Horizontal" Spacing="3">
+        <Grid Background="Transparent" Cursor="SizeWestEast" x:Name="ResizeArea"
+              PointerPressed="ResizeDown" PointerReleased="ResizeUp" PointerMoved="ResizeMove">
+        
+          <Border Margin="2 0" MaxWidth="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0"/>
+        </Grid>
+        
+        <Components:ColorPicker x:Name="Picker" ColorChanged="Color_Changed" />
+      </StackPanel>
     </Grid>
   </Grid>
 </UserControl>
