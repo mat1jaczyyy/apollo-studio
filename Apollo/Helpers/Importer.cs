@@ -70,14 +70,15 @@ namespace Apollo.Helpers {
             if (!File.Exists(path)) return false;
             
             using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read))) {
-                if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'h', 'd'}) || // Header Identifier
+                
+                if (!reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'M', 'T', 'h', 'd'}) || // Header Identifier
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x06}) || // Header size
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x01})) // Single track file
                     return false;
                 
                 double beatsize = (reader.ReadByte() << 8) + reader.ReadByte();
 
-                if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'r', 'k'})) // Track start
+                if (!reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'M', 'T', 'r', 'k'})) // Track start
                     return false;
                 
                 long end = reader.BaseStream.Position + BitConverter.ToInt32(reader.ReadBytes(4).Reverse().ToArray()); // Track length

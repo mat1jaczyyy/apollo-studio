@@ -16,7 +16,7 @@ using Apollo.Windows;
 
 namespace Apollo.Binary {
     public static class Decoder {
-        static bool DecodeHeader(BinaryReader reader) => reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
+        static bool DecodeHeader(BinaryReader reader) => reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
 
         static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
