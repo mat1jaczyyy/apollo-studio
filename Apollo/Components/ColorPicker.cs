@@ -168,23 +168,45 @@ namespace Apollo.Components {
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
         }
 
+        bool thumbHeld = false;
+
         void Thumb_Down(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
+            if (thumbHeld) return;
+
             if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                 oldColor = Color.Clone();
-            else if (MouseButton == PointerUpdateKind.RightButtonPressed)
+            else if (MouseButton == PointerUpdateKind.RightButtonPressed && sender == MainThumb)
                 mouseLock = MouseLock.Ready;
+            else {
+                e.Handled = true;
+                return;
+            }
+
+            thumbHeld = true;
         }
 
         void Thumb_Up(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
             
-            mouseLock = MouseLock.None;
-            TopBar.IsVisible = BottomBar.IsVisible = LeftBar.IsVisible = RightBar.IsVisible = false;
+            if (!thumbHeld) return;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonReleased && oldColor != Color)
-                ColorChanged?.Invoke(Color, oldColor);
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased || (MouseButton == PointerUpdateKind.RightButtonReleased && sender == MainThumb)) {
+                if (MouseButton == PointerUpdateKind.RightButtonReleased && sender == MainThumb) {
+                    mouseLock = MouseLock.None;
+                    TopBar.IsVisible = BottomBar.IsVisible = LeftBar.IsVisible = RightBar.IsVisible = false;
+                }
+
+                if (oldColor != Color)
+                    ColorChanged?.Invoke(Color, oldColor);
+            
+            } else {
+                e.Handled = true;
+                return;
+            }
+
+            thumbHeld = false;
         }
 
         void MainThumb_Move(object sender, VectorEventArgs e) {
