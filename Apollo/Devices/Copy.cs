@@ -18,7 +18,7 @@ namespace Apollo.Devices {
 
         public void Insert(int index, Offset offset = null, int angle = 0) {
             Offsets.Insert(index, offset?? new Offset());
-            Offsets.Last().Changed += OffsetChanged;
+            Offsets[index].Changed += OffsetChanged;
 
             Angles.Insert(index, angle);
 
