@@ -27,8 +27,8 @@ namespace Apollo.Components {
             MainCanvas = this.Get<Canvas>("MainCanvas");
             HueCanvas = this.Get<Canvas>("HueCanvas");
 
-            MainThumb = this.Get<Thumb>("MainThumb");
-            HueThumb = this.Get<Thumb>("HueThumb");
+            MainThumb = this.Get<Canvas>("MainThumb");
+            HueThumb = this.Get<Canvas>("HueThumb");
 
             MainColor = ((LinearGradientBrush)this.Get<Grid>("MainColor").Background).GradientStops[1];
             
@@ -70,13 +70,14 @@ namespace Apollo.Components {
         }
 
         Ellipse Preview;
-        Canvas MainCanvas, HueCanvas;
-        Thumb MainThumb, HueThumb;
+        Canvas MainCanvas, HueCanvas, MainThumb, HueThumb;
         GradientStop MainColor;
         TextBox Hex;
         Rectangle TopBar, BottomBar, LeftBar, RightBar;
 
-        bool main_mouseHeld, hue_mouseHeld, hexValidation;
+        bool hexValidation;
+        object mouseHeld;
+        double offsetX, offsetY;
         MouseLock mouseLock = MouseLock.None;
         Color oldColor;
 
@@ -85,12 +86,6 @@ namespace Apollo.Components {
 
             observables.Add(MainCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
             observables.Add(HueCanvas.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
-            
-            MainThumb.AddHandler(InputElement.PointerPressedEvent, Thumb_Down, RoutingStrategies.Tunnel);
-            MainThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
-
-            HueThumb.AddHandler(InputElement.PointerPressedEvent, Thumb_Down, RoutingStrategies.Tunnel);
-            HueThumb.AddHandler(InputElement.PointerReleasedEvent, Thumb_Up, RoutingStrategies.Tunnel);
 
             hexValidation = true;
             observables.Add(Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed));
@@ -98,12 +93,6 @@ namespace Apollo.Components {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
-            
-            MainThumb.RemoveHandler(InputElement.PointerPressedEvent, Thumb_Down);
-            MainThumb.RemoveHandler(InputElement.PointerReleasedEvent, Thumb_Up);
-
-            HueThumb.RemoveHandler(InputElement.PointerPressedEvent, Thumb_Down);
-            HueThumb.RemoveHandler(InputElement.PointerReleasedEvent, Thumb_Up);
 
             foreach (IDisposable observable in observables)
                 observable.Dispose();
@@ -168,53 +157,16 @@ namespace Apollo.Components {
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
         }
 
-        bool thumbHeld = false;
+        void Main_Move(object sender, PointerEventArgs e) {
+            Vector position = e.GetPosition(MainThumb);
+            position = position.WithX(position.X - offsetX)
+                               .WithY(position.Y - offsetY);
 
-        void Thumb_Down(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-
-            if (thumbHeld) return;
-
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed)
-                oldColor = Color.Clone();
-            else if (MouseButton == PointerUpdateKind.RightButtonPressed && sender == MainThumb)
-                mouseLock = MouseLock.Ready;
-            else {
-                e.Handled = true;
-                return;
-            }
-
-            thumbHeld = true;
-        }
-
-        void Thumb_Up(object sender, PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-            
-            if (!thumbHeld) return;
-
-            if (MouseButton == PointerUpdateKind.LeftButtonReleased || (MouseButton == PointerUpdateKind.RightButtonReleased && sender == MainThumb)) {
-                if (MouseButton == PointerUpdateKind.RightButtonReleased && sender == MainThumb) {
-                    mouseLock = MouseLock.None;
-                    TopBar.IsVisible = BottomBar.IsVisible = LeftBar.IsVisible = RightBar.IsVisible = false;
-                }
-
-                if (oldColor != Color)
-                    ColorChanged?.Invoke(Color, oldColor);
-            
-            } else {
-                e.Handled = true;
-                return;
-            }
-
-            thumbHeld = false;
-        }
-
-        void MainThumb_Move(object sender, VectorEventArgs e) {
             double x = Canvas.GetLeft(MainThumb);
             double y = Canvas.GetTop(MainThumb);
             
             if (mouseLock == MouseLock.Ready)
-                if (Math.Abs(e.Vector.X) > Math.Abs(e.Vector.Y)) {
+                if (Math.Abs(position.X) > Math.Abs(position.Y)) {
                     mouseLock = MouseLock.Horizontal;
                     LeftBar.IsVisible = RightBar.IsVisible = true;
                 } else {
@@ -223,13 +175,13 @@ namespace Apollo.Components {
                 }
 
             if (mouseLock == MouseLock.None || mouseLock == MouseLock.Horizontal) {
-                x += e.Vector.X;
+                x += position.X;
                 x = (x < 0)? 0 : x;
                 x = (x > MainCanvas.Bounds.Width)? MainCanvas.Bounds.Width : x;
             }
 
             if (mouseLock == MouseLock.None || mouseLock == MouseLock.Vertical) {
-                y += e.Vector.Y;
+                y += position.Y;
                 y = (y < 0)? 0 : y;
                 y = (y > MainCanvas.Bounds.Height)? MainCanvas.Bounds.Height : y;
             }
@@ -241,47 +193,12 @@ namespace Apollo.Components {
             UpdateThumbAxes();
         }
 
-        void MainCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+        void Hue_Move(object sender, PointerEventArgs e) {
+            Vector position = e.GetPosition(HueThumb);
+            position = position.WithX(position.X - offsetX)
+                               .WithY(position.Y - offsetY);
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
-                main_mouseHeld = true;
-                e.Pointer.Capture(MainCanvas);
-
-                oldColor = Color.Clone();
-
-                Vector position = e.GetPosition(MainThumb);
-                position = position.WithX(position.X - MainThumb.Bounds.Width / 2)
-                                   .WithY(position.Y - MainThumb.Bounds.Height / 2);
-
-                MainThumb_Move(null, new VectorEventArgs() { Vector = position });
-            }
-        }
-
-        void MainCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-
-            if (main_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
-                main_mouseHeld = false;
-                e.Pointer.Capture(null);
-
-                if (oldColor != Color)
-                    ColorChanged?.Invoke(Color, oldColor);
-            }
-        }
-
-        void MainCanvas_MouseMove(object sender, PointerEventArgs e) {
-            if (main_mouseHeld) {
-                Vector position = e.GetPosition(MainThumb);
-                position = position.WithX(position.X - MainThumb.Bounds.Width / 2)
-                                   .WithY(position.Y - MainThumb.Bounds.Height / 2);
-
-                MainThumb_Move(null, new VectorEventArgs() { Vector = position });
-            }
-        }
-
-        void HueThumb_Move(object sender, VectorEventArgs e) {
-            double y = Canvas.GetTop(HueThumb) + e.Vector.Y;
+            double y = Canvas.GetTop(HueThumb) + position.Y;
             y = (y < 0)? 0 : y;
             y = y > HueCanvas.Bounds.Height? HueCanvas.Bounds.Height : y;
 
@@ -291,41 +208,105 @@ namespace Apollo.Components {
             UpdateCanvas();
         }
 
-        void HueCanvas_MouseDown(object sender, PointerPressedEventArgs e) {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+        void Start(object sender, PointerEventArgs e, bool move, bool hue) {
+            Control source = (Control)sender;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
-                hue_mouseHeld = true;
-                e.Pointer.Capture(HueCanvas);
+            mouseHeld = sender;
+            e.Pointer.Capture(source);
 
-                oldColor = Color.Clone();
+            oldColor = Color.Clone();
 
-                Vector position = e.GetPosition(HueThumb);
-                position = position.WithY(position.Y - HueThumb.Bounds.Height / 2);
+            if (move) {
+                offsetX = offsetY = 0;
 
-                HueThumb_Move(null, new VectorEventArgs() { Vector = position });
+                if (hue) Hue_Move(sender, e);
+                else Main_Move(sender, e);
+
+            } else {
+                Vector position = e.GetPosition(source);
+                offsetX = position.X;
+                offsetY = position.Y;
             }
         }
 
-        void HueCanvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+        void End(PointerEventArgs e,bool hue) {
+            mouseHeld = null;
+            e.Pointer.Capture(null);
+            
+            if (!hue) {
+                mouseLock = MouseLock.None;
+                TopBar.IsVisible = BottomBar.IsVisible = LeftBar.IsVisible = RightBar.IsVisible = false;
+            }
+
+            if (oldColor != Color)
+                ColorChanged?.Invoke(Color, oldColor);
+        }
+        
+        void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (hue_mouseHeld && MouseButton == PointerUpdateKind.LeftButtonReleased) {
-                hue_mouseHeld = false;
-                e.Pointer.Capture(null);
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) Start(sender, e, true, sender == HueCanvas);
+        }
+
+        void Canvas_MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) End(e, sender == HueCanvas);
+        }
+
+        void MainThumb_MouseDown(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (mouseHeld != null) return;
+
+            if (MouseButton == PointerUpdateKind.RightButtonPressed)
+                mouseLock = MouseLock.Ready;
                 
-                if (oldColor != Color)
-                    ColorChanged?.Invoke(Color, oldColor);
-            }
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || MouseButton == PointerUpdateKind.RightButtonPressed)
+                Start(sender, e, false, false);
+                
+            e.Handled = true;
         }
 
-        void HueCanvas_MouseMove(object sender, PointerEventArgs e) {
-            if (hue_mouseHeld) {
-                Vector position = e.GetPosition(HueThumb);
-                position = position.WithY(position.Y - HueThumb.Bounds.Height / 2);
+        void MainThumb_MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+            
+            if (mouseHeld == null) return;
 
-                HueThumb_Move(null, new VectorEventArgs() { Vector = position });
-            }
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased || MouseButton == PointerUpdateKind.RightButtonReleased)
+                End(e, false);
+            
+            e.Handled = true;
+        }
+
+        void Main_MouseMove(object sender, PointerEventArgs e) {
+            if (mouseHeld == sender) Main_Move(sender, e);
+        }
+
+        void HueThumb_MouseDown(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (mouseHeld != null) return;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed)
+                Start(sender, e, false, true);
+                
+            e.Handled = true;
+        }
+
+        void HueThumb_MouseUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+            
+            if (mouseHeld == null) return;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased)
+                End(e, true);
+            
+            e.Handled = true;
+        }
+
+        void Hue_MouseMove(object sender, PointerEventArgs e) {
+            if (mouseHeld == sender) Hue_Move(sender, e);
         }
 
         bool Hex_Dirty = false;

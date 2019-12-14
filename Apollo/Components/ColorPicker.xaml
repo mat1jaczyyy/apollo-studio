@@ -25,17 +25,16 @@
             </Grid.Background>
 
             <Canvas Background="Transparent" ClipToBounds="true" x:Name="MainCanvas"
-                    PointerPressed="MainCanvas_MouseDown" PointerReleased="MainCanvas_MouseUp" PointerMoved="MainCanvas_MouseMove">
-              <Thumb Canvas.Left="0" Canvas.Top="0" Margin="-5 -5 0 0" Width="10" Height="10" Cursor="Hand" x:Name="MainThumb" DragDelta="MainThumb_Move">
-                <Thumb.Template>
-                  <ControlTemplate>
-                    <Canvas Background="Transparent">
-                      <Ellipse Width="10" Height="10" Stroke="#FFFFFFFF" StrokeThickness="1" />
-                      <Ellipse Canvas.Top="1" Canvas.Left="1" Width="8" Height="8" Stroke="#FF000000" StrokeThickness="1" />
-                    </Canvas>
-                  </ControlTemplate>
-                </Thumb.Template>
-              </Thumb>
+                    PointerPressed="Canvas_MouseDown" PointerReleased="Canvas_MouseUp" PointerMoved="Main_MouseMove">
+
+              <Canvas Margin="-5 -5 0 0" Width="10" Height="10" Cursor="Hand" Background="Transparent" x:Name="MainThumb"
+                      PointerPressed="MainThumb_MouseDown" PointerReleased="MainThumb_MouseUp" PointerMoved="Main_MouseMove">
+
+                <Ellipse Width="10" Height="10" Stroke="#FFFFFFFF" StrokeThickness="1" />
+                <Ellipse Canvas.Top="1" Canvas.Left="1" Width="8" Height="8" Stroke="#FF000000" StrokeThickness="1" />
+              </Canvas>
+
+              <!-- DragDelta="MainThumb_Move"-->
               
               <Rectangle IsVisible="false" x:Name="TopBar" Fill="#FFFFFF" Opacity="0.5" Width="2" />
               <Rectangle IsVisible="false" x:Name="BottomBar" Fill="#FFFFFF" Opacity="0.5" Width="2"/>
@@ -61,19 +60,16 @@
           </Grid.Background>
 
           <Canvas Background="Transparent" ClipToBounds="true" Width="13" x:Name="HueCanvas"
-                  PointerPressed="HueCanvas_MouseDown" PointerReleased="HueCanvas_MouseUp" PointerMoved="HueCanvas_MouseMove">
-            <Thumb Canvas.Left="0" Canvas.Top="0" Margin="0 -4" Width="13" Height="10" Cursor="Hand" x:Name="HueThumb" DragDelta="HueThumb_Move">
-              <Thumb.Template>
-                <ControlTemplate>
-                  <Canvas Background="Transparent">
-                    <Path Fill="#FF000000"
-                          Data="M 0,0 L 4,4 0,8 Z" />
-                    <Path Fill="#FF000000"
-                          Data="M 13,0 L 9,4 13,8 Z" />
-                  </Canvas>
-                </ControlTemplate>
-              </Thumb.Template>
-            </Thumb>
+                  PointerPressed="Canvas_MouseDown" PointerReleased="Canvas_MouseUp" PointerMoved="Hue_MouseMove">
+
+            <Canvas Margin="0 -4" Width="13" Height="10" Cursor="Hand" Background="Transparent" x:Name="HueThumb"
+                    PointerPressed="HueThumb_MouseDown" PointerReleased="HueThumb_MouseUp" PointerMoved="Hue_MouseMove">
+
+              <Path Fill="#FF000000"
+                    Data="M 0,0 L 4,4 0,8 Z" />
+              <Path Fill="#FF000000"
+                    Data="M 13,0 L 9,4 13,8 Z" />
+            </Canvas>
           </Canvas>
         </Grid>
       </Border>
