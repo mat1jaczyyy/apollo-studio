@@ -26,7 +26,6 @@ namespace Apollo.Binary {
             typeof(Fade),
             typeof(Flip),
             typeof(Hold),
-            typeof(Loop),
             typeof(KeyFilter),
             typeof(Layer),
             typeof(Move),
@@ -49,7 +48,9 @@ namespace Apollo.Binary {
             typeof(Choke),
             typeof(ColorFilter),
             typeof(Clear),
-            typeof(LayerFilter)
+            typeof(LayerFilter),
+            
+            typeof(Loop),
         };
     }
 }
