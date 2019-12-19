@@ -6,7 +6,10 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   <Grid RowDefinitions="*,*" Width="125">
-    <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+    <Components:Dial Grid.Row="0" x:Name="Amount" Margin="0 5 0 0" Title="Amount" Minimum="0" Maximum="100" Default="0" Exponent="2" Round="0" Unit="" FillStart="false"
+                       ValueChanged="Amount_Changed" />
+                       
+    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
       <Grid ColumnDefinitions="*,*" Margin="5 5 5 0">
         <Components:Dial VerticalAlignment="Center" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
                            ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
@@ -14,8 +17,5 @@
                        ValueChanged="Gate_Changed" />
       </Grid>
     </Border>
-
-    <Components:Dial Grid.Row="1" x:Name="Amount" Margin="0 5 0 0" Title="Amount" Minimum="0" Maximum="100" Default="0" Exponent="2" Round="0" Unit="" FillStart="false"
-                     ValueChanged="Amount_Changed" />
   </Grid>
 </UserControl>

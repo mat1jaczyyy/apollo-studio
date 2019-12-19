@@ -69,7 +69,7 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
         
-        public Loop(Time duration = null, double gate = 0, int amount = 0) : base("loop"){
+        public Loop(Time duration = null, double gate = 1, int amount = 0) : base("loop"){
             Duration = duration?? new Time();
             Amount = amount;
             Gate = gate;
