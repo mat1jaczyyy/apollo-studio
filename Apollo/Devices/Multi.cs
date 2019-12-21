@@ -52,15 +52,19 @@ namespace Apollo.Devices {
                 for (int i = 0; i < value.Count; i++) {
                     if (value[i] != null && value[i].Length == 101) {
                         _filters[index] = value[i];
-                        if (Viewer?.SpecificViewer != null) ((KeyFilterViewer)Viewer.SpecificViewer).Set(_filters[index]);
+                        if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, _filters[index]);
                         index++;
                     }
                 }
             }
         }
+        public bool[] GetFilter(int index) => _filters[index];
+        public void SetFilter(int index, bool[] filter) {
+            _filters[index] = filter;
+            if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, filter);
+        }
 
         Random RNG = new Random();
-
         MultiType _mode;
         public MultiType Mode {
             get => _mode;
@@ -177,15 +181,11 @@ namespace Apollo.Devices {
                 }
                 else if (Mode == MultiType.Key) {
                     for (int index = 0; index < _filters.Count; index++) {
-                        if (_filters[index][m.Index]) {
-                            target.Add(index);
-                        }
+                        if (_filters[index][m.Index]) target.Add(index);
                     }
                 }
 
-                if(Mode != MultiType.Key) {
-                    target.Add(current);
-                }
+                if(Mode != MultiType.Key) target.Add(current);
 
                 m.MultiTarget.Push(buffer[n] = target);
 
@@ -222,12 +222,6 @@ namespace Apollo.Devices {
             Preprocess.Dispose();
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
-        }
-
-        public bool[] GetFilter(int index) => _filters[index];
-        public void SetFilter(int index, bool[] filter) {
-            _filters[index] = filter;
-            if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, filter);
         }
     }
 }
