@@ -35,8 +35,8 @@
 
     </Grid>
 
-    <Border Grid.Column="1" Margin="4 0" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
-        <Components:LaunchpadGrid x:Name="Grid" MaxWidth="0" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished"/>
+    <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+        <Components:LaunchpadGrid x:Name="Grid" Margin="0 0" MaxWidth="0" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished"/>
     </Border>
 
   </Grid>

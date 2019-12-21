@@ -128,6 +128,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(3, new ChainViewer(_multi[index], true));
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
+            Grid.Margin = new Thickness(4, 0, 4, 0);
             Grid.MaxWidth = double.MaxValue;
             Set(-1, _multi.GetFilter(index));
 
@@ -140,6 +141,7 @@ namespace Apollo.DeviceViewers {
             _root.RemoveAt(4);
             _root.RemoveAt(3);
 
+            Grid.Margin = new Thickness(0, 0, 0, 0);
             Grid.MaxWidth = 0;
 
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
