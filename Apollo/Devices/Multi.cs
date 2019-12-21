@@ -176,7 +176,11 @@ namespace Apollo.Devices {
                     else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
                 }
                 else if (Mode == MultiType.Key) {
-                    // TODO: IMPLEMENT
+                    for (int index = 0; index < _filters.Count; index++) {
+                        if (_filters[index][m.Index]) {
+                            target.Add(index);
+                        }
+                    }
                 }
 
                 if(Mode != MultiType.Key) {
