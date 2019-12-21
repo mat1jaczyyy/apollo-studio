@@ -49,13 +49,13 @@ namespace Apollo.Devices {
             get => _filters;
             set {
                 int index = 0;
-                foreach (bool[] i in value) {
-                    if (i != null && i.Length == 101) {
-                        _filters[index] = i;
+                for (int i = 0; i < value.Count; i++) {
+                    if (value[i] != null && value[i].Length == 101) {
+                        _filters[index] = value[i];
                         if (Viewer?.SpecificViewer != null) ((KeyFilterViewer)Viewer.SpecificViewer).Set(_filters[index]);
                         index++;
                     }
-                } 
+                }
             }
         }
 

@@ -55,12 +55,9 @@ namespace Apollo.DeviceViewers {
         void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
-            for (int i = 1; i < Contents.Count; i++)
-                ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
+            for (int i = 1; i < Contents.Count; i++) ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
 
-            if (Contents.Count > 1) {
-                ((ChainInfo)Contents.Last()).ChainAdd.AlwaysShowing = true;
-            } 
+            if (Contents.Count > 1) ((ChainInfo)Contents.Last()).ChainAdd.AlwaysShowing = true;
         }
 
         public void Contents_Insert(int index, Chain chain) {
@@ -624,7 +621,7 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_multi);
             int selected = (int)_multi.Expanded;
 
-            Program.Project.Undo.Add($"KeyFilter Changed", () => {
+            Program.Project.Undo.Add($"MultiFilter Changed", () => {
                 Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
             }, () => {
                 Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
