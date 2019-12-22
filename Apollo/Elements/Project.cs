@@ -187,10 +187,10 @@ namespace Apollo.Elements {
         public event TrackCountChangedEventHandler TrackCountChanged;
 
         void Reroute() {
+            TrackCountChanged?.Invoke(Tracks.Count);
+
             for (int i = 0; i < Tracks.Count; i++)
                 Tracks[i].ParentIndex = i;
-            
-            TrackCountChanged?.Invoke(Tracks.Count);
         }
 
         public Track this[int index] {
