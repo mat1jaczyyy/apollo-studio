@@ -6,8 +6,6 @@ using Avalonia.Platform;
 
 using Apollo.Structures;
 
-using System;
-
 namespace Apollo.Components
 {
     public class FrameThumbnail : UserControl
@@ -43,8 +41,6 @@ namespace Apollo.Components
         
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e)
         {
-            Clicked = null;
-
             _frame = null;
         }
         
@@ -67,13 +63,6 @@ namespace Apollo.Components
                 FrameImage.Source = bitmap;
             }
             
-        }
-
-        void Click(object sender, PointerReleasedEventArgs e)
-        {
-            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed) Clicked?.Invoke();
         }
     }
 }
