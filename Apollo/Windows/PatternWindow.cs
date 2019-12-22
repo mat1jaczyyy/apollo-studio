@@ -1274,7 +1274,11 @@ namespace Apollo.Windows {
                     new FileDialogFilter() {
                         Extensions = new List<string>() {
                             "mid",
-                            "gif"
+                            "gif",
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "bmp",
                         },
                         Name = "All Supported Files"
                     },
@@ -1288,7 +1292,16 @@ namespace Apollo.Windows {
                         Extensions = new List<string>() {
                             "gif"
                         },
-                        Name = "GIF Images"
+                        Name = "Animated GIF Images"
+                    },
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "bmp"
+                        },
+                        Name = "Static JPG, PNG or BMP images"
                     }
                 },
                 Title = "Import Pattern"

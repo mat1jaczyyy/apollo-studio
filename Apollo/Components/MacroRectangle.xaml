@@ -13,6 +13,6 @@
   </UserControl.Styles>
 
   <Grid Background="Transparent" Margin="1" Cursor="Hand" Width="15" Height="15" x:Name="Rect">
-    <TextBlock FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Text" />
+    <TextBlock FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="false" x:Name="Text" />
   </Grid>
 </UserControl>

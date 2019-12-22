@@ -139,37 +139,5 @@ namespace Apollo.DeviceViewers {
             for (int i = 0; i < 100; i++)
                 SetColor((MacroRectangle)MacrosGrid.Children[i], filter[i]);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*void Clicked(object sender, PointerReleasedEventArgs e) {
-            int index = MacrosGrid.Children.IndexOf((IControl)sender);
-
-            bool u = _filter[index];
-            bool r = !_filter[index];
-            List<int> path = Track.GetPath(_filter);
-
-            Program.Project.Undo.Add($"MacroFilter {index + 1} Changed to {(r? "Allowed" : "Blocked")}", () => {
-                Track.TraversePath<MacroFilter>(path)[index] = u;
-            }, () => {
-                Track.TraversePath<MacroFilter>(path)[index] = r;
-            });
-
-            _filter[index] = !_filter[index];
-        }
-
-        public void Set(int index, bool value) => Set((MacroRectangle)MacrosGrid.Children[index], value);*/
     }
 }

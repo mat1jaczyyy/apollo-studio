@@ -1,13 +1,5 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<ClearButton xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.UndoClearButton"
              ToolTip.Tip="Clear History"
-             DetachedFromVisualTree="Unloaded">
-
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
-          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
-    <Path x:Name="Path"
-          Data="M 13.96875,0 L 16,1.96875 10.875,7 12.875,9 11.59375,10.3125 5.625,4.34375 6.9375,3.0625 8.96875,5.03125 Z
-          M 5.1875,5.1875 L 10.71875,10.71875 6.71875,16 7.6875,13 5.53125,14.71875 5.125,14.3125 6.875,11.53125 4.625,13.8125 4.125,13.28125 6.59375,10.3125 3.4375,12.625 3.15625,12.34375 4.78125,9.96875 2.75,11.9375 2.46875,11.625 4.6875,8.4375 1.78125,10.96875 1.34375,10.53125 3.4375,8 0.84375,10.03125 0,9.21875 Z" />
-  </Canvas>
-</UserControl>
+             DetachedFromVisualTree="Unloaded" />

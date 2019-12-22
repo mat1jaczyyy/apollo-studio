@@ -70,14 +70,15 @@ namespace Apollo.Helpers {
             if (!File.Exists(path)) return false;
             
             using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read))) {
-                if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'h', 'd'}) || // Header Identifier
+                
+                if (!reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'M', 'T', 'h', 'd'}) || // Header Identifier
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x06}) || // Header size
                     !reader.ReadBytes(4).SequenceEqual(new byte[] {0x00, 0x00, 0x00, 0x01})) // Single track file
                     return false;
                 
                 double beatsize = (reader.ReadByte() << 8) + reader.ReadByte();
 
-                if (!reader.ReadChars(4).SequenceEqual(new char[] {'M', 'T', 'r', 'k'})) // Track start
+                if (!reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'M', 'T', 'r', 'k'})) // Track start
                     return false;
                 
                 long end = reader.BaseStream.Position + BitConverter.ToInt32(reader.ReadBytes(4).Reverse().ToArray()); // Track length
@@ -144,6 +145,41 @@ namespace Apollo.Helpers {
 
         static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
 
+        static bool DecodeImageFrame(SKCodec codec, out Frame decoded, int index = -1) {
+            decoded = null;
+            SKBitmap frame = new SKBitmap(codec.Info);
+
+            if ((
+                (index == -1)
+                    ? codec.GetPixels(codec.Info, frame.GetPixels())
+                    : codec.GetPixels(codec.Info, frame.GetPixels(), new SKCodecOptions(index))
+                ) == SKCodecResult.Success) {
+
+                frame = frame.Resize(targetInfo, SKFilterQuality.High);
+
+                decoded = new Frame(new Time(
+                    false,
+                    free: (index == -1)
+                        ? 1000
+                        : codec.FrameInfo[index].Duration
+                ));
+
+                for (int x = 0; x <= 9; x++) {
+                    for (int y = 0; y <= 9; y++) {
+                        SKColor color = frame.GetPixel(x, 9 - y);
+                        decoded.Screen[y * 10 + x] = new Color(
+                            (byte)(color.Red >> 2),
+                            (byte)(color.Green >> 2),
+                            (byte)(color.Blue >> 2)
+                        );
+                    }
+                }
+
+                return true;
+
+            } else return false;
+        }
+
         public static bool FramesFromImage(string path, out List<Frame> ret) {
             ret = null;
             
@@ -152,30 +188,20 @@ namespace Apollo.Helpers {
             using (SKCodec codec = SKCodec.Create(path)){
                 if (codec == null) return false;
 
-                SKImageInfo info = codec.Info;
                 ret = new List<Frame>();
                 
-                for (int i = 0; i < codec.FrameCount; i++) {
-                    SKBitmap frame = new SKBitmap(info);
+                if (codec.FrameCount > 0)
+                    for (int i = 0; i < codec.FrameCount; i++) {
+                        if (DecodeImageFrame(codec, out Frame frame, i))
+                            ret.Add(frame);
+                        
+                        else return false;
+                    }
 
-                    if (codec.GetPixels(info, frame.GetPixels(), new SKCodecOptions(i)) == SKCodecResult.Success) {
-                        frame = frame.Resize(targetInfo, SKFilterQuality.High);
-
-                        ret.Add(new Frame(new Time(false, free: codec.FrameInfo[i].Duration)));
-
-                        for (int x = 0; x <= 9; x++) {
-                            for (int y = 0; y <= 9; y++) {
-                                SKColor color = frame.GetPixel(x, 9 - y);
-                                ret[i].Screen[y * 10 + x] = new Color(
-                                    (byte)(color.Red >> 2),
-                                    (byte)(color.Green >> 2),
-                                    (byte)(color.Blue >> 2)
-                                );
-                            }
-                        }
-
-                    } else return false;
-                }
+                else if (DecodeImageFrame(codec, out Frame frame))
+                    ret.Add(frame);
+                
+                else return false;
 
                 return true;
             }
