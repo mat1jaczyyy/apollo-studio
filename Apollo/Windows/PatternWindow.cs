@@ -553,15 +553,9 @@ namespace Apollo.Windows {
                 ColorHistory.Use();
             });
 
-            _pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
-
-            Color padColor = _pattern[_pattern.Expanded].Screen[signalIndex];
-
-            SolidColorBrush brush = (SolidColorBrush)padColor.ToScreenBrush();
-
-            Editor.SetColor(index, brush);
+            Editor.SetColor(index, (SolidColorBrush)(_pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone()).ToScreenBrush());
             
-            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw_Launchpad();
+            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw();
 
             Launchpad?.Send(new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }

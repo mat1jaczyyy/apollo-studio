@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using AvaloniaColor = Avalonia.Media.Color;
-using Avalonia.Platform;
 
 namespace Apollo.Structures {
     public class Color {
@@ -181,20 +180,14 @@ namespace Apollo.Structures {
 
         public override string ToString() => $"({Red}, {Green}, {Blue})";
         
-        public uint ToUInt32(PixelFormat format = PixelFormat.Rgba8888){
-            switch(format){
-            case PixelFormat.Rgba8888:
-                // Console.WriteLine((byte)(_r * 255.0/63) | (byte)(_g* 255.0/63) << 8 | (byte)(_b* 255.0/63) << 16 | 0b_1111_1111 << 24);
-                uint generatedColor = this.ToScreenBrush().Color.ToUint32();
-                byte a = (byte)(generatedColor >> 24);
-                byte r = (byte)(generatedColor >> 16);
-                byte g = (byte)(generatedColor >> 8);
-                byte b = (byte)(generatedColor >> 0);
-                return (uint)(a << 24 | b << 16 | g << 8 | r);
-            default:
-                return 0;
-            }
-            
+        public uint ToUInt32(){
+            uint generatedColor = this.ToScreenBrush().Color.ToUint32();
+
+            byte r = (byte)(generatedColor >> 16);
+            byte g = (byte)(generatedColor >> 8);
+            byte b = (byte)generatedColor;
+
+            return (uint)(255 << 24 | b << 16 | g << 8 | r);
         }
     }
 }
