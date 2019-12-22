@@ -31,18 +31,6 @@ namespace Apollo.Devices {
             }
         }
         
-        int _amount = 0;
-        public int Amount {
-            get => _amount;
-            set {
-                if (0 <= value && value <= 100 && _amount != value) {
-                    _amount = value;
-                    
-                    if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetAmount(Amount);
-                }
-            }
-        }
-        
         double _gate;
         public double Gate {
             get => _gate;
@@ -51,6 +39,18 @@ namespace Apollo.Devices {
                     _gate = value;
                     
                     if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetGate(Gate);
+                }
+            }
+        }
+        
+        int _repeats;
+        public int Repeats {
+            get => _repeats;
+            set {
+                if (1 <= value && value <= 128 && _repeats != value) {
+                    _repeats = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRepeats(Repeats);
                 }
             }
         }
@@ -69,13 +69,13 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
         
-        public Loop(Time duration = null, double gate = 1, int amount = 0) : base("loop"){
+        public Loop(Time duration = null, double gate = 1, int repeats = 1): base("loop") {
             Duration = duration?? new Time();
-            Amount = amount;
             Gate = gate;
+            Repeats = repeats;
         }
         
-        public override Device Clone() => new Loop(Duration, Amount);
+        public override Device Clone() => new Loop(Duration, Gate, Repeats);
         
         void Stop(Signal n) {
             if (timers.ContainsKey(n))
@@ -88,7 +88,7 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n){
             Stop(n);
             
-            for(int i = 1; i <= Amount; i++){
+            for(int i = 1; i <= Repeats; i++){
                 Courier courier;
                 timers[n].Add(courier = new Courier(){
                     AutoReset = false,

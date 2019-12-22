@@ -13,22 +13,22 @@ using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
     public class LoopViewer: UserControl {
-    
         public static readonly string DeviceIdentifier = "loop";
         
         Loop _loop;
         
-        Dial Duration, Amount, Gate;
+        Dial Duration, Gate, Repeats;
         
         void InitializeComponent(){
             AvaloniaXamlLoader.Load(this);
             
             Duration = this.Get<Dial>("Duration");
-            Amount = this.Get<Dial>("Amount");
             Gate = this.Get<Dial>("Gate");
+            Repeats = this.Get<Dial>("Repeats");
         }
         
         public LoopViewer() => new InvalidOperationException();
+
         public LoopViewer(Loop loop) {
             InitializeComponent();
             
@@ -38,14 +38,14 @@ namespace Apollo.DeviceViewers {
             Duration.Length = _loop.Duration.Length;
             Duration.RawValue = _loop.Duration.Free;
             
-            Amount.RawValue = _loop.Amount;
-            
             Gate.RawValue = _loop.Gate * 100;
+            
+            Repeats.RawValue = _loop.Repeats;
         }
         
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
 
-        void Duration_Changed(Dial sender, double value, double? old){
+        void Duration_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
@@ -61,6 +61,8 @@ namespace Apollo.DeviceViewers {
             _loop.Duration.Free = (int)value;
         }
         
+        public void SetDurationValue(int value) => Duration.RawValue = value;
+        
         void Duration_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
@@ -74,6 +76,8 @@ namespace Apollo.DeviceViewers {
                 });
             }
         }
+        
+        public void SetDurationStep(Length duration) => Duration.Length = duration;
         
         void Duration_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
@@ -91,29 +95,7 @@ namespace Apollo.DeviceViewers {
             _loop.Duration.Mode = value;
         }
         
-        void Amount_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_loop);
-
-                Program.Project.Undo.Add($"Amount Value Changed to {r}{Amount.Unit}", () => {
-                    Track.TraversePath<Loop>(path).Amount = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Amount = r;
-                });
-            }
-
-            _loop.Amount = (int)value;
-        }
-        
-        public void SetAmount(int amount) => Amount.RawValue = amount;
-        
-        public void SetDurationValue(int value) => Duration.RawValue = value;
-        
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
-        
-        public void SetDurationStep(Length duration) => Duration.Length = duration;
         
         void Gate_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {
@@ -132,5 +114,23 @@ namespace Apollo.DeviceViewers {
         }
         
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
+        
+        void Repeats_Changed(Dial sender, double value, double? old){
+            if (old != null && old != value) {
+                int u = (int)old.Value;
+                int r = (int)value;
+                List<int> path = Track.GetPath(_loop);
+
+                Program.Project.Undo.Add($"Loop Repeats Changed to {r}{Repeats.Unit}", () => {
+                    Track.TraversePath<Loop>(path).Repeats = u;
+                }, () => {
+                    Track.TraversePath<Loop>(path).Repeats = r;
+                });
+            }
+
+            _loop.Repeats = (int)value;
+        }
+        
+        public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
     }   
 }
