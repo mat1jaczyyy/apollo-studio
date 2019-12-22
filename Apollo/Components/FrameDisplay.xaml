@@ -7,16 +7,22 @@
   <UserControl.Resources>
     <SolidColorBrush x:Key="BackgroundBrush" />
 
-    <ContextMenu x:Key="FrameContextMenu" Cursor="Arrow">
+    <Components:ApolloContextMenu x:Key="FrameContextMenu" MenuAction="ContextMenu_Action">
       <MenuItem Header="Cut" />
       <MenuItem Header="Copy" />
       <MenuItem Header="Duplicate" />
       <MenuItem Header="Paste" />
       <MenuItem Header="Replace" />
+
+      <Separator />
+
       <MenuItem Header="Delete" />
+
+      <Separator />
+
       <MenuItem Header="Play Here" />
       <MenuItem Header="Fire Here" />
-    </ContextMenu>
+    </Components:ApolloContextMenu>
   </UserControl.Resources>
 
   <StackPanel HorizontalAlignment="Stretch">

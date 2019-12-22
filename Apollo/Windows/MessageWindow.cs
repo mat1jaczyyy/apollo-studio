@@ -83,6 +83,9 @@ namespace Apollo.Windows {
 
             window.Show();
             window.Owner = null;
+            
+            window.Topmost = true;
+            window.Topmost = Preferences.AlwaysOnTop;
 
             return await window.Completed.Task;
         }

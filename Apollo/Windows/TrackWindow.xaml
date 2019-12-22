@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         WindowStartupLocation="CenterOwner"
         Icon="/Resources/WindowIcon.png"
-        Width="600" MinWidth="400"
+        Width="900" MinWidth="400"
         Height="274" MinHeight="274" MaxHeight="274"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">

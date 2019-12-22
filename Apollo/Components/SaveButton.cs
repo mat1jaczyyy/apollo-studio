@@ -1,6 +1,4 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -19,8 +17,6 @@ namespace Apollo.Components {
             Path = this.Get<Path>("Path");
         }
 
-        ContextMenu SaveContextMenu;
-
         void Update_Saved(bool saved) => Enabled = !saved;
 
         Path Path;
@@ -36,9 +32,6 @@ namespace Apollo.Components {
             AllowRightClick = true;
             base.MouseLeave(this, null);
 
-            SaveContextMenu = (ContextMenu)this.Resources["SaveContextMenu"];
-            SaveContextMenu.AddHandler(MenuItem.ClickEvent, SaveContextMenu_Click);
-
             Program.Project.Undo.SavedChanged += Update_Saved;
             Update_Saved(Program.Project.Undo.Saved);
         }
@@ -48,33 +41,15 @@ namespace Apollo.Components {
             
             if (Program.Project.Undo != null)
                 Program.Project.Undo.SavedChanged -= Update_Saved;
-            
-            SaveContextMenu.RemoveHandler(MenuItem.ClickEvent, SaveContextMenu_Click);
-            SaveContextMenu = null;
         }
 
-        async void SaveContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem)) {
-                switch (((MenuItem)item).Header) {
-                    case "Save as...":
-                        await Program.Project.Save((Window)this.GetVisualRoot(), true);
-                        break;
-
-                    case "Save a copy...":
-                        await Program.Project.Save((Window)this.GetVisualRoot(), false);
-                        break;
-                }
-            }
-        }
+        async void ContextMenu_Action(string action) => await Program.Project.Save((Window)this.GetVisualRoot(), action == "Save as...");
 
         protected override async void Click(PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
             
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) await Program.Project.Save((Window)this.GetVisualRoot());
-            else if (MouseButton == PointerUpdateKind.RightButtonReleased) SaveContextMenu.Open(this);
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) ((ApolloContextMenu)this.Resources["SaveContextMenu"]).Open(this);
         }
     }
 }

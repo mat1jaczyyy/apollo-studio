@@ -10,116 +10,116 @@
       <Components:Dial Margin="5 0 15 0" Title="Macro" Minimum="1" Maximum="4" Default="1" FillStart="false" x:Name="MacroDial" ValueChanged="Target_Changed" />
     </Border>
 
-    <UniformGrid Rows="10" Columns="10" VerticalAlignment="Center" x:Name="MacrosGrid">
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+    <UniformGrid Rows="10" Columns="10" VerticalAlignment="Center" x:Name="MacrosGrid" PointerReleased="MouseUp" PointerMoved="MouseMove">
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
 
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
-      <Components:MacroRectangle PointerReleased="Clicked" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
+      <Components:MacroRectangle PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove" />
     </UniformGrid>
   </StackPanel>
 </UserControl>

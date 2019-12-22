@@ -297,9 +297,7 @@ namespace Apollo.Devices {
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
 
-            if (courier.Info.GetType() == typeof(Signal)) {
-                Signal n = (Signal)courier.Info;
-
+            if (courier.Info is Signal n) {
                 lock (locker[n]) {
                     if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(courier)) return;
 

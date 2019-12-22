@@ -1,6 +1,4 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -35,8 +33,8 @@ namespace Apollo.Components {
                     _actions = value;
 
                     if (_actions == AvailableActions.None) ActionContextMenu = null;
-                    else if (_actions == AvailableActions.Paste) ActionContextMenu = (ContextMenu)this.Resources["PasteContextMenu"];
-                    else if (_actions == AvailableActions.PasteAndImport) ActionContextMenu = ((ContextMenu)this.Resources["PasteAndImportContextMenu"]);
+                    else if (_actions == AvailableActions.Paste) ActionContextMenu = (ApolloContextMenu)this.Resources["PasteContextMenu"];
+                    else if (_actions == AvailableActions.PasteAndImport) ActionContextMenu = (ApolloContextMenu)this.Resources["PasteAndImportContextMenu"];
                 }
             }
         }
@@ -56,28 +54,18 @@ namespace Apollo.Components {
             InitializeComponent();
 
             AllowRightClick = true;
-            base.MouseLeave(this, null);
 
-            ((ContextMenu)this.Resources["PasteContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
-            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
+            base.MouseLeave(this, null);
         }
 
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            ((ContextMenu)this.Resources["PasteContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
-            ((ContextMenu)this.Resources["PasteAndImportContextMenu"]).RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
             ActionContextMenu = null;
             
             Action = null;
             base.Unloaded(sender, e);
         }
 
-        void ActionContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Action?.Invoke((string)((MenuItem)item).Header);
-        }
+        void ContextMenu_Action(string action) => Action?.Invoke(action);
 
         protected override void Click(PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;

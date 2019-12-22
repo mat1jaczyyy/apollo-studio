@@ -1,0 +1,34 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.LockToggle"
+             ToolTip.Tip="Remember Virtual Launchpad"
+             DetachedFromVisualTree="Unloaded">
+
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="Brush" />
+  </UserControl.Resources>
+
+  <Grid>
+    <Canvas Width="12" Height="12" Background="Transparent" x:Name="Unlocked"
+            PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+
+      <Path Fill="{DynamicResource Brush}"
+            Data="F1 M 0,0 C -1.6,0 -3.04,1.28 -3.04,2.88 L -3.04,4 -1.92,4 -1.92,2.88 C -1.92,1.76 -1.12,0.96 0,0.96 1.12,0.96 2.08,1.76 2.08,2.88 L 2.08,5.44 -4.48,5.44 -4.48,12 4.48,12 4.48,5.44 3.04,5.44 3.04,2.88 C 3.04,1.28 1.6,0 0,0 Z" Clip="M -4.48,0 L 4.64,0 4.64,11.68 -4.48,11.68 z">
+        <Path.RenderTransform>
+          <MatrixTransform Matrix="1,0,0,1,5.92,0" />
+        </Path.RenderTransform>
+      </Path>
+    </Canvas>
+
+    <Canvas Width="12" Height="12" Background="Transparent" x:Name="Locked"
+            PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+      
+      <Path Fill="{DynamicResource Brush}"
+            Data="F1 M 0,0 C -1.6,0 -3.04,1.28 -3.04,3.04 L -3.04,4 -1.92,4 -1.92,3.04 C -1.92,1.92 -1.12,0.96 0,0.96 1.12,0.96 2.08,1.92 2.08,3.04 L 2.08,3.52 -4.48,3.52 -4.48,9.92 4.48,9.92 4.48,3.52 3.04,3.52 3.04,3.04 C 3.04,1.28 1.6,0 0,0 Z">
+        <Path.RenderTransform>
+          <MatrixTransform Matrix="1,0,0,1,5.92,0.96" />
+        </Path.RenderTransform>
+      </Path>
+    </Canvas>
+  </Grid>
+</UserControl>

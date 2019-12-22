@@ -41,14 +41,13 @@ namespace Apollo.Viewers {
         Chain _chain;
 
         Grid DropZoneBefore, DropZoneAfter;
-        ContextMenu DeviceContextMenuBefore, DeviceContextMenuAfter;
 
         Controls Contents;
         DeviceAdd DeviceAdd;
         public Indicator Indicator { get; private set; }
 
         void SetAlwaysShowing() {
-            bool RootChain = _chain.Parent.GetType() == typeof(Track);
+            bool RootChain = _chain.Parent is Track;
 
             DeviceAdd.AlwaysShowing = Contents.Count == 1 || RootChain;
 
@@ -79,12 +78,6 @@ namespace Apollo.Viewers {
 
             _chain = chain;
             _chain.Viewer = this;
-            
-            DeviceContextMenuBefore = (ContextMenu)this.Resources["DeviceContextMenuBefore"];
-            DeviceContextMenuBefore.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            
-            DeviceContextMenuAfter = (ContextMenu)this.Resources["DeviceContextMenuAfter"];
-            DeviceContextMenuAfter.AddHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -101,10 +94,6 @@ namespace Apollo.Viewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _chain.Viewer = null;
             _chain = null;
-
-            DeviceContextMenuBefore.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            DeviceContextMenuAfter.RemoveHandler(MenuItem.ClickEvent, DeviceContextMenu_Click);
-            DeviceContextMenuBefore = DeviceContextMenuAfter = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
@@ -120,9 +109,9 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device ({r.GetType().ToString().Split(".").Last()}) Inserted", () => {
-                ((Chain)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Chain>(path).Remove(index);
             }, () => {
-                ((Chain)Track.TraversePath(path)).Insert(index, r.Clone());
+                Track.TraversePath<Chain>(path).Insert(index, r.Clone());
             }, () => {
                 r.Dispose();
             });
@@ -140,20 +129,15 @@ namespace Apollo.Viewers {
         void Device_Action(string action) => Device_Action(action, false);
         void Device_Action(string action, bool right) => Track.Get(_chain)?.Window?.Selection.Action(action, _chain, (right? _chain.Count : 0) - 1);
 
-        void DeviceContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Device_Action((string)((MenuItem)item).Header, sender == DeviceContextMenuAfter);
-        }
+        void ContextMenu_Action(ApolloContextMenu sender, string action) =>
+            Device_Action(action, sender == (ApolloContextMenu)this.Resources["DeviceContextMenuAfter"]);
 
         void Click(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                if (sender == DropZoneBefore) DeviceContextMenuBefore.Open((Control)sender);
-                else if (sender == DropZoneAfter) DeviceContextMenuAfter.Open((Control)sender);
+                if (sender == DropZoneBefore) ((ApolloContextMenu)this.Resources["DeviceContextMenuBefore"]).Open((Control)sender);
+                else if (sender == DropZoneAfter) ((ApolloContextMenu)this.Resources["DeviceContextMenuAfter"]).Open((Control)sender);
 
             e.Handled = true;
         }
@@ -209,22 +193,22 @@ namespace Apollo.Viewers {
                 
                 Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetchain.Remove(i);
 
                     }) : new Action(() => {
-                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
 
                         Device.Move(umoving, sourcechain, before_pos);
 
                 }), () => {
-                    Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                    Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                    Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                     List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
 
@@ -247,14 +231,14 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             undo = () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     chain.Remove(right + i + 1);
             };
             
             redo = () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     chain.Insert(right + i + 1, pasted[i].Clone());
@@ -281,14 +265,14 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             undo = () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = left; i <= right; i++)
                     chain.Insert(i, u[i - left].Clone());
             };
 
             redo = () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
@@ -332,7 +316,7 @@ namespace Apollo.Viewers {
                 Program.Project.Undo.Add("Device Replaced",
                     undo2 + undo,
                     redo + redo2 + (() => {
-                        Chain chain = ((Chain)Track.TraversePath(path));
+                        Chain chain = Track.TraversePath<Chain>(path);
 
                         Track.Get(chain).Window?.Selection.Select(chain[left + paste.Contents.Count - 1], true);
                     }),
@@ -347,13 +331,13 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Duplicated", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = right - left; i >= 0; i--)
                     chain.Remove(right + i + 1);
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = 0; i <= right - left; i++)
                     chain.Insert(right + i + 1, chain[left + i].Clone());
@@ -381,7 +365,7 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Grouped", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 chain.Remove(left);
 
@@ -393,7 +377,7 @@ namespace Apollo.Viewers {
                 track?.Window?.Selection.Select(chain[right], true);
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
                 
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
@@ -411,27 +395,27 @@ namespace Apollo.Viewers {
         }
 
         public void Ungroup(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Group) || ((Group)_chain.Devices[index]).Count != 1) return;
+            if (!(_chain.Devices[index] is Group group) || group.Count != 1) return;
 
-            Chain init = ((Group)_chain.Devices[index])[0].Clone();
+            Group init = (Group)group.Clone();
 
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Ungrouped", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
-                for (int i = index + init.Count - 1; i >= index; i--)
+                for (int i = index + init[0].Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                chain.Insert(index, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
+                chain.Insert(index, init.Clone());
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
                 
                 chain.Remove(index);
             
-                for (int i = 0; i < init.Count; i++)
-                    chain.Insert(index + i, init[i].Clone());
+                for (int i = 0; i < init[0].Count; i++)
+                    chain.Insert(index + i, init[0][i].Clone());
 
                 Track.Get(chain).Window?.Selection.Select(chain[index], true);
                 
@@ -441,8 +425,8 @@ namespace Apollo.Viewers {
 
             _chain.Remove(index);
             
-            for (int i = 0; i < init.Count; i++)
-                _chain.Insert(index + i, init[i].Clone());
+            for (int i = 0; i < init[0].Count; i++)
+                _chain.Insert(index + i, init[0][i].Clone());
 
             Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
         }
@@ -456,7 +440,7 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Choked", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 chain.Remove(left);
 
@@ -468,7 +452,7 @@ namespace Apollo.Viewers {
                 track?.Window?.Selection.Select(chain[right], true);
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
                 
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
@@ -486,27 +470,27 @@ namespace Apollo.Viewers {
         }
 
         public void Unchoke(int index) {
-            if (_chain.Devices[index].GetType() != typeof(Choke)) return;
+            if (!(_chain.Devices[index] is Choke choke))return;
 
-            Chain init = ((Choke)_chain.Devices[index]).Chain.Clone();
+            Choke init = (Choke)choke.Clone();
 
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Unchoked", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
-                for (int i = index + init.Count - 1; i >= index; i--)
+                for (int i = index + init.Chain.Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                chain.Insert(index, new Choke(1, init.Clone()));
+                chain.Insert(index, init.Clone());
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
                 
                 chain.Remove(index);
             
-                for (int i = 0; i < init.Count; i++)
-                    chain.Insert(index + i, init[i].Clone());
+                for (int i = 0; i < init.Chain.Count; i++)
+                    chain.Insert(index + i, init.Chain[i].Clone());
 
                 Track.Get(chain).Window?.Selection.Select(chain[index], true);
                 
@@ -516,8 +500,8 @@ namespace Apollo.Viewers {
 
             _chain.Remove(index);
             
-            for (int i = 0; i < init.Count; i++)
-                _chain.Insert(index + i, init[i].Clone());
+            for (int i = 0; i < init.Chain.Count; i++)
+                _chain.Insert(index + i, init.Chain[i].Clone());
 
             Track.Get(_chain).Window?.Selection.Select(_chain[index], true);
         }
@@ -529,13 +513,13 @@ namespace Apollo.Viewers {
             List<int> path = Track.GetPath(_chain);
 
             Program.Project.Undo.Add($"Device Muted", () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = left; i <= right; i++)
                     chain[i].Enabled = u[i - left];
 
             }, () => {
-                Chain chain = ((Chain)Track.TraversePath(path));
+                Chain chain = Track.TraversePath<Chain>(path);
 
                 for (int i = left; i <= right; i++)
                     chain[i].Enabled = r;

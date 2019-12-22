@@ -49,20 +49,18 @@ namespace Apollo.Core {
                 foreach (Track track in Program.Project.Tracks)
                     if (track.Window != null) return;
             }
-
-            Type type = sender.GetType();
             
-            if (type == typeof(PatternWindow)) return;
+            if (sender is PatternWindow) return;
 
-            if (type == typeof(ProjectWindow)) {
+            if (sender is ProjectWindow) {
                 Program.Project = null;
 
                 SplashWindow.Create(sender);
 
-            } else if (type == typeof(TrackWindow)) {
+            } else if (sender is TrackWindow) {
                 ProjectWindow.Create(sender);
             
-            } else if (type == typeof(SplashWindow)) {
+            } else if (sender is SplashWindow) {
                 Preferences.Window?.Close();
                 
                 foreach (Launchpad lp in MIDI.Devices)
@@ -113,6 +111,11 @@ namespace Apollo.Core {
                 if (Preferences.DiscordPresence) Discord.Set(true);
 
                 MIDI.Start();
+
+                foreach (int i in Preferences.VirtualLaunchpads) {
+                    LaunchpadWindow.Create(MIDI.ConnectVirtual(i), null);
+                    MIDI.Update();
+                }
                 
                 Courier autosave = new Courier() { Interval = 180000 };
                 autosave.Elapsed += async (_, __) => {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -30,7 +29,8 @@ namespace Apollo.DeviceViewers {
             canvas = this.Get<Canvas>("Canvas");
             PickerContainer = this.Get<Grid>("PickerContainer");
             Picker = this.Get<ColorPicker>("Picker");
-            Gradient = (LinearGradientBrush)this.Get<Rectangle>("Gradient").Fill;
+            Gradient = this.Get<Rectangle>("Gradient");
+            ResizeArea = this.Get<Grid>("ResizeArea");
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Duration = this.Get<Dial>("Duration");
@@ -50,9 +50,9 @@ namespace Apollo.DeviceViewers {
         TextBlock PositionText, Display;
         TextBox Input;
         Canvas canvas;
-        Grid PickerContainer;
+        Grid PickerContainer, ResizeArea;
         ColorPicker Picker;
-        LinearGradientBrush Gradient;
+        Rectangle Gradient;
 
         List<FadeThumb> thumbs = new List<FadeThumb>();
         List<Fade.FadeInfo> fullFade;
@@ -63,7 +63,7 @@ namespace Apollo.DeviceViewers {
                 Fill = color.ToBrush()
             };
             thumbs.Insert(index, thumb);
-            Canvas.SetLeft(thumb, _fade.GetPosition(index) * 200);
+            Canvas.SetLeft(thumb, _fade.GetPosition(index) * Gradient.Width);
 
             thumb.Moved += Thumb_Move;
             thumb.Focused += Thumb_Focus;
@@ -169,7 +169,7 @@ namespace Apollo.DeviceViewers {
                 for (index = 0; index < thumbs.Count; index++)
                     if (x < Canvas.GetLeft(thumbs[index])) break;
                 
-                double pos = x / 200;
+                double pos = x / Gradient.Width;
                 
                 double time = pos * _fade.Time;
                 
@@ -183,9 +183,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
-                    ((Fade)Track.TraversePath(path)).Remove(index);
+                    Track.TraversePath<Fade>(path).Remove(index);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Insert(index, thumbColor, pos, FadeType.Linear);
+                    Track.TraversePath<Fade>(path).Insert(index, thumbColor, pos, FadeType.Linear);
                 });
 
                 _fade.Insert(index, thumbColor.Clone(), pos, FadeType.Linear);
@@ -201,9 +201,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () => {
-                ((Fade)Track.TraversePath(path)).Insert(index, uc, up, ut);
+                Track.TraversePath<Fade>(path).Insert(index, uc, up, ut);
             }, () => {
-                ((Fade)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Fade>(path).Remove(index);
             });
 
             _fade.Remove(index);
@@ -217,9 +217,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Type {index + 1} Changed to {newType}", () => {
-                ((Fade)Track.TraversePath(path)).SetFadeType(index, oldType);
+                Track.TraversePath<Fade>(path).SetFadeType(index, oldType);
             }, () => {
-                ((Fade)Track.TraversePath(path)).SetFadeType(index, newType);
+                Track.TraversePath<Fade>(path).SetFadeType(index, newType);
             });
 
             _fade.SetFadeType(index, newType);
@@ -239,16 +239,16 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            double pos = x / 200;
+            double pos = x / Gradient.Width;
 
             if (total != null) {
-                double u = x - total.Value;
+                double u = x - total.Value / Gradient.Width;
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                    ((Fade)Track.TraversePath(path)).SetPosition(i, u / 200);
+                    Track.TraversePath<Fade>(path).SetPosition(i, u);
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).SetPosition(i, pos);
+                    Track.TraversePath<Fade>(path).SetPosition(i, pos);
                 });
             }
 
@@ -256,7 +256,7 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetPosition(int index, double position) {
-            Canvas.SetLeft(thumbs[index], position * 200);
+            Canvas.SetLeft(thumbs[index], position * Gradient.Width);
 
             if (index == _fade.Expanded)
                 Display.Text = $"{(Math.Round(_fade.GetPosition(index) * 1000) / 10).ToString()}%";
@@ -273,9 +273,9 @@ namespace Apollo.DeviceViewers {
                     List<int> path = Track.GetPath(_fade);
 
                     Program.Project.Undo.Add($"Fade Color {_fade.Expanded + 1} Changed to {r.ToHex()}", () => {
-                        ((Fade)Track.TraversePath(path)).SetColor(index, u.Clone());
+                        Track.TraversePath<Fade>(path).SetColor(index, u.Clone());
                     }, () => {
-                        ((Fade)Track.TraversePath(path)).SetColor(index, r.Clone());
+                        Track.TraversePath<Fade>(path).SetColor(index, r.Clone());
                     });
                 }
 
@@ -294,17 +294,19 @@ namespace Apollo.DeviceViewers {
             if (Program.Project.IsDisposing) return;
             
             fullFade = points;
+
+            LinearGradientBrush gradient = (LinearGradientBrush)Gradient.Fill;
             
             Dispatcher.UIThread.InvokeAsync(() => {
-                Gradient.GradientStops.Clear();
+                gradient.GradientStops.Clear();
 
                 if (_fade == null) return;
 
                 for (int i = 0; i < points.Count; i++) {
                     if (i > 0 && points[i - 1].IsHold)
-                        Gradient.GradientStops.Add(new GradientStop(points[i - 1].Color.ToAvaloniaColor(), (points[i].Time - .0000000001) / (_fade.Time * _fade.Gate)));
+                        gradient.GradientStops.Add(new GradientStop(points[i - 1].Color.ToAvaloniaColor(), (points[i].Time - .0000000001) / (_fade.Time * _fade.Gate)));
 
-                    Gradient.GradientStops.Add(new GradientStop(points[i].Color.ToAvaloniaColor(), points[i].Time / (_fade.Time * _fade.Gate)));
+                    gradient.GradientStops.Add(new GradientStop(points[i].Color.ToAvaloniaColor(), points[i].Time / (_fade.Time * _fade.Gate)));
                 }
             });
         }
@@ -316,9 +318,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed to {r}{Duration.Unit}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Free = u;
+                    Track.TraversePath<Fade>(path).Time.Free = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Free = r;
+                    Track.TraversePath<Fade>(path).Time.Free = r;
                 });
             }
 
@@ -334,9 +336,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Mode = u;
+                    Track.TraversePath<Fade>(path).Time.Mode = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Mode = r;
+                    Track.TraversePath<Fade>(path).Time.Mode = r;
                 });
             }
 
@@ -352,9 +354,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Duration Changed to {Length.Steps[r]}", () => {
-                    ((Fade)Track.TraversePath(path)).Time.Length.Step = u;
+                    Track.TraversePath<Fade>(path).Time.Length.Step = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Time.Length.Step = r;
+                    Track.TraversePath<Fade>(path).Time.Length.Step = r;
                 });
             }
         }
@@ -368,9 +370,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Fade)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Fade>(path).Gate = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Fade>(path).Gate = r;
                 });
             }
 
@@ -388,9 +390,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Playback Mode Changed to {r}", () => {
-                    ((Fade)Track.TraversePath(path)).PlayMode = u;
+                    Track.TraversePath<Fade>(path).PlayMode = u;
                 }, () => {
-                    ((Fade)Track.TraversePath(path)).PlayMode = r;
+                    Track.TraversePath<Fade>(path).PlayMode = r;
                 });
 
                 _fade.PlayMode = selected;
@@ -473,9 +475,9 @@ namespace Apollo.DeviceViewers {
             List<int> path = Track.GetPath(_fade);
 
             Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                ((Fade)Track.TraversePath(path)).SetPosition(i, u);
+                Track.TraversePath<Fade>(path).SetPosition(i, u);
             }, () => {
-                ((Fade)Track.TraversePath(path)).SetPosition(i, r);
+                Track.TraversePath<Fade>(path).SetPosition(i, r);
             });
         }
 
@@ -495,5 +497,44 @@ namespace Apollo.DeviceViewers {
         }
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+
+        bool mouseHeld;
+        double original;
+
+        void ResizeDown(object sender, PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed) {
+                mouseHeld = true;
+                e.Pointer.Capture(ResizeArea);
+
+                original = e.GetPosition(ResizeArea).X;
+
+                ResizeMove(sender, e);
+            }
+        }
+
+        void ResizeUp(object sender, PointerReleasedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
+                ResizeMove(sender, e);
+
+                mouseHeld = false;
+                e.Pointer.Capture(null);
+            }
+        }
+
+        void ResizeMove(object sender, PointerEventArgs e) {
+            if (mouseHeld) {
+                double width = Math.Min(1200, Math.Max(170, Gradient.Width + e.GetPosition(ResizeArea).X - original));
+
+                Gradient.Width = width;
+                canvas.Width = width + 14;
+
+                for (int i = 0; i < _fade.Count; i++)
+                    Canvas.SetLeft(thumbs[i], _fade.GetPosition(i) * Gradient.Width);
+            }
+        }
     }
 }

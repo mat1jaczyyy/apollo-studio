@@ -27,7 +27,7 @@ namespace Apollo.Core {
             }
         }
 
-        public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output");
+        public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output", 0);
 
         public static void ClearState(bool multi = true) {
             foreach (Track track in Program.Project?.Tracks)
@@ -82,11 +82,11 @@ namespace Apollo.Core {
             }
         }
 
-        public static VirtualLaunchpad ConnectVirtual() {
+        public static VirtualLaunchpad ConnectVirtual(int start = 1) {
             lock (locker) {
                 Launchpad ret = null;
             
-                for (int i = 1; true; i++) {
+                for (int i = start; true; i++) {
                     string name = $"Virtual Launchpad {i}";
 
                     ret = Devices.Find((lp) => lp.Name == name);
@@ -98,7 +98,7 @@ namespace Apollo.Core {
                         }
 
                     } else {
-                        Devices.Add(ret = new VirtualLaunchpad(name));
+                        Devices.Add(ret = new VirtualLaunchpad(name, i));
                         ret.Connect(null, null);
                         updated = true;
                         return (VirtualLaunchpad)ret;

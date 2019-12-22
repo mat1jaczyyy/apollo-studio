@@ -1,6 +1,4 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -23,8 +21,6 @@ namespace Apollo.Components {
         
         Canvas Icon;
 
-        ContextMenu ActionContextMenu;
-
         public override bool AlwaysShowing {
             set {
                 if (value != _always) {
@@ -39,32 +35,20 @@ namespace Apollo.Components {
 
             AllowRightClick = true;
             base.MouseLeave(this, null);
-
-            ActionContextMenu = (ContextMenu)this.Resources["ActionContextMenu"];
-            ActionContextMenu.AddHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
         }
 
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            ActionContextMenu.RemoveHandler(MenuItem.ClickEvent, ActionContextMenu_Click);
-            ActionContextMenu = null;
-
             Action = null;
             base.Unloaded(sender, e);
         }
 
-        void ActionContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Action?.Invoke((string)((MenuItem)item).Header);
-        }
+        void ContextMenu_Action(string action) => Action?.Invoke(action);
 
         protected override void Click(PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) InvokeAdded();
-            else if (MouseButton == PointerUpdateKind.RightButtonReleased) ActionContextMenu.Open(Icon);
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) ((ApolloContextMenu)this.Resources["ActionContextMenu"]).Open(Icon);
         }
     }
 }

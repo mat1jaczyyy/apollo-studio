@@ -150,6 +150,9 @@ namespace Apollo.Windows {
                 Program.Project.Undo.Window.WindowState = WindowState.Normal;
                 Program.Project.Undo.Window.Activate();
             }
+            
+            Program.Project.Undo.Window.Topmost = true;
+            Program.Project.Undo.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }

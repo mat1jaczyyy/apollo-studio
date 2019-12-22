@@ -109,7 +109,6 @@ namespace Apollo.Windows {
         ComboBox PortSelector, PlaybackMode;
         LaunchpadGrid Editor, RootKey;
         Controls Contents;
-        ContextMenu FrameContextMenu;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Repeats, Pinch;
@@ -128,7 +127,6 @@ namespace Apollo.Windows {
                 _locked = value;
 
                 if (Repeats.Enabled) Repeats.DisplayDisabledText = false;
-                if (Gate.Enabled) Gate.DisplayDisabledText = false;
                 if (Duration.Enabled) Duration.DisplayDisabledText = false;
 
                 UndoButton.IsEnabled =
@@ -136,6 +134,7 @@ namespace Apollo.Windows {
                 ImportButton.IsEnabled =
                 Repeats.Enabled =
                 Gate.Enabled =
+                Pinch.Enabled =
                 PlaybackMode.IsEnabled =
                 Wrap.IsEnabled =
                 Infinite.IsEnabled =
@@ -154,7 +153,7 @@ namespace Apollo.Windows {
                     Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
                     Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
 
-                    Repeats.DisplayDisabledText = Gate.DisplayDisabledText = Duration.DisplayDisabledText = true;
+                    Repeats.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
             }
         }
@@ -251,9 +250,6 @@ namespace Apollo.Windows {
 
             Infinite.IsChecked = _pattern.Infinite;
 
-            FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
-
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
 
@@ -319,9 +315,6 @@ namespace Apollo.Windows {
             _track.NameChanged -= UpdateTitle;
             _track = null;
 
-            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, FrameContextMenu_Click);
-            FrameContextMenu = null;
-
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             this.RemoveHandler(DragDrop.DropEvent, Drop);
 
@@ -385,9 +378,9 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern Frame {index + 1} Inserted", () => {
-                ((Pattern)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Pattern>(path).Remove(index);
             }, () => {
-                ((Pattern)Track.TraversePath(path)).Insert(index, r.Clone());
+                Track.TraversePath<Pattern>(path).Insert(index, r.Clone());
             }, () => {
                 r.Dispose();
             });
@@ -406,9 +399,9 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern Frame {index + 1} Removed", () => {
-                ((Pattern)Track.TraversePath(path)).Insert(index, u.Clone());
+                Track.TraversePath<Pattern>(path).Insert(index, u.Clone());
             }, () => {
-                ((Pattern)Track.TraversePath(path)).Remove(index);
+                Track.TraversePath<Pattern>(path).Remove(index);
             }, () => {
                 u.Dispose();
             });
@@ -446,19 +439,13 @@ namespace Apollo.Windows {
         void Frame_Action(string action) => Frame_Action(action, false);
         void Frame_Action(string action, bool right) => Selection.Action(action, _pattern, (right? _pattern.Count : 0) - 1);
 
-        void FrameContextMenu_Click(object sender, EventArgs e) {
-            this.Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Frame_Action((string)((MenuItem)item).Header, true);
-        }
+        void ContextMenu_Action(string action) => Frame_Action(action, true);
         
         void Frame_AfterClick(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
-                FrameContextMenu.Open((Control)sender);
+                ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open((Control)sender);
 
             e.Handled = true;
         }
@@ -589,11 +576,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame {index + 1} Changed", () => {
-                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in u select i.Clone()).ToArray();
-
+                    Track.TraversePath<Pattern>(path)[index].Screen = (from i in u select i.Clone()).ToArray();
                 }, () => {
-                    ((Pattern)Track.TraversePath(path))[index].Screen = (from i in r select i.Clone()).ToArray();
-
+                    Track.TraversePath<Pattern>(path)[index].Screen = (from i in r select i.Clone()).ToArray();
                 });
             }
             
@@ -715,9 +700,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Pattern)Track.TraversePath(path)).Infinite = u;
+                    Track.TraversePath<Pattern>(path).Infinite = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Infinite = r;
+                    Track.TraversePath<Pattern>(path).Infinite = r;
                 });
 
                 _pattern.Infinite = value;
@@ -753,13 +738,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {r}{Duration.Unit}", () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
                     
                 }, () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++) {
                         pattern[left + i].Time.Free = r;
@@ -796,13 +781,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Changed to {Length.Steps[r]}", () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
                     
                 }, () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++) {
                         pattern[left + i].Time.Length.Step = r;
@@ -839,13 +824,13 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Frame {_pattern.Expanded + 1} Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time = u[i].Clone();
                     
                 }, () => {
-                    Pattern pattern = (Pattern)Track.TraversePath(path);
+                    Pattern pattern = Track.TraversePath<Pattern>(path);
                     
                     for (int i = 0; i < u.Count; i++)
                         pattern[left + i].Time.Mode = r;
@@ -880,7 +865,7 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             void ur() {
-                Pattern pattern = (Pattern)Track.TraversePath(path);
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -925,7 +910,7 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             void ur() {
-                Pattern pattern = (Pattern)Track.TraversePath(path);
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 for (int i = left; i <= right; i++)
                     pattern[i].Invert();
@@ -946,9 +931,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Playback Mode Changed to {r}", () => {
-                    ((Pattern)Track.TraversePath(path)).Mode = u;
+                    Track.TraversePath<Pattern>(path).Mode = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Mode = r;
+                    Track.TraversePath<Pattern>(path).Mode = r;
                 });
 
                 _pattern.Mode = selected;
@@ -969,9 +954,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Pattern)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Pattern>(path).Gate = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Pattern>(path).Gate = r;
                 });
             }
 
@@ -987,9 +972,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Repeats Changed to {value}{Repeats.Unit}", () => {
-                    ((Pattern)Track.TraversePath(path)).Repeats = u;
+                    Track.TraversePath<Pattern>(path).Repeats = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Repeats = r;
+                    Track.TraversePath<Pattern>(path).Repeats = r;
                 });
             }
 
@@ -1005,9 +990,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Pinch Changed to {value}{Pinch.Unit}", () => {
-                    ((Pattern)Track.TraversePath(path)).Pinch = u;
+                    Track.TraversePath<Pattern>(path).Pinch = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Pinch = r;
+                    Track.TraversePath<Pattern>(path).Pinch = r;
                 });
             }
 
@@ -1044,9 +1029,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Root Key Changed", () => {
-                    ((Pattern)Track.TraversePath(path)).RootKey = u;
+                    Track.TraversePath<Pattern>(path).RootKey = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).RootKey = r;
+                    Track.TraversePath<Pattern>(path).RootKey = r;
                 });
             }
 
@@ -1071,9 +1056,9 @@ namespace Apollo.Windows {
                 List<int> path = Track.GetPath(_pattern);
 
                 Program.Project.Undo.Add($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Pattern)Track.TraversePath(path)).Wrap = u;
+                    Track.TraversePath<Pattern>(path).Wrap = u;
                 }, () => {
-                    ((Pattern)Track.TraversePath(path)).Wrap = r;
+                    Track.TraversePath<Pattern>(path).Wrap = r;
                 });
 
                 _pattern.Wrap = value;
@@ -1107,10 +1092,10 @@ namespace Apollo.Windows {
             courier.Elapsed -= Tick;
 
             lock (PlayLocker) {
-                if (++PlayIndex < _pattern.Count) {
-                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
-                        if (_pattern[PlayIndex].Screen[i] != _pattern[PlayIndex - 1].Screen[i])
-                            PlayColor(i, _pattern[PlayIndex].Screen[i]);
+                if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
+                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                        if (_pattern[PlayIndex % _pattern.Count].Screen[i] != _pattern[(PlayIndex - 1) % _pattern.Count].Screen[i])
+                            PlayColor(i, _pattern[PlayIndex % _pattern.Count].Screen[i]);
 
                 } else {
                     for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
@@ -1136,9 +1121,9 @@ namespace Apollo.Windows {
                 for (int i = 0; i < PlayTimers.Count; i++)
                     PlayTimers[i].Dispose();
                 
-                if (send && PlayIndex < _pattern.Count)
-                    for (int i = 0; i < _pattern[PlayIndex].Screen.Length; i++)
-                        if (_pattern[PlayIndex].Screen[i].Lit)
+                if (send && PlayIndex < _pattern.Count * _pattern.AdjustedRepeats)
+                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                        if (_pattern[PlayIndex % _pattern.Count].Screen[i].Lit)
                             PlayColor(i, new Color(0));
 
                 PlayTimers = new List<Courier>();
@@ -1176,11 +1161,14 @@ namespace Apollo.Windows {
             for (int i = 0; i < _pattern[start].Screen.Length; i++)
                 PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)i, _pattern[start].Screen[i].Clone()));
 
-            double time = 0;
+            double time = Enumerable.Sum(_pattern.Frames.Take(start).Select(i => (double)i.Time)) * _pattern.Gate;
+            double starttime = _pattern.ApplyPinch(time);
 
-            for (int i = start; i < _pattern.Count; i++) {
-                time += _pattern[i].Time * _pattern.Gate;
-                FireCourier(time);
+            for (int i = start; i < _pattern.Count * _pattern.AdjustedRepeats; i++) {
+                time += _pattern[i % _pattern.Count].Time * _pattern.Gate;
+                double pinched = _pattern.ApplyPinch(time);
+
+                FireCourier(pinched - starttime);
             }
         }
 
@@ -1268,9 +1256,9 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames((Pattern)Track.TraversePath(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
+                ImportFrames(Track.TraversePath<Pattern>(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
             }, () => {
-                ImportFrames((Pattern)Track.TraversePath(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
+                ImportFrames(Track.TraversePath<Pattern>(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
             }, () => {
                 foreach (Frame frame in uf) frame.Dispose();
                 foreach (Frame frame in rf) frame.Dispose();
@@ -1289,7 +1277,11 @@ namespace Apollo.Windows {
                     new FileDialogFilter() {
                         Extensions = new List<string>() {
                             "mid",
-                            "gif"
+                            "gif",
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "bmp",
                         },
                         Name = "All Supported Files"
                     },
@@ -1303,7 +1295,16 @@ namespace Apollo.Windows {
                         Extensions = new List<string>() {
                             "gif"
                         },
-                        Name = "GIF Images"
+                        Name = "Animated GIF Images"
+                    },
+                    new FileDialogFilter() {
+                        Extensions = new List<string>() {
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "bmp"
+                        },
+                        Name = "Static JPG, PNG or BMP images"
                     }
                 },
                 Title = "Import Pattern"
@@ -1357,22 +1358,22 @@ namespace Apollo.Windows {
                 
                 Program.Project.Undo.Add($"Pattern Frame {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetpattern.Remove(i);
 
                     }) : new Action(() => {
-                        Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
 
                         Frame.Move(umoving, sourcepattern, before_pos);
 
                 }), () => {
-                    Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                    Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                     List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
 
@@ -1395,7 +1396,7 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             undo = () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1410,7 +1411,7 @@ namespace Apollo.Windows {
             };
             
             redo = () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1453,7 +1454,7 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             undo = () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1468,7 +1469,7 @@ namespace Apollo.Windows {
             };
             
             redo = () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1534,7 +1535,7 @@ namespace Apollo.Windows {
                     Program.Project.Undo.Add("Pattern Frame Replaced",
                         undo2 + undo,
                         redo + redo2 + (() => {
-                            Pattern pattern = ((Pattern)Track.TraversePath(path));
+                            Pattern pattern = Track.TraversePath<Pattern>(path);
 
                             Track.Get(pattern).Window?.Selection.Select(pattern[left + paste.Contents.Count - 1], true);
                         }),
@@ -1559,7 +1560,7 @@ namespace Apollo.Windows {
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern Frame Duplicated", () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1573,7 +1574,7 @@ namespace Apollo.Windows {
                 }
 
             }, () => {
-                Pattern pattern = ((Pattern)Track.TraversePath(path));
+                Pattern pattern = Track.TraversePath<Pattern>(path);
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1663,6 +1664,9 @@ namespace Apollo.Windows {
                 pattern.Window.WindowState = WindowState.Normal;
                 pattern.Window.Activate();
             }
+
+            pattern.Window.Topmost = true;
+            pattern.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }

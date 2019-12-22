@@ -50,9 +50,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_choke);
 
                 Program.Project.Undo.Add($"Choke Target Changed to {r}{Target.Unit}", () => {
-                    ((Choke)Track.TraversePath(path)).Target = u;
+                    Track.TraversePath<Choke>(path).Target = u;
                 }, () => {
-                    ((Choke)Track.TraversePath(path)).Target = r;
+                    Track.TraversePath<Choke>(path).Target = r;
                 });
             }
 

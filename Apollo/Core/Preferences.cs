@@ -285,6 +285,18 @@ namespace Apollo.Core {
 
             Save();
         }
+        
+        public static List<int> VirtualLaunchpads = new List<int>();
+
+        public static void VirtualLaunchpadsToggle(int index) {
+            if (VirtualLaunchpads.Contains(index)) VirtualLaunchpads.Remove(index);
+            else {
+                VirtualLaunchpads.Add(index);
+                VirtualLaunchpads.Sort();
+            }
+
+            Save();
+        }
 
         static bool _crashed = false;
         public static bool Crashed {

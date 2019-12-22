@@ -29,7 +29,7 @@ namespace Apollo.Elements {
         }
 
         public bool IRoot { 
-            get => Parent.GetType() == typeof(Track);
+            get => Parent is Track;
         }
 
         public ChainInfo Info;

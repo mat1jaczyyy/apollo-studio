@@ -46,9 +46,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Changed to {r}{Duration.Unit}", () => {
-                    ((Delay)Track.TraversePath(path)).Time.Free = u;
+                    Track.TraversePath<Delay>(path).Time.Free = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Time.Free = r;
+                    Track.TraversePath<Delay>(path).Time.Free = r;
                 });
             }
 
@@ -66,9 +66,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    ((Delay)Track.TraversePath(path)).Time.Mode = u;
+                    Track.TraversePath<Delay>(path).Time.Mode = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Time.Mode = r;
+                    Track.TraversePath<Delay>(path).Time.Mode = r;
                 });
             }
 
@@ -84,9 +84,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Duration Changed to {Length.Steps[r]}", () => {
-                    ((Delay)Track.TraversePath(path)).Time.Length.Step = u;
+                    Track.TraversePath<Delay>(path).Time.Length.Step = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Time.Length.Step = r;
+                    Track.TraversePath<Delay>(path).Time.Length.Step = r;
                 });
             }
         }
@@ -100,9 +100,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_delay);
 
                 Program.Project.Undo.Add($"Delay Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Delay)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Delay>(path).Gate = u;
                 }, () => {
-                    ((Delay)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Delay>(path).Gate = r;
                 });
             }
 

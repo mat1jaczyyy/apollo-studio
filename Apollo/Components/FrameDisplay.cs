@@ -43,7 +43,6 @@ namespace Apollo.Components {
         StackPanel Root;
         public Remove Remove;
         public VerticalAdd FrameAdd;
-        ContextMenu FrameContextMenu;
 
         void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -69,9 +68,6 @@ namespace Apollo.Components {
 
             Viewer.Frame = frame;
 
-            FrameContextMenu = (ContextMenu)this.Resources["FrameContextMenu"];
-            FrameContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
         }
@@ -84,22 +80,14 @@ namespace Apollo.Components {
 
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             this.RemoveHandler(DragDrop.DropEvent, Drop);
-
-            FrameContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            FrameContextMenu = null;
         }
 
         void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
 
-        void ContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item is MenuItem menuItem) {
-                if ((string)menuItem.Header == "Play Here") _pattern.Window?.PlayFrom(this);
-                else if ((string)menuItem.Header == "Fire Here") _pattern.Window?.PlayFrom(this, true);
-                else _pattern.Window?.Selection.Action((string)menuItem.Header);
-            }
+        void ContextMenu_Action(string action) {
+            if (action == "Play Here") _pattern.Window?.PlayFrom(this);
+            else if (action == "Fire Here") _pattern.Window?.PlayFrom(this, true);
+            else _pattern.Window?.Selection.Action(action);
         }
 
         void Select(PointerPressedEventArgs e) {
@@ -133,7 +121,7 @@ namespace Apollo.Components {
                     FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
         
                 if (MouseButton == PointerUpdateKind.RightButtonPressed)
-                    FrameContextMenu.Open(Viewer);
+                    ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open(Viewer);
 
                 if (MouseButton == PointerUpdateKind.MiddleButtonPressed)
                     _pattern.Window?.PlayFrom(this, e.KeyModifiers == KeyModifiers.Shift);
@@ -185,22 +173,22 @@ namespace Apollo.Components {
                 
                 Program.Project.Undo.Add(copy? $"Pattern Frame Copied" : $"Pattern Frame Moved", copy
                     ? new Action(() => {
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetpattern.Remove(i);
 
                     }) : new Action(() => {
-                        Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                        Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                         List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
 
                         Frame.Move(umoving, sourcepattern, before_pos);
 
                 }), () => {
-                    Pattern sourcepattern = ((Pattern)Track.TraversePath(sourcepath));
-                    Pattern targetpattern = ((Pattern)Track.TraversePath(targetpath));
+                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
+                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
 
                     List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
 

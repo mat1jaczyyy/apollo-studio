@@ -130,15 +130,15 @@ namespace Apollo.Helpers {
         public void Limit() {
             int remove;
             if ((remove = History.Count - 150) > 0) {
+                if (Position < History.Count - 150) return;
+
                 if (_saved != null) {
                     _saved += -remove;
                     if (_saved < 0) _saved = null;
                 }
-
-                if (Position < History.Count - 150) Select(History.Count - 150);
-                _position += -remove;
-
                 SavedPositionChanged?.Invoke(SavedPosition);
+
+                _position += -remove;
 
                 for (int i = History.Count - 151; i >= 0; i--)
                     Remove(i);

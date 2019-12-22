@@ -269,16 +269,26 @@ namespace Apollo.Components {
                 : angle_start - Math.Abs(angle_end - angle_start) * value * 0.94;
 
             if (overrideBase) angle_starting = angle_start;
-
-            double x_start = (radius * (Math.Cos(angle_starting) + 1) + strokeHalf) * _scale;
-            double y_start = (radius * (-Math.Sin(angle_starting) + 1) + strokeHalf) * _scale;
             
             double angle_point = angle_start - Math.Abs(angle_end - angle_start) * (_centered && !overrideBase? value : (1 - (1 - value) * 0.94));
 
+            double angle = (angle_starting - angle_point) / Math.PI * 180;
+            double angleLen = Math.Abs(angle);
+
+            if (angleLen < 17.9) {
+                double change = (.1 * Math.PI - angle_starting + angle_point) / 2;
+
+                angle_starting += change;
+                angle_point -= change;
+
+                angle = 18;
+            }
+
+            double x_start = (radius * (Math.Cos(angle_starting) + 1) + strokeHalf) * _scale;
+            double y_start = (radius * (-Math.Sin(angle_starting) + 1) + strokeHalf) * _scale;
+
             double x_end = (radius * (Math.Cos(angle_point) + 1) + strokeHalf) * _scale;
             double y_end = (radius * (-Math.Sin(angle_point) + 1) + strokeHalf) * _scale;
-
-            double angle = (angle_starting - angle_point) / Math.PI * 180;
 
             int large = Convert.ToInt32(angle > 180);
             int direction = Convert.ToInt32(angle > 0);

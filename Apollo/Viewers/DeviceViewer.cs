@@ -33,7 +33,8 @@ namespace Apollo.Viewers {
             Indicator = this.Get<Indicator>("Indicator");
 
             DeviceMute = this.Get<MenuItem>("DeviceMute");
-            GroupMute = this.Get<MenuItem>("DeviceMute");
+            GroupMute = this.Get<MenuItem>("GroupMute");
+            ChokeMute = this.Get<MenuItem>("ChokeMute");
         }
 
         static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
@@ -71,24 +72,20 @@ namespace Apollo.Viewers {
 
         protected TextBlock TitleText;
         protected Grid Draggable;
-        protected ContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
-        protected MenuItem DeviceMute, GroupMute;
+        protected ApolloContextMenu DeviceContextMenu, GroupContextMenu, ChokeContextMenu;
+        protected MenuItem DeviceMute, GroupMute, ChokeMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
 
-            if (Root.Children[0].GetType() == typeof(DeviceHead)) {
-                DeviceHead target = ((DeviceHead)Root.Children[0]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
+            if (Root.Children[0] is DeviceHead targetHead) {
+                if (IsArrangeValid) targetHead.Header.Background = brush;
+                else targetHead.Resources["TitleBrush"] = brush;
             }
 
-            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail)) {
-                DeviceTail target = ((DeviceTail)Root.Children[Root.Children.Count - 2]);
-
-                if (IsArrangeValid) target.Header.Background = brush;
-                else target.Resources["TitleBrush"] = brush;
+            if (Root.Children[Root.Children.Count - 2] is DeviceTail targetTail) {
+                if (IsArrangeValid) targetTail.Header.Background = brush;
+                else targetTail.Resources["TitleBrush"] = brush;
             }
 
             if (IsArrangeValid) Header.Background = brush;
@@ -116,13 +113,9 @@ namespace Apollo.Viewers {
             _device.Viewer = this;
             Deselect();
 
-            DeviceContextMenu = (ContextMenu)this.Resources["DeviceContextMenu"];
-            GroupContextMenu = (ContextMenu)this.Resources["GroupContextMenu"];
-            ChokeContextMenu = (ContextMenu)this.Resources["ChokeContextMenu"];
-            
-            DeviceContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.AddHandler(MenuItem.ClickEvent, ContextMenu_Click);
+            DeviceContextMenu = (ApolloContextMenu)this.Resources["DeviceContextMenu"];
+            GroupContextMenu = (ApolloContextMenu)this.Resources["GroupContextMenu"];
+            ChokeContextMenu = (ApolloContextMenu)this.Resources["ChokeContextMenu"];
             
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -142,9 +135,6 @@ namespace Apollo.Viewers {
             _device.Viewer = null;
             _device = null;
 
-            DeviceContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            GroupContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
-            ChokeContextMenu.RemoveHandler(MenuItem.ClickEvent, ContextMenu_Click);
             DeviceContextMenu = GroupContextMenu = ChokeContextMenu = null;
             
             this.RemoveHandler(DragDrop.DropEvent, Drop);
@@ -156,24 +146,18 @@ namespace Apollo.Viewers {
             Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
             TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
-            if (Root.Children[0].GetType() == typeof(DeviceHead))
-                ((DeviceHead)Root.Children[0]).SetEnabled(_device.Enabled);
+            if (Root.Children[0] is DeviceHead targetHead)
+                targetHead.SetEnabled(_device.Enabled);
 
-            if (Root.Children[Root.Children.Count - 2].GetType() == typeof(DeviceTail))
-                ((DeviceTail)Root.Children[Root.Children.Count - 2]).SetEnabled(_device.Enabled);
+            if (Root.Children[Root.Children.Count - 2] is DeviceTail targetTail)
+                targetTail.SetEnabled(_device.Enabled);
         }
 
         protected void Device_Add(Type device) => Added?.Invoke(_device.ParentIndex.Value + 1, device);
 
         protected void Device_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action, _device.Parent, _device.ParentIndex.Value);
 
-        protected void ContextMenu_Click(object sender, EventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
-            IInteractive item = ((RoutedEventArgs)e).Source;
-
-            if (item.GetType() == typeof(MenuItem))
-                Track.Get(_device)?.Window?.Selection.Action((string)((MenuItem)item).Header);
-        }
+        protected void ContextMenu_Action(string action) => Track.Get(_device)?.Window?.Selection.Action(action);
 
         void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -198,18 +182,18 @@ namespace Apollo.Viewers {
                 if (selected) Select(e);
                 
                 if (MouseButton == PointerUpdateKind.RightButtonPressed) {
-                    ContextMenu menu = DeviceContextMenu;
+                    ApolloContextMenu menu = DeviceContextMenu;
                     List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
 
                     if (selection.Count == 1) {
-                        if (selection[0].GetType() == typeof(Group) && ((Group)selection[0]).Count == 1)
+                        if (selection[0] is Group group && group.Count == 1)
                             menu = GroupContextMenu;
 
-                        else if (selection[0].GetType() == typeof(Choke))
+                        else if (selection[0] is Choke)
                             menu = ChokeContextMenu;
                     } 
                     
-                    DeviceMute.Header = GroupMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
+                    DeviceMute.Header = GroupMute.Header = ChokeMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 
                     menu.Open(Draggable);
                 
@@ -274,22 +258,22 @@ namespace Apollo.Viewers {
                 
                 Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         for (int i = after + count; i > after; i--)
                             targetchain.Remove(i);
 
                     }) : new Action(() => {
-                        Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                        Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                         List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
 
                         Device.Move(umoving, sourcechain, before_pos);
 
                 }), () => {
-                    Chain sourcechain = ((Chain)Track.TraversePath(sourcepath));
-                    Chain targetchain = ((Chain)Track.TraversePath(targetpath));
+                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                    Chain targetchain = Track.TraversePath<Chain>(targetpath);
 
                     List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
 

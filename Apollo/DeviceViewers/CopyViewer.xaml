@@ -5,12 +5,12 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
   
-  <Grid ColumnDefinitions="118,Auto">
+  <Grid ColumnDefinitions="*,Auto">
     <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
       <Grid RowDefinitions="*,*" Margin="0 0 5 0">
         <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-          <StackPanel Margin="0 0 0 5" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
+          <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0" Margin="0 0 0 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
               <ComboBox BorderThickness="0" Background="Transparent" x:Name="CopyMode" SelectionChanged="CopyMode_Changed">
                 <ComboBoxItem>Static</ComboBoxItem>
                 <ComboBoxItem>Animate</ComboBoxItem>
@@ -20,23 +20,38 @@
               </ComboBox>
             </Border>
 
-            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
-              <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
-                <ComboBoxItem>10x10</ComboBoxItem>
-                <ComboBoxItem>8x8</ComboBoxItem>
-              </ComboBox>
-            </Border>
+            <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0 0 0 5">
+              <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 1 0">
+                <StackPanel Margin="5 0 5 5" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
+                  <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1" HorizontalAlignment="Center">
+                    <ComboBox BorderThickness="0" Background="Transparent" x:Name="GridMode" SelectionChanged="GridMode_Changed">
+                      <ComboBoxItem>10x10</ComboBoxItem>
+                      <ComboBoxItem>8x8</ComboBoxItem>
+                    </ComboBox>
+                  </Border>
 
-            <CheckBox Margin="0 5 0 0" HorizontalAlignment="Center" x:Name="Wrap" Click="Wrap_Changed">Wrap</CheckBox>
-          </StackPanel>
+                  <CheckBox HorizontalAlignment="Center" x:Name="Wrap" Click="Wrap_Changed">Wrap</CheckBox>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Grid.Column="1" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
+                <CheckBox x:Name="Reverse" Click="Reverse_Changed">Reverse</CheckBox>
+
+                <CheckBox x:Name="Infinite" Click="Infinite_Changed">Infinite</CheckBox>
+              </StackPanel>
+            </Grid>
+          </Grid>
         </Border>
         
-        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="5 5 5 0">
-          <Components:Dial Grid.Column="0" Margin="0 0 5 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="10" Maximum="5000" Default="500" Exponent="3.348186161" Round="0" Unit="ms" DisabledText="Unused" AllowSteps="true"
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Width="165" Margin="5 5 5 0">
+          <Components:Dial Grid.Column="0" Margin="0 0 5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="10" Maximum="5000" Default="500" Exponent="3.348186161" Round="0" Unit="ms" DisabledText="Unused" AllowSteps="true"
                            ValueChanged="Rate_ValueChanged" ModeChanged="Rate_ModeChanged" StepChanged="Rate_StepChanged" />
         
-          <Components:Dial Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%" DisabledText="Unused"
+          <Components:Dial Grid.Column="1" Margin="5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%" DisabledText="Unused"
                            ValueChanged="Gate_Changed" />
+                           
+          <Components:Dial Grid.Column="2" Margin="5 0 0 0" HorizontalAlignment="Stretch" x:Name="Pinch" Title="Pinch" Minimum="-2" Maximum="2" Default="0" Exponent="1" Round="1" Unit="" Centered="true" DisabledText="Unused"
+                           ValueChanged="Pinch_Changed" />
         </Grid>
       </Grid>
     </Border>

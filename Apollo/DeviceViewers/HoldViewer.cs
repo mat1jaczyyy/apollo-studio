@@ -57,9 +57,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Changed to {r}{Duration.Unit}", () => {
-                    ((Hold)Track.TraversePath(path)).Time.Free = u;
+                    Track.TraversePath<Hold>(path).Time.Free = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Time.Free = r;
+                    Track.TraversePath<Hold>(path).Time.Free = r;
                 });
             }
 
@@ -75,9 +75,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    ((Hold)Track.TraversePath(path)).Time.Mode = u;
+                    Track.TraversePath<Hold>(path).Time.Mode = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Time.Mode = r;
+                    Track.TraversePath<Hold>(path).Time.Mode = r;
                 });
             }
 
@@ -93,9 +93,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Duration Changed to {Length.Steps[r]}", () => {
-                    ((Hold)Track.TraversePath(path)).Time.Length.Step = u;
+                    Track.TraversePath<Hold>(path).Time.Length.Step = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Time.Length.Step = r;
+                    Track.TraversePath<Hold>(path).Time.Length.Step = r;
                 });
             }
         }
@@ -109,9 +109,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Gate Changed to {value}{Gate.Unit}", () => {
-                    ((Hold)Track.TraversePath(path)).Gate = u;
+                    Track.TraversePath<Hold>(path).Gate = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Gate = r;
+                    Track.TraversePath<Hold>(path).Gate = r;
                 });
             }
 
@@ -129,9 +129,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Hold)Track.TraversePath(path)).Infinite = u;
+                    Track.TraversePath<Hold>(path).Infinite = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Infinite = r;
+                    Track.TraversePath<Hold>(path).Infinite = r;
                 });
 
                 _hold.Infinite = value;
@@ -152,9 +152,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_hold);
 
                 Program.Project.Undo.Add($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Hold)Track.TraversePath(path)).Release = u;
+                    Track.TraversePath<Hold>(path).Release = u;
                 }, () => {
-                    ((Hold)Track.TraversePath(path)).Release = r;
+                    Track.TraversePath<Hold>(path).Release = r;
                 });
 
                 _hold.Release = value;

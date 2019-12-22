@@ -48,9 +48,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_rotate);
 
                 Program.Project.Undo.Add($"Rotate Angle Changed to {((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    ((Rotate)Track.TraversePath(path)).Mode = u;
+                    Track.TraversePath<Rotate>(path).Mode = u;
                 }, () => {
-                    ((Rotate)Track.TraversePath(path)).Mode = r;
+                    Track.TraversePath<Rotate>(path).Mode = r;
                 });
 
                 _rotate.Mode = selected;
@@ -68,9 +68,9 @@ namespace Apollo.DeviceViewers {
                 List<int> path = Track.GetPath(_rotate);
 
                 Program.Project.Undo.Add($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    ((Rotate)Track.TraversePath(path)).Bypass = u;
+                    Track.TraversePath<Rotate>(path).Bypass = u;
                 }, () => {
-                    ((Rotate)Track.TraversePath(path)).Bypass = r;
+                    Track.TraversePath<Rotate>(path).Bypass = r;
                 });
 
                 _rotate.Bypass = value;

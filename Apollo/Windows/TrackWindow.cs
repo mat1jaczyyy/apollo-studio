@@ -135,13 +135,13 @@ namespace Apollo.Windows {
         void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
         bool InChoke() => Selection.Start is Device &&
-            Selection.Start.IParent is Chain &&
-            ((Chain)Selection.Start.IParent).Parent?.GetType() == typeof(Choke);
+            Selection.Start.IParent is Chain chain &&
+            chain.Parent?.GetType() == typeof(Choke);
 
         bool InMultiPreprocess() => Selection.Start is Device &&
-            Selection.Start.IParent is ISelect &&
-            ((ISelect)Selection.Start.IParent).IParentIndex == null &&
-            ((ISelect)Selection.Start.IParent).IParent?.GetType() == typeof(Multi);
+            Selection.Start.IParent is ISelect iselect &&
+            iselect.IParentIndex == null &&
+            iselect.IParent?.GetType() == typeof(Multi);
 
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
@@ -163,15 +163,15 @@ namespace Apollo.Windows {
 
             if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
-            bool vertical = Selection.Start.GetType() == typeof(Chain);
+            bool vertical = Selection.Start is Chain;
 
             if (vertical) {
                 if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
                 else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
                 else if (e.Key == Key.Right) Selection.MoveChild();
                 else if (e.Key == Key.Enter) Selection.Expand();
-                else if (e.Key == Key.Left && Selection.Start.IParent.GetType() == typeof(Multi))
-                    Selection.Select(((Multi)Selection.Start.IParent).Preprocess.Devices.Last());
+                else if (e.Key == Key.Left && Selection.Start.IParent is Multi multi)
+                    Selection.Select(multi.Preprocess.Devices.Last());
 
             } else if (e.Key == Key.Left) {
                 ISelect left = Selection.Selection.First();
@@ -203,9 +203,8 @@ namespace Apollo.Windows {
                 Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
 
             } else if (e.Key == Key.Down) {
-                if (Selection.Start.GetType() == typeof(Choke)) {
-                    Chain chain = ((Choke)Selection.Start).Chain;
-                    if (chain.Count > 0) Selection.Select(chain[0]);
+                if (Selection.Start is Choke choke) {
+                    if (choke.Chain.Count > 0) Selection.Select(choke.Chain[0]);
                     return;
                 }
                 Selection.MoveChild();
@@ -280,6 +279,9 @@ namespace Apollo.Windows {
                 track.Window.WindowState = WindowState.Normal;
                 track.Window.Activate();
             }
+            
+            track.Window.Topmost = true;
+            track.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }

@@ -16,7 +16,7 @@ using Apollo.Windows;
 
 namespace Apollo.Binary {
     public static class Decoder {
-        static bool DecodeHeader(BinaryReader reader) => reader.ReadChars(4).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
+        static bool DecodeHeader(BinaryReader reader) => reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
 
         static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
@@ -129,6 +129,10 @@ namespace Apollo.Binary {
                     Preferences.Recents = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadString()).ToList();
                 }
 
+                if (version >= 25) {
+                    Preferences.VirtualLaunchpads = (from i in Enumerable.Range(0, reader.ReadInt32()) select reader.ReadInt32()).ToList();
+                }
+
                 if (15 <= version && version <= 22) {
                     reader.ReadString();
                     reader.ReadString();
@@ -233,7 +237,7 @@ namespace Apollo.Binary {
                     }
                 
                 Launchpad ret;
-                if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name);
+                if (name.Contains("Virtual Launchpad ")) ret = new VirtualLaunchpad(name, Convert.ToInt32(name.Substring(18)));
                 else if (name.Contains("Ableton Connector ")) ret = new AbletonLaunchpad(name);
                 else ret = new Launchpad(name, format, rotation);
 
@@ -287,6 +291,21 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
+                double pinch = 0;
+                if (version >= 26) {
+                    pinch = reader.ReadDouble();
+                }
+
+                bool reverse = false;
+                if (version >= 26) {
+                    reverse = reader.ReadBoolean();
+                }
+
+                bool infinite = false;
+                if (version >= 27) {
+                    infinite = reader.ReadBoolean();
+                }
+
                 CopyType copyType = (CopyType)reader.ReadInt32();
                 GridType gridType = (GridType)reader.ReadInt32();
                 bool wrap = reader.ReadBoolean();
@@ -295,7 +314,7 @@ namespace Apollo.Binary {
                 List<Offset> offsets = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList();
                 List<int> angles = (from i in Enumerable.Range(0, count) select (version >= 25)? reader.ReadInt32() : 0).ToList();
 
-                return new Copy(time, gate, copyType, gridType, wrap, offsets, angles);
+                return new Copy(time, gate, pinch, reverse, infinite, copyType, gridType, wrap, offsets, angles);
             
             } else if (t == typeof(Delay)) {
                 Time time;

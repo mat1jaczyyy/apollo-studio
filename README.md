@@ -4,7 +4,7 @@
 
 ![Logo](Assets/readme.png)
 
-Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 2M of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
+Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 262k of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
 
 Apollo Studio solves all the problems we experience every day in Live including the unintuitive workflow, limited color palette, inconsistent undo behavior, differences between Launchpad models, CPU lag, large RAM usage and more; while bringing new and revolutionary features to the table.
 
@@ -29,6 +29,7 @@ You can take a look at the [GitHub Wikis](https://github.com/mat1jaczyyy/apollo-
 
 You are the people who make Apollo Studio possible.
 
+* [Brendonovich](https://github.com/Brendonovich) for actively contributing features to Apollo Studio.
 * [vaaski](https://vaa.ski/) for expressing interest early in the project, even if it didn't work out ultimately; and maintaining the website for the project.
 * [LaunchpadLights](http://www.launchpadlights.com/) for sparking some bright ideas and designing the logo and artwork for the project.
 * [rpg.aleksy](https://www.youtube.com/channel/UC209YLY-uQPy4U2Gu6sqaVw) for keeping me sane while I worked full days without a break.

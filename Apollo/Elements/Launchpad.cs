@@ -18,6 +18,7 @@ using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -86,6 +87,7 @@ namespace Apollo.Elements {
         }
 
         public LaunchpadWindow Window;
+        public LaunchpadInfo Info;
 
         PatternWindow _patternwindow;
         public virtual PatternWindow PatternWindow {

@@ -71,7 +71,9 @@ namespace Apollo.Windows {
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
 
-            if (_launchpad.GetType() == typeof(VirtualLaunchpad))
+            _launchpad.Info?.SetPopout(true);
+
+            if (_launchpad is VirtualLaunchpad lp && !Preferences.VirtualLaunchpads.Contains(lp.VirtualIndex))
                 MIDI.Disconnect(_launchpad);
             
             _launchpad = null;
@@ -172,6 +174,9 @@ namespace Apollo.Windows {
                 launchpad.Window.WindowState = WindowState.Normal;
                 launchpad.Window.Activate();
             }
+
+            launchpad.Window.Topmost = true;
+            launchpad.Window.Topmost = Preferences.AlwaysOnTop;
         }
     }
 }

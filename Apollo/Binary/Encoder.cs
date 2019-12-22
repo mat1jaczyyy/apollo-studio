@@ -87,6 +87,10 @@ namespace Apollo.Binary {
                 for (int i = 0; i < Preferences.Recents.Count; i++)
                     writer.Write(Preferences.Recents[i]);
                 
+                writer.Write(Preferences.VirtualLaunchpads.Count);
+                for (int i = 0; i < Preferences.VirtualLaunchpads.Count; i++)
+                    writer.Write(Preferences.VirtualLaunchpads[i]);
+                
                 writer.Write(Preferences.Crashed);
                 writer.Write(Preferences.CrashPath);
                 
@@ -208,6 +212,10 @@ namespace Apollo.Binary {
 
             Encode(writer, o.Time);
             writer.Write(o.Gate);
+            writer.Write(o.Pinch);
+
+            writer.Write(o.Reverse);
+            writer.Write(o.Infinite);
 
             writer.Write((int)o.CopyMode);
             writer.Write((int)o.GridMode);

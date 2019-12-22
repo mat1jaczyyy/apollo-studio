@@ -6,6 +6,8 @@ using Apollo.Structures;
 
 namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
+        public int VirtualIndex = 0;
+
         public override void Send(Signal n) => Window?.SignalRender(n);
 
         public override void Clear(bool manual = false) {
@@ -21,9 +23,10 @@ namespace Apollo.Elements {
             }
         }
 
-        public VirtualLaunchpad(string name) {
+        public VirtualLaunchpad(string name, int index) {
             Type = LaunchpadType.PRO;
             Name = name;
+            VirtualIndex = index;
         }
 
         public override void Connect(IMidiInputDeviceInfo input = null, IMidiOutputDeviceInfo output = null) {
