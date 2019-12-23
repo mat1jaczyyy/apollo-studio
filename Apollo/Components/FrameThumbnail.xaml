@@ -1,12 +1,11 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui" 
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.FrameThumbnail"
-             xmlns:Components="clr-namespace:Apollo.Components"
+             x:Class="Apollo.Components.FrameThumbnail" 
              Cursor="Hand"
              DetachedFromVisualTree="Unloaded">
 
   <StackPanel Spacing="2" Background="Transparent" Orientation="Horizontal">
-    <Components:LaunchpadGrid VerticalAlignment="Center" Scale="0.05882" LowQuality="true" x:Name="Launchpad" />
+    <Image x:Name="FrameImage" Width="10" Height="10"/>
     <TextBlock VerticalAlignment="Center" x:Name="Time" />
   </StackPanel>
 </UserControl>
