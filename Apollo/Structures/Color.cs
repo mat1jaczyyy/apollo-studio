@@ -179,5 +179,15 @@ namespace Apollo.Structures {
         public string ToHex() => $"#{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
 
         public override string ToString() => $"({Red}, {Green}, {Blue})";
+        
+        public uint ToUInt32(){
+            uint generatedColor = this.ToScreenBrush().Color.ToUint32();
+
+            byte r = (byte)(generatedColor >> 16);
+            byte g = (byte)(generatedColor >> 8);
+            byte b = (byte)generatedColor;
+
+            return (uint)(255 << 24 | b << 16 | g << 8 | r);
+        }
     }
 }
