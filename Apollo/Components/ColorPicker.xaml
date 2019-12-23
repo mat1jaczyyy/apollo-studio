@@ -33,8 +33,6 @@
                 <Ellipse Width="10" Height="10" Stroke="#FFFFFFFF" StrokeThickness="1" />
                 <Ellipse Canvas.Top="1" Canvas.Left="1" Width="8" Height="8" Stroke="#FF000000" StrokeThickness="1" />
               </Canvas>
-
-              <!-- DragDelta="MainThumb_Move"-->
               
               <Rectangle IsVisible="false" x:Name="TopBar" Fill="#FFFFFF" Opacity="0.5" Width="2" />
               <Rectangle IsVisible="false" x:Name="BottomBar" Fill="#FFFFFF" Opacity="0.5" Width="2"/>
