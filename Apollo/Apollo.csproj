@@ -10,6 +10,7 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject>Apollo.Core.Program</StartupObject>
     <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   
   <ItemGroup>

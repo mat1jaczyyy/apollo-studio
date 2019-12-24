@@ -63,7 +63,6 @@ namespace Apollo.Components {
                 else this.Resources["ModeBrush"] = color;
             }
 
-            else if (LowQuality) Elements[index].Fill = color;
             else Elements[index].Stroke = IsPhantom(index)? color : Elements[index].Fill = color;
         }
 
@@ -78,11 +77,8 @@ namespace Apollo.Components {
         }
 
         void Update_LaunchpadStyle() {
-            if (LowQuality) return;
-
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
                 Elements[i].Fill = IsPhantom(i)? SolidColorBrush.Parse("Transparent") : Elements[i].Stroke;
-            }
         }
 
         void Update_LaunchpadModel() {
@@ -157,21 +153,7 @@ namespace Apollo.Components {
             }
         }
 
-        double EffectiveScale => Scale * ((Preferences.LaunchpadGridRotation && !LowQuality)? 0.702 : 1);
-        
-        bool _lowQuality = false;
-        public bool LowQuality {
-            get => _lowQuality;
-            set {
-                if (value != _lowQuality) {
-                    _lowQuality = value;
-
-                    ApplyScale();
-                }
-            }
-        }
-
-        readonly Geometry LowQualityGeometry = Geometry.Parse("M 0,0 L 0,1 1,1 1,0 Z");
+        double EffectiveScale => Scale * (Preferences.LaunchpadGridRotation? 0.702 : 1);
 
         public Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
             ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
@@ -235,26 +217,26 @@ namespace Apollo.Components {
         ));
 
         public void DrawPath() {
-            this.Resources["SquareGeometry"] = LowQuality? LowQualityGeometry : SquareGeometry;
-            this.Resources["CircleGeometry"] = LowQuality? LowQualityGeometry : CircleGeometry;
-            this.Resources["NovationGeometry"] = LowQuality? LowQualityGeometry : NovationGeometry;
-            this.Resources["HiddenGeometry"] = LowQuality? LowQualityGeometry : HiddenGeometry;
+            this.Resources["SquareGeometry"] = SquareGeometry;
+            this.Resources["CircleGeometry"] = CircleGeometry;
+            this.Resources["NovationGeometry"] = NovationGeometry;
+            this.Resources["HiddenGeometry"] = HiddenGeometry;
 
-            Elements[44].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
-            Elements[45].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
-            Elements[54].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
-            Elements[55].Data = LowQuality? LowQualityGeometry : CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
+            Elements[44].Data = CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z");
+            Elements[45].Data = CreateCornerGeometry("M {3},{3} L {3},{2} {1},{0} {0},{0} {0},{3} Z");
+            Elements[54].Data = CreateCornerGeometry("M {3},{3} L {3},{0} {0},{0} {0},{1} {2},{3} Z");
+            Elements[55].Data = CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
         void ApplyScale() {
             bool is10x10 = Preferences.LaunchpadModel == LaunchpadModels.Pro || Preferences.LaunchpadModel == LaunchpadModels.All;
 
-            this.Resources["Rotation"] = (Preferences.LaunchpadGridRotation && !LowQuality)? -45.0 : 0.0;
+            this.Resources["Rotation"] = Preferences.LaunchpadGridRotation? -45.0 : 0.0;
             this.Resources["CanvasSize"] = (is10x10? 184 : 167) * Scale;
             this.Resources["PadSize"] = 15 * EffectiveScale;
             this.Resources["NovationSize"] = 11 * EffectiveScale;
             this.Resources["HiddenSize"] = 7 * EffectiveScale;
-            this.Resources["PadThickness"] = LowQuality? 0 : 1 * EffectiveScale;
+            this.Resources["PadThickness"] = 1 * EffectiveScale;
             this.Resources["PadCut1"] = 3 * EffectiveScale;
             this.Resources["PadCut2"] = 12 * EffectiveScale;
             this.Resources["ModeWidth"] = 4 * EffectiveScale;
@@ -286,8 +268,7 @@ namespace Apollo.Components {
 
             for (int i = 0; i < 100; i++) Grid.Children.Add(Canvases[i]);
 
-            Back.Opacity = Convert.ToInt32(!LowQuality);
-            ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = (!LowQuality && is10x10));
+            ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = is10x10);
             
             DrawPath();
         }

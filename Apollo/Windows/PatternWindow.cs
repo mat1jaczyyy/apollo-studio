@@ -553,12 +553,9 @@ namespace Apollo.Windows {
                 ColorHistory.Use();
             });
 
-            _pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone();
-
-            SolidColorBrush brush = (SolidColorBrush)_pattern[_pattern.Expanded].Screen[signalIndex].ToScreenBrush();
-
-            Editor.SetColor(index, brush);
-            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Launchpad.SetColor(index, brush);
+            Editor.SetColor(index, (SolidColorBrush)(_pattern[_pattern.Expanded].Screen[signalIndex] = drawingState.Clone()).ToScreenBrush());
+            
+            ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw();
 
             Launchpad?.Send(new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex]));
         }
@@ -578,7 +575,7 @@ namespace Apollo.Windows {
                     Track.TraversePath<Pattern>(path)[index].Screen = (from i in r select i.Clone()).ToArray();
                 });
             }
-
+            
             oldScreen = null;
         }
 
