@@ -10,6 +10,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
+using Avalonia.Interactivity;
 
 namespace Apollo.DeviceViewers {
     public class LoopViewer: UserControl {
@@ -18,6 +19,7 @@ namespace Apollo.DeviceViewers {
         Loop _loop;
         
         Dial Duration, Gate, Repeats;
+        CheckBox Hold;
         
         void InitializeComponent(){
             AvaloniaXamlLoader.Load(this);
@@ -25,6 +27,8 @@ namespace Apollo.DeviceViewers {
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
+            
+            Hold = this.Get<CheckBox>("Hold");
         }
         
         public LoopViewer() => new InvalidOperationException();
@@ -95,6 +99,29 @@ namespace Apollo.DeviceViewers {
             _loop.Duration.Mode = value;
         }
         
+        void Hold_Changed(object sender, RoutedEventArgs e) {
+            bool value = Hold.IsChecked.Value;
+
+            if (_loop.Hold != value) {
+                bool u = _loop.Hold;
+                bool r = value;
+                List<int> path = Track.GetPath(_loop);
+
+                Program.Project.Undo.Add($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    Track.TraversePath<Loop>(path).Hold = u;
+                }, () => {
+                    Track.TraversePath<Loop>(path).Hold = r;
+                });
+
+                _loop.Hold = value;
+            }
+        }
+        
+        public void SetHold(bool hold){
+            Hold.IsChecked = hold;
+            Repeats.Enabled = !hold;
+        }
+        
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
         
         void Gate_Changed(Dial sender, double value, double? old){
@@ -130,7 +157,9 @@ namespace Apollo.DeviceViewers {
 
             _loop.Repeats = (int)value;
         }
-        
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
+    
+        
+    
     }   
 }

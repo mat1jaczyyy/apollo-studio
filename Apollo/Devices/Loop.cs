@@ -55,7 +55,19 @@ namespace Apollo.Devices {
             }
         }
         
+        bool _hold;
+        public bool Hold {
+            get => _hold;
+            set {
+                _hold = value;
+
+                if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetHold(Hold);
+            }
+        }
+        
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        ConcurrentDictionary<byte, List<Courier>> holdTimers = new ConcurrentDictionary<byte, List<Courier>>();
+
 
         void FreeChanged(int value) {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationValue(value);
@@ -85,20 +97,41 @@ namespace Apollo.Devices {
             timers[n] = new List<Courier>();
         }
         
+        void Stop_Hold(byte index){
+            if(holdTimers.ContainsKey(index))
+                for(int i = 0; i < holdTimers[index].Count; i++)
+                    holdTimers[index][i].Dispose();
+                    
+            holdTimers[index] = new List<Courier>();            
+        }
+        
         public override void MIDIProcess(Signal n){
-            Stop(n);
-            
-            for(int i = 1; i <= Repeats; i++){
-                Courier courier;
-                timers[n].Add(courier = new Courier(){
-                    AutoReset = false,
-                    Info = n,
-                    Interval = i * _duration * _gate
-                });
-                courier.Elapsed += Tick;
-                courier.Start();
+            if(Hold){
+                Stop_Hold(n.Index);
+
+                if(n.Color.Lit){
+                    Courier courier;
+                    holdTimers[n.Index].Add(courier = new Courier(){
+                        AutoReset = false,
+                        Info = n,
+                        Interval = _duration * _gate
+                    });
+                    courier.Elapsed += Tick_Hold;
+                    courier.Start();
+                }
+            } else {
+                Stop(n);
+                for(int i = 1; i <= Repeats; i++){
+                    Courier courier;
+                    timers[n].Add(courier = new Courier(){
+                        AutoReset = false,
+                        Info = n,
+                        Interval = i * _duration * _gate
+                    });
+                    courier.Elapsed += Tick;
+                    courier.Start();
+                }
             }
-            
             Signal m = n.Clone();
             InvokeExit(m);
         }
@@ -115,9 +148,34 @@ namespace Apollo.Devices {
             
                 Signal m = n.Clone();
                 InvokeExit(m);
-            }   
+            }
         }
         
+        void Tick_Hold(object sender, EventArgs e){
+            if(Disposed) return;
+            
+            Courier sender_courier = (Courier)sender;
+            sender_courier.Elapsed -= Tick;
+            
+            if(sender_courier.Info is Signal n){
+                Courier new_courier;
+                holdTimers[n.Index].Add(new_courier = new Courier(){
+                    AutoReset = false,
+                    Info = n,
+                    Interval = sender_courier.Interval
+                });
+                new_courier.Elapsed += Tick_Hold;
+                new_courier.Start();
+                
+                holdTimers[n.Index].Remove(sender_courier);
+                sender_courier.Dispose();
+            
+                Signal m = n.Clone();
+                InvokeExit(m);
+            }
+            
+            
+        }
         protected override void Stop() {
             foreach (List<Courier> i in timers.Values) {
                 foreach (Courier j in i) j.Dispose();

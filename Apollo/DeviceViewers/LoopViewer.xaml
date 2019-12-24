@@ -5,13 +5,16 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
 
-  <Grid RowDefinitions="*,*" Width="125">
+  <Grid RowDefinitions="*,Auto,*" Width="125">
     <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-      <Components:Dial Margin="0 0 0 5" x:Name="Repeats" Title="Repeats" Minimum="1" Maximum="128" Default="0" Exponent="2" Round="0" Unit=""
-                       ValueChanged="Repeats_Changed" />
+      <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="10">
+        <Components:Dial Margin="0 0 0 5" x:Name="Repeats" Title="Repeats" Minimum="1" Maximum="128" Default="0" Exponent="2" Round="0" Unit=""
+                         ValueChanged="Repeats_Changed" />
+        <CheckBox Margin="0 0 0 5" x:Name="Hold" Click="Hold_Changed">Hold</CheckBox> 
+      </StackPanel>
     </Border>
                        
-    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="5 5 5 0">
+    <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="5 5 5 0">
       <Components:Dial Grid.Column="0" Margin="0 0 5 0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" AllowSteps="true"
                        ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
       <Components:Dial Grid.Column="1" Margin="5 0 0 0" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%"
