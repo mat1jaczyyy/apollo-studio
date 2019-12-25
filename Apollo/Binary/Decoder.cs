@@ -443,7 +443,8 @@ namespace Apollo.Binary {
                 return new Loop(
                     Decode(reader, version),
                     reader.ReadDouble(),
-                    reader.ReadInt32()
+                    reader.ReadInt32(),
+                    reader.ReadBoolean()
                 );
                 
             else if (t == typeof(Move))

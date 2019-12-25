@@ -81,10 +81,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
         }
         
-        public Loop(Time duration = null, double gate = 1, int repeats = 1): base("loop") {
+        public Loop(Time duration = null, double gate = 1, int repeats = 1, bool hold = false): base("loop") {
             Duration = duration?? new Time();
             Gate = gate;
             Repeats = repeats;
+            Hold = hold;
         }
         
         public override Device Clone() => new Loop(Duration, Gate, Repeats);

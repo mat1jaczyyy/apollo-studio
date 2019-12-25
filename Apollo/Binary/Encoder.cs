@@ -304,6 +304,7 @@ namespace Apollo.Binary {
             writer.Write(o.Gate);
 
             writer.Write(o.Repeats);
+            writer.Write(o.Hold);
         }
 
         static void Encode(BinaryWriter writer, Move o) {

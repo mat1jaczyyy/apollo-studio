@@ -45,6 +45,8 @@ namespace Apollo.DeviceViewers {
             Gate.RawValue = _loop.Gate * 100;
             
             Repeats.RawValue = _loop.Repeats;
+            
+            Hold.IsChecked = _loop.Hold;
         }
         
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
