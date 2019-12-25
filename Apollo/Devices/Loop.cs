@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -101,11 +102,8 @@ namespace Apollo.Devices {
         }
 
         void Start(Signal n, Signal m, int count) {
-            if (timers.ContainsKey(n))
-                for (int i = 0; i < timers[n].Count; i++)
-                    timers[n][i].Dispose();
-            
-            timers[n] = new List<Courier>();
+            if (!timers.ContainsKey(n)) 
+                timers[n] = new List<Courier>();
 
             InvokeExit(m.Clone());
 
@@ -122,8 +120,15 @@ namespace Apollo.Devices {
                 
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
-                lock (locker[n])
+                lock (locker[n]) {
+                    if (timers.ContainsKey(n))
+                        for (int i = 0; i < timers[n].Count; i++)
+                            timers[n][i].Dispose();
+                    
+                    timers[n] = new List<Courier>();
+
                     Start(n, m, 2);
+                }
             
             } else Start(n, m, Repeats);
         }
@@ -142,11 +147,14 @@ namespace Apollo.Devices {
 
                     lock (locker[n]) {
                         FireCourier(n, m, _rate * _gate);
-
+                        timers[n].Remove(courier);
                         InvokeExit(m);
                     }
                 
-                } else InvokeExit(m);
+                } else {
+                    timers[n].Remove(courier);
+                    InvokeExit(m);
+                }
             }
         }
 
