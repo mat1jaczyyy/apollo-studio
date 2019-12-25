@@ -7,26 +7,25 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Loop: Device {
-        
-        Time _duration;
-        public Time Duration {
-            get => _duration;
+        Time _rate;
+        public Time Rate {
+            get => _rate;
             set {
-                if (_duration != null) {
-                    _duration.FreeChanged -= FreeChanged;
-                    _duration.ModeChanged -= ModeChanged;
-                    _duration.StepChanged -= StepChanged;
+                if (_rate != null) {
+                    _rate.FreeChanged -= FreeChanged;
+                    _rate.ModeChanged -= ModeChanged;
+                    _rate.StepChanged -= StepChanged;
                 }
 
-                _duration = value;
+                _rate = value;
 
-                if (_duration != null) {
-                    _duration.Minimum = 10;
-                    _duration.Maximum = 30000;
+                if (_rate != null) {
+                    _rate.Minimum = 10;
+                    _rate.Maximum = 30000;
 
-                    _duration.FreeChanged += FreeChanged;
-                    _duration.ModeChanged += ModeChanged;
-                    _duration.StepChanged += StepChanged;
+                    _rate.FreeChanged += FreeChanged;
+                    _rate.ModeChanged += ModeChanged;
+                    _rate.StepChanged += StepChanged;
                 }
             }
         }
@@ -70,7 +69,7 @@ namespace Apollo.Devices {
 
 
         void FreeChanged(int value) {
-            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationValue(value);
+            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRateValue(value);
         }
 
         void ModeChanged(bool value) {
@@ -78,16 +77,16 @@ namespace Apollo.Devices {
         }
 
         void StepChanged(Length value) {
-            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
+            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
         
-        public Loop(Time duration = null, double gate = 1, int repeats = 1): base("loop") {
-            Duration = duration?? new Time();
+        public Loop(Time rate = null, double gate = 1, int repeats = 1): base("loop") {
+            Rate = rate?? new Time();
             Gate = gate;
             Repeats = repeats;
         }
         
-        public override Device Clone() => new Loop(Duration, Gate, Repeats);
+        public override Device Clone() => new Loop(Rate, Gate, Repeats);
         
         void Stop(Signal n) {
             if (timers.ContainsKey(n))
@@ -114,7 +113,7 @@ namespace Apollo.Devices {
                     holdTimers[n.Index].Add(courier = new Courier(){
                         AutoReset = false,
                         Info = n,
-                        Interval = _duration * _gate
+                        Interval = _rate * _gate
                     });
                     courier.Elapsed += Tick_Hold;
                     courier.Start();
@@ -126,7 +125,7 @@ namespace Apollo.Devices {
                     timers[n].Add(courier = new Courier(){
                         AutoReset = false,
                         Info = n,
-                        Interval = i * _duration * _gate
+                        Interval = i * _rate * _gate
                     });
                     courier.Elapsed += Tick;
                     courier.Start();

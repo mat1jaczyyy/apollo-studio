@@ -300,7 +300,7 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, Loop o){
             EncodeID(writer, typeof(Loop));
             
-            Encode(writer, o.Duration);
+            Encode(writer, o.Rate);
             writer.Write(o.Gate);
 
             writer.Write(o.Repeats);
