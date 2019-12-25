@@ -110,7 +110,7 @@ namespace Apollo.Devices {
             InvokeExit(m.Clone());
 
             if (!Hold || m.Color.Lit)
-                for (int i = 1; i <= count; i++)
+                for (int i = 1; i < count; i++)
                     FireCourier(n, m, i * _rate * _gate);
         }
         
@@ -123,7 +123,7 @@ namespace Apollo.Devices {
                 if (!locker.ContainsKey(n)) locker[n] = new object();
 
                 lock (locker[n])
-                    Start(n, m, 1);
+                    Start(n, m, 2);
             
             } else Start(n, m, Repeats);
         }
