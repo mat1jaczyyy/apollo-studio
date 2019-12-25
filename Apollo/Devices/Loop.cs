@@ -81,7 +81,7 @@ namespace Apollo.Devices {
         
         public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
         
-        public Loop(Time rate = null, double gate = 1, int repeats = 1, bool hold = false): base("loop") {
+        public Loop(Time rate = null, double gate = 1, int repeats = 2, bool hold = false): base("loop") {
             Rate = rate?? new Time();
             Gate = gate;
             Repeats = repeats;
