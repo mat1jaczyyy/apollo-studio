@@ -80,13 +80,14 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
         
-        public Loop(Time rate = null, double gate = 1, int repeats = 1): base("loop") {
+        public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
+        
+        public Loop(Time rate = null, double gate = 1, int repeats = 1, bool hold = false): base("loop") {
             Rate = rate?? new Time();
             Gate = gate;
             Repeats = repeats;
+            Hold = hold;
         }
-        
-        public override Device Clone() => new Loop(Rate, Gate, Repeats);
         
         void Stop(Signal n) {
             if (timers.ContainsKey(n))
