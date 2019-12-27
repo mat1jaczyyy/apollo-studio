@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Components;
@@ -10,7 +11,6 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
-using Avalonia.Interactivity;
 
 namespace Apollo.DeviceViewers {
     public class LoopViewer: UserControl {
@@ -18,13 +18,13 @@ namespace Apollo.DeviceViewers {
         
         Loop _loop;
         
-        Dial Duration, Gate, Repeats;
+        Dial Rate, Gate, Repeats;
         CheckBox Hold;
         
         void InitializeComponent(){
             AvaloniaXamlLoader.Load(this);
             
-            Duration = this.Get<Dial>("Duration");
+            Rate = this.Get<Dial>("Rate");
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
             
@@ -38,9 +38,9 @@ namespace Apollo.DeviceViewers {
             
             _loop = loop;
             
-            Duration.UsingSteps = _loop.Duration.Mode;
-            Duration.Length = _loop.Duration.Length;
-            Duration.RawValue = _loop.Duration.Free;
+            Rate.UsingSteps = _loop.Rate.Mode;
+            Rate.Length = _loop.Rate.Length;
+            Rate.RawValue = _loop.Rate.Free;
             
             Gate.RawValue = _loop.Gate * 100;
             
@@ -52,54 +52,54 @@ namespace Apollo.DeviceViewers {
         
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
 
-        void Duration_Changed(Dial sender, double value, double? old) {
+        void Rate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
                 List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Duration Changed to {r}{Duration.Unit}", () => {
-                    Track.TraversePath<Loop>(path).Duration.Free = u;
+                Program.Project.Undo.Add($"Loop Rate Changed to {r}{Rate.Unit}", () => {
+                    Track.TraversePath<Loop>(path).Rate.Free = u;
                 }, () => {
-                    Track.TraversePath<Loop>(path).Duration.Free = r;
+                    Track.TraversePath<Loop>(path).Rate.Free = r;
                 });
             }
 
-            _loop.Duration.Free = (int)value;
+            _loop.Rate.Free = (int)value;
         }
         
-        public void SetDurationValue(int value) => Duration.RawValue = value;
+        public void SetRateValue(int value) => Rate.RawValue = value;
         
-        void Duration_StepChanged(int value, int? old) {
+        void Rate_StepChanged(int value, int? old) {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
                 List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Duration Changed to {Length.Steps[r]}", () => {
-                    Track.TraversePath<Loop>(path).Duration.Length.Step = u;
+                Program.Project.Undo.Add($"Loop Rate Changed to {Length.Steps[r]}", () => {
+                    Track.TraversePath<Loop>(path).Rate.Length.Step = u;
                 }, () => {
-                    Track.TraversePath<Loop>(path).Duration.Length.Step = r;
+                    Track.TraversePath<Loop>(path).Rate.Length.Step = r;
                 });
             }
         }
         
-        public void SetDurationStep(Length duration) => Duration.Length = duration;
+        public void SetRateStep(Length rate) => Rate.Length = rate;
         
-        void Duration_ModeChanged(bool value, bool? old) {
+        void Rate_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
                 List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    Track.TraversePath<Loop>(path).Duration.Mode = u;
+                Program.Project.Undo.Add($"Loop Rate Switched to {(r? "Steps" : "Free")}", () => {
+                    Track.TraversePath<Loop>(path).Rate.Mode = u;
                 }, () => {
-                    Track.TraversePath<Loop>(path).Duration.Mode = r;
+                    Track.TraversePath<Loop>(path).Rate.Mode = r;
                 });
             }
 
-            _loop.Duration.Mode = value;
+            _loop.Rate.Mode = value;
         }
         
         void Hold_Changed(object sender, RoutedEventArgs e) {
@@ -125,7 +125,7 @@ namespace Apollo.DeviceViewers {
             Repeats.Enabled = !hold;
         }
         
-        public void SetMode(bool mode) => Duration.UsingSteps = mode;
+        public void SetMode(bool mode) => Rate.UsingSteps = mode;
         
         void Gate_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) {

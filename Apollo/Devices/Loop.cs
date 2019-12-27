@@ -1,34 +1,46 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Loop: Device {
-        
-        Time _duration;
-        public Time Duration {
-            get => _duration;
+        Time _rate;
+        public Time Rate {
+            get => _rate;
             set {
-                if (_duration != null) {
-                    _duration.FreeChanged -= FreeChanged;
-                    _duration.ModeChanged -= ModeChanged;
-                    _duration.StepChanged -= StepChanged;
+                if (_rate != null) {
+                    _rate.FreeChanged -= FreeChanged;
+                    _rate.ModeChanged -= ModeChanged;
+                    _rate.StepChanged -= StepChanged;
                 }
 
-                _duration = value;
+                _rate = value;
 
-                if (_duration != null) {
-                    _duration.Minimum = 10;
-                    _duration.Maximum = 30000;
+                if (_rate != null) {
+                    _rate.Minimum = 10;
+                    _rate.Maximum = 30000;
 
-                    _duration.FreeChanged += FreeChanged;
-                    _duration.ModeChanged += ModeChanged;
-                    _duration.StepChanged += StepChanged;
+                    _rate.FreeChanged += FreeChanged;
+                    _rate.ModeChanged += ModeChanged;
+                    _rate.StepChanged += StepChanged;
                 }
             }
+        }
+
+        void FreeChanged(int value) {
+            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRateValue(value);
+        }
+
+        void ModeChanged(bool value) {
+            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetMode(value);
+        }
+
+        void StepChanged(Length value) {
+            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetRateStep(value);
         }
         
         double _gate;
@@ -65,118 +77,87 @@ namespace Apollo.Devices {
             }
         }
         
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        ConcurrentDictionary<byte, List<Courier>> holdTimers = new ConcurrentDictionary<byte, List<Courier>>();
-
-
-        void FreeChanged(int value) {
-            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationValue(value);
-        }
-
-        void ModeChanged(bool value) {
-            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetMode(value);
-        }
-
-        void StepChanged(Length value) {
-            if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetDurationStep(value);
-        }
         
-        public Loop(Time duration = null, double gate = 1, int repeats = 1, bool hold = false): base("loop") {
-            Duration = duration?? new Time();
+        public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
+        
+        public Loop(Time rate = null, double gate = 1, int repeats = 2, bool hold = false): base("loop") {
+            Rate = rate?? new Time();
             Gate = gate;
             Repeats = repeats;
             Hold = hold;
         }
         
-        public override Device Clone() => new Loop(Duration, Gate, Repeats);
-        
-        void Stop(Signal n) {
-            if (timers.ContainsKey(n))
-                for (int i = 0; i < timers[n].Count; i++)
-                    timers[n][i].Dispose();
-            
-            timers[n] = new List<Courier>();
-        }
-        
-        void Stop_Hold(byte index){
-            if(holdTimers.ContainsKey(index))
-                for(int i = 0; i < holdTimers[index].Count; i++)
-                    holdTimers[index][i].Dispose();
-                    
-            holdTimers[index] = new List<Courier>();            
-        }
-        
-        public override void MIDIProcess(Signal n){
-            if(Hold){
-                Stop_Hold(n.Index);
+        void FireCourier(Signal n, Signal m, double time) {
+            Courier courier;
 
-                if(n.Color.Lit){
-                    Courier courier;
-                    holdTimers[n.Index].Add(courier = new Courier(){
-                        AutoReset = false,
-                        Info = n,
-                        Interval = _duration * _gate
-                    });
-                    courier.Elapsed += Tick_Hold;
-                    courier.Start();
-                }
-            } else {
-                Stop(n);
-                for(int i = 1; i <= Repeats; i++){
-                    Courier courier;
-                    timers[n].Add(courier = new Courier(){
-                        AutoReset = false,
-                        Info = n,
-                        Interval = i * _duration * _gate
-                    });
-                    courier.Elapsed += Tick;
-                    courier.Start();
-                }
-            }
+            timers[n].Add(courier = new Courier() {
+                Info = m.Clone(),
+                AutoReset = false,
+                Interval = time,
+            });
+            courier.Elapsed += Tick;
+            courier.Start();
+        }
+
+        void Start(Signal n, Signal m, int count) {
+            if (!timers.ContainsKey(n)) 
+                timers[n] = new List<Courier>();
+
+            InvokeExit(m.Clone());
+
+            if (!Hold || m.Color.Lit)
+                for (int i = 1; i < count; i++)
+                    FireCourier(n, m, i * _rate * _gate);
+        }
+        
+        public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
-            InvokeExit(m);
+
+            if (Hold) {
+                n.Color = new Color();
+                
+                if (!locker.ContainsKey(n)) locker[n] = new object();
+
+                lock (locker[n]) {
+                    if (timers.ContainsKey(n))
+                        for (int i = 0; i < timers[n].Count; i++)
+                            timers[n][i].Dispose();
+                    
+                    timers[n] = new List<Courier>();
+
+                    Start(n, m, 2);
+                }
+            
+            } else Start(n, m, Repeats);
         }
         
         void Tick(object sender, EventArgs e) {
-            if(Disposed) return;
+            if (Disposed) return;
             
             Courier courier = (Courier)sender;
             courier.Elapsed -= Tick;
             
-            if(courier.Info is Signal n){
-                timers[n].Remove(courier);
-                courier.Dispose();
-            
+            if (courier.Info is Signal n) {
                 Signal m = n.Clone();
-                InvokeExit(m);
-            }
-        }
-        
-        void Tick_Hold(object sender, EventArgs e){
-            if(Disposed) return;
-            
-            Courier sender_courier = (Courier)sender;
-            sender_courier.Elapsed -= Tick;
-            
-            if(sender_courier.Info is Signal n){
-                Courier new_courier;
-                holdTimers[n.Index].Add(new_courier = new Courier(){
-                    AutoReset = false,
-                    Info = n,
-                    Interval = sender_courier.Interval
-                });
-                new_courier.Elapsed += Tick_Hold;
-                new_courier.Start();
+
+                if (Hold) {
+                    n.Color = new Color();
+
+                    lock (locker[n]) {
+                        FireCourier(n, m, _rate * _gate);
+                        timers[n].Remove(courier);
+                        InvokeExit(m);
+                    }
                 
-                holdTimers[n.Index].Remove(sender_courier);
-                sender_courier.Dispose();
-            
-                Signal m = n.Clone();
-                InvokeExit(m);
+                } else {
+                    timers[n].Remove(courier);
+                    InvokeExit(m);
+                }
             }
-            
-            
         }
+
         protected override void Stop() {
             foreach (List<Courier> i in timers.Values) {
                 foreach (Courier j in i) j.Dispose();
