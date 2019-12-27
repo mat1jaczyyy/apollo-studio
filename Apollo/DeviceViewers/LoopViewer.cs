@@ -45,6 +45,7 @@ namespace Apollo.DeviceViewers {
             Gate.RawValue = _loop.Gate * 100;
             
             Repeats.RawValue = _loop.Repeats;
+            Repeats.Enabled = !_loop.Hold;
             
             Hold.IsChecked = _loop.Hold;
         }
