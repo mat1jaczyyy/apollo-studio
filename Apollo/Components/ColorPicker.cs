@@ -15,6 +15,7 @@ using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
 
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -33,6 +34,9 @@ namespace Apollo.Components {
             MainColor = ((LinearGradientBrush)this.Get<Grid>("MainColor").Background).GradientStops[1];
             
             Hex = this.Get<TextBox>("Hex");
+            Red = this.Get<TextBox>("Red");
+            Green = this.Get<TextBox>("Green");
+            Blue = this.Get<TextBox>("Blue");
             
             TopBar = this.Get<Rectangle>("TopBar");
             BottomBar = this.Get<Rectangle>("BottomBar");
@@ -72,10 +76,10 @@ namespace Apollo.Components {
         Ellipse Preview;
         Canvas MainCanvas, HueCanvas, MainThumb, HueThumb;
         GradientStop MainColor;
-        TextBox Hex;
+        TextBox Hex, Red, Green, Blue;
         Rectangle TopBar, BottomBar, LeftBar, RightBar;
 
-        bool hexValidation;
+        bool hexValidation, rgbValidation;
         object mouseHeld;
         double offsetX, offsetY;
         MouseLock mouseLock = MouseLock.None;
@@ -89,10 +93,20 @@ namespace Apollo.Components {
 
             hexValidation = true;
             observables.Add(Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed));
+            
+            rgbValidation = true;
+            observables.Add(Red.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Red")));
+            observables.Add(Green.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Green")));
+            observables.Add(Blue.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Blue")));
+            
+            Preferences.ColorModeChanged += Update_ColorMode;
+            Update_ColorMode();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
+            
+            Preferences.ColorModeChanged -= Update_ColorMode;
 
             foreach (IDisposable observable in observables)
                 observable.Dispose();
@@ -117,12 +131,24 @@ namespace Apollo.Components {
 
             UpdateCanvas();
             Hex.Text = Color.ToHex();
+            
+            Red.Text = "" + Color.Red;
+            Green.Text = "" + Color.Green;
+            Blue.Text = "" + Color.Blue;
         }
 
         void UpdateText() {
             hexValidation = false;
+            rgbValidation = false;
+            
             Hex.Text = Color.ToHex();
+            
+            Red.Text = "" + Color.Red;
+            Green.Text = "" + Color.Green;
+            Blue.Text = "" + Color.Blue;
+
             hexValidation = true;
+            rgbValidation = true;
         }
 
         void UpdateColor() {
@@ -155,6 +181,24 @@ namespace Apollo.Components {
             else if (hi == 3) MainColor.Color = new AvaloniaColor(255, p, q, v);
             else if (hi == 4) MainColor.Color = new AvaloniaColor(255, t, p, v);
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
+        }
+
+        void Update_ColorMode(){
+            Red.IsVisible = false;
+            Green.IsVisible = false;
+            Blue.IsVisible = false;
+            Hex.IsVisible = false;
+            
+            switch(Preferences.ColorMode){
+            case ColorModeType.Hex:
+                Hex.IsVisible = true;
+                break;
+            case ColorModeType.RGB:
+                Red.IsVisible = true;
+                Green.IsVisible = true;
+                Blue.IsVisible = true;
+                break;         
+            }
         }
 
         void Main_Move(object sender, PointerEventArgs e) {
@@ -309,7 +353,7 @@ namespace Apollo.Components {
             if (mouseHeld == sender) Hue_Move(sender, e);
         }
 
-        bool Hex_Dirty = false;
+        bool Hex_Dirty, RGB_Dirty = false;
 
         Action HexAction(string text) {
             Action update = () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
@@ -349,7 +393,90 @@ namespace Apollo.Components {
                 hexValidation = true;
             });
         }
+        
+        Action RGBAction(string text, string name) {
+            Action update = () => {};
+            
+            TextBox changedBox = null;
+            
+            if(name == "Red"){
+                update = () => Red.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                changedBox = Red;
+            } else if(name == "Green"){
+                update = () => Green.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                changedBox = Green;
+            } else if(name == "Blue"){
+                update = () => Blue.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                changedBox = Blue;
+            }
+            
+            foreach (char i in text)
+                if (!"0123456789".Contains(i))
+                    return update + (() => UpdateText());
+                         
+            int val;
+            
+            if (text == "") val = 0;
+            else val = Convert.ToInt32(text);
+            
+            val = (val > 63)? 63 : val;  
+            
+            if(!RGB_Dirty){
+                oldColor = Color.Clone();
+                RGB_Dirty = true;
+            }
+            
+            Color newColor = _color.Clone();
+            
+            if(name == "Red"){
+                newColor.Red = (byte)val;
+            } else if(name == "Green"){
+                newColor.Green = (byte)val;            
+            } else if(name == "Blue"){
+                newColor.Blue = (byte)val;            
+            }
+            
+            return update + (() => {
+                Color = newColor;
+                
+                Preview.Fill = Color.ToScreenBrush();
+                
+                rgbValidation = false;
+                InitCanvas();
+                rgbValidation = true;
+            });
+        }
+        
+        void RGB_Changed(string text, string name){
+            if (!rgbValidation) return;
+            
+            if (text == "" || text == null) return;
+            
+            Dispatcher.UIThread.InvokeAsync(RGBAction(text, name));
+        }
+        
+        void RGB_MouseUp(object sender, PointerReleasedEventArgs e){
+            string name = ((TextBox)sender).Name;
+            
+            if(name == "Red"){
+                Red.Focus();
+            } else if(name == "Green"){
+                Green.Focus();
+            } else if(name == "Blue"){
+                Blue.Focus();
+            }
+        }
 
+        void RGB_Unfocus(object sender, RoutedEventArgs e){
+            if(sender is TextBox senderBox && senderBox.Text == "")
+                Dispatcher.UIThread.InvokeAsync(RGBAction("0", senderBox.Name));
+                
+            if (oldColor != Color)
+                ColorChanged?.Invoke(Color, oldColor);
+                
+            RGB_Dirty = false;
+        }
+        
         void Hex_Changed(string text) {
             if (!hexValidation) return;
             
@@ -361,7 +488,7 @@ namespace Apollo.Components {
 
         void Hex_MouseUp(object sender, PointerReleasedEventArgs e) => Hex.Focus();
         
-        void Hex_KeyDown(object sender, KeyEventArgs e) {
+        void Text_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
             if (e.Key == Key.Return)

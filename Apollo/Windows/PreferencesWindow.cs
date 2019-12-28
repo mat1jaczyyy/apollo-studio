@@ -54,6 +54,9 @@ namespace Apollo.Windows {
             ThemeHeader = this.Get<TextBlock>("ThemeHeader");
             Dark = this.Get<RadioButton>("Dark");
             Light = this.Get<RadioButton>("Light");
+            
+            Hex = this.Get<RadioButton>("Hex");
+            RGB = this.Get<RadioButton>("RGB");
 
             Backup = this.Get<CheckBox>("Backup");
             Autosave = this.Get<CheckBox>("Autosave");
@@ -76,7 +79,7 @@ namespace Apollo.Windows {
         CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
-        RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
+        RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light, Hex, RGB;
         HorizontalDial FadeSmoothness;
         Controls Contents;
         DispatcherTimer Timer;
@@ -170,6 +173,9 @@ namespace Apollo.Windows {
 
             Dark.IsChecked = Preferences.Theme == ThemeType.Dark;
             Light.IsChecked = Preferences.Theme == ThemeType.Light;
+            
+            Hex.IsChecked = Preferences.ColorMode == ColorModeType.Hex;
+            RGB.IsChecked = Preferences.ColorMode == ColorModeType.RGB;
 
             Backup.IsChecked = Preferences.Backup;
             Autosave.IsChecked = Preferences.Autosave;
@@ -292,6 +298,9 @@ namespace Apollo.Windows {
         void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Dark);
 
         void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Light);
+
+        void Hex_Changed(object sender, RoutedEventArgs e) => Preferences.ColorMode = ColorModeType.Hex;
+        void RGB_Changed(object sender, RoutedEventArgs e) => Preferences.ColorMode = ColorModeType.RGB;
 
         void Backup_Changed(object sender, RoutedEventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 

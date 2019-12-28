@@ -97,6 +97,8 @@ namespace Apollo.Binary {
                 writer.Write(Preferences.CheckForUpdates);
 
                 writer.Write(Preferences.Time);
+                
+                writer.Write((int)Preferences.ColorMode);
             }
 
             return output;

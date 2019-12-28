@@ -148,6 +148,9 @@ namespace Apollo.Binary {
 
                 if (version >= 17)
                     Preferences.BaseTime = reader.ReadInt64();
+                    
+                if (version >= 27)
+                    Preferences.ColorMode = (ColorModeType)reader.ReadInt32();
                 
                 return null;
 

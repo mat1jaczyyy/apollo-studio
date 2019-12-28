@@ -6,6 +6,10 @@ namespace Apollo.Enums {
     public enum ThemeType {
         Dark, Light
     }
+    
+    public enum ColorModeType{
+        Hex, RGB
+    }
 
     public enum LaunchpadModels {
         MK2, Pro, X, All

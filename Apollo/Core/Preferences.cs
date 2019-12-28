@@ -317,6 +317,19 @@ namespace Apollo.Core {
                 Save();
             }
         }
+        
+        public static event Changed ColorModeChanged;
+        static ColorModeType _ColorMode = ColorModeType.Hex;
+        public static ColorModeType ColorMode{
+            get => _ColorMode;
+            set {
+                _ColorMode = value;
+                
+                ColorModeChanged?.Invoke();
+                
+                Save();
+            }
+        }
 
         public static void Save() {
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
