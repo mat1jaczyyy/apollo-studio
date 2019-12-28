@@ -679,7 +679,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>/Users/mat1jaczyyy/Code/apollo-studio/LICENSE</string>
+							<string>../LICENSE</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
