@@ -97,7 +97,7 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, Mode) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), (from i in Filters select (bool[])i.Clone()).ToList(), Expanded, Mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -140,10 +140,12 @@ namespace Apollo.Devices {
             }
         }
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
+        public Multi(Chain preprocess = null, List<Chain> init = null, List<bool[]> filters = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
+
+            foreach (bool[] arr in filters?? new List<bool[]>()) Filters.Add(arr);
             
             Expanded = expanded;
 
