@@ -378,9 +378,9 @@ namespace Apollo.Components {
 
                 Preview.Fill = Color.ToScreenBrush();
                 
-                hexValidation = false;
+                hexValidation = rgbValidation = false;
                 InitCanvas();
-                hexValidation = true;
+                hexValidation = rgbValidation = true;
             });
         }
         
@@ -414,9 +414,9 @@ namespace Apollo.Components {
                 
                 Preview.Fill = Color.ToScreenBrush();
                 
-                rgbValidation = false;
+                hexValidation = rgbValidation = false;
                 InitCanvas();
-                rgbValidation = true;
+                hexValidation = rgbValidation = true;
             });
         }
         
