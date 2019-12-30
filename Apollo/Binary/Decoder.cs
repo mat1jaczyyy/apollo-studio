@@ -401,7 +401,7 @@ namespace Apollo.Binary {
                     reader.ReadBoolean(),
                     reader.ReadBoolean()
                 );
-            
+                
             } else if (t == typeof(KeyFilter)) {
                 bool[] filter;
                 if (version <= 18) {
@@ -439,6 +439,14 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
 
+            else if (t == typeof(Loop))
+                return new Loop(
+                    Decode(reader, version),
+                    reader.ReadDouble(),
+                    reader.ReadInt32(),
+                    reader.ReadBoolean()
+                );
+                
             else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),

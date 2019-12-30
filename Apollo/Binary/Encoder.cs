@@ -296,6 +296,16 @@ namespace Apollo.Binary {
             writer.Write(o.Target);
             writer.Write(o.Range);
         }
+        
+        static void Encode(BinaryWriter writer, Loop o){
+            EncodeID(writer, typeof(Loop));
+            
+            Encode(writer, o.Rate);
+            writer.Write(o.Gate);
+
+            writer.Write(o.Repeats);
+            writer.Write(o.Hold);
+        }
 
         static void Encode(BinaryWriter writer, Move o) {
             EncodeID(writer, typeof(Move));
