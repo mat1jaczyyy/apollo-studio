@@ -459,6 +459,12 @@ namespace Apollo.Components {
             if (e.Key == Key.Return)
                 this.Focus();
             
+            if (e.Key == Key.Tab && sender is TextBox textBox) {
+                if (textBox == Red) ((e.KeyModifiers == KeyModifiers.Shift)? Blue : Green).Focus();
+                if (textBox == Green) ((e.KeyModifiers == KeyModifiers.Shift)? Red : Blue).Focus();
+                if (textBox == Blue) ((e.KeyModifiers == KeyModifiers.Shift)? Green : Red).Focus();
+            }
+            
             e.Key = Key.None;
         }
         
