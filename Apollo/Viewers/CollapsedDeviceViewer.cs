@@ -39,7 +39,7 @@ namespace Apollo.Viewers {
         public CollapsedDeviceViewer() => new InvalidOperationException();
 
         public CollapsedDeviceViewer(Device device) {
-            TitleText.Text = device.GetType().ToString().Split(".").Last();
+            TitleText.Text = device.Name;
 
             _device = device;
             _device.Viewer = this;
