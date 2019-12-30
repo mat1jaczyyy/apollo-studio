@@ -454,15 +454,25 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
             
-            else if (t == typeof(Multi))
-                return new Multi(
-                    Decode(reader, version),
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
-                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
-                    (MultiType)reader.ReadInt32()
-                );
+            else if (t == typeof(Multi)) {
+                Chain preprocess = Decode(reader, version);
+
+                int count = reader.ReadInt32();
+                List<Chain> init = (from i in Enumerable.Range(0, count) select (Chain)Decode(reader, version)).ToList();
+
+                List<bool[]> filters = (from i in Enumerable.Range(0, count) select new bool[101]).ToList();
+                if (version >= 28) {
+                    filters = (from i in Enumerable.Range(0, count) select 
+                        (from j in Enumerable.Range(0, 101) select reader.ReadBoolean()
+                    ).ToArray()).ToList();
+                }
+                
+                int? expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+                MultiType mode = (MultiType)reader.ReadInt32();
+                
+                return new Multi(preprocess, init, filters, expanded, mode);
             
-            else if (t == typeof(Output))
+            } else if (t == typeof(Output))
                 return new Output(
                     reader.ReadInt32()
                 );

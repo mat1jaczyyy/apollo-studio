@@ -37,6 +37,8 @@ namespace Apollo.DeviceViewers {
             
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
+
+            Grid = this.Get<LaunchpadGrid>("Grid");
         }
         
         Multi _multi;
@@ -47,11 +49,13 @@ namespace Apollo.DeviceViewers {
         ComboBox MultiMode;
         VerticalAdd ChainAdd;
 
+        LaunchpadGrid Grid;
+        SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+
         void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
-            for (int i = 1; i < Contents.Count; i++)
-                ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
+            for (int i = 1; i < Contents.Count; i++) ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
 
             if (Contents.Count > 1) ((ChainInfo)Contents.Last()).ChainAdd.AlwaysShowing = true;
         }
@@ -95,7 +99,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(0, new DeviceHead(_multi, parent));
             _root.Insert(1, new ChainViewer(_multi.Preprocess, true));
 
-            MultiMode.SelectedIndex = (int)_multi.Mode;
+            SetMode(_multi.Mode);
 
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -121,6 +125,10 @@ namespace Apollo.DeviceViewers {
             _root.Insert(3, new ChainViewer(_multi[index], true));
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
+            Grid.Margin = new Thickness(4, 0, 4, 0);
+            Grid.MaxWidth = double.MaxValue;
+            Set(-1, _multi.GetFilter(index));
+
             _parent.Border.CornerRadius = new CornerRadius(0);
             _parent.Header.CornerRadius = new CornerRadius(0);
             ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
@@ -129,6 +137,9 @@ namespace Apollo.DeviceViewers {
         void Expand_Remove() {
             _root.RemoveAt(4);
             _root.RemoveAt(3);
+
+            Grid.Margin = new Thickness(0, 0, 0, 0);
+            Grid.MaxWidth = 0;
 
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
@@ -200,7 +211,11 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void SetMode(MultiType mode) => MultiMode.SelectedIndex = (int)mode;
+        public void SetMode(MultiType mode) {
+            MultiMode.SelectedIndex = (int)mode;
+
+            Grid.IsVisible = mode == MultiType.Key;
+        }
 
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
@@ -581,6 +596,45 @@ namespace Apollo.DeviceViewers {
             
             if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
                 Program.Project.Undo.Add("Chain Imported", undo, redo, dispose);
+        }
+    
+        bool drawingState;
+        bool[] old;
+        void PadStarted(int index) {
+            bool[] filter = _multi.GetFilter((int)_multi.Expanded);
+            drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
+            old = filter.ToArray();
+        }
+
+        void PadPressed(int index) => Grid.SetColor(
+            index,
+            GetColor(
+                _multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState
+                )
+            );
+
+        void PadFinished(int index) {
+            if (old == null) return;
+
+            bool[] u = old.ToArray();
+            bool[] r = _multi.GetFilter((int)_multi.Expanded).ToArray();
+            List<int> path = Track.GetPath(_multi);
+            int selected = (int)_multi.Expanded;
+
+            Program.Project.Undo.Add($"MultiFilter Changed", () => {
+                Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
+            }, () => {
+                Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
+            });
+
+            old = null;
+        }
+
+        public void Set(int index, bool[] filter) {
+            if (index != -1 && _multi.Expanded != index) return;
+
+            for (int i = 0; i < 100; i++)
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(filter[i]));
         }
     }
 }
