@@ -22,6 +22,7 @@
       <MenuItem Header="Timing">
         <MenuItem Header="Delay" />
         <MenuItem Header="Hold" />
+        <MenuItem Header="Loop" />
       </MenuItem>
 
       <MenuItem Header="Shape">

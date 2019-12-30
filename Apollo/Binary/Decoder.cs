@@ -63,6 +63,10 @@ namespace Apollo.Binary {
                 } else if (version >= 23) {
                     Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
                 }
+                
+                if (version >= 28) {
+                    Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
+                }
 
                 if (version >= 9) {
                     Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
@@ -401,7 +405,7 @@ namespace Apollo.Binary {
                     reader.ReadBoolean(),
                     reader.ReadBoolean()
                 );
-            
+                
             } else if (t == typeof(KeyFilter)) {
                 bool[] filter;
                 if (version <= 18) {
@@ -439,6 +443,14 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
 
+            else if (t == typeof(Loop))
+                return new Loop(
+                    Decode(reader, version),
+                    reader.ReadDouble(),
+                    reader.ReadInt32(),
+                    reader.ReadBoolean()
+                );
+                
             else if (t == typeof(Move))
                 return new Move(
                     Decode(reader, version),
@@ -446,15 +458,25 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
             
-            else if (t == typeof(Multi))
-                return new Multi(
-                    Decode(reader, version),
-                    (from i in Enumerable.Range(0, reader.ReadInt32()) select (Chain)Decode(reader, version)).ToList(),
-                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
-                    (MultiType)reader.ReadInt32()
-                );
+            else if (t == typeof(Multi)) {
+                Chain preprocess = Decode(reader, version);
+
+                int count = reader.ReadInt32();
+                List<Chain> init = (from i in Enumerable.Range(0, count) select (Chain)Decode(reader, version)).ToList();
+
+                List<bool[]> filters = (from i in Enumerable.Range(0, count) select new bool[101]).ToList();
+                if (version >= 28) {
+                    filters = (from i in Enumerable.Range(0, count) select 
+                        (from j in Enumerable.Range(0, 101) select reader.ReadBoolean()
+                    ).ToArray()).ToList();
+                }
+                
+                int? expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+                MultiType mode = (MultiType)reader.ReadInt32();
+                
+                return new Multi(preprocess, init, filters, expanded, mode);
             
-            else if (t == typeof(Output))
+            } else if (t == typeof(Output))
                 return new Output(
                     reader.ReadInt32()
                 );
@@ -485,6 +507,11 @@ namespace Apollo.Binary {
                 double pinch = 0;
                 if (version >= 24) {
                     pinch = reader.ReadDouble();
+                }
+
+                bool bilateral = false;
+                if (version >= 28) {
+                    bilateral = reader.ReadBoolean();
                 }
 
                 List<Frame> frames = (from i in Enumerable.Range(0, reader.ReadInt32()) select (Frame)Decode(reader, version)).ToList();
@@ -521,7 +548,7 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = new Pattern(repeats, gate, pinch, frames, mode, infinite, rootkey, wrap, expanded);
+                Pattern ret = new Pattern(repeats, gate, pinch, bilateral, frames, mode, infinite, rootkey, wrap, expanded);
 
                 if (chokeenabled) {
                     return new Choke(choke, new Chain(new List<Device>() {ret}));

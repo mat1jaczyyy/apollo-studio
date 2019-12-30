@@ -41,6 +41,8 @@ namespace Apollo.Binary {
 
                 writer.Write(Preferences.ChainSignalIndicators);
                 writer.Write(Preferences.DeviceSignalIndicators);
+                
+                writer.Write((int)Preferences.ColorDisplayFormat);
 
                 writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
@@ -296,6 +298,16 @@ namespace Apollo.Binary {
             writer.Write(o.Target);
             writer.Write(o.Range);
         }
+        
+        static void Encode(BinaryWriter writer, Loop o){
+            EncodeID(writer, typeof(Loop));
+            
+            Encode(writer, o.Rate);
+            writer.Write(o.Gate);
+
+            writer.Write(o.Repeats);
+            writer.Write(o.Hold);
+        }
 
         static void Encode(BinaryWriter writer, Move o) {
             EncodeID(writer, typeof(Move));
@@ -313,6 +325,10 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o[i]);
+
+            for (int i = 0; i < o.Count; i++)
+                for (int j = 0; j < 101; j++)
+                    writer.Write(o.GetFilter(i)[j]);
             
             writer.Write(o.Expanded.HasValue);
             if (o.Expanded.HasValue)
@@ -354,7 +370,9 @@ namespace Apollo.Binary {
 
             writer.Write(o.Repeats);
             writer.Write(o.Gate);
+
             writer.Write(o.Pinch);
+            writer.Write(o.Bilateral);
             
             writer.Write(o.Frames.Count);
             for (int i = 0; i < o.Frames.Count; i++)

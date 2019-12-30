@@ -44,7 +44,26 @@ namespace Apollo.Devices {
         public Chain Preprocess;
         public List<Chain> Chains = new List<Chain>();
 
-        Random RNG = new Random();
+        List<bool[]> _filters = new List<bool[]>();
+        List<bool[]> Filters {
+            get => _filters;
+            set {
+                int index = 0;
+                for (int i = 0; i < value.Count; i++) {
+                    if (value[i] != null && value[i].Length == 101) {
+                        _filters[index] = value[i];
+                        if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, _filters[index]);
+                        index++;
+                    }
+                }
+            }
+        }
+
+        public bool[] GetFilter(int index) => _filters[index];
+        public void SetFilter(int index, bool[] filter) {
+            _filters[index] = filter;
+            if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, filter);
+        }
 
         MultiType _mode;
         public MultiType Mode {
@@ -57,7 +76,9 @@ namespace Apollo.Devices {
         }
 
         int current = -1;
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, List<int>> buffer = new ConcurrentDictionary<Signal, List<int>>();
+
+        Random RNG = new Random();
 
         void Reroute() {
             Preprocess.Parent = this;
@@ -78,13 +99,14 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, Mode) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), (from i in Filters select (bool[])i.Clone()).ToList(), Expanded, Mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
+            _filters.Insert(index, new bool[101]);
             Reroute();
 
             SpecificViewer?.Contents_Insert(index, Chains[index]);
@@ -105,6 +127,7 @@ namespace Apollo.Devices {
 
             if (dispose) Chains[index].Dispose();
             Chains.RemoveAt(index);
+            _filters.RemoveAt(index);
             Reroute();
         }
 
@@ -119,10 +142,12 @@ namespace Apollo.Devices {
             }
         }
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
+        public Multi(Chain preprocess = null, List<Chain> init = null, List<bool[]> filters = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
+
+            foreach (bool[] arr in filters?? new List<bool[]>()) Filters.Add(arr);
             
             Expanded = expanded;
 
@@ -142,6 +167,8 @@ namespace Apollo.Devices {
             if (!buffer.ContainsKey(n)) {
                 if (!m.Color.Lit) return;
 
+                List<int> target = new List<int>();
+
                 if (Mode == MultiType.Forward) {
                     if (++current >= Chains.Count) current = 0;
                 
@@ -155,13 +182,20 @@ namespace Apollo.Devices {
                     int old = current;
                     if (Chains.Count <= 1) current = 0;
                     else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
+                    
+                } else if (Mode == MultiType.Key) {
+                    for (int index = 0; index < _filters.Count; index++) {
+                        if (_filters[index][m.Index]) target.Add(index);
+                    }
                 }
 
-                m.MultiTarget.Push(buffer[n] = current);
+                if(Mode != MultiType.Key) target.Add(current);
+
+                m.MultiTarget.Push(buffer[n] = target);
 
             } else {
                 m.MultiTarget.Push(buffer[n]);
-                if (!m.Color.Lit) buffer.Remove(n, out int _);
+                if (!m.Color.Lit) buffer.Remove(n, out List<int> _);
             }
 
             Preprocess.MIDIEnter(m);
@@ -170,10 +204,13 @@ namespace Apollo.Devices {
         void PreprocessExit(Signal n) {
             if (n is StopSignal) return;
 
-            int target = n.MultiTarget.Pop();
+            List<int> target = n.MultiTarget.Pop();
             
             if (Chains.Count == 0) InvokeExit(n);
-            else Chains[target].MIDIEnter(n);
+            else {
+                foreach (int i in target)
+                Chains[i].MIDIEnter(n.Clone());
+            }
         }
         
         protected override void Stop() {

@@ -6,6 +6,10 @@ namespace Apollo.Enums {
     public enum ThemeType {
         Dark, Light
     }
+    
+    public enum ColorDisplayType {
+        Hex, RGB
+    }
 
     public enum LaunchpadModels {
         MK2, Pro, X, All
@@ -50,7 +54,8 @@ namespace Apollo.Enums {
         Forward,
         Backward,
         Random,
-        RandomPlus
+        RandomPlus,
+        Key
     }
 
     public enum PlaybackType {
