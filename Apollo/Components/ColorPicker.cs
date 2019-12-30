@@ -137,9 +137,9 @@ namespace Apollo.Components {
             UpdateCanvas();
             Hex.Text = Color.ToHex();
             
-            Red.Text = "" + Color.Red;
-            Green.Text = "" + Color.Green;
-            Blue.Text = "" + Color.Blue;
+            Red.Text = Color.Red.ToString();
+            Green.Text = Color.Green.ToString();
+            Blue.Text = Color.Blue.ToString();
         }
 
         void UpdateText() {
@@ -148,9 +148,9 @@ namespace Apollo.Components {
             
             Hex.Text = Color.ToHex();
             
-            Red.Text = "" + Color.Red;
-            Green.Text = "" + Color.Green;
-            Blue.Text = "" + Color.Blue;
+            Red.Text = Color.Red.ToString();
+            Green.Text = Color.Green.ToString();
+            Blue.Text = Color.Blue.ToString();
 
             hexValidation = true;
             rgbValidation = true;
