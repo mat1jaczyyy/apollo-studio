@@ -63,6 +63,10 @@ namespace Apollo.Binary {
                 } else if (version >= 23) {
                     Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
                 }
+                
+                if (version >= 28) {
+                    Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
+                }
 
                 if (version >= 9) {
                     Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
@@ -148,9 +152,6 @@ namespace Apollo.Binary {
 
                 if (version >= 17)
                     Preferences.BaseTime = reader.ReadInt64();
-                    
-                if (version >= 27)
-                    Preferences.ColorMode = (ColorModeType)reader.ReadInt32();
                 
                 return null;
 

@@ -56,6 +56,19 @@ namespace Apollo.Core {
                 Save();
             }
         }
+        
+        public static event Changed ColorDisplayFormatChanged;
+        static ColorDisplayType _ColorDisplayFormat = ColorDisplayType.Hex;
+        public static ColorDisplayType ColorDisplayFormat {
+            get => _ColorDisplayFormat;
+            set {
+                _ColorDisplayFormat = value;
+                
+                ColorDisplayFormatChanged?.Invoke();
+                
+                Save();
+            }
+        }
 
         public static event Changed LaunchpadModelChanged;
         static LaunchpadModels _LaunchpadModel = LaunchpadModels.Pro;
@@ -314,19 +327,6 @@ namespace Apollo.Core {
             get => _CrashPath;
             set {
                 _CrashPath = value;
-                Save();
-            }
-        }
-        
-        public static event Changed ColorModeChanged;
-        static ColorModeType _ColorMode = ColorModeType.Hex;
-        public static ColorModeType ColorMode{
-            get => _ColorMode;
-            set {
-                _ColorMode = value;
-                
-                ColorModeChanged?.Invoke();
-                
                 Save();
             }
         }

@@ -32,6 +32,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators = this.Get<CheckBox>("ChainSignalIndicators");
             DeviceSignalIndicators = this.Get<CheckBox>("DeviceSignalIndicators");
+            
+            ColorDisplayFormat = this.Get<ComboBox>("ColorDisplayFormat");
 
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
@@ -54,9 +56,6 @@ namespace Apollo.Windows {
             ThemeHeader = this.Get<TextBlock>("ThemeHeader");
             Dark = this.Get<RadioButton>("Dark");
             Light = this.Get<RadioButton>("Light");
-            
-            Hex = this.Get<RadioButton>("Hex");
-            RGB = this.Get<RadioButton>("RGB");
 
             Backup = this.Get<CheckBox>("Backup");
             Autosave = this.Get<CheckBox>("Autosave");
@@ -77,9 +76,9 @@ namespace Apollo.Windows {
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
-        ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
+        ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
-        RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light, Hex, RGB;
+        RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         HorizontalDial FadeSmoothness;
         Controls Contents;
         DispatcherTimer Timer;
@@ -151,6 +150,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators.IsChecked = Preferences.ChainSignalIndicators;
             DeviceSignalIndicators.IsChecked = Preferences.DeviceSignalIndicators;
+            
+            ColorDisplayFormat.SelectedIndex = (int)Preferences.ColorDisplayFormat;
 
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
@@ -173,9 +174,6 @@ namespace Apollo.Windows {
 
             Dark.IsChecked = Preferences.Theme == ThemeType.Dark;
             Light.IsChecked = Preferences.Theme == ThemeType.Light;
-            
-            Hex.IsChecked = Preferences.ColorMode == ColorModeType.Hex;
-            RGB.IsChecked = Preferences.ColorMode == ColorModeType.RGB;
 
             Backup.IsChecked = Preferences.Backup;
             Autosave.IsChecked = Preferences.Autosave;
@@ -228,6 +226,8 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
+
+        void ColorDisplayFormat_Changed(object sender, SelectionChangedEventArgs e) => Preferences.ColorDisplayFormat = (ColorDisplayType)ColorDisplayFormat.SelectedIndex;
         
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
@@ -298,9 +298,6 @@ namespace Apollo.Windows {
         void Dark_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Dark);
 
         void Light_Changed(object sender, RoutedEventArgs e) => SetTheme(ThemeType.Light);
-
-        void Hex_Changed(object sender, RoutedEventArgs e) => Preferences.ColorMode = ColorModeType.Hex;
-        void RGB_Changed(object sender, RoutedEventArgs e) => Preferences.ColorMode = ColorModeType.RGB;
 
         void Backup_Changed(object sender, RoutedEventArgs e) => Preferences.Backup = Backup.IsChecked.Value;
 

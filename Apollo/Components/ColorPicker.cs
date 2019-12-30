@@ -99,14 +99,14 @@ namespace Apollo.Components {
             observables.Add(Green.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Green")));
             observables.Add(Blue.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Blue")));
             
-            Preferences.ColorModeChanged += Update_ColorMode;
-            Update_ColorMode();
+            Preferences.ColorDisplayFormatChanged += Update_ColorDisplayFormat;
+            Update_ColorDisplayFormat();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
             
-            Preferences.ColorModeChanged -= Update_ColorMode;
+            Preferences.ColorDisplayFormatChanged -= Update_ColorDisplayFormat;
 
             foreach (IDisposable observable in observables)
                 observable.Dispose();
@@ -183,22 +183,9 @@ namespace Apollo.Components {
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
         }
 
-        void Update_ColorMode(){
-            Red.IsVisible = false;
-            Green.IsVisible = false;
-            Blue.IsVisible = false;
-            Hex.IsVisible = false;
-            
-            switch(Preferences.ColorMode){
-            case ColorModeType.Hex:
-                Hex.IsVisible = true;
-                break;
-            case ColorModeType.RGB:
-                Red.IsVisible = true;
-                Green.IsVisible = true;
-                Blue.IsVisible = true;
-                break;         
-            }
+        void Update_ColorDisplayFormat() {
+            Red.IsVisible = Green.IsVisible = Blue.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.RGB;
+            Hex.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.Hex;
         }
 
         void Main_Move(object sender, PointerEventArgs e) {

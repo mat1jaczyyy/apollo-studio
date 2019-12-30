@@ -7,7 +7,7 @@ namespace Apollo.Enums {
         Dark, Light
     }
     
-    public enum ColorModeType{
+    public enum ColorDisplayType {
         Hex, RGB
     }
 
