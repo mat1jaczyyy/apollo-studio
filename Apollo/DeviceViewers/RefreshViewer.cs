@@ -9,23 +9,21 @@ using Apollo.Elements;
 using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
-    public class PatternViewer: UserControl {
-        public static readonly string DeviceIdentifier = "pattern";
+    public class RefreshViewer: UserControl {
+        public static readonly string DeviceIdentifier = "refresh";
 
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
-        Pattern _pattern;
+        Refresh _refresh;
 
-        public PatternViewer() => new InvalidOperationException();
+        public RefreshViewer() => new InvalidOperationException();
 
-        public PatternViewer(Pattern pattern) {
+        public RefreshViewer(Refresh refresh) {
             InitializeComponent();
 
-            _pattern = pattern;
+            _refresh = refresh;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _pattern = null;
-
-        void Pattern_Popout() => PatternWindow.Create(_pattern, Track.Get(_pattern)?.Window);
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
     }
 }
