@@ -56,6 +56,19 @@ namespace Apollo.Core {
                 Save();
             }
         }
+        
+        public static event Changed ColorDisplayFormatChanged;
+        static ColorDisplayType _ColorDisplayFormat = ColorDisplayType.Hex;
+        public static ColorDisplayType ColorDisplayFormat {
+            get => _ColorDisplayFormat;
+            set {
+                _ColorDisplayFormat = value;
+                
+                ColorDisplayFormatChanged?.Invoke();
+                
+                Save();
+            }
+        }
 
         public static event Changed LaunchpadModelChanged;
         static LaunchpadModels _LaunchpadModel = LaunchpadModels.Pro;
