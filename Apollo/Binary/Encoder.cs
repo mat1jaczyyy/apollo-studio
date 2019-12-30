@@ -41,6 +41,8 @@ namespace Apollo.Binary {
 
                 writer.Write(Preferences.ChainSignalIndicators);
                 writer.Write(Preferences.DeviceSignalIndicators);
+                
+                writer.Write((int)Preferences.ColorDisplayFormat);
 
                 writer.Write((int)Preferences.LaunchpadStyle);
                 writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));

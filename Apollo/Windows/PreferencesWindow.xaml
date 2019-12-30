@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner" CanResize="false"
         Icon="/Resources/WindowIcon.png"
-        Width="420" MinWidth="420" MaxWidth="420"
+        Width="440" MinWidth="440" MaxWidth="440"
         Height="640" MinHeight="640" MaxHeight="640"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown">
@@ -42,13 +42,28 @@
               </Style>
             </StackPanel.Styles>
 
-            <Grid ColumnDefinitions="*,Auto,Auto">
+            <Grid ColumnDefinitions="*,Auto,*">
+              <Grid.Styles>
+                <Style Selector="ComboBox">
+                  <Setter Property="BorderThickness" Value="0" />
+                  <Setter Property="Padding" Value="0" />
+                  <Setter Property="Background" Value="Transparent" />
+                </Style>
+              </Grid.Styles>
+
               <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center">
                 <TextBlock Classes="heading" Text="Appearance" />
                 <CheckBox Click="AlwaysOnTop_Changed" x:Name="AlwaysOnTop">Always on Top</CheckBox>
                 <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
                 <CheckBox Click="ChainSignalIndicators_Changed" x:Name="ChainSignalIndicators">Chain Signal Indicators</CheckBox>
                 <CheckBox Click="DeviceSignalIndicators_Changed" x:Name="DeviceSignalIndicators">Device Signal Indicators</CheckBox>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <TextBlock Text="Color Display Format:" />
+                  <ComboBox x:Name="ColorDisplayFormat" SelectionChanged="ColorDisplayFormat_Changed">
+                    <ComboBoxItem>Hex</ComboBoxItem>
+                    <ComboBoxItem>RGB</ComboBoxItem>
+                  </ComboBox>
+                </StackPanel>
 
                 <Border />
 
@@ -67,19 +82,13 @@
                 <TextBlock Classes="heading" Text="Processing" />
                 <Components:HorizontalDial HorizontalAlignment="Left" x:Name="FadeSmoothness" Title="Fade Smoothness:" Minimum="0" Maximum="100" Default="1" Exponent="1" Round="0" Unit="%" Scale="0.4" 
                                            ValueChanged="FadeSmoothness_Changed"/>
+              </StackPanel>
 
-                <Border />
+              <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Margin="10 0" VerticalAlignment="Stretch" Width="2" BorderThickness="0 0 1 0" />
 
+              <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
                 <TextBlock Classes="heading" Text="On-screen Launchpad Style" />
                 <StackPanel Orientation="Horizontal">
-                  <StackPanel.Styles>
-                    <Style Selector="ComboBox">
-                      <Setter Property="BorderThickness" Value="0" />
-                      <Setter Property="Padding" Value="0" />
-                      <Setter Property="Background" Value="Transparent" />
-                    </Style>
-                  </StackPanel.Styles>
-
                   <ComboBox x:Name="LaunchpadGridRotation" SelectionChanged="LaunchpadGridRotation_Changed">
                     <ComboBoxItem>Standard</ComboBoxItem>
                     <ComboBoxItem>Diagonal</ComboBoxItem>
@@ -98,12 +107,9 @@
                     <ComboBoxItem>All</ComboBoxItem>
                   </ComboBox>
                 </StackPanel>
-              </StackPanel>
 
-              <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" Margin="10 0" VerticalAlignment="Stretch" Width="2" BorderThickness="0 0 1 0" />
+                <Border />
 
-              <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
-                <TextBlock Classes="heading" Text="Launchpad Preview" />
                 <Components:LaunchpadGrid x:Name="Preview" PadPressed="Preview_Pressed" />
               </StackPanel>
             </Grid>

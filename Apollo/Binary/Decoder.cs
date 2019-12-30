@@ -63,6 +63,10 @@ namespace Apollo.Binary {
                 } else if (version >= 23) {
                     Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
                 }
+                
+                if (version >= 28) {
+                    Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
+                }
 
                 if (version >= 9) {
                     Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();

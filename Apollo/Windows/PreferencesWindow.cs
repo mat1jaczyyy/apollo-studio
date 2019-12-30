@@ -32,6 +32,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators = this.Get<CheckBox>("ChainSignalIndicators");
             DeviceSignalIndicators = this.Get<CheckBox>("DeviceSignalIndicators");
+            
+            ColorDisplayFormat = this.Get<ComboBox>("ColorDisplayFormat");
 
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
@@ -74,7 +76,7 @@ namespace Apollo.Windows {
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
-        ComboBox LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
+        ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         HorizontalDial FadeSmoothness;
@@ -148,6 +150,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators.IsChecked = Preferences.ChainSignalIndicators;
             DeviceSignalIndicators.IsChecked = Preferences.DeviceSignalIndicators;
+            
+            ColorDisplayFormat.SelectedIndex = (int)Preferences.ColorDisplayFormat;
 
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
@@ -222,6 +226,8 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
+
+        void ColorDisplayFormat_Changed(object sender, SelectionChangedEventArgs e) => Preferences.ColorDisplayFormat = (ColorDisplayType)ColorDisplayFormat.SelectedIndex;
         
         void LaunchpadStyle_Changed(object sender, SelectionChangedEventArgs e) => Preferences.LaunchpadStyle = (LaunchpadStyles)LaunchpadStyle.SelectedIndex;
 
