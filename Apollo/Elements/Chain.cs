@@ -62,7 +62,7 @@ namespace Apollo.Elements {
         }
 
         void InvokeExit(Signal n) {
-            Info?.Indicator.Trigger();
+            Info?.Indicator.Trigger(n.Color.Lit);
             MIDIExit?.Invoke(n);
         }
 
@@ -166,7 +166,7 @@ namespace Apollo.Elements {
         public void MIDIEnter(Signal n) {
             if (n is StopSignal) _chainenter?.Invoke(n);
             else if (Enabled) {
-                Viewer?.Indicator.Trigger();
+                Viewer?.Indicator.Trigger(n.Color.Lit);
                 _chainenter?.Invoke(n);
             }
         }

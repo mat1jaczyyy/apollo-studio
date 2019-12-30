@@ -34,7 +34,7 @@ namespace Apollo.Elements {
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
         protected void InvokeExit(Signal n) {
-            Viewer?.Indicator.Trigger();
+            Viewer?.Indicator.Trigger(n.Color.Lit);
             MIDIExit?.Invoke(n);
         }
 

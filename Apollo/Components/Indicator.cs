@@ -25,7 +25,7 @@ namespace Apollo.Components {
         
         bool Disposed = false;
 
-        void SetIndicator(bool state) => Dispatcher.UIThread.InvokeAsync(() => Display.Opacity = Convert.ToInt32(state));
+        void SetIndicator(double state) => Dispatcher.UIThread.InvokeAsync(() => Display.Opacity = state);
 
         public Indicator() => InitializeComponent();
 
@@ -36,7 +36,7 @@ namespace Apollo.Components {
             }
         }
 
-        public void Trigger() {
+        public void Trigger(bool lit) {
             if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
 
             lock (locker) {
@@ -48,10 +48,10 @@ namespace Apollo.Components {
                     Interval = 200
                 };
 
-                Timer.Elapsed += (_, __) => SetIndicator(false);
+                Timer.Elapsed += (_, __) => SetIndicator(0);
                 Timer.Start();
 
-                SetIndicator(true);
+                SetIndicator(lit? 1 : 0.5);
             }
         }
     }
