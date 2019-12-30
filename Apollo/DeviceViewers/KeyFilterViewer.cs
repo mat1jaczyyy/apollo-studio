@@ -48,7 +48,12 @@ namespace Apollo.DeviceViewers {
             old = _filter.Filter.ToArray();
         }
 
-        void PadPressed(int index) => Grid.SetColor(index, GetColor(_filter[LaunchpadGrid.GridToSignal(index)] = drawingState));
+        void PadPressed(int index) => Grid.SetColor(
+            index,
+            GetColor(
+                _filter[LaunchpadGrid.GridToSignal(index)] = drawingState
+                )
+            );
 
         void PadFinished(int index) {
             if (old == null) return;

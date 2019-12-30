@@ -50,7 +50,8 @@ namespace Apollo.Enums {
         Forward,
         Backward,
         Random,
-        RandomPlus
+        RandomPlus,
+        Key
     }
 
     public enum PlaybackType {

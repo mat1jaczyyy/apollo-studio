@@ -11,24 +11,31 @@
     </Components:ApolloContextMenu>
   </UserControl.Resources>
   
-  <Grid RowDefinitions="*,Auto">
-    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-      <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
-        <StackPanel Grid.Row="0" MinWidth="105" MaxWidth="105" x:Name="Contents">
-          <Components:VerticalAdd AlwaysShowing="true" Actions="PasteAndImport" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
-        </StackPanel>
+  <Grid ColumnDefinitions="Auto,*">
+    <Grid Grid.Column="0" RowDefinitions="*,Auto" >
+      <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+        <Grid RowDefinitions="Auto,*" Margin="10 5" x:Name="Layout">
+          <StackPanel Grid.Row="0" MinWidth="105" MaxWidth="105" x:Name="Contents">
+            <Components:VerticalAdd AlwaysShowing="true" Actions="PasteAndImport" Added="Chain_InsertStart" Action="Chain_Action" DragDrop.AllowDrop="true" x:Name="ChainAdd" />
+          </StackPanel>
 
-        <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
-      </Grid>
-    </ScrollViewer>
-  
-    <Border Grid.Row="1" Margin="10 0 10 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-      <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="2" x:Name="MultiMode" SelectionChanged="Mode_Changed">
-        <ComboBoxItem>Forward</ComboBoxItem>
-        <ComboBoxItem>Backward</ComboBoxItem>
-        <ComboBoxItem>Random</ComboBoxItem>
-        <ComboBoxItem>Random+</ComboBoxItem>
-      </ComboBox>
+          <Grid Grid.Row="1" VerticalAlignment="Stretch" Background="Transparent" DragDrop.AllowDrop="true" x:Name="DropZoneAfter" PointerReleased="Click" />
+        </Grid>
+      </ScrollViewer>
+
+      <Border Grid.Row="1" Margin="10 0 10 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
+        <ComboBox Margin="0 5 0 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="2" x:Name="MultiMode" SelectionChanged="Mode_Changed">
+          <ComboBoxItem>Forward</ComboBoxItem>
+          <ComboBoxItem>Backward</ComboBoxItem>
+          <ComboBoxItem>Random</ComboBoxItem>
+          <ComboBoxItem>Random+</ComboBoxItem>
+          <ComboBoxItem>Key</ComboBoxItem>
+        </ComboBox>
+      </Border>
+    </Grid>
+    
+    <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+        <Components:LaunchpadGrid x:Name="Grid" Margin="0 0" MaxWidth="0" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished"/>
     </Border>
   </Grid>
 </UserControl>
