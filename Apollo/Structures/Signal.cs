@@ -88,6 +88,7 @@ namespace Apollo.Structures {
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
         public override int GetHashCode() => HashCode.Combine(Source, HashIndex? Index : 11, Color, HashCode.Combine(Macros[0], Macros[1], Macros[2], Macros[3]), Layer, BlendingMode, BlendingRange, GetListHashCode(PeekMultiTarget));
+        
         int GetListHashCode(IEnumerable<int> x) => (x == null || x.Count() == 0)
             ? HashCode.Combine((int?)null)
             : (x.Count() > 1)

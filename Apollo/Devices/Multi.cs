@@ -58,13 +58,13 @@ namespace Apollo.Devices {
                 }
             }
         }
+
         public bool[] GetFilter(int index) => _filters[index];
         public void SetFilter(int index, bool[] filter) {
             _filters[index] = filter;
             if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, filter);
         }
 
-        Random RNG = new Random();
         MultiType _mode;
         public MultiType Mode {
             get => _mode;
@@ -77,6 +77,8 @@ namespace Apollo.Devices {
 
         int current = -1;
         ConcurrentDictionary<Signal, List<int>> buffer = new ConcurrentDictionary<Signal, List<int>>();
+
+        Random RNG = new Random();
 
         void Reroute() {
             Preprocess.Parent = this;
@@ -180,8 +182,8 @@ namespace Apollo.Devices {
                     int old = current;
                     if (Chains.Count <= 1) current = 0;
                     else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
-                }
-                else if (Mode == MultiType.Key) {
+                    
+                } else if (Mode == MultiType.Key) {
                     for (int index = 0; index < _filters.Count; index++) {
                         if (_filters[index][m.Index]) target.Add(index);
                     }

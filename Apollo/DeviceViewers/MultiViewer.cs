@@ -58,7 +58,8 @@ namespace Apollo.DeviceViewers {
         void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
-            for (int i = 1; i < Contents.Count; i++) ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
+            for (int i = 1; i < Contents.Count; i++)
+                ((ChainInfo)Contents[i]).ChainAdd.AlwaysShowing = false;
 
             if (Contents.Count > 1) ((ChainInfo)Contents.Last()).ChainAdd.AlwaysShowing = true;
         }
@@ -216,6 +217,44 @@ namespace Apollo.DeviceViewers {
             MultiMode.SelectedIndex = (int)mode;
 
             GridContainer.IsVisible = mode == MultiType.Key;
+        }
+    
+        bool drawingState;
+        bool[] old;
+
+        void PadStarted(int index) {
+            bool[] filter = _multi.GetFilter((int)_multi.Expanded);
+            drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
+            old = filter.ToArray();
+        }
+
+        void PadPressed(int index) => Grid.SetColor(
+            index,
+            GetColor(_multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState)
+        );
+
+        void PadFinished(int index) {
+            if (old == null) return;
+
+            bool[] u = old.ToArray();
+            bool[] r = _multi.GetFilter((int)_multi.Expanded).ToArray();
+            List<int> path = Track.GetPath(_multi);
+            int selected = (int)_multi.Expanded;
+
+            Program.Project.Undo.Add($"MultiFilter Changed", () => {
+                Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
+            }, () => {
+                Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
+            });
+
+            old = null;
+        }
+
+        public void Set(int index, bool[] filter) {
+            if (index != -1 && _multi.Expanded != index) return;
+
+            for (int i = 0; i < 100; i++)
+                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(filter[i]));
         }
 
         void DragOver(object sender, DragEventArgs e) {
@@ -597,44 +636,6 @@ namespace Apollo.DeviceViewers {
             
             if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
                 Program.Project.Undo.Add("Chain Imported", undo, redo, dispose);
-        }
-    
-        bool drawingState;
-        bool[] old;
-
-        void PadStarted(int index) {
-            bool[] filter = _multi.GetFilter((int)_multi.Expanded);
-            drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
-            old = filter.ToArray();
-        }
-
-        void PadPressed(int index) => Grid.SetColor(
-            index,
-            GetColor(_multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState)
-        );
-
-        void PadFinished(int index) {
-            if (old == null) return;
-
-            bool[] u = old.ToArray();
-            bool[] r = _multi.GetFilter((int)_multi.Expanded).ToArray();
-            List<int> path = Track.GetPath(_multi);
-            int selected = (int)_multi.Expanded;
-
-            Program.Project.Undo.Add($"MultiFilter Changed", () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
-            }, () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
-            });
-
-            old = null;
-        }
-
-        public void Set(int index, bool[] filter) {
-            if (index != -1 && _multi.Expanded != index) return;
-
-            for (int i = 0; i < 100; i++)
-                Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(filter[i]));
         }
     }
 }
