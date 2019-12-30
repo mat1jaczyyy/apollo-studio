@@ -213,6 +213,15 @@ namespace Apollo.Components {
             }
         }
 
+        bool _precise = true;
+        public bool AllowPrecise {
+            get => _precise;
+            set {
+                if (!(_precise = value) && Input.IsEnabled)
+                    Input_LostFocus(null, null);
+            }
+        }
+
         double _scale = 1;
         public double Scale {
             get => _scale;
@@ -470,7 +479,7 @@ namespace Apollo.Components {
         protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled) {
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled && AllowPrecise) {
                 Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 
