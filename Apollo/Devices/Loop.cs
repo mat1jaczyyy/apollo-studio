@@ -148,6 +148,8 @@ namespace Apollo.Devices {
                     lock (locker[n]) {
                         FireCourier(n, m, _rate * _gate);
                         timers[n].Remove(courier);
+                        
+                        InvokeExit(m.With(m.Index, new Color(0)));
                         InvokeExit(m);
                     }
                 
