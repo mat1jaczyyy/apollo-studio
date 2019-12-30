@@ -559,6 +559,9 @@ namespace Apollo.Binary {
                     (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
+
+            else if (t == typeof(Refresh))
+                return new Refresh();
             
             else if (t == typeof(Switch)) {
                 int target = (version >= 25)? reader.ReadInt32() : 1;

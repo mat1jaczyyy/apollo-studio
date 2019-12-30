@@ -399,6 +399,10 @@ namespace Apollo.Binary {
             writer.Write(o.Bypass);
         }
 
+        static void Encode(BinaryWriter writer, Refresh o) {
+            EncodeID(writer, typeof(Refresh));
+        }
+
         static void Encode(BinaryWriter writer, Tone o) {
             EncodeID(writer, typeof(Tone));
 
