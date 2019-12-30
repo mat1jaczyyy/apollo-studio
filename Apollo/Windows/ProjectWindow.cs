@@ -282,7 +282,10 @@ namespace Apollo.Windows {
                     if (value <= 0) text = "0";
                     else text = text.TrimStart('0');
 
-                    if (value > 999) text = "999";
+                    if (value > 999) {
+                        text = "999";
+                        BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                    }
                     
                     BPM.Text = text;
                 };
