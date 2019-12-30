@@ -48,7 +48,9 @@ namespace Apollo.Windows {
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
+
             Pinch = this.Get<Dial>("Pinch");
+            Bilateral = this.Get<CheckBox>("Bilateral");
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
@@ -113,7 +115,7 @@ namespace Apollo.Windows {
         ColorHistory ColorHistory;
         Dial Duration, Gate, Repeats, Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
-        CheckBox Wrap, Infinite;
+        CheckBox Wrap, Infinite, Bilateral;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -994,6 +996,26 @@ namespace Apollo.Windows {
         }
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
+
+        void Bilateral_Changed(object sender, RoutedEventArgs e) {
+            bool value = Bilateral.IsChecked.Value;
+
+            if (_pattern.Bilateral != value) {
+                bool u = _pattern.Bilateral;
+                bool r = value;
+                List<int> path = Track.GetPath(_pattern);
+
+                Program.Project.Undo.Add($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    Track.TraversePath<Pattern>(path).Bilateral = u;
+                }, () => {
+                    Track.TraversePath<Pattern>(path).Bilateral = r;
+                });
+
+                _pattern.Bilateral = value;
+            }
+        }
+
+        public void SetBilateral(bool value) => Bilateral.IsChecked = value;
 
         int? oldRootKey = -1;
 
