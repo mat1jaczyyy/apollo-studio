@@ -39,6 +39,7 @@ namespace Apollo.DeviceViewers {
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
 
             Grid = this.Get<LaunchpadGrid>("Grid");
+            GridContainer = this.Get<Border>("GridContainer");
         }
         
         Multi _multi;
@@ -50,6 +51,8 @@ namespace Apollo.DeviceViewers {
         VerticalAdd ChainAdd;
 
         LaunchpadGrid Grid;
+        Border GridContainer;
+
         SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
 
         void SetAlwaysShowing() {
@@ -125,8 +128,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(3, new ChainViewer(_multi[index], true));
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
-            Grid.Margin = new Thickness(4, 0, 4, 0);
-            Grid.MaxWidth = double.MaxValue;
+            GridContainer.MaxWidth = double.MaxValue;
             Set(-1, _multi.GetFilter(index));
 
             _parent.Border.CornerRadius = new CornerRadius(0);
@@ -138,8 +140,7 @@ namespace Apollo.DeviceViewers {
             _root.RemoveAt(4);
             _root.RemoveAt(3);
 
-            Grid.Margin = new Thickness(0, 0, 0, 0);
-            Grid.MaxWidth = 0;
+            GridContainer.MaxWidth = 0;
 
             _parent.Border.CornerRadius = new CornerRadius(0, 5, 5, 0);
             _parent.Header.CornerRadius = new CornerRadius(0, 5, 0, 0);
@@ -214,7 +215,7 @@ namespace Apollo.DeviceViewers {
         public void SetMode(MultiType mode) {
             MultiMode.SelectedIndex = (int)mode;
 
-            Grid.IsVisible = mode == MultiType.Key;
+            GridContainer.IsVisible = mode == MultiType.Key;
         }
 
         void DragOver(object sender, DragEventArgs e) {
@@ -600,6 +601,7 @@ namespace Apollo.DeviceViewers {
     
         bool drawingState;
         bool[] old;
+
         void PadStarted(int index) {
             bool[] filter = _multi.GetFilter((int)_multi.Expanded);
             drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
@@ -608,10 +610,8 @@ namespace Apollo.DeviceViewers {
 
         void PadPressed(int index) => Grid.SetColor(
             index,
-            GetColor(
-                _multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState
-                )
-            );
+            GetColor(_multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState)
+        );
 
         void PadFinished(int index) {
             if (old == null) return;

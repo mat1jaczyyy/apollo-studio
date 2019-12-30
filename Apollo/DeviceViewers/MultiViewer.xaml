@@ -24,7 +24,7 @@
       </ScrollViewer>
 
       <Border Grid.Row="1" Margin="0 0 0 5" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-        <ComboBox Margin="10 5 10 0" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="2" x:Name="MultiMode" SelectionChanged="Mode_Changed">
+        <ComboBox Margin="10 5 10 1" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Padding="2" x:Name="MultiMode" SelectionChanged="Mode_Changed">
           <ComboBoxItem>Forward</ComboBoxItem>
           <ComboBoxItem>Backward</ComboBoxItem>
           <ComboBoxItem>Random</ComboBoxItem>
@@ -34,8 +34,8 @@
       </Border>
     </Grid>
     
-    <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
-        <Components:LaunchpadGrid x:Name="Grid" Margin="0 0" MaxWidth="0" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished"/>
+    <Border Grid.Column="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0" MaxWidth="0" x:Name="GridContainer">
+      <Components:LaunchpadGrid x:Name="Grid" Margin="5 0" PadStarted="PadStarted" PadPressed="PadPressed" PadFinished="PadFinished"/>
     </Border>
   </Grid>
 </UserControl>
