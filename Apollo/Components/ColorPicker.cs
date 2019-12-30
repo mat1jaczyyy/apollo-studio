@@ -79,6 +79,11 @@ namespace Apollo.Components {
         TextBox Hex, Red, Green, Blue;
         Rectangle TopBar, BottomBar, LeftBar, RightBar;
 
+        void Update_ColorDisplayFormat() {
+            Red.IsVisible = Green.IsVisible = Blue.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.RGB;
+            Hex.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.Hex;
+        }
+
         bool hexValidation, rgbValidation;
         object mouseHeld;
         double offsetX, offsetY;
@@ -95,9 +100,9 @@ namespace Apollo.Components {
             observables.Add(Hex.GetObservable(TextBox.TextProperty).Subscribe(Hex_Changed));
             
             rgbValidation = true;
-            observables.Add(Red.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Red")));
-            observables.Add(Green.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Green")));
-            observables.Add(Blue.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, "Blue")));
+            observables.Add(Red.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, Red)));
+            observables.Add(Green.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, Green)));
+            observables.Add(Blue.GetObservable(TextBox.TextProperty).Subscribe((string text) => RGB_Changed(text, Blue)));
             
             Preferences.ColorDisplayFormatChanged += Update_ColorDisplayFormat;
             Update_ColorDisplayFormat();
@@ -181,11 +186,6 @@ namespace Apollo.Components {
             else if (hi == 3) MainColor.Color = new AvaloniaColor(255, p, q, v);
             else if (hi == 4) MainColor.Color = new AvaloniaColor(255, t, p, v);
             else              MainColor.Color = new AvaloniaColor(255, v, p, q);
-        }
-
-        void Update_ColorDisplayFormat() {
-            Red.IsVisible = Green.IsVisible = Blue.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.RGB;
-            Hex.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.Hex;
         }
 
         void Main_Move(object sender, PointerEventArgs e) {
@@ -381,26 +381,13 @@ namespace Apollo.Components {
             });
         }
         
-        Action RGBAction(string text, string name) {
+        Action RGBAction(string text, TextBox sender) {
             Action update = () => {};
-            
-            TextBox changedBox = null;
-            
-            if(name == "Red"){
-                update = () => Red.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
-                changedBox = Red;
-            } else if(name == "Green"){
-                update = () => Green.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
-                changedBox = Green;
-            } else if(name == "Blue"){
-                update = () => Blue.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
-                changedBox = Blue;
-            }
             
             foreach (char i in text)
                 if (!"0123456789".Contains(i))
                     return update + (() => UpdateText());
-                         
+            
             int val;
             
             if (text == "") val = 0;
@@ -408,20 +395,16 @@ namespace Apollo.Components {
             
             val = (val > 63)? 63 : val;  
             
-            if(!RGB_Dirty){
+            if (!RGB_Dirty) {
                 oldColor = Color.Clone();
                 RGB_Dirty = true;
             }
             
             Color newColor = _color.Clone();
             
-            if(name == "Red"){
-                newColor.Red = (byte)val;
-            } else if(name == "Green"){
-                newColor.Green = (byte)val;            
-            } else if(name == "Blue"){
-                newColor.Blue = (byte)val;            
-            }
+            if (sender == Red) newColor.Red = (byte)val;
+            else if (sender == Green) newColor.Green = (byte)val;
+            else if (sender == Blue) newColor.Blue = (byte)val;
             
             return update + (() => {
                 Color = newColor;
@@ -434,29 +417,21 @@ namespace Apollo.Components {
             });
         }
         
-        void RGB_Changed(string text, string name){
+        void RGB_Changed(string text, TextBox sender) {
             if (!rgbValidation) return;
             
             if (text == "" || text == null) return;
             
-            Dispatcher.UIThread.InvokeAsync(RGBAction(text, name));
+            Dispatcher.UIThread.InvokeAsync(RGBAction(text, sender));
         }
         
-        void RGB_MouseUp(object sender, PointerReleasedEventArgs e){
-            string name = ((TextBox)sender).Name;
-            
-            if(name == "Red"){
-                Red.Focus();
-            } else if(name == "Green"){
-                Green.Focus();
-            } else if(name == "Blue"){
-                Blue.Focus();
-            }
+        void RGB_MouseUp(object sender, PointerReleasedEventArgs e) {
+            if (sender is TextBox textBox) textBox.Focus();
         }
 
         void RGB_Unfocus(object sender, RoutedEventArgs e){
-            if(sender is TextBox senderBox && senderBox.Text == "")
-                Dispatcher.UIThread.InvokeAsync(RGBAction("0", senderBox.Name));
+            if (sender is TextBox textBox && textBox.Text == "")
+                Dispatcher.UIThread.InvokeAsync(RGBAction("0", textBox));
                 
             if (oldColor != Color)
                 ColorChanged?.Invoke(Color, oldColor);
