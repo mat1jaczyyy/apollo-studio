@@ -276,7 +276,7 @@ namespace Apollo.Components {
                 };
             }
 
-            if (text == "-") Update = null;
+            if (!AbsoluteCanvas.IsVisible && text == "-") Update = null;
 
             Dispatcher.UIThread.InvokeAsync(() => {
                 Update?.Invoke();
