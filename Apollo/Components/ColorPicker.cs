@@ -13,6 +13,7 @@ using LinearGradientBrush = Avalonia.Media.LinearGradientBrush;
 using GradientStop = Avalonia.Media.GradientStop;
 using IBrush = Avalonia.Media.IBrush;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Enums;
@@ -82,6 +83,8 @@ namespace Apollo.Components {
         void Update_ColorDisplayFormat() {
             Red.IsVisible = Green.IsVisible = Blue.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.RGB;
             Hex.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.Hex;
+
+            ((Window)this.GetVisualRoot())?.Focus();
         }
 
         bool hexValidation, rgbValidation;
