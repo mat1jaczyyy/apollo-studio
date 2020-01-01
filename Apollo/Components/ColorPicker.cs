@@ -348,21 +348,16 @@ namespace Apollo.Components {
         Action HexAction(string text) {
             Action update = () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
 
-            foreach (char i in text.Substring(1))
+            foreach (char i in text)
                 if (!"0123456789ABCDEF".Contains(i))
                     return update + (() => UpdateText());
 
-            if (text == "#") return () => {
-                Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
-                Hex.Text = text;
-            };
+            if (text.Length > 6) return update + (() => UpdateText());
+            if (text.Length < 6) return () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
 
-            if (text[0] != '#' || text.Length > 7) return update + (() => UpdateText());
-            if (text.Length < 7) return () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
-
-            int r = Convert.ToInt32(text.Substring(1, 2), 16);
-            int g = Convert.ToInt32(text.Substring(3, 2), 16);
-            int b = Convert.ToInt32(text.Substring(5, 2), 16);
+            int r = Convert.ToInt32(text.Substring(0, 2), 16);
+            int g = Convert.ToInt32(text.Substring(2, 2), 16);
+            int b = Convert.ToInt32(text.Substring(4, 2), 16);
 
             r = (r > 63)? 63 : r;
             g = (g > 63)? 63 : g;
@@ -446,7 +441,6 @@ namespace Apollo.Components {
             if (!hexValidation) return;
             
             if (text == null) return;
-            if (text == "") text = "#";
 
             Dispatcher.UIThread.InvokeAsync(HexAction(text.ToUpper()));
         }
