@@ -122,7 +122,7 @@ namespace Apollo.Devices {
             ? RegularPinch(2 * x) / 2
             : 1 - RegularPinch(2 * (1 - x)) / 2;
 
-        // https://www.desmos.com/calculator/77qhlepi5y
+        // https://www.desmos.com/calculator/t74unzeehh
         public double ApplyPinch(double time) {
             double x = Math.Min(1, Math.Max(0, time / TotalTime));
             return (Bilateral? BilateralPinch(x) : RegularPinch(x)) * TotalTime;
