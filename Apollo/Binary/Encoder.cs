@@ -370,7 +370,9 @@ namespace Apollo.Binary {
 
             writer.Write(o.Repeats);
             writer.Write(o.Gate);
+
             writer.Write(o.Pinch);
+            writer.Write(o.Bilateral);
             
             writer.Write(o.Frames.Count);
             for (int i = 0; i < o.Frames.Count; i++)

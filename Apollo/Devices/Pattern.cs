@@ -101,10 +101,32 @@ namespace Apollo.Devices {
             }
         }
 
+        bool _bilateral;
+        public bool Bilateral {
+            get => _bilateral;
+            set {
+                if (_bilateral != value) {
+                    _bilateral = value;
+
+                    Window?.SetBilateral(_bilateral);
+                }
+            }
+        }
+
         double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
         double TotalTime => Enumerable.Sum(Frames.Select(i => (double)i.Time)) * AdjustedRepeats * Gate;
 
-        public double ApplyPinch(double time) => (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / TotalTime)), ActualPinch), 1 / ActualPinch)) * TotalTime;
+        double RegularPinch(double x) => 1 - Math.Pow(1 - Math.Pow(x, ActualPinch), 1 / ActualPinch);
+
+        double BilateralPinch(double x) => (x < 0.5)
+            ? RegularPinch(2 * x) / 2
+            : 1 - RegularPinch(2 * (1 - x)) / 2;
+
+        // https://www.desmos.com/calculator/t74unzeehh
+        public double ApplyPinch(double time) {
+            double x = Math.Min(1, Math.Max(0, time / TotalTime));
+            return (Bilateral? BilateralPinch(x) : RegularPinch(x)) * TotalTime;
+        }
 
         class PolyInfo {
             public Signal n;
@@ -174,7 +196,7 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
+        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, Bilateral, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -188,12 +210,13 @@ namespace Apollo.Devices {
             }
         }
 
-        public Pattern(int repeats = 1, double gate = 1, double pinch = 0, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
+        public Pattern(int repeats = 1, double gate = 1, double pinch = 0, bool bilateral = false, List<Frame> frames = null, PlaybackType mode = PlaybackType.Mono, bool infinite = false, int? root = null, bool wrap = false, int expanded = 0): base("pattern") {
             if (frames == null || frames.Count == 0) frames = new List<Frame>() {new Frame()};
 
             Repeats = repeats;
             Gate = gate;
             Pinch = pinch;
+            Bilateral = bilateral;
             Frames = frames;
             Mode = mode;
             Infinite = infinite;
