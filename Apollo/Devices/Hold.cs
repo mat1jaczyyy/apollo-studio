@@ -81,6 +81,7 @@ namespace Apollo.Devices {
         ConcurrentQueue<Signal> buffer = new ConcurrentQueue<Signal>();
         object queuelocker = new object();
         ConcurrentHashSet<Courier> timers = new ConcurrentHashSet<Courier>();
+        ConcurrentDictionary<Signal, int> ignores = new ConcurrentDictionary<Signal, int>();
 
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
@@ -101,8 +102,8 @@ namespace Apollo.Devices {
             courier.Elapsed -= Tick;
             
             lock (queuelocker) {
-                if (buffer.TryDequeue(out Signal n))
-                    InvokeExit(n);
+                if (buffer.TryDequeue(out Signal n) && ignores[n]-- <= 0)
+                    InvokeExit(n.Clone());
             }
         }
 
@@ -118,7 +119,14 @@ namespace Apollo.Devices {
                 if (color.Lit != Release) {
                     if (!Infinite)
                         lock (queuelocker) {
-                            buffer.Enqueue(n.Clone());
+                            Signal m = n.Clone();
+
+                            if (!ignores.ContainsKey(m))
+                                ignores[m] = -1;
+                            
+                            ignores[m]++;
+
+                            buffer.Enqueue(m);
 
                             Courier courier;
                             timers.Add(courier = new Courier() {
@@ -151,6 +159,7 @@ namespace Apollo.Devices {
 
             releasebuffer.Clear();
             locker.Clear();
+            ignores.Clear();
         }
 
         public override void Dispose() {
