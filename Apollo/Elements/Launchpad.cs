@@ -103,7 +103,7 @@ namespace Apollo.Elements {
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
         bool HasModeLight => Type == LaunchpadType.PRO || Type == LaunchpadType.CFW;
-        bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
+        public bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
 
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
