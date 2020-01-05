@@ -79,7 +79,7 @@
                 </Border>
 
                 <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
-                  <Components:HorizontalDial HorizontalAlignment="Left" Margin="0 5 0 0" x:Name="Pinch" Title="Pinch:" Minimum="-2" Maximum="2" Default="0" Exponent="1" Round="1" Unit="" Centered="true" Scale="0.4" DisplayDisabledText="false" AllowPrecise="false"
+                  <Components:HorizontalDial HorizontalAlignment="Left" Margin="0 5 0 0" x:Name="Pinch" Title="Pinch:" Minimum="-2" Maximum="2" Default="0" Exponent="1" Round="1" Centered="true" Scale="0.4" DisplayDisabledText="false"
                                              ValueChanged="Pinch_Changed" />
                 </Border>
 
