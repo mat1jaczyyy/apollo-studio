@@ -4,4 +4,13 @@
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
+
+    <Grid>
+        <StackPanel x:Name="MacroStack" VerticalAlignment="Center" Spacing="10">
+            <CheckBox HorizontalAlignment="Center" x:Name="Macro_1" Click="Macro_Changed">Macro 1</CheckBox>
+            <CheckBox HorizontalAlignment="Center" x:Name="Macro_2" Click="Macro_Changed">Macro 2</CheckBox>
+            <CheckBox HorizontalAlignment="Center" x:Name="Macro_3" Click="Macro_Changed">Macro 3</CheckBox>
+            <CheckBox HorizontalAlignment="Center" x:Name="Macro_4" Click="Macro_Changed">Macro 4</CheckBox>
+        </StackPanel>
+    </Grid>
 </UserControl>
