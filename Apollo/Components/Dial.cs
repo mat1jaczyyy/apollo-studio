@@ -69,7 +69,7 @@ namespace Apollo.Components {
         }
 
         protected double _max = 100;
-        public virtual double Maximum {
+        public double Maximum {
             get => _max;
             set {
                 if (_max != value) {
@@ -210,15 +210,6 @@ namespace Apollo.Components {
 
                 this.Focus();
                 DrawArcAuto();
-            }
-        }
-
-        bool _precise = true;
-        public bool AllowPrecise {
-            get => _precise;
-            set {
-                if (!(_precise = value) && Input.IsEnabled)
-                    Input_LostFocus(null, null);
             }
         }
 
@@ -440,7 +431,7 @@ namespace Apollo.Components {
 
             Input_Update = () => { Input.Text = RawValue.ToString(); };
 
-            if (int.TryParse(text, out int value)) {
+            if (double.TryParse(text, out double value)) {
                 if (Minimum <= value && value <= Maximum) {
                     RawValue = value;
                     Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
@@ -449,9 +440,9 @@ namespace Apollo.Components {
                 }
 
                 Input_Update += () => {
-                    if (value < 0) text = $"-{text.Substring(1).TrimStart('0')}";
-                    else if (value > 0) text = text.TrimStart('0');
-                    else text = "0";
+                    if (value <= -1) text = $"-{text.Substring(1).TrimStart('0')}";
+                    else if (value >= 1) text = text.TrimStart('0');
+                    else if (!text.Contains('.') && text[0] != '-') text = "0";
 
                     if (Minimum >= 0) {
                         if (value < 0) text = "0";
@@ -479,7 +470,7 @@ namespace Apollo.Components {
         protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled && AllowPrecise) {
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled) {
                 Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 

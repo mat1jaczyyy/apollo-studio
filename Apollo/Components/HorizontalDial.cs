@@ -17,19 +17,6 @@ namespace Apollo.Components {
             Input = this.Get<TextBox>("Input");
         }
 
-        public override double Maximum {
-            get => _max;
-            set {
-                if (_max != value) {
-                    _max = value;
-
-                    Input.Width = ((int)_max).ToString().Length * 25.0 / 3;
-                    
-                    Value = ToValue(RawValue);
-                }
-            }
-        }
-
         public HorizontalDial() {}
     }
 }

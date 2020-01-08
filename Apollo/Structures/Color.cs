@@ -176,7 +176,7 @@ namespace Apollo.Structures {
             ));
         }
 
-        public string ToHex() => $"#{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
+        public string ToHex() => $"{Red.ToString("X2")}{Green.ToString("X2")}{Blue.ToString("X2")}";
 
         public override string ToString() => $"({Red}, {Green}, {Blue})";
         

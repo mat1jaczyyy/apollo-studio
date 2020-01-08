@@ -607,9 +607,11 @@ namespace Apollo.Windows {
                 
             } else if (x == 0 && y == -1) { // Down
                 if (Locked) return;
-                PadStarted(-1);
-                PadPressed(-1);
-                PadFinished(-1);
+                
+                int index = Launchpad.IsGenerationX? 9 : -1;
+                PadStarted(index);
+                PadPressed(index);
+                PadFinished(index);
                 
             } else if (x == -1 && y == 1) // Up-Left
                 PatternPlay(Play);
