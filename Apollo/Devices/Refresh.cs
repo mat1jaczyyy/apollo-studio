@@ -18,7 +18,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((RefreshViewer)Viewer.SpecificViewer).SetMacro(index, macro);
         }
 
-        public Refresh(): base("refresh") {}
+        public Refresh(bool[] macros = null): base("refresh") {
+            if (macros != null) {
+                for (int i = 0; i < 4; i++) SetMacro(i, macros[i]);
+            }
+        }
 
         public override void MIDIProcess(Signal n) {
             for (int i = 0; i < 4; i++) {
