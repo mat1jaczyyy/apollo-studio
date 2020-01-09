@@ -21,7 +21,10 @@ namespace Apollo.Devices {
         public Refresh(): base("refresh") {}
 
         public override void MIDIProcess(Signal n) {
-            n.Macros = (int[])Program.Project.Macros.Clone();
+            for (int i = 0; i < 4; i++) {
+                if (_macros[i] == true) n.Macros[i] = (int)Program.Project.GetMacro(i+1);
+            }
+            
             InvokeExit(n);
         }
     }
