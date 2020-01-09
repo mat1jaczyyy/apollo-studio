@@ -14,10 +14,13 @@ namespace Apollo.DeviceViewers {
     public class RefreshViewer: UserControl {
         public static readonly string DeviceIdentifier = "refresh";
 
-        void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+        void InitializeComponent(){
+            AvaloniaXamlLoader.Load(this);
+            for (int i = 0; i < 4; i++) Macros[i] = this.Get<CheckBox>($"Macro_{i+1}");
+        }
         
         Refresh _refresh;
-        StackPanel MacroStack = new StackPanel();
+        CheckBox[] Macros = new CheckBox[4];
 
         public RefreshViewer() => new InvalidOperationException();
 
@@ -25,6 +28,7 @@ namespace Apollo.DeviceViewers {
             InitializeComponent();
 
             _refresh = refresh;
+            for (int i = 0; i < 4; i++) Macros[i].IsChecked = _refresh.GetMacro(i);
         }
 
         void Macro_Changed(object sender, RoutedEventArgs e) {
@@ -33,8 +37,8 @@ namespace Apollo.DeviceViewers {
             bool value = source.IsChecked.Value;
 
             if (_refresh.GetMacro(index) != value) {
-                bool u = value;
-                bool r = _refresh.GetMacro(index);
+                bool u = _refresh.GetMacro(index);
+                bool r = value;
                 List<int> path = Track.GetPath(_refresh);
 
                 Program.Project.Undo.Add($"Refresh Macro {index} changed to {(r? "Enabled" : "Disabled")}", () => {
@@ -43,11 +47,11 @@ namespace Apollo.DeviceViewers {
                     Track.TraversePath<Refresh>(path).SetMacro(index, r);
                 });
 
-                SetMacro(index, value);
+                _refresh.SetMacro(index, value);
             }
         }
 
-        public void SetMacro(int index, bool value) => _refresh.SetMacro(index, value);
+        public void SetMacro(int index, bool value) => Macros[index].IsChecked = value;
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
     }
