@@ -19,14 +19,13 @@ namespace Apollo.Devices {
         }
 
         public Refresh(bool[] macros = null): base("refresh") {
-            if (macros != null) {
-                for (int i = 0; i < 4; i++) SetMacro(i, macros[i]);
-            }
+            if (macros == null || macros.Length != 4) macros = new bool[4];
+            _macros = macros;
         }
 
         public override void MIDIProcess(Signal n) {
             for (int i = 0; i < 4; i++) {
-                if (_macros[i] == true) n.Macros[i] = (int)Program.Project.GetMacro(i+1);
+                if (_macros[i]) n.Macros[i] = (int)Program.Project.GetMacro(i+1);
             }
             
             InvokeExit(n);
