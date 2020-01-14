@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -16,7 +17,7 @@ namespace Apollo.DeviceViewers {
 
         void InitializeComponent(){
             AvaloniaXamlLoader.Load(this);
-            for (int i = 0; i < 4; i++) Macros[i] = this.Get<CheckBox>($"Macro_{i+1}");
+            Macros = (this.Get<StackPanel>("MacroStack")).Children.OfType<CheckBox>().ToArray();
         }
         
         Refresh _refresh;
@@ -31,9 +32,11 @@ namespace Apollo.DeviceViewers {
             for (int i = 0; i < 4; i++) Macros[i].IsChecked = _refresh.GetMacro(i);
         }
 
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
+
         void Macro_Changed(object sender, RoutedEventArgs e) {
             CheckBox source = (CheckBox)sender;
-            int index = ((StackPanel)source.Parent).Children.IndexOf(source);
+            int index = Array.IndexOf(Macros, source);
             bool value = source.IsChecked.Value;
 
             if (_refresh.GetMacro(index) != value) {
@@ -52,7 +55,5 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetMacro(int index, bool value) => Macros[index].IsChecked = value;
-
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
     }
 }

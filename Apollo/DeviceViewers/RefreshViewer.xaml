@@ -6,7 +6,7 @@
              DetachedFromVisualTree="Unloaded">
 
     <Grid>
-        <StackPanel VerticalAlignment="Center" Spacing="10">
+        <StackPanel x:Name="MacroStack" VerticalAlignment="Center" Spacing="10">
             <CheckBox HorizontalAlignment="Center" Click="Macro_Changed">Macro 1</CheckBox>
             <CheckBox HorizontalAlignment="Center" Click="Macro_Changed">Macro 2</CheckBox>
             <CheckBox HorizontalAlignment="Center" Click="Macro_Changed">Macro 3</CheckBox>
