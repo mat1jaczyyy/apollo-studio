@@ -24,7 +24,7 @@ namespace Apollo.Elements {
         }
 
         public VirtualLaunchpad(string name, int index) {
-            Type = LaunchpadType.PRO;
+            Type = LaunchpadType.Pro;
             Name = name;
             VirtualIndex = index;
         }

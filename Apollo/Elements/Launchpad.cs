@@ -76,13 +76,24 @@ namespace Apollo.Elements {
             "https://circuit-librarian-staging.herokuapp.com/launchpad-mini-mk3/firmware"
         );
 
+        public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running an older version of the\n" + 
+            "official Novation firmware. While they will work with Apollo Studio, this\n" +
+            "version is known to cause performance issues and lags.\n\n" +
+            "Update these to the latest version of the firmware using the Novation\n" +
+            "Components app to avoid any potential issues with Apollo Studio.",
+            "Launch Components Online (requires Chrome)",
+            "https://circuit-librarian-staging.herokuapp.com/launchpad-pro-mk3/firmware"
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
-                MiniMK3FirmwareOld.DisplayWarning(sender);
+                if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
+                ProMK3FirmwareOld.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -102,25 +113,27 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        bool HasModeLight => Type == LaunchpadType.PRO || Type == LaunchpadType.CFW;
-        public bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
+        bool HasModeLight => LaunchpadType.Pro <= Type && Type <= LaunchpadType.CFW;
+        public bool IsGenerationX => Type >= LaunchpadType.X;
 
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
             {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0B}).ToArray()},
-            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
+            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, new byte[] {0x6F}},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
+            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
         };
 
         static Dictionary<LaunchpadType, byte[]> ClearMessage = new Dictionary<LaunchpadType, byte[]>() {
             {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()}
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x02, 0x00}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
@@ -230,7 +243,7 @@ namespace Apollo.Elements {
                         if (versionInt < 182) // Old Firmware
                             ProFirmwareOld.Set();
 
-                        return LaunchpadType.PRO;
+                        return LaunchpadType.Pro;
 
                     case 0x03: // Launchpad X
                         if (response.Data[8] == 17) // Bootloader
@@ -249,6 +262,15 @@ namespace Apollo.Elements {
                             MiniMK3FirmwareOld.Set();
 
                         return LaunchpadType.MiniMK3;
+                    
+                    case 0x23: // Launchpad Pro MK3
+                        if (response.Data[8] == 17) // Bootloader
+                            return LaunchpadType.Unknown;
+                        
+                        if (versionInt < 385) // Old Firmware
+                            ProMK3FirmwareOld.Set();
+
+                        return LaunchpadType.ProMK3;
                 }
             }
 
@@ -312,10 +334,6 @@ namespace Apollo.Elements {
 
             n = n.Clone();
 
-            byte r = (byte)(n.Color.Red * (IsGenerationX? 2 : 1));
-            byte g = (byte)(n.Color.Green * (IsGenerationX? 2 : 1));
-            byte b = (byte)(n.Color.Blue * (IsGenerationX? 2 : 1));
-
             if (n.Index != 100) {
                 if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
                 else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
@@ -330,7 +348,7 @@ namespace Apollo.Elements {
                     if (91 <= n.Index && n.Index <= 98) offset = 13;
                     break;
                 
-                case LaunchpadType.PRO:
+                case LaunchpadType.Pro:
                 case LaunchpadType.CFW:
                     if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
                     else if (n.Index == 100) offset = -1;
@@ -340,9 +358,18 @@ namespace Apollo.Elements {
                 case LaunchpadType.MiniMK3:
                     if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
                     break;
+                    
+                case LaunchpadType.ProMK3:
+                    if (n.Index == 0 || n.Index == 9 || n.Index == 100) return;
+                    break;
             }
 
-            SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), r, g, b}).ToArray());
+            SysExSend(RGBHeader[Type].Concat(new byte[] {
+                (byte)(n.Index + offset),
+                (byte)(n.Color.Red * (IsGenerationX? 2 : 1)),
+                (byte)(n.Color.Green * (IsGenerationX? 2 : 1)),
+                (byte)(n.Color.Blue * (IsGenerationX? 2 : 1))
+            }).ToArray());
         }
 
         public virtual void Clear(bool manual = false) {
@@ -511,7 +538,7 @@ namespace Apollo.Elements {
                         ));
                     break;
 
-                case LaunchpadType.PRO:
+                case LaunchpadType.Pro:
                 case LaunchpadType.CFW:
                     if (e.Control == 121) {
                         Multi.InvokeReset();
@@ -529,6 +556,7 @@ namespace Apollo.Elements {
 
                 case LaunchpadType.X:
                 case LaunchpadType.MiniMK3:
+                case LaunchpadType.ProMK3:
                     HandleMessage(new Signal(
                         InputType.XY,
                         this,

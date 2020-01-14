@@ -75,7 +75,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, PRO, CFW, X, MiniMK3, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, Unknown
     }
 
     public enum InputType {
