@@ -565,12 +565,8 @@ namespace Apollo.Binary {
                     reader.ReadBoolean()
                 );
 
-            else if (t == typeof(Refresh)) {
-                bool[] macros;
-                macros = (from i in Enumerable.Range(0, 4) select reader.ReadBoolean()).ToArray();
-
-                return new Refresh(macros);
-            }
+            else if (t == typeof(Refresh)) 
+                return new Refresh((from i in Enumerable.Range(0, 4) select reader.ReadBoolean()).ToArray());
                 
             
             else if (t == typeof(Switch)) {
