@@ -566,8 +566,9 @@ namespace Apollo.Binary {
                 );
 
             else if (t == typeof(Refresh)) 
-                return new Refresh((from i in Enumerable.Range(0, 4) select reader.ReadBoolean()).ToArray());
-                
+                return new Refresh(
+                    (from i in Enumerable.Range(0, 4) select reader.ReadBoolean()
+                ).ToArray());
             
             else if (t == typeof(Switch)) {
                 int target = (version >= 25)? reader.ReadInt32() : 1;

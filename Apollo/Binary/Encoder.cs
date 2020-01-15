@@ -404,7 +404,8 @@ namespace Apollo.Binary {
         static void Encode(BinaryWriter writer, Refresh o) {
             EncodeID(writer, typeof(Refresh));
 
-            for (int i = 0; i < 4; i++) writer.Write(o.GetMacro(i));
+            for (int i = 0; i < 4; i++)
+                writer.Write(o.GetMacro(i));
         }
 
         static void Encode(BinaryWriter writer, Tone o) {
