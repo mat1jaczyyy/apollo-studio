@@ -8,6 +8,7 @@ using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Copy: Device {
@@ -495,5 +496,26 @@ namespace Apollo.Devices {
                 p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
                 p.Y + t * b.Y
             );
+
+        public class CopyOffsetUndoEntry: PathUndoEntry<Copy> {
+            int index, ux, uy, rx, ry;
+
+            protected override void UndoPath(params Copy[] item) {
+                item[0].Offsets[index].X = ux;
+                item[0].Offsets[index].Y = uy;
+            }
+
+            protected override void RedoPath(params Copy[] item) {
+                item[0].Offsets[index].X = rx;
+                item[0].Offsets[index].Y = ry;
+            }
+            
+            public CopyOffsetUndoEntry(Copy copy, int index, int old_x, int old_y, int x, int y): base($"Copy Offset {index + 1} Relative Changed to {x},{y}", copy) {
+                ux = old_x;
+                uy = old_y;
+                rx = x;
+                ry = y;
+            }
+        }
     }
 }

@@ -72,26 +72,15 @@ namespace Apollo.Components {
             _offset.X = x;
             _offset.Y = y;
 
-            if (old_x != null && old_y != null) {
-                int ux = old_x.Value;
-                int uy = old_y.Value;
-                int rx = x;
-                int ry = y;
-                int index = _copy.Offsets.IndexOf(_offset);
-
-                List<int> path = Track.GetPath(_copy);
-
-                Program.Project.Undo.Add($"Copy Offset {index + 1} Relative Changed to {rx},{ry}", () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].X = ux;
-                    copy.Offsets[index].Y = uy;
-
-                }, () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].X = rx;
-                    copy.Offsets[index].Y = ry;
-                });
-            }
+            if (old_x != null && old_y != null)
+                Program.Project.Undo.Add(new Copy.CopyOffsetUndoEntry(
+                    _copy,
+                    _copy.Offsets.IndexOf(_offset),
+                    old_x.Value,
+                    old_y.Value,
+                    x,
+                    y
+                ));
         }
 
         void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
