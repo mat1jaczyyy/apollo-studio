@@ -4,6 +4,7 @@ using System.Linq;
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Interfaces;
+using Apollo.Undo;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {
@@ -149,6 +150,42 @@ namespace Apollo.Structures {
             Info = null;
             Parent = null;
             ParentIndex = null;
+        }
+
+        public class DragDropUndoEntry: PathUndoEntry<Pattern> {
+            bool copy;
+            int count, before, before_pos, after, after_pos;
+
+            protected override void UndoPath(params Pattern[] item) {
+                if (copy) {
+                    for (int i = after + count; i > after; i--)
+                        item[1].Remove(i);
+
+                } else Frame.Move(
+                    (from i in Enumerable.Range(after_pos + 1, count) select item[1][i]).ToList(),
+                    item[0],
+                    before_pos
+                );
+            }
+
+            protected override void RedoPath(params Pattern[] item) {
+                Frame.Move((
+                    from i in Enumerable.Range(before + 1, count) select item[0][i]).ToList(),
+                    item[1],
+                    after,
+                    copy
+                );
+            }
+            
+            public DragDropUndoEntry(Pattern sourcepattern, Pattern targetpattern, bool copy, int count, int before, int after, int before_pos, int after_pos)
+            : base($"Pattern Frame {(copy? "Copied" : "Moved")}", sourcepattern, targetpattern) {
+                this.copy = copy;
+                this.count = count;
+                this.before = before;
+                this.after = after;
+                this.before_pos = before_pos;
+                this.after_pos = after_pos;
+            }
         }
     }
 }

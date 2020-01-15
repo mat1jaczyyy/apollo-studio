@@ -161,39 +161,16 @@ namespace Apollo.Components {
             bool result = Frame.Move(moving, _pattern, after, copy);
 
             if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (source_parent == _pattern && after < before)
-                    before_pos += count;
-                
-                List<int> sourcepath = Track.GetPath(source_parent);
-                List<int> targetpath = Track.GetPath(_pattern);
-                
-                Program.Project.Undo.Add(copy? $"Pattern Frame Copied" : $"Pattern Frame Moved", copy
-                    ? new Action(() => {
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        for (int i = after + count; i > after; i--)
-                            targetpattern.Remove(i);
-
-                    }) : new Action(() => {
-                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
-
-                        Frame.Move(umoving, sourcepattern, before_pos);
-
-                }), () => {
-                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
-
-                    Frame.Move(rmoving, targetpattern, after, copy);
-                });
+                Program.Project.Undo.Add(new Frame.DragDropUndoEntry(
+                    source_parent,
+                    _pattern,
+                    copy,
+                    moving.Count,
+                    before,
+                    after,
+                    before + ((source_parent == _pattern && after < before)? moving.Count : 0),
+                    moving[0].IParentIndex.Value - 1
+                ));
             
             } else e.DragEffects = DragDropEffects.None;
         }
