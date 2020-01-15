@@ -5,8 +5,8 @@ using System.Reflection;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Output: Device {
