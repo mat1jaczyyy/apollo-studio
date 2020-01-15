@@ -55,11 +55,11 @@ namespace Apollo.Undo {
             SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
-        public void Add(string desc, Action undo, Action redo, Action dispose = null) {
+        public void Add(UndoEntry entry) {
             for (int i = History.Count - 1; i > Position; i--)
                 Remove(i);
             
-            History.Add(new UndoEntry(desc, undo, redo, dispose));
+            History.Add(entry);
             Window?.Contents_Insert(History.Count - 1, History.Last());
 
             Position = History.Count - 1;
@@ -69,15 +69,20 @@ namespace Apollo.Undo {
             Program.Project.WriteCrashBackup();
         }
 
+        public void AddAndExecute(UndoEntry entry) {
+            Add(entry);
+            entry.Redo();
+        }
+
         public void Select(int index) {
             lock (locker) {
                 if (index < Position)
                     for (int i = Position; i > index; i--)
-                        History[i].Undo.Invoke();
+                        History[i].Undo();
                 
                 else if (index > Position)
                     for (int i = Position + 1; i <= index; i++)
-                        History[i].Redo.Invoke();
+                        History[i].Redo();
                 
                 Position = index;
             }

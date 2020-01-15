@@ -1,19 +1,11 @@
-using System;
-
 namespace Apollo.Undo {
     public class UndoEntry {
-        public string Description;
-        public Action Undo;
-        public Action Redo;
-        Action DisposeAction;
+        public readonly string Description;
 
-        public UndoEntry(string desc, Action undo = null, Action redo = null, Action dispose = null) {
-            Description = desc;
-            Undo = undo?? (() => {});
-            Redo = redo?? (() => {});
-            DisposeAction = dispose?? (() => {});
-        }
+        public virtual void Undo() {}
+        public virtual void Redo() {}
+        public virtual void Dispose() {}
 
-        public void Dispose() => DisposeAction?.Invoke();
+        public UndoEntry(string desc) => Description = desc;
     }
 }
