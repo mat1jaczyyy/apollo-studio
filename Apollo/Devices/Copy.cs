@@ -497,7 +497,7 @@ namespace Apollo.Devices {
                 p.Y + t * b.Y
             );
 
-        public class CopyOffsetUndoEntry: PathUndoEntry<Copy> {
+        public class OffsetRelativeUndoEntry: PathUndoEntry<Copy> {
             int index, ux, uy, rx, ry;
 
             protected override void UndoPath(params Copy[] item) {
@@ -510,11 +510,65 @@ namespace Apollo.Devices {
                 item[0].Offsets[index].Y = ry;
             }
             
-            public CopyOffsetUndoEntry(Copy copy, int index, int old_x, int old_y, int x, int y): base($"Copy Offset {index + 1} Relative Changed to {x},{y}", copy) {
-                ux = old_x;
-                uy = old_y;
-                rx = x;
-                ry = y;
+            public OffsetRelativeUndoEntry(Copy copy, int index, int ux, int uy, int rx, int ry)
+            : base($"Copy Offset {index + 1} Relative Changed to {rx},{ry}", copy) {
+                this.index = index;
+                this.ux = ux;
+                this.uy = uy;
+                this.rx = rx;
+                this.ry = ry;
+            }
+        }
+
+        public class OffsetAbsoluteUndoEntry: PathUndoEntry<Copy> {
+            int index, ux, uy, rx, ry;
+
+            protected override void UndoPath(params Copy[] item) {
+                item[0].Offsets[index].AbsoluteX = ux;
+                item[0].Offsets[index].AbsoluteY = uy;
+            }
+
+            protected override void RedoPath(params Copy[] item) {
+                item[0].Offsets[index].AbsoluteX = rx;
+                item[0].Offsets[index].AbsoluteY = ry;
+            }
+            
+            public OffsetAbsoluteUndoEntry(Copy copy, int index, int ux, int uy, int rx, int ry)
+            : base($"Copy Offset {index + 1} Absolute Changed to {rx},{ry}", copy) {
+                this.index = index;
+                this.ux = ux;
+                this.uy = uy;
+                this.rx = rx;
+                this.ry = ry;
+            }
+        }
+
+        public class OffsetSwitchedUndoEntry: PathUndoEntry<Copy> {
+            int index;
+            bool u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Offsets[index].IsAbsolute = u;
+            protected override void RedoPath(params Copy[] item) => item[0].Offsets[index].IsAbsolute = r;
+            
+            public OffsetSwitchedUndoEntry(Copy copy, int index, bool u, bool r)
+            : base($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", copy) {
+                this.index = index;
+                this.u = u;
+                this.r = r;
+            }
+        }
+
+        public class OffsetAngleUndoEntry: PathUndoEntry<Copy> {
+            int index, u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].SetAngle(index, u);
+            protected override void RedoPath(params Copy[] item) => item[0].SetAngle(index, r);
+            
+            public OffsetAngleUndoEntry(Copy copy, int index, int u, int r)
+            : base($"Copy Angle {index + 1} Changed to {r}°", copy) {
+                this.index = index;
+                this.u = u;
+                this.r = r;
             }
         }
     }
