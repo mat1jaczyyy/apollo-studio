@@ -6,7 +6,7 @@
   <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center" LayoutUpdated="LayoutChanged">
     <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
 
-    <Canvas Grid.Row="1" Margin="5 0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="43" Height="39" 
+    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="43" Height="39" 
             Background="Transparent" Cursor="Hand" x:Name="ArcCanvas"
             PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
       <Path Stroke="{DynamicResource ThemeControlLowBrush}" x:Name="ArcBase" />
