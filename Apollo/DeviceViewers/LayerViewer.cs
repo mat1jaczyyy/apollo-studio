@@ -46,16 +46,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_layer);
 
-                Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<Layer>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).Target = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Layer.TargetUndoEntry(_layer, Target.Unit, u, r));
             }
-
-            _layer.Target = (int)value;
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
@@ -66,15 +59,8 @@ namespace Apollo.DeviceViewers {
             if (_layer.BlendingMode != selected) {
                 BlendingType u = _layer.BlendingMode;
                 BlendingType r = selected;
-                List<int> path = Track.GetPath(_layer);
 
-                Program.Project.Undo.Add($"Layer Blending Changed to {r}", () => {
-                    Track.TraversePath<Layer>(path).BlendingMode = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).BlendingMode = r;
-                });
-
-                _layer.BlendingMode = selected;
+                Program.Project.Undo.AddAndExecute(new Layer.ModeUndoEntry(_layer, u, r));
             }
         }
 
@@ -84,16 +70,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_layer);
 
-                Program.Project.Undo.Add($"Layer Range Changed to {r}{Range.Unit}", () => {
-                    Track.TraversePath<Layer>(path).Range = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).Range = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Layer.RangeUndoEntry(_layer, Range.Unit, u, r));
             }
-
-            _layer.Range = (int)value;
         }
 
         public void SetRange(int value) => Range.RawValue = value;
