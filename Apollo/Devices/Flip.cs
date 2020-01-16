@@ -2,6 +2,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Flip: Device {
@@ -62,6 +63,34 @@ namespace Apollo.Devices {
             
             n.Index = (byte)result;
             InvokeExit(n);
+        }
+        
+        public class ModeUndoEntry: PathUndoEntry<Flip> {
+            FlipType u, r;
+            
+            protected override void UndoPath(params Flip[] items) => items[0].Mode = u;
+            
+            protected override void RedoPath(params Flip[] items) => items[0].Mode = r;
+            
+            public ModeUndoEntry(Flip flip, FlipType u, FlipType r)
+            : base($"Flip Orientation Changed to {r.ToString()}", flip){
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class BypassUndoEntry: PathUndoEntry<Flip> {
+            bool u, r;
+            
+            protected override void UndoPath(params Flip[] items) => items[0].Bypass = u;
+            
+            protected override void RedoPath(params Flip[] items) => items[0].Bypass = r;
+            
+            public BypassUndoEntry(Flip flip, bool u, bool r)
+            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip){
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

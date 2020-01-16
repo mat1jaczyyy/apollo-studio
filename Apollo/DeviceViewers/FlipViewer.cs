@@ -45,15 +45,8 @@ namespace Apollo.DeviceViewers {
             if (_flip.Mode != selected) {
                 FlipType u = _flip.Mode;
                 FlipType r = selected;
-                List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Orientation Changed to {((ComboBoxItem)FlipMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    Track.TraversePath<Flip>(path).Mode = u;
-                }, () => {
-                    Track.TraversePath<Flip>(path).Mode = r;
-                });
-
-                _flip.Mode = selected;
+                Program.Project.Undo.AddAndExecute(new Flip.ModeUndoEntry(_flip, u, r));
             }
         }
 
@@ -65,15 +58,8 @@ namespace Apollo.DeviceViewers {
             if (_flip.Bypass != value) {
                 bool u = _flip.Bypass;
                 bool r = value;
-                List<int> path = Track.GetPath(_flip);
 
-                Program.Project.Undo.Add($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Flip>(path).Bypass = u;
-                }, () => {
-                    Track.TraversePath<Flip>(path).Bypass = r;
-                });
-
-                _flip.Bypass = value;
+                Program.Project.Undo.AddAndExecute(new Flip.BypassUndoEntry(_flip, u, r));
             }
         }
 
