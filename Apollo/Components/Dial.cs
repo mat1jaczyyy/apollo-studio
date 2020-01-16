@@ -240,7 +240,7 @@ namespace Apollo.Components {
         }
 
         bool _usingSteps = false;
-        public bool UsingSteps {
+        virtual public bool UsingSteps {
             get => _usingSteps;
             set {
                 if (AllowSteps && Enabled && _usingSteps != value) {
@@ -261,9 +261,9 @@ namespace Apollo.Components {
             }
         }
 
-        string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+        protected string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
-        void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
+        protected virtual void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             double angle_starting = FillStart
                 ? (_centered? angle_center: angle_start)
                 : angle_start - Math.Abs(angle_end - angle_start) * value * 0.94;
@@ -317,11 +317,11 @@ namespace Apollo.Components {
             if (!UsingSteps) DrawArc(Arc, _value, false);
         }
 
-        void DrawArcSteps() {
+        protected virtual void DrawArcSteps() {
             if (UsingSteps) DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
         }
 
-        public void DrawArcAuto() {
+        public virtual void DrawArcAuto() {
             if (UsingSteps) DrawArcSteps();
             else DrawArcValue();
         }
