@@ -53,16 +53,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
 
-                Program.Project.Undo.Add($"MacroFilter Target Changed to {r}", () => {
-                    Track.TraversePath<MacroFilter>(path).Macro = u;
-                }, () => {
-                    Track.TraversePath<MacroFilter>(path).Macro = r;
-                });
+                Program.Project.Undo.AddAndExecute(new MacroFilter.TargetUndoEntry(_filter, u, r));
             }
-
-            _filter.Macro = (int)value;
         }
         
         public void SetMacro(int macro) => MacroDial.RawValue = macro;
@@ -98,13 +91,8 @@ namespace Apollo.DeviceViewers {
                 if (old != null) {
                     bool[] u = old.ToArray();
                     bool[] r = _filter.Filter.ToArray();
-                    List<int> path = Track.GetPath(_filter);
 
-                    Program.Project.Undo.Add($"MacroFilter Changed", () => {
-                        Track.TraversePath<MacroFilter>(path).Filter = u.ToArray();
-                    }, () => {
-                        Track.TraversePath<MacroFilter>(path).Filter = r.ToArray();
-                    });
+                    Program.Project.Undo.AddAndExecute(new MacroFilter.FilterUndoEntry(_filter, u.ToArray(), r.ToArray()));
 
                     old = null;
                 }
