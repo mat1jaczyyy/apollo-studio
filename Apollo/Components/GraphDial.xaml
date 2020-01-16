@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.GraphDial"
+             DetachedFromVisualTree="Unloaded">
+
+  <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center" LayoutUpdated="LayoutChanged">
+    <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="Title" />
+
+    <Canvas Grid.Row="1" Margin="0 5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="50" x:Name="PathCanvas" Background="Transparent" Cursor="Hand" PointerPressed="MouseDown" PointerReleased="MouseUp" PointerMoved="MouseMove">
+      <Path Stroke="{DynamicResource ThemeAccentBrush}" x:Name="Curve"/>
+    </Canvas>
+    
+    <TextBlock Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Display" PointerPressed="DisplayPressed" />
+
+    <TextBox Grid.Row="2" Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" Padding="1" x:Name="Input"
+             LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
+  </Grid>
+</UserControl>
