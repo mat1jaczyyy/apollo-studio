@@ -56,16 +56,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Rate Changed to {r}{Rate.Unit}", () => {
-                    Track.TraversePath<Loop>(path).Rate.Free = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Rate.Free = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Loop.RateUndoEntry(_loop, Rate.Unit, u, r));
             }
-
-            _loop.Rate.Free = (int)value;
         }
         
         public void SetRateValue(int value) => Rate.RawValue = value;
@@ -74,13 +67,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Rate Changed to {Length.Steps[r]}", () => {
-                    Track.TraversePath<Loop>(path).Rate.Length.Step = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Rate.Length.Step = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Loop.RateStepUndoEntry(_loop, u, r));
             }
         }
         
@@ -90,16 +78,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Rate Switched to {(r? "Steps" : "Free")}", () => {
-                    Track.TraversePath<Loop>(path).Rate.Mode = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Rate.Mode = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Loop.RateModeUndoEntry(_loop, u, r));
             }
-
-            _loop.Rate.Mode = value;
         }
         
         void Hold_Changed(object sender, RoutedEventArgs e) {
@@ -108,15 +89,8 @@ namespace Apollo.DeviceViewers {
             if (_loop.Hold != value) {
                 bool u = _loop.Hold;
                 bool r = value;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Loop>(path).Hold = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Hold = r;
-                });
-
-                _loop.Hold = value;
+                Program.Project.Undo.AddAndExecute(new Loop.HoldUndoEntry(_loop, u, r));
             }
         }
         
@@ -131,16 +105,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Gate Changed to {value}{Gate.Unit}", () => {
-                    Track.TraversePath<Loop>(path).Gate = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Gate = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Loop.GateUndoEntry(_loop, u, r));
             }
-
-            _loop.Gate = value / 100;
         }
         
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
@@ -149,16 +116,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_loop);
 
-                Program.Project.Undo.Add($"Loop Repeats Changed to {r}{Repeats.Unit}", () => {
-                    Track.TraversePath<Loop>(path).Repeats = u;
-                }, () => {
-                    Track.TraversePath<Loop>(path).Repeats = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Loop.RepeatsUndoEntry(_loop, Repeats.Unit, u, r));
             }
-
-            _loop.Repeats = (int)value;
         }
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
     
