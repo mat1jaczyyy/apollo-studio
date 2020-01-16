@@ -229,6 +229,8 @@ namespace Apollo.Binary {
 
             for (int i = 0; i < o.Offsets.Count; i++)
                 writer.Write(o.GetAngle(i));
+                
+            writer.Write(o.Bilateral);
         }
 
         static void Encode(BinaryWriter writer, Delay o) {

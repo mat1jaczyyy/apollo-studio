@@ -317,8 +317,13 @@ namespace Apollo.Binary {
                 int count;
                 List<Offset> offsets = (from i in Enumerable.Range(0, count = reader.ReadInt32()) select (Offset)Decode(reader, version)).ToList();
                 List<int> angles = (from i in Enumerable.Range(0, count) select (version >= 25)? reader.ReadInt32() : 0).ToList();
+                
+                bool bilateral = false;
+                if(version >= 28){
+                    bilateral = reader.ReadBoolean();
+                }
 
-                return new Copy(time, gate, pinch, reverse, infinite, copyType, gridType, wrap, offsets, angles);
+                return new Copy(time, gate, pinch, reverse, infinite, copyType, gridType, wrap, offsets, angles, bilateral);
             
             } else if (t == typeof(Delay)) {
                 Time time;
