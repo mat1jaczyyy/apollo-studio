@@ -43,16 +43,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Changed to {r}{Duration.Unit}", () => {
-                    Track.TraversePath<Delay>(path).Time.Free = u;
-                }, () => {
-                    Track.TraversePath<Delay>(path).Time.Free = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Delay.DurationUndoEntry(_delay, Duration.Unit, u, r));
             }
-
-            _delay.Time.Free = (int)value;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
@@ -63,16 +56,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
-                List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    Track.TraversePath<Delay>(path).Time.Mode = u;
-                }, () => {
-                    Track.TraversePath<Delay>(path).Time.Mode = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Delay.DurationModeUndoEntry(_delay, u, r));
             }
-
-            _delay.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
@@ -81,13 +67,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
-                List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Duration Changed to {Length.Steps[r]}", () => {
-                    Track.TraversePath<Delay>(path).Time.Length.Step = u;
-                }, () => {
-                    Track.TraversePath<Delay>(path).Time.Length.Step = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Delay.DurationStepUndoEntry(_delay, u, r));
             }
         }
 
@@ -97,16 +78,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_delay);
 
-                Program.Project.Undo.Add($"Delay Gate Changed to {value}{Gate.Unit}", () => {
-                    Track.TraversePath<Delay>(path).Gate = u;
-                }, () => {
-                    Track.TraversePath<Delay>(path).Gate = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Delay.GateUndoEntry(_delay, u, r));
             }
-
-            _delay.Gate = value / 100;
         }
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
