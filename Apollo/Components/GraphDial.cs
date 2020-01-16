@@ -17,7 +17,7 @@ using Avalonia.Platform;
 namespace Apollo.Components {
     public class GraphDial: Dial {
         
-        public delegate void DialBilateralChangedEventHandler(bool NewValue, bool? OldValue);
+        public delegate void DialBilateralChangedEventHandler(GraphDial sender, bool NewValue, bool? OldValue);
         public event DialBilateralChangedEventHandler BilateralChanged;
         
         bool _isBilateral;
@@ -26,7 +26,7 @@ namespace Apollo.Components {
             set {
                 _isBilateral = value;
                 DrawArcAuto();
-                BilateralChanged?.Invoke(IsBilateral, !IsBilateral);
+                BilateralChanged?.Invoke(this, IsBilateral, !IsBilateral);
             }
         }
         
@@ -58,9 +58,16 @@ namespace Apollo.Components {
             ModeChanged += (bool _, bool? __) => IsBilateral = !IsBilateral;
         }
         
+        protected void Graph_Unloaded(object sender, VisualTreeAttachmentEventArgs e){
+            Unloaded(sender, e);
+            
+            BilateralChanged = null;
+        }
+        
         public override void DrawArcAuto() {
+            Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
+            
             if(!Enabled){
-                Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
                 Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
                 return;
             }

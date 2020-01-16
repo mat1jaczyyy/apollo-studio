@@ -180,6 +180,18 @@ namespace Apollo.Devices {
                 }
             }
         }
+        
+        bool _bilateral;
+        public bool Bilateral{
+            get => _bilateral;
+            set {
+                if (value != _bilateral){
+                    _bilateral = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetBilateral(Bilateral);
+                }
+            }
+        }
 
         bool _reverse;
         public bool Reverse {
@@ -203,19 +215,24 @@ namespace Apollo.Devices {
         
         double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
 
-        double ApplyPinch(double time, double total) => (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
+        double ApplyPinch(double time, double total){
+            if(!Bilateral) return (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
+            else return time / total < 0.5? 
+                (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) / 2 * total:
+                (1 - ((1 - Math.Pow(1 - Math.Pow(2 * (1 - Math.Min(1, Math.Max(0, time / total))), ActualPinch), 1 / ActualPinch)) / 2)) * total;
+        }
 
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList(), Bilateral) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
+        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null, bool bilateral = false): base("copy") {
             Time = time?? new Time(free: 500);
             Gate = gate;
             Pinch = pinch;
@@ -232,6 +249,8 @@ namespace Apollo.Devices {
 
             foreach (Offset offset in Offsets)
                 offset.Changed += OffsetChanged;
+                
+            Bilateral = bilateral;
         }
 
         void FireCourier(PolyInfo info, double time) {

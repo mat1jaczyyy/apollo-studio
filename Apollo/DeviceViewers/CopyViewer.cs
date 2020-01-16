@@ -22,7 +22,7 @@ namespace Apollo.DeviceViewers {
 
             Rate = this.Get<Dial>("Rate");
             Gate = this.Get<Dial>("Gate");
-            Pinch = this.Get<Dial>("Pinch");
+            Pinch = this.Get<GraphDial>("Pinch");
 
             CopyMode = this.Get<ComboBox>("CopyMode");
             GridMode = this.Get<ComboBox>("GridMode");
@@ -37,7 +37,8 @@ namespace Apollo.DeviceViewers {
 
         Copy _copy;
 
-        Dial Rate, Gate, Pinch;
+        Dial Rate, Gate;
+        GraphDial Pinch;
         ComboBox CopyMode, GridMode;
         CheckBox Wrap, Reverse, Infinite;
 
@@ -71,6 +72,7 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = _copy.Gate * 100;
             Pinch.RawValue = _copy.Pinch;
+            Pinch.IsBilateral = _copy.Bilateral;
 
             Reverse.IsChecked = _copy.Reverse;
             Infinite.IsChecked = _copy.Infinite;
@@ -181,6 +183,8 @@ namespace Apollo.DeviceViewers {
                 ((CopyOffset)Contents[i]).AngleEnabled = selected == CopyType.Interpolate;
         }
 
+        
+
         public void SetCopyMode(CopyType mode) => CopyMode.SelectedIndex = (int)mode;
 
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
@@ -220,6 +224,24 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
+        
+        void Bilateral_Changed(GraphDial sender, bool value, bool? old){
+            if (old != null && old != value) {
+                bool u = old.Value;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Pinch Bilateral Changed to {(value ? "True" : "False")}", () => {
+                    Track.TraversePath<Copy>(path).Bilateral = u;
+                }, () => {
+                    Track.TraversePath<Copy>(path).Bilateral = r;
+                });
+            }
+
+            _copy.Bilateral = value;
+        }
+        
+        public void SetBilateral(bool bilateral) => Pinch.IsBilateral = bilateral;
 
         void Reverse_Changed(object sender, RoutedEventArgs e) {
             bool value = Reverse.IsChecked.Value;
