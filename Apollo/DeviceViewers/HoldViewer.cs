@@ -54,16 +54,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Duration Changed to {r}{Duration.Unit}", () => {
-                    Track.TraversePath<Hold>(path).Time.Free = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Time.Free = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Hold.DurationUndoEntry(_hold, Duration.Unit, u, r));
             }
-
-            _hold.Time.Free = (int)value;
         }
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
@@ -72,16 +65,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    Track.TraversePath<Hold>(path).Time.Mode = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Time.Mode = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Hold.DurationModeUndoEntry(_hold, u, r));
             }
-
-            _hold.Time.Mode = value;
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
@@ -90,13 +76,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = old.Value;
                 int r = value;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Duration Changed to {Length.Steps[r]}", () => {
-                    Track.TraversePath<Hold>(path).Time.Length.Step = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Time.Length.Step = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Hold.DurationStepUndoEntry(_hold, u, r));
             }
         }
 
@@ -106,16 +87,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Gate Changed to {value}{Gate.Unit}", () => {
-                    Track.TraversePath<Hold>(path).Gate = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Gate = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Hold.GateUndoEntry(_hold, u, r));
             }
-
-            _hold.Gate = value / 100;
         }
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
@@ -126,15 +100,8 @@ namespace Apollo.DeviceViewers {
             if (_hold.Infinite != value) {
                 bool u = _hold.Infinite;
                 bool r = value;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Hold>(path).Infinite = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Infinite = r;
-                });
-
-                _hold.Infinite = value;
+                Program.Project.Undo.AddAndExecute(new Hold.InfiniteUndoEntry(_hold, u, r));
             }
         }
 
@@ -149,15 +116,8 @@ namespace Apollo.DeviceViewers {
             if (_hold.Release != value) {
                 bool u = _hold.Release;
                 bool r = value;
-                List<int> path = Track.GetPath(_hold);
 
-                Program.Project.Undo.Add($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Hold>(path).Release = u;
-                }, () => {
-                    Track.TraversePath<Hold>(path).Release = r;
-                });
-
-                _hold.Release = value;
+                Program.Project.Undo.AddAndExecute(new Hold.ReleaseUndoEntry(_hold, u, r));
             }
         }
 
