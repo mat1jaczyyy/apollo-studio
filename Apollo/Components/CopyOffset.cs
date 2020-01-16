@@ -105,8 +105,6 @@ namespace Apollo.Components {
             int index = _copy.Offsets.IndexOf(_offset);
             
             if (old != null && old.Value != angle) {
-                List<int> path = Track.GetPath(_copy);
-                
                 int u = (int)old.Value;
                 int r = (int)angle;
 

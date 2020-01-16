@@ -496,6 +496,176 @@ namespace Apollo.Devices {
                 p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
                 p.Y + t * b.Y
             );
+            
+        public class RateUndoEntry: PathUndoEntry<Copy> {
+            int u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Time.Free = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Time.Free = r;
+            
+            public RateUndoEntry(Copy copy, string unit, int u, int r)
+            : base($"Copy Rate Changed to {r}{unit}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }   
+        
+        public class RateModeUndoEntry: PathUndoEntry<Copy> {
+            bool u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Time.Mode = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Time.Mode = r;
+            
+            public RateModeUndoEntry(Copy copy, bool u, bool r)
+            : base($"Copy Rate Switched to {(r? "Steps" : "Free")}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class RateStepUndoEntry: PathUndoEntry<Copy> {
+            int u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Time.Length.Step = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Time.Length.Step = r;
+            
+            public RateStepUndoEntry(Copy copy, int u, int r)
+            : base($"Copy Rate Changed to {Length.Steps[r]}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class GateUndoEntry: PathUndoEntry<Copy> {
+            double u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Gate = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Gate = r;
+            
+            public GateUndoEntry(Copy copy, double u, double r)
+            : base($"Copy Gate Changed to {r}%", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class CopyModeUndoEntry: PathUndoEntry<Copy> {
+            CopyType u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].CopyMode = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].CopyMode = r;
+            
+            public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r)
+            : base($"Copy Mode Changed to {r.ToString()}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class GridModeUndoEntry: PathUndoEntry<Copy> {
+            GridType u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].GridMode = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].GridMode = r;
+            
+            public GridModeUndoEntry(Copy copy, GridType u, GridType r)
+            : base($"Copy Grid Changed to {r.ToString()}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class PinchUndoEntry: PathUndoEntry<Copy> {
+            double u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Pinch = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Pinch = r;
+            
+            public PinchUndoEntry(Copy copy, double u, double r)
+            : base($"Copy Pinch Changed to {r}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class ReverseUndoEntry: PathUndoEntry<Copy> {
+            bool u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Reverse = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Reverse = r;
+            
+            public ReverseUndoEntry(Copy copy, bool u, bool r)
+            : base($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class InfiniteUndoEntry: PathUndoEntry<Copy> {
+            bool u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Infinite = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Infinite = r;
+            
+            public InfiniteUndoEntry(Copy copy, bool u, bool r)
+            : base($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class WrapUndoEntry: PathUndoEntry<Copy> {
+            bool u, r;
+
+            protected override void UndoPath(params Copy[] item) => item[0].Wrap = u;
+
+            protected override void RedoPath(params Copy[] item) => item[0].Wrap = r;
+            
+            public WrapUndoEntry(Copy copy, bool u, bool r)
+            : base($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", copy) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class OffsetInsertUndoEntry: PathUndoEntry<Copy> {
+            int index;
+            
+            protected override void UndoPath(params Copy[] items) => items[0].Remove(index);
+            
+            protected override void RedoPath(params Copy[] items) => items[0].Insert(index);
+            
+            public OffsetInsertUndoEntry(Copy copy, int index): base($"Copy Offset {index + 1} Inserted", copy){
+                this.index = index;
+            }
+
+        }
+        
+        public class OffsetRemoveUndoEntry: PathUndoEntry<Copy> {
+            int index;
+            Offset offset;
+            
+            protected override void UndoPath(params Copy[] items) => items[0].Insert(index, offset);
+            
+            protected override void RedoPath(params Copy[] items) => items[0].Remove(index);
+            
+            protected override void DisposePath(params Copy[] items) => offset.Dispose();
+            
+            public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index): base($"Copy Offset {index + 1} Removed", copy){
+                this.index = index;
+                this.offset = offset;
+            }
+
+        }
 
         public class OffsetRelativeUndoEntry: PathUndoEntry<Copy> {
             int index, ux, uy, rx, ry;
