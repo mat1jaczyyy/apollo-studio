@@ -644,7 +644,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Copy[] items) => items[0].Insert(index);
             
-            public OffsetInsertUndoEntry(Copy copy, int index): base($"Copy Offset {index + 1} Inserted", copy){
+            public OffsetInsertUndoEntry(Copy copy, int index)
+            : base($"Copy Offset {index + 1} Inserted", copy){
                 this.index = index;
             }
 
@@ -660,7 +661,8 @@ namespace Apollo.Devices {
             
             protected override void DisposePath(params Copy[] items) => offset.Dispose();
             
-            public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index): base($"Copy Offset {index + 1} Removed", copy){
+            public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index)
+            : base($"Copy Offset {index + 1} Removed", copy){
                 this.index = index;
                 this.offset = offset;
             }

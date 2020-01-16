@@ -122,7 +122,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Delay[] items) => items[0].Time.Free = r;
             
-            public DurationUndoEntry(Delay delay, string unit, int u, int r): base($"Delay Duration Changed to {r}", delay){
+            public DurationUndoEntry(Delay delay, string unit, int u, int r)
+            : base($"Delay Duration Changed to {r}", delay){
                 this.u = u;
                 this.r = r;
             }
@@ -135,7 +136,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Delay[] items) => items[0].Time.Mode = r;
             
-            public DurationModeUndoEntry(Delay delay, bool u, bool r): base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay){
+            public DurationModeUndoEntry(Delay delay, bool u, bool r)
+            : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay){
                 this.u = u;
                 this.r = r;
             }
@@ -148,7 +150,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Delay[] items) => items[0].Time.Length.Step = r;
             
-            public DurationStepUndoEntry(Delay delay, int u, int r): base($"Delay Duration Changed to {Length.Steps[r]}", delay){
+            public DurationStepUndoEntry(Delay delay, int u, int r)
+            : base($"Delay Duration Changed to {Length.Steps[r]}", delay){
                 this.u = u;
                 this.r = r;
             }
@@ -161,7 +164,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Delay[] items) => items[0].Gate = r;
             
-            public GateUndoEntry(Delay delay, double u, double r): base($"Delay Gate Changed to {r}%", delay){
+            public GateUndoEntry(Delay delay, double u, double r)
+            : base($"Delay Gate Changed to {r}%", delay){
                 this.u = u;
                 this.r = r;
             }

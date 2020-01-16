@@ -110,7 +110,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Hue = u;
             
-            public HueUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Hue Changed to {r}°", colorFilter){
+            public HueUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Hue Changed to {r}°", colorFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -124,7 +125,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Saturation = u;
             
-            public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Sat Changed to {r}%", colorFilter){
+            public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Sat Changed to {r}%", colorFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -138,7 +140,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Value = u;
             
-            public ValueUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Value Changed to {r}%", colorFilter){
+            public ValueUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Value Changed to {r}%", colorFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -152,7 +155,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].HueTolerance = u;
             
-            public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Hue Tol Changed to {r}%", colorFilter){
+            public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -166,7 +170,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].SaturationTolerance = u;
             
-            public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Sat Tol Changed to {r}%", colorFilter){
+            public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -180,7 +185,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].ValueTolerance = u;
             
-            public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) : base($"Color Filter Value Tol Changed to {r}%", colorFilter){
+            public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Value Tol Changed to {r}%", colorFilter){
                 this.u = u;
                 this.r = r;
             }
