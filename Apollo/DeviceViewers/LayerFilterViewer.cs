@@ -42,16 +42,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
 
-                Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<LayerFilter>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<LayerFilter>(path).Target = r;
-                });
+                Program.Project.Undo.AddAndExecute(new LayerFilter.TargetUndoEntry(_filter, Target.Unit, u, r));
             }
-
-            _filter.Target = (int)value;
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
@@ -60,16 +53,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 int u = (int)old.Value;
                 int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
 
-                Program.Project.Undo.Add($"Layer Filter Range Changed to {r}{Range.Unit}", () => {
-                    Track.TraversePath<LayerFilter>(path).Range = u;
-                }, () => {
-                    Track.TraversePath<LayerFilter>(path).Range = r;
-                });
+                Program.Project.Undo.AddAndExecute(new LayerFilter.RangeUndoEntry(_filter, Range.Unit, u, r));
             }
-
-            _filter.Range = (int)value;
         }
 
         public void SetRange(int value) => Range.RawValue = value;
