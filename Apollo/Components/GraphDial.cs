@@ -55,6 +55,9 @@ namespace Apollo.Components {
             
             Arc.StrokeThickness = 2 * Scale;
             
+            ArcBase.StrokeThickness = 4 * Scale;
+            ArcBase.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
+            
             ModeChanged += (bool _, bool? __) => IsBilateral = !IsBilateral;
         }
         
@@ -69,8 +72,12 @@ namespace Apollo.Components {
             
             if(!Enabled){
                 Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
+                ArcBase.IsVisible = false;
                 return;
             }
+            
+            ArcBase.IsVisible = true;
+            
             
             if (IsBilateral) DrawArcBilateral();
             else DrawArcQuad();
@@ -85,7 +92,7 @@ namespace Apollo.Components {
 
             double realWidthHalf = width * Scale / 2;
             
-            Arc.Data = Geometry.Parse(String.Format("M 0 43 C {0} {1} {2} {3} 43 0",
+            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 43 C {0} {1} {2} {3} 43 0",
                 (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
                 (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
                 (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString(),
@@ -98,7 +105,7 @@ namespace Apollo.Components {
             
             double realWidth = width * Scale;
             
-            Arc.Data = Geometry.Parse(String.Format("M 0 {0} Q {1} {1} {0} 0", 
+            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 {0} Q {1} {1} {0} 0", 
                 realWidth.ToString(),
                 (realWidth / 2 + Math.Round(-RawValue * realWidth / 4)).ToString()
             ));
