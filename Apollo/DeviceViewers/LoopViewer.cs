@@ -53,45 +53,46 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
 
         void Rate_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Loop.RateUndoEntry(_loop, Rate.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Loop.RateUndoEntry(
+                    _loop, 
+                    Rate.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         
         public void SetRateValue(int value) => Rate.RawValue = value;
         
         void Rate_StepChanged(int value, int? old) {
-            if (old != null && old != value) {
-                int u = old.Value;
-                int r = value;
-
-                Program.Project.Undo.AddAndExecute(new Loop.RateStepUndoEntry(_loop, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Loop.RateStepUndoEntry(
+                    _loop, 
+                    old.Value, 
+                    value
+                ));
         }
         
         public void SetRateStep(Length rate) => Rate.Length = rate;
         
         void Rate_ModeChanged(bool value, bool? old) {
-            if (old != null && old != value) {
-                bool u = old.Value;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Loop.RateModeUndoEntry(_loop, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Loop.RateModeUndoEntry(
+                    _loop, 
+                    old.Value, 
+                    value
+                ));
         }
         
         void Hold_Changed(object sender, RoutedEventArgs e) {
             bool value = Hold.IsChecked.Value;
 
-            if (_loop.Hold != value) {
-                bool u = _loop.Hold;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Loop.HoldUndoEntry(_loop, u, r));
-            }
+            if (_loop.Hold != value)
+                Program.Project.Undo.AddAndExecute(new Loop.HoldUndoEntry(
+                    _loop, 
+                    _loop.Hold, 
+                    value
+                ));
         }
         
         public void SetHold(bool hold){
@@ -102,27 +103,25 @@ namespace Apollo.DeviceViewers {
         public void SetMode(bool mode) => Rate.UsingSteps = mode;
         
         void Gate_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Loop.GateUndoEntry(_loop, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Loop.GateUndoEntry(
+                    _loop, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
         
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
         
         void Repeats_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Loop.RepeatsUndoEntry(_loop, Repeats.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Loop.RepeatsUndoEntry(
+                    _loop, 
+                    Repeats.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         public void SetRepeats(int repeats) => Repeats.RawValue = repeats;
-    
-        
-    
     }   
 }

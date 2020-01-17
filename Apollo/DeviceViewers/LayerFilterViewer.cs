@@ -39,23 +39,25 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new LayerFilter.TargetUndoEntry(_filter, Target.Unit, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new LayerFilter.TargetUndoEntry(
+                    _filter, 
+                    Target.Unit, 
+                    (int)value, 
+                    (int)old.Value
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
 
         void Range_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new LayerFilter.RangeUndoEntry(_filter, Range.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new LayerFilter.RangeUndoEntry(
+                    _filter, 
+                    Range.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetRange(int value) => Range.RawValue = value;

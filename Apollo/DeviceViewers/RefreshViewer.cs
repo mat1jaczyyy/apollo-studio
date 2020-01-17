@@ -41,12 +41,13 @@ namespace Apollo.DeviceViewers {
             int index = Array.IndexOf(Macros, source);
             bool value = source.IsChecked.Value;
 
-            if (_refresh.GetMacro(index) != value) {
-                bool u = _refresh.GetMacro(index);
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Refresh.MacroUndoEntry(_refresh, index, u, r));
-            }
+            if (_refresh.GetMacro(index) != value) 
+                Program.Project.Undo.AddAndExecute(new Refresh.MacroUndoEntry(
+                    _refresh, 
+                    index, 
+                    _refresh.GetMacro(index), 
+                    value
+                ));
         }
 
         public void SetMacro(int index, bool value) => Macros[index].IsChecked = value;

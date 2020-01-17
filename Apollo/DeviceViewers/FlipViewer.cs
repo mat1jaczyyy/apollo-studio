@@ -42,12 +42,12 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             FlipType selected = (FlipType)FlipMode.SelectedIndex;
 
-            if (_flip.Mode != selected) {
-                FlipType u = _flip.Mode;
-                FlipType r = selected;
-
-                Program.Project.Undo.AddAndExecute(new Flip.ModeUndoEntry(_flip, u, r));
-            }
+            if (_flip.Mode != selected)
+                Program.Project.Undo.AddAndExecute(new Flip.ModeUndoEntry(
+                    _flip, 
+                    _flip.Mode, 
+                    selected
+                ));
         }
 
         public void SetMode(FlipType mode) => FlipMode.SelectedIndex = (int)mode;
@@ -55,12 +55,12 @@ namespace Apollo.DeviceViewers {
         void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
-            if (_flip.Bypass != value) {
-                bool u = _flip.Bypass;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Flip.BypassUndoEntry(_flip, u, r));
-            }
+            if (_flip.Bypass != value)
+                Program.Project.Undo.AddAndExecute(new Flip.BypassUndoEntry(
+                    _flip, 
+                    _flip.Bypass, 
+                    value
+                ));
         }
 
         public void SetBypass(bool value) => Bypass.IsChecked = value;

@@ -45,57 +45,56 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
 
         void Hue_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value;
-                double r = value;
-
-                Program.Project.Undo.AddAndExecute(new Tone.HueUndoEntry(_tone, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.HueUndoEntry(
+                    _tone, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetHue(double value) => Hue.RawValue = value;
 
         void SaturationHigh_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Tone.SatHighUndoEntry(_tone, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.SatHighUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
 
         void SaturationLow_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Tone.SatLowUndoEntry(_tone, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.SatLowUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
 
         void ValueHigh_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Tone.ValueHighUndoEntry(_tone, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.ValueHighUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
 
         void ValueLow_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Tone.ValueLowUndoEntry(_tone, u, r));
-
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.ValueLowUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueLow(double value) => ValueLow.RawValue = value * 100;

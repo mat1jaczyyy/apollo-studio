@@ -50,12 +50,12 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Target_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new MacroFilter.TargetUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new MacroFilter.TargetUndoEntry(
+                    _filter, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         
         public void SetMacro(int macro) => MacroDial.RawValue = macro;
@@ -89,10 +89,11 @@ namespace Apollo.DeviceViewers {
                 MouseMove(sender, e);
 
                 if (old != null) {
-                    bool[] u = old.ToArray();
-                    bool[] r = _filter.Filter.ToArray();
-
-                    Program.Project.Undo.AddAndExecute(new MacroFilter.FilterUndoEntry(_filter, u.ToArray(), r.ToArray()));
+                    Program.Project.Undo.AddAndExecute(new MacroFilter.FilterUndoEntry(
+                        _filter, 
+                        old.ToArray(), 
+                        _filter.Filter.ToArray()
+                    ));
 
                     old = null;
                 }

@@ -40,23 +40,23 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
         void Target_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Switch.TargetUndoEntry(_switch, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Switch.TargetUndoEntry(
+                    _switch, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
        
         public void SetTarget(int target) => Target.RawValue = target;
         
         void Value_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Switch.ValueUndoEntry(_switch, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Switch.ValueUndoEntry(
+                    _switch, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         
         public void SetValue(int value) => Value.RawValue = value;

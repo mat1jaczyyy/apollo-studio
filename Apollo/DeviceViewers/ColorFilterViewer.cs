@@ -49,67 +49,67 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Hue_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value;
-                double r = value;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.HueUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.HueUndoEntry(
+                    _filter, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetHue(double value) => Hue.RawValue = value;
 
         void Saturation_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturation(double value) => Saturation.RawValue = value * 100;
 
         void Value_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValue(double value) => Value.RawValue = value * 100;
 
         void HueTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.HueToleranceUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.HueToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetHueTolerance(double value) => HueTolerance.RawValue = value * 100;
 
         void SaturationTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationToleranceUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationTolerance(double value) => SaturationTolerance.RawValue = value * 100;
 
         void ValueTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueToleranceUndoEntry(_filter, u, r));
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueTolerance(double value) => ValueTolerance.RawValue = value * 100;

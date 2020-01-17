@@ -102,19 +102,13 @@ namespace Apollo.Components {
         public void SetOffset(Offset offset) => _viewer.Update(offset);
         
         public void Angle_Changed(Dial sender, double angle, double? old){
-            int index = _copy.Offsets.IndexOf(_offset);
-            
-            if (old != null && old.Value != angle) {
-                int u = (int)old.Value;
-                int r = (int)angle;
-
+            if (old != null && old.Value != angle)
                 Program.Project.Undo.AddAndExecute(new Copy.OffsetAngleUndoEntry(
                     _copy,
                     _copy.Offsets.IndexOf(_offset),
                     (int)old.Value,
                     (int)angle
                 ));
-            }
         }
     
         public void SetAngle(double angle) => Angle.RawValue = angle;

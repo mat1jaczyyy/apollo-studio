@@ -42,12 +42,13 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             RotateType selected = (RotateType)RotateMode.SelectedIndex;
 
-            if (_rotate.Mode != selected) {
-                RotateType u = _rotate.Mode;
-                RotateType r = selected;
-
-                Program.Project.Undo.AddAndExecute(new Rotate.ModeUndoEntry(_rotate, (string)((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content, u, r));
-            }
+            if (_rotate.Mode != selected)
+                Program.Project.Undo.AddAndExecute(new Rotate.ModeUndoEntry(
+                    _rotate, 
+                    (string)((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)selected)).Content, 
+                    _rotate.Mode, 
+                    selected
+                ));
         }
 
         public void SetMode(RotateType mode) => RotateMode.SelectedIndex = (int)mode;
@@ -55,12 +56,12 @@ namespace Apollo.DeviceViewers {
         void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
-            if (_rotate.Bypass != value) {
-                bool u = _rotate.Bypass;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Rotate.BypassUndoEntry(_rotate, u, r));
-            }
+            if (_rotate.Bypass != value)
+                Program.Project.Undo.AddAndExecute(new Rotate.BypassUndoEntry(
+                    _rotate, 
+                    _rotate.Bypass, 
+                    value
+                ));
         }
 
         public void SetBypass(bool value) => Bypass.IsChecked = value;

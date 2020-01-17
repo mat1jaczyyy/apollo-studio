@@ -37,12 +37,12 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
         
         void Color_Changed(Color color, Color old) {
-            if (old != null) {
-                Color u = old.Clone();
-                Color r = color.Clone();
-
-                Program.Project.Undo.AddAndExecute(new Paint.ColorUndoEntry(_paint, u, r));
-            }
+            if (old != null)
+                Program.Project.Undo.AddAndExecute(new Paint.ColorUndoEntry(
+                    _paint, 
+                    old.Clone(), 
+                    color.Clone()
+                ));
         }
 
         public void Set(Color color) => Picker.SetColor(color);

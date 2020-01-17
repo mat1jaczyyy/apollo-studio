@@ -57,33 +57,32 @@ namespace Apollo.DeviceViewers {
         }
 
         void Offset_Changed(int x, int y, int? old_x, int? old_y) {
-            if (old_x != null && old_y != null) {
-                int ux = old_x.Value;
-                int uy = old_y.Value;
-                int rx = x;
-                int ry = y;
-
-                Program.Project.Undo.AddAndExecute(new Move.OffsetUndoEntry(_move, ux, uy, rx, ry));
-            }
+            if (old_x != null && old_y != null)
+                Program.Project.Undo.AddAndExecute(new Move.OffsetUndoEntry(
+                    _move, 
+                    old_x.Value, 
+                    old_y.Value, 
+                    x, 
+                    y
+                ));
         }
 
         void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
-            if (old_x != null && old_y != null) {
-                int ux = old_x.Value;
-                int uy = old_y.Value;
-                int rx = x;
-                int ry = y;
-
-                Program.Project.Undo.AddAndExecute(new Move.OffsetAbsoluteUndoEntry(_move, ux, uy, rx, ry));
-            }
+            if (old_x != null && old_y != null)
+                Program.Project.Undo.AddAndExecute(new Move.OffsetAbsoluteUndoEntry(
+                    _move, 
+                    old_x.Value, 
+                    old_y.Value, 
+                    x, 
+                    y
+                ));
         }
 
-        void Offset_Switched() {
-            bool u = _move.Offset.IsAbsolute;
-            bool r = !_move.Offset.IsAbsolute;
-
-            Program.Project.Undo.AddAndExecute(new Move.OffsetSwitchedUndoEntry(_move, u, r));
-        }
+        void Offset_Switched() => Program.Project.Undo.AddAndExecute(new Move.OffsetSwitchedUndoEntry(
+                _move, 
+                _move.Offset.IsAbsolute, 
+                !_move.Offset.IsAbsolute
+            ));
 
         public void SetOffset(Offset offset) {
             Offset.Update(offset);
@@ -93,12 +92,12 @@ namespace Apollo.DeviceViewers {
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {
             GridType selected = (GridType)GridMode.SelectedIndex;
 
-            if (_move.GridMode != selected) {
-                GridType u = _move.GridMode;
-                GridType r = selected;
-
-                Program.Project.Undo.AddAndExecute(new Move.GridModeUndoEntry(_move, u, r));
-            }
+            if (_move.GridMode != selected)
+                Program.Project.Undo.AddAndExecute(new Move.GridModeUndoEntry(
+                    _move, 
+                    _move.GridMode, 
+                    selected
+                ));
         }
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
@@ -106,12 +105,12 @@ namespace Apollo.DeviceViewers {
         void Wrap_Changed(object sender, RoutedEventArgs e) {
             bool value = Wrap.IsChecked.Value;
 
-            if (_move.Wrap != value) {
-                bool u = _move.Wrap;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Move.WrapUndoEntry(_move, u, r));
-            }
+            if (_move.Wrap != value)
+                Program.Project.Undo.AddAndExecute(new Move.WrapUndoEntry(
+                    _move, 
+                    _move.Wrap, 
+                    value
+                ));
         }
 
         public void SetWrap(bool value) => Wrap.IsChecked = value;

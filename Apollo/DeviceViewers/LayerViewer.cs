@@ -43,12 +43,13 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
 
         void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Layer.TargetUndoEntry(_layer, Target.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Layer.TargetUndoEntry(
+                    _layer, 
+                    Target.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
@@ -56,23 +57,24 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             BlendingType selected = (BlendingType)BlendingMode.SelectedIndex;
 
-            if (_layer.BlendingMode != selected) {
-                BlendingType u = _layer.BlendingMode;
-                BlendingType r = selected;
-
-                Program.Project.Undo.AddAndExecute(new Layer.ModeUndoEntry(_layer, u, r));
-            }
+            if (_layer.BlendingMode != selected)
+                Program.Project.Undo.AddAndExecute(new Layer.ModeUndoEntry(
+                    _layer, 
+                    _layer.BlendingMode, 
+                    selected
+                ));
         }
 
         public void SetMode(BlendingType mode) => Range.Enabled = (BlendingMode.SelectedIndex = (int)mode) > 0;
 
         void Range_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Layer.RangeUndoEntry(_layer, Range.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Layer.RangeUndoEntry(
+                    _layer, 
+                    Range.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetRange(int value) => Range.RawValue = value;

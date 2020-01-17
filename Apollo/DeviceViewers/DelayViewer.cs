@@ -40,12 +40,13 @@ namespace Apollo.DeviceViewers {
         }
 
         void Duration_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-
-                Program.Project.Undo.AddAndExecute(new Delay.DurationUndoEntry(_delay, Duration.Unit, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Delay.DurationUndoEntry(
+                    _delay, 
+                    Duration.Unit, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
@@ -53,34 +54,34 @@ namespace Apollo.DeviceViewers {
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
         void Duration_ModeChanged(bool value, bool? old) {
-            if (old != null && old != value) {
-                bool u = old.Value;
-                bool r = value;
-
-                Program.Project.Undo.AddAndExecute(new Delay.DurationModeUndoEntry(_delay, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Delay.DurationModeUndoEntry(
+                    _delay, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
         void Duration_StepChanged(int value, int? old) {
-            if (old != null && old != value) {
-                int u = old.Value;
-                int r = value;
-
-                Program.Project.Undo.AddAndExecute(new Delay.DurationStepUndoEntry(_delay, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Delay.DurationStepUndoEntry(
+                    _delay, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
         void Gate_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-
-                Program.Project.Undo.AddAndExecute(new Delay.GateUndoEntry(_delay, u, r));
-            }
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Delay.GateUndoEntry(
+                    _delay, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
