@@ -48,16 +48,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value;
                 double r = value;
-                List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Hue Changed to {r}{Hue.Unit}", () => {
-                    Track.TraversePath<Tone>(path).Hue = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).Hue = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Tone.HueUndoEntry(_tone, u, r));
             }
-
-            _tone.Hue = value;
         }
 
         public void SetHue(double value) => Hue.RawValue = value;
@@ -66,16 +59,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Sat Hi Changed to {r}{SaturationHigh.Unit}", () => {
-                    Track.TraversePath<Tone>(path).SaturationHigh = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).SaturationHigh = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Tone.SatHighUndoEntry(_tone, u, r));
             }
-
-            _tone.SaturationHigh = value / 100;
         }
 
         public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
@@ -84,16 +70,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Sat Lo Changed to {r}{SaturationLow.Unit}", () => {
-                    Track.TraversePath<Tone>(path).SaturationLow = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).SaturationLow = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Tone.SatLowUndoEntry(_tone, u, r));
             }
-
-            _tone.SaturationLow = value / 100;
         }
 
         public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
@@ -102,16 +81,9 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Val Hi Changed to {r}{ValueHigh.Unit}", () => {
-                    Track.TraversePath<Tone>(path).ValueHigh = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).ValueHigh = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Tone.ValueHighUndoEntry(_tone, u, r));
             }
-
-            _tone.ValueHigh = value / 100;
         }
 
         public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
@@ -120,16 +92,10 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) {
                 double u = old.Value / 100;
                 double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
 
-                Program.Project.Undo.Add($"Tone Val Lo Changed to {r}{ValueLow.Unit}", () => {
-                    Track.TraversePath<Tone>(path).ValueLow = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).ValueLow = r;
-                });
+                Program.Project.Undo.AddAndExecute(new Tone.ValueLowUndoEntry(_tone, u, r));
+
             }
-
-            _tone.ValueLow = value / 100;
         }
 
         public void SetValueLow(double value) => ValueLow.RawValue = value * 100;
