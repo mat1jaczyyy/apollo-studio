@@ -29,6 +29,8 @@ namespace Apollo.Components {
             }
         }
 
+        double lineWidth => radius * 1.9;
+
         public PinchDial() {
             Minimum = -2;
             Maximum = 2;
@@ -36,9 +38,9 @@ namespace Apollo.Components {
             
             IsBilateral = false;
             
-            Arc.StrokeThickness = 2 * Scale;
+            Arc.StrokeThickness = stroke * Scale / 2;
             
-            ArcBase.StrokeThickness = 4 * Scale;
+            ArcBase.StrokeThickness = stroke * Scale;
             ArcBase.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
             
             ModeChanged += (bool _, bool? __) => IsBilateral = !IsBilateral;
@@ -69,30 +71,35 @@ namespace Apollo.Components {
         protected override void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             DrawArcAuto();
         }
+
+        Geometry CreateGeometry(string geometry) {
+            double realHeight = height * Scale;
+            double margin = (width - height) * Scale / 2;
+
+            return Geometry.Parse(String.Format("M {0} {1} " + geometry + " {6} 0",
+                margin.ToString(),
+                (realHeight).ToString(),
+                (realHeight * (1 - Value) + margin).ToString(),
+                (realHeight * (1 - Value)).ToString(),
+                (realHeight * Value + margin).ToString(),
+                (realHeight * Value).ToString(),
+                (realHeight + margin).ToString()
+            ));
+        }
         
         void DrawArcBilateral() {
             Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeExtraBrush");
 
-            double realWidthHalf = width * Scale / 2;
-            
-            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 {4} C {0} {1} {2} {3} {4} 0",
-                (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
-                (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
-                (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString(),
-                (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString(),
-                (realWidthHalf * 2).ToString()
-            )); 
+            Arc.Data = ArcBase.Data = CreateGeometry("C {2} {3} {4} {5}");
         }
         
         void DrawArcQuad() {
             Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush");
             
-            double realWidth = width * Scale;
+            double realWidth = lineWidth * Scale;
+            double margin = (width - lineWidth) / 2;
             
-            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 {0} Q {1} {1} {0} 0", 
-                realWidth.ToString(),
-                (realWidth / 2 + Math.Round(-RawValue * realWidth / 4)).ToString()
-            ));
+            Arc.Data = ArcBase.Data = CreateGeometry("Q {2} {3}");
         }
     }
 }
