@@ -301,7 +301,7 @@ namespace Apollo.Binary {
                 }
                 
                 bool bilateral = false;
-                if(version >= 28){
+                if (version >= 28) {
                     bilateral = reader.ReadBoolean();
                 }
 
