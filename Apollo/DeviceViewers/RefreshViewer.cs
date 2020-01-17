@@ -44,15 +44,8 @@ namespace Apollo.DeviceViewers {
             if (_refresh.GetMacro(index) != value) {
                 bool u = _refresh.GetMacro(index);
                 bool r = value;
-                List<int> path = Track.GetPath(_refresh);
 
-                Program.Project.Undo.Add($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Refresh>(path).SetMacro(index, u);
-                }, () => {
-                    Track.TraversePath<Refresh>(path).SetMacro(index, r);
-                });
-
-                _refresh.SetMacro(index, value);
+                Program.Project.Undo.AddAndExecute(new Refresh.MacroUndoEntry(_refresh, index, u, r));
             }
         }
 
