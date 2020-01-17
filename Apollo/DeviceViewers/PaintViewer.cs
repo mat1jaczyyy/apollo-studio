@@ -40,16 +40,9 @@ namespace Apollo.DeviceViewers {
             if (old != null) {
                 Color u = old.Clone();
                 Color r = color.Clone();
-                List<int> path = Track.GetPath(_paint);
 
-                Program.Project.Undo.Add($"Paint Color Changed to {r.ToHex()}", () => {
-                    Track.TraversePath<Paint>(path).Color = u.Clone();
-                }, () => {
-                    Track.TraversePath<Paint>(path).Color = r.Clone();
-                });
+                Program.Project.Undo.AddAndExecute(new Paint.ColorUndoEntry(_paint, u, r));
             }
-
-            _paint.Color = color;
         }
 
         public void Set(Color color) => Picker.SetColor(color);
