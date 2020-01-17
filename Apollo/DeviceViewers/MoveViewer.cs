@@ -57,52 +57,24 @@ namespace Apollo.DeviceViewers {
         }
 
         void Offset_Changed(int x, int y, int? old_x, int? old_y) {
-            _move.Offset.X = x;
-            _move.Offset.Y = y;
-
             if (old_x != null && old_y != null) {
                 int ux = old_x.Value;
                 int uy = old_y.Value;
                 int rx = x;
                 int ry = y;
 
-                List<int> path = Track.GetPath(_move);
-
-                Program.Project.Undo.Add($"Move Offset Relative Changed to {rx},{ry}", () => {
-                    Move move = Track.TraversePath<Move>(path);
-                    move.Offset.X = ux;
-                    move.Offset.Y = uy;
-
-                }, () => {
-                    Move move = Track.TraversePath<Move>(path);
-                    move.Offset.X = rx;
-                    move.Offset.Y = ry;
-                });
+                Program.Project.Undo.AddAndExecute(new Move.OffsetUndoEntry(_move, ux, uy, rx, ry));
             }
         }
 
         void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
-            _move.Offset.AbsoluteX = x;
-            _move.Offset.AbsoluteY = y;
-
             if (old_x != null && old_y != null) {
                 int ux = old_x.Value;
                 int uy = old_y.Value;
                 int rx = x;
                 int ry = y;
 
-                List<int> path = Track.GetPath(_move);
-
-                Program.Project.Undo.Add($"Move Offset Absolute Changed to {rx},{ry}", () => {
-                    Move move = Track.TraversePath<Move>(path);
-                    move.Offset.AbsoluteX = ux;
-                    move.Offset.AbsoluteY = uy;
-
-                }, () => {
-                    Move move = Track.TraversePath<Move>(path);
-                    move.Offset.AbsoluteX = rx;
-                    move.Offset.AbsoluteY = ry;
-                });
+                Program.Project.Undo.AddAndExecute(new Move.OffsetAbsoluteUndoEntry(_move, ux, uy, rx, ry));
             }
         }
 
@@ -110,18 +82,7 @@ namespace Apollo.DeviceViewers {
             bool u = _move.Offset.IsAbsolute;
             bool r = !_move.Offset.IsAbsolute;
 
-            List<int> path = Track.GetPath(_move);
-
-            Program.Project.Undo.Add($"Move Offset Switched to {(r? "Absolute" : "Relative")}", () => {
-                Move move = Track.TraversePath<Move>(path);
-                move.Offset.IsAbsolute = u;
-
-            }, () => {
-                Move move = Track.TraversePath<Move>(path);
-                move.Offset.IsAbsolute = r;
-            });
-
-            _move.Offset.IsAbsolute = !_move.Offset.IsAbsolute;
+            Program.Project.Undo.AddAndExecute(new Move.OffsetSwitchedUndoEntry(_move, u, r));
         }
 
         public void SetOffset(Offset offset) {
@@ -135,15 +96,8 @@ namespace Apollo.DeviceViewers {
             if (_move.GridMode != selected) {
                 GridType u = _move.GridMode;
                 GridType r = selected;
-                List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Grid Changed to {((ComboBoxItem)GridMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    Track.TraversePath<Move>(path).GridMode = u;
-                }, () => {
-                    Track.TraversePath<Move>(path).GridMode = r;
-                });
-
-                _move.GridMode = selected;
+                Program.Project.Undo.AddAndExecute(new Move.GridModeUndoEntry(_move, u, r));
             }
         }
 
@@ -155,15 +109,8 @@ namespace Apollo.DeviceViewers {
             if (_move.Wrap != value) {
                 bool u = _move.Wrap;
                 bool r = value;
-                List<int> path = Track.GetPath(_move);
 
-                Program.Project.Undo.Add($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Move>(path).Wrap = u;
-                }, () => {
-                    Track.TraversePath<Move>(path).Wrap = r;
-                });
-
-                _move.Wrap = value;
+                Program.Project.Undo.AddAndExecute(new Move.WrapUndoEntry(_move, u, r));
             }
         }
 
