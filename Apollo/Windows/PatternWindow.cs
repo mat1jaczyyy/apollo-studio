@@ -1007,7 +1007,7 @@ namespace Apollo.Windows {
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
+                Program.Project.Undo.Add($"Pattern Pinch Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
                     Track.TraversePath<Pattern>(path).Bilateral = u;
                 }, () => {
                     Track.TraversePath<Pattern>(path).Bilateral = r;

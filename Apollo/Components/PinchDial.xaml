@@ -1,6 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.GraphDial"
+             x:Class="Apollo.Components.PinchDial"
              DetachedFromVisualTree="Graph_Unloaded">
 
   <Grid RowDefinitions="Auto,Auto,Auto" VerticalAlignment="Center" LayoutUpdated="LayoutChanged">

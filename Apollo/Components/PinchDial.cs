@@ -15,13 +15,12 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
 namespace Apollo.Components {
-    public class GraphDial: Dial {
-        
-        public delegate void DialBilateralChangedEventHandler(GraphDial sender, bool NewValue, bool? OldValue);
+    public class PinchDial: Dial {
+        public delegate void DialBilateralChangedEventHandler(PinchDial sender, bool NewValue, bool? OldValue);
         public event DialBilateralChangedEventHandler BilateralChanged;
         
         bool _isBilateral;
-        public bool IsBilateral{
+        public bool IsBilateral {
             get => _isBilateral;
             set {
                 _isBilateral = value;
@@ -44,7 +43,7 @@ namespace Apollo.Components {
             Input = this.Get<TextBox>("Input");
         }
         
-        public GraphDial(){
+        public PinchDial() {
             InitializeComponent();
             
             Minimum = -2;
@@ -83,24 +82,25 @@ namespace Apollo.Components {
             else DrawArcQuad();
         }
         
-        protected override void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush"){
+        protected override void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             DrawArcAuto();
         }
         
-        void DrawArcBilateral(){
+        void DrawArcBilateral() {
             Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeExtraBrush");
 
             double realWidthHalf = width * Scale / 2;
             
-            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 43 C {0} {1} {2} {3} 43 0",
+            Arc.Data = ArcBase.Data = Geometry.Parse(String.Format("M 0 {4} C {0} {1} {2} {3} {4} 0",
                 (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
                 (realWidthHalf + (int)Math.Round(-RawValue * realWidthHalf / 2)).ToString(),
                 (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString(),
-                (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString()
+                (realWidthHalf + (int)Math.Round(RawValue * realWidthHalf / 2)).ToString(),
+                (realWidthHalf * 2).ToString()
             )); 
         }
         
-        void DrawArcQuad(){
+        void DrawArcQuad() {
             Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush");
             
             double realWidth = width * Scale;
