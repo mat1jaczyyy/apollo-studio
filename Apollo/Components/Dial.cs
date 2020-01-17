@@ -112,7 +112,7 @@ namespace Apollo.Components {
 
                     _value = value;
                     RawValue = ToRawValue(_value);
-                    DrawArcValue();
+                    DrawArcAuto();
 
                     _valuechanging = false;
                 }
@@ -240,14 +240,12 @@ namespace Apollo.Components {
         }
 
         bool _usingSteps = false;
-        virtual public bool UsingSteps {
+        public virtual bool UsingSteps {
             get => _usingSteps;
             set {
                 if (AllowSteps && Enabled && _usingSteps != value) {
                     _usingSteps = value;
                     DrawArcAuto();
-                    
-                    ModeChanged?.Invoke(UsingSteps, null);
                 }
             }
         }
@@ -261,7 +259,7 @@ namespace Apollo.Components {
             }
         }
 
-        protected string ValueString => UsingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
+        protected string ValueString => _usingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         protected virtual void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
             double angle_starting = FillStart
@@ -313,16 +311,16 @@ namespace Apollo.Components {
 
         protected void DrawArcBase() => DrawArc(ArcBase, 1, true);
 
-        void DrawArcValue() {
-            if (!UsingSteps) DrawArc(Arc, _value, false);
+        protected void DrawArcValue() {
+            if (!_usingSteps) DrawArc(Arc, _value, false);
         }
 
-        protected virtual void DrawArcSteps() {
-            if (UsingSteps) DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
+        protected void DrawArcSteps() {
+            if (_usingSteps) DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
         }
 
-        public virtual void DrawArcAuto() {
-            if (UsingSteps) DrawArcSteps();
+        protected virtual void DrawArcAuto() {
+            if (_usingSteps) DrawArcSteps();
             else DrawArcValue();
         }
 
@@ -357,7 +355,7 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed && Enabled) {
                 if (e.KeyModifiers.HasFlag(App.ControlKey)) {
-                    if (UsingSteps) Length.Step = 5;
+                    if (_usingSteps) Length.Step = 5;
                     else RawValue = Default;
                     return;
                 }
@@ -371,7 +369,7 @@ namespace Apollo.Components {
                 e.Pointer.Capture(ArcCanvas);
 
                 lastY = e.GetPosition(ArcCanvas).Y;
-                if (UsingSteps) oldStep = Length.Step;
+                if (_usingSteps) oldStep = Length.Step;
                 else oldValue = RawValue;
 
                 Started?.Invoke();
@@ -389,7 +387,7 @@ namespace Apollo.Components {
                 mouseHeld = false;
                 e.Pointer.Capture(null);
 
-                if (UsingSteps) StepChanged?.Invoke(Length.Step, oldStep);
+                if (_usingSteps) StepChanged?.Invoke(Length.Step, oldStep);
                 else ValueChanged?.Invoke(this, RawValue, oldValue);
 
                 ArcCanvas.Cursor = new Cursor(StandardCursorType.Hand);
@@ -407,7 +405,7 @@ namespace Apollo.Components {
             if (mouseHeld && Enabled) {
                 double Y = e.GetPosition(ArcCanvas).Y;
 
-                if (UsingSteps) {
+                if (_usingSteps) {
                     if (Math.Abs(Y - lastY) >= 8) {
                         _length.Step -= (int)((Y - lastY) / 8);
 
@@ -470,7 +468,7 @@ namespace Apollo.Components {
         protected void DisplayPressed(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !UsingSteps && Enabled) {
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2 && !_usingSteps && Enabled) {
                 Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 

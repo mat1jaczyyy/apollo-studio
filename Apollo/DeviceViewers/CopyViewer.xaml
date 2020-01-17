@@ -50,8 +50,8 @@
           <Components:Dial Grid.Column="1" Margin="5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%" DisabledText="Unused"
                            ValueChanged="Gate_Changed" />
                            
-          <Components:PinchDial Grid.Column="2" Margin="5 0 0 0" HorizontalAlignment="Stretch" x:Name="Pinch" Title="Pinch" DisabledText="Unused"
-                                ValueChanged="Pinch_Changed" BilateralChanged="Bilateral_Changed"  />
+          <Components:PinchDial Grid.Column="2" Margin="5 0 0 0" HorizontalAlignment="Stretch" x:Name="Pinch" DisabledText="Unused"
+                                ValueChanged="Pinch_Changed" ModeChanged="Bilateral_Changed" />
         </Grid>
       </Grid>
     </Border>

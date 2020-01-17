@@ -223,7 +223,7 @@ namespace Apollo.DeviceViewers {
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
         
-        void Bilateral_Changed(PinchDial sender, bool value, bool? old) {
+        void Bilateral_Changed(bool value, bool? old) {
             if (old != null && old != value) {
                 bool u = old.Value;
                 bool r = value;

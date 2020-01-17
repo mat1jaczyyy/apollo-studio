@@ -3,103 +3,71 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Threading;
-
-using Apollo.Core;
-using Apollo.Structures;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 
 namespace Apollo.Components {
     public class PinchDial: Dial {
-        public delegate void DialBilateralChangedEventHandler(PinchDial sender, bool NewValue, bool? OldValue);
-        public event DialBilateralChangedEventHandler BilateralChanged;
+        public override bool UsingSteps {
+            get => IsBilateral;
+            set => IsBilateral = value;
+        }
         
         bool _isBilateral;
         public bool IsBilateral {
             get => _isBilateral;
             set {
                 _isBilateral = value;
+                
                 DrawArcAuto();
-                BilateralChanged?.Invoke(this, IsBilateral, !IsBilateral);
             }
         }
 
-        double lineWidth => radius * 1.9;
-
         public PinchDial() {
+            Title = "Pinch";
+
             Minimum = -2;
             Maximum = 2;
             Round = 1;
             
             IsBilateral = false;
-            
-            Arc.StrokeThickness = stroke * Scale / 2;
-            
-            ArcBase.StrokeThickness = stroke * Scale;
-            ArcBase.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
-            
-            ModeChanged += (bool _, bool? __) => IsBilateral = !IsBilateral;
-        }
-        
-        protected void Graph_Unloaded(object sender, VisualTreeAttachmentEventArgs e){
-            Unloaded(sender, e);
-            
-            BilateralChanged = null;
-        }
-        
-        public override void DrawArcAuto() {
-            Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
-            
-            if(!Enabled){
-                Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
-                ArcBase.IsVisible = false;
-                return;
-            }
-            
-            ArcBase.IsVisible = true;
-            
-            
-            if (IsBilateral) DrawArcBilateral();
-            else DrawArcQuad();
-        }
-        
-        protected override void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
-            DrawArcAuto();
         }
 
-        Geometry CreateGeometry(string geometry) {
+        Geometry CreateGeometry(string geometry, double value) {
             double realHeight = height * Scale;
             double margin = (width - height) * Scale / 2;
 
             return Geometry.Parse(String.Format("M {0} {1} " + geometry + " {6} 0",
                 margin.ToString(),
                 (realHeight).ToString(),
-                (realHeight * (1 - Value) + margin).ToString(),
-                (realHeight * (1 - Value)).ToString(),
-                (realHeight * Value + margin).ToString(),
-                (realHeight * Value).ToString(),
+                (realHeight * (1 - value) + margin).ToString(),
+                (realHeight * (1 - value)).ToString(),
+                (realHeight * value + margin).ToString(),
+                (realHeight * value).ToString(),
                 (realHeight + margin).ToString()
             ));
         }
         
-        void DrawArcBilateral() {
-            Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeExtraBrush");
+        protected override void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
+            if (overrideBase) return;
+            
+            Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
 
-            Arc.Data = ArcBase.Data = CreateGeometry("C {2} {3} {4} {5}");
+            ArcBase.StrokeThickness = stroke * Scale;
+            ArcBase.IsVisible = Enabled;
+
+            Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
+            Arc.StrokeThickness = stroke * Scale / 2;
+            
+            ArcBase.Data = Arc.Data = CreateGeometry(IsBilateral? "C {2} {3} {4} {5}" : "Q {2} {3}", value);
         }
         
-        void DrawArcQuad() {
-            Arc.Stroke = (IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush");
-            
-            double realWidth = lineWidth * Scale;
-            double margin = (width - lineWidth) / 2;
-            
-            Arc.Data = ArcBase.Data = CreateGeometry("Q {2} {3}");
+        void DrawArcBilateral() {
+            if (IsBilateral) DrawArc(Arc, Value, false, "ThemeExtraBrush");
+        }
+
+        protected override void DrawArcAuto() {
+            if (IsBilateral) DrawArcBilateral();
+            else DrawArcValue();
         }
     }
 }
