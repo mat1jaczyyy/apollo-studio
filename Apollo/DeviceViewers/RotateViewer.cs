@@ -45,7 +45,7 @@ namespace Apollo.DeviceViewers {
             if (_rotate.Mode != selected)
                 Program.Project.Undo.AddAndExecute(new Rotate.ModeUndoEntry(
                     _rotate, 
-                    (string)((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)selected)).Content, 
+                    selected.ToString().Substring(1), 
                     _rotate.Mode, 
                     selected
                 ));

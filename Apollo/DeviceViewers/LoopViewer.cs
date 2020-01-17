@@ -55,8 +55,7 @@ namespace Apollo.DeviceViewers {
         void Rate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Loop.RateUndoEntry(
-                    _loop, 
-                    Rate.Unit, 
+                    _loop,
                     (int)old.Value, 
                     (int)value
                 ));
@@ -116,8 +115,7 @@ namespace Apollo.DeviceViewers {
         void Repeats_Changed(Dial sender, double value, double? old){
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Loop.RepeatsUndoEntry(
-                    _loop, 
-                    Repeats.Unit, 
+                    _loop,
                     (int)old.Value, 
                     (int)value
                 ));

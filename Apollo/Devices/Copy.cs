@@ -504,8 +504,8 @@ namespace Apollo.Devices {
 
             protected override void RedoPath(params Copy[] item) => item[0].Time.Free = r;
             
-            public RateUndoEntry(Copy copy, string unit, int u, int r)
-            : base($"Copy Rate Changed to {r}{unit}", copy) {
+            public RateUndoEntry(Copy copy, int u, int r)
+            : base($"Copy Rate Changed to {r}ms", copy) {
                 this.u = u;
                 this.r = r;
             }

@@ -53,8 +53,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params LayerFilter[] items) => items[0].Target = r;
             
-            public TargetUndoEntry(LayerFilter LayerFilter, string unit, int u, int r)
-            : base($"Layer Target Changed to {r}{unit}", LayerFilter){
+            public TargetUndoEntry(LayerFilter LayerFilter, int u, int r)
+            : base($"Layer Target Changed to {r}", LayerFilter){
                 this.u = u;
                 this.r = r;
             }
@@ -67,8 +67,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params LayerFilter[] items) => items[0].Range = r;
             
-            public RangeUndoEntry(LayerFilter LayerFilter, string unit, int u, int r)
-            : base($"Layer Filter Range Changed to {r}{unit}", LayerFilter){
+            public RangeUndoEntry(LayerFilter LayerFilter, int u, int r)
+            : base($"Layer Filter Range Changed to {r}", LayerFilter){
                 this.u = u;
                 this.r = r;
             }

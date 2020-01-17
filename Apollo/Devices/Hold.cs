@@ -179,8 +179,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Hold[] items) => items[0].Time.Free = r;
             
-            public DurationUndoEntry(Hold Hold, string unit, int u, int r)
-            : base($"Hold Duration Changed to {r}{unit}", Hold){
+            public DurationUndoEntry(Hold Hold, int u, int r)
+            : base($"Hold Duration Changed to {r}ms", Hold){
                 this.u = u;
                 this.r = r;
             }

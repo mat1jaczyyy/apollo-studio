@@ -45,8 +45,7 @@ namespace Apollo.DeviceViewers {
         void Target_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Layer.TargetUndoEntry(
-                    _layer, 
-                    Target.Unit, 
+                    _layer,
                     (int)old.Value, 
                     (int)value
                 ));
@@ -70,8 +69,7 @@ namespace Apollo.DeviceViewers {
         void Range_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Layer.RangeUndoEntry(
-                    _layer, 
-                    Range.Unit, 
+                    _layer,
                     (int)old.Value, 
                     (int)value
                 ));

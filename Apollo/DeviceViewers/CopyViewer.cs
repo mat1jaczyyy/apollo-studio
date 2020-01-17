@@ -89,28 +89,44 @@ namespace Apollo.DeviceViewers {
 
         void Rate_ValueChanged(Dial sender, double value, double? old) {
             if (old != null && old != value) 
-                Program.Project.Undo.AddAndExecute(new Copy.RateUndoEntry(_copy, Rate.Unit, (int)old.Value, (int)value));
+                Program.Project.Undo.AddAndExecute(new Copy.RateUndoEntry(
+                    _copy,
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetRateValue(int rate) => Rate.RawValue = rate;
 
         void Rate_ModeChanged(bool value, bool? old) {
             if (old != null && old != value) 
-                Program.Project.Undo.AddAndExecute(new Copy.RateModeUndoEntry(_copy, old.Value, value));
+                Program.Project.Undo.AddAndExecute(new Copy.RateModeUndoEntry(
+                    _copy, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetMode(bool mode) => Rate.UsingSteps = mode;
 
         void Rate_StepChanged(int value, int? old) {
             if (old != null && old != value) 
-                Program.Project.Undo.AddAndExecute(new Copy.RateStepUndoEntry(_copy, old.Value, value));
+                Program.Project.Undo.AddAndExecute(new Copy.RateStepUndoEntry(
+                    _copy, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetRateStep(Length rate) => Rate.Length = rate;
 
         void Gate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) 
-                Program.Project.Undo.AddAndExecute(new Copy.GateUndoEntry(_copy, old.Value / 100, value / 100));
+                Program.Project.Undo.AddAndExecute(new Copy.GateUndoEntry(
+                    _copy, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
@@ -119,7 +135,11 @@ namespace Apollo.DeviceViewers {
             CopyType selected = (CopyType)CopyMode.SelectedIndex;
 
             if (_copy.CopyMode != selected)
-                Program.Project.Undo.AddAndExecute(new Copy.CopyModeUndoEntry(_copy, _copy.CopyMode, selected));
+                Program.Project.Undo.AddAndExecute(new Copy.CopyModeUndoEntry(
+                    _copy, 
+                    _copy.CopyMode, 
+                    selected
+                ));
 
             Rate.Enabled = Gate.Enabled = selected != CopyType.Static && selected != CopyType.RandomSingle;
             Pinch.Enabled = Reverse.IsEnabled = Infinite.IsEnabled = selected == CopyType.Animate || selected == CopyType.Interpolate;
@@ -134,14 +154,22 @@ namespace Apollo.DeviceViewers {
             GridType selected = (GridType)GridMode.SelectedIndex;
 
             if (_copy.GridMode != selected) 
-                Program.Project.Undo.AddAndExecute(new Copy.GridModeUndoEntry(_copy, _copy.GridMode, selected));
+                Program.Project.Undo.AddAndExecute(new Copy.GridModeUndoEntry(
+                    _copy, 
+                    _copy.GridMode, 
+                    selected
+                ));
         }
 
         public void SetGridMode(GridType mode) => GridMode.SelectedIndex = (int)mode;
 
         void Pinch_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)
-                Program.Project.Undo.AddAndExecute(new Copy.PinchUndoEntry(_copy, old.Value, value));
+                Program.Project.Undo.AddAndExecute(new Copy.PinchUndoEntry(
+                    _copy, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
@@ -150,7 +178,11 @@ namespace Apollo.DeviceViewers {
             bool value = Reverse.IsChecked.Value;
 
             if (_copy.Reverse != value)
-                Program.Project.Undo.AddAndExecute(new Copy.ReverseUndoEntry(_copy, _copy.Reverse, value));
+                Program.Project.Undo.AddAndExecute(new Copy.ReverseUndoEntry(
+                    _copy, 
+                    _copy.Reverse, 
+                    value
+                ));
         }
 
         public void SetReverse(bool value) => Reverse.IsChecked = value;
@@ -159,7 +191,11 @@ namespace Apollo.DeviceViewers {
             bool value = Infinite.IsChecked.Value;
 
             if (_copy.Infinite != value)
-                Program.Project.Undo.AddAndExecute(new Copy.InfiniteUndoEntry(_copy, _copy.Infinite, value));
+                Program.Project.Undo.AddAndExecute(new Copy.InfiniteUndoEntry(
+                    _copy, 
+                    _copy.Infinite, 
+                    value
+                ));
         }
 
         public void SetInfinite(bool value) => Infinite.IsChecked = value;
@@ -168,7 +204,11 @@ namespace Apollo.DeviceViewers {
             bool value = Wrap.IsChecked.Value;
 
             if (_copy.Wrap != value)
-                Program.Project.Undo.AddAndExecute(new Copy.WrapUndoEntry(_copy, _copy.Wrap, value));
+                Program.Project.Undo.AddAndExecute(new Copy.WrapUndoEntry(
+                    _copy, 
+                    _copy.Wrap, 
+                    value
+                ));
         }
 
         public void SetWrap(bool value) => Wrap.IsChecked = value;

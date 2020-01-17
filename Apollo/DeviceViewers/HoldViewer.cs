@@ -53,8 +53,7 @@ namespace Apollo.DeviceViewers {
         void Duration_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new Hold.DurationUndoEntry(
-                    _hold, 
-                    Duration.Unit, 
+                    _hold,
                     (int)old.Value, 
                     (int)value
                 ));

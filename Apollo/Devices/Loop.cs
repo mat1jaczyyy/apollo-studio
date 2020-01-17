@@ -184,7 +184,7 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Loop[] items) => items[0].Rate.Free = r;
             
-            public RateUndoEntry(Loop Loop, string unit, int u, int r)
+            public RateUndoEntry(Loop Loop, int u, int r)
             : base($"Loop Rate Changed to {r}", Loop){
                 this.u = u;
                 this.r = r;
@@ -254,8 +254,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Loop[] items) => items[0].Repeats = r;
             
-            public RepeatsUndoEntry(Loop Loop, string unit, int u, int r)
-            : base($"Loop Repeats Changed to {r}{unit}%", Loop){
+            public RepeatsUndoEntry(Loop Loop, int u, int r)
+            : base($"Loop Repeats Changed to {r}", Loop){
                 this.u = u;
                 this.r = r;
             }

@@ -122,8 +122,8 @@ namespace Apollo.Devices {
             
             protected override void RedoPath(params Delay[] items) => items[0].Time.Free = r;
             
-            public DurationUndoEntry(Delay delay, string unit, int u, int r)
-            : base($"Delay Duration Changed to {r}", delay){
+            public DurationUndoEntry(Delay delay, int u, int r)
+            : base($"Delay Duration Changed to {r}ms", delay){
                 this.u = u;
                 this.r = r;
             }

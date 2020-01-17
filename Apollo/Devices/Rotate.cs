@@ -60,7 +60,7 @@ namespace Apollo.Devices {
             protected override void RedoPath(params Rotate[] items) => items[0].Mode = r;
             
             public ModeUndoEntry(Rotate rotate, string angle, RotateType u, RotateType r)
-            : base($"Rotate Angle Changed to {angle}", rotate){
+            : base($"Rotate Angle Changed to {angle}°", rotate){
                 this.u = u;
                 this.r = r;
             }
