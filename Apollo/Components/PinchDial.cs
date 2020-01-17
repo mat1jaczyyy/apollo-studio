@@ -27,7 +27,7 @@ namespace Apollo.Components {
 
             Minimum = -2;
             Maximum = 2;
-            Round = 1;
+            Round = 2;
             
             IsBilateral = false;
         }
