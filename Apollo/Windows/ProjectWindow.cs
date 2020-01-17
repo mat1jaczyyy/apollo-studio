@@ -381,7 +381,9 @@ namespace Apollo.Windows {
             this.Focus();
         }
 
-        void BottomCollapse() => BottomPane.Opacity = Convert.ToInt32(CollapseButton.Showing = (BottomPane.MaxHeight = (BottomPane.MaxHeight == 0)? 1000 : 0) != 0);
+        void BottomCollapse() {
+            BottomPane.Opacity = Convert.ToInt32(CollapseButton.Showing = (BottomPane.MaxHeight = (BottomPane.MaxHeight == 0)? 1000 : 0) != 0);
+        }
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
