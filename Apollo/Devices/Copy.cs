@@ -212,15 +212,6 @@ namespace Apollo.Devices {
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetInfinite(Infinite);
             }
         }
-        
-        double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
-
-        double ApplyPinch(double time, double total) {
-            if (!Bilateral) return (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
-            else return time / total < 0.5? 
-                (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) / 2 * total:
-                (1 - ((1 - Math.Pow(1 - Math.Pow(2 * (1 - Math.Min(1, Math.Max(0, time / total))), ActualPinch), 1 / ActualPinch)) / 2)) * total;
-        }
 
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
@@ -450,7 +441,7 @@ namespace Apollo.Devices {
 
                     for (int i = 1; i < validOffsets.Count; i++)
                         if (!Infinite || i < validOffsets.Count - 1 || n.Color.Lit)
-                            FireCourier(info, ApplyPinch(_time * _gate * i, total));
+                            FireCourier(info, Pincher.ApplyPinch(_time * _gate * i, total, Pinch, Bilateral));
                 }
 
             } else if (CopyMode == CopyType.RandomSingle) {
