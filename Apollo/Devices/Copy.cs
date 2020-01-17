@@ -182,10 +182,10 @@ namespace Apollo.Devices {
         }
         
         bool _bilateral;
-        public bool Bilateral{
+        public bool Bilateral {
             get => _bilateral;
             set {
-                if (value != _bilateral){
+                if (value != _bilateral) {
                     _bilateral = value;
                     
                     if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetBilateral(Bilateral);
@@ -227,15 +227,16 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList(), Bilateral) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null, bool bilateral = false): base("copy") {
+        public Copy(Time time = null, double gate = 1, double pinch = 0, bool bilateral = false, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
             Time = time?? new Time(free: 500);
             Gate = gate;
             Pinch = pinch;
+            Bilateral = bilateral;
 
             Reverse = reverse;
             Infinite = infinite;
@@ -249,8 +250,6 @@ namespace Apollo.Devices {
 
             foreach (Offset offset in Offsets)
                 offset.Changed += OffsetChanged;
-                
-            Bilateral = bilateral;
         }
 
         void FireCourier(PolyInfo info, double time) {
