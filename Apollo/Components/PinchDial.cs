@@ -28,6 +28,7 @@ namespace Apollo.Components {
             Minimum = -2;
             Maximum = 2;
             Round = 2;
+            Default = 0;
             
             IsBilateral = false;
         }
