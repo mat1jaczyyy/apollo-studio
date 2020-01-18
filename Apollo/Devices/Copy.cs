@@ -505,6 +505,9 @@ namespace Apollo.Devices {
 
             buffer.Clear();
             locker.Clear();
+
+            screen.Clear();
+            screenlocker.Clear();
         }
 
         public override void Dispose() {
