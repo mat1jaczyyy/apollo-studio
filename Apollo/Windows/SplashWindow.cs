@@ -154,22 +154,16 @@ namespace Apollo.Windows {
 
         async void CheckUpdate() {
             if (await Github.ShouldUpdate())
-                UpdateButton.Enable();
+                UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
         }
 
-        async void Update() {
-            if (IsVisible && !openDialog && await MessageWindow.Create(
-                $"A new version of Apollo Studio is available ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).\n\n" +
-                "Do you want to update to the latest version?",
-                new string[] { "Yes", "No" }, null
-            ) == "Yes") {
-                foreach (Window window in App.Windows)
-                    if (window.GetType() != typeof(MessageWindow))
-                        window.Close();
-                
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
-                else UpdateWindow.Create(this);
-            }
+        void Update() {
+            foreach (Window window in App.Windows)
+                if (window.GetType() != typeof(MessageWindow))
+                    window.Close();
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
+            else UpdateWindow.Create(this);
         }
 
         void TabChanged(int tab) {
