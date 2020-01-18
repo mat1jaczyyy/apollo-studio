@@ -31,7 +31,9 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+
             CrashPanel = this.Get<Grid>("CrashPanel");
+            IgnoreButton = this.Get<Button>("IgnoreButton");
 
             TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
@@ -53,6 +55,7 @@ namespace Apollo.Windows {
         StackPanel Recents;
         TextBlock BlogpostBody, BlogpostLink, ReleaseVersion, ReleaseBody, ReleaseLink;
         UpdateButton UpdateButton;
+        Button IgnoreButton;
 
         bool openDialog = false;
 
@@ -299,13 +302,18 @@ namespace Apollo.Windows {
             ResolveCrash();
         }
 
-        void Ignore(object sender, RoutedEventArgs e) {
-            CrashPanel.Opacity = 0;
-            CrashPanel.IsHitTestVisible = false;
-            CrashPanel.ZIndex = -1;
+        int ignoreCount = 0;
 
-            ResolveCrash();
-            CheckUpdate();
+        void Ignore(object sender, RoutedEventArgs e) {
+            if (ignoreCount++ == 0) IgnoreButton.Content = "Are you sure?";
+            else {
+                CrashPanel.Opacity = 0;
+                CrashPanel.IsHitTestVisible = false;
+                CrashPanel.ZIndex = -1;
+
+                ResolveCrash();
+                CheckUpdate();
+            }
         }
 
         void HandleKey(object sender, KeyEventArgs e) {
