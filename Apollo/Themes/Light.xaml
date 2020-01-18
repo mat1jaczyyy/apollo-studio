@@ -6,26 +6,26 @@
     <Image Source="/Resources/SplashBlack.png" x:Key="SplashImage" />
     <Image Source="/Resources/UpdateBlack.png" x:Key="UpdateImage" />
 
-    <Color x:Key="ThemeBackgroundColor">#FFD6D6D6</Color>
-    <Color x:Key="ThemeSplashColor">#FFF0F0F0</Color>
-    <Color x:Key="ThemeBorderLowColor">#FF979797</Color>
-    <Color x:Key="ThemeBorderMidColor">#FFA0A0A0</Color>
-    <Color x:Key="ThemeBorderHighColor">#FFAEAEAE</Color>
-    <Color x:Key="ThemeControlLowColor">#FFBFBFBF</Color>
-    <Color x:Key="ThemeControlMidColor">#FFD6D6D6</Color>
-    <Color x:Key="ThemeControlMidHighColor">#FFDEDEDE</Color>
-    <Color x:Key="ThemeControlHighColor">#FFE5E5E5</Color>
+    <Color x:Key="ThemeBackgroundColor">#FFD0D0D0</Color>
+    <Color x:Key="ThemeSplashColor">#FFEEEEEE</Color>
+    <Color x:Key="ThemeBorderLowColor">#FF797979</Color>
+    <Color x:Key="ThemeBorderMidColor">#FF8D8D8D</Color>
+    <Color x:Key="ThemeBorderHighColor">#FF9F9F9F</Color>
+    <Color x:Key="ThemeControlLowColor">#FFB3B3B3</Color>
+    <Color x:Key="ThemeControlMidColor">#FFD0D0D0</Color>
+    <Color x:Key="ThemeControlMidHighColor">#FFDADADA</Color>
+    <Color x:Key="ThemeControlHighColor">#FFE2E2E2</Color>
     <Color x:Key="ThemeControlVeryHighColor">#FFF3F3F3</Color>
     <Color x:Key="ThemeControlDarkenColor">#20FFFFFF</Color>
     <Color x:Key="ThemeControlHighlightLowColor">#FF575757</Color>
     <Color x:Key="ThemeControlHighlightMidColor">#FF7D7D7D</Color>
     <Color x:Key="ThemeControlHighlightHighColor">#FFAFAFAF</Color>
-    <Color x:Key="ThemeForegroundColor">#FF232323</Color>
-    <Color x:Key="ThemeForegroundLowColor">#FFA0A0A0</Color>
-    <Color x:Key="ThemeButtonDownColor">#FF505050</Color>
-    <Color x:Key="ThemeButtonOverColor">#FF404040</Color>
-    <Color x:Key="ThemeButtonEnabledColor">#FF606060</Color>
-    <Color x:Key="ThemeButtonDisabledColor">#FF919191</Color>
+    <Color x:Key="ThemeForegroundColor">#FF1E1E1E</Color>
+    <Color x:Key="ThemeForegroundLowColor">#FF8D8D8D</Color>
+    <Color x:Key="ThemeButtonDownColor">#FF404040</Color>
+    <Color x:Key="ThemeButtonOverColor">#FF303030</Color>
+    <Color x:Key="ThemeButtonEnabledColor">#FF585858</Color>
+    <Color x:Key="ThemeButtonDisabledColor">#FF727272</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeSplashBrush" Color="{DynamicResource ThemeSplashColor}"></SolidColorBrush>
