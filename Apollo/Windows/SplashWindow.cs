@@ -57,8 +57,6 @@ namespace Apollo.Windows {
         UpdateButton UpdateButton;
         Button IgnoreButton;
 
-        bool openDialog = false;
-
         void UpdateTopmost(bool value) => Topmost = value;
 
         async void UpdateBlogpost() {
@@ -256,9 +254,7 @@ namespace Apollo.Windows {
                 Title = "Open Project"
             };
 
-            openDialog = true;
             string[] result = await ofd.ShowAsync(this);
-            openDialog = false;
 
             if (result.Length > 0)
                 ReadFile(result[0]);
