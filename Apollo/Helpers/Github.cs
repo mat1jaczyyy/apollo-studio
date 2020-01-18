@@ -1,7 +1,10 @@
+using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
 using Octokit;
 
 using Apollo.Core;
@@ -15,6 +18,7 @@ namespace Apollo.Helpers {
         static RepositoryContent blogpost = null;
         static Release release = null;
         static ReleaseAsset download = null;
+        static string avalonia = "";
 
         public static bool UpdateChecked = false;
 
@@ -66,6 +70,26 @@ namespace Apollo.Helpers {
                 }
 
             return Preferences.CheckForUpdates && release.Name != Program.Version && download != null;
+        }
+
+        static readonly string DepsPath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.deps.json";
+
+        public static string AvaloniaVersion() {
+            if (avalonia == "" && File.Exists(DepsPath)) {
+                try {
+                    using (StreamReader file = File.OpenText(DepsPath))
+                        using (JsonTextReader reader = new JsonTextReader(file))
+                            while (reader.Read())
+                                if (reader.TokenType == JsonToken.String && (string)reader.Path == "targets['.NETCoreApp,Version=v3.0']['Apollo/1.0.0'].dependencies.Avalonia") {
+                                    avalonia = (string)reader.Value;
+                                    break;
+                                }
+                } catch {
+                    avalonia = "";
+                }
+            }
+
+            return avalonia;
         }
     }
 }
