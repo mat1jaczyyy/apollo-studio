@@ -21,6 +21,8 @@ namespace Apollo.Devices {
                 Time = time;
                 IsHold = isHold;
             }
+
+            public FadeInfo WithTime(double time) => new FadeInfo(Color, time, IsHold);
         }
 
         List<Color> _colors = new List<Color>();
@@ -167,15 +169,17 @@ namespace Apollo.Devices {
                     _steps.Add(_colors[i]);
                     _counts.Add(1);
                     _cutoffs.Add(1 + _cutoffs.Last());
-                } else{
+
+                } else {
                     for (double k = 0; k < max; k++) {
-                        double factor = k/max;
+                        double factor = k / max;
                         _steps.Add(new Color(
                             (byte)(_colors[i].Red + (_colors[i + 1].Red - _colors[i].Red) * factor),
                             (byte)(_colors[i].Green + (_colors[i + 1].Green - _colors[i].Green) * factor),
                             (byte)(_colors[i].Blue + (_colors[i + 1].Blue - _colors[i].Blue) * factor)
                         ));
                     }
+
                     _counts.Add(max);
                     _cutoffs.Add(max + _cutoffs.Last());
                 }
@@ -195,9 +199,6 @@ namespace Apollo.Devices {
             List<FadeInfo> fullFade = new List<FadeInfo>() {
                 new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
             };
-            
-            fade = new List<FadeInfo>();
-            fade.Add(fullFade.Last());
 
             int j = 0;
             for (int i = 1; i < _steps.Count; i++) {
@@ -211,10 +212,20 @@ namespace Apollo.Devices {
                     double time = EaseTime(_types[j], prevTime, nextTime, currTime);
                     
                     fullFade.Add(new FadeInfo(_steps[i], time, _types[j] == FadeType.Hold));
-
-                    if (fade.Last().Time + smoothness < time)
-                        fade.Add(fullFade.Last());
                 }
+            }
+            
+            fade = new List<FadeInfo>();
+            fade.Add(fullFade.First());
+
+            for (int i = 1; i < fullFade.Count; i++) {
+                double cutoff = fade.Last().Time + smoothness;
+
+                if (cutoff < fullFade[i].Time)
+                    fade.Add(fullFade[i]);
+                    
+                else if (fade.Last().Time + 2 * smoothness <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
+                    fade.Add(fullFade[i].WithTime(cutoff));
             }
 
             fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
