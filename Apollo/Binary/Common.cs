@@ -49,7 +49,8 @@ namespace Apollo.Binary {
             typeof(ColorFilter),
             typeof(Clear),
             typeof(LayerFilter),
-            typeof(Loop)
+            typeof(Loop),
+            typeof(Refresh)
         };
     }
 }
