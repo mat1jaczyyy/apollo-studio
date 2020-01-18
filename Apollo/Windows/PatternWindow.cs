@@ -66,6 +66,9 @@ namespace Apollo.Windows {
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
+
+            BottomLeftPane = this.Get<StackPanel>("BottomLeftPane");
+            CollapseButton = this.Get<CollapseButton>("CollapseButton");
         }
 
         HashSet<IDisposable> observables = new HashSet<IDisposable>();
@@ -103,7 +106,7 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText, TitleCenter;
-        StackPanel CenteringLeft, CenteringRight;
+        StackPanel CenteringLeft, CenteringRight, BottomLeftPane;
         UndoButton UndoButton;
         RedoButton RedoButton;
         ScrollViewer FrameList;
@@ -116,6 +119,7 @@ namespace Apollo.Windows {
         PinchDial Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Wrap, Infinite;
+        CollapseButton CollapseButton;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -253,6 +257,8 @@ namespace Apollo.Windows {
             PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
             Infinite.IsChecked = _pattern.Infinite;
+
+            CollapseButton.Showing = true;
 
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -1635,6 +1641,8 @@ namespace Apollo.Windows {
 
         public void Export(int left, int right) {}
         public void Import(int right, string path = null) {}
+
+        void BottomCollapse() => BottomLeftPane.Opacity = Convert.ToInt32(BottomLeftPane.IsVisible = CollapseButton.Showing = (BottomLeftPane.MaxHeight = (BottomLeftPane.MaxHeight == 0)? 1000 : 0) != 0);
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 
