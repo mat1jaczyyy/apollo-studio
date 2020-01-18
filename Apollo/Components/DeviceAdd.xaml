@@ -48,7 +48,6 @@
         <MenuItem Header="Preview" />
         <MenuItem Header="Switch" />
         <MenuItem Header="Clear" />
-        <MenuItem Header="Refresh" />
       </MenuItem>
     </Components:ApolloContextMenu>
 
