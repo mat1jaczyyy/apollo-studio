@@ -28,7 +28,7 @@ namespace Apollo.Devices {
         
         public override Device Clone() => new Blur(Radius, Amount);
 
-        public Blur(double radius = 2, double amount = 0.5): base("flip") {
+        public Blur(double radius = 2, double amount = 0.5): base("blur") {
             Radius = radius;
             Amount = amount;
         }
