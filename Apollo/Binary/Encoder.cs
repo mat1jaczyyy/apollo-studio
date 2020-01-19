@@ -455,5 +455,12 @@ namespace Apollo.Binary {
             Encode(writer, o.Length);
             writer.Write(o.Free);
         }
+        
+        static void Encode(BinaryWriter writer, Blur o) {
+            EncodeID(writer, typeof(Blur));
+            
+            writer.Write(o.Radius);
+            writer.Write(o.Amount);
+        }
     }
 }

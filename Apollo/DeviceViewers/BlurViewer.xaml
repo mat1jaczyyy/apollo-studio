@@ -1,0 +1,16 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.DeviceViewers.BlurViewer"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             Margin="10 5"
+             DetachedFromVisualTree="Unloaded">
+
+  <StackPanel VerticalAlignment="Center" Spacing="5" Width="90">
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
+      <Components:Dial x:Name="Radius" Title="Radius" Minimum="0.5" Maximum="5" Default="2" Round="1" Unit=""
+                       ValueChanged="Radius_Changed"/>
+    </Border>
+    <Components:Dial x:Name="Amount" Title="Amount" Minimum="1" Maximum="100" Default="50" Round="0" Unit="%"
+                     ValueChanged="Amount_Changed" />
+  </StackPanel>
+</UserControl>

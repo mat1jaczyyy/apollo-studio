@@ -29,6 +29,7 @@
         <MenuItem Header="Move" />
         <MenuItem Header="Copy" />
         <MenuItem Header="Pattern" />
+        <MenuItem Header="Blur" />
       </MenuItem>
 
       <MenuItem Header="Transform">

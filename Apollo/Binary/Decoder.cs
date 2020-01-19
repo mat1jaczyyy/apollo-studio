@@ -653,6 +653,12 @@ namespace Apollo.Binary {
                     Decode(reader, version),
                     reader.ReadInt32()
                 );
+            else if (t == typeof(Blur)) {
+                return new Blur(
+                    reader.ReadDouble(),
+                    reader.ReadDouble()
+                );
+            }
 
             throw new InvalidDataException();
         }
