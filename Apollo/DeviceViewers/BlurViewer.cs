@@ -12,7 +12,7 @@ using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class BlurViewer: UserControl {
-        public static readonly string DeviceIdentifier = "flip";
+        public static readonly string DeviceIdentifier = "blur";
 
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
