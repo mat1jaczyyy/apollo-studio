@@ -32,7 +32,7 @@ namespace Apollo.DeviceViewers {
             _blur = blur;
 
             Radius.RawValue = _blur.Radius;
-            Amount.RawValue = _blur.Amount;
+            Amount.RawValue = _blur.Amount * 100;
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _blur = null;
