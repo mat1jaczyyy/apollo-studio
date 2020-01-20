@@ -31,7 +31,9 @@ namespace Apollo.Windows {
             AvaloniaXamlLoader.Load(this);
             
             Root = this.Get<Grid>("Root");
+
             CrashPanel = this.Get<Grid>("CrashPanel");
+            IgnoreButton = this.Get<Button>("IgnoreButton");
 
             TabControl = this.Get<TabControl>("TabControl");
             Recents = this.Get<StackPanel>("Recents");
@@ -53,8 +55,7 @@ namespace Apollo.Windows {
         StackPanel Recents;
         TextBlock BlogpostBody, BlogpostLink, ReleaseVersion, ReleaseBody, ReleaseLink;
         UpdateButton UpdateButton;
-
-        bool openDialog = false;
+        Button IgnoreButton;
 
         void UpdateTopmost(bool value) => Topmost = value;
 
@@ -153,23 +154,20 @@ namespace Apollo.Windows {
         }
 
         async void CheckUpdate() {
-            if (await Github.ShouldUpdate())
-                UpdateButton.Enable();
+            if (await Github.ShouldUpdate()) {
+                UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
+
+                MinHeight = MaxHeight += 30;
+            }
         }
 
-        async void Update() {
-            if (IsVisible && !openDialog && await MessageWindow.Create(
-                $"A new version of Apollo Studio is available ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).\n\n" +
-                "Do you want to update to the latest version?",
-                new string[] { "Yes", "No" }, null
-            ) == "Yes") {
-                foreach (Window window in App.Windows)
-                    if (window.GetType() != typeof(MessageWindow))
-                        window.Close();
-                
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
-                else UpdateWindow.Create(this);
-            }
+        void Update() {
+            foreach (Window window in App.Windows)
+                if (window.GetType() != typeof(MessageWindow))
+                    window.Close();
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
+            else UpdateWindow.Create(this);
         }
 
         void TabChanged(int tab) {
@@ -259,9 +257,7 @@ namespace Apollo.Windows {
                 Title = "Open Project"
             };
 
-            openDialog = true;
             string[] result = await ofd.ShowAsync(this);
-            openDialog = false;
 
             if (result.Length > 0)
                 ReadFile(result[0]);
@@ -305,13 +301,18 @@ namespace Apollo.Windows {
             ResolveCrash();
         }
 
-        void Ignore(object sender, RoutedEventArgs e) {
-            CrashPanel.Opacity = 0;
-            CrashPanel.IsHitTestVisible = false;
-            CrashPanel.ZIndex = -1;
+        int ignoreCount = 0;
 
-            ResolveCrash();
-            CheckUpdate();
+        void Ignore(object sender, RoutedEventArgs e) {
+            if (ignoreCount++ == 0) IgnoreButton.Content = "Are you sure?";
+            else {
+                CrashPanel.Opacity = 0;
+                CrashPanel.IsHitTestVisible = false;
+                CrashPanel.ZIndex = -1;
+
+                ResolveCrash();
+                CheckUpdate();
+            }
         }
 
         void HandleKey(object sender, KeyEventArgs e) {

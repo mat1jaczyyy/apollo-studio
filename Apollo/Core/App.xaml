@@ -65,5 +65,13 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Height" Value="1" />
     </Style>
+    
+    <Style Selector="StackPanel.collapseAnimation">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
   </Application.Styles>
 </Application>
