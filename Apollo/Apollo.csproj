@@ -4,7 +4,6 @@
     <RuntimeFrameworkVersion>3.0.0</RuntimeFrameworkVersion>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
-    <PublishReadyToRun>true</PublishReadyToRun>
     <LangVersion>7.2</LangVersion>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -18,15 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.9.999-cibuild*" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.9.999-cibuild*" />
+    <PackageReference Include="Avalonia" Version="0.9.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.9.1" />
     <PackageReference Include="DiscordRichPresence" Version="1.0.121">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="Octokit" Version="0.32.0" />
     <PackageReference Include="RtMidi.Core" Version="1.0.50" />
-    <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
+    <PackageReference Include="SkiaSharp" Version="1.68.0" />
   </ItemGroup>
   
   <ItemGroup>
