@@ -57,8 +57,6 @@ namespace Apollo.Windows {
         UpdateButton UpdateButton;
         Button IgnoreButton;
 
-        bool openDialog = false;
-
         void UpdateTopmost(bool value) => Topmost = value;
 
         async void UpdateBlogpost() {
@@ -156,8 +154,11 @@ namespace Apollo.Windows {
         }
 
         async void CheckUpdate() {
-            if (await Github.ShouldUpdate())
+            if (await Github.ShouldUpdate()) {
                 UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
+
+                MinHeight = MaxHeight += 30;
+            }
         }
 
         void Update() {
@@ -256,9 +257,7 @@ namespace Apollo.Windows {
                 Title = "Open Project"
             };
 
-            openDialog = true;
             string[] result = await ofd.ShowAsync(this);
-            openDialog = false;
 
             if (result.Length > 0)
                 ReadFile(result[0]);
