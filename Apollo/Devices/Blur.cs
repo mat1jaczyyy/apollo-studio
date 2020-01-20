@@ -39,6 +39,11 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
+            if (n.Index == 100) {
+                InvokeExit(n);
+                return;
+            };
+                
             lock (locker) {
                 currentSignals[n.Index] = new List<Signal>();
                 
@@ -68,6 +73,10 @@ namespace Apollo.Devices {
                 
                 ScreenOutput();
             }
+        }
+        
+        void GenerateBlur(){
+            
         }
         
         void ScreenOutput() {
