@@ -85,9 +85,9 @@ namespace Apollo.Devices {
                         {
                             Color color = outputSignals[index].Color;
 
-                            color.Red += blurSignal.Color.Red;
-                            color.Blue += blurSignal.Color.Blue;
-                            color.Green += blurSignal.Color.Green;
+                            color.Red = (color.Red + blurSignal.Color.Red > 63)? (byte)63 : (byte)(color.Red + blurSignal.Color.Red);
+                            color.Green = (color.Green + blurSignal.Color.Green > 63)? (byte)63 : (byte)(color.Green + blurSignal.Color.Green);
+                            color.Blue = (color.Blue + blurSignal.Color.Blue > 63)? (byte)63 : (byte)(color.Blue + blurSignal.Color.Blue);
 
                             outputSignals[index] = outputSignals[index].With(index, color);
                         }
