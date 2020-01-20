@@ -9,8 +9,8 @@ using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Blur : Device {
-        
-        List<List<Signal>> currentSignals = new List<List<Signal>>(101);
+        ConcurrentDictionary<int, List<Signal>> currentSignals = new ConcurrentDictionary<int, List<Signal>>();
+        object locker = new object();
         
         double _radius;
         public double Radius {
@@ -36,14 +36,10 @@ namespace Apollo.Devices {
         public Blur(double radius = 2, double amount = 0.5): base("blur") {
             Radius = radius;
             Amount = amount;
-            
-            for (int i = 0; i < 101; i++){
-                currentSignals.Add(null);
-            }
         }
 
         public override void MIDIProcess(Signal n) {
-            if(n.Color.Lit){
+            lock (locker) {
                 currentSignals[n.Index] = new List<Signal>();
                 
                 int size = (int)Radius;
@@ -63,7 +59,7 @@ namespace Apollo.Devices {
                             newColor.Green = (byte)(newColor.Green * factor);
                             newColor.Blue = (byte)(newColor.Blue * factor);
                             
-                            if(newColor.Lit) currentSignals[n.Index].Add(n.With((byte)newIndex, newColor));
+                            currentSignals[n.Index].Add(n.With((byte)newIndex, newColor));
                         }
                     }
                 }
@@ -71,46 +67,41 @@ namespace Apollo.Devices {
                 currentSignals[n.Index].Add(n);
                 
                 ScreenOutput();
-            } else {
-                if(currentSignals[n.Index] != null) {
-                    foreach(Signal signal in currentSignals[n.Index]) {
-                        signal.Color = new Color(0);
-                    }
-                    
-                    ScreenOutput();
-                    
-                    currentSignals[n.Index] = null;
-                }
             }
         }
         
         void ScreenOutput() {
-            List<Signal> outputSignals = new List<Signal>(101);
-            for(int i = 0; i < 101; i++) outputSignals.Add(null);
+            lock (locker)
+            {
+                List<Signal> outputSignals = new List<Signal>(101);
+                for(int i = 0; i < 101; i++) outputSignals.Add(null);
                 
-            
-            for(int i = 0; i < 101; i++) {
-                if(currentSignals[i] != null){
-                    foreach(Signal blurSignal in currentSignals[i]) {
+                foreach (int inputIndex in currentSignals.Keys) {
+                    foreach (Signal blurSignal in currentSignals[inputIndex].ToList()) {
                         byte index = blurSignal.Index;
                         
                         if (ReferenceEquals(outputSignals.ElementAtOrDefault(index), null)) outputSignals[index] = blurSignal.Clone();
-                        else {
+                        else
+                        {
                             Color color = outputSignals[index].Color;
-                            
+
                             color.Red += blurSignal.Color.Red;
                             color.Blue += blurSignal.Color.Blue;
                             color.Green += blurSignal.Color.Green;
-                            
+
                             outputSignals[index] = outputSignals[index].With(index, color);
                         }
                     }
                 }
+                
+                foreach(Signal signal in outputSignals) {
+                    if(!ReferenceEquals(signal, null)) InvokeExit(signal.Clone());
+                }
             }
-            
-            foreach(Signal signal in outputSignals) {
-                if(!ReferenceEquals(signal, null)) InvokeExit(signal.Clone());
-            }
+        }
+        
+        protected override void Stop() {
+            currentSignals.Clear();
         }
     }
 }
