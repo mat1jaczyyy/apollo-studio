@@ -67,18 +67,18 @@ namespace Apollo.Devices {
         public class OffsetUndoEntry: PathUndoEntry<Move> {
             int ux, uy, rx, ry;
             
-            protected override void UndoPath(params Move[] items){
+            protected override void UndoPath(params Move[] items) {
                 items[0].Offset.X = ux;
                 items[0].Offset.Y = uy;
             }
             
-            protected override void RedoPath(params Move[] items){
+            protected override void RedoPath(params Move[] items) {
                 items[0].Offset.X = rx;
                 items[0].Offset.Y = ry;
             }
             
-            public OffsetUndoEntry(Move Move, int ux, int uy, int rx, int ry)
-            : base($"Move Offset Relative Changed to {rx},{ry}", Move){
+            public OffsetUndoEntry(Move move, int ux, int uy, int rx, int ry)
+            : base($"Move Offset Relative Changed to {rx},{ry}", move) {
                 this.ux = ux;
                 this.uy = uy;
                 this.rx = rx;
@@ -89,18 +89,18 @@ namespace Apollo.Devices {
         public class OffsetAbsoluteUndoEntry: PathUndoEntry<Move> {
             int ux, uy, rx, ry;
             
-            protected override void UndoPath(params Move[] items){
+            protected override void UndoPath(params Move[] items) {
                 items[0].Offset.AbsoluteX = ux;
                 items[0].Offset.AbsoluteY = uy;
             }
             
-            protected override void RedoPath(params Move[] items){
+            protected override void RedoPath(params Move[] items) {
                 items[0].Offset.AbsoluteX = rx;
                 items[0].Offset.AbsoluteY = ry;
             }
             
-            public OffsetAbsoluteUndoEntry(Move Move, int ux, int uy, int rx, int ry)
-            : base($"Move Offset Absolute Changed to {rx},{ry}", Move){
+            public OffsetAbsoluteUndoEntry(Move move, int ux, int uy, int rx, int ry)
+            : base($"Move Offset Absolute Changed to {rx},{ry}", move) {
                 this.ux = ux;
                 this.uy = uy;
                 this.rx = rx;
@@ -112,11 +112,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Move[] items) => items[0].Offset.IsAbsolute = u;
-            
             protected override void RedoPath(params Move[] items) => items[0].Offset.IsAbsolute = r;
             
-            public OffsetSwitchedUndoEntry(Move Move, bool u, bool r)
-            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", Move){
+            public OffsetSwitchedUndoEntry(Move move, bool u, bool r)
+            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move) {
                 this.u = u;
                 this.r = r;
             }
@@ -126,11 +125,10 @@ namespace Apollo.Devices {
             GridType u, r;
             
             protected override void UndoPath(params Move[] items) => items[0].GridMode = u;
-            
             protected override void RedoPath(params Move[] items) => items[0].GridMode = r;
             
-            public GridModeUndoEntry(Move Move, GridType u, GridType r)
-            : base($"Move Grid Changed to {r.ToString()}", Move){
+            public GridModeUndoEntry(Move move, GridType u, GridType r)
+            : base($"Move Grid Changed to {r.ToString()}", move) {
                 this.u = u;
                 this.r = r;
             }
@@ -140,11 +138,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Move[] items) => items[0].Wrap = u;
-            
             protected override void RedoPath(params Move[] items) => items[0].Wrap = r;
             
-            public WrapUndoEntry(Move Move, bool u, bool r)
-            : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", Move){
+            public WrapUndoEntry(Move move, bool u, bool r)
+            : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", move) {
                 this.u = u;
                 this.r = r;
             }

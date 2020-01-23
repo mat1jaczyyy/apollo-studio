@@ -42,11 +42,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Refresh[] items) => items[0].SetMacro(index, u);
-            
             protected override void RedoPath(params Refresh[] items) => items[0].SetMacro(index, r);
             
             public MacroUndoEntry(Refresh refresh, int index, bool u, bool r)
-            : base($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", refresh){
+            : base($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", refresh) {
                 this.index = index;
                 this.u = u;
                 this.r = r;

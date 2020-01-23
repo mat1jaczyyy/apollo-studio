@@ -95,11 +95,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Tone[] items) => items[0].Hue = u;
-            
             protected override void RedoPath(params Tone[] items) => items[0].Hue = r;
             
             public HueUndoEntry(Tone tone, double u, double r)
-            : base($"Tone Hue Changed to {r}°", tone){
+            : base($"Tone Hue Changed to {r}°", tone) {
                 this.u = u;
                 this.r = r;
             }
@@ -109,11 +108,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Tone[] items) => items[0].SaturationHigh = u;
-            
             protected override void RedoPath(params Tone[] items) => items[0].SaturationHigh = r;
             
             public SatHighUndoEntry(Tone tone, double u, double r)
-            : base($"Tone Sat Hi Changed to {r}%", tone){
+            : base($"Tone Sat Hi Changed to {r}%", tone) {
                 this.u = u;
                 this.r = r;
             }
@@ -123,11 +121,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Tone[] items) => items[0].SaturationLow = u;
-            
             protected override void RedoPath(params Tone[] items) => items[0].SaturationLow = r;
             
             public SatLowUndoEntry(Tone tone, double u, double r)
-            : base($"Tone Sat Lo Changed to {r}%", tone){
+            : base($"Tone Sat Lo Changed to {r}%", tone) {
                 this.u = u;
                 this.r = r;
             }
@@ -137,11 +134,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Tone[] items) => items[0].ValueHigh = u;
-            
             protected override void RedoPath(params Tone[] items) => items[0].ValueHigh = r;
             
             public ValueHighUndoEntry(Tone tone, double u, double r)
-            : base($"Tone Value Hi Changed to {r}%", tone){
+            : base($"Tone Value Hi Changed to {r}%", tone) {
                 this.u = u;
                 this.r = r;
             }
@@ -151,11 +147,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Tone[] items) => items[0].ValueLow = u;
-            
             protected override void RedoPath(params Tone[] items) => items[0].ValueLow = r;
             
             public ValueLowUndoEntry(Tone tone, double u, double r)
-            : base($"Tone Value Lo Changed to {r}%", tone){
+            : base($"Tone Value Lo Changed to {r}%", tone) {
                 this.u = u;
                 this.r = r;
             }

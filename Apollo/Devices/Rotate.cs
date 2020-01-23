@@ -56,11 +56,10 @@ namespace Apollo.Devices {
             RotateType u, r;
             
             protected override void UndoPath(params Rotate[] items) => items[0].Mode = u;
-            
             protected override void RedoPath(params Rotate[] items) => items[0].Mode = r;
             
             public ModeUndoEntry(Rotate rotate, string angle, RotateType u, RotateType r)
-            : base($"Rotate Angle Changed to {angle}°", rotate){
+            : base($"Rotate Angle Changed to {angle}°", rotate) {
                 this.u = u;
                 this.r = r;
             }
@@ -70,11 +69,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Rotate[] items) => items[0].Bypass = u;
-            
             protected override void RedoPath(params Rotate[] items) => items[0].Bypass = r;
             
             public BypassUndoEntry(Rotate rotate, bool u, bool r)
-            : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate){
+            : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate) {
                 this.u = u;
                 this.r = r;
             }

@@ -69,11 +69,10 @@ namespace Apollo.Devices {
             FlipType u, r;
             
             protected override void UndoPath(params Flip[] items) => items[0].Mode = u;
-            
             protected override void RedoPath(params Flip[] items) => items[0].Mode = r;
             
             public ModeUndoEntry(Flip flip, FlipType u, FlipType r)
-            : base($"Flip Orientation Changed to {r.ToString()}", flip){
+            : base($"Flip Orientation Changed to {r.ToString()}", flip) {
                 this.u = u;
                 this.r = r;
             }
@@ -83,11 +82,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Flip[] items) => items[0].Bypass = u;
-            
             protected override void RedoPath(params Flip[] items) => items[0].Bypass = r;
             
             public BypassUndoEntry(Flip flip, bool u, bool r)
-            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip){
+            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip) {
                 this.u = u;
                 this.r = r;
             }

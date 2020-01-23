@@ -176,11 +176,10 @@ namespace Apollo.Devices {
             int u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Time.Free = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Time.Free = r;
             
-            public DurationUndoEntry(Hold Hold, int u, int r)
-            : base($"Hold Duration Changed to {r}ms", Hold){
+            public DurationUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {r}ms", hold) {
                 this.u = u;
                 this.r = r;
             }
@@ -190,11 +189,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Time.Mode = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Time.Mode = r;
             
-            public DurationModeUndoEntry(Hold Hold, bool u, bool r)
-            : base($"Hold Duration Switched to {(r? "Steps" : "Free")}", Hold){
+            public DurationModeUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Duration Switched to {(r? "Steps" : "Free")}", hold) {
                 this.u = u;
                 this.r = r;
             }
@@ -204,11 +202,10 @@ namespace Apollo.Devices {
             int u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Time.Length.Step = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Time.Length.Step = r;
             
-            public DurationStepUndoEntry(Hold Hold, int u, int r)
-            : base($"Hold Duration Changed to {Length.Steps[r]}", Hold){
+            public DurationStepUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {Length.Steps[r]}", hold) {
                 this.u = u;
                 this.r = r;
             }
@@ -218,11 +215,10 @@ namespace Apollo.Devices {
             double u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Gate = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Gate = r;
             
-            public GateUndoEntry(Hold Hold, double u, double r)
-            : base($"Hold Gate Changed to {r}%", Hold){
+            public GateUndoEntry(Hold hold, double u, double r)
+            : base($"Hold Gate Changed to {r}%", hold) {
                 this.u = u;
                 this.r = r;
             }
@@ -232,11 +228,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Infinite = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Infinite = r;
             
-            public InfiniteUndoEntry(Hold Hold, bool u, bool r)
-            : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", Hold){
+            public InfiniteUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", hold) {
                 this.u = u;
                 this.r = r;
             }
@@ -246,11 +241,10 @@ namespace Apollo.Devices {
             bool u, r;
             
             protected override void UndoPath(params Hold[] items) => items[0].Release = u;
-            
             protected override void RedoPath(params Hold[] items) => items[0].Release = r;
             
-            public ReleaseUndoEntry(Hold Hold, bool u, bool r)
-            : base($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", Hold){
+            public ReleaseUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", hold) {
                 this.u = u;
                 this.r = r;
             }

@@ -65,11 +65,10 @@ namespace Apollo.Devices {
             int u, r;
             
             protected override void UndoPath(params MacroFilter[] items) => items[0].Macro = u;
-            
             protected override void RedoPath(params MacroFilter[] items) => items[0].Macro = r;
             
-            public TargetUndoEntry(MacroFilter MacroFilter, int u, int r)
-            : base($"MacroFilter Target Changed to {r}%", MacroFilter){
+            public TargetUndoEntry(MacroFilter filter, int u, int r)
+            : base($"MacroFilter Target Changed to {r}%", filter) {
                 this.u = u;
                 this.r = r;
             }
@@ -79,11 +78,10 @@ namespace Apollo.Devices {
             bool[] u, r;
             
             protected override void UndoPath(params MacroFilter[] items) => items[0].Filter = u;
-            
             protected override void RedoPath(params MacroFilter[] items) => items[0].Filter = r;
             
-            public FilterUndoEntry(MacroFilter MacroFilter, bool[] u, bool[] r)
-            : base($"MacroFilter Changed", MacroFilter){
+            public FilterUndoEntry(MacroFilter filter, bool[] u, bool[] r)
+            : base($"MacroFilter Changed", filter) {
                 this.u = u;
                 this.r = r;
             }

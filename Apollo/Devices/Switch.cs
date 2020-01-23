@@ -51,11 +51,10 @@ namespace Apollo.Devices {
             int u, r;
             
             protected override void UndoPath(params Switch[] items) => items[0].Target = u;
-            
             protected override void RedoPath(params Switch[] items) => items[0].Target = r;
             
-            public TargetUndoEntry(Switch rotate, int u, int r)
-            : base($"Switch Target Changed to {r}", rotate){
+            public TargetUndoEntry(Switch macroswitch, int u, int r)
+            : base($"Switch Target Changed to {r}", macroswitch) {
                 this.u = u;
                 this.r = r;
             }
@@ -65,11 +64,10 @@ namespace Apollo.Devices {
             int u, r;
             
             protected override void UndoPath(params Switch[] items) => items[0].Value = u;
-            
             protected override void RedoPath(params Switch[] items) => items[0].Value = r;
             
-            public ValueUndoEntry(Switch rotate, int u, int r)
-            : base($"Switch Value Changed to {r}", rotate){
+            public ValueUndoEntry(Switch macroswitch, int u, int r)
+            : base($"Switch Value Changed to {r}", macroswitch) {
                 this.u = u;
                 this.r = r;
             }

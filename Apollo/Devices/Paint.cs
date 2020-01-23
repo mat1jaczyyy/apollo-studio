@@ -33,11 +33,10 @@ namespace Apollo.Devices {
             Color u, r;
             
             protected override void UndoPath(params Paint[] items) => items[0].Color = u.Clone();
-            
             protected override void RedoPath(params Paint[] items) => items[0].Color = r.Clone();
             
             public ColorUndoEntry(Paint paint, Color u, Color r)
-            : base($"Paint Color Changed to {r.ToHex()}", paint){
+            : base($"Paint Color Changed to {r.ToHex()}", paint) {
                 this.u = u;
                 this.r = r;
             }
