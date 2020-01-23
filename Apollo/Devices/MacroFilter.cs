@@ -77,8 +77,8 @@ namespace Apollo.Devices {
         public class FilterUndoEntry: PathUndoEntry<MacroFilter> {
             bool[] u, r;
             
-            protected override void UndoPath(params MacroFilter[] items) => items[0].Filter = u;
-            protected override void RedoPath(params MacroFilter[] items) => items[0].Filter = r;
+            protected override void UndoPath(params MacroFilter[] items) => items[0].Filter = u.ToArray();
+            protected override void RedoPath(params MacroFilter[] items) => items[0].Filter = r.ToArray();
             
             public FilterUndoEntry(MacroFilter filter, bool[] u, bool[] r)
             : base($"MacroFilter Changed", filter) {
