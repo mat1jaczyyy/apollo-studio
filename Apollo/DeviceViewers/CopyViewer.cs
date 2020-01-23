@@ -216,15 +216,15 @@ namespace Apollo.DeviceViewers {
         void Offset_InsertStart() => Offset_Insert(0);
 
         void Offset_Insert(int index) => Program.Project.Undo.AddAndExecute(new Copy.OffsetInsertUndoEntry(
-                _copy, 
-                index
-            ));
+            _copy, 
+            index
+        ));
 
         void Offset_Remove(int index) => Program.Project.Undo.AddAndExecute(new Copy.OffsetRemoveUndoEntry(
-                _copy, 
-                _copy.Offsets[index].Clone(), 
-                index
-            ));
+            _copy, 
+            _copy.Offsets[index].Clone(), 
+            index
+        ));
 
         public void SetOffset(int index, Offset offset) => ((CopyOffset)Contents[index + 1]).SetOffset(offset);
         

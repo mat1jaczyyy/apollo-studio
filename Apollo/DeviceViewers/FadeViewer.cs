@@ -201,11 +201,11 @@ namespace Apollo.DeviceViewers {
         }
 
         void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) => Program.Project.Undo.AddAndExecute(new Fade.ThumbTypeUndoEntry(
-                _fade, 
-                thumbs.IndexOf(sender), 
-                _fade.GetFadeType(thumbs.IndexOf(sender)), 
-                newType
-            ));
+            _fade, 
+            thumbs.IndexOf(sender), 
+            _fade.GetFadeType(thumbs.IndexOf(sender)), 
+            newType
+        ));
 
         public FadeType GetFadeType(FadeThumb sender) => _fade.GetFadeType(thumbs.IndexOf(sender));
 

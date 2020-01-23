@@ -102,91 +102,80 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
 
-        public class HueUndoEntry : PathUndoEntry<ColorFilter>
-        {
-            
+        public class HueUndoEntry: PathUndoEntry<ColorFilter> { 
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].Hue = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Hue = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].Hue = r;
             
             public HueUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Hue Changed to {r}°", colorFilter){
+            : base($"Color Filter Hue Changed to {r}°", colorFilter) {
                 this.u = u;
                 this.r = r;
             }
         }
         
-        public class SaturationUndoEntry : PathUndoEntry<ColorFilter>
-        {
-            
+        public class SaturationUndoEntry: PathUndoEntry<ColorFilter> {
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].Saturation = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Saturation = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].Saturation = r;
             
             public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Sat Changed to {r}%", colorFilter){
+            : base($"Color Filter Sat Changed to {r}%", colorFilter) {
                 this.u = u;
                 this.r = r;
             }
         }
         
-        public class ValueUndoEntry : PathUndoEntry<ColorFilter>
-        {
+        public class ValueUndoEntry: PathUndoEntry<ColorFilter> {
             
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].Value = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].Value = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].Value = r;
             
             public ValueUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Value Changed to {r}%", colorFilter){
+            : base($"Color Filter Value Changed to {r}%", colorFilter) {
                 this.u = u;
                 this.r = r;
             }
         }
         
-        public class HueToleranceUndoEntry : PathUndoEntry<ColorFilter>
-        {
-            
+        public class HueToleranceUndoEntry: PathUndoEntry<ColorFilter> {
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].HueTolerance = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].HueTolerance = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].HueTolerance = r;
             
             public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter){
+            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter) {
                 this.u = u;
                 this.r = r;
             }
         }
         
-        public class SaturationToleranceUndoEntry : PathUndoEntry<ColorFilter>
-        {
-            
+        public class SaturationToleranceUndoEntry: PathUndoEntry<ColorFilter> {
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].SaturationTolerance = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].SaturationTolerance = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].SaturationTolerance = r;
             
             public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter){
+            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter) {
                 this.u = u;
                 this.r = r;
             }
         }
         
-        public class ValueToleranceUndoEntry : PathUndoEntry<ColorFilter>
-        {
-            
+        public class ValueToleranceUndoEntry: PathUndoEntry<ColorFilter> {
             double u, r;
-            protected override void RedoPath(params ColorFilter[] items) => items[0].ValueTolerance = r;
 
             protected override void UndoPath(params ColorFilter[] items) => items[0].ValueTolerance = u;
+            protected override void RedoPath(params ColorFilter[] items) => items[0].ValueTolerance = r;
             
             public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Value Tol Changed to {r}%", colorFilter){
+            : base($"Color Filter Value Tol Changed to {r}%", colorFilter) {
                 this.u = u;
                 this.r = r;
             }

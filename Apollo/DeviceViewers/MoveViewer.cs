@@ -79,10 +79,10 @@ namespace Apollo.DeviceViewers {
         }
 
         void Offset_Switched() => Program.Project.Undo.AddAndExecute(new Move.OffsetSwitchedUndoEntry(
-                _move, 
-                _move.Offset.IsAbsolute, 
-                !_move.Offset.IsAbsolute
-            ));
+            _move, 
+            _move.Offset.IsAbsolute, 
+            !_move.Offset.IsAbsolute
+        ));
 
         public void SetOffset(Offset offset) {
             Offset.Update(offset);

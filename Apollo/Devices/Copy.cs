@@ -501,7 +501,6 @@ namespace Apollo.Devices {
             int u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Time.Free = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Time.Free = r;
             
             public RateUndoEntry(Copy copy, int u, int r)
@@ -515,7 +514,6 @@ namespace Apollo.Devices {
             bool u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Time.Mode = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Time.Mode = r;
             
             public RateModeUndoEntry(Copy copy, bool u, bool r)
@@ -529,7 +527,6 @@ namespace Apollo.Devices {
             int u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Time.Length.Step = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Time.Length.Step = r;
             
             public RateStepUndoEntry(Copy copy, int u, int r)
@@ -543,7 +540,6 @@ namespace Apollo.Devices {
             double u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Gate = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Gate = r;
             
             public GateUndoEntry(Copy copy, double u, double r)
@@ -557,7 +553,6 @@ namespace Apollo.Devices {
             CopyType u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].CopyMode = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].CopyMode = r;
             
             public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r)
@@ -571,7 +566,6 @@ namespace Apollo.Devices {
             GridType u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].GridMode = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].GridMode = r;
             
             public GridModeUndoEntry(Copy copy, GridType u, GridType r)
@@ -585,7 +579,6 @@ namespace Apollo.Devices {
             double u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Pinch = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Pinch = r;
             
             public PinchUndoEntry(Copy copy, double u, double r)
@@ -599,7 +592,6 @@ namespace Apollo.Devices {
             bool u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Reverse = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Reverse = r;
             
             public ReverseUndoEntry(Copy copy, bool u, bool r)
@@ -613,7 +605,6 @@ namespace Apollo.Devices {
             bool u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Infinite = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Infinite = r;
             
             public InfiniteUndoEntry(Copy copy, bool u, bool r)
@@ -627,7 +618,6 @@ namespace Apollo.Devices {
             bool u, r;
 
             protected override void UndoPath(params Copy[] item) => item[0].Wrap = u;
-
             protected override void RedoPath(params Copy[] item) => item[0].Wrap = r;
             
             public WrapUndoEntry(Copy copy, bool u, bool r)
@@ -641,14 +631,12 @@ namespace Apollo.Devices {
             int index;
             
             protected override void UndoPath(params Copy[] items) => items[0].Remove(index);
-            
             protected override void RedoPath(params Copy[] items) => items[0].Insert(index);
             
             public OffsetInsertUndoEntry(Copy copy, int index)
-            : base($"Copy Offset {index + 1} Inserted", copy){
+            : base($"Copy Offset {index + 1} Inserted", copy) {
                 this.index = index;
             }
-
         }
         
         public class OffsetRemoveUndoEntry: PathUndoEntry<Copy> {
@@ -656,17 +644,15 @@ namespace Apollo.Devices {
             Offset offset;
             
             protected override void UndoPath(params Copy[] items) => items[0].Insert(index, offset);
-            
             protected override void RedoPath(params Copy[] items) => items[0].Remove(index);
             
             protected override void DisposePath(params Copy[] items) => offset.Dispose();
             
             public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index)
-            : base($"Copy Offset {index + 1} Removed", copy){
+            : base($"Copy Offset {index + 1} Removed", copy) {
                 this.index = index;
                 this.offset = offset;
             }
-
         }
 
         public class OffsetRelativeUndoEntry: PathUndoEntry<Copy> {

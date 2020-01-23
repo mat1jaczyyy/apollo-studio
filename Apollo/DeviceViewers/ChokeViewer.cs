@@ -44,7 +44,7 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
 
         void Target_Changed(Dial sender, double value, double? old){
-            if(old != null && old != value) 
+            if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new Choke.TargetUndoEntry(
                     _choke, 
                     (int)old.Value, 
@@ -53,7 +53,5 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
-        
-        
     }
 }
