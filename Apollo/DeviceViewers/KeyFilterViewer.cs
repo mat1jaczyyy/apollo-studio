@@ -55,16 +55,12 @@ namespace Apollo.DeviceViewers {
 
         void PadFinished(int index) {
             if (old == null) return;
-
-            bool[] u = old.ToArray();
-            bool[] r = _filter.Filter.ToArray();
-            List<int> path = Track.GetPath(_filter);
-
-            Program.Project.Undo.Add($"KeyFilter Changed", () => {
-                Track.TraversePath<KeyFilter>(path).Filter = u.ToArray();
-            }, () => {
-                Track.TraversePath<KeyFilter>(path).Filter = r.ToArray();
-            });
+            
+            Program.Project.Undo.AddAndExecute(new KeyFilter.ChangedUndoEntry(
+                _filter, 
+                old.ToArray(), 
+                _filter.Filter.ToArray()
+            ));
 
             old = null;
         }

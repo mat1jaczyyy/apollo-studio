@@ -2,6 +2,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Layer: Device {
@@ -56,6 +57,45 @@ namespace Apollo.Devices {
             n.BlendingRange = Range;
 
             InvokeExit(n);
+        }
+        
+        public class TargetUndoEntry: PathUndoEntry<Layer> {
+            int u, r;
+            
+            protected override void UndoPath(params Layer[] items) => items[0].Target = u;
+            protected override void RedoPath(params Layer[] items) => items[0].Target = r;
+            
+            public TargetUndoEntry(Layer layer, int u, int r)
+            : base($"Layer Target Changed to {r}", layer) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class ModeUndoEntry: PathUndoEntry<Layer> {
+            BlendingType u, r;
+            
+            protected override void UndoPath(params Layer[] items) => items[0].BlendingMode = u;
+            protected override void RedoPath(params Layer[] items) => items[0].BlendingMode = r;
+            
+            public ModeUndoEntry(Layer layer, BlendingType u, BlendingType r)
+            : base($"Layer Blending Changed to {r}", layer) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class RangeUndoEntry: PathUndoEntry<Layer> {
+            int u, r;
+            
+            protected override void UndoPath(params Layer[] items) => items[0].Range = u;
+            protected override void RedoPath(params Layer[] items) => items[0].Range = r;
+            
+            public RangeUndoEntry(Layer layer, int u, int r)
+            : base($"Layer Range Changed to {r}", layer) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

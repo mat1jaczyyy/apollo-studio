@@ -3,6 +3,7 @@ using System;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class LayerFilter: Device {
@@ -43,6 +44,32 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (Math.Abs(n.Layer - Target) <= Range)
                 InvokeExit(n);
+        }
+        
+        public class TargetUndoEntry: PathUndoEntry<LayerFilter> {
+            int u, r;
+            
+            protected override void UndoPath(params LayerFilter[] items) => items[0].Target = u;
+            protected override void RedoPath(params LayerFilter[] items) => items[0].Target = r;
+            
+            public TargetUndoEntry(LayerFilter filter, int u, int r)
+            : base($"Layer Target Changed to {r}", filter) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class RangeUndoEntry: PathUndoEntry<LayerFilter> {
+            int u, r;
+            
+            protected override void UndoPath(params LayerFilter[] items) => items[0].Range = u;
+            protected override void RedoPath(params LayerFilter[] items) => items[0].Range = r;
+            
+            public RangeUndoEntry(LayerFilter filter, int u, int r)
+            : base($"Layer Filter Range Changed to {r}", filter) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

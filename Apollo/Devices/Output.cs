@@ -48,7 +48,7 @@ namespace Apollo.Devices {
                 int u = Target;
                 List<int> path = Track.GetPath(this);
 
-                //Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => Track.TraversePath<Output>(path).Target = u;
+                //TODO Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => Track.TraversePath<Output>(path).Target = u;
             }
 
             Target = Track.Get(this).ParentIndex.Value;

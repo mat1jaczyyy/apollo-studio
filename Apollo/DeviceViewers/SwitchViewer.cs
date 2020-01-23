@@ -40,37 +40,23 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
         void Target_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_switch);
-
-                Program.Project.Undo.Add($"Switch Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<Switch>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<Switch>(path).Target = r;
-                });
-            }
-
-            _switch.Target = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Switch.TargetUndoEntry(
+                    _switch, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
        
         public void SetTarget(int target) => Target.RawValue = target;
         
         void Value_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_switch);
-
-                Program.Project.Undo.Add($"Switch Value Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<Switch>(path).Value = u;
-                }, () => {
-                    Track.TraversePath<Switch>(path).Value = r;
-                });
-            }
-
-            _switch.Value = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Switch.ValueUndoEntry(
+                    _switch, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         
         public void SetValue(int value) => Value.RawValue = value;

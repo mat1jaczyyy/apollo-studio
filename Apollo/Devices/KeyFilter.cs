@@ -3,6 +3,7 @@ using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class KeyFilter: Device {
@@ -39,6 +40,19 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (_filter[n.Index])
                 InvokeExit(n);
+        }
+        
+        public class ChangedUndoEntry: PathUndoEntry<KeyFilter> {
+            bool[] u, r;
+            
+            protected override void UndoPath(params KeyFilter[] items) => items[0].Filter = u.ToArray();
+            protected override void RedoPath(params KeyFilter[] items) => items[0].Filter = r.ToArray();
+            
+            public ChangedUndoEntry(KeyFilter filter, bool[] u, bool[] r)
+            : base($"KeyFilter Changed", filter) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

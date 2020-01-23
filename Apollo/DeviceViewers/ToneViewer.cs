@@ -45,91 +45,56 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
 
         void Hue_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value;
-                double r = value;
-                List<int> path = Track.GetPath(_tone);
-
-                Program.Project.Undo.Add($"Tone Hue Changed to {r}{Hue.Unit}", () => {
-                    Track.TraversePath<Tone>(path).Hue = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).Hue = r;
-                });
-            }
-
-            _tone.Hue = value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.HueUndoEntry(
+                    _tone, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetHue(double value) => Hue.RawValue = value;
 
         void SaturationHigh_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
-
-                Program.Project.Undo.Add($"Tone Sat Hi Changed to {r}{SaturationHigh.Unit}", () => {
-                    Track.TraversePath<Tone>(path).SaturationHigh = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).SaturationHigh = r;
-                });
-            }
-
-            _tone.SaturationHigh = value / 100;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.SatHighUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationHigh(double value) => SaturationHigh.RawValue = value * 100;
 
         void SaturationLow_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
-
-                Program.Project.Undo.Add($"Tone Sat Lo Changed to {r}{SaturationLow.Unit}", () => {
-                    Track.TraversePath<Tone>(path).SaturationLow = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).SaturationLow = r;
-                });
-            }
-
-            _tone.SaturationLow = value / 100;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.SatLowUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationLow(double value) => SaturationLow.RawValue = value * 100;
 
         void ValueHigh_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
-
-                Program.Project.Undo.Add($"Tone Val Hi Changed to {r}{ValueHigh.Unit}", () => {
-                    Track.TraversePath<Tone>(path).ValueHigh = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).ValueHigh = r;
-                });
-            }
-
-            _tone.ValueHigh = value / 100;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.ValueHighUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueHigh(double value) => ValueHigh.RawValue = value * 100;
 
         void ValueLow_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_tone);
-
-                Program.Project.Undo.Add($"Tone Val Lo Changed to {r}{ValueLow.Unit}", () => {
-                    Track.TraversePath<Tone>(path).ValueLow = u;
-                }, () => {
-                    Track.TraversePath<Tone>(path).ValueLow = r;
-                });
-            }
-
-            _tone.ValueLow = value / 100;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Tone.ValueLowUndoEntry(
+                    _tone, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueLow(double value) => ValueLow.RawValue = value * 100;

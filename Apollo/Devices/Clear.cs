@@ -3,6 +3,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Clear: Device {
@@ -30,6 +31,19 @@ namespace Apollo.Devices {
             }
 
             InvokeExit(n);
+        }
+        
+        public class ModeUndoEntry: PathUndoEntry<Clear> {
+            ClearType u, r;
+            
+            protected override void UndoPath(params Clear[] item) => item[0].Mode = u;
+            protected override void RedoPath(params Clear[] item) => item[0].Mode = r;
+            
+            public ModeUndoEntry(Clear clear, ClearType u, ClearType r)
+            : base($"Clear Mode Changed to {r.ToString()}", clear) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

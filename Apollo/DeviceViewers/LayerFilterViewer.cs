@@ -39,37 +39,23 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<LayerFilter>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<LayerFilter>(path).Target = r;
-                });
-            }
-
-            _filter.Target = (int)value;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new LayerFilter.TargetUndoEntry(
+                    _filter,
+                    (int)value, 
+                    (int)old.Value
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
 
         void Range_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Layer Filter Range Changed to {r}{Range.Unit}", () => {
-                    Track.TraversePath<LayerFilter>(path).Range = u;
-                }, () => {
-                    Track.TraversePath<LayerFilter>(path).Range = r;
-                });
-            }
-
-            _filter.Range = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new LayerFilter.RangeUndoEntry(
+                    _filter,
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetRange(int value) => Range.RawValue = value;

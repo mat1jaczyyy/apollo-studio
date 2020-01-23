@@ -49,109 +49,67 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Hue_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value;
-                double r = value;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Hue Changed to {r}{Hue.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).Hue = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).Hue = r;
-                });
-            }
-
-            _filter.Hue = value;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.HueUndoEntry(
+                    _filter, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetHue(double value) => Hue.RawValue = value;
 
         void Saturation_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Sat Changed to {r}{Saturation.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).Saturation = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).Saturation = r;
-                });
-            }
-
-            _filter.Saturation = value / 100;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturation(double value) => Saturation.RawValue = value * 100;
 
         void Value_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Val Changed to {r}{Value.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).Value = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).Value = r;
-                });
-            }
-
-            _filter.Value = value / 100;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValue(double value) => Value.RawValue = value * 100;
 
         void HueTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Hue Tol Changed to {r}{HueTolerance.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).HueTolerance = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).HueTolerance = r;
-                });
-            }
-
-            _filter.HueTolerance = value / 100;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.HueToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetHueTolerance(double value) => HueTolerance.RawValue = value * 100;
 
         void SaturationTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Sat Tol Changed to {r}{SaturationTolerance.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).SaturationTolerance = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).SaturationTolerance = r;
-                });
-            }
-
-            _filter.SaturationTolerance = value / 100;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetSaturationTolerance(double value) => SaturationTolerance.RawValue = value * 100;
 
         void ValueTolerance_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"Color Filter Val Tol Changed to {r}{ValueTolerance.Unit}", () => {
-                    Track.TraversePath<ColorFilter>(path).ValueTolerance = u;
-                }, () => {
-                    Track.TraversePath<ColorFilter>(path).ValueTolerance = r;
-                });
-            }
-
-            _filter.ValueTolerance = value / 100;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new ColorFilter.ValueToleranceUndoEntry(
+                    _filter, 
+                    old.Value / 100, 
+                    value / 100
+                ));
         }
 
         public void SetValueTolerance(double value) => ValueTolerance.RawValue = value * 100;

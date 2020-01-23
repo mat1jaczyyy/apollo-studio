@@ -4,6 +4,7 @@ using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class MacroFilter: Device {
@@ -58,6 +59,32 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (_filter[n.GetMacro(Macro) - 1])
                 InvokeExit(n);
+        }
+        
+        public class TargetUndoEntry: PathUndoEntry<MacroFilter> {
+            int u, r;
+            
+            protected override void UndoPath(params MacroFilter[] items) => items[0].Macro = u;
+            protected override void RedoPath(params MacroFilter[] items) => items[0].Macro = r;
+            
+            public TargetUndoEntry(MacroFilter filter, int u, int r)
+            : base($"MacroFilter Target Changed to {r}%", filter) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class FilterUndoEntry: PathUndoEntry<MacroFilter> {
+            bool[] u, r;
+            
+            protected override void UndoPath(params MacroFilter[] items) => items[0].Filter = u.ToArray();
+            protected override void RedoPath(params MacroFilter[] items) => items[0].Filter = r.ToArray();
+            
+            public FilterUndoEntry(MacroFilter filter, bool[] u, bool[] r)
+            : base($"MacroFilter Changed", filter) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

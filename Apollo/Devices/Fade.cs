@@ -8,6 +8,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Fade: Device {
@@ -380,6 +381,152 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+
+        public class ThumbInsertUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color thumbColor;
+            double pos;
+            FadeType type;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Fade[] items) => items[0].Insert(index, thumbColor, pos, type);
+            
+            public ThumbInsertUndoEntry(Fade fade, int index, Color thumbColor, double pos, FadeType type)
+            : base($"Fade Color {index + 1} Inserted", fade) {
+                this.index = index;
+                this.thumbColor = thumbColor;
+                this.pos = pos;
+                this.type = type;
+            }
+        }
+        
+        public class ThumbRemoveUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color uc;
+            double up;
+            FadeType ut;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Insert(index, uc, up, ut);
+            protected override void RedoPath(params Fade[] items) => items[0].Remove(index);
+            
+            public ThumbRemoveUndoEntry(Fade fade, int index, Color uc, double up, FadeType ut)
+            : base($"Fade Color {index + 1} Removed", fade) {
+                this.index = index;
+                this.uc = uc;
+                this.up = up;
+                this.ut = ut;
+            }
+        }
+        
+        public class ThumbTypeUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            FadeType oldType, newType;
+
+            protected override void UndoPath(params Fade[] items) => items[0].SetFadeType(index, oldType);
+            protected override void RedoPath(params Fade[] items) => items[0].SetFadeType(index, newType);
+            
+            public ThumbTypeUndoEntry(Fade fade, int index, FadeType oldType, FadeType newType)
+            : base($"Fade Type {index + 1} Changed to {newType.ToString()}", fade) {
+                this.index = index;
+                this.oldType = oldType;
+                this.newType = newType;
+            }
+        }
+        
+        public class ThumbMoveUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            double u, r;
+
+            protected override void UndoPath(params Fade[] items) => items[0].SetPosition(index, u);
+            protected override void RedoPath(params Fade[] items) => items[0].SetPosition(index, r);
+            
+            public ThumbMoveUndoEntry(Fade fade, int index, double u, double r)
+            : base($"Fade Color {index + 1} Moved", fade) {
+                this.index = index;
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class ColorUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].SetColor(index, u);
+            protected override void RedoPath(params Fade[] items) => items[0].SetColor(index, r);
+            
+            public ColorUndoEntry(Fade fade, int index, Color u, Color r)
+            : base($"Fade Color {index + 1} Changed to {r.ToHex()}", fade) {
+                this.index = index;
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class DurationUndoEntry: PathUndoEntry<Fade> {
+            int u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Time.Free = u;
+            protected override void RedoPath(params Fade[] items) => items[0].Time.Free = r;
+            
+            public DurationUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {r}ms", fade) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class DurationModeUndoEntry: PathUndoEntry<Fade> {
+            bool u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Time.Mode = u;
+            protected override void RedoPath(params Fade[] items) => items[0].Time.Mode = r;
+            
+            public DurationModeUndoEntry(Fade fade, bool u, bool r)
+            : base($"Fade Duration Switched to {(r? "Steps" : "Free")}", fade) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class DurationStepUndoEntry: PathUndoEntry<Fade> {
+            int u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Time.Length.Step = u;
+            protected override void RedoPath(params Fade[] items) => items[0].Time.Length.Step = r;
+            
+            public DurationStepUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {Length.Steps[r]}", fade) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class GateUndoEntry: PathUndoEntry<Fade> {
+            double u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Gate = u;
+            protected override void RedoPath(params Fade[] items) => items[0].Gate = r;
+            
+            public GateUndoEntry(Fade fade, double u, double r)
+            : base($"Fade Gate Changed to {r}%", fade){
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+          public class PlaybackModeUndoEntry: PathUndoEntry<Fade> {
+            FadePlaybackType u, r;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].PlayMode = u;
+            protected override void RedoPath(params Fade[] items) => items[0].PlayMode = r;
+            
+            public PlaybackModeUndoEntry(Fade fade, FadePlaybackType u, FadePlaybackType r)
+            : base($"Fade Playback Mode Changed to {r.ToString()}", fade) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }

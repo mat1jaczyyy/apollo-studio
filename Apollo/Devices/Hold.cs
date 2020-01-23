@@ -5,6 +5,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Hold: Device {
@@ -169,6 +170,84 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+        
+        public class DurationUndoEntry: PathUndoEntry<Hold> {
+            int u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Time.Free = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Time.Free = r;
+            
+            public DurationUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {r}ms", hold) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class DurationModeUndoEntry: PathUndoEntry<Hold> {
+            bool u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Time.Mode = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Time.Mode = r;
+            
+            public DurationModeUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Duration Switched to {(r? "Steps" : "Free")}", hold) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class DurationStepUndoEntry: PathUndoEntry<Hold> {
+            int u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Time.Length.Step = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Time.Length.Step = r;
+            
+            public DurationStepUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {Length.Steps[r]}", hold) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class GateUndoEntry: PathUndoEntry<Hold> {
+            double u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Gate = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Gate = r;
+            
+            public GateUndoEntry(Hold hold, double u, double r)
+            : base($"Hold Gate Changed to {r}%", hold) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class InfiniteUndoEntry: PathUndoEntry<Hold> {
+            bool u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Infinite = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Infinite = r;
+            
+            public InfiniteUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", hold) {
+                this.u = u;
+                this.r = r;
+            }
+        }
+        
+        public class ReleaseUndoEntry: PathUndoEntry<Hold> {
+            bool u, r;
+            
+            protected override void UndoPath(params Hold[] items) => items[0].Release = u;
+            protected override void RedoPath(params Hold[] items) => items[0].Release = r;
+            
+            public ReleaseUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", hold) {
+                this.u = u;
+                this.r = r;
+            }
         }
     }
 }
