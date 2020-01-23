@@ -482,22 +482,23 @@ namespace Apollo.Elements {
 
         byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
 
-        public void NoteOn(object sender, in NoteOnMessage e) => HandleMessage(new Signal(
-            InputFormat,
-            this,
-            this,
-            (byte)e.Key,
-            new Color(InputColor(e.Velocity))
-        ));
+        void HandleNote(byte key, byte vel) {
+            if (Type == LaunchpadType.X && InputFormat == InputType.DrumRack && 108 <= key && key <= 116)
+                key -= 80;
 
-        void NoteOff(object sender, in NoteOffMessage e) => HandleMessage(new Signal(
-            InputFormat,
-            this,
-            this,
-            (byte)e.Key,
-            new Color(0)
-        ));
+            HandleMessage(new Signal(
+                InputFormat,
+                this,
+                this,
+                key,
+                new Color(InputColor(vel))
+            ));
+        }
 
+        public void NoteOn(object sender, in NoteOnMessage e) => HandleNote((byte)e.Key, (byte)e.Velocity);
+
+        void NoteOff(object sender, in NoteOffMessage e) => HandleNote((byte)e.Key, 0);
+        
         void ControlChange(object sender, in ControlChangeMessage e) {
             switch (Type) {
                 case LaunchpadType.MK2:
