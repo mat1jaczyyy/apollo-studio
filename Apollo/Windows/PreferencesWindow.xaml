@@ -190,7 +190,7 @@
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" HorizontalAlignment="Center">
               <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock TextAlignment="Center" Text="2018 - 2019 mat1jaczyyy" />
+              <TextBlock TextAlignment="Center" Text="2018 - 2020 mat1jaczyyy" />
             </StackPanel>
 
             <Components:Patreon Grid.Column="1" VerticalAlignment="Center" />

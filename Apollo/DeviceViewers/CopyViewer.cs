@@ -22,7 +22,7 @@ namespace Apollo.DeviceViewers {
 
             Rate = this.Get<Dial>("Rate");
             Gate = this.Get<Dial>("Gate");
-            Pinch = this.Get<Dial>("Pinch");
+            Pinch = this.Get<PinchDial>("Pinch");
 
             CopyMode = this.Get<ComboBox>("CopyMode");
             GridMode = this.Get<ComboBox>("GridMode");
@@ -37,7 +37,8 @@ namespace Apollo.DeviceViewers {
 
         Copy _copy;
 
-        Dial Rate, Gate, Pinch;
+        Dial Rate, Gate;
+        PinchDial Pinch;
         ComboBox CopyMode, GridMode;
         CheckBox Wrap, Reverse, Infinite;
 
@@ -71,6 +72,7 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = _copy.Gate * 100;
             Pinch.RawValue = _copy.Pinch;
+            Pinch.IsBilateral = _copy.Bilateral;
 
             Reverse.IsChecked = _copy.Reverse;
             Infinite.IsChecked = _copy.Infinite;
@@ -173,6 +175,24 @@ namespace Apollo.DeviceViewers {
         }
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
+        
+        void Bilateral_Changed(bool value, bool? old) {
+            if (old != null && old != value) {
+                bool u = old.Value;
+                bool r = value;
+                List<int> path = Track.GetPath(_copy);
+
+                Program.Project.Undo.Add($"Copy Pinch Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
+                    Track.TraversePath<Copy>(path).Bilateral = u;
+                }, () => {
+                    Track.TraversePath<Copy>(path).Bilateral = r;
+                });
+            }
+
+            _copy.Bilateral = value;
+        }
+        
+        public void SetBilateral(bool bilateral) => Pinch.IsBilateral = bilateral;
 
         void Reverse_Changed(object sender, RoutedEventArgs e) {
             bool value = Reverse.IsChecked.Value;

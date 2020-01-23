@@ -49,8 +49,7 @@ namespace Apollo.Windows {
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
 
-            Pinch = this.Get<Dial>("Pinch");
-            Bilateral = this.Get<CheckBox>("Bilateral");
+            Pinch = this.Get<PinchDial>("Pinch");
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
@@ -67,6 +66,9 @@ namespace Apollo.Windows {
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
+
+            BottomLeftPane = this.Get<StackPanel>("BottomLeftPane");
+            CollapseButton = this.Get<CollapseButton>("CollapseButton");
         }
 
         HashSet<IDisposable> observables = new HashSet<IDisposable>();
@@ -104,7 +106,7 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText, TitleCenter;
-        StackPanel CenteringLeft, CenteringRight;
+        StackPanel CenteringLeft, CenteringRight, BottomLeftPane;
         UndoButton UndoButton;
         RedoButton RedoButton;
         ScrollViewer FrameList;
@@ -113,9 +115,11 @@ namespace Apollo.Windows {
         Controls Contents;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate, Repeats, Pinch;
+        Dial Duration, Gate, Repeats;
+        PinchDial Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
-        CheckBox Wrap, Infinite, Bilateral;
+        CheckBox Wrap, Infinite;
+        CollapseButton CollapseButton;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -246,11 +250,15 @@ namespace Apollo.Windows {
 
             Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = _pattern.Gate * 100;
+
             Pinch.RawValue = _pattern.Pinch;
+            Pinch.IsBilateral = _pattern.Bilateral;
 
             PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
             Infinite.IsChecked = _pattern.Infinite;
+
+            CollapseButton.Showing = true;
 
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -999,15 +1007,13 @@ namespace Apollo.Windows {
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
 
-        void Bilateral_Changed(object sender, RoutedEventArgs e) {
-            bool value = Bilateral.IsChecked.Value;
-
-            if (_pattern.Bilateral != value) {
+        void Bilateral_Changed(bool value, bool? old) {
+            if (old != null && old != value) {
                 bool u = _pattern.Bilateral;
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
+                Program.Project.Undo.Add($"Pattern Pinch Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
                     Track.TraversePath<Pattern>(path).Bilateral = u;
                 }, () => {
                     Track.TraversePath<Pattern>(path).Bilateral = r;
@@ -1017,7 +1023,7 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetBilateral(bool value) => Bilateral.IsChecked = value;
+        public void SetBilateral(bool value) => Pinch.IsBilateral = value;
 
         int? oldRootKey = -1;
 
@@ -1635,6 +1641,8 @@ namespace Apollo.Windows {
 
         public void Export(int left, int right) {}
         public void Import(int right, string path = null) {}
+
+        void BottomCollapse() => BottomLeftPane.Opacity = Convert.ToInt32(BottomLeftPane.IsVisible = CollapseButton.Showing = (BottomLeftPane.MaxHeight = (BottomLeftPane.MaxHeight == 0)? 1000 : 0) != 0);
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 

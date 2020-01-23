@@ -113,20 +113,12 @@ namespace Apollo.Devices {
             }
         }
 
-        double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
-        double TotalTime => Enumerable.Sum(Frames.Select(i => (double)i.Time)) * AdjustedRepeats * Gate;
-
-        double RegularPinch(double x) => 1 - Math.Pow(1 - Math.Pow(x, ActualPinch), 1 / ActualPinch);
-
-        double BilateralPinch(double x) => (x < 0.5)
-            ? RegularPinch(2 * x) / 2
-            : 1 - RegularPinch(2 * (1 - x)) / 2;
-
-        // https://www.desmos.com/calculator/t74unzeehh
-        public double ApplyPinch(double time) {
-            double x = Math.Min(1, Math.Max(0, time / TotalTime));
-            return (Bilateral? BilateralPinch(x) : RegularPinch(x)) * TotalTime;
-        }
+        public double ApplyPinch(double time) => Pincher.ApplyPinch(
+            time,
+            Enumerable.Sum(Frames.Select(i => (double)i.Time)) * AdjustedRepeats * Gate,
+            Pinch,
+            Bilateral
+        );
 
         class PolyInfo {
             public Signal n;

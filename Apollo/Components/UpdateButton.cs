@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -8,28 +7,22 @@ namespace Apollo.Components {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
-            Path = this.Get<Path>("Path");
+            Message = this.Get<TextBlock>("Message");
         }
 
-        Path Path;
+        TextBlock Message;
 
-        protected override IBrush Fill {
-            get => Path.Stroke;
-            set => Path.Stroke = value;
-        }
+        protected override IBrush Fill { get; set; }
 
         public UpdateButton() {
             InitializeComponent();
 
             base.MouseLeave(this, null);
-
-            Opacity = 0;
-            IsHitTestVisible = false;
         }
 
-        public void Enable() {
-            Opacity = 1;
-            IsHitTestVisible = true;
+        public void Enable(string message) {
+            Message.Text = message;
+            IsVisible = true;
         }
     }
 }

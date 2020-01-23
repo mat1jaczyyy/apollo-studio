@@ -181,6 +181,18 @@ namespace Apollo.Devices {
                 }
             }
         }
+        
+        bool _bilateral;
+        public bool Bilateral {
+            get => _bilateral;
+            set {
+                if (value != _bilateral) {
+                    _bilateral = value;
+                    
+                    if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer)?.SetBilateral(Bilateral);
+                }
+            }
+        }
 
         bool _reverse;
         public bool Reverse {
@@ -201,25 +213,25 @@ namespace Apollo.Devices {
                 if (Viewer?.SpecificViewer != null) ((CopyViewer)Viewer.SpecificViewer).SetInfinite(Infinite);
             }
         }
-        
-        double ActualPinch => (Pinch < 0)? ((1 / (1 - Pinch)) - 1) * .9 + 1 : 1 + (Pinch * 4 / 3);
-
-        double ApplyPinch(double time, double total) => (1 - Math.Pow(1 - Math.Pow(Math.Min(1, Math.Max(0, time / total)), ActualPinch), 1 / ActualPinch)) * total;
 
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
+        ConcurrentDictionary<Signal, HashSet<Signal>> screen = new ConcurrentDictionary<Signal, HashSet<Signal>>();
+        ConcurrentDictionary<Signal, object> screenlocker = new ConcurrentDictionary<Signal, object>();
+
+        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Copy(Time time = null, double gate = 1, double pinch = 0, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
+        public Copy(Time time = null, double gate = 1, double pinch = 0, bool bilateral = false, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
             Time = time?? new Time(free: 500);
             Gate = gate;
             Pinch = pinch;
+            Bilateral = bilateral;
 
             Reverse = reverse;
             Infinite = infinite;
@@ -233,6 +245,34 @@ namespace Apollo.Devices {
 
             foreach (Offset offset in Offsets)
                 offset.Changed += OffsetChanged;
+        }
+
+        void ScreenOutput(Signal o, Signal i) {
+            bool on = i.Color.Lit;
+            i.Color = new Color();
+            Signal k = o.With(o.Index, new Color());
+
+            if (!screenlocker.ContainsKey(k))
+                screenlocker[k] = new object();
+            
+            lock (screenlocker[k]) {
+                if (!screen.ContainsKey(k))
+                    screen[k] = new HashSet<Signal>();
+
+                if (on) {
+                    if (!screen[k].Contains(i))
+                        screen[k].Add(i);
+
+                    InvokeExit(o.Clone());
+
+                } else {
+                    if (screen[k].Contains(i))
+                        screen[k].Remove(i);
+                    
+                    if (screen[k].Count == 0)
+                        InvokeExit(o.Clone());
+                }
+            }
         }
 
         void FireCourier(PolyInfo info, double time) {
@@ -268,7 +308,7 @@ namespace Apollo.Devices {
                     if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
                         Signal m = info.n.Clone();
                         m.Index = (byte)info.offsets[info.index];
-                        InvokeExit(m);
+                        ScreenOutput(m, info.n.Clone());
 
                         if (info.index == info.offsets.Count - 1)
                             poly.Remove(info);
@@ -297,7 +337,7 @@ namespace Apollo.Devices {
                     Signal o = original.Clone();
                     o.Index = (byte)offsets[buffer[n]];
                     o.Color = new Color(0);
-                    InvokeExit(o);
+                    ScreenOutput(o, original.Clone());
 
                     if (m.Color.Lit) {
                         if (offsets.Count > 1) {
@@ -311,7 +351,7 @@ namespace Apollo.Devices {
                 }
 
                 if (buffer.ContainsKey(n)) {
-                    InvokeExit(m);
+                    ScreenOutput(m, original.Clone());
                     FireCourier((original, offsets), _time * _gate);
                 } else {
                     timers[n].Dispose();
@@ -322,7 +362,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(Signal n) {
             if (n.Index == 100) {
-                InvokeExit(n);
+                ScreenOutput(n.Clone(), n.Clone());
                 return;
             }
 
@@ -408,13 +448,13 @@ namespace Apollo.Devices {
             if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
 
             if (CopyMode == CopyType.Static) {
-                InvokeExit(n.Clone());
+                ScreenOutput(n.Clone(), n.Clone());
 
                 for (int i = 1; i < validOffsets.Count; i++) {
                     Signal m = n.Clone();
                     m.Index = (byte)validOffsets[i];
 
-                    InvokeExit(m);
+                    ScreenOutput(m, n.Clone());
                 }
 
             } else if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
@@ -424,16 +464,16 @@ namespace Apollo.Devices {
                     if (Reverse) validOffsets.Reverse();
 
                     if (validOffsets[0] != -1)
-                        InvokeExit(n.With((byte)validOffsets[0], n.Color));
+                        ScreenOutput(n.With((byte)validOffsets[0], n.Color), n.Clone());
                     
-                    PolyInfo info = new PolyInfo(n, validOffsets);
+                    PolyInfo info = new PolyInfo(n.Clone(), validOffsets);
                     poly.Add(info);
 
                     double total = _time * _gate * (validOffsets.Count - 1);
 
                     for (int i = 1; i < validOffsets.Count; i++)
                         if (!Infinite || i < validOffsets.Count - 1 || n.Color.Lit)
-                            FireCourier(info, ApplyPinch(_time * _gate * i, total));
+                            FireCourier(info, Pincher.ApplyPinch(_time * _gate * i, total, Pinch, Bilateral));
                 }
 
             } else if (CopyMode == CopyType.RandomSingle) {
@@ -449,7 +489,7 @@ namespace Apollo.Devices {
                     if (!m.Color.Lit) buffer.Remove(n, out int _);
                 }
 
-                InvokeExit(m);
+                ScreenOutput(m, n.Clone());
 
             } else if (CopyMode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
         }
@@ -466,6 +506,9 @@ namespace Apollo.Devices {
 
             buffer.Clear();
             locker.Clear();
+
+            screen.Clear();
+            screenlocker.Clear();
         }
 
         public override void Dispose() {

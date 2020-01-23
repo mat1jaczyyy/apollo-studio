@@ -2,6 +2,7 @@
 
 cd ../Apollo
 rm -rf bin/Release/netcoreapp3.0/osx-x64/publish
+dotnet clean
 dotnet publish -r osx-x64 -c Release
 fileicon set bin/Release/netcoreapp3.0/osx-x64/publish/Apollo icon.ico
 rm bin/Release/netcoreapp3.0/osx-x64/publish/Apollo.config > /dev/null 2>&1
@@ -10,6 +11,7 @@ echo
 
 cd ../ApolloUpdate
 rm -rf bin/Release/netcoreapp3.0/osx-x64/publish
+dotnet clean
 dotnet publish -r osx-x64 -c Release
 fileicon set bin/Release/netcoreapp3.0/osx-x64/publish/ApolloUpdate icon.ico
 
