@@ -107,44 +107,26 @@ namespace Apollo.Devices {
                 this.ry = ry;
             }
         }
-        
-        public class OffsetSwitchedUndoEntry: PathUndoEntry<Move> {
-            bool u, r;
+
+        public class OffsetSwitchedUndoEntry: SimpleIndexUndoEntry<Move, bool> {
+            protected override void Action(Move item, int index, bool element) => item.Offset.IsAbsolute = element;
             
-            protected override void UndoPath(params Move[] items) => items[0].Offset.IsAbsolute = u;
-            protected override void RedoPath(params Move[] items) => items[0].Offset.IsAbsolute = r;
-            
-            public OffsetSwitchedUndoEntry(Move move, bool u, bool r)
-            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move) {
-                this.u = u;
-                this.r = r;
-            }
+            public OffsetSwitchedUndoEntry(Move move, int index, bool u, bool r)
+            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, index, u, r) {}
         }
         
-        public class GridModeUndoEntry: PathUndoEntry<Move> {
-            GridType u, r;
-            
-            protected override void UndoPath(params Move[] items) => items[0].GridMode = u;
-            protected override void RedoPath(params Move[] items) => items[0].GridMode = r;
+        public class GridModeUndoEntry: SimpleUndoEntry<Move, GridType> {
+            protected override void Action(Move item, GridType element) => item.GridMode = element;
             
             public GridModeUndoEntry(Move move, GridType u, GridType r)
-            : base($"Move Grid Changed to {r.ToString()}", move) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Move Grid Changed to {r.ToString()}", move, u, r) {}
         }
         
-        public class WrapUndoEntry: PathUndoEntry<Move> {
-            bool u, r;
-            
-            protected override void UndoPath(params Move[] items) => items[0].Wrap = u;
-            protected override void RedoPath(params Move[] items) => items[0].Wrap = r;
+        public class WrapUndoEntry: SimpleUndoEntry<Move, bool> {
+            protected override void Action(Move item, bool element) => item.Wrap = element;
             
             public WrapUndoEntry(Move move, bool u, bool r)
-            : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", move) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", move, u, r) {}
         }
     }
 }

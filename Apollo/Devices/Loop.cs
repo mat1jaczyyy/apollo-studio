@@ -177,82 +177,46 @@ namespace Apollo.Devices {
             base.Dispose();
         }
         
-        public class RateUndoEntry: PathUndoEntry<Loop> {
-            int u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Rate.Free = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Rate.Free = r;
+        public class RateUndoEntry: SimpleUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Free = element;
             
             public RateUndoEntry(Loop loop, int u, int r)
-            : base($"Loop Rate Changed to {r}", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Rate Changed to {r}ms", loop, u, r) {}
         }
         
-        public class RateModeUndoEntry: PathUndoEntry<Loop> {
-            bool u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Rate.Mode = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Rate.Mode = r;
+        public class RateModeUndoEntry: SimpleUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Rate.Mode = element;
             
             public RateModeUndoEntry(Loop loop, bool u, bool r)
-            : base($"Loop Rate Switched to {(r? "Steps" : "Free")}", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Rate Switched to {(r? "Steps" : "Free")}", loop, u, r) {}
         }
         
-        public class RateStepUndoEntry: PathUndoEntry<Loop> {
-            int u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Rate.Length.Step = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Rate.Length.Step = r;
+        public class RateStepUndoEntry: SimpleUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Length.Step = element;
             
             public RateStepUndoEntry(Loop loop, int u, int r)
-            : base($"Loop Rate Changed to {Length.Steps[r]}", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Rate Changed to {Length.Steps[r]}", loop, u, r) {}
         }
         
-        public class HoldUndoEntry: PathUndoEntry<Loop> {
-            bool u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Hold = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Hold = r;
+        public class HoldUndoEntry: SimpleUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Hold = element;
             
             public HoldUndoEntry(Loop loop, bool u, bool r)
-            : base($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", loop, u, r) {}
         }
         
-        public class GateUndoEntry: PathUndoEntry<Loop> {
-            double u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Gate = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Gate = r;
+        public class GateUndoEntry: SimpleUndoEntry<Loop, double> {
+            protected override void Action(Loop item, double element) => item.Gate = element;
             
             public GateUndoEntry(Loop loop, double u, double r)
-            : base($"Loop Gate Changed to {r}%", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Gate Changed to {r}%", loop, u, r) {}
         }
         
-        public class RepeatsUndoEntry: PathUndoEntry<Loop> {
-            int u, r;
-            
-            protected override void UndoPath(params Loop[] items) => items[0].Repeats = u;
-            protected override void RedoPath(params Loop[] items) => items[0].Repeats = r;
+        public class RepeatsUndoEntry: SimpleUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Repeats = element;
             
             public RepeatsUndoEntry(Loop loop, int u, int r)
-            : base($"Loop Repeats Changed to {r}", loop) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Loop Repeats Changed to {r}", loop, u, r) {}
         }
     }
 }

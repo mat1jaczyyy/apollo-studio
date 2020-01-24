@@ -61,30 +61,18 @@ namespace Apollo.Devices {
                 InvokeExit(n);
         }
         
-        public class TargetUndoEntry: PathUndoEntry<MacroFilter> {
-            int u, r;
-            
-            protected override void UndoPath(params MacroFilter[] items) => items[0].Macro = u;
-            protected override void RedoPath(params MacroFilter[] items) => items[0].Macro = r;
+        public class TargetUndoEntry: SimpleUndoEntry<MacroFilter, int> {
+            protected override void Action(MacroFilter item, int element) => item.Macro = element;
             
             public TargetUndoEntry(MacroFilter filter, int u, int r)
-            : base($"MacroFilter Target Changed to {r}%", filter) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"MacroFilter Target Changed to {r}%", filter, u, r) {}
         }
         
-        public class FilterUndoEntry: PathUndoEntry<MacroFilter> {
-            bool[] u, r;
-            
-            protected override void UndoPath(params MacroFilter[] items) => items[0].Filter = u.ToArray();
-            protected override void RedoPath(params MacroFilter[] items) => items[0].Filter = r.ToArray();
+        public class FilterUndoEntry: SimpleUndoEntry<MacroFilter, bool[]> {
+            protected override void Action(MacroFilter item, bool[] element) => item.Filter = element.ToArray();
             
             public FilterUndoEntry(MacroFilter filter, bool[] u, bool[] r)
-            : base($"MacroFilter Changed", filter) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"MacroFilter Changed", filter, u, r) {}
         }
     }
 }

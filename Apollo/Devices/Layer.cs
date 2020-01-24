@@ -59,43 +59,25 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class TargetUndoEntry: PathUndoEntry<Layer> {
-            int u, r;
-            
-            protected override void UndoPath(params Layer[] items) => items[0].Target = u;
-            protected override void RedoPath(params Layer[] items) => items[0].Target = r;
+        public class TargetUndoEntry: SimpleUndoEntry<Layer, int> {
+            protected override void Action(Layer item, int element) => item.Target = element;
             
             public TargetUndoEntry(Layer layer, int u, int r)
-            : base($"Layer Target Changed to {r}", layer) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Layer Target Changed to {r}", layer, u, r) {}
         }
         
-        public class ModeUndoEntry: PathUndoEntry<Layer> {
-            BlendingType u, r;
-            
-            protected override void UndoPath(params Layer[] items) => items[0].BlendingMode = u;
-            protected override void RedoPath(params Layer[] items) => items[0].BlendingMode = r;
+        public class ModeUndoEntry: SimpleUndoEntry<Layer, BlendingType> {
+            protected override void Action(Layer item, BlendingType element) => item.BlendingMode = element;
             
             public ModeUndoEntry(Layer layer, BlendingType u, BlendingType r)
-            : base($"Layer Blending Changed to {r}", layer) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Layer Blending Changed to {r}", layer, u, r) {}
         }
         
-        public class RangeUndoEntry: PathUndoEntry<Layer> {
-            int u, r;
-            
-            protected override void UndoPath(params Layer[] items) => items[0].Range = u;
-            protected override void RedoPath(params Layer[] items) => items[0].Range = r;
+        public class RangeUndoEntry: SimpleUndoEntry<Layer, int> {
+            protected override void Action(Layer item, int element) => item.Range = element;
             
             public RangeUndoEntry(Layer layer, int u, int r)
-            : base($"Layer Range Changed to {r}", layer) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Layer Range Changed to {r}", layer, u, r) {}
         }
     }
 }
