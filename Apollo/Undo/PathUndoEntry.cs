@@ -5,7 +5,7 @@ using Apollo.Elements;
 using Apollo.Interfaces;
 
 namespace Apollo.Undo {
-    public class PathUndoEntry<T>: UndoEntry where T: ISelect {
+    public abstract class PathUndoEntry<T>: UndoEntry where T: ISelect {
         protected IEnumerable<List<int>> Paths;
         protected T[] Items => Paths.Select(i => Track.TraversePath<T>(i)).ToArray();
 

@@ -1,5 +1,5 @@
 namespace Apollo.Undo {
-    public class UndoEntry {
+    public abstract class UndoEntry {
         public readonly string Description;
 
         public virtual void Undo() {}
