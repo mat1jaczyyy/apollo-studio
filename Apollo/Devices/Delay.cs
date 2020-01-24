@@ -115,56 +115,32 @@ namespace Apollo.Devices {
             base.Dispose();
         }
         
-        public class DurationUndoEntry: PathUndoEntry<Delay> {
-            int u, r;
-            
-            protected override void UndoPath(params Delay[] items) => items[0].Time.Free = u;
-            protected override void RedoPath(params Delay[] items) => items[0].Time.Free = r;
+        public class DurationUndoEntry: SimpleUndoEntry<Delay, int> {
+            protected override void Action(Delay item, int element) => item.Time.Free = element;
             
             public DurationUndoEntry(Delay delay, int u, int r)
-            : base($"Delay Duration Changed to {r}ms", delay) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Delay Duration Changed to {r}ms", delay, u, r) {}
         }
         
-        public class DurationModeUndoEntry: PathUndoEntry<Delay> {
-            bool u, r;
-            
-            protected override void UndoPath(params Delay[] items) => items[0].Time.Mode = u;
-            protected override void RedoPath(params Delay[] items) => items[0].Time.Mode = r;
+        public class DurationModeUndoEntry: SimpleUndoEntry<Delay, bool> {
+            protected override void Action(Delay item, bool element) => item.Time.Mode = element;
             
             public DurationModeUndoEntry(Delay delay, bool u, bool r)
-            : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay, u, r) {}
         }
         
-        public class DurationStepUndoEntry: PathUndoEntry<Delay> {
-            int u, r;
-            
-            protected override void UndoPath(params Delay[] items) => items[0].Time.Length.Step = u;
-            protected override void RedoPath(params Delay[] items) => items[0].Time.Length.Step = r;
+        public class DurationStepUndoEntry: SimpleUndoEntry<Delay, int> {
+            protected override void Action(Delay item, int element) => item.Time.Length.Step = element;
             
             public DurationStepUndoEntry(Delay delay, int u, int r)
-            : base($"Delay Duration Changed to {Length.Steps[r]}", delay) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Delay Duration Changed to {Length.Steps[r]}", delay, u, r) {}
         }
         
-        public class GateUndoEntry: PathUndoEntry<Delay> {
-            double u, r;
-            
-            protected override void UndoPath(params Delay[] items) => items[0].Gate = u;
-            protected override void RedoPath(params Delay[] items) => items[0].Gate = r;
+        public class GateUndoEntry: SimpleUndoEntry<Delay, double> {
+            protected override void Action(Delay item, double element) => item.Gate = element;
             
             public GateUndoEntry(Delay delay, double u, double r)
-            : base($"Delay Gate Changed to {r}%", delay) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Delay Gate Changed to {r}%", delay, u, r) {}
         }
     }
 }

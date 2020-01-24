@@ -65,30 +65,18 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: PathUndoEntry<Flip> {
-            FlipType u, r;
-            
-            protected override void UndoPath(params Flip[] items) => items[0].Mode = u;
-            protected override void RedoPath(params Flip[] items) => items[0].Mode = r;
+        public class ModeUndoEntry: SimpleUndoEntry<Flip, FlipType> {
+            protected override void Action(Flip item, FlipType element) => item.Mode = element;
             
             public ModeUndoEntry(Flip flip, FlipType u, FlipType r)
-            : base($"Flip Orientation Changed to {r.ToString()}", flip) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Flip Orientation Changed to {r.ToString()}", flip, u, r) {}
         }
         
-        public class BypassUndoEntry: PathUndoEntry<Flip> {
-            bool u, r;
-            
-            protected override void UndoPath(params Flip[] items) => items[0].Bypass = u;
-            protected override void RedoPath(params Flip[] items) => items[0].Bypass = r;
+        public class BypassUndoEntry: SimpleUndoEntry<Flip, bool> {
+            protected override void Action(Flip item, bool element) => item.Bypass = element;
             
             public BypassUndoEntry(Flip flip, bool u, bool r)
-            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip, u, r) {}
         }
     }
 }

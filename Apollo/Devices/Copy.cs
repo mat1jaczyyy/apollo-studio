@@ -540,134 +540,74 @@ namespace Apollo.Devices {
                 p.Y + t * b.Y
             );
             
-        public class RateUndoEntry: PathUndoEntry<Copy> {
-            int u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Time.Free = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Time.Free = r;
+        public class RateUndoEntry: SimpleUndoEntry<Copy, int> {
+            protected override void Action(Copy item, int element) => item.Time.Free = element;
             
             public RateUndoEntry(Copy copy, int u, int r)
-            : base($"Copy Rate Changed to {r}ms", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Rate Changed to {r}ms", copy, u, r) {}
         }   
         
-        public class RateModeUndoEntry: PathUndoEntry<Copy> {
-            bool u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Time.Mode = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Time.Mode = r;
+        public class RateModeUndoEntry: SimpleUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, bool element) => item.Time.Mode = element;
             
             public RateModeUndoEntry(Copy copy, bool u, bool r)
-            : base($"Copy Rate Switched to {(r? "Steps" : "Free")}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Rate Switched to {(r? "Steps" : "Free")}", copy, u, r) {}
         }
         
-        public class RateStepUndoEntry: PathUndoEntry<Copy> {
-            int u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Time.Length.Step = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Time.Length.Step = r;
+        public class RateStepUndoEntry: SimpleUndoEntry<Copy, int> {
+            protected override void Action(Copy item, int element) => item.Time.Length.Step = element;
             
             public RateStepUndoEntry(Copy copy, int u, int r)
-            : base($"Copy Rate Changed to {Length.Steps[r]}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Rate Changed to {Length.Steps[r]}", copy, u, r) {}
         }
         
-        public class GateUndoEntry: PathUndoEntry<Copy> {
-            double u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Gate = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Gate = r;
+        public class GateUndoEntry: SimpleUndoEntry<Copy, double> {
+            protected override void Action(Copy item, double element) => item.Gate = element;
             
             public GateUndoEntry(Copy copy, double u, double r)
-            : base($"Copy Gate Changed to {r}%", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Gate Changed to {r}%", copy, u, r) {}
         }
         
-        public class CopyModeUndoEntry: PathUndoEntry<Copy> {
-            CopyType u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].CopyMode = u;
-            protected override void RedoPath(params Copy[] item) => item[0].CopyMode = r;
+        public class CopyModeUndoEntry: SimpleUndoEntry<Copy, CopyType> {
+            protected override void Action(Copy item, CopyType element) => item.CopyMode = element;
             
             public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r)
-            : base($"Copy Mode Changed to {r.ToString()}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Mode Changed to {r.ToString()}", copy, u, r) {}
         }
         
-        public class GridModeUndoEntry: PathUndoEntry<Copy> {
-            GridType u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].GridMode = u;
-            protected override void RedoPath(params Copy[] item) => item[0].GridMode = r;
+        public class GridModeUndoEntry: SimpleUndoEntry<Copy, GridType> {
+            protected override void Action(Copy item, GridType element) => item.GridMode = element;
             
             public GridModeUndoEntry(Copy copy, GridType u, GridType r)
-            : base($"Copy Grid Changed to {r.ToString()}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Grid Changed to {r.ToString()}", copy, u, r) {}
         }
         
-        public class PinchUndoEntry: PathUndoEntry<Copy> {
-            double u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Pinch = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Pinch = r;
+        public class PinchUndoEntry: SimpleUndoEntry<Copy, double> {
+            protected override void Action(Copy item, double element) => item.Pinch = element;
             
             public PinchUndoEntry(Copy copy, double u, double r)
-            : base($"Copy Pinch Changed to {r}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Pinch Changed to {r}", copy, u, r) {}
         }
         
-        public class ReverseUndoEntry: PathUndoEntry<Copy> {
-            bool u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Reverse = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Reverse = r;
+        public class ReverseUndoEntry: SimpleUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, bool element) => item.Reverse = element;
             
             public ReverseUndoEntry(Copy copy, bool u, bool r)
-            : base($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
         }
         
-        public class InfiniteUndoEntry: PathUndoEntry<Copy> {
-            bool u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Infinite = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Infinite = r;
+        public class InfiniteUndoEntry: SimpleUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, bool element) => item.Infinite = element;
             
             public InfiniteUndoEntry(Copy copy, bool u, bool r)
-            : base($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
         }
         
-        public class WrapUndoEntry: PathUndoEntry<Copy> {
-            bool u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Wrap = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Wrap = r;
+        public class WrapUndoEntry: SimpleUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, bool element) => item.Wrap = element;
             
             public WrapUndoEntry(Copy copy, bool u, bool r)
-            : base($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", copy) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
         }
         
         public class OffsetInsertUndoEntry: PathUndoEntry<Copy> {
@@ -677,9 +617,7 @@ namespace Apollo.Devices {
             protected override void RedoPath(params Copy[] items) => items[0].Insert(index);
             
             public OffsetInsertUndoEntry(Copy copy, int index)
-            : base($"Copy Offset {index + 1} Inserted", copy) {
-                this.index = index;
-            }
+            : base($"Copy Offset {index + 1} Inserted", copy) => this.index = index;
         }
         
         public class OffsetRemoveUndoEntry: PathUndoEntry<Copy> {
@@ -744,33 +682,18 @@ namespace Apollo.Devices {
             }
         }
 
-        public class OffsetSwitchedUndoEntry: PathUndoEntry<Copy> {
-            int index;
-            bool u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].Offsets[index].IsAbsolute = u;
-            protected override void RedoPath(params Copy[] item) => item[0].Offsets[index].IsAbsolute = r;
+        public class OffsetSwitchedUndoEntry: SimpleIndexUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, int index, bool element) => item.Offsets[index].IsAbsolute = element;
             
             public OffsetSwitchedUndoEntry(Copy copy, int index, bool u, bool r)
-            : base($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", copy) {
-                this.index = index;
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", copy, index, u, r) {}
         }
 
-        public class OffsetAngleUndoEntry: PathUndoEntry<Copy> {
-            int index, u, r;
-
-            protected override void UndoPath(params Copy[] item) => item[0].SetAngle(index, u);
-            protected override void RedoPath(params Copy[] item) => item[0].SetAngle(index, r);
+        public class OffsetAngleUndoEntry: SimpleIndexUndoEntry<Copy, int> {
+            protected override void Action(Copy item, int index, int element) => item.SetAngle(index, element);
             
             public OffsetAngleUndoEntry(Copy copy, int index, int u, int r)
-            : base($"Copy Angle {index + 1} Changed to {r}°", copy) {
-                this.index = index;
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Copy Angle {index + 1} Changed to {r}°", copy, index, u, r) {}
         }
     }
 }

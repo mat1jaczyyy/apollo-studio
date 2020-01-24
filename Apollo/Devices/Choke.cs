@@ -111,17 +111,11 @@ namespace Apollo.Devices {
         
         void SetTarget(int target) => Target = target;
         
-        public class TargetUndoEntry: PathUndoEntry<Choke> {
-            int u, r;
+        public class TargetUndoEntry: SimpleUndoEntry<Choke, int> {
+            protected override void Action(Choke item, int element) => item.SetTarget(element);
 
-            protected override void UndoPath(params Choke[] item) => item[0].SetTarget(u);
-            protected override void RedoPath(params Choke[] item) => item[0].SetTarget(r);
-            
             public TargetUndoEntry(Choke choke, int u, int r)
-            : base($"Choke Target Changed to {r}", choke) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Choke Target Changed to {r}", choke, u, r) {}
         }
     }
 }

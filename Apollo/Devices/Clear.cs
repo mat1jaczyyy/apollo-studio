@@ -33,17 +33,11 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: PathUndoEntry<Clear> {
-            ClearType u, r;
-            
-            protected override void UndoPath(params Clear[] item) => item[0].Mode = u;
-            protected override void RedoPath(params Clear[] item) => item[0].Mode = r;
+        public class ModeUndoEntry: SimpleUndoEntry<Clear, ClearType> {
+            protected override void Action(Clear item, ClearType element) => item.Mode = element;
             
             public ModeUndoEntry(Clear clear, ClearType u, ClearType r)
-            : base($"Clear Mode Changed to {r.ToString()}", clear) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Clear Mode Changed to {r.ToString()}", clear, u, r) {}
         }
     }
 }
