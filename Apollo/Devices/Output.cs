@@ -89,5 +89,12 @@ namespace Apollo.Devices {
 
             base.Dispose();
         }
+        
+        public class TargetUndoEntry: SimpleUndoEntry<Output, int> {
+            protected override void Action(Output item, int element) => item.Target = element;
+            
+            public TargetUndoEntry(Output output, int u, int r)
+            : base($"Output Target Changed to {r}", output, u, r) {}
+        }
     }
 }

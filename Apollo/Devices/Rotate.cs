@@ -52,30 +52,18 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: PathUndoEntry<Rotate> {
-            RotateType u, r;
+        public class ModeUndoEntry: SimpleUndoEntry<Rotate, RotateType> {
+            protected override void Action(Rotate item, RotateType element) => item.Mode = element;
             
-            protected override void UndoPath(params Rotate[] items) => items[0].Mode = u;
-            protected override void RedoPath(params Rotate[] items) => items[0].Mode = r;
-            
-            public ModeUndoEntry(Rotate rotate, string angle, RotateType u, RotateType r)
-            : base($"Rotate Angle Changed to {angle}°", rotate) {
-                this.u = u;
-                this.r = r;
-            }
+            public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r)
+            : base($"Rotate Angle Changed to {r.ToString().Substring(1)}°", rotate, u, r) {}
         }
         
-        public class BypassUndoEntry: PathUndoEntry<Rotate> {
-            bool u, r;
-            
-            protected override void UndoPath(params Rotate[] items) => items[0].Bypass = u;
-            protected override void RedoPath(params Rotate[] items) => items[0].Bypass = r;
+        public class BypassUndoEntry: SimpleUndoEntry<Rotate, bool> {
+            protected override void Action(Rotate item, bool element) => item.Bypass = element;
             
             public BypassUndoEntry(Rotate rotate, bool u, bool r)
-            : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate, u, r) {}
         }
     }
 }

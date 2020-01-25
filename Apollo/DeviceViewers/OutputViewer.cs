@@ -47,19 +47,12 @@ namespace Apollo.DeviceViewers {
         }
 
         void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value - 1;
-                int r = (int)value - 1;
-                List<int> path = Track.GetPath(_output);
-
-                Program.Project.Undo.Add($"Output Target Changed to {r + 1}{Target.Unit}", () => {
-                    Track.TraversePath<Output>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<Output>(path).Target = r;
-                });
-            }
-
-            _output.Target = (int)value - 1;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Output.TargetUndoEntry(
+                    _output,
+                    (int)old.Value - 1,
+                    (int)value - 1
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value + 1;

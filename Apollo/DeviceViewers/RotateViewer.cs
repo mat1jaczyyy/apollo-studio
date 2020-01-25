@@ -45,8 +45,7 @@ namespace Apollo.DeviceViewers {
             if (_rotate.Mode != selected)
                 Program.Project.Undo.AddAndExecute(new Rotate.ModeUndoEntry(
                     _rotate, 
-                    selected.ToString().Substring(1), 
-                    _rotate.Mode, 
+                    _rotate.Mode,
                     selected
                 ));
         }

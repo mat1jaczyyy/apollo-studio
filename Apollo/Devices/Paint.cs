@@ -29,17 +29,11 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ColorUndoEntry: PathUndoEntry<Paint> {
-            Color u, r;
-            
-            protected override void UndoPath(params Paint[] items) => items[0].Color = u.Clone();
-            protected override void RedoPath(params Paint[] items) => items[0].Color = r.Clone();
+        public class ColorUndoEntry: SimpleUndoEntry<Paint, Color> {
+            protected override void Action(Paint item, Color element) => item.Color = element.Clone();
             
             public ColorUndoEntry(Paint paint, Color u, Color r)
-            : base($"Paint Color Changed to {r.ToHex()}", paint) {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Paint Color Changed to {r.ToHex()}", paint, u, r) {}
         }
     }
 }
