@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.Devices;
 using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Viewers;
@@ -181,7 +182,7 @@ namespace Apollo.Elements {
             _ParentIndex = null;
         }
 
-        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) {
+        public static bool Move(List<Chain> source, Group target, int position, bool copy = false) {
             if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
 
             return (position == -1)
@@ -196,30 +197,30 @@ namespace Apollo.Elements {
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
+                if (!copy) ((Group)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
-                ((IMultipleChainParent)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
+                ((Group)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
             }
 
             Track track = Track.Get(moved.First());
             track?.Window?.Selection.Select(moved.First());
             track?.Window?.Selection.Select(moved.Last(), true);
 
-            ((IMultipleChainParent)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
+            ((Group)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
             
             return true;
         }
 
-        public static bool Move(List<Chain> source, IMultipleChainParent target, bool copy = false) {
+        public static bool Move(List<Chain> source, Group target, bool copy = false) {
             if (!copy && target.Count > 0 && source[0] == target[0])
                 return false;
             
             List<Chain> moved = new List<Chain>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
+                if (!copy) ((Group)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 

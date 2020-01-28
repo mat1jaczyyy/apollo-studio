@@ -6,43 +6,16 @@ using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
-using Apollo.Interfaces;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Multi: Device, IMultipleChainParent, ISelectParent {
-        public IMultipleChainParentViewer SpecificViewer {
-            get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
-        }
-
-        public ISelectParentViewer IViewer {
-            get => (ISelectParentViewer)Viewer?.SpecificViewer;
-        }
-
-        public List<ISelect> IChildren {
-            get => Chains.Select(i => (ISelect)i).ToList();
-        }
-
-        public bool IRoot {
-            get => false;
-        }
-
-        Action<Signal> _midiexit;
-        public override Action<Signal> MIDIExit {
-            get => _midiexit;
-            set {
-                _midiexit = value;
-                Reroute();
-            }
-        }
-
+    public class Multi: Group {
         public delegate void MultiResetHandler();
         public static event MultiResetHandler Reset;
 
         public static void InvokeReset() => Reset?.Invoke();
 
         public Chain Preprocess;
-        public List<Chain> Chains = new List<Chain>();
 
         List<bool[]> _filters = new List<bool[]>();
         List<bool[]> Filters {
@@ -80,23 +53,13 @@ namespace Apollo.Devices {
 
         Random RNG = new Random();
 
-        void Reroute() {
-            Preprocess.Parent = this;
-            Preprocess.MIDIExit = PreprocessExit;
-
-            for (int i = 0; i < Chains.Count; i++) {
-                Chains[i].Parent = this;
-                Chains[i].ParentIndex = i;
-                Chains[i].MIDIExit = ChainExit;
+        protected override void Reroute() {
+            if (Preprocess != null) {
+                Preprocess.Parent = this;
+                Preprocess.MIDIExit = PreprocessExit;
             }
-        }
 
-        public Chain this[int index] {
-            get => Chains[index];
-        }
-
-        public int Count {
-            get => Chains.Count;
+            base.Reroute();
         }
 
         public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), (from i in Filters select (bool[])i.Clone()).ToList(), Expanded, Mode) {
@@ -104,52 +67,24 @@ namespace Apollo.Devices {
             Enabled = Enabled
         };
 
-        public void Insert(int index, Chain chain = null) {
-            Chains.Insert(index, chain?? new Chain());
+        public override void Insert(int index, Chain chain = null) {
             _filters.Insert(index, new bool[101]);
-            Reroute();
-
-            SpecificViewer?.Contents_Insert(index, Chains[index]);
             
-            Track.Get(this)?.Window?.Selection.Select(Chains[index]);
-            SpecificViewer?.Expand(index);
+            base.Insert(index, chain);
         }
 
-        public void Remove(int index, bool dispose = true) {
-            if (index < Chains.Count - 1)
-                Track.Get(this)?.Window?.Selection.Select(Chains[index + 1]);
-            else if (Chains.Count > 1)
-                Track.Get(this)?.Window?.Selection.Select(Chains[Chains.Count - 2]);
-            else
-                Track.Get(this)?.Window?.Selection.Select(null);
-
-            SpecificViewer?.Contents_Remove(index);
-
-            if (dispose) Chains[index].Dispose();
-            Chains.RemoveAt(index);
+        public override void Remove(int index, bool dispose = true) {
+            base.Remove(index, dispose);
+            
             _filters.RemoveAt(index);
-            Reroute();
         }
 
         void HandleReset() => current = -1;
 
-        int? _expanded;
-        public int? Expanded {
-            get => _expanded;
-            set {
-                if (value != null && !(0 <= value && value < Chains.Count)) value = null;
-                _expanded = value;                
-            }
-        }
-
-        public Multi(Chain preprocess = null, List<Chain> init = null, List<bool[]> filters = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
+        public Multi(Chain preprocess = null, List<Chain> init = null, List<bool[]> filters = null, int? expanded = null, MultiType mode = MultiType.Forward): base(init, expanded, "multi") {
             Preprocess = preprocess?? new Chain();
 
-            foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
-
             foreach (bool[] arr in filters?? new List<bool[]>()) Filters.Add(arr);
-            
-            Expanded = expanded;
 
             Mode = mode;
             
@@ -157,8 +92,6 @@ namespace Apollo.Devices {
 
             Reroute();
         }
-
-        void ChainExit(Signal n) => InvokeExit(n);
 
         public override void MIDIProcess(Signal n) {
             Signal m = n.Clone();
@@ -214,7 +147,7 @@ namespace Apollo.Devices {
         }
         
         protected override void Stop() {
-            foreach (Chain chain in Chains) chain.MIDIEnter(new StopSignal());
+            base.Stop();
             Preprocess.MIDIEnter(new StopSignal());
         }
 
