@@ -589,6 +589,13 @@ namespace Apollo.Devices {
             : base($"Copy Pinch Changed to {r}", copy, u, r) {}
         }
         
+        public class BilateralUndoEntry: SimpleUndoEntry<Copy, bool> {
+            protected override void Action(Copy item, bool element) => item.Bilateral = element;
+            
+            public BilateralUndoEntry(Copy copy, bool u, bool r)
+            : base($"Copy Bilateral Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
+        }
+        
         public class ReverseUndoEntry: SimpleUndoEntry<Copy, bool> {
             protected override void Action(Copy item, bool element) => item.Reverse = element;
             

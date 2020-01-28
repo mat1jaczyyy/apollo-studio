@@ -177,19 +177,12 @@ namespace Apollo.DeviceViewers {
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
         
         void Bilateral_Changed(bool value, bool? old) {
-            if (old != null && old != value) {
-                bool u = old.Value;
-                bool r = value;
-                List<int> path = Track.GetPath(_copy);
-
-                Program.Project.Undo.Add($"Copy Pinch Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Copy>(path).Bilateral = u;
-                }, () => {
-                    Track.TraversePath<Copy>(path).Bilateral = r;
-                });
-            }
-
-            _copy.Bilateral = value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Copy.BilateralUndoEntry(
+                    _copy, 
+                    old.Value, 
+                    value
+                ));
         }
         
         public void SetBilateral(bool bilateral) => Pinch.IsBilateral = bilateral;
