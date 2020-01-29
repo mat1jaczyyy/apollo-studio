@@ -182,15 +182,15 @@ namespace Apollo.Elements {
             _ParentIndex = null;
         }
 
-        public static bool Move(List<Chain> source, Group target, int position, bool copy = false) {
+        public static bool Move(List<Chain> source, Group target, int position, bool copy = false, List<bool[]> multiFilters = null) {
             if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
 
             return (position == -1)
-                ? Move(source, target, copy)
-                : Move(source, target[position], copy);
+                ? Move(source, target, copy, multiFilters)
+                : Move(source, target[position], copy, multiFilters);
         }
 
-        public static bool Move(List<Chain> source, Chain target, bool copy = false) {
+        public static bool Move(List<Chain> source, Chain target, bool copy = false, List<bool[]> multiFilters = null) {
             if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
                 return false;
             
@@ -202,6 +202,9 @@ namespace Apollo.Elements {
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 ((Group)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
+
+                if (multiFilters != null && target.Parent is Multi multi)
+                    multi.SetFilter(target.ParentIndex.Value + i + 1, multiFilters[i].ToArray());
             }
 
             Track track = Track.Get(moved.First());
@@ -213,7 +216,7 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public static bool Move(List<Chain> source, Group target, bool copy = false) {
+        public static bool Move(List<Chain> source, Group target, bool copy = false, List<bool[]> multiFilters = null) {
             if (!copy && target.Count > 0 && source[0] == target[0])
                 return false;
             
@@ -225,6 +228,9 @@ namespace Apollo.Elements {
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 target.Insert(i, moved.Last());
+
+                if (multiFilters != null && target is Multi multi)
+                    multi.SetFilter(i, multiFilters[i].ToArray());
             }
 
             Track track = Track.Get(moved.First());
