@@ -6,10 +6,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.VisualTree;
 
 using Apollo.Binary;
 using Apollo.Components;
@@ -157,7 +155,7 @@ namespace Apollo.DeviceViewers {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Group Chain {index + 1} Inserted", () => {   // Multi also uses this
+            Program.Project.Undo.Add($"{((this.GetType() == typeof(Multi))? "Multi" : "Group")} Chain {index + 1} Inserted", () => {
                 Track.TraversePath<Group>(path).Remove(index);
             }, () => {
                 Track.TraversePath<Group>(path).Insert(index, r.Clone());
@@ -409,7 +407,7 @@ namespace Apollo.DeviceViewers {
             Copyable paste = await Copyable.DecodeClipboard();
 
             if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);   // Multi also uses this
+                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);
         }
 
         public async void Replace(int left, int right) {
@@ -420,7 +418,7 @@ namespace Apollo.DeviceViewers {
 
                 List<int> path = Track.GetPath(_group);
 
-                Program.Project.Undo.Add("Chain Replaced",   // Multi also uses this
+                Program.Project.Undo.Add("Chain Replaced",
                     undo2 + undo,
                     redo + redo2 + (() => {
                         Group group = Track.TraversePath<Group>(path);
@@ -434,7 +432,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void Duplicate(int left, int right) {   // Multi also uses this
+        public void Duplicate(int left, int right) {
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Duplicated", () => {
@@ -460,7 +458,7 @@ namespace Apollo.DeviceViewers {
 
         public void Delete(int left, int right) {
             Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
-            Program.Project.Undo.Add($"Chain Removed", undo, redo, dispose);   // Multi also uses this
+            Program.Project.Undo.Add($"Chain Removed", undo, redo, dispose);
         }
 
         public void Group(int left, int right) {}
@@ -474,7 +472,7 @@ namespace Apollo.DeviceViewers {
 
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Muted", () => {      // Multi also uses this
+            Program.Project.Undo.Add($"Chain Muted", () => {
                 Group group = Track.TraversePath<Group>(path);
 
                 for (int i = left; i <= right; i++)
