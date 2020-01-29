@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Devices;
+using Apollo.DeviceViewers;
 using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Viewers;
@@ -128,7 +129,18 @@ namespace Apollo.Elements {
             }
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name) {
+        bool[] _filter;
+        public bool[] SecretMultiFilter {
+            get => _filter;
+            set {
+                if (value.Length == 101) {
+                    _filter = value;
+                    if (Parent is Multi multi && multi.Viewer?.SpecificViewer != null) ((MultiViewer)multi.Viewer.SpecificViewer).Set(this, _filter);
+                }
+            }
+        }
+
+        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
             Enabled = Enabled
         };
 
@@ -158,9 +170,13 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Chain(List<Device> init = null, string name = "Chain #") {
+        public Chain(List<Device> init = null, string name = "Chain #", bool[] filter = null) {
             Devices = init?? new List<Device>();
             Name = name;
+
+            if (filter == null || filter.Length != 101) filter = new bool[101];
+            _filter = filter;
+            
             Reroute();
         }
 

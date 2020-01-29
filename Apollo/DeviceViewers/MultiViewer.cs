@@ -130,7 +130,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
             GridContainer.MaxWidth = double.MaxValue;
-            Set(-1, _multi.GetFilter(index));
+            Set(null, _multi[index].SecretMultiFilter);
 
             _parent.Border.CornerRadius = new CornerRadius(0);
             _parent.Header.CornerRadius = new CornerRadius(0);
@@ -223,34 +223,36 @@ namespace Apollo.DeviceViewers {
         bool[] old;
 
         void PadStarted(int index) {
-            bool[] filter = _multi.GetFilter((int)_multi.Expanded);
+            bool[] filter = _multi[(int)_multi.Expanded].SecretMultiFilter;
             drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
             old = filter.ToArray();
         }
 
         void PadPressed(int index) => Grid.SetColor(
             index,
-            GetColor(_multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState)
+            GetColor(_multi[(int)_multi.Expanded].SecretMultiFilter[LaunchpadGrid.GridToSignal(index)] = drawingState)
         );
 
         void PadFinished(int index) {
             if (old == null) return;
 
             bool[] u = old.ToArray();
-            bool[] r = _multi.GetFilter((int)_multi.Expanded).ToArray();
+            bool[] r = _multi[(int)_multi.Expanded].SecretMultiFilter.ToArray();
             List<int> path = Track.GetPath(_multi);
             int selected = (int)_multi.Expanded;
 
             Program.Project.Undo.Add($"MultiFilter Changed", () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
+                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = u.ToArray();
             }, () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
+                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = r.ToArray();
             });
 
             old = null;
         }
 
-        public void Set(int index, bool[] filter) {
+        public void Set(Chain chain, bool[] filter) {
+            int index = _multi.Chains.IndexOf(chain);
+
             if (index != -1 && _multi.Expanded != index) return;
 
             for (int i = 0; i < 100; i++)

@@ -44,27 +44,6 @@ namespace Apollo.Devices {
         public Chain Preprocess;
         public List<Chain> Chains = new List<Chain>();
 
-        List<bool[]> _filters = new List<bool[]>();
-        List<bool[]> Filters {
-            get => _filters;
-            set {
-                int index = 0;
-                for (int i = 0; i < value.Count; i++) {
-                    if (value[i] != null && value[i].Length == 101) {
-                        _filters[index] = value[i];
-                        if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, _filters[index]);
-                        index++;
-                    }
-                }
-            }
-        }
-
-        public bool[] GetFilter(int index) => _filters[index];
-        public void SetFilter(int index, bool[] filter) {
-            _filters[index] = filter;
-            if (Viewer?.SpecificViewer != null) ((MultiViewer)Viewer.SpecificViewer).Set(index, filter);
-        }
-
         MultiType _mode;
         public MultiType Mode {
             get => _mode;
@@ -99,14 +78,13 @@ namespace Apollo.Devices {
             get => Chains.Count;
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), (from i in Filters select (bool[])i.Clone()).ToList(), Expanded, Mode) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, Mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
-            _filters.Insert(index, new bool[101]);
             Reroute();
 
             SpecificViewer?.Contents_Insert(index, Chains[index]);
@@ -127,7 +105,6 @@ namespace Apollo.Devices {
 
             if (dispose) Chains[index].Dispose();
             Chains.RemoveAt(index);
-            _filters.RemoveAt(index);
             Reroute();
         }
 
@@ -142,12 +119,10 @@ namespace Apollo.Devices {
             }
         }
 
-        public Multi(Chain preprocess = null, List<Chain> init = null, List<bool[]> filters = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
+        public Multi(Chain preprocess = null, List<Chain> init = null, int? expanded = null, MultiType mode = MultiType.Forward): base("multi") {
             Preprocess = preprocess?? new Chain();
 
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
-
-            foreach (bool[] arr in filters?? new List<bool[]>()) Filters.Add(arr);
             
             Expanded = expanded;
 
@@ -184,12 +159,11 @@ namespace Apollo.Devices {
                     else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
                     
                 } else if (Mode == MultiType.Key) {
-                    for (int index = 0; index < _filters.Count; index++) {
-                        if (_filters[index][m.Index]) target.Add(index);
-                    }
+                    for (int index = 0; index < Chains.Count; index++)
+                        if (Chains[index].SecretMultiFilter[m.Index]) target.Add(index);
                 }
 
-                if(Mode != MultiType.Key) target.Add(current);
+                if (Mode != MultiType.Key) target.Add(current);
 
                 m.MultiTarget.Push(buffer[n] = target);
 
