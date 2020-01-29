@@ -209,17 +209,13 @@ namespace Apollo.DeviceViewers {
             bool result;
 
             if (e.Data.Contains("chain")) {
-                List<Chain> moving = (List<Chain>)e.Data.Get("chain");
-
-                List<bool[]> movingfilters = e.Data.Contains("filters")
-                    ? (List<bool[]>)e.Data.Get("filters")
-                    : null;
+                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
                 Group source_parent = (Group)moving[0].Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
 
-                if (result = Chain.Move(moving, _group, after, copy, movingfilters)) {
+                if (result = Chain.Move(moving, _group, after, copy)) {
                     int before_pos = before;
                     int after_pos = moving[0].IParentIndex.Value - 1;
                     int count = moving.Count;
@@ -243,7 +239,7 @@ namespace Apollo.DeviceViewers {
 
                             List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
 
-                            Chain.Move(umoving, sourcedevice, before_pos, multiFilters: movingfilters);
+                            Chain.Move(umoving, sourcedevice, before_pos);
 
                     }), () => {
                         Group sourcedevice = Track.TraversePath<Group>(sourcepath);
@@ -251,7 +247,7 @@ namespace Apollo.DeviceViewers {
 
                         List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
 
-                        Chain.Move(rmoving, targetdevice, after, copy, movingfilters);
+                        Chain.Move(rmoving, targetdevice, after, copy);
                     });
                 }
             

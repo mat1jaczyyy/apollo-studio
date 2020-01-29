@@ -130,7 +130,7 @@ namespace Apollo.DeviceViewers {
             _root.Insert(4, new DeviceTail(_multi, _parent));
 
             GridContainer.MaxWidth = double.MaxValue;
-            Set(-1, _multi.GetFilter(index));
+            Set(null, _multi[index].SecretMultiFilter);
 
             _parent.Border.CornerRadius = new CornerRadius(0);
             _parent.Header.CornerRadius = new CornerRadius(0);
@@ -223,34 +223,36 @@ namespace Apollo.DeviceViewers {
         bool[] old;
 
         void PadStarted(int index) {
-            bool[] filter = _multi.GetFilter((int)_multi.Expanded);
+            bool[] filter = _multi[(int)_multi.Expanded].SecretMultiFilter;
             drawingState = !filter[LaunchpadGrid.GridToSignal(index)];
             old = filter.ToArray();
         }
 
         void PadPressed(int index) => Grid.SetColor(
             index,
-            GetColor(_multi.GetFilter((int)_multi.Expanded)[LaunchpadGrid.GridToSignal(index)] = drawingState)
+            GetColor(_multi[(int)_multi.Expanded].SecretMultiFilter[LaunchpadGrid.GridToSignal(index)] = drawingState)
         );
 
         void PadFinished(int index) {
             if (old == null) return;
 
             bool[] u = old.ToArray();
-            bool[] r = _multi.GetFilter((int)_multi.Expanded).ToArray();
+            bool[] r = _multi[(int)_multi.Expanded].SecretMultiFilter.ToArray();
             List<int> path = Track.GetPath(_multi);
             int selected = (int)_multi.Expanded;
 
             Program.Project.Undo.Add($"MultiFilter Changed", () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, u.ToArray());
+                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = u.ToArray();
             }, () => {
-                Track.TraversePath<Multi>(path).SetFilter(selected, r.ToArray());
+                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = r.ToArray();
             });
 
             old = null;
         }
 
-        public void Set(int index, bool[] filter) {
+        public void Set(Chain chain, bool[] filter) {
+            int index = _multi.Chains.IndexOf(chain);
+
             if (index != -1 && _multi.Expanded != index) return;
 
             for (int i = 0; i < 100; i++)
@@ -289,17 +291,13 @@ namespace Apollo.DeviceViewers {
             bool result;
 
             if (e.Data.Contains("chain")) {
-                List<Chain> moving = (List<Chain>)e.Data.Get("chain");
-
-                List<bool[]> movingfilters = e.Data.Contains("filters")
-                    ? (List<bool[]>)e.Data.Get("filters")
-                    : null;
+                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
                 Group source_parent = (Group)moving[0].Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
 
-                if (result = Chain.Move(moving, _multi, after, copy, movingfilters)) {
+                if (result = Chain.Move(moving, _multi, after, copy)) {
                     int before_pos = before;
                     int after_pos = moving[0].IParentIndex.Value - 1;
                     int count = moving.Count;
@@ -323,7 +321,7 @@ namespace Apollo.DeviceViewers {
 
                             List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
 
-                            Chain.Move(umoving, sourcedevice, before_pos, multiFilters: movingfilters);
+                            Chain.Move(umoving, sourcedevice, before_pos);
 
                     }), () => {
                         Group sourcedevice = Track.TraversePath<Group>(sourcepath);
@@ -331,7 +329,7 @@ namespace Apollo.DeviceViewers {
 
                         List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
 
-                        Chain.Move(rmoving, targetdevice, after, copy, movingfilters);
+                        Chain.Move(rmoving, targetdevice, after, copy);
                     });
                 }
             

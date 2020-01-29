@@ -200,7 +200,12 @@ namespace Apollo.Binary {
                     enabled = reader.ReadBoolean();
                 }
 
-                return new Chain(devices, name) {
+                bool[] filter = null;
+                if (version >= 29) {
+                    filter = (from i in Enumerable.Range(0, 101) select reader.ReadBoolean()).ToArray();
+                }
+
+                return new Chain(devices, name, filter) {
                     Enabled = enabled
                 };
 
@@ -469,17 +474,19 @@ namespace Apollo.Binary {
                 int count = reader.ReadInt32();
                 List<Chain> init = (from i in Enumerable.Range(0, count) select (Chain)Decode(reader, version)).ToList();
 
-                List<bool[]> filters = (from i in Enumerable.Range(0, count) select new bool[101]).ToList();
-                if (version >= 28) {
-                    filters = (from i in Enumerable.Range(0, count) select 
+                if (version == 28) {
+                    List<bool[]> filters = (from i in Enumerable.Range(0, count) select 
                         (from j in Enumerable.Range(0, 101) select reader.ReadBoolean()
                     ).ToArray()).ToList();
+
+                    for (int i = 0; i < count; i++)
+                        init[i].SecretMultiFilter = filters[i];
                 }
                 
                 int? expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 MultiType mode = (MultiType)reader.ReadInt32();
                 
-                return new Multi(preprocess, init, filters, expanded, mode);
+                return new Multi(preprocess, init, expanded, mode);
             
             } else if (t == typeof(Output))
                 return new Output(
@@ -569,6 +576,11 @@ namespace Apollo.Binary {
                     (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 );
+
+            else if (t == typeof(Refresh)) 
+                return new Refresh(
+                    (from i in Enumerable.Range(0, 4) select reader.ReadBoolean()
+                ).ToArray());
             
             else if (t == typeof(Switch)) {
                 int target = (version >= 25)? reader.ReadInt32() : 1;

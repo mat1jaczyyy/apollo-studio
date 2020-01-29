@@ -37,7 +37,7 @@ namespace Apollo.Devices {
         public Chain this[int index] => Chains[index];
         public int Count => Chains.Count;
 
-        public virtual void Insert(int index, Chain chain = null) {
+        public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
             Reroute();
 
@@ -47,7 +47,7 @@ namespace Apollo.Devices {
             SpecificViewer?.Expand(index);
         }
 
-        public virtual void Remove(int index, bool dispose = true) {
+        public void Remove(int index, bool dispose = true) {
             if (index < Chains.Count - 1)
                 Track.Get(this)?.Window?.Selection.Select(Chains[index + 1]);
             else if (Chains.Count > 1)

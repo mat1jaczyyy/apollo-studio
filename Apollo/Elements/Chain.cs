@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Devices;
+using Apollo.DeviceViewers;
 using Apollo.Interfaces;
 using Apollo.Structures;
 using Apollo.Viewers;
@@ -128,7 +129,18 @@ namespace Apollo.Elements {
             }
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name) {
+        bool[] _filter;
+        public bool[] SecretMultiFilter {
+            get => _filter;
+            set {
+                if (value.Length == 101) {
+                    _filter = value;
+                    if (Parent is Multi multi && multi.Viewer?.SpecificViewer != null) ((MultiViewer)multi.Viewer.SpecificViewer).Set(this, _filter);
+                }
+            }
+        }
+
+        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
             Enabled = Enabled
         };
 
@@ -158,9 +170,13 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Chain(List<Device> init = null, string name = "Chain #") {
+        public Chain(List<Device> init = null, string name = "Chain #", bool[] filter = null) {
             Devices = init?? new List<Device>();
             Name = name;
+
+            if (filter == null || filter.Length != 101) filter = new bool[101];
+            _filter = filter;
+            
             Reroute();
         }
 
@@ -182,15 +198,15 @@ namespace Apollo.Elements {
             _ParentIndex = null;
         }
 
-        public static bool Move(List<Chain> source, Group target, int position, bool copy = false, List<bool[]> multiFilters = null) {
+        public static bool Move(List<Chain> source, Group target, int position, bool copy = false) {
             if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
 
             return (position == -1)
-                ? Move(source, target, copy, multiFilters)
-                : Move(source, target[position], copy, multiFilters);
+                ? Move(source, target, copy)
+                : Move(source, target[position], copy);
         }
 
-        public static bool Move(List<Chain> source, Chain target, bool copy = false, List<bool[]> multiFilters = null) {
+        public static bool Move(List<Chain> source, Chain target, bool copy = false) {
             if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
                 return false;
             
@@ -202,9 +218,6 @@ namespace Apollo.Elements {
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 ((Group)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
-
-                if (multiFilters != null && target.Parent is Multi multi)
-                    multi.SetFilter(target.ParentIndex.Value + i + 1, multiFilters[i].ToArray());
             }
 
             Track track = Track.Get(moved.First());
@@ -216,7 +229,7 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public static bool Move(List<Chain> source, Group target, bool copy = false, List<bool[]> multiFilters = null) {
+        public static bool Move(List<Chain> source, Group target, bool copy = false) {
             if (!copy && target.Count > 0 && source[0] == target[0])
                 return false;
             
@@ -228,9 +241,6 @@ namespace Apollo.Elements {
                 moved.Add(copy? source[i].Clone() : source[i]);
 
                 target.Insert(i, moved.Last());
-
-                if (multiFilters != null && target is Multi multi)
-                    multi.SetFilter(i, multiFilters[i].ToArray());
             }
 
             Track track = Track.Get(moved.First());
