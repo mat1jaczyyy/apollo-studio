@@ -7,7 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 
 using Apollo.Binary;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Helpers {

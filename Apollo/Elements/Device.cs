@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 
 using Apollo.Devices;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;
 

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 
-namespace Apollo.Interfaces {
-    public interface IChainParent: ISelect {}
-
+namespace Apollo.Selection {
     public interface ISelect {
         ISelectViewer IInfo { get; }
 

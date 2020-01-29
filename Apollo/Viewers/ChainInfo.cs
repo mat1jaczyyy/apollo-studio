@@ -13,7 +13,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {

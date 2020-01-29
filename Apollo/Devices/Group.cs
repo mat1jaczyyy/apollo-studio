@@ -4,7 +4,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 
 namespace Apollo.Devices {

@@ -4,11 +4,13 @@ using System.Linq;
 
 using Apollo.Devices;
 using Apollo.DeviceViewers;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
+    public interface IChainParent: ISelect {}
+
     public class Chain: ISelect, ISelectParent {
         public ISelectViewer IInfo {
             get => Info;
