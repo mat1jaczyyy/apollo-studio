@@ -11,6 +11,7 @@ using Avalonia.Media;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Windows;
