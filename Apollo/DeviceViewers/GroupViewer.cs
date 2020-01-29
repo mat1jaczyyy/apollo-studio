@@ -155,7 +155,7 @@ namespace Apollo.DeviceViewers {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"{((this.GetType() == typeof(Multi))? "Multi" : "Group")} Chain {index + 1} Inserted", () => {
+            Program.Project.Undo.Add($"{((_group.GetType() == typeof(Multi))? "Multi" : "Group")} Chain {index + 1} Inserted", () => {
                 Track.TraversePath<Group>(path).Remove(index);
             }, () => {
                 Track.TraversePath<Group>(path).Insert(index, r.Clone());
