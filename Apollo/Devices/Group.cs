@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Interfaces;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent, ISelectParent {
-        public IMultipleChainParentViewer SpecificViewer => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
+        public GroupViewer SpecificViewer => (GroupViewer)Viewer?.SpecificViewer;
 
         public ISelectParentViewer IViewer => (ISelectParentViewer)Viewer?.SpecificViewer;
 

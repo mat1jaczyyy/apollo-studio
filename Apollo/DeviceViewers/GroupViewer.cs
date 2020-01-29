@@ -22,28 +22,28 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
-    public class GroupViewer: UserControl, IMultipleChainParentViewer, ISelectParentViewer {
+    public class GroupViewer: UserControl, ISelectParentViewer {
         public static readonly string DeviceIdentifier = "group";
 
         public int? IExpanded {
             get => _group.Expanded;
         }
 
-        void InitializeComponent() {
+        protected virtual void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
             Contents = this.Get<StackPanel>("Contents").Children;
             ChainAdd = this.Get<VerticalAdd>("ChainAdd");
         }
         
-        Group _group;
-        DeviceViewer _parent;
-        Controls _root;
+        protected Group _group;
+        protected DeviceViewer _parent;
+        protected Controls _root;
 
-        Controls Contents;
-        VerticalAdd ChainAdd;
+        protected Controls Contents;
+        protected VerticalAdd ChainAdd;
 
-        void SetAlwaysShowing() {
+        protected void SetAlwaysShowing() {
             ChainAdd.AlwaysShowing = (Contents.Count == 1);
 
             for (int i = 1; i < Contents.Count; i++)
@@ -95,7 +95,7 @@ namespace Apollo.DeviceViewers {
             if (_group.Expanded != null) Expand_Insert(_group.Expanded.Value);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
 
@@ -104,18 +104,20 @@ namespace Apollo.DeviceViewers {
             _root = null;
         }
 
-        void Expand_Insert(int index) {
-            _root.Insert(1, new ChainViewer(_group[index], true));
-            _root.Insert(2, new DeviceTail(_group, _parent));
+        protected int ExpandBase = 1;
+
+        protected virtual void Expand_Insert(int index) {
+            _root.Insert(ExpandBase, new ChainViewer(_group[index], true));
+            _root.Insert(ExpandBase + 1, new DeviceTail(_group, _parent));
 
             _parent.Border.CornerRadius = new CornerRadius(5, 0, 0, 5);
             _parent.Header.CornerRadius = new CornerRadius(5, 0, 0, 0);
             ((ChainInfo)Contents[index + 1]).Get<TextBlock>("Name").FontWeight = FontWeight.Bold;
         }
 
-        void Expand_Remove() {
-            _root.RemoveAt(2);
-            _root.RemoveAt(1);
+        protected virtual void Expand_Remove() {
+            _root.RemoveAt(ExpandBase + 1);
+            _root.RemoveAt(ExpandBase);
 
             _parent.Border.CornerRadius = new CornerRadius(5);
             _parent.Header.CornerRadius = new CornerRadius(5, 5, 0, 0);
@@ -137,22 +139,25 @@ namespace Apollo.DeviceViewers {
             _group.Expanded = index;
         }
 
-        void Chain_Insert(int index) {
+        protected void Chain_Insert(int index) {
             Chain chain = new Chain();
-            if (Preferences.AutoCreateMacroFilter) chain.Add(new MacroFilter());
-            if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
-            if (Preferences.AutoCreatePattern) chain.Add(new Pattern());
+
+            if (this.GetType() == typeof(Group)) {
+                if (Preferences.AutoCreateMacroFilter) chain.Add(new MacroFilter());
+                if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
+                if (Preferences.AutoCreatePattern) chain.Add(new Pattern());
+            }
 
             Chain_Insert(index, chain);
         }
 
-        void Chain_InsertStart() => Chain_Insert(0);
+        protected void Chain_InsertStart() => Chain_Insert(0);
 
-        void Chain_Insert(int index, Chain chain) {
+        protected void Chain_Insert(int index, Chain chain) {
             Chain r = chain.Clone();
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Group Chain {index + 1} Inserted", () => {
+            Program.Project.Undo.Add($"Group Chain {index + 1} Inserted", () => {   // Multi also uses this
                 Track.TraversePath<Group>(path).Remove(index);
             }, () => {
                 Track.TraversePath<Group>(path).Insert(index, r.Clone());
@@ -163,12 +168,12 @@ namespace Apollo.DeviceViewers {
             _group.Insert(index, chain);
         }
 
-        void Chain_Action(string action) => Chain_Action(action, false);
-        void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
+        protected void Chain_Action(string action) => Chain_Action(action, false);
+        protected void Chain_Action(string action, bool right) => Track.Get(_group)?.Window?.Selection.Action(action, _group, (right? _group.Count : 0) - 1);
 
-        void ContextMenu_Action(string action) => Chain_Action(action, true);
+        protected void ContextMenu_Action(string action) => Chain_Action(action, true);
 
-        void Click(object sender, PointerReleasedEventArgs e) {
+        protected void Click(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.RightButtonReleased)
@@ -177,12 +182,12 @@ namespace Apollo.DeviceViewers {
             e.Handled = true;
         }
 
-        void DragOver(object sender, DragEventArgs e) {
+        protected void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("chain") && !e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
-        void Drop(object sender, DragEventArgs e) {
+        protected void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
             
             IControl source = (IControl)e.Source;
@@ -320,7 +325,7 @@ namespace Apollo.DeviceViewers {
             if (!result) e.DragEffects = DragDropEffects.None;
         }
 
-        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
+        protected bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
             undo = redo = dispose = null;
 
             List<Chain> pasted;
@@ -361,7 +366,7 @@ namespace Apollo.DeviceViewers {
             return true;
         }
 
-        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
+        protected void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
             List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
 
             List<int> path = Track.GetPath(_group);
@@ -404,7 +409,7 @@ namespace Apollo.DeviceViewers {
             Copyable paste = await Copyable.DecodeClipboard();
 
             if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);
+                Program.Project.Undo.Add("Chain Pasted", undo, redo, dispose);   // Multi also uses this
         }
 
         public async void Replace(int left, int right) {
@@ -415,7 +420,7 @@ namespace Apollo.DeviceViewers {
 
                 List<int> path = Track.GetPath(_group);
 
-                Program.Project.Undo.Add("Chain Replaced",
+                Program.Project.Undo.Add("Chain Replaced",   // Multi also uses this
                     undo2 + undo,
                     redo + redo2 + (() => {
                         Group group = Track.TraversePath<Group>(path);
@@ -429,7 +434,7 @@ namespace Apollo.DeviceViewers {
             }
         }
 
-        public void Duplicate(int left, int right) {
+        public void Duplicate(int left, int right) {   // Multi also uses this
             List<int> path = Track.GetPath(_group);
 
             Program.Project.Undo.Add($"Chain Duplicated", () => {
@@ -455,7 +460,7 @@ namespace Apollo.DeviceViewers {
 
         public void Delete(int left, int right) {
             Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
-            Program.Project.Undo.Add($"Chain Removed", undo, redo, dispose);
+            Program.Project.Undo.Add($"Chain Removed", undo, redo, dispose);   // Multi also uses this
         }
 
         public void Group(int left, int right) {}
@@ -469,7 +474,7 @@ namespace Apollo.DeviceViewers {
 
             List<int> path = Track.GetPath(_group);
 
-            Program.Project.Undo.Add($"Chain Muted", () => {
+            Program.Project.Undo.Add($"Chain Muted", () => {      // Multi also uses this
                 Group group = Track.TraversePath<Group>(path);
 
                 for (int i = left; i <= right; i++)
