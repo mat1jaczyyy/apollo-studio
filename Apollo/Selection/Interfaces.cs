@@ -1,27 +1,6 @@
 using System.Collections.Generic;
 
-using Apollo.Elements;
-
-namespace Apollo.Interfaces {
-    public interface IChainParent: ISelect {}
-
-    public interface IMultipleChainParent: IChainParent {
-        IMultipleChainParentViewer SpecificViewer { get; }
-
-        Chain this[int index] { get; }
-        int Count { get; }
-
-        int? Expanded { get; }
-
-        void Insert(int index, Chain chain = null);
-        void Remove(int index, bool dispose = true);
-    }
-
-    public interface IMultipleChainParentViewer: ISelectParentViewer {
-        void Contents_Insert(int index, Chain chain);
-        void Contents_Remove(int index);
-    }
-
+namespace Apollo.Selection {
     public interface ISelect {
         ISelectViewer IInfo { get; }
 

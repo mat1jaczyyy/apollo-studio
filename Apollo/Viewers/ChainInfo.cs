@@ -8,12 +8,12 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
@@ -139,12 +139,12 @@ namespace Apollo.Viewers {
             }
         }
 
-        public void DragOver(object sender, DragEventArgs e) {
+        void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             if (!e.Data.Contains("chain") && !e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
         }
 
-        public void Drop(object sender, DragEventArgs e) {
+        void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
             IControl source = (IControl)e.Source;
@@ -157,7 +157,7 @@ namespace Apollo.Viewers {
                 }
             }
 
-            IMultipleChainParent _device = (IMultipleChainParent)_chain.Parent;
+            Group _device = (Group)_chain.Parent;
             
             int after = _chain.ParentIndex.Value;
             if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
@@ -176,7 +176,7 @@ namespace Apollo.Viewers {
             if (e.Data.Contains("chain")) {
                 List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
-                IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
+                Group source_parent = (Group)moving[0].Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
 
@@ -193,22 +193,22 @@ namespace Apollo.Viewers {
                     
                     Program.Project.Undo.Add($"Chain {(copy? "Copied" : "Moved")}", copy
                         ? new Action(() => {
-                            IMultipleChainParent targetdevice = Track.TraversePath<IMultipleChainParent>(targetpath);
+                            Group targetdevice = Track.TraversePath<Group>(targetpath);
 
                             for (int i = after + count; i > after; i--)
                                 targetdevice.Remove(i);
 
                         }) : new Action(() => {
-                            IMultipleChainParent sourcedevice = Track.TraversePath<IMultipleChainParent>(sourcepath);
-                            IMultipleChainParent targetdevice = Track.TraversePath<IMultipleChainParent>(targetpath);
+                            Group sourcedevice = Track.TraversePath<Group>(sourcepath);
+                            Group targetdevice = Track.TraversePath<Group>(targetpath);
 
                             List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
 
                             Chain.Move(umoving, sourcedevice, before_pos);
 
                     }), () => {
-                        IMultipleChainParent sourcedevice = Track.TraversePath<IMultipleChainParent>(sourcepath);
-                        IMultipleChainParent targetdevice = Track.TraversePath<IMultipleChainParent>(targetpath);
+                        Group sourcedevice = Track.TraversePath<Group>(sourcepath);
+                        Group targetdevice = Track.TraversePath<Group>(targetpath);
 
                         List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
 
@@ -227,12 +227,12 @@ namespace Apollo.Viewers {
                 int? remove = null;
 
                 if (source.Name == "DropZone") {
-                    if (((IMultipleChainParent)_chain.Parent).Expanded != _chain.ParentIndex)
-                        ((IMultipleChainParent)_chain.Parent).SpecificViewer.Expand(_chain.ParentIndex);
+                    if (((Group)_chain.Parent).Expanded != _chain.ParentIndex)
+                        ((Group)_chain.Parent).SpecificViewer.Expand(_chain.ParentIndex);
                 
                 } else {
-                    ((IMultipleChainParent)_chain.Parent).Insert((remove = _chain.ParentIndex + 1).Value);
-                    target_chain = ((IMultipleChainParent)_chain.Parent)[_chain.ParentIndex.Value + 1];
+                    ((Group)_chain.Parent).Insert((remove = _chain.ParentIndex + 1).Value);
+                    target_chain = ((Group)_chain.Parent)[_chain.ParentIndex.Value + 1];
                 }
 
                 if (result = Device.Move(moving, target_chain, after = target_chain.Count - 1, copy)) {
@@ -254,7 +254,7 @@ namespace Apollo.Viewers {
                                 targetchain.Remove(i);
                             
                             if (remove != null)
-                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+                                ((Group)targetchain.Parent).Remove(remove.Value);
 
                         }) : new Action(() => {
                             Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
@@ -265,14 +265,14 @@ namespace Apollo.Viewers {
                             Device.Move(umoving, sourcechain, before_pos);
 
                             if (remove != null)
-                                ((IMultipleChainParent)targetchain.Parent).Remove(remove.Value);
+                                ((Group)targetchain.Parent).Remove(remove.Value);
 
                     }), () => {
                         Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
                         Chain targetchain;
 
                         if (remove != null) {
-                            IMultipleChainParent target = Track.TraversePath<IMultipleChainParent>(targetpath.Skip(1).ToList());
+                            Group target = Track.TraversePath<Group>(targetpath.Skip(1).ToList());
                             target.Insert(remove.Value);
                             targetchain = target[remove.Value];
                         
@@ -283,7 +283,7 @@ namespace Apollo.Viewers {
                         Device.Move(rmoving, targetchain, after, copy);
                     });
 
-                } else if (remove != null) ((IMultipleChainParent)_chain.Parent).Remove(remove.Value);
+                } else if (remove != null) ((Group)_chain.Parent).Remove(remove.Value);
 
             } else return;
 
@@ -304,7 +304,7 @@ namespace Apollo.Viewers {
 
             Input_Ignore = true;
             for (int i = Input_Left; i <= Input_Right; i++)
-                ((IMultipleChainParent)_chain.Parent)[i].Name = text;
+                ((Group)_chain.Parent)[i].Name = text;
             Input_Ignore = false;
         }
 
@@ -314,7 +314,7 @@ namespace Apollo.Viewers {
 
             Input_Clean = new List<string>();
             for (int i = left; i <= right; i++)
-                Input_Clean.Add(((IMultipleChainParent)_chain.Parent)[i].Name);
+                Input_Clean.Add(((Group)_chain.Parent)[i].Name);
 
             Input.Text = _chain.Name;
             Input.SelectionStart = 0;
@@ -342,7 +342,7 @@ namespace Apollo.Viewers {
 
                 Program.Project.Undo.Add($"Chain Renamed to {Input.Text}", () => {
                     Chain chain = Track.TraversePath<Chain>(path);
-                    IMultipleChainParent parent = (IMultipleChainParent)chain.Parent;
+                    Group parent = (Group)chain.Parent;
 
                     for (int i = left; i <= right; i++)
                         parent[i].Name = u[i - left];
@@ -354,7 +354,7 @@ namespace Apollo.Viewers {
                     
                 }, () => {
                     Chain chain = Track.TraversePath<Chain>(path);
-                    IMultipleChainParent parent = (IMultipleChainParent)chain.Parent;
+                    Group parent = (Group)chain.Parent;
 
                     for (int i = left; i <= right; i++)
                         parent[i].Name = r[i - left];

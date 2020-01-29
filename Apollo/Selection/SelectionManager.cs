@@ -5,9 +5,8 @@ using System.Linq;
 using Avalonia.Input;
 
 using Apollo.Core;
-using Apollo.Interfaces;
 
-namespace Apollo.Helpers {
+namespace Apollo.Selection {
     public class SelectionManager {
         public ISelect Start { get; private set; } = null;
         public ISelect End { get; private set; } = null;

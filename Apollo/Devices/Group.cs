@@ -2,27 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    public class Group: Device, IMultipleChainParent, ISelectParent {
-        public IMultipleChainParentViewer SpecificViewer {
-            get => (IMultipleChainParentViewer)Viewer?.SpecificViewer;
-        }
+    public class Group: Device, IChainParent, ISelectParent {
+        public GroupViewer SpecificViewer => (GroupViewer)Viewer?.SpecificViewer;
 
-        public ISelectParentViewer IViewer {
-            get => (ISelectParentViewer)Viewer?.SpecificViewer;
-        }
+        public ISelectParentViewer IViewer => (ISelectParentViewer)Viewer?.SpecificViewer;
 
-        public List<ISelect> IChildren {
-            get => Chains.Select(i => (ISelect)i).ToList();
-        }
+        public List<ISelect> IChildren => Chains.Select(i => (ISelect)i).ToList();
 
-        public bool IRoot {
-            get => false;
-        }
+        public bool IRoot => false;
 
         Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
@@ -34,8 +27,7 @@ namespace Apollo.Devices {
         }
 
         public List<Chain> Chains = new List<Chain>();
-
-        void Reroute() {
+        protected virtual void Reroute() {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;
                 Chains[i].ParentIndex = i;
@@ -43,18 +35,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public Chain this[int index] {
-            get => Chains[index];
-        }
-
-        public int Count {
-            get => Chains.Count;
-        }
-
-        public override Device Clone() => new Group((from i in Chains select i.Clone()).ToList(), Expanded) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        public Chain this[int index] => Chains[index];
+        public int Count => Chains.Count;
 
         public void Insert(int index, Chain chain = null) {
             Chains.Insert(index, chain?? new Chain());
@@ -81,7 +63,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        int? _expanded;
+        protected int? _expanded;
         public int? Expanded {
             get => _expanded;
             set {
@@ -90,14 +72,19 @@ namespace Apollo.Devices {
             }
         }
 
-        public Group(List<Chain> init = null, int? expanded = null): base("group") {
+        public override Device Clone() => new Group((from i in Chains select i.Clone()).ToList(), Expanded) {
+            Collapsed = Collapsed,
+            Enabled = Enabled
+        };
+
+        public Group(List<Chain> init = null, int? expanded = null, string identifier = "group"): base(identifier) {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
             Expanded = expanded;
 
             Reroute();
         }
 
-        void ChainExit(Signal n) => InvokeExit(n);
+        protected void ChainExit(Signal n) => InvokeExit(n);
 
         public override void MIDIProcess(Signal n) {
             if (Chains.Count == 0) ChainExit(n);
@@ -105,7 +92,7 @@ namespace Apollo.Devices {
             foreach (Chain chain in Chains)
                 chain.MIDIEnter(n.Clone());
         }
-
+        
         protected override void Stop() {
             foreach (Chain chain in Chains) chain.MIDIEnter(new StopSignal());
         }

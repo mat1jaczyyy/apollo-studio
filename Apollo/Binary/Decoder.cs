@@ -10,7 +10,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Windows;
 
