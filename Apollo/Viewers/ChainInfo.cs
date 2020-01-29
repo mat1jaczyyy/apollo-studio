@@ -12,7 +12,6 @@ using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
-using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Interfaces;
 using Apollo.Windows;
@@ -121,11 +120,7 @@ namespace Apollo.Viewers {
             if (!selected) Select(e);
 
             DataObject dragData = new DataObject();
-            List<Chain> chains = Track.Get(_chain)?.Window?.Selection.Selection.OfType<Chain>().ToList();
-            dragData.Set("chain", chains);
-
-            if (_chain.Parent is Multi multi)
-                dragData.Set("filters", chains.Select(i => multi.GetFilter(multi.Chains.IndexOf(i)).ToArray()).ToList());
+            dragData.Set("chain", Track.Get(_chain)?.Window?.Selection.Selection);
 
             App.Dragging = true;
             DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
@@ -179,17 +174,13 @@ namespace Apollo.Viewers {
             bool result;
 
             if (e.Data.Contains("chain")) {
-                List<Chain> moving = (List<Chain>)e.Data.Get("chain");
-
-                List<bool[]> movingfilters = e.Data.Contains("filters")
-                    ? (List<bool[]>)e.Data.Get("filters")
-                    : null;
+                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
 
                 IMultipleChainParent source_parent = (IMultipleChainParent)moving[0].Parent;
 
                 int before = moving[0].IParentIndex.Value - 1;
 
-                if (result = Chain.Move(moving, _device, after, copy, movingfilters)) {
+                if (result = Chain.Move(moving, _device, after, copy)) {
                     int before_pos = before;
                     int after_pos = moving[0].IParentIndex.Value - 1;
                     int count = moving.Count;
@@ -213,7 +204,7 @@ namespace Apollo.Viewers {
 
                             List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
 
-                            Chain.Move(umoving, sourcedevice, before_pos, multiFilters: movingfilters);
+                            Chain.Move(umoving, sourcedevice, before_pos);
 
                     }), () => {
                         IMultipleChainParent sourcedevice = Track.TraversePath<IMultipleChainParent>(sourcepath);
@@ -221,7 +212,7 @@ namespace Apollo.Viewers {
 
                         List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
 
-                        Chain.Move(rmoving, targetdevice, after, copy, movingfilters);
+                        Chain.Move(rmoving, targetdevice, after, copy);
                     });
                 }
 
