@@ -483,8 +483,10 @@ namespace Apollo.Elements {
         byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
 
         void HandleNote(byte key, byte vel) {
-            if (Type == LaunchpadType.X && InputFormat == InputType.DrumRack && 108 <= key && key <= 116)
-                key -= 80;
+            if (IsGenerationX && InputFormat == InputType.DrumRack) {
+                if (108 <= key && key <= 115) key -= 80;
+                else if (key == 116) key = 27;
+            }
 
             HandleMessage(new Signal(
                 InputFormat,
