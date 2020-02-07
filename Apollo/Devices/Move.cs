@@ -108,11 +108,11 @@ namespace Apollo.Devices {
             }
         }
 
-        public class OffsetSwitchedUndoEntry: SimpleIndexUndoEntry<Move, bool> {
-            protected override void Action(Move item, int index, bool element) => item.Offset.IsAbsolute = element;
+        public class OffsetSwitchedUndoEntry: SimpleUndoEntry<Move, bool> {
+            protected override void Action(Move item, bool element) => item.Offset.IsAbsolute = element;
             
-            public OffsetSwitchedUndoEntry(Move move, int index, bool u, bool r)
-            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, index, u, r) {}
+            public OffsetSwitchedUndoEntry(Move move, bool u, bool r)
+            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, u, r) {}
         }
         
         public class GridModeUndoEntry: SimpleUndoEntry<Move, GridType> {
