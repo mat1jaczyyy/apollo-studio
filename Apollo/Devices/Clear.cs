@@ -33,7 +33,7 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: SimpleUndoEntry<Clear, ClearType> {
+        public class ModeUndoEntry: SimplePathUndoEntry<Clear, ClearType> {
             protected override void Action(Clear item, ClearType element) => item.Mode = element;
             
             public ModeUndoEntry(Clear clear, ClearType u, ClearType r)

@@ -61,14 +61,14 @@ namespace Apollo.Devices {
                 InvokeExit(n);
         }
         
-        public class TargetUndoEntry: SimpleUndoEntry<MacroFilter, int> {
+        public class TargetUndoEntry: SimplePathUndoEntry<MacroFilter, int> {
             protected override void Action(MacroFilter item, int element) => item.Macro = element;
             
             public TargetUndoEntry(MacroFilter filter, int u, int r)
             : base($"Macro Filter Target Changed to {r}%", filter, u, r) {}
         }
         
-        public class FilterUndoEntry: SimpleUndoEntry<MacroFilter, bool[]> {
+        public class FilterUndoEntry: SimplePathUndoEntry<MacroFilter, bool[]> {
             protected override void Action(MacroFilter item, bool[] element) => item.Filter = element.ToArray();
             
             public FilterUndoEntry(MacroFilter filter, bool[] u)

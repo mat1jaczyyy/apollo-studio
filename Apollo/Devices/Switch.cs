@@ -47,14 +47,14 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class TargetUndoEntry: SimpleUndoEntry<Switch, int> {
+        public class TargetUndoEntry: SimplePathUndoEntry<Switch, int> {
             protected override void Action(Switch item, int element) => item.Target = element;
             
             public TargetUndoEntry(Switch macroswitch, int u, int r)
             : base($"Switch Target Changed to {r}", macroswitch, u, r) {}
         }
         
-        public class ValueUndoEntry: SimpleUndoEntry<Switch, int> {
+        public class ValueUndoEntry: SimplePathUndoEntry<Switch, int> {
             protected override void Action(Switch item, int element) => item.Value = element;
             
             public ValueUndoEntry(Switch macroswitch, int u, int r)

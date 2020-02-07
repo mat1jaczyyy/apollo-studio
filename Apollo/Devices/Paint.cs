@@ -29,7 +29,7 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ColorUndoEntry: SimpleUndoEntry<Paint, Color> {
+        public class ColorUndoEntry: SimplePathUndoEntry<Paint, Color> {
             protected override void Action(Paint item, Color element) => item.Color = element.Clone();
             
             public ColorUndoEntry(Paint paint, Color u, Color r)

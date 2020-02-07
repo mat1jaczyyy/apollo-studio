@@ -52,14 +52,14 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: SimpleUndoEntry<Rotate, RotateType> {
+        public class ModeUndoEntry: SimplePathUndoEntry<Rotate, RotateType> {
             protected override void Action(Rotate item, RotateType element) => item.Mode = element;
             
             public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r)
             : base($"Rotate Angle Changed to {r.ToString().Substring(1)}°", rotate, u, r) {}
         }
         
-        public class BypassUndoEntry: SimpleUndoEntry<Rotate, bool> {
+        public class BypassUndoEntry: SimplePathUndoEntry<Rotate, bool> {
             protected override void Action(Rotate item, bool element) => item.Bypass = element;
             
             public BypassUndoEntry(Rotate rotate, bool u, bool r)

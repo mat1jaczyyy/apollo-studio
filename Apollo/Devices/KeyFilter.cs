@@ -42,7 +42,7 @@ namespace Apollo.Devices {
                 InvokeExit(n);
         }
         
-        public class ChangedUndoEntry: SimpleUndoEntry<KeyFilter, bool[]> {
+        public class ChangedUndoEntry: SimplePathUndoEntry<KeyFilter, bool[]> {
             protected override void Action(KeyFilter item, bool[] element) => item.Filter = element.ToArray();
             
             public ChangedUndoEntry(KeyFilter filter, bool[] u)

@@ -126,14 +126,14 @@ namespace Apollo.Devices {
             base.Dispose();
         }
         
-        public class ModeUndoEntry: SimpleUndoEntry<Multi, MultiType> {
+        public class ModeUndoEntry: SimplePathUndoEntry<Multi, MultiType> {
             protected override void Action(Multi item, MultiType element) => item.Mode = element;
             
             public ModeUndoEntry(Multi multi, MultiType u, MultiType r)
             : base($"Multi Direction Changed to {r.ToString().Replace("Plus", "+")}", multi, u, r) {}
         }
         
-        public class FilterChangedUndoEntry: SimpleIndexUndoEntry<Multi, bool[]> {
+        public class FilterChangedUndoEntry: SimpleIndexPathUndoEntry<Multi, bool[]> {
             protected override void Action(Multi item, int index, bool[] element) => item[index].SecretMultiFilter = element.ToArray();
             
             public FilterChangedUndoEntry(Multi multi, int index, bool[] u)

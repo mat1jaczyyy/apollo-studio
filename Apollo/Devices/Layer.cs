@@ -59,21 +59,21 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class TargetUndoEntry: SimpleUndoEntry<Layer, int> {
+        public class TargetUndoEntry: SimplePathUndoEntry<Layer, int> {
             protected override void Action(Layer item, int element) => item.Target = element;
             
             public TargetUndoEntry(Layer layer, int u, int r)
             : base($"Layer Target Changed to {r}", layer, u, r) {}
         }
         
-        public class ModeUndoEntry: SimpleUndoEntry<Layer, BlendingType> {
+        public class ModeUndoEntry: SimplePathUndoEntry<Layer, BlendingType> {
             protected override void Action(Layer item, BlendingType element) => item.BlendingMode = element;
             
             public ModeUndoEntry(Layer layer, BlendingType u, BlendingType r)
             : base($"Layer Blending Changed to {r}", layer, u, r) {}
         }
         
-        public class RangeUndoEntry: SimpleUndoEntry<Layer, int> {
+        public class RangeUndoEntry: SimplePathUndoEntry<Layer, int> {
             protected override void Action(Layer item, int element) => item.Range = element;
             
             public RangeUndoEntry(Layer layer, int u, int r)

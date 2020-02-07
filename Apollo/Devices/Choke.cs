@@ -111,7 +111,7 @@ namespace Apollo.Devices {
         
         void SetTarget(int target) => Target = target;
         
-        public class TargetUndoEntry: SimpleUndoEntry<Choke, int> {
+        public class TargetUndoEntry: SimplePathUndoEntry<Choke, int> {
             protected override void Action(Choke item, int element) => item.SetTarget(element);
 
             public TargetUndoEntry(Choke choke, int u, int r)

@@ -115,28 +115,28 @@ namespace Apollo.Devices {
             base.Dispose();
         }
         
-        public class DurationUndoEntry: SimpleUndoEntry<Delay, int> {
+        public class DurationUndoEntry: SimplePathUndoEntry<Delay, int> {
             protected override void Action(Delay item, int element) => item.Time.Free = element;
             
             public DurationUndoEntry(Delay delay, int u, int r)
             : base($"Delay Duration Changed to {r}ms", delay, u, r) {}
         }
         
-        public class DurationModeUndoEntry: SimpleUndoEntry<Delay, bool> {
+        public class DurationModeUndoEntry: SimplePathUndoEntry<Delay, bool> {
             protected override void Action(Delay item, bool element) => item.Time.Mode = element;
             
             public DurationModeUndoEntry(Delay delay, bool u, bool r)
             : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay, u, r) {}
         }
         
-        public class DurationStepUndoEntry: SimpleUndoEntry<Delay, int> {
+        public class DurationStepUndoEntry: SimplePathUndoEntry<Delay, int> {
             protected override void Action(Delay item, int element) => item.Time.Length.Step = element;
             
             public DurationStepUndoEntry(Delay delay, int u, int r)
             : base($"Delay Duration Changed to {Length.Steps[r]}", delay, u, r) {}
         }
         
-        public class GateUndoEntry: SimpleUndoEntry<Delay, double> {
+        public class GateUndoEntry: SimplePathUndoEntry<Delay, double> {
             protected override void Action(Delay item, double element) => item.Gate = element;
             
             public GateUndoEntry(Delay delay, double u, double r)

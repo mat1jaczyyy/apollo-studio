@@ -36,7 +36,7 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class MacroUndoEntry: SimpleIndexUndoEntry<Refresh, bool> {
+        public class MacroUndoEntry: SimpleIndexPathUndoEntry<Refresh, bool> {
             protected override void Action(Refresh item, int index, bool element) => item.SetMacro(index, element);
             
             public MacroUndoEntry(Refresh refresh, int index, bool u, bool r)

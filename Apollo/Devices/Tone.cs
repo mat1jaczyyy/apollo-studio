@@ -91,35 +91,35 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class HueUndoEntry: SimpleUndoEntry<Tone, double> {
+        public class HueUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.Hue = element;
             
             public HueUndoEntry(Tone tone, double u, double r)
             : base($"Tone Hue Changed to {r}°", tone, u, r) {}
         }
         
-        public class SatHighUndoEntry: SimpleUndoEntry<Tone, double> {
+        public class SatHighUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.SaturationHigh = element;
             
             public SatHighUndoEntry(Tone tone, double u, double r)
             : base($"Tone Sat Hi Changed to {r}%", tone, u, r) {}
         }
         
-        public class SatLowUndoEntry: SimpleUndoEntry<Tone, double> {
+        public class SatLowUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.SaturationLow = element;
             
             public SatLowUndoEntry(Tone tone, double u, double r)
             : base($"Tone Sat Lo Changed to {r}%", tone, u, r) {}
         }
         
-        public class ValueHighUndoEntry: SimpleUndoEntry<Tone, double> {
+        public class ValueHighUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.ValueHigh = element;
             
             public ValueHighUndoEntry(Tone tone, double u, double r)
             : base($"Tone Value Hi Changed to {r}%", tone, u, r) {}
         }
         
-        public class ValueLowUndoEntry: SimpleUndoEntry<Tone, double> {
+        public class ValueLowUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.ValueLow = element;
             
             public ValueLowUndoEntry(Tone tone, double u, double r)

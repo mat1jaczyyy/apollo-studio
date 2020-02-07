@@ -46,14 +46,14 @@ namespace Apollo.Devices {
                 InvokeExit(n);
         }
         
-        public class TargetUndoEntry: SimpleUndoEntry<LayerFilter, int> {
+        public class TargetUndoEntry: SimplePathUndoEntry<LayerFilter, int> {
             protected override void Action(LayerFilter item, int element) => item.Target = element;
             
             public TargetUndoEntry(LayerFilter filter, int u, int r)
             : base($"Layer Filter Target Changed to {r}", filter, u, r) {}
         }
         
-        public class RangeUndoEntry: SimpleUndoEntry<LayerFilter, int> {
+        public class RangeUndoEntry: SimplePathUndoEntry<LayerFilter, int> {
             protected override void Action(LayerFilter item, int element) => item.Range = element;
             
             public RangeUndoEntry(LayerFilter filter, int u, int r)
