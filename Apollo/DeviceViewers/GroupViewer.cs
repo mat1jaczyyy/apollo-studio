@@ -152,18 +152,11 @@ namespace Apollo.DeviceViewers {
         protected void Chain_InsertStart() => Chain_Insert(0);
 
         protected void Chain_Insert(int index, Chain chain) {
-            Chain r = chain.Clone();
-            List<int> path = Track.GetPath(_group);
-
-            Program.Project.Undo.Add($"{((_group.GetType() == typeof(Multi))? "Multi" : "Group")} Chain {index + 1} Inserted", () => {
-                Track.TraversePath<Group>(path).Remove(index);
-            }, () => {
-                Track.TraversePath<Group>(path).Insert(index, r.Clone());
-            }, () => {
-                r.Dispose();
-            });
-
-            _group.Insert(index, chain);
+            Program.Project.Undo.AddAndExecute(new Group.ChainInsertedUndoEntry(
+                _group,
+                index,
+                chain
+            ));
         }
 
         protected void Chain_Action(string action) => Chain_Action(action, false);

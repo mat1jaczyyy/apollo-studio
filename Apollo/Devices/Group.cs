@@ -6,6 +6,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent, ISelectParent {
@@ -102,6 +103,22 @@ namespace Apollo.Devices {
 
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
+        }
+                
+        public class ChainInsertedUndoEntry: PathUndoEntry<Group> {
+            int index;
+            Chain chain;
+
+            protected override void UndoPath(params Group[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Group[] items) => items[0].Insert(index, chain.Clone());
+            
+            protected override void DisposePath(params Group[] items) => chain.Dispose();
+            
+            public ChainInsertedUndoEntry(Group group, int index, Chain chain)
+            : base($"{group.Name} Chain {index + 1} Inserted", group) {
+                this.index = index;
+                this.chain = chain.Clone();
+            }
         }
     }
 }
