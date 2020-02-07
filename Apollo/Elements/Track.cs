@@ -5,6 +5,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
 using Apollo.Windows;
 
@@ -239,6 +240,47 @@ namespace Apollo.Elements {
             Program.Project.Window.Selection.Select(moved.Last(), true);
             
             return true;
+        }
+
+        public class LaunchpadChangedUndoEntry: UndoEntry {
+            int index;
+            Launchpad u, r;
+
+            void Action(Launchpad element) => Program.Project[index].Launchpad = element;
+
+            public override void Undo() => Action(u);
+            public override void Redo() => Action(r);
+
+            public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
+            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}") {
+                this.index = track.ParentIndex.Value;
+                this.u = u;
+                this.r = r;
+            }
+        }
+
+        public class RenamedUndoEntry: UndoEntry {
+            int left, right;
+            List<string> u, r;
+
+            void Action(List<string> element) {
+                for (int i = left; i <= right; i++)
+                    Program.Project[i].Name = element[i - left];
+                
+                Program.Project.Window?.Selection.Select(Program.Project[left]);
+                Program.Project.Window?.Selection.Select(Program.Project[right], true);
+            }
+
+            public override void Undo() => Action(u);
+            public override void Redo() => Action(r);
+            
+            public RenamedUndoEntry(int left, int right, List<string> u, List<string> r)
+            : base($"Track Renamed to {r[0]}") {
+                this.left = left;
+                this.right = right;
+                this.u = u.ToList();
+                this.r = r.ToList();
+            }
         }
     }
 }

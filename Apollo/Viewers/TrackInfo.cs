@@ -226,19 +226,12 @@ namespace Apollo.Viewers {
         void Port_Changed(object sender, SelectionChangedEventArgs e) {
             Launchpad selected = (Launchpad)PortSelector.SelectedItem;
 
-            if (selected != null && _track.Launchpad != selected) {
-                Launchpad u = _track.Launchpad;
-                Launchpad r = selected;
-                int path = _track.ParentIndex.Value;
-
-                Program.Project.Undo.Add($"{_track.ProcessedName} Launchpad Changed to {selected.Name}", () => {
-                    Program.Project[path].Launchpad = u;
-                }, () => {
-                    Program.Project[path].Launchpad = r;
-                });
-
-                _track.Launchpad = selected;
-            }
+            if (selected != null && _track.Launchpad != selected)
+                Program.Project.Undo.AddAndExecute(new Track.LaunchpadChangedUndoEntry(
+                    _track,
+                    _track.Launchpad,
+                    selected
+                ));
         }
 
         int Input_Left, Input_Right;
@@ -280,29 +273,16 @@ namespace Apollo.Viewers {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
+            
+            List<string> newName = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
 
-            List<string> r = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
-
-            if (!r.SequenceEqual(Input_Clean)) {
-                int left = Input_Left;
-                int right = Input_Right;
-                List<string> u = (from i in Input_Clean select i).ToList();
-
-                Program.Project.Undo.Add($"Track Renamed to {Input.Text}", () => {
-                    for (int i = left; i <= right; i++)
-                        Program.Project[i].Name = u[i - left];
-
-                    Program.Project.Window?.Selection.Select(Program.Project[left]);
-                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
-                    
-                }, () => {
-                    for (int i = left; i <= right; i++)
-                        Program.Project[i].Name = r[i - left];
-                    
-                    Program.Project.Window?.Selection.Select(Program.Project[left]);
-                    Program.Project.Window?.Selection.Select(Program.Project[right], true);
-                });
-            }
+            if (!newName.SequenceEqual(Input_Clean))
+                Program.Project.Undo.Add(new Track.RenamedUndoEntry(
+                    Input_Left,
+                    Input_Right,
+                    Input_Clean,
+                    newName
+                ));
         }
 
         public void SetName(string name) {
