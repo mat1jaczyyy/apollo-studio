@@ -55,11 +55,10 @@ namespace Apollo.DeviceViewers {
 
         void PadFinished(int index) {
             if (old == null) return;
-            
-            Program.Project.Undo.AddAndExecute(new KeyFilter.ChangedUndoEntry(
+
+            Program.Project.Undo.Add(new KeyFilter.ChangedUndoEntry(
                 _filter, 
-                old.ToArray(), 
-                _filter.Filter.ToArray()
+                old.ToArray()
             ));
 
             old = null;

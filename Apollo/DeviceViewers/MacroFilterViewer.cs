@@ -89,10 +89,9 @@ namespace Apollo.DeviceViewers {
                 MouseMove(sender, e);
 
                 if (old != null) {
-                    Program.Project.Undo.AddAndExecute(new MacroFilter.FilterUndoEntry(
+                    Program.Project.Undo.Add(new MacroFilter.FilterUndoEntry(
                         _filter, 
-                        old.ToArray(), 
-                        _filter.Filter.ToArray()
+                        old.ToArray()
                     ));
 
                     old = null;

@@ -45,8 +45,8 @@ namespace Apollo.Devices {
         public class ChangedUndoEntry: SimpleUndoEntry<KeyFilter, bool[]> {
             protected override void Action(KeyFilter item, bool[] element) => item.Filter = element.ToArray();
             
-            public ChangedUndoEntry(KeyFilter filter, bool[] u, bool[] r)
-            : base($"KeyFilter Changed", filter, u, r) {}
+            public ChangedUndoEntry(KeyFilter filter, bool[] u)
+            : base($"Key Filter Changed", filter, u.ToArray(), filter.Filter.ToArray()) {}
         }
     }
 }

@@ -7,6 +7,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Multi: Group {
@@ -123,6 +124,20 @@ namespace Apollo.Devices {
             Preprocess.Dispose();
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
+        }
+        
+        public class ModeUndoEntry: SimpleUndoEntry<Multi, MultiType> {
+            protected override void Action(Multi item, MultiType element) => item.Mode = element;
+            
+            public ModeUndoEntry(Multi multi, MultiType u, MultiType r)
+            : base($"Multi Direction Changed to {r.ToString().Replace("Plus", "+")}", multi, u, r) {}
+        }
+        
+        public class FilterChangedUndoEntry: SimpleIndexUndoEntry<Multi, bool[]> {
+            protected override void Action(Multi item, int index, bool[] element) => item[index].SecretMultiFilter = element.ToArray();
+            
+            public FilterChangedUndoEntry(Multi multi, int index, bool[] u)
+            : base($"Multi Chain {index} Filter Changed", multi, index, u.ToArray(), multi[index].SecretMultiFilter.ToArray()) {}
         }
     }
 }
