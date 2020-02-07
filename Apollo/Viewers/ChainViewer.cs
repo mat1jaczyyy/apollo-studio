@@ -105,18 +105,11 @@ namespace Apollo.Viewers {
         void Device_InsertStart(Type device) => Device_Insert(0, device);
 
         void Device_Insert(int index, Device device) {
-            Device r = device.Clone();
-            List<int> path = Track.GetPath(_chain);
-
-            Program.Project.Undo.Add($"Device ({r.GetType().ToString().Split(".").Last()}) Inserted", () => {
-                Track.TraversePath<Chain>(path).Remove(index);
-            }, () => {
-                Track.TraversePath<Chain>(path).Insert(index, r.Clone());
-            }, () => {
-                r.Dispose();
-            });
-            
-            _chain.Insert(index, device);
+            Program.Project.Undo.AddAndExecute(new Chain.DeviceInsertedUndoEntry(
+                _chain,
+                index,
+                device
+            ));
         }
 
         void Device_Collapsed(int index) {

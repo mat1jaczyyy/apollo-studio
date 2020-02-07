@@ -331,40 +331,17 @@ namespace Apollo.Viewers {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
+            
+            List<string> newName = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
 
-            List<string> r = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
-
-            if (!r.SequenceEqual(Input_Clean)) {
-                int left = Input_Left;
-                int right = Input_Right;
-                List<string> u = (from i in Input_Clean select i).ToList();
-                List<int> path = Track.GetPath(_chain);
-
-                Program.Project.Undo.Add($"Chain Renamed to {Input.Text}", () => {
-                    Chain chain = Track.TraversePath<Chain>(path);
-                    Group parent = (Group)chain.Parent;
-
-                    for (int i = left; i <= right; i++)
-                        parent[i].Name = u[i - left];
-                    
-                    TrackWindow window = Track.Get(chain)?.Window;
-
-                    window?.Selection.Select(parent[left]);
-                    window?.Selection.Select(parent[right], true);
-                    
-                }, () => {
-                    Chain chain = Track.TraversePath<Chain>(path);
-                    Group parent = (Group)chain.Parent;
-
-                    for (int i = left; i <= right; i++)
-                        parent[i].Name = r[i - left];
-                    
-                    TrackWindow window = Track.Get(chain)?.Window;
-
-                    window?.Selection.Select(parent[left]);
-                    window?.Selection.Select(parent[right], true);
-                });
-            }
+            if (!newName.SequenceEqual(Input_Clean))
+                Program.Project.Undo.Add(new Chain.RenamedUndoEntry(
+                    (Group)_chain.Parent,
+                    Input_Left,
+                    Input_Right,
+                    Input_Clean,
+                    newName
+                ));
         }
 
         public void SetName(string name) {

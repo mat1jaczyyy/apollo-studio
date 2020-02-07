@@ -6,7 +6,9 @@ using Apollo.Devices;
 using Apollo.DeviceViewers;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}
@@ -252,6 +254,48 @@ namespace Apollo.Elements {
             target.SpecificViewer.Expand(moved.Last().ParentIndex);
             
             return true;
+        }
+                
+        public class DeviceInsertedUndoEntry: PathUndoEntry<Chain> {
+            int index;
+            Device device;
+
+            protected override void UndoPath(params Chain[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone());
+            
+            protected override void DisposePath(params Chain[] items) => device.Dispose();
+            
+            public DeviceInsertedUndoEntry(Chain chain, int index, Device device)
+            : base($"Device ({device.Name}) Inserted", chain) {
+                this.index = index;
+                this.device = device.Clone();
+            }
+        }
+
+        public class RenamedUndoEntry: PathUndoEntry<Group> {
+            int left, right;
+            List<string> u, r;
+
+            void Action(Group item, List<string> element) {
+                for (int i = left; i <= right; i++)
+                    item[i].Name = element[i - left];
+                
+                TrackWindow window = Track.Get(item)?.Window;
+
+                window?.Selection.Select(item[left]);
+                window?.Selection.Select(item[right], true);
+            }
+
+            protected override void UndoPath(params Group[] item) => Action(item[0], u);
+            protected override void RedoPath(params Group[] item) => Action(item[0], r);
+            
+            public RenamedUndoEntry(Group group, int left, int right, List<string> u, List<string> r)
+            : base($"Chain Renamed to {r[0]}", group) {
+                this.left = left;
+                this.right = right;
+                this.u = u.ToList();
+                this.r = r.ToList();
+            }
         }
     }
 }
