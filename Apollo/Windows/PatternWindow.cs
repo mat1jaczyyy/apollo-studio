@@ -201,7 +201,7 @@ namespace Apollo.Windows {
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
-            viewer.FrameRemoved += Frame_Remove;
+            viewer.FrameRemoved += i => Delete(i, i);
             viewer.FrameSelected += Frame_Select;
             frame.Info = viewer;
 
@@ -399,25 +399,6 @@ namespace Apollo.Windows {
         }
 
         void Frame_InsertStart() => Frame_Insert(0);
-
-        void Frame_Remove(int index) {
-            if (Locked) return;
-
-            if (_pattern.Count == 1) return;
-
-            Frame u = _pattern[index].Clone();
-            List<int> path = Track.GetPath(_pattern);
-
-            Program.Project.Undo.Add($"Pattern Frame {index + 1} Removed", () => {
-                Track.TraversePath<Pattern>(path).Insert(index, u.Clone());
-            }, () => {
-                Track.TraversePath<Pattern>(path).Remove(index);
-            }, () => {
-                u.Dispose();
-            });
-
-            _pattern.Remove(index);
-        }
 
         public bool Draw = true;
 
@@ -631,7 +612,7 @@ namespace Apollo.Windows {
                 Frame_Insert(_pattern.Expanded + 1);
                 
             else if (x == -1 && y == -1) // Down-Left
-                Frame_Remove(_pattern.Expanded);
+                Delete(_pattern.Expanded, _pattern.Expanded);
         }
 
         public void MIDIEnter(Signal n) {
