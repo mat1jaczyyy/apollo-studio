@@ -149,6 +149,9 @@ namespace Apollo.Binary {
             
             writer.Write(o.Name);
             writer.Write(o.Enabled);
+
+            for (int i = 0; i < 101; i++)
+                writer.Write(o.SecretMultiFilter[i]);
         }
 
         static void Encode(BinaryWriter writer, Device o) {
@@ -326,10 +329,6 @@ namespace Apollo.Binary {
             writer.Write(o.Count);
             for (int i = 0; i < o.Count; i++)
                 Encode(writer, o[i]);
-
-            for (int i = 0; i < o.Count; i++)
-                for (int j = 0; j < 101; j++)
-                    writer.Write(o.GetFilter(i)[j]);
             
             writer.Write(o.Expanded.HasValue);
             if (o.Expanded.HasValue)

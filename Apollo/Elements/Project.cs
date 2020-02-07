@@ -11,7 +11,7 @@ using Avalonia.Input;
 using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Enums;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Undo;
 using Apollo.Windows;
 

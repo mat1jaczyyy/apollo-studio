@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Elements;
-using Apollo.Interfaces;
+using Apollo.Selection;
 
 namespace Apollo.Undo {
     public abstract class PathUndoEntry<T>: UndoEntry where T: ISelect {

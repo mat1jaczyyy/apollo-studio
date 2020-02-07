@@ -3,7 +3,7 @@ using System.Linq;
 
 using Apollo.Components;
 using Apollo.Devices;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Undo;
 
 namespace Apollo.Structures {

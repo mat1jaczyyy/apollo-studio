@@ -1,4 +1,4 @@
-using Apollo.Interfaces;
+using Apollo.Selection;
 
 namespace Apollo.Undo {
     public abstract class SimpleUndoEntry<T, I>: PathUndoEntry<T> where T: ISelect {

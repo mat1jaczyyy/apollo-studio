@@ -21,7 +21,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Helpers;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
