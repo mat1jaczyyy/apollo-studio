@@ -282,5 +282,51 @@ namespace Apollo.Elements {
 
             TimeSpent.Stop();
         }
+        
+        public class TrackInsertedUndoEntry: UndoEntry {
+            int index;
+            Track track;
+
+            public override void Undo() => Program.Project.Remove(index);
+            public override void Redo() => Program.Project.Insert(index, track.Clone());
+
+            public override void Dispose() => track.Dispose();
+            
+            public TrackInsertedUndoEntry(int index, Track track)
+            : base($"Track {index + 1} Inserted") {
+                this.index = index;
+                this.track = track.Clone();
+            }
+        }
+
+        public class BPMChangedUndoEntry: UndoEntry {
+            int u, r;
+
+            void Action(int element) => Program.Project.BPM = element;
+
+            public override void Undo() => Action(u);
+            public override void Redo() => Action(r);
+
+            public BPMChangedUndoEntry(int u, int r)
+            : base($"BPM Changed to {r}") {
+                this.u = u;
+                this.r = r;
+            }
+        }
+
+        public class AuthorChangedUndoEntry: UndoEntry {
+            string u, r;
+
+            void Action(string element) => Program.Project.Author = element;
+
+            public override void Undo() => Action(u);
+            public override void Redo() => Action(r);
+
+            public AuthorChangedUndoEntry(string u, string r)
+            : base($"Author Changed to {r}") {
+                this.u = u;
+                this.r = r;
+            }
+        }
     }
 }

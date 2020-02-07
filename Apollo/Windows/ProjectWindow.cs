@@ -205,17 +205,10 @@ namespace Apollo.Windows {
         void Track_InsertStart() => Track_Insert(0);
 
         void Track_Insert(int index, Track track) {
-            Track r = track.Clone();
-
-            Program.Project.Undo.Add($"Track {index + 1} Inserted", () => {
-                Program.Project.Remove(index);
-            }, () => {
-                Program.Project.Insert(index, r.Clone());
-            }, () => {
-                r.Dispose();
-            });
-            
-            Program.Project.Insert(index, track);
+            Program.Project.Undo.AddAndExecute(new Project.TrackInsertedUndoEntry(
+                index,
+                track
+            ));
         }
 
         async void HandleKey(object sender, KeyEventArgs e) {
@@ -315,17 +308,12 @@ namespace Apollo.Windows {
         }
 
         void BPM_Unfocus(object sender, RoutedEventArgs e) {
-            if (BPM_Clean != Program.Project.BPM) {
-                int u = BPM_Clean;
-                int r = BPM_Clean = Program.Project.BPM;
-
-                Program.Project.Undo.Add($"BPM Changed to {r}", () => {
-                    Program.Project.BPM = u;
-                }, () => {
-                    Program.Project.BPM = r;
-                });
-            }
-
+            if (BPM_Clean != Program.Project.BPM)
+                Program.Project.Undo.AddAndExecute(new Project.BPMChangedUndoEntry(
+                    BPM_Clean,
+                    BPM_Clean = Program.Project.BPM
+                ));
+                
             BPM_Dirty = false;
         }
 
@@ -358,16 +346,11 @@ namespace Apollo.Windows {
         }
 
         void Author_Unfocus(object sender, RoutedEventArgs e) {
-            if (Author_Clean != Program.Project.Author) {
-                string u = Author_Clean;
-                string r = Author_Clean = Program.Project.Author;
-
-                Program.Project.Undo.Add($"Author Changed to {r}", () => {
-                    Program.Project.Author = u;
-                }, () => {
-                    Program.Project.Author = r;
-                });
-            }
+            if (Author_Clean != Program.Project.Author)
+                Program.Project.Undo.AddAndExecute(new Project.AuthorChangedUndoEntry(
+                    Author_Clean,
+                    Author_Clean = Program.Project.Author
+                ));
 
             Author_Dirty = false;
         }

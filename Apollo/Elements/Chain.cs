@@ -255,7 +255,7 @@ namespace Apollo.Elements {
             
             return true;
         }
-                
+        
         public class DeviceInsertedUndoEntry: PathUndoEntry<Chain> {
             int index;
             Device device;
