@@ -242,44 +242,28 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public class LaunchpadChangedUndoEntry: UndoEntry {
-            int index;
-            Launchpad u, r;
-
-            void Action(Launchpad element) => Program.Project[index].Launchpad = element;
-
-            public override void Undo() => Action(u);
-            public override void Redo() => Action(r);
+        public class LaunchpadChangedUndoEntry: SimpleIndexUndoEntry<Launchpad> {
+            protected override void Action(int index, Launchpad element) => Program.Project[index].Launchpad = element;
 
             public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
-            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}") {
-                this.index = track.ParentIndex.Value;
-                this.u = u;
-                this.r = r;
-            }
+            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
         }
 
-        public class RenamedUndoEntry: UndoEntry {
+        public class RenamedUndoEntry: SimpleUndoEntry<List<string>> {
             int left, right;
-            List<string> u, r;
 
-            void Action(List<string> element) {
+            protected override void Action(List<string> element) {
                 for (int i = left; i <= right; i++)
                     Program.Project[i].Name = element[i - left];
                 
                 Program.Project.Window?.Selection.Select(Program.Project[left]);
                 Program.Project.Window?.Selection.Select(Program.Project[right], true);
             }
-
-            public override void Undo() => Action(u);
-            public override void Redo() => Action(r);
             
             public RenamedUndoEntry(int left, int right, List<string> u, List<string> r)
-            : base($"Track Renamed to {r[0]}") {
+            : base($"Track Renamed to {r[0]}", u, r) {
                 this.left = left;
                 this.right = right;
-                this.u = u.ToList();
-                this.r = r.ToList();
             }
         }
     }

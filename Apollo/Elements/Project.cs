@@ -299,34 +299,18 @@ namespace Apollo.Elements {
             }
         }
 
-        public class BPMChangedUndoEntry: UndoEntry {
-            int u, r;
-
-            void Action(int element) => Program.Project.BPM = element;
-
-            public override void Undo() => Action(u);
-            public override void Redo() => Action(r);
+        public class BPMChangedUndoEntry: SimpleUndoEntry<int> {
+            protected override void Action(int element) => Program.Project.BPM = element;
 
             public BPMChangedUndoEntry(int u, int r)
-            : base($"BPM Changed to {r}") {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"BPM Changed to {r}", u, r) {}
         }
 
-        public class AuthorChangedUndoEntry: UndoEntry {
-            string u, r;
-
-            void Action(string element) => Program.Project.Author = element;
-
-            public override void Undo() => Action(u);
-            public override void Redo() => Action(r);
+        public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
+            protected override void Action(string element) => Program.Project.Author = element;
 
             public AuthorChangedUndoEntry(string u, string r)
-            : base($"Author Changed to {r}") {
-                this.u = u;
-                this.r = r;
-            }
+            : base($"Author Changed to {r}", u, r) {}
         }
     }
 }

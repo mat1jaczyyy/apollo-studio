@@ -272,11 +272,10 @@ namespace Apollo.Elements {
             }
         }
 
-        public class RenamedUndoEntry: PathUndoEntry<Group> {
+        public class RenamedUndoEntry: SimplePathUndoEntry<Group, List<string>> {
             int left, right;
-            List<string> u, r;
 
-            void Action(Group item, List<string> element) {
+            protected override void Action(Group item, List<string> element) {
                 for (int i = left; i <= right; i++)
                     item[i].Name = element[i - left];
                 
@@ -285,16 +284,11 @@ namespace Apollo.Elements {
                 window?.Selection.Select(item[left]);
                 window?.Selection.Select(item[right], true);
             }
-
-            protected override void UndoPath(params Group[] item) => Action(item[0], u);
-            protected override void RedoPath(params Group[] item) => Action(item[0], r);
             
             public RenamedUndoEntry(Group group, int left, int right, List<string> u, List<string> r)
-            : base($"Chain Renamed to {r[0]}", group) {
+            : base($"Chain Renamed to {r[0]}", group, u.ToList(), r.ToList()) {
                 this.left = left;
                 this.right = right;
-                this.u = u.ToList();
-                this.r = r.ToList();
             }
         }
     }
