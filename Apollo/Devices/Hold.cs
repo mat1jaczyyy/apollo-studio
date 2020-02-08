@@ -197,7 +197,7 @@ namespace Apollo.Devices {
             protected override void Action(Hold item, double element) => item.Gate = element;
             
             public GateUndoEntry(Hold hold, double u, double r)
-            : base($"Hold Gate Changed to {r}%", hold, u, r) {}
+            : base($"Hold Gate Changed to {r}%", hold, u / 100, r / 100) {}
         }
         
         public class InfiniteUndoEntry: SimplePathUndoEntry<Hold, bool> {

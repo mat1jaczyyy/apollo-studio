@@ -476,7 +476,7 @@ namespace Apollo.Devices {
             protected override void Action(Fade item, double element) => item.Gate = element;
             
             public GateUndoEntry(Fade fade, double u, double r)
-            : base($"Fade Gate Changed to {r}%", fade, u, r) {}
+            : base($"Fade Gate Changed to {r}%", fade, u / 100, r / 100) {}
         }
         
         public class PlaybackModeUndoEntry: SimplePathUndoEntry<Fade, FadePlaybackType> {

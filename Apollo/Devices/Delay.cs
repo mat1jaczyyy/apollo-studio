@@ -140,7 +140,7 @@ namespace Apollo.Devices {
             protected override void Action(Delay item, double element) => item.Gate = element;
             
             public GateUndoEntry(Delay delay, double u, double r)
-            : base($"Delay Gate Changed to {r}%", delay, u, r) {}
+            : base($"Delay Gate Changed to {r}%", delay, u / 100, r / 100) {}
         }
     }
 }

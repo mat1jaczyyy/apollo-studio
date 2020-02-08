@@ -87,8 +87,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Hold.GateUndoEntry(
                     _hold, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 

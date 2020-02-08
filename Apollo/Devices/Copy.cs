@@ -565,7 +565,7 @@ namespace Apollo.Devices {
             protected override void Action(Copy item, double element) => item.Gate = element;
             
             public GateUndoEntry(Copy copy, double u, double r)
-            : base($"Copy Gate Changed to {r}%", copy, u, r) {}
+            : base($"Copy Gate Changed to {r}%", copy, u / 100, r / 100) {}
         }
         
         public class CopyModeUndoEntry: SimplePathUndoEntry<Copy, CopyType> {

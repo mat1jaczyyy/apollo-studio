@@ -209,7 +209,7 @@ namespace Apollo.Devices {
             protected override void Action(Loop item, double element) => item.Gate = element;
             
             public GateUndoEntry(Loop loop, double u, double r)
-            : base($"Loop Gate Changed to {r}%", loop, u, r) {}
+            : base($"Loop Gate Changed to {r}%", loop, u / 100, r / 100) {}
         }
         
         public class RepeatsUndoEntry: SimplePathUndoEntry<Loop, int> {
