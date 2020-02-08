@@ -8,6 +8,7 @@ using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Devices {
@@ -410,6 +411,189 @@ namespace Apollo.Devices {
 
             foreach (Frame frame in Frames) frame.Dispose();
             base.Dispose();
+        }
+        
+        public class FrameInsertedUndoEntry: PathUndoEntry<Pattern> {
+            int index;
+            Frame frame;
+
+            protected override void UndoPath(params Pattern[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Pattern[] items) => items[0].Insert(index, frame.Clone());
+            
+            protected override void DisposePath(params Pattern[] items) => frame.Dispose();
+            
+            public FrameInsertedUndoEntry(Pattern pattern, int index, Frame frame)
+            : base($"Pattern Frame {index + 1} Inserted", pattern) {
+                this.index = index;
+                this.frame = frame.Clone();
+            }
+        }
+        
+        public class FrameChangedUndoEntry: SimpleIndexPathUndoEntry<Pattern, Color[]> {
+            static Color[] Clone(Color[] arr) => (from i in arr select i.Clone()).ToArray();
+
+            protected override void Action(Pattern item, int index, Color[] element) => item[index].Screen = Clone(element);
+            
+            public FrameChangedUndoEntry(Pattern pattern, int index, Color[] u)
+            : base($"Pattern Frame {index + 1} Changed", pattern, index, Clone(u), Clone(pattern[index].Screen)) {}
+        }
+        
+        public class InfiniteUndoEntry: SimplePathUndoEntry<Pattern, bool> {
+            protected override void Action(Pattern item, bool element) => item.Infinite = element;
+            
+            public InfiniteUndoEntry(Pattern pattern, bool u, bool r)
+            : base($"Pattern Infinite Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
+        }
+        
+        public abstract class DurationUndoEntry<I>: PathUndoEntry<Pattern> {
+            int left;
+            List<Time> u;
+            I r;
+
+            protected abstract void SetValue(Time item, I element);
+
+            protected override void UndoPath(params Pattern[] items) {
+                for (int i = 0; i < u.Count; i++)
+                    items[0][left + i].Time = u[i].Clone();
+            }
+
+            protected override void RedoPath(params Pattern[] items) {
+                for (int i = 0; i < u.Count; i++) {
+                    SetValue(items[0][left + i].Time, r);
+                }
+            }
+            
+            protected override void DisposePath(params Pattern[] items) {
+                foreach (Time time in u) time.Dispose();
+                u = null;
+            }
+            
+            public DurationUndoEntry(string desc, Pattern pattern, int left, List<Time> u, I r)
+            : base(desc, pattern) {
+                this.left = left;
+                this.u = (from i in u select i.Clone()).ToList();
+                this.r = r;
+            }
+        }
+
+        public class DurationValueUndoEntry: DurationUndoEntry<int> {
+            protected override void SetValue(Time item, int element) {
+                item.Free = element;
+                item.Mode = false;
+            }
+
+            public DurationValueUndoEntry(Pattern pattern, int left, List<Time> u, int r)
+            : base($"Pattern Frame {pattern.Expanded + 1} Duration Changed to {r}ms", pattern, left, u, r) {}
+        }
+
+        public class DurationStepUndoEntry: DurationUndoEntry<int> {
+            protected override void SetValue(Time item, int element) {
+                item.Free = element;
+                item.Mode = true;
+            }
+
+            public DurationStepUndoEntry(Pattern pattern, int left, List<Time> u, int r)
+            : base($"Pattern Frame {pattern.Expanded + 1} Duration Changed to {Length.Steps[r]}", pattern, left, u, r) {}
+        }
+
+        public class DurationModeUndoEntry: DurationUndoEntry<bool> {
+            protected override void SetValue(Time item, bool element) => item.Mode = element;
+
+            public DurationModeUndoEntry(Pattern pattern, int left, List<Time> u, bool r)
+            : base($"Pattern Frame {pattern.Expanded + 1} Duration Switched to {(r? "Steps" : "Free")}", pattern, left, u, r) {}
+        }
+        
+        public class FrameReversedUndoEntry: SymmetricPathUndoEntry<Pattern> {
+            int index, left, right;
+
+            protected override void Action(Pattern item) {
+                if (item.Window != null) item.Window.Draw = false;
+
+                for (int i = left; i < right; i++) {
+                    Frame frame = item[right];
+                    item.Remove(right);
+                    item.Insert(i, frame);
+                }
+
+                if (item.Window != null) {
+                    item.Window.Draw = true;
+
+                    item.Window.Frame_Select(index);
+                    item.Window.Selection.Select(item[left]);
+                    item.Window.Selection.Select(item[right], true);
+                }
+            }
+            
+            public FrameReversedUndoEntry(Pattern pattern, int index, int left, int right)
+            : base($"Pattern Frames Reversed", pattern) {
+                this.index = index;
+                this.left = left;
+                this.right = right;
+            }
+        }
+        
+        public class FrameInvertedUndoEntry: SymmetricPathUndoEntry<Pattern> {
+            int left, right;
+
+            protected override void Action(Pattern item) {
+                for (int i = left; i <= right; i++)
+                    item[i].Invert();
+            }
+            
+            public FrameInvertedUndoEntry(Pattern pattern, int left, int right)
+            : base($"Pattern Frames Inverted", pattern) {
+                this.left = left;
+                this.right = right;
+            }
+        }
+        
+        public class PlaybackModeUndoEntry: SimplePathUndoEntry<Pattern, PlaybackType> {
+            protected override void Action(Pattern item, PlaybackType element) => item.Mode = element;
+            
+            public PlaybackModeUndoEntry(Pattern pattern, PlaybackType u, PlaybackType r)
+            : base($"Pattern Playback Mode Changed to {r}", pattern, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Pattern, double> {
+            protected override void Action(Pattern item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Pattern pattern, double u, double r)
+            : base($"Pattern Gate Changed to {r}%", pattern, u / 100, r / 100) {}
+        }
+        
+        public class RepeatsUndoEntry: SimplePathUndoEntry<Pattern, int> {
+            protected override void Action(Pattern item, int element) => item.Repeats = element;
+            
+            public RepeatsUndoEntry(Pattern pattern, int u, int r)
+            : base($"Pattern Repeats Changed to {r}", pattern, u, r) {}
+        }
+        
+        public class PinchUndoEntry: SimplePathUndoEntry<Pattern, double> {
+            protected override void Action(Pattern item, double element) => item.Pinch = element;
+            
+            public PinchUndoEntry(Pattern pattern, double u, double r)
+            : base($"Pattern Pinch Changed to {r}", pattern, u, r) {}
+        }
+        
+        public class BilateralUndoEntry: SimplePathUndoEntry<Pattern, bool> {
+            protected override void Action(Pattern item, bool element) => item.Bilateral = element;
+            
+            public BilateralUndoEntry(Pattern pattern, bool u, bool r)
+            : base($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
+        }
+        
+        public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, int?> {
+            protected override void Action(Pattern item, int? element) => item.RootKey = element;
+            
+            public RootKeyUndoEntry(Pattern pattern, int? u, int? r)
+            : base($"Pattern Root Key Changed", pattern, u, r) {}
+        }
+        
+        public class WrapUndoEntry: SimplePathUndoEntry<Pattern, bool> {
+            protected override void Action(Pattern item, bool element) => item.Wrap = element;
+            
+            public WrapUndoEntry(Pattern pattern, bool u, bool r)
+            : base($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
         }
     }
 }
