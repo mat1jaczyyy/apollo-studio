@@ -1037,13 +1037,19 @@ namespace Apollo.Windows {
             else PatternPlay(Play, start);
         }
 
-        static void ImportFrames(Pattern pattern, int repeats, double gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
-            pattern.Repeats = repeats;
-            pattern.Gate = gate;
-            pattern.Frames = frames;
-            pattern.Mode = mode;
-            pattern.Infinite = infinite;
-            pattern.RootKey = root;
+        static void ImportFrames(Pattern pattern, Pattern importing) {
+            importing = (Pattern)importing.Clone();
+            
+            pattern.Repeats = importing.Repeats;
+            pattern.Gate = importing.Gate;
+            pattern.Pinch = importing.Pinch;
+            pattern.Bilateral = importing.Bilateral;
+            pattern.Frames = importing.Frames;
+            pattern.Mode = importing.Mode;
+            pattern.Infinite = importing.Infinite;
+            pattern.RootKey = importing.RootKey;
+            pattern.Wrap = importing.Wrap;
+            pattern.Expanded = importing.Expanded;
 
             while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
             pattern.Expanded = 0;
@@ -1069,33 +1075,22 @@ namespace Apollo.Windows {
                 return;
             }
 
-            int ur = _pattern.Repeats;
-            double ug = _pattern.Gate;
-            List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
-            PlaybackType um = _pattern.Mode;
-            bool ui = _pattern.Infinite;
-            int? uo = _pattern.RootKey;
-
-            int rr = 1;
-            double rg = 1;
-            List<Frame> rf = frames.Select(i => i.Clone()).ToList();
-            PlaybackType rm = PlaybackType.Mono;
-            bool ri = false;
-            int? ro = null;
+            Pattern u = (Pattern)_pattern.Clone();
+            Pattern r = new Pattern(frames: frames.Select(i => i.Clone()).ToList());
 
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
+                ImportFrames(Track.TraversePath<Pattern>(path), u);
             }, () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
+                ImportFrames(Track.TraversePath<Pattern>(path), r);
             }, () => {
-                foreach (Frame frame in uf) frame.Dispose();
-                foreach (Frame frame in rf) frame.Dispose();
-                uf = rf = null;
+                u.Dispose();
+                r.Dispose();
+                u = r = null;
             });
 
-            ImportFrames(_pattern, 1, 1, frames, PlaybackType.Mono, false, null);
+            ImportFrames(_pattern, r);
         }
 
         async void ImportDialog(object sender, RoutedEventArgs e) {
