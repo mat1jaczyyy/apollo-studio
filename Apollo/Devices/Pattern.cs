@@ -31,8 +31,13 @@ namespace Apollo.Devices {
         public List<Frame> Frames {
             get => _frames;
             set {
-                _frames = value;
-                Reroute();
+                if (value != null && value.Count != 0) {
+                    _frames = value;
+
+                    Window?.RecreateFrames();
+
+                    Reroute();
+                }
             }
         }
 
@@ -594,6 +599,29 @@ namespace Apollo.Devices {
             
             public WrapUndoEntry(Pattern pattern, bool u, bool r)
             : base($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
+        }
+        
+        public class ImportUndoEntry: SimplePathUndoEntry<Pattern, Pattern> {
+            protected override void Action(Pattern item, Pattern element) {
+                item.Repeats = element.Repeats;
+                item.Gate = element.Gate;
+                item.Pinch = element.Pinch;
+                item.Bilateral = element.Bilateral;
+                item.Frames = (from i in element.Frames select i.Clone()).ToList();
+                item.Mode = element.Mode;
+                item.Infinite = element.Infinite;
+                item.RootKey = element.RootKey;
+                item.Wrap = element.Wrap;
+                item.Expanded = element.Expanded;
+            }
+
+            protected override void Dispose(Pattern item, Pattern undo, Pattern redo) {
+                undo.Dispose();
+                redo.Dispose();
+            }
+            
+            public ImportUndoEntry(Pattern pattern, string filename, Pattern r)
+            : base($"Pattern File Imported from {filename}", pattern, (Pattern)pattern.Clone(), r) {}
         }
     }
 }

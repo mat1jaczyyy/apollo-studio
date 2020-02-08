@@ -1037,30 +1037,17 @@ namespace Apollo.Windows {
             else PatternPlay(Play, start);
         }
 
-        static void ImportFrames(Pattern pattern, Pattern importing) {
-            importing = (Pattern)importing.Clone();
-            
-            pattern.Repeats = importing.Repeats;
-            pattern.Gate = importing.Gate;
-            pattern.Pinch = importing.Pinch;
-            pattern.Bilateral = importing.Bilateral;
-            pattern.Frames = importing.Frames;
-            pattern.Mode = importing.Mode;
-            pattern.Infinite = importing.Infinite;
-            pattern.RootKey = importing.RootKey;
-            pattern.Wrap = importing.Wrap;
-            pattern.Expanded = importing.Expanded;
+        public void RecreateFrames() {
+            while (Contents.Count > 1) Contents.RemoveAt(1);
+            _pattern.Expanded = 0;
 
-            while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
-            pattern.Expanded = 0;
+            for (int i = 0; i < _pattern.Count; i++)
+                Contents_Insert(i, _pattern[i], true);
 
-            for (int i = 0; i < pattern.Count; i++)
-                pattern.Window?.Contents_Insert(i, pattern[i], true);
+            if (_pattern.Count == 1) ((FrameDisplay)_pattern.Window?.Contents[1]).Remove.Opacity = 0;
 
-            if (pattern.Count == 1) ((FrameDisplay)pattern.Window?.Contents[1]).Remove.Opacity = 0;
-
-            pattern.Window?.Frame_Select(0);
-            pattern.Window?.Selection.Select(pattern[0]);
+            Frame_Select(0);
+            Selection.Select(_pattern[0]);
         }
 
         async void ImportFile(string filepath) {
@@ -1075,22 +1062,11 @@ namespace Apollo.Windows {
                 return;
             }
 
-            Pattern u = (Pattern)_pattern.Clone();
-            Pattern r = new Pattern(frames: frames.Select(i => i.Clone()).ToList());
-
-            List<int> path = Track.GetPath(_pattern);
-
-            Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), u);
-            }, () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), r);
-            }, () => {
-                u.Dispose();
-                r.Dispose();
-                u = r = null;
-            });
-
-            ImportFrames(_pattern, r);
+            Program.Project.Undo.AddAndExecute(new Pattern.ImportUndoEntry(
+                _pattern,
+                Path.GetFileNameWithoutExtension(filepath),
+                new Pattern(frames: frames.Select(i => i.Clone()).ToList())
+            ));
         }
 
         async void ImportDialog(object sender, RoutedEventArgs e) {
