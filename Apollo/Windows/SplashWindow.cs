@@ -155,7 +155,7 @@ namespace Apollo.Windows {
 
         async void CheckUpdate() {
             if (await Github.ShouldUpdate()) {
-                while (App.Windows.Where(i => i.GetType() == typeof(MessageWindow)).FirstOrDefault() is MessageWindow window)
+                while (App.Windows.OfType<MessageWindow>().Where(i => !i.Completed.Task.IsCompleted).FirstOrDefault() is MessageWindow window)
                     await window.Completed.Task;
                 
                 Dispatcher.UIThread.Post(async () => {
