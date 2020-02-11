@@ -262,7 +262,7 @@ namespace Apollo.Elements {
                         if (response.Data[8] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 289) // Old Firmware
+                        if (versionInt < 351) // Old Firmware
                             XFirmwareOld.Set();
 
                         return LaunchpadType.X;
@@ -271,7 +271,7 @@ namespace Apollo.Elements {
                         if (response.Data[8] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 341) // Old Firmware
+                        if (versionInt < 407) // Old Firmware
                             MiniMK3FirmwareOld.Set();
 
                         return LaunchpadType.MiniMK3;
