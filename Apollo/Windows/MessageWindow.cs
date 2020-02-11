@@ -15,6 +15,8 @@ namespace Apollo.Windows {
     public class MessageWindow: Window {
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+        Button Default;
+
         public TaskCompletionSource<string> Completed = new TaskCompletionSource<string>();
         
         void UpdateTopmost(bool value) => Topmost = value;
@@ -33,14 +35,15 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             this.Get<TextBlock>("Message").Text = message;
-
+            
             StackPanel Buttons = this.Get<StackPanel>("Buttons");
 
-            foreach (string option in options?? new string[] {"OK"}) {
-                Button button = new Button() { Content = option };
-                button.Click += Complete;
-                Buttons.Children.Add(button);
-            }
+            Default = (options?? new string[] {"OK"}).Select(i => {
+                Button btn = new Button() { Content = i };
+                btn.Click += Complete;
+                Buttons.Children.Add(btn);
+                return btn;
+            }).ToList().Last();  // ToList required otherwise Last will only resolve Select on the last item
         }
 
         void Loaded(object sender, EventArgs e) {
@@ -52,6 +55,9 @@ namespace Apollo.Windows {
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
+            if (!Completed.Task.IsCompleted)
+                Completed.SetResult((string)Default.Content);
+
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
             if (App.Windows.Count(i => i is MessageWindow) <= 1)
