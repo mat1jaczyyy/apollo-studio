@@ -1,6 +1,7 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Core.App">
+             x:Class="Apollo.Core.App"
+             Name="Apollo Studio">
 
   <Application.Resources>
     <FontFamily x:Key="Font">/Resources/#Open Sans</FontFamily>
@@ -74,4 +75,8 @@
       </Setter>
     </Style>
   </Application.Styles>
+  
+  <NativeMenu.Menu>
+    <NativeMenu />
+  </NativeMenu.Menu>  
 </Application>
