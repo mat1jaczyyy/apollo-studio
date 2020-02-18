@@ -166,12 +166,12 @@ namespace Apollo.Windows {
         }
 
         void Update() {
-            foreach (Window window in App.Windows)
-                if (window.GetType() != typeof(MessageWindow))
-                    window.Close();
-            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
             else UpdateWindow.Create(this);
+
+            foreach (Window window in App.Windows)
+                if (window.GetType() != typeof(MessageWindow) && window.GetType() != typeof(UpdateWindow))
+                    window.Close();
         }
 
         void TabChanged(int tab) {
