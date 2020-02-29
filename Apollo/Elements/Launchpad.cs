@@ -108,8 +108,10 @@ namespace Apollo.Elements {
             "version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using the Novation\n" +
             "Components app to avoid any potential issues with Apollo Studio.",
-            "Launch Components Online (requires Chrome)",
-            "https://circuit-librarian-staging.herokuapp.com/launchpad-pro-mk3/firmware"
+            new PortWarning.Option(
+                "Launch Components Online",
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+            )
         );
 
         public static void DisplayWarnings(Window sender) {
