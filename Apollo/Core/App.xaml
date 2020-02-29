@@ -1,6 +1,7 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Core.App">
+             x:Class="Apollo.Core.App"
+             Name="Apollo Studio">
 
   <Application.Resources>
     <FontFamily x:Key="Font">/Resources/#Open Sans</FontFamily>
@@ -65,5 +66,17 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Height" Value="1" />
     </Style>
+    
+    <Style Selector="StackPanel.collapseAnimation">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
   </Application.Styles>
+  
+  <NativeMenu.Menu>
+    <NativeMenu />
+  </NativeMenu.Menu>  
 </Application>

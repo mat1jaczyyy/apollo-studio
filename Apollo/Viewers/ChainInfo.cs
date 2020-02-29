@@ -170,7 +170,7 @@ namespace Apollo.Viewers {
                 return;
             }
 
-            bool copy = e.Modifiers.HasFlag(App.ControlInput);
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
             bool result;
 
             if (e.Data.Contains("chain")) {
@@ -204,7 +204,7 @@ namespace Apollo.Viewers {
 
                             List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
 
-                            Chain.Move(umoving, sourcedevice, before_pos, copy);
+                            Chain.Move(umoving, sourcedevice, before_pos);
 
                     }), () => {
                         IMultipleChainParent sourcedevice = Track.TraversePath<IMultipleChainParent>(sourcepath);
@@ -212,7 +212,7 @@ namespace Apollo.Viewers {
 
                         List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
 
-                        Chain.Move(rmoving, targetdevice, after);
+                        Chain.Move(rmoving, targetdevice, after, copy);
                     });
                 }
 

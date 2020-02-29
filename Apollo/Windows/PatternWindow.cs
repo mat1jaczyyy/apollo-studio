@@ -49,8 +49,7 @@ namespace Apollo.Windows {
             Gate = this.Get<Dial>("Gate");
             Repeats = this.Get<Dial>("Repeats");
 
-            Pinch = this.Get<Dial>("Pinch");
-            Bilateral = this.Get<CheckBox>("Bilateral");
+            Pinch = this.Get<PinchDial>("Pinch");
 
             PlaybackMode = this.Get<ComboBox>("PlaybackMode");
             Infinite = this.Get<CheckBox>("Infinite");
@@ -67,6 +66,9 @@ namespace Apollo.Windows {
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
+
+            BottomLeftPane = this.Get<StackPanel>("BottomLeftPane");
+            CollapseButton = this.Get<CollapseButton>("CollapseButton");
         }
 
         HashSet<IDisposable> observables = new HashSet<IDisposable>();
@@ -104,7 +106,7 @@ namespace Apollo.Windows {
         }
 
         TextBlock TitleText, TitleCenter;
-        StackPanel CenteringLeft, CenteringRight;
+        StackPanel CenteringLeft, CenteringRight, BottomLeftPane;
         UndoButton UndoButton;
         RedoButton RedoButton;
         ScrollViewer FrameList;
@@ -113,9 +115,11 @@ namespace Apollo.Windows {
         Controls Contents;
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
-        Dial Duration, Gate, Repeats, Pinch;
+        Dial Duration, Gate, Repeats;
+        PinchDial Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
-        CheckBox Wrap, Infinite, Bilateral;
+        CheckBox Wrap, Infinite;
+        CollapseButton CollapseButton;
 
         int origin = -1;
         int gesturePoint = -1;
@@ -197,7 +201,7 @@ namespace Apollo.Windows {
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
-            viewer.FrameRemoved += Frame_Remove;
+            viewer.FrameRemoved += i => Delete(i, i);
             viewer.FrameSelected += Frame_Select;
             frame.Info = viewer;
 
@@ -246,11 +250,15 @@ namespace Apollo.Windows {
 
             Repeats.RawValue = _pattern.Repeats;
             Gate.RawValue = _pattern.Gate * 100;
+
             Pinch.RawValue = _pattern.Pinch;
+            Pinch.IsBilateral = _pattern.Bilateral;
 
             PlaybackMode.SelectedIndex = (int)_pattern.Mode;
 
             Infinite.IsChecked = _pattern.Infinite;
+
+            CollapseButton.Showing = true;
 
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
             this.AddHandler(DragDrop.DropEvent, Drop);
@@ -391,25 +399,6 @@ namespace Apollo.Windows {
         }
 
         void Frame_InsertStart() => Frame_Insert(0);
-
-        void Frame_Remove(int index) {
-            if (Locked) return;
-
-            if (_pattern.Count == 1) return;
-
-            Frame u = _pattern[index].Clone();
-            List<int> path = Track.GetPath(_pattern);
-
-            Program.Project.Undo.Add($"Pattern Frame {index + 1} Removed", () => {
-                Track.TraversePath<Pattern>(path).Insert(index, u.Clone());
-            }, () => {
-                Track.TraversePath<Pattern>(path).Remove(index);
-            }, () => {
-                u.Dispose();
-            });
-
-            _pattern.Remove(index);
-        }
 
         public bool Draw = true;
 
@@ -623,7 +612,7 @@ namespace Apollo.Windows {
                 Frame_Insert(_pattern.Expanded + 1);
                 
             else if (x == -1 && y == -1) // Down-Left
-                Frame_Remove(_pattern.Expanded);
+                Delete(_pattern.Expanded, _pattern.Expanded);
         }
 
         public void MIDIEnter(Signal n) {
@@ -999,15 +988,13 @@ namespace Apollo.Windows {
 
         public void SetPinch(double pinch) => Pinch.RawValue = pinch;
 
-        void Bilateral_Changed(object sender, RoutedEventArgs e) {
-            bool value = Bilateral.IsChecked.Value;
-
-            if (_pattern.Bilateral != value) {
+        void Bilateral_Changed(bool value, bool? old) {
+            if (old != null && old != value) {
                 bool u = _pattern.Bilateral;
                 bool r = value;
                 List<int> path = Track.GetPath(_pattern);
 
-                Program.Project.Undo.Add($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
+                Program.Project.Undo.Add($"Pattern Pinch Bilateral Changed to {(r? "Enabled" : "Disabled")}", () => {
                     Track.TraversePath<Pattern>(path).Bilateral = u;
                 }, () => {
                     Track.TraversePath<Pattern>(path).Bilateral = r;
@@ -1017,7 +1004,7 @@ namespace Apollo.Windows {
             }
         }
 
-        public void SetBilateral(bool value) => Bilateral.IsChecked = value;
+        public void SetBilateral(bool value) => Pinch.IsBilateral = value;
 
         int? oldRootKey = -1;
 
@@ -1225,13 +1212,19 @@ namespace Apollo.Windows {
             else PatternPlay(Play, start);
         }
 
-        static void ImportFrames(Pattern pattern, int repeats, double gate, List<Frame> frames, PlaybackType mode, bool infinite, int? root) {
-            pattern.Repeats = repeats;
-            pattern.Gate = gate;
-            pattern.Frames = frames;
-            pattern.Mode = mode;
-            pattern.Infinite = infinite;
-            pattern.RootKey = root;
+        static void ImportFrames(Pattern pattern, Pattern importing) {
+            importing = (Pattern)importing.Clone();
+            
+            pattern.Repeats = importing.Repeats;
+            pattern.Gate = importing.Gate;
+            pattern.Pinch = importing.Pinch;
+            pattern.Bilateral = importing.Bilateral;
+            pattern.Frames = importing.Frames;
+            pattern.Mode = importing.Mode;
+            pattern.Infinite = importing.Infinite;
+            pattern.RootKey = importing.RootKey;
+            pattern.Wrap = importing.Wrap;
+            pattern.Expanded = importing.Expanded;
 
             while (pattern.Window?.Contents.Count > 1) pattern.Window?.Contents.RemoveAt(1);
             pattern.Expanded = 0;
@@ -1257,33 +1250,22 @@ namespace Apollo.Windows {
                 return;
             }
 
-            int ur = _pattern.Repeats;
-            double ug = _pattern.Gate;
-            List<Frame> uf = _pattern.Frames.Select(i => i.Clone()).ToList();
-            PlaybackType um = _pattern.Mode;
-            bool ui = _pattern.Infinite;
-            int? uo = _pattern.RootKey;
-
-            int rr = 1;
-            double rg = 1;
-            List<Frame> rf = frames.Select(i => i.Clone()).ToList();
-            PlaybackType rm = PlaybackType.Mono;
-            bool ri = false;
-            int? ro = null;
+            Pattern u = (Pattern)_pattern.Clone();
+            Pattern r = new Pattern(frames: frames.Select(i => i.Clone()).ToList());
 
             List<int> path = Track.GetPath(_pattern);
 
             Program.Project.Undo.Add($"Pattern File Imported from {Path.GetFileNameWithoutExtension(filepath)}", () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), ur, ug, uf.Select(i => i.Clone()).ToList(), um, ui, uo);
+                ImportFrames(Track.TraversePath<Pattern>(path), u);
             }, () => {
-                ImportFrames(Track.TraversePath<Pattern>(path), rr, rg, rf.Select(i => i.Clone()).ToList(), rm, ri, ro);
+                ImportFrames(Track.TraversePath<Pattern>(path), r);
             }, () => {
-                foreach (Frame frame in uf) frame.Dispose();
-                foreach (Frame frame in rf) frame.Dispose();
-                uf = rf = null;
+                u.Dispose();
+                r.Dispose();
+                u = r = null;
             });
 
-            ImportFrames(_pattern, 1, 1, frames, PlaybackType.Mono, false, null);
+            ImportFrames(_pattern, r);
         }
 
         async void ImportDialog(object sender, RoutedEventArgs e) {
@@ -1359,7 +1341,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(App.ControlInput);
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 
@@ -1635,6 +1617,8 @@ namespace Apollo.Windows {
 
         public void Export(int left, int right) {}
         public void Import(int right, string path = null) {}
+
+        void BottomCollapse() => BottomLeftPane.Opacity = Convert.ToInt32(BottomLeftPane.IsVisible = CollapseButton.Showing = (BottomLeftPane.MaxHeight = (BottomLeftPane.MaxHeight == 0)? 1000 : 0) != 0);
 
         void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -11,13 +12,22 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public class PortWarning {
-        PortWarningType State = PortWarningType.None;
-        string message, action, url;
+        public class Option {
+            public readonly string action, url;
 
-        public PortWarning(string msg, string button, string location) {
+            public Option(string button, string location) {
+                action = button;
+                url = location;
+            }
+        }
+
+        PortWarningType State = PortWarningType.None;
+        string message;
+        Option[] options;
+
+        public PortWarning(string msg, params Option[] opts) {
             message = msg;
-            action = button;
-            url = location;
+            options = opts;
         }
 
         public void Set() {
@@ -34,8 +44,11 @@ namespace Apollo.Helpers {
             State = PortWarningType.Done;
 
             Action DisplayMessage = async () => {
-                if (await MessageWindow.Create(message, new string[] {action, "OK"}, sender) == action)
-                    App.URL(url);
+                string[] actions = options.Select(i => i.action).ToArray();
+                int result;
+
+                if ((result = Array.IndexOf(actions, await MessageWindow.Create(message, actions.Append("Ignore").ToArray(), sender))) != -1)
+                    App.URL(options[result].url);
 
                 Launchpad.DisplayWarnings(sender);
             };

@@ -190,7 +190,8 @@ namespace Apollo.Viewers {
 
             List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
             int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.Modifiers.HasFlag(App.ControlInput);
+            
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
 
             bool result = Track.Move(moving, Program.Project, after, copy);
 

@@ -5,7 +5,7 @@
         WindowStartupLocation="CenterOwner"
         CanResize="false" SizeToContent="Height"
         Title="" Icon="/Resources/WindowIcon.png"
-        Width="500" MinWidth="500" MaxWidth="500"
+        Width="510" MinWidth="510" MaxWidth="510"
         Opened="Loaded" Closing="Unloaded"
         PointerPressed="Window_Focus">
 

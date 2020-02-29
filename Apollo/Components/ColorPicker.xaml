@@ -74,17 +74,17 @@
     </Grid>
 
     <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 5 0 0">
-      <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="70" Padding="2" x:Name="Hex"
+      <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="50" Padding="2" x:Name="Hex"
                KeyDown="Text_KeyDown" LostFocus="Hex_Unfocus" PointerReleased="Hex_MouseUp" />
       
       <StackPanel Orientation="Horizontal" x:Name="RGB_Panel" Spacing="4">
-        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="Red"
+        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="20" Padding="2" x:Name="Red"
                  KeyDown="Text_KeyDown" PointerReleased="RGB_MouseUp" LostFocus="RGB_Unfocus" />
 
-        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="Green"
+        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="20" Padding="2" x:Name="Green"
                  KeyDown="Text_KeyDown" PointerReleased="RGB_MouseUp" LostFocus="RGB_Unfocus" />
 
-        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="25" Padding="2" x:Name="Blue"
+        <TextBox Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="0 0 0 1" MinWidth="20" Padding="2" x:Name="Blue"
                  KeyDown="Text_KeyDown" PointerReleased="RGB_MouseUp" LostFocus="RGB_Unfocus" />
       </StackPanel>
       

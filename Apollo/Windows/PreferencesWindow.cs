@@ -143,7 +143,11 @@ namespace Apollo.Windows {
 
             Preferences.Window = this;
 
-            this.Get<TextBlock>("Version").Text += Program.Version;
+            TextBlock Version = this.Get<TextBlock>("Version");
+            Version.Text += Program.Version;
+
+            if (Github.AvaloniaVersion() != "")
+                ToolTip.SetTip(Version, $"Avalonia {Github.AvaloniaVersion()}");
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;

@@ -1,11 +1,19 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.UpdateButton"
+             IsVisible="false"
              DetachedFromVisualTree="Unloaded">
 
-  <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
-          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
-    <Path StrokeThickness="2" x:Name="Path"
-          Data="M 8,0 L 8,11 M 8,11 L 3,6 M 8,11 L 13,6 M 3,15 L 13,15" />
-  </Canvas>
+  <Border Background="{DynamicResource ThemeAccentBrush}" BorderBrush="{DynamicResource ThemeAccentBrush2}" BorderThickness="1 0 1 1" Cursor="Hand"
+        PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+
+    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="5" Margin="6">
+      <Canvas VerticalAlignment="Center" Width="16" Height="16" Background="Transparent">
+        <Path StrokeThickness="2" Stroke="{DynamicResource ThemeForegroundBrush}"
+              Data="M 8,0 L 8,11 M 8,11 L 3,6 M 8,11 L 13,6 M 3,15 L 13,15" />
+      </Canvas>
+
+      <TextBlock VerticalAlignment="Center" FontWeight="Bold" x:Name="Message" />
+    </StackPanel>
+  </Border>
 </UserControl>
