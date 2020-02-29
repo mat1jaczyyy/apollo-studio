@@ -394,6 +394,15 @@ namespace Apollo.Elements {
                 screen?.MIDIEnter(n);
         }
 
+        void StartIdentification() {
+            Task.Run(() => {
+                Available = true;
+
+                Input.SysEx += WaitForIdentification;
+                Output.Send(in DeviceInquiry);
+            });
+        }
+
         public Launchpad() => CreateScreen();
 
         public Launchpad(IMidiInputDeviceInfo input, IMidiOutputDeviceInfo output) {
@@ -407,10 +416,7 @@ namespace Apollo.Elements {
 
             Program.Log($"MIDI Created {Name}");
 
-            Available = true;
-
-            Input.SysEx += WaitForIdentification;
-            Output.Send(in DeviceInquiry);
+            StartIdentification();
         }
 
         public Launchpad(string name, InputType format = InputType.DrumRack, RotationType rotation = RotationType.D0) {
@@ -432,12 +438,10 @@ namespace Apollo.Elements {
 
             Program.Log($"MIDI Connected {Name}");
 
-            Available = true;
             Type = LaunchpadType.Unknown;
             doingMK2VersionInquiry = false;
 
-            Input.SysEx += WaitForIdentification;
-            Output.Send(in DeviceInquiry);
+            StartIdentification();
         }
 
         public virtual void Disconnect(bool actuallyClose = true) {
