@@ -62,9 +62,10 @@ namespace Apollo.Devices {
             Window?.Frame_Select(index);
         }
 
-        public void Remove(int index) {
+        public void Remove(int index, bool dispose = true) {
             Window?.Contents_Remove(index);
 
+            if (dispose) Frames[index].Dispose();
             Frames.RemoveAt(index);
             Reroute();
 

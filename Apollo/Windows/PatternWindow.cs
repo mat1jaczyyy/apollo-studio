@@ -858,7 +858,7 @@ namespace Apollo.Windows {
 
                 for (int i = left; i < right; i++) {
                     Frame frame = pattern[right];
-                    pattern.Remove(right);
+                    pattern.Remove(right, false);
                     pattern.Insert(i, frame);
                 }
 
@@ -877,7 +877,7 @@ namespace Apollo.Windows {
 
             for (int i = left; i < right; i++) {
                 Frame frame = _pattern[right];
-                _pattern.Remove(right);
+                _pattern.Remove(right, false);
                 _pattern.Insert(i, frame);
             }
 
