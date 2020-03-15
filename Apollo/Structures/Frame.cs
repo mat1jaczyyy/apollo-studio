@@ -105,7 +105,7 @@ namespace Apollo.Structures {
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
@@ -127,7 +127,7 @@ namespace Apollo.Structures {
             List<Frame> moved = new List<Frame>();
 
             for (int i = 0; i < source.Count; i++) {
-                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value);
+                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value, false);
 
                 moved.Add(copy? source[i].Clone() : source[i]);
 
