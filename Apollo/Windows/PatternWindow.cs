@@ -1142,7 +1142,7 @@ namespace Apollo.Windows {
             int before = moving[0].IParentIndex.Value - 1;
             int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
 
-            bool copy = e.Modifiers.HasFlag(App.ControlInput);
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
 
             bool result = Frame.Move(moving, _pattern, after, copy);
 

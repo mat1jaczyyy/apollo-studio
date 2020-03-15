@@ -225,7 +225,7 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.AddAndExecute(new Fade.ThumbMoveUndoEntry(
                     _fade, 
                     i, 
-                    x - total.Value / Gradient.Width, 
+                    (x - total.Value) / Gradient.Width, 
                     x / Gradient.Width
                 ));
         }

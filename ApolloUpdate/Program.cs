@@ -106,7 +106,7 @@ namespace ApolloUpdate {
                 foreach (string newpath in Directory.GetFiles(tempm4lpath)) {
                     string newfile = Path.GetFileName(newpath);
                     
-                    if (!m4lfiles.Contains(newpath))
+                    if (!m4lfiles.Contains(newfile))
                         File.Copy(newpath, Path.Combine(m4lpath, newfile));
                 }
 
