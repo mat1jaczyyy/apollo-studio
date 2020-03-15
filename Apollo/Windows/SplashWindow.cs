@@ -155,19 +155,23 @@ namespace Apollo.Windows {
 
         async void CheckUpdate() {
             if (await Github.ShouldUpdate()) {
-                UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
-
-                MinHeight = MaxHeight += 30;
+                while (App.Windows.OfType<MessageWindow>().Where(i => !i.Completed.Task.IsCompleted).FirstOrDefault() is MessageWindow window)
+                    await window.Completed.Task;
+                
+                Dispatcher.UIThread.Post(async () => {
+                    UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
+                    MinHeight = MaxHeight += 30;
+                }, DispatcherPriority.MinValue);
             }
         }
 
         void Update() {
-            foreach (Window window in App.Windows)
-                if (window.GetType() != typeof(MessageWindow))
-                    window.Close();
-            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
             else UpdateWindow.Create(this);
+
+            foreach (Window window in App.Windows)
+                if (window.GetType() != typeof(MessageWindow) && window.GetType() != typeof(UpdateWindow))
+                    window.Close();
         }
 
         void TabChanged(int tab) {

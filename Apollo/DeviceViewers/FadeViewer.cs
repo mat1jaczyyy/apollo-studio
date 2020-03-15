@@ -242,7 +242,7 @@ namespace Apollo.DeviceViewers {
             double pos = x / Gradient.Width;
 
             if (total != null) {
-                double u = x - total.Value / Gradient.Width;
+                double u = (x - total.Value) / Gradient.Width;
                 List<int> path = Track.GetPath(_fade);
 
                 Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {

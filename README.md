@@ -15,7 +15,7 @@ Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apo
 [![Terravita x Chime x Akylla - Go Higher](http://img.youtube.com/vi/a-MwTVH-wX8/mqdefault.jpg)](https://www.youtube.com/watch?v=a-MwTVH-wX8 "Terravita x Chime x Akylla - Go Higher")
 [![Owl City - Fireflies](http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg)](http://www.youtube.com/watch?v=DDJ0JPgd8fw "Owl City - Fireflies")
 [![Borgeous, Taylr Renee - Sweeter Without You](http://img.youtube.com/vi/yA-bFsYRG4I/mqdefault.jpg)](http://www.youtube.com/watch?v=yA-bFsYRG4I "Borgeous, Taylr Renee - Sweeter Without You")
-[![Denking x NEKT - Paint in the Sky](http://img.youtube.com/vi/XdBOQ_Z8oaU/mqdefault.jpg)](http://www.youtube.com/watch?v=XdBOQ_Z8oaU "Denking x NEKT - Paint in the Sky")
+[![Jonas Aden, Castion, Danny Leax - Tell Me A Lie](http://img.youtube.com/vi/caiNv3bC5YI/mqdefault.jpg)](https://www.youtube.com/watch?v=caiNv3bC5YI "Jonas Aden, Castion, Danny Leax - Tell Me A Lie")
 
 ## Getting Started
 
