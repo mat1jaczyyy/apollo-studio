@@ -24,6 +24,10 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Device)item);
+        
+        public ISelect IClone() => (ISelect)Clone();
+
         public ISelectParentViewer IViewer {
             get => Viewer;
         }
@@ -198,60 +202,6 @@ namespace Apollo.Elements {
             Viewer = null;
             Parent = null;
             _ParentIndex = null;
-        }
-
-        public static bool Move(List<Chain> source, Group target, int position, bool copy = false) {
-            if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
-
-            return (position == -1)
-                ? Move(source, target, copy)
-                : Move(source, target[position], copy);
-        }
-
-        public static bool Move(List<Chain> source, Chain target, bool copy = false) {
-            if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
-                return false;
-            
-            List<Chain> moved = new List<Chain>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((Group)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                ((Group)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
-            }
-
-            Track track = Track.Get(moved.First());
-            track?.Window?.Selection.Select(moved.First());
-            track?.Window?.Selection.Select(moved.Last(), true);
-
-            ((Group)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
-            
-            return true;
-        }
-
-        public static bool Move(List<Chain> source, Group target, bool copy = false) {
-            if (!copy && target.Count > 0 && source[0] == target[0])
-                return false;
-            
-            List<Chain> moved = new List<Chain>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((Group)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                target.Insert(i, moved.Last());
-            }
-
-            Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
-
-            target.SpecificViewer.Expand(moved.Last().ParentIndex);
-            
-            return true;
         }
     }
 }
