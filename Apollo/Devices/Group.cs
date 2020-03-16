@@ -17,6 +17,8 @@ namespace Apollo.Devices {
 
         public bool IRoot => false;
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Chain)item);
+
         Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
             get => _midiexit;

@@ -24,6 +24,8 @@ namespace Apollo.Devices {
             get => true;
         }
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Frame)item);
+
         public PatternWindow Window;
 
         List<Frame> _frames;

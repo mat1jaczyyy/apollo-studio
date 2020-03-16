@@ -26,6 +26,8 @@ namespace Apollo.Elements {
         public int? IParentIndex {
             get => ParentIndex;
         }
+        
+        public ISelect IClone() => (ISelect)Clone();
 
         public DeviceViewer Viewer { get; set; }
         

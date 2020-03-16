@@ -15,13 +15,14 @@ using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
-    public class ChainViewer: UserControl, ISelectParentViewer {
+    public class ChainViewer: UserControl, ISelectParentViewer, IDroppable {
         public int? IExpanded {
             get => null;
         }
@@ -79,8 +80,7 @@ namespace Apollo.Viewers {
             _chain = chain;
             _chain.Viewer = this;
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop = new DragDropManager(this);
 
             for (int i = 0; i < _chain.Count; i++)
                 Contents_Insert(i, _chain[i]);
@@ -95,8 +95,8 @@ namespace Apollo.Viewers {
             _chain.Viewer = null;
             _chain = null;
             
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop.Dispose();
+            DragDrop = null;
         }
 
         public void Expand(int? index) {}
@@ -142,81 +142,17 @@ namespace Apollo.Viewers {
             e.Handled = true;
         }
 
-        void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
-        }
+        DragDropManager DragDrop;
 
-        void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
+        public List<string> DropAreas => new List<string>() {"DropZoneBefore", "DropZoneAfter", "DeviceAdd"};
 
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneBefore" && source.Name != "DropZoneAfter" && source.Name != "DeviceAdd") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {DataFormats.FileNames, null},
+            {"Device", null}
+        };
 
-            int after = (source.Name == "DropZoneAfter")? _chain.Count - 1 : -1;
-
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                string path = e.Data.GetFileNames().FirstOrDefault();
-
-                if (path != null) Import(after, path);
-
-                return;
-            }
-
-            if (!e.Data.Contains("device")) return;
-
-            List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
-            Chain source_parent = moving[0].Parent;
-            int before = moving[0].IParentIndex.Value - 1;
-
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
-
-            bool result = Device.Move(moving, _chain, after, copy);
-            
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (source_parent == _chain && after < before)
-                    before_pos += count;
-                
-                List<int> sourcepath = Track.GetPath(source_parent);
-                List<int> targetpath = Track.GetPath(_chain);
-                
-                Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                        for (int i = after + count; i > after; i--)
-                            targetchain.Remove(i);
-
-                    }) : new Action(() => {
-                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                        List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
-
-                        Device.Move(umoving, sourcechain, before_pos);
-
-                }), () => {
-                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                    Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                    List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
-
-                    Device.Move(rmoving, targetchain, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
-        }
+        public ISelect Item => null;
+        public ISelectParent ItemParent => _chain;
 
         bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
             undo = redo = dispose = null;
