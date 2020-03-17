@@ -77,9 +77,11 @@ namespace Apollo.DragDrop {
             bool copy;
             int count, before, before_pos, after, after_pos;
 
-            PathUndoEntry<ISelect> pathProvider;
-            ISelectParent source => ((ISelectParent)pathProvider?.Items[0])?? Program.Project;
-            ISelectParent target => ((ISelectParent)pathProvider?.Items[1])?? Program.Project;
+            Path<ISelect> sourcepath = null;
+            Path<ISelect> targetpath = null;
+
+            ISelectParent source => ((ISelectParent)sourcepath?.Resolve())?? Program.Project;
+            ISelectParent target => ((ISelectParent)targetpath?.Resolve())?? Program.Project;
 
             public override void Undo() {
                 if (copy)
@@ -109,8 +111,10 @@ namespace Apollo.DragDrop {
                 this.before_pos = before_pos;
                 this.after_pos = after_pos;
 
-                if (!(sourceparent is Project) && !(targetparent is Project))
-                    pathProvider = new PathUndoEntry<ISelect>(null, (ISelect)sourceparent, (ISelect)targetparent);
+                if (!(sourceparent is Project) && !(targetparent is Project)) {
+                    sourcepath = new Path<ISelect>((ISelect)sourceparent);
+                    targetpath = new Path<ISelect>((ISelect)targetpath);
+                }
             }
         }
 

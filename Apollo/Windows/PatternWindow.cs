@@ -1136,10 +1136,10 @@ namespace Apollo.Windows {
                 return false;
             }
             
-            List<int> path = Track.GetPath(_pattern);
+            Path<Pattern> path = new Path<Pattern>(_pattern);
 
             undo = () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1154,7 +1154,7 @@ namespace Apollo.Windows {
             };
             
             redo = () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1194,10 +1194,10 @@ namespace Apollo.Windows {
 
             List<Frame> u = (from i in Enumerable.Range(left, right - left + 1) select _pattern[i].Clone()).ToList();
 
-            List<int> path = Track.GetPath(_pattern);
+            Path<Pattern> path = new Path<Pattern>(_pattern);
 
             undo = () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1212,7 +1212,7 @@ namespace Apollo.Windows {
             };
             
             redo = () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1273,12 +1273,12 @@ namespace Apollo.Windows {
             if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
                 if (Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2)) {
 
-                    List<int> path = Track.GetPath(_pattern);
+                    Path<Pattern> path = new Path<Pattern>(_pattern);
 
                     Program.Project.Undo.Add("Pattern Frame Replaced",
                         undo2 + undo,
                         redo + redo2 + (() => {
-                            Pattern pattern = Track.TraversePath<Pattern>(path);
+                            Pattern pattern = path.Resolve();
 
                             Track.Get(pattern).Window?.Selection.Select(pattern[left + paste.Contents.Count - 1], true);
                         }),
@@ -1300,10 +1300,10 @@ namespace Apollo.Windows {
         public void Duplicate(int left, int right) {
             if (Locked) return;
 
-            List<int> path = Track.GetPath(_pattern);
+            Path<Pattern> path = new Path<Pattern>(_pattern);
 
             Program.Project.Undo.Add($"Pattern Frame Duplicated", () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 
@@ -1317,7 +1317,7 @@ namespace Apollo.Windows {
                 }
 
             }, () => {
-                Pattern pattern = Track.TraversePath<Pattern>(path);
+                Pattern pattern = path.Resolve();
 
                 if (pattern.Window != null) pattern.Window.Draw = false;
 

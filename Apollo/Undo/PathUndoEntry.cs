@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Apollo.Elements;
 using Apollo.Selection;
 
 namespace Apollo.Undo {
     public class PathUndoEntry<T>: UndoEntry where T: ISelect {
-        protected IEnumerable<List<int>> Paths;
-        public T[] Items => Paths.Select(i => Track.TraversePath<T>(i)).ToArray();
+        protected IEnumerable<Path<T>> Paths;
+        public T[] Items => Paths.Select(i => i.Resolve()).ToArray();
 
         public override void Undo() => UndoPath(Items);
         protected virtual void UndoPath(params T[] items) {}
@@ -18,6 +17,6 @@ namespace Apollo.Undo {
         public override void Dispose() => DisposePath(Items);
         protected virtual void DisposePath(params T[] items) {}
 
-        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => Track.GetPath(i));
+        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i));
     }
 }

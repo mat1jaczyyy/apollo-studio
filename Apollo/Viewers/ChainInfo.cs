@@ -151,12 +151,12 @@ namespace Apollo.Viewers {
                 if (source_chain == target_chain && after < before)
                     before_pos += count;
                 
-                List<int> sourcepath = Track.GetPath(source_chain);
-                List<int> targetpath = Track.GetPath(target_chain);
+                Path<Chain> sourcepath = new Path<Chain>(source_chain);
+                Path<Chain> targetpath = new Path<Chain>(target_chain);
                 
                 Program.Project.Undo.Add($"{format} {(copy? "Copied" : "Moved")}", copy
                     ? new Action(() => {
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
+                        Chain targetchain = targetpath.Resolve();
 
                         for (int i = after + count; i > after; i--)
                             targetchain.Remove(i);
@@ -165,8 +165,8 @@ namespace Apollo.Viewers {
                             ((Group)targetchain.Parent).Remove(remove.Value);
 
                     }) : new Action(() => {
-                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
+                        Chain sourcechain = sourcepath.Resolve();
+                        Chain targetchain = targetpath.Resolve();
 
                         List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
 
@@ -176,11 +176,11 @@ namespace Apollo.Viewers {
                             ((Group)targetchain.Parent).Remove(remove.Value);
 
                 }), () => {
-                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
+                    Chain sourcechain = sourcepath.Resolve();
                     Chain targetchain;
 
-                    if (remove != null) Track.TraversePath<Group>(targetpath.Skip(1).ToList()).Insert(remove.Value, targetchain = new Chain());
-                    else targetchain = Track.TraversePath<Chain>(targetpath);
+                    if (remove != null) targetpath.Resolve(1).Insert(remove.Value, targetchain = new Chain());
+                    else targetchain = targetpath.Resolve();
 
                     List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
 

@@ -196,17 +196,17 @@ namespace Apollo.DeviceViewers {
                 return false;
             }
 
-            List<int> path = Track.GetPath(_group);
+            Path<Group> path = new Path<Group>(_group);
 
             undo = () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = paste.Contents.Count - 1; i >= 0; i--)
                     group.Remove(right + i + 1);
             };
             
             redo = () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = 0; i < paste.Contents.Count; i++)
                     group.Insert(right + i + 1, pasted[i].Clone());
@@ -230,17 +230,17 @@ namespace Apollo.DeviceViewers {
         protected void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
             List<Chain> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Clone()).ToList();
 
-            List<int> path = Track.GetPath(_group);
+            Path<Group> path = new Path<Group>(_group);
 
             undo = () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = left; i <= right; i++)
                     group.Insert(i, u[i - left].Clone());
             };
             
             redo = () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = right; i >= left; i--)
                     group.Remove(i);
@@ -279,12 +279,12 @@ namespace Apollo.DeviceViewers {
             if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
                 Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
 
-                List<int> path = Track.GetPath(_group);
+                Path<Group> path = new Path<Group>(_group);
 
                 Program.Project.Undo.Add("Chain Replaced",
                     undo2 + undo,
                     redo + redo2 + (() => {
-                        Group group = Track.TraversePath<Group>(path);
+                        Group group = path.Resolve();
 
                         Track.Get(group).Window?.Selection.Select(group[left + paste.Contents.Count - 1], true);
                     }),
@@ -296,16 +296,16 @@ namespace Apollo.DeviceViewers {
         }
 
         public void Duplicate(int left, int right) {
-            List<int> path = Track.GetPath(_group);
+            Path<Group> path = new Path<Group>(_group);
 
             Program.Project.Undo.Add($"Chain Duplicated", () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = right - left; i >= 0; i--)
                     group.Remove(right + i + 1);
 
             }, () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = 0; i <= right - left; i++)
                     group.Insert(right + i + 1, group[left + i].Clone());
@@ -333,16 +333,16 @@ namespace Apollo.DeviceViewers {
             List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select _group[i].Enabled).ToList();
             bool r = !_group[left].Enabled;
 
-            List<int> path = Track.GetPath(_group);
+            Path<Group> path = new Path<Group>(_group);
 
             Program.Project.Undo.Add($"Chain Muted", () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = left; i <= right; i++)
                     group[i].Enabled = u[i - left];
 
             }, () => {
-                Group group = Track.TraversePath<Group>(path);
+                Group group = path.Resolve();
 
                 for (int i = left; i <= right; i++)
                     group[i].Enabled = r;

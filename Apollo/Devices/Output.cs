@@ -5,6 +5,7 @@ using System.Reflection;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -46,9 +47,9 @@ namespace Apollo.Devices {
 
             if (!redoing) {
                 int u = Target;
-                List<int> path = Track.GetPath(this);
+                Path<Output> path = new Path<Output>(this);
 
-                //TODO Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => Track.TraversePath<Output>(path).Target = u;
+                //TODO Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => path.Resolve().Target = u;
             }
 
             Target = Track.Get(this).ParentIndex.Value;
