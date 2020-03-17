@@ -13,6 +13,7 @@ using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Selection;
@@ -20,7 +21,7 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
-    public class GroupViewer: UserControl, ISelectParentViewer {
+    public class GroupViewer: UserControl, ISelectParentViewer, IDroppable {
         public static readonly string DeviceIdentifier = "group";
 
         public int? IExpanded {
@@ -82,8 +83,7 @@ namespace Apollo.DeviceViewers {
             _parent = parent;
             _root = _parent.Root.Children;
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop = new DragDropManager(this);
             
             for (int i = 0; i < _group.Count; i++) {
                 _group[i].ClearParentIndexChanged();
@@ -94,8 +94,8 @@ namespace Apollo.DeviceViewers {
         }
 
         protected void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop.Dispose();
+            DragDrop = null;
 
             _group = null;
             _parent = null;
@@ -180,148 +180,18 @@ namespace Apollo.DeviceViewers {
             e.Handled = true;
         }
 
-        protected void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("chain") && !e.Data.Contains("device") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
-        }
+        DragDropManager DragDrop;
 
-        protected void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
-            
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "ChainAdd") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
+        public List<string> DropAreas => new List<string>() {"DropZoneAfter", "ChainAdd"};
 
-            int after = (source.Name == "DropZoneAfter")? _group.Count - 1 : -1;
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {DataFormats.FileNames, null},
+            {"Chain", null},
+            {"Device", ChainInfo.DeviceAsChainDrop}
+        };
 
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                string path = e.Data.GetFileNames().FirstOrDefault();
-
-                if (path != null) Import(after, path);
-
-                return;
-            }
-
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
-            bool result;
-
-            if (e.Data.Contains("chain")) {
-                List<Chain> moving = ((List<ISelect>)e.Data.Get("chain")).Select(i => (Chain)i).ToList();
-
-                Group source_parent = (Group)moving[0].Parent;
-
-                int before = moving[0].IParentIndex.Value - 1;
-
-                if (result = Chain.Move(moving, _group, after, copy)) {
-                    int before_pos = before;
-                    int after_pos = moving[0].IParentIndex.Value - 1;
-                    int count = moving.Count;
-
-                    if (source_parent == _group && after < before)
-                        before_pos += count;
-                    
-                    List<int> sourcepath = Track.GetPath((ISelect)source_parent);
-                    List<int> targetpath = Track.GetPath((ISelect)_group);
-                    
-                    Program.Project.Undo.Add($"Chain {(copy? "Copied" : "Moved")}", copy
-                        ? new Action(() => {
-                            Group targetdevice = Track.TraversePath<Group>(targetpath);
-
-                            for (int i = after + count; i > after; i--)
-                                targetdevice.Remove(i);
-
-                        }) : new Action(() => {
-                            Group sourcedevice = Track.TraversePath<Group>(sourcepath);
-                            Group targetdevice = Track.TraversePath<Group>(targetpath);
-
-                            List<Chain> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetdevice[i]).ToList();
-
-                            Chain.Move(umoving, sourcedevice, before_pos);
-
-                    }), () => {
-                        Group sourcedevice = Track.TraversePath<Group>(sourcepath);
-                        Group targetdevice = Track.TraversePath<Group>(targetpath);
-
-                        List<Chain> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcedevice[i]).ToList();
-
-                        Chain.Move(rmoving, targetdevice, after, copy);
-                    });
-                }
-            
-            } else if (e.Data.Contains("device")) {
-                List<Device> moving = ((List<ISelect>)e.Data.Get("device")).Select(i => (Device)i).ToList();
-
-                Chain source_chain = moving[0].Parent;
-                Chain target_chain;
-
-                int before = moving[0].IParentIndex.Value - 1;
-                after = -1;
-
-                int remove = 0;
-
-                if (source.Name != "DropZoneAfter") {
-                    _group.Insert(remove = 0);
-                    target_chain = _group[0];
-                } else {
-                    _group.Insert(remove = _group.Count);
-                    target_chain = _group.Chains.Last();
-                }
-
-                if (result = Device.Move(moving, target_chain, after = target_chain.Count - 1, copy)) {
-                    int before_pos = before;
-                    int after_pos = moving[0].IParentIndex.Value - 1;
-                    int count = moving.Count;
-
-                    if (source_chain == target_chain && after < before)
-                        before_pos += count;
-                    
-                    List<int> sourcepath = Track.GetPath(source_chain);
-                    List<int> targetpath = Track.GetPath(target_chain);
-                    
-                    Program.Project.Undo.Add($"Device {(copy? "Copied" : "Moved")}", copy
-                        ? new Action(() => {
-                            Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                            for (int i = after + count; i > after; i--)
-                                targetchain.Remove(i);
-                            
-                            ((Group)targetchain.Parent).Remove(remove);
-
-                        }) : new Action(() => {
-                            Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                            Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                            List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
-
-                            Device.Move(umoving, sourcechain, before_pos);
-
-                            ((Group)targetchain.Parent).Remove(remove);
-
-                    }), () => {
-                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                        Chain targetchain;
-
-                        Group target = Track.TraversePath<Group>(targetpath.Skip(1).ToList());
-                        target.Insert(remove);
-                        targetchain = target[remove];
-
-                        List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
-
-                        Device.Move(rmoving, targetchain, after, copy);
-                    });
-                    
-                } else _group.Remove(remove);
-
-            } else return;
-
-            if (!result) e.DragEffects = DragDropEffects.None;
-        }
+        public ISelect Item => null;
+        public ISelectParent ItemParent => _group;
 
         protected bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
             undo = redo = dispose = null;

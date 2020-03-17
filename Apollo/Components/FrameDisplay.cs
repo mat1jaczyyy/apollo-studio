@@ -14,12 +14,13 @@ using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
 
 namespace Apollo.Components {
-    public class FrameDisplay: UserControl, ISelectViewer {
+    public class FrameDisplay: UserControl, ISelectViewer, IDraggable {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -37,7 +38,7 @@ namespace Apollo.Components {
         public event FrameEventHandler FrameSelected;
         
         Pattern _pattern;
-        bool selected = false;
+        public bool Selected { get; private set; } = false;
         public FrameThumbnail Viewer;
 
         StackPanel Root;
@@ -51,12 +52,12 @@ namespace Apollo.Components {
 
         public void Select() {
             ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
-            selected = true;
+            Selected = true;
         }
 
         public void Deselect() {
             ApplyHeaderBrush(new SolidColorBrush(AvaloniaColor.Parse("Transparent")));
-            selected = false;
+            Selected = false;
         }
 
         public FrameDisplay() => throw new InvalidOperationException();
@@ -68,8 +69,7 @@ namespace Apollo.Components {
 
             Viewer.Frame = frame;
 
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
-            this.AddHandler(DragDrop.DropEvent, Drop);
+            DragDrop = new DragDropManager(this);
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -78,8 +78,8 @@ namespace Apollo.Components {
             FrameSelected = null;
             Viewer = null;
 
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            DragDrop.Dispose();
+            DragDrop = null;
         }
 
         void Frame_Action(string action) => _pattern.Window?.Selection.Action(action, _pattern, Viewer.Frame.ParentIndex.Value);
@@ -90,112 +90,47 @@ namespace Apollo.Components {
             else _pattern.Window?.Selection.Action(action);
         }
 
-        void Select(PointerPressedEventArgs e) {
+        public void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !Selected))
                 _pattern.Window?.Selection.Select(Viewer.Frame, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
+        
+        DragDropManager DragDrop;
 
-        public async void Drag(object sender, PointerPressedEventArgs e) {
+        public string DragFormat => "Frame";
+        public List<string> DropAreas => new List<string>() {"DropZone", "DropZoneAfter"};
+
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {DragFormat, null},
+        };
+
+        public ISelect Item => Viewer.Frame;
+        public ISelectParent ItemParent => _pattern;
+
+        public void DragFailed(PointerPressedEventArgs e) {
+            PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+            
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed)
+                FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
+    
+            if (MouseButton == PointerUpdateKind.RightButtonPressed)
+                ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open(Viewer);
+
+            if (MouseButton == PointerUpdateKind.MiddleButtonPressed)
+                _pattern.Window?.PlayFrom(this, e.KeyModifiers == KeyModifiers.Shift);
+        }
+
+        public void Drag(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if ((e.KeyModifiers & ~KeyModifiers.Shift) == KeyModifiers.Alt) {
                 _pattern.Window?.PlayFrom(this, (e.KeyModifiers & ~KeyModifiers.Alt) == KeyModifiers.Shift);
                 return;
             }
-
-            if (!selected) Select(e);
-
-            DataObject dragData = new DataObject();
-            dragData.Set("frame", _pattern.Window?.Selection.Selection);
-
-            App.Dragging = true;
-            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
-            App.Dragging = false;
-
-            if (result == DragDropEffects.None) {
-                if (selected) Select(e);
-                
-                if (MouseButton == PointerUpdateKind.LeftButtonPressed)
-                    FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
-        
-                if (MouseButton == PointerUpdateKind.RightButtonPressed)
-                    ((ApolloContextMenu)this.Resources["FrameContextMenu"]).Open(Viewer);
-
-                if (MouseButton == PointerUpdateKind.MiddleButtonPressed)
-                    _pattern.Window?.PlayFrom(this, e.KeyModifiers == KeyModifiers.Shift);
-            }
-        }
-
-        public void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("frame")) e.DragEffects = DragDropEffects.None; 
-        }
-
-        public void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
-
-            if (!e.Data.Contains("frame")) return;
-
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
-
-            List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
-
-            Pattern source_parent = moving[0].Parent;
-
-            int before = moving[0].IParentIndex.Value - 1;
-            int after = Viewer.Frame.ParentIndex.Value;
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
-
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
             
-            bool result = Frame.Move(moving, _pattern, after, copy);
-
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (source_parent == _pattern && after < before)
-                    before_pos += count;
-                
-                List<int> sourcepath = Track.GetPath(source_parent);
-                List<int> targetpath = Track.GetPath(_pattern);
-                
-                Program.Project.Undo.Add(copy? $"Pattern Frame Copied" : $"Pattern Frame Moved", copy
-                    ? new Action(() => {
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        for (int i = after + count; i > after; i--)
-                            targetpattern.Remove(i);
-
-                    }) : new Action(() => {
-                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
-
-                        Frame.Move(umoving, sourcepattern, before_pos);
-
-                }), () => {
-                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
-
-                    Frame.Move(rmoving, targetpattern, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
+            DragDrop.Drag(_pattern.Window?.Selection, e);
         }
         
         void Frame_Add() => FrameAdded?.Invoke(Viewer.Frame.ParentIndex.Value + 1);

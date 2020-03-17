@@ -30,18 +30,12 @@ namespace Apollo.Components {
 
             this.Resources["TitleBrush"] = Owner.Header.Background?? Owner.Resources["TitleBrush"];
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
-
+            Owner.DragDrop.Subscribe(this);
+            
             SetEnabled(owner.Enabled);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            Owner = null;
-
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-        }
+        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Owner = null;
 
         public void SetEnabled(bool value) {
             Border.Background = (IBrush)Application.Current.Styles.FindResource(value? "ThemeControlHighBrush" : "ThemeControlMidBrush");
@@ -49,7 +43,5 @@ namespace Apollo.Components {
         }
 
         void Drag(object sender, PointerPressedEventArgs e) => Owner.Drag(sender, e);
-        void DragOver(object sender, DragEventArgs e) => Owner.DragOver(sender, e);
-        void Drop(object sender, DragEventArgs e) => Owner.Drop(sender, e);
     }
 }

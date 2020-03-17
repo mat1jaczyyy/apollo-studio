@@ -4,7 +4,7 @@
     <RuntimeFrameworkVersion>3.1.2</RuntimeFrameworkVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject>Apollo.Core.Program</StartupObject>

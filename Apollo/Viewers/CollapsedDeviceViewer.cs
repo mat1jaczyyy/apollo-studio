@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
+using Apollo.DragDrop;
 using Apollo.Elements;
 
 namespace Apollo.Viewers {
@@ -48,9 +49,8 @@ namespace Apollo.Viewers {
             DeviceContextMenu = (ApolloContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ApolloContextMenu)this.Resources["GroupContextMenu"];
             ChokeContextMenu = (ApolloContextMenu)this.Resources["ChokeContextMenu"];
-
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            
+            DragDrop = new DragDropManager(this);
 
             SetEnabled();
         }
@@ -63,9 +63,9 @@ namespace Apollo.Viewers {
             _device = null;
 
             DeviceContextMenu = GroupContextMenu = ChokeContextMenu = null;
-            
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+
+            DragDrop.Dispose();
+            DragDrop = null;
         }
 
         public override void SetEnabled() {
