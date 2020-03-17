@@ -29,6 +29,8 @@ namespace Apollo.Elements {
             get => true;
         }
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Track)item);
+
         public ProjectWindow Window;
 
         public bool IsDisposing { get; private set; } = false;

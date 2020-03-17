@@ -16,6 +16,7 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
@@ -23,7 +24,7 @@ using Apollo.Selection;
 using Apollo.Structures;
 
 namespace Apollo.Windows {
-    public class PatternWindow: Window, ISelectParentViewer {
+    public class PatternWindow: Window, ISelectParentViewer, IDroppable {
         public int? IExpanded {
             get => _pattern.Expanded;
         }
@@ -260,8 +261,7 @@ namespace Apollo.Windows {
 
             CollapseButton.Showing = true;
 
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
-            this.AddHandler(DragDrop.DropEvent, Drop);
+            DragDrop = new DragDropManager(this);
 
             for (int i = 0; i < _pattern.Count; i++)
                 Contents_Insert(i, _pattern[i], true);
@@ -325,8 +325,8 @@ namespace Apollo.Windows {
             _track.NameChanged -= UpdateTitle;
             _track = null;
 
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            DragDrop.Dispose();
+            DragDrop = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             ColorHistory.HistoryChanged -= RenderHistory;
@@ -1115,74 +1115,16 @@ namespace Apollo.Windows {
             if (result.Length > 0) ImportFile(result[0]);
         }
 
-        public void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("frame")) e.DragEffects = DragDropEffects.None; 
-        }
+        DragDropManager DragDrop;
 
-        public void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
+        public List<string> DropAreas => new List<string>() {"DropZoneAfter", "FrameAdd"};
 
-            if (!e.Data.Contains("frame")) return;
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {"Frame", null}
+        };
 
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "FrameAdd") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
-
-            List<Frame> moving = ((List<ISelect>)e.Data.Get("frame")).Select(i => (Frame)i).ToList();
-
-            Pattern source_parent = moving[0].Parent;
-
-            int before = moving[0].IParentIndex.Value - 1;
-            int after = (source.Name == "DropZoneAfter")? _pattern.Count - 1 : -1;
-
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
-
-            bool result = Frame.Move(moving, _pattern, after, copy);
-
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (source_parent == _pattern && after < before)
-                    before_pos += count;
-                
-                List<int> sourcepath = Track.GetPath(source_parent);
-                List<int> targetpath = Track.GetPath(_pattern);
-                
-                Program.Project.Undo.Add($"Pattern Frame {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        for (int i = after + count; i > after; i--)
-                            targetpattern.Remove(i);
-
-                    }) : new Action(() => {
-                        Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                        Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                        List<Frame> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetpattern[i]).ToList();
-
-                        Frame.Move(umoving, sourcepattern, before_pos);
-
-                }), () => {
-                    Pattern sourcepattern = Track.TraversePath<Pattern>(sourcepath);
-                    Pattern targetpattern = Track.TraversePath<Pattern>(targetpath);
-
-                    List<Frame> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcepattern[i]).ToList();
-
-                    Frame.Move(rmoving, targetpattern, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
-        }
+        public ISelect Item => null;
+        public ISelectParent ItemParent => _pattern;
 
         bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
             undo = redo = dispose = null;

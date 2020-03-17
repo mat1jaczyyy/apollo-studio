@@ -19,13 +19,14 @@ using Humanizer.Localisation;
 using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {
-    public class ProjectWindow: Window, ISelectParentViewer {
+    public class ProjectWindow: Window, ISelectParentViewer, IDroppable {
         public int? IExpanded {
             get => null;
         }
@@ -116,8 +117,7 @@ namespace Apollo.Windows {
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
             
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop = new DragDropManager(this);
 
             for (int i = 0; i < Program.Project.Count; i++)
                 Contents_Insert(i, Program.Project[i]);
@@ -179,8 +179,8 @@ namespace Apollo.Windows {
 
             Selection.Dispose();
             
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop.Dispose();
+            DragDrop = null;
 
             foreach (IDisposable observable in observables)
                 observable.Dispose();
@@ -433,69 +433,17 @@ namespace Apollo.Windows {
             e.Handled = true;
         }
 
-        void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("track") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
-        }
+        DragDropManager DragDrop;
 
-        void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
+        public List<string> DropAreas => new List<string>() {"DropZoneAfter", "TrackAdd"};
 
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZoneAfter" && source.Name != "TrackAdd") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {DataFormats.FileNames, null},
+            {"Track", null},
+        };
 
-            int after = (source.Name == "DropZoneAfter")? Program.Project.Count - 1 : -1;
-
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                string path = e.Data.GetFileNames().FirstOrDefault();
-
-                if (path != null) Import(after, path);
-
-                return;
-            }
-
-            if (!e.Data.Contains("track")) return;
-
-            List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
-
-            int before = moving[0].IParentIndex.Value - 1;
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
-
-            bool result = Track.Move(moving, Program.Project, after, copy);
-
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (after < before)
-                    before_pos += count;
-                
-                Program.Project.Undo.Add($"Track {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        for (int i = after + count; i > after; i--)
-                            Program.Project.Remove(i);
-
-                    }) : new Action(() => {
-                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
-
-                        Track.Move(umoving, Program.Project, before_pos);
-
-                }), () => {
-                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
-
-                    Track.Move(rmoving, Program.Project, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
-        }
+        public ISelect Item => null;
+        public ISelectParent ItemParent => Program.Project;
 
         bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
             undo = redo = dispose = null;

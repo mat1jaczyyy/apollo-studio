@@ -25,6 +25,8 @@ namespace Apollo.Devices {
             get => true;
         }
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Frame)item);
+
         public PatternWindow Window;
 
         List<Frame> _frames;
@@ -68,9 +70,10 @@ namespace Apollo.Devices {
             Window?.Frame_Select(index);
         }
 
-        public void Remove(int index) {
+        public void Remove(int index, bool dispose = true) {
             Window?.Contents_Remove(index);
 
+            if (dispose) Frames[index].Dispose();
             Frames.RemoveAt(index);
             Reroute();
 
@@ -516,7 +519,7 @@ namespace Apollo.Devices {
 
                 for (int i = left; i < right; i++) {
                     Frame frame = item[right];
-                    item.Remove(right);
+                    item.Remove(right, false);
                     item.Insert(i, frame);
                 }
 

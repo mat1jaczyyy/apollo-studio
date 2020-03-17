@@ -13,13 +13,14 @@ using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
+using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
-    public class TrackInfo: UserControl, ISelectViewer {
+    public class TrackInfo: UserControl, ISelectViewer, IDraggable {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -39,7 +40,7 @@ namespace Apollo.Viewers {
         public event AddedEventHandler Added;
         
         Track _track;
-        bool selected = false;
+        public bool Selected { get; private set; } = false;
 
         TextBlock NameText;
         ComboBox PortSelector;
@@ -73,12 +74,12 @@ namespace Apollo.Viewers {
 
         public void Select() {
             ApplyHeaderBrush("ThemeAccentBrush2");
-            selected = true;
+            Selected = true;
         }
 
         public void Deselect() {
             ApplyHeaderBrush("ThemeControlHighBrush");
-            selected = false;
+            Selected = false;
         }
 
         public TrackInfo() => new InvalidOperationException();
@@ -94,8 +95,7 @@ namespace Apollo.Viewers {
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
 
-            this.AddHandler(DragDrop.DropEvent, Drop);
-            this.AddHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop = new DragDropManager(this);
             
             Deselect();
 
@@ -115,8 +115,8 @@ namespace Apollo.Viewers {
 
             observable.Dispose();
 
-            this.RemoveHandler(DragDrop.DropEvent, Drop);
-            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+            DragDrop.Dispose();
+            DragDrop = null;
         }
 
         public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
@@ -125,102 +125,39 @@ namespace Apollo.Viewers {
 
         void ContextMenu_Action(string action) => Program.Project.Window?.Selection.Action(action);
 
-        void Select(PointerPressedEventArgs e) {
+        public void Select(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !selected))
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed || (MouseButton == PointerUpdateKind.RightButtonPressed && !Selected))
                 Program.Project.Window?.Selection.Select(_track, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
-        public async void Drag(object sender, PointerPressedEventArgs e) {
+        DragDropManager DragDrop;
+
+        public string DragFormat => "Track";
+        public List<string> DropAreas => new List<string>() {"DropZone", "DropZoneAfter"};
+
+        public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
+            {DataFormats.FileNames, null},
+            {DragFormat, null},
+        };
+
+        public ISelect Item => _track;
+        public ISelectParent ItemParent => Program.Project;
+
+        public void DragFailed(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-
-            if (!selected) Select(e);
-
-            DataObject dragData = new DataObject();
-            dragData.Set("track", Program.Project.Window?.Selection.Selection);
-
-            App.Dragging = true;
-            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
-            App.Dragging = false;
-
-            if (result == DragDropEffects.None) {
-                if (selected) Select(e);
                 
-                if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) 
-                    TrackWindow.Create(_track, (Window)this.GetVisualRoot());
-                
-                if (MouseButton == PointerUpdateKind.RightButtonPressed) {
-                    MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
-                    ((ApolloContextMenu)this.Resources["TrackContextMenu"]).Open(Draggable);
-                }
-            }
-        }
-
-        public void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            if (!e.Data.Contains("track") && !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
-        }
-
-        public void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
-
-            IControl source = (IControl)e.Source;
-            while (source.Name != "DropZone" && source.Name != "DropZoneAfter") {
-                source = source.Parent;
-                
-                if (source == this) {
-                    e.Handled = false;
-                    return;
-                }
-            }
-
-            int after = _track.ParentIndex.Value;
-            if (source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2) after--;
-
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                string path = e.Data.GetFileNames().FirstOrDefault();
-
-                if (path != null) Program.Project.Window?.Import(after, path);
-
-                return;
-            }
-
-            if (!e.Data.Contains("track")) return;
-
-            List<Track> moving = ((List<ISelect>)e.Data.Get("track")).Select(i => (Track)i).ToList();
-            int before = moving[0].IParentIndex.Value - 1;
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) 
+                TrackWindow.Create(_track, (Window)this.GetVisualRoot());
             
-            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
-
-            bool result = Track.Move(moving, Program.Project, after, copy);
-
-            if (result) {
-                int before_pos = before;
-                int after_pos = moving[0].IParentIndex.Value - 1;
-                int count = moving.Count;
-
-                if (after < before)
-                    before_pos += count;
-                
-                Program.Project.Undo.Add($"Track {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        for (int i = after + count; i > after; i--)
-                            Program.Project.Remove(i);
-
-                    }) : new Action(() => {
-                        List<Track> umoving = (from i in Enumerable.Range(after_pos + 1, count) select Program.Project[i]).ToList();
-
-                        Track.Move(umoving, Program.Project, before_pos);
-
-                }), () => {
-                    List<Track> rmoving = (from i in Enumerable.Range(before + 1, count) select Program.Project[i]).ToList();
-
-                    Track.Move(rmoving, Program.Project, after, copy);
-                });
-            
-            } else e.DragEffects = DragDropEffects.None;
+            if (MouseButton == PointerUpdateKind.RightButtonPressed) {
+                MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";
+                ((ApolloContextMenu)this.Resources["TrackContextMenu"]).Open(Draggable);
+            }
         }
+
+        public void Drag(object sender, PointerPressedEventArgs e) => DragDrop.Drag(Program.Project.Window?.Selection, e);
 
         void Track_Add() => Added?.Invoke(_track.ParentIndex.Value + 1);
 

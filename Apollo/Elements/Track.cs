@@ -22,6 +22,8 @@ namespace Apollo.Elements {
         public int? IParentIndex {
             get => ParentIndex;
         }
+        
+        public ISelect IClone() => (ISelect)Clone();
 
         public TrackInfo Info;
         public TrackWindow Window;
@@ -95,7 +97,7 @@ namespace Apollo.Elements {
             return path;
         }
 
-        public static T TraversePath<T>(List<int> path) where T : ISelect {
+        public static T TraversePath<T>(List<int> path) where T: ISelect {
             ISelectParent ret = Program.Project[path.Last()].Chain;
 
             if (path.Count == 1) return (T)ret;
@@ -196,50 +198,6 @@ namespace Apollo.Elements {
             Chain = null;
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
-        }
-
-        public static bool Move(List<Track> source, Project target, int position, bool copy = false) => (position == -1)
-            ? Move(source, target, copy)
-            : Move(source, target[position], copy);
-
-        public static bool Move(List<Track> source, Track target, bool copy = false) {
-            if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
-                return false;
-            
-            List<Track> moved = new List<Track>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
-            }
-
-            Program.Project.Window.Selection.Select(moved.First());
-            Program.Project.Window.Selection.Select(moved.Last(), true);
-            
-            return true;
-        }
-
-        public static bool Move(List<Track> source, Project target, bool copy = false) {
-            if (!copy && target.Count > 0 && source[0] == target[0])
-                return false;
-            
-            List<Track> moved = new List<Track>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                Program.Project.Insert(i, moved.Last());
-            }
-
-            Program.Project.Window.Selection.Select(moved.First());
-            Program.Project.Window.Selection.Select(moved.Last(), true);
-            
-            return true;
         }
 
         public class LaunchpadChangedUndoEntry: SimpleIndexUndoEntry<Launchpad> {
