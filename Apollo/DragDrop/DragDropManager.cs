@@ -73,51 +73,6 @@ namespace Apollo.DragDrop {
             return result;
         }
 
-        public class DragDropUndoEntry: UndoEntry {
-            bool copy;
-            int count, before, before_pos, after, after_pos;
-
-            Path<ISelect> sourcepath = null;
-            Path<ISelect> targetpath = null;
-
-            ISelectParent source => ((ISelectParent)sourcepath?.Resolve())?? Program.Project;
-            ISelectParent target => ((ISelectParent)targetpath?.Resolve())?? Program.Project;
-
-            public override void Undo() {
-                if (copy)
-                    for (int i = after + count; i > after; i--)
-                        target.Remove(i);
-
-                else Move(
-                    (from i in Enumerable.Range(after_pos + 1, count) select target.IChildren[i]).ToList(),
-                    source,
-                    before_pos
-                );
-            }
-
-            public override void Redo() => Move(
-                (from i in Enumerable.Range(before + 1, count) select source.IChildren[i]).ToList(),
-                target,
-                after,
-                copy
-            );
-            
-            public DragDropUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
-            : base($"{format} {(copy? "Copied" : "Moved")}") {
-                this.copy = copy;
-                this.count = count;
-                this.before = before;
-                this.after = after;
-                this.before_pos = before_pos;
-                this.after_pos = after_pos;
-
-                if (!(sourceparent is Project) && !(targetparent is Project)) {
-                    sourcepath = new Path<ISelect>((ISelect)sourceparent);
-                    targetpath = new Path<ISelect>((ISelect)targetpath);
-                }
-            }
-        }
-
         static bool FileDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
             string path = e.Data.GetFileNames().FirstOrDefault();
 
@@ -206,6 +161,54 @@ namespace Apollo.DragDrop {
 
             Subscribed = null;
             Host = null;
+        }
+        
+        public class DragDropUndoEntry: UndoEntry {
+            bool copy;
+            int count, before, before_pos, after, after_pos;
+
+            protected Path<ISelect> sourcepath = null;
+            protected Path<ISelect> targetpath = null;
+
+            ISelectParent source => ((ISelectParent)sourcepath?.Resolve())?? Program.Project;
+            ISelectParent target => ((ISelectParent)targetpath?.Resolve())?? Program.Project;
+
+            public override void Undo() => UndoDrop(source, target);
+            public override void Redo() => RedoDrop(source, target);
+
+            protected void UndoDrop(ISelectParent source, ISelectParent target) {
+                if (copy)
+                    for (int i = after + count; i > after; i--)
+                        target.Remove(i);
+
+                else Move(
+                    (from i in Enumerable.Range(after_pos + 1, count) select target.IChildren[i]).ToList(),
+                    source,
+                    before_pos
+                );
+            }
+
+            protected void RedoDrop(ISelectParent source, ISelectParent target) => Move(
+                (from i in Enumerable.Range(before + 1, count) select source.IChildren[i]).ToList(),
+                target,
+                after,
+                copy
+            );
+            
+            public DragDropUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
+            : base($"{format} {(copy? "Copied" : "Moved")}") {
+                this.copy = copy;
+                this.count = count;
+                this.before = before;
+                this.after = after;
+                this.before_pos = before_pos;
+                this.after_pos = after_pos;
+
+                if (!(sourceparent is Project) && !(targetparent is Project)) {
+                    sourcepath = new Path<ISelect>((ISelect)sourceparent);
+                    targetpath = new Path<ISelect>((ISelect)targetpath);
+                }
+            }
         }
     }
 }
