@@ -69,6 +69,23 @@ namespace Apollo.Undo {
             Program.Project.WriteCrashBackup();
         }
 
+        public void Add(string desc, Action undo = null, Action redo = null, Action dispose = null) => Add(new LegacyUndoEntry(desc, undo, redo, dispose));
+
+        class LegacyUndoEntry: UndoEntry {  // TODO delete this
+            Action undo, redo, dispose;
+
+            public override void Undo() => undo?.Invoke();
+            public override void Redo() => redo?.Invoke();
+            public override void Dispose() => dispose?.Invoke();
+
+            public LegacyUndoEntry(string desc, Action undo, Action redo, Action dispose)
+            : base(desc) {
+                this.undo = undo;
+                this.redo = redo;
+                this.dispose = dispose;
+            }
+        }
+
         public void AddAndExecute(UndoEntry entry) {
             Add(entry);
             entry.Redo();
