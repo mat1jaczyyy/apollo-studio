@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Controls;
+
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
@@ -26,6 +28,12 @@ namespace Apollo.Devices {
         }
 
         public void IInsert(int index, ISelect item) => Insert(index, (Frame)item);
+        
+        public Window IWindow => Window;
+        public SelectionManager Selection => Window?.Selection;
+
+        public string ChildString => "Frame";
+        public string ChildFileExtension => null;
 
         public PatternWindow Window;
 

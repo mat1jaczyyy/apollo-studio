@@ -20,7 +20,7 @@ namespace Apollo.Selection {
             List<ISelect> pasted;
             try {
                 pasted = paste.Contents;
-            } catch (InvalidCastException) {
+            } catch (InvalidCastException) {  // TODO test this out a lot
                 return false;
             }
             
@@ -39,7 +39,7 @@ namespace Apollo.Selection {
                 for (int i = 0; i < paste.Contents.Count; i++)
                     chain.IInsert(right + i + 1, pasted[i].IClone());
 
-                ISelectParent.GetSelection(chain)?.Select(chain.IChildren[right + 1], true);
+                chain.Selection?.Select(chain.IChildren[right + 1], true);
             };
             
             dispose = () => {
@@ -50,7 +50,7 @@ namespace Apollo.Selection {
             for (int i = 0; i < paste.Contents.Count; i++)
                 parent.IInsert(right + i + 1, pasted[i].IClone());
             
-            ISelectParent.GetSelection(parent)?.Select(parent.IChildren[right + 1], true);
+            parent.Selection?.Select(parent.IChildren[right + 1], true);
             
             return true;
         }
@@ -102,7 +102,7 @@ namespace Apollo.Selection {
             Copyable paste = await Copyable.DecodeClipboard();
 
             if (paste != null && InsertCopyable(parent, paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Device Pasted", undo, redo, dispose);
+                Program.Project.Undo.Add($"{parent.ChildString} Pasted", undo, redo, dispose);
         }
 
         public static async void Replace(ISelectParent parent, int left, int right) {
@@ -113,24 +113,24 @@ namespace Apollo.Selection {
 
                 Path<ISelect> path = new Path<ISelect>((ISelect)parent);
 
-                Program.Project.Undo.Add("Device Replaced",
+                Program.Project.Undo.Add($"{parent.ChildString} Replaced",
                     undo2 + undo,
                     redo + redo2 + (() => {
                         ISelectParent chain = (ISelectParent)path.Resolve();
 
-                        ISelectParent.GetSelection(chain)?.Select(chain.IChildren[left + paste.Contents.Count - 1], true);
+                        chain.Selection?.Select(chain.IChildren[left + paste.Contents.Count - 1], true);
                     }),
                     dispose2 + dispose
                 );
                 
-                ISelectParent.GetSelection(parent)?.Select(parent.IChildren[left + paste.Contents.Count - 1], true);
+                parent.Selection?.Select(parent.IChildren[left + paste.Contents.Count - 1], true);
             }
         }
 
         public static void Duplicate(ISelectParent parent, int left, int right) {
             Path<ISelect> path = new Path<ISelect>((ISelect)parent);
 
-            Program.Project.Undo.Add($"Device Duplicated", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Duplicated", () => {
                 ISelectParent chain = (ISelectParent)path.Resolve();
 
                 for (int i = right - left; i >= 0; i--)
@@ -142,22 +142,22 @@ namespace Apollo.Selection {
                 for (int i = 0; i <= right - left; i++)
                     chain.IInsert(right + i + 1, chain.IChildren[left + i].IClone());
             
-                ISelectParent.GetSelection(chain)?.Select(chain.IChildren[right + 1], true);
+                chain.Selection?.Select(chain.IChildren[right + 1], true);
             });
 
             for (int i = 0; i <= right - left; i++)
                 parent.IInsert(right + i + 1, parent.IChildren[left + i].IClone());
             
-            ISelectParent.GetSelection(parent)?.Select(parent.IChildren[right + 1], true);
+            parent.Selection?.Select(parent.IChildren[right + 1], true);
         }
 
         public static void Delete(ISelectParent parent, int left, int right) {
             DeleteRegion(parent, left, right, out Action undo, out Action redo, out Action dispose);
-            Program.Project.Undo.Add($"Device Removed", undo, redo, dispose);
+            Program.Project.Undo.Add($"{parent.ChildString} Removed", undo, redo, dispose);
         }
 
         public static void Group(ISelectParent parent, int left, int right) {
-            Chain chain = (Chain)parent;
+            if (!(parent is Chain chain)) return;
 
             Chain init = new Chain();
 
@@ -166,7 +166,7 @@ namespace Apollo.Selection {
 
             Path<Chain> path = new Path<Chain>(chain);
 
-            Program.Project.Undo.Add($"Device Grouped", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Grouped", () => {
                 Chain chain = path.Resolve();
 
                 chain.Remove(left);
@@ -174,7 +174,7 @@ namespace Apollo.Selection {
                 for (int i = left; i <= right; i++)
                     chain.Insert(i, init[i - left].Clone());
                 
-                SelectionManager selection = ISelectParent.GetSelection(chain);
+                SelectionManager selection = chain.Selection;
                 selection?.Select(chain[left]);
                 selection?.Select(chain[right], true);
 
@@ -197,7 +197,7 @@ namespace Apollo.Selection {
         }
 
         public static void Ungroup(ISelectParent parent, int index) {
-            Chain chain = (Chain)parent;
+            if (!(parent is Chain chain)) return;
 
             if (!(chain[index] is Group group) || group.Count != 1) return;
 
@@ -205,7 +205,7 @@ namespace Apollo.Selection {
 
             Path<Chain> path = new Path<Chain>(chain);
 
-            Program.Project.Undo.Add($"Device Ungrouped", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Ungrouped", () => {
                 Chain chain = path.Resolve();
 
                 for (int i = index + init[0].Count - 1; i >= index; i--)
@@ -221,7 +221,7 @@ namespace Apollo.Selection {
                 for (int i = 0; i < init[0].Count; i++)
                     chain.Insert(index + i, init[0][i].Clone());
 
-                ISelectParent.GetSelection(chain)?.Select(chain[index], true);
+                chain.Selection?.Select(chain[index], true);
                 
             }, () => {
                 init.Dispose();
@@ -232,11 +232,11 @@ namespace Apollo.Selection {
             for (int i = 0; i < init[0].Count; i++)
                 chain.Insert(index + i, init[0][i].Clone());
 
-            ISelectParent.GetSelection(parent)?.Select(chain[index], true);
+            parent.Selection?.Select(chain[index], true);
         }
         
         public static void Choke(ISelectParent parent, int left, int right) {
-            Chain chain = (Chain)parent;
+            if (!(parent is Chain chain)) return;
 
             Chain init = new Chain();
 
@@ -245,7 +245,7 @@ namespace Apollo.Selection {
 
             Path<Chain> path = new Path<Chain>(chain);
 
-            Program.Project.Undo.Add($"Device Choked", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Choked", () => {
                 Chain chain = path.Resolve();
 
                 chain.Remove(left);
@@ -253,7 +253,7 @@ namespace Apollo.Selection {
                 for (int i = left; i <= right; i++)
                     chain.Insert(i, init[i - left].Clone());
                 
-                SelectionManager selection = ISelectParent.GetSelection(chain);
+                SelectionManager selection = chain.Selection;
                 selection?.Select(chain[left]);
                 selection?.Select(chain[right], true);
 
@@ -276,15 +276,15 @@ namespace Apollo.Selection {
         }
 
         public static void Unchoke(ISelectParent parent, int index) {
-            Chain chain = (Chain)parent;
+            if (!(parent is Chain chain)) return;
 
-            if (!(chain[index] is Choke choke))return;
+            if (!(chain[index] is Choke choke)) return;
 
             Choke init = (Choke)choke.Clone();
 
             Path<Chain> path = new Path<Chain>(chain);
 
-            Program.Project.Undo.Add($"Device Unchoked", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Unchoked", () => {
                 Chain chain = path.Resolve();
 
                 for (int i = index + init.Chain.Count - 1; i >= index; i--)
@@ -300,7 +300,7 @@ namespace Apollo.Selection {
                 for (int i = 0; i < init.Chain.Count; i++)
                     chain.Insert(index + i, init.Chain[i].Clone());
 
-                ISelectParent.GetSelection(chain)?.Select(chain[index], true);
+                chain.Selection?.Select(chain[index], true);
                 
             }, () => {
                 init.Dispose();
@@ -311,10 +311,12 @@ namespace Apollo.Selection {
             for (int i = 0; i < init.Chain.Count; i++)
                 chain.Insert(index + i, init.Chain[i].Clone());
 
-            ISelectParent.GetSelection(chain)?.Select(chain[index], true);
+            chain.Selection?.Select(chain[index], true);
         }
 
         public static void Mute(ISelectParent parent, int left, int right) {
+            if (!(parent.IChildren[left] is IMutable)) return;
+
             List<IMutable> items = parent.IChildren.Cast<IMutable>().ToList();
 
             List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select items[i].Enabled).ToList();
@@ -322,7 +324,7 @@ namespace Apollo.Selection {
 
             Path<ISelect> path = new Path<ISelect>((ISelect)parent);
 
-            Program.Project.Undo.Add($"Device Muted", () => {
+            Program.Project.Undo.Add($"{parent.ChildString} Muted", () => {
                 List<IMutable> items = ((ISelectParent)path.Resolve()).IChildren.Cast<IMutable>().ToList();
 
                 for (int i = left; i <= right; i++)
@@ -343,22 +345,28 @@ namespace Apollo.Selection {
             // TODO Implement
         }
 
-        public static async void Export(ISelectParent parent, int left, int right) {
-            Window sender = ISelectParent.GetWindow(parent);
+        static List<FileDialogFilter> CreateFilters(ISelectParent parent) => new List<FileDialogFilter>() {
+            new FileDialogFilter() {
+                Extensions = new List<string>() {parent.ChildFileExtension},
+                Name = $"Apollo {parent.ChildString} Preset"
+            }
+        };
 
-            SaveFileDialog sfd = new SaveFileDialog() {
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "apdev"
-                        },
-                        Name = "Apollo Device Preset"
-                    }
-                },
-                Title = "Export Device Preset"
-            };
+        static SaveFileDialog CreateSFD(ISelectParent parent) => new SaveFileDialog() {
+            Filters = CreateFilters(parent),
+            Title = $"Export {parent.ChildString} Preset"
+        };
+
+        static OpenFileDialog CreateOFD(ISelectParent parent) => new OpenFileDialog() {
+            AllowMultiple = false,
+            Filters = CreateFilters(parent),
+            Title = $"Import {parent.ChildString} Preset"
+        };
+
+        public static async void Export(ISelectParent parent, int left, int right) {
+            Window sender = parent.IWindow;
             
-            string result = await sfd.ShowAsync(sender);
+            string result = await CreateSFD(parent).ShowAsync(sender);
 
             if (result != null) {
                 string[] file = result.Split(Path.DirectorySeparatorChar);
@@ -382,23 +390,10 @@ namespace Apollo.Selection {
         }
         
         public static async void Import(ISelectParent parent, int right, string path = null) {
-            Window sender = ISelectParent.GetWindow(parent);
+            Window sender = parent.IWindow;
 
             if (path == null) {
-                OpenFileDialog ofd = new OpenFileDialog() {
-                    AllowMultiple = false,
-                    Filters = new List<FileDialogFilter>() {
-                        new FileDialogFilter() {
-                            Extensions = new List<string>() {
-                                "apdev"
-                            },
-                            Name = "Apollo Device Preset"
-                        }
-                    },
-                    Title = "Import Device Preset"
-                };
-
-                string[] result = await ofd.ShowAsync(sender);
+                string[] result = await CreateOFD(parent).ShowAsync(sender);
 
                 if (result.Length > 0) path = result[0];
                 else return;
@@ -407,7 +402,7 @@ namespace Apollo.Selection {
             Copyable loaded = await Copyable.DecodeFile(path, sender);
             
             if (loaded != null && InsertCopyable(parent, loaded, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Device Imported", undo, redo, dispose);
+                Program.Project.Undo.Add($"{parent.ChildString} Imported", undo, redo, dispose);
         }
     }
 }

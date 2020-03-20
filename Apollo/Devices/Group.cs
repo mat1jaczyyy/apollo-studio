@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Controls;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Selection;
@@ -19,6 +21,12 @@ namespace Apollo.Devices {
         public bool IRoot => false;
 
         public void IInsert(int index, ISelect item) => Insert(index, (Chain)item);
+        
+        public Window IWindow => Track.Get(this)?.Window;
+        public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
+
+        public string ChildString => "Chain";
+        public string ChildFileExtension => "apchn";
 
         Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {

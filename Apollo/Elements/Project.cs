@@ -30,6 +30,12 @@ namespace Apollo.Elements {
         }
 
         public void IInsert(int index, ISelect item) => Insert(index, (Track)item);
+        
+        public Window IWindow => Window;
+        public SelectionManager Selection => Window?.Selection;
+        
+        public string ChildString => "Track";
+        public string ChildFileExtension => "aptrk";
 
         public ProjectWindow Window;
 

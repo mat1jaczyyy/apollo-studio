@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Controls;
+
 using Apollo.Devices;
 using Apollo.DeviceViewers;
 using Apollo.Selection;
@@ -11,9 +13,9 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public interface IChainParent: ISelect, IMutable {}
+    public interface IChainParent: ISelect {}
 
-    public class Chain: ISelect, ISelectParent {
+    public class Chain: ISelect, ISelectParent, IMutable {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -41,6 +43,12 @@ namespace Apollo.Elements {
         public bool IRoot { 
             get => Parent is Track;
         }
+        
+        public Window IWindow => Track.Get(this)?.Window;
+        public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
+
+        public string ChildString => "Device";
+        public string ChildFileExtension => "apdev";
 
         public ChainInfo Info;
         public ChainViewer Viewer;

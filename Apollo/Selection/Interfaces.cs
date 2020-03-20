@@ -49,24 +49,6 @@ namespace Apollo.Selection {
     }
 
     public interface ISelectParent {
-        static SelectionManager GetSelection(ISelectParent item) {
-            if (item is Chain chain) return Track.Get(chain)?.Window?.Selection;
-            else if (item is Group group) return Track.Get(group)?.Window?.Selection;
-            else if (item is Project) return Program.Project.Window?.Selection;
-            else if (item is Pattern pattern) return pattern.Window?.Selection;
-
-            return null;
-        }
-
-        static Window GetWindow(ISelectParent item) {
-            if (item is Chain chain) return Track.Get(chain)?.Window;
-            else if (item is Group group) return Track.Get(group)?.Window;
-            else if (item is Project) return Program.Project.Window;
-            else if (item is Pattern pattern) return pattern.Window;
-
-            return null;
-        }
-
         ISelectParentViewer IViewer { get; }
 
         List<ISelect> IChildren { get; }
@@ -76,6 +58,12 @@ namespace Apollo.Selection {
 
         void IInsert(int index, ISelect device);
         void Remove(int index, bool dispose = true);
+
+        Window IWindow { get; }
+        SelectionManager Selection { get; }
+
+        string ChildString { get; }
+        string ChildFileExtension { get; }
     }
 
     public interface ISelectParentViewer {
