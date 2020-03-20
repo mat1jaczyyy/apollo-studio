@@ -221,13 +221,19 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
+            Console.WriteLine($"{change} {x}");
+
+            Fade.ThumbMoveUndoEntry entry = new Fade.ThumbMoveUndoEntry(
+                _fade,
+                i,
+                (x - total?? 0) / Gradient.Width,
+                x / Gradient.Width
+            );
+
             if (total != null) 
-                Program.Project.Undo.AddAndExecute(new Fade.ThumbMoveUndoEntry(
-                    _fade, 
-                    i, 
-                    (x - total.Value) / Gradient.Width, 
-                    x / Gradient.Width
-                ));
+                Program.Project.Undo.Add(entry);
+            
+            entry.Redo();
         }
 
         public void SetPosition(int index, double position) {

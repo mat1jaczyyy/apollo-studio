@@ -69,7 +69,7 @@ namespace Apollo.Devices {
             protected override void Action(Flip item, FlipType element) => item.Mode = element;
             
             public ModeUndoEntry(Flip flip, FlipType u, FlipType r)
-            : base($"Flip Orientation Changed to {r.ToString()}", flip, u, r) {}
+            : base($"Flip Orientation Changed to {r.ToString().Replace('1', '+').Replace('2', '-')}", flip, u, r) {}
         }
         
         public class BypassUndoEntry: SimplePathUndoEntry<Flip, bool> {

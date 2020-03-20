@@ -14,9 +14,6 @@ namespace Apollo.Undo {
         public override void Redo() => RedoPath(Items);
         protected virtual void RedoPath(params T[] items) {}
 
-        public override void Dispose() => DisposePath(Items);
-        protected virtual void DisposePath(params T[] items) {}
-
         public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
     }
 }

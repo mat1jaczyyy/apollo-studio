@@ -70,25 +70,25 @@ namespace Apollo.Components {
 
         void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             if (old_x != null && old_y != null)
-                Program.Project.Undo.Add(new Copy.OffsetRelativeUndoEntry(
+                Program.Project.Undo.AddAndExecute(new Copy.OffsetRelativeUndoEntry(
                     _copy,
                     _copy.Offsets.IndexOf(_offset),
                     old_x.Value,
                     old_y.Value,
-                    _offset.X,
-                    _offset.Y
+                    x,
+                    y
                 ));
         }
 
         void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
             if (old_x != null && old_y != null)
-                Program.Project.Undo.Add(new Copy.OffsetAbsoluteUndoEntry(
+                Program.Project.Undo.AddAndExecute(new Copy.OffsetAbsoluteUndoEntry(
                     _copy,
                     _copy.Offsets.IndexOf(_offset),
                     old_x.Value,
                     old_y.Value,
-                    _offset.AbsoluteX,
-                    _offset.AbsoluteY
+                    x,
+                    y
                 ));
         }
 

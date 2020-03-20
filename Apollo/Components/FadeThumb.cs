@@ -110,11 +110,10 @@ namespace Apollo.Components {
         double change;
 
         void MouseMove(object sender, VectorEventArgs e) {
-            if (!dragged) change = 0;
-            change += e.Vector.X;
+            change = e.Vector.X;
 
             dragged = true;
-            Moved?.Invoke(this, e.Vector.X, null);
+            Moved?.Invoke(this, change, null);
         }
         
         public void Select() => this.Resources["Outline"] = new SolidColorBrush(new Color(255, 255, 255, 255));

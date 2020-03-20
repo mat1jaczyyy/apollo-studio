@@ -59,8 +59,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Tone.SatHighUndoEntry(
                     _tone, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -70,8 +70,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Tone.SatLowUndoEntry(
                     _tone, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -81,8 +81,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Tone.ValueHighUndoEntry(
                     _tone, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -92,8 +92,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Tone.ValueLowUndoEntry(
                     _tone, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
