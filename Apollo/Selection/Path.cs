@@ -32,7 +32,7 @@ namespace Apollo.Selection {
             ISelect child = (ISelect)item;
 
             while (true) {
-                if (item is Chain chain && (chain.Parent is Choke || chain.IRoot))
+                if (child is Chain chain && (chain.Parent is Choke || chain.IRoot))
                     child = (ISelect)chain.Parent;
 
                 path.Add(child.IParentIndex?? -1);
