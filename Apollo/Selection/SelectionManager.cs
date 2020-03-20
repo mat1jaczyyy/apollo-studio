@@ -102,8 +102,8 @@ namespace Apollo.Selection {
         public void MoveChild() {
             Expand();
 
-            if (Start is ISelectParent && ((ISelectParent)Start).IChildren.Count > 0)
-                Select(((ISelectParent)Start).IChildren[0]);
+            if (Start is ISelectParent parent && parent.IChildren.Count > 0)
+                Select(parent.IChildren[0]);
         }
 
         public void Action(string action) {

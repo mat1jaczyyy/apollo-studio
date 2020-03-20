@@ -104,7 +104,7 @@ namespace Apollo.Viewers {
         public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
         void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
-
+    
         void ContextMenu_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action);
 
         public void Select(PointerPressedEventArgs e) {
