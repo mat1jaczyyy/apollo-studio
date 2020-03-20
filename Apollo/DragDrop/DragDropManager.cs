@@ -206,7 +206,7 @@ namespace Apollo.DragDrop {
 
                 if (!(sourceparent is Project) && !(targetparent is Project)) {
                     sourcepath = new Path<ISelect>((ISelect)sourceparent);
-                    targetpath = new Path<ISelect>((ISelect)targetpath);
+                    targetpath = new Path<ISelect>((ISelect)targetparent);
                 }
             }
         }
