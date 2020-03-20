@@ -76,7 +76,7 @@ namespace Apollo.DragDrop {
         static bool FileDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
             string path = e.Data.GetFileNames().FirstOrDefault();
 
-            if (path != null) parent.IViewer?.Import(after, path);
+            if (path != null) Operations.Import(parent, after, path);
 
             return true;
         }
@@ -172,7 +172,7 @@ namespace Apollo.DragDrop {
 
             ISelectParent source => ((ISelectParent)sourcepath?.Resolve())?? Program.Project;
             ISelectParent target => ((ISelectParent)targetpath?.Resolve())?? Program.Project;
-
+    
             public override void Undo() => UndoDrop(source, target);
             public override void Redo() => RedoDrop(source, target);
 
