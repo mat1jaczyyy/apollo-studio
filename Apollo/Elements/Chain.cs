@@ -11,7 +11,7 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public interface IChainParent: ISelect {}
+    public interface IChainParent: ISelect, IMutable {}
 
     public class Chain: ISelect, ISelectParent {
         public ISelectViewer IInfo {

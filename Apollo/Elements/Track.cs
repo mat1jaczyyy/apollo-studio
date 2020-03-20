@@ -10,7 +10,7 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: ISelect, IChainParent {
+    public class Track: ISelect, IChainParent, IMutable {
         public ISelectViewer IInfo {
             get => Info;
         }

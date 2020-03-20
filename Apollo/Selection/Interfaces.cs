@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+using Avalonia.Controls;
 using Avalonia.Input;
 
 using Apollo.Core;
@@ -14,7 +15,7 @@ namespace Apollo.Selection {
             if (item is Device device) return Track.Get(device)?.Window?.Selection;
 
             else if (item is Chain chain) {
-                ((Group)chain.Parent).SpecificViewer.Expand(chain.ParentIndex);
+                ((Group)chain.Parent).SpecificViewer.Expand(chain.ParentIndex);  // TODO this and Frame_Select are not nice
                 return Track.Get(chain)?.Window?.Selection;
             
             } else if (item is Track track) return Program.Project.Window?.Selection;
@@ -35,6 +36,8 @@ namespace Apollo.Selection {
         int? IParentIndex { get; }
 
         ISelect IClone();
+        
+        void Dispose();
     }
 
     public interface ISelectViewer {
@@ -46,6 +49,24 @@ namespace Apollo.Selection {
     }
 
     public interface ISelectParent {
+        static SelectionManager GetSelection(ISelectParent item) {
+            if (item is Chain chain) return Track.Get(chain)?.Window?.Selection;
+            else if (item is Group group) return Track.Get(group)?.Window?.Selection;
+            else if (item is Project) return Program.Project.Window?.Selection;
+            else if (item is Pattern pattern) return pattern.Window?.Selection;
+
+            return null;
+        }
+
+        static Window GetWindow(ISelectParent item) {
+            if (item is Chain chain) return Track.Get(chain)?.Window;
+            else if (item is Group group) return Track.Get(group)?.Window;
+            else if (item is Project) return Program.Project.Window;
+            else if (item is Pattern pattern) return pattern.Window;
+
+            return null;
+        }
+
         ISelectParentViewer IViewer { get; }
 
         List<ISelect> IChildren { get; }
@@ -60,22 +81,9 @@ namespace Apollo.Selection {
     public interface ISelectParentViewer {
         int? IExpanded { get; }
         void Expand(int? index);
+    }
 
-        void Copy(int left, int right, bool cut = false);
-        void Duplicate(int left, int right);
-        void Paste(int right);
-        void Replace(int left, int right);
-        void Delete(int left, int right);
-
-        void Group(int left, int right);
-        void Ungroup(int left);
-        void Choke(int left, int right);
-        void Unchoke(int left);
-
-        void Mute(int left, int right);
-        void Rename(int left, int right);
-        
-        void Export(int left, int right);
-        void Import(int right, string path = null);
+    public interface IMutable: ISelect {
+        bool Enabled { get; set; }
     }
 }
