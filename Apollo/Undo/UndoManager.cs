@@ -79,7 +79,7 @@ namespace Apollo.Undo {
             public override void Dispose() => dispose?.Invoke();
 
             public LegacyUndoEntry(string desc, Action undo, Action redo, Action dispose)
-            : base(desc) {
+            : base($"[Legacy] {desc}") {
                 this.undo = undo;
                 this.redo = redo;
                 this.dispose = dispose;
