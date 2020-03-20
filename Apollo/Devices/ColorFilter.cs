@@ -113,35 +113,35 @@ namespace Apollo.Devices {
             protected override void Action(ColorFilter item, double element) => item.Saturation = element;
             
             public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Sat Changed to {r}%", colorFilter, u, r) {}
+            : base($"Color Filter Sat Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
         
         public class ValueUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
             protected override void Action(ColorFilter item, double element) => item.Value = element;
             
             public ValueUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Value Changed to {r}%", colorFilter, u, r) {}
+            : base($"Color Filter Value Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
         
         public class HueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
             protected override void Action(ColorFilter item, double element) => item.HueTolerance = element;
             
             public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter, u, r) {}
+            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
         
         public class SaturationToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
             protected override void Action(ColorFilter item, double element) => item.SaturationTolerance = element;
             
             public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter, u, r) {}
+            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
         
         public class ValueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
             protected override void Action(ColorFilter item, double element) => item.ValueTolerance = element;
             
             public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
-            : base($"Color Filter Value Tol Changed to {r}%", colorFilter, u, r) {}
+            : base($"Color Filter Value Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
     }
 }

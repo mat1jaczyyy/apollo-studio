@@ -74,8 +74,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new ColorFilter.ValueUndoEntry(
                     _filter, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -85,8 +85,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new ColorFilter.HueToleranceUndoEntry(
                     _filter, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -96,8 +96,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationToleranceUndoEntry(
                     _filter, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
@@ -107,8 +107,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new ColorFilter.ValueToleranceUndoEntry(
                     _filter, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
