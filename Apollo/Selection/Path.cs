@@ -29,15 +29,17 @@ namespace Apollo.Selection {
         }
 
         public Path(T item) {
+            ISelect child = (ISelect)item;
+
             while (true) {
                 if (item is Chain chain && (chain.Parent is Choke || chain.IRoot))
-                    item = (T)chain.Parent;
+                    child = (ISelect)chain.Parent;
 
-                path.Add(item.IParentIndex?? -1);
+                path.Add(child.IParentIndex?? -1);
 
-                if (item is Track) break;
+                if (child is Track) break;
 
-                item = (T)item.IParent;
+                child = (ISelect)child.IParent;
             }
         }
     }
