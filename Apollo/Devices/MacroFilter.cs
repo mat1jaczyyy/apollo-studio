@@ -65,7 +65,7 @@ namespace Apollo.Devices {
             protected override void Action(MacroFilter item, int element) => item.Macro = element;
             
             public TargetUndoEntry(MacroFilter filter, int u, int r)
-            : base($"Macro Filter Target Changed to {r}%", filter, u, r) {}
+            : base($"Macro Filter Target Changed to {r}", filter, u, r) {}
         }
         
         public class FilterUndoEntry: SimplePathUndoEntry<MacroFilter, bool[]> {
