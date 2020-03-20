@@ -9,8 +9,8 @@ namespace Apollo.Undo {
 
         protected virtual void Action(T item, I element) {}
 
-        protected override void DisposePath(params T[] items) => Dispose(items[0], u, r);
-        protected virtual void Dispose(T item, I undo, I redo) {}
+        public override void Dispose() => Dispose(u, r);
+        protected virtual void Dispose(I undo, I redo) {}
 
         public SimplePathUndoEntry(string desc, T child, I undo, I redo): base(desc, child) {
             this.u = undo;

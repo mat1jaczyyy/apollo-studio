@@ -213,7 +213,7 @@ namespace Apollo.Elements {
             protected override void UndoPath(params Chain[] items) => items[0].Remove(index);
             protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone());
             
-            protected override void DisposePath(params Chain[] items) => device.Dispose();
+            public override void Dispose() => device.Dispose();
             
             public DeviceInsertedUndoEntry(Chain chain, int index, Device device)
             : base($"Device ({device.Name}) Inserted", chain) {
