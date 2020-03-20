@@ -63,8 +63,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new ColorFilter.SaturationUndoEntry(
                     _filter, 
-                    old.Value / 100, 
-                    value / 100
+                    old.Value, 
+                    value
                 ));
         }
 
