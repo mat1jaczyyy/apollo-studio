@@ -48,7 +48,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _th != value) {
                     _th = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetHueTolerance(Hue);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetHueTolerance(HueTolerance);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _ts != value) {
                     _ts = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetSaturationTolerance(Saturation);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetSaturationTolerance(SaturationTolerance);
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _tv != value) {
                     _tv = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetValueTolerance(Value);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetValueTolerance(ValueTolerance);
                 }
             }
         }
