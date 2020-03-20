@@ -5,7 +5,7 @@ using Apollo.Selection;
 
 namespace Apollo.Undo {
     public class PathUndoEntry<T>: UndoEntry where T: ISelect {
-        protected IEnumerable<Path<T>> Paths;
+        protected List<Path<T>> Paths;
         public T[] Items => Paths.Select(i => i.Resolve()).ToArray();
 
         public override void Undo() => UndoPath(Items);
@@ -17,6 +17,6 @@ namespace Apollo.Undo {
         public override void Dispose() => DisposePath(Items);
         protected virtual void DisposePath(params T[] items) {}
 
-        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i));
+        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
     }
 }
