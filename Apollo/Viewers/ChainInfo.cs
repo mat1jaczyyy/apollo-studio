@@ -161,20 +161,20 @@ namespace Apollo.Viewers {
         public class DeviceAsChainUndoEntry: DragDropManager.DragDropUndoEntry {
             int? remove;
 
-            public override void Undo() {
-                base.Undo();
+            protected override void UndoPath(params ISelectParent[] items) {
+                base.UndoPath(items);
                 
                 if (remove != null)
-                    ((Group)targetpath.Resolve()).Remove(remove.Value);
+                    items[1].Remove(remove.Value);
             }
 
-            public override void Redo() {
+            protected override void RedoPath(params ISelectParent[] items) {
                 ISelectParent target;
 
-                if (remove != null) ((ISelectParent)targetpath.Resolve(1)).IInsert(remove.Value, (Chain)(target = new Chain()));
-                else target = (ISelectParent)targetpath.Resolve();
+                if (remove != null) ((ISelectParent)Paths[1].Resolve(1)).IInsert(remove.Value, (Chain)(target = new Chain()));
+                else target = (ISelectParent)Paths[1].Resolve();
 
-                RedoDrop((ISelectParent)sourcepath.Resolve(), target);
+                base.RedoPath(items[0], target);
             }
 
             public DeviceAsChainUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)

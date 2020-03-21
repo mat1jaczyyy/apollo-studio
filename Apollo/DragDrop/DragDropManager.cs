@@ -163,51 +163,37 @@ namespace Apollo.DragDrop {
             Host = null;
         }
         
-        public class DragDropUndoEntry: UndoEntry {
+        public class DragDropUndoEntry: PathParentUndoEntry<ISelectParent> {
             bool copy;
             int count, before, before_pos, after, after_pos;
 
-            protected Path<ISelect> sourcepath = null;
-            protected Path<ISelect> targetpath = null;
-
-            ISelectParent source => ((ISelectParent)sourcepath?.Resolve())?? Program.Project;
-            ISelectParent target => ((ISelectParent)targetpath?.Resolve())?? Program.Project;
-    
-            public override void Undo() => UndoDrop(source, target);
-            public override void Redo() => RedoDrop(source, target);
-
-            protected void UndoDrop(ISelectParent source, ISelectParent target) {
+            protected override void UndoPath(params ISelectParent[] items) {
                 if (copy)
                     for (int i = after + count; i > after; i--)
-                        target.Remove(i);
+                        items[1].Remove(i);
 
                 else Move(
-                    (from i in Enumerable.Range(after_pos + 1, count) select target.IChildren[i]).ToList(),
-                    source,
+                    (from i in Enumerable.Range(after_pos + 1, count) select items[1].IChildren[i]).ToList(),
+                    items[0],
                     before_pos
                 );
             }
 
-            protected void RedoDrop(ISelectParent source, ISelectParent target) => Move(
-                (from i in Enumerable.Range(before + 1, count) select source.IChildren[i]).ToList(),
-                target,
+            protected override void RedoPath(params ISelectParent[] items) => Move(
+                (from i in Enumerable.Range(before + 1, count) select items[0].IChildren[i]).ToList(),
+                items[1],
                 after,
                 copy
             );
             
             public DragDropUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
-            : base($"{format} {(copy? "Copied" : "Moved")}") {
+            : base($"{format} {(copy? "Copied" : "Moved")}", sourceparent, targetparent) {
                 this.copy = copy;
                 this.count = count;
                 this.before = before;
                 this.after = after;
                 this.before_pos = before_pos;
                 this.after_pos = after_pos;
-
-                if (!(sourceparent is Project) && !(targetparent is Project)) {
-                    sourcepath = new Path<ISelect>((ISelect)sourceparent);
-                    targetpath = new Path<ISelect>((ISelect)targetparent);
-                }
             }
         }
     }
