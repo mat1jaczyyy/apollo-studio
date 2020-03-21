@@ -10,6 +10,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Selection {
@@ -127,28 +128,45 @@ namespace Apollo.Selection {
             }
         }
 
-        public static void Duplicate(ISelectParent parent, int left, int right) {
-            Path<ISelect> path = new Path<ISelect>((ISelect)parent);
+        public abstract class SingleParentUndoEntry<T>: PathParentUndoEntry<T> where T: ISelectParent {
+            protected override void UndoPath(params T[] items) => Undo(items[0]);
+            protected virtual void Undo(T item) {}
 
-            Program.Project.Undo.Add($"{parent.ChildString} Duplicated", () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
+            protected override void RedoPath(params T[] items) => Redo(items[0]);
+            protected virtual void Redo(T item) {}
 
+            public SingleParentUndoEntry(string desc, T item)
+            : base(desc, item) {}
+        }
+
+        public class DuplicateUndoEntry: SingleParentUndoEntry<ISelectParent> {
+            int left, right;
+
+            protected override void Undo(ISelectParent parent) {
                 for (int i = right - left; i >= 0; i--)
-                    chain.Remove(right + i + 1);
+                    parent.Remove(right + i + 1);
+            }
 
-            }, () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
-
+            protected override void Redo(ISelectParent parent) {
                 for (int i = 0; i <= right - left; i++)
-                    chain.IInsert(right + i + 1, chain.IChildren[left + i].IClone());
+                    parent.IInsert(right + i + 1, parent.IChildren[left + i].IClone());
             
-                chain.Selection?.Select(chain.IChildren[right + 1], true);
-            });
+                parent.Selection?.Select(parent.IChildren[right + 1], true);
+            }
+            
+            public DuplicateUndoEntry(ISelectParent parent, int left, int right)
+            : base($"{parent.ChildString} Duplicated", parent) {
+                this.left = left;
+                this.right = right;
+            }
+        }
 
-            for (int i = 0; i <= right - left; i++)
-                parent.IInsert(right + i + 1, parent.IChildren[left + i].IClone());
-            
-            parent.Selection?.Select(parent.IChildren[right + 1], true);
+        public static void Duplicate(ISelectParent parent, int left, int right) {
+            Program.Project.Undo.AddAndExecute(new DuplicateUndoEntry(
+                parent,
+                left,
+                right
+            ));
         }
 
         public static void Delete(ISelectParent parent, int left, int right) {
@@ -156,44 +174,100 @@ namespace Apollo.Selection {
             Program.Project.Undo.Add($"{parent.ChildString} Removed", undo, redo, dispose);
         }
 
-        public static void Group(ISelectParent parent, int left, int right) {
-            if (!(parent is Chain chain)) return;
+        public abstract class DeviceEncapsulationUndoEntry: SingleParentUndoEntry<Chain> {
+            int left, right;
+            Chain init;
 
-            Chain init = new Chain();
+            protected abstract Device Encapsulate(Chain chain);
 
-            for (int i = left; i <= right; i++)
-                init.Add(chain[i].Clone());
-
-            Path<Chain> path = new Path<Chain>(chain);
-
-            Program.Project.Undo.Add($"{parent.ChildString} Grouped", () => {
-                Chain chain = path.Resolve();
-
+            protected override void Undo(Chain chain) {
                 chain.Remove(left);
 
                 for (int i = left; i <= right; i++)
                     chain.Insert(i, init[i - left].Clone());
                 
-                SelectionManager selection = chain.Selection;
-                selection?.Select(chain[left]);
-                selection?.Select(chain[right], true);
+                chain.Selection?.Select(chain[left]);
+                chain.Selection?.Select(chain[right], true);
+            }
 
-            }, () => {
-                Chain chain = path.Resolve();
-                
+            protected override void Redo(Chain chain) {
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
                 
-                chain.Insert(left, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
-            
-            }, () => {
-                init.Dispose();
-            });
-            
-            for (int i = right; i >= left; i--)
-                chain.Remove(i);
+                chain.Insert(left, Encapsulate(init.Clone()));
+            }
 
-            chain.Insert(left, new Group(new List<Chain>() {init.Clone()}) {Expanded = 0});
+            public override void Dispose() => init.Dispose();
+            
+            public DeviceEncapsulationUndoEntry(Chain chain, int left, int right, string action)
+            : base($"{chain.ChildString} {action}", chain) {
+                this.left = left;
+                this.right = right;
+
+                init = new Chain();
+
+                for (int i = left; i <= right; i++)
+                    init.Add(chain[i].Clone());
+            }
+        }
+
+        public abstract class DeviceDecapsulationUndoEntry<T>: SingleParentUndoEntry<Chain> where T: Device, IChainParent {
+            int index;
+            T init;
+
+            protected abstract Chain GetChain(T container);
+
+            protected override void Undo(Chain chain) {
+                for (int i = index + GetChain(init).Count - 1; i >= index; i--)
+                    chain.Remove(i);
+                
+                chain.Insert(index, init.Clone());
+            }
+
+            protected override void Redo(Chain chain) {
+                Chain items = GetChain(init);
+
+                chain.Remove(index);
+            
+                for (int i = 0; i < items.Count; i++)
+                    chain.Insert(index + i, items[i].Clone());
+
+                chain.Selection?.Select(chain[index], true);
+            }
+
+            public override void Dispose() => init.Dispose();
+            
+            public DeviceDecapsulationUndoEntry(Chain chain, int index, string action)
+            : base($"{chain.ChildString} {action}", chain) {
+                this.index = index;
+
+                init = (T)chain[index].Clone();
+            }
+        }
+
+        public class GroupUndoEntry: DeviceEncapsulationUndoEntry {
+            protected override Device Encapsulate(Chain chain)
+                => new Group(new List<Chain>() {chain}) {Expanded = 0};
+
+            public GroupUndoEntry(Chain chain, int left, int right)
+            : base(chain, left, right, "Grouped") {}
+        }
+
+        public static void Group(ISelectParent parent, int left, int right) {
+            if (!(parent is Chain chain)) return;
+
+            Program.Project.Undo.AddAndExecute(new GroupUndoEntry(
+                chain,
+                left,
+                right
+            ));
+        }
+
+        public class UngroupUndoEntry: DeviceDecapsulationUndoEntry<Group> {
+            protected override Chain GetChain(Group group) => group[0];
+            
+            public UngroupUndoEntry(Chain chain, int index)
+            : base(chain, index, "Ungrouped") {}
         }
 
         public static void Ungroup(ISelectParent parent, int index) {
@@ -201,78 +275,35 @@ namespace Apollo.Selection {
 
             if (!(chain[index] is Group group) || group.Count != 1) return;
 
-            Group init = (Group)group.Clone();
-
-            Path<Chain> path = new Path<Chain>(chain);
-
-            Program.Project.Undo.Add($"{parent.ChildString} Ungrouped", () => {
-                Chain chain = path.Resolve();
-
-                for (int i = index + init[0].Count - 1; i >= index; i--)
-                    chain.Remove(i);
-                
-                chain.Insert(index, init.Clone());
-
-            }, () => {
-                Chain chain = path.Resolve();
-                
-                chain.Remove(index);
-            
-                for (int i = 0; i < init[0].Count; i++)
-                    chain.Insert(index + i, init[0][i].Clone());
-
-                chain.Selection?.Select(chain[index], true);
-                
-            }, () => {
-                init.Dispose();
-            });
-
-            chain.Remove(index);
-            
-            for (int i = 0; i < init[0].Count; i++)
-                chain.Insert(index + i, init[0][i].Clone());
-
-            parent.Selection?.Select(chain[index], true);
+            Program.Project.Undo.AddAndExecute(new UngroupUndoEntry(
+                chain,
+                index
+            ));
         }
         
+        public class ChokeUndoEntry: DeviceEncapsulationUndoEntry {
+            protected override Device Encapsulate(Chain chain)
+                => new Choke(chain: chain.Clone());
+
+            public ChokeUndoEntry(Chain chain, int left, int right)
+            : base(chain, left, right, "Choked") {}
+        }
+
         public static void Choke(ISelectParent parent, int left, int right) {
             if (!(parent is Chain chain)) return;
-
-            Chain init = new Chain();
-
-            for (int i = left; i <= right; i++)
-                init.Add(chain[i].Clone());
-
-            Path<Chain> path = new Path<Chain>(chain);
-
-            Program.Project.Undo.Add($"{parent.ChildString} Choked", () => {
-                Chain chain = path.Resolve();
-
-                chain.Remove(left);
-
-                for (int i = left; i <= right; i++)
-                    chain.Insert(i, init[i - left].Clone());
-                
-                SelectionManager selection = chain.Selection;
-                selection?.Select(chain[left]);
-                selection?.Select(chain[right], true);
-
-            }, () => {
-                Chain chain = path.Resolve();
-                
-                for (int i = right; i >= left; i--)
-                    chain.Remove(i);
-                
-                chain.Insert(left, new Choke(1, init.Clone()));
             
-            }, () => {
-                init.Dispose();
-            });
-            
-            for (int i = right; i >= left; i--)
-                chain.Remove(i);
+            Program.Project.Undo.AddAndExecute(new ChokeUndoEntry(
+                chain,
+                left,
+                right
+            ));
+        }
 
-            chain.Insert(left, new Choke(1, init.Clone()));
+        public class UnchokeUndoEntry: DeviceDecapsulationUndoEntry<Choke> {
+            protected override Chain GetChain(Choke choke) => choke.Chain;
+            
+            public UnchokeUndoEntry(Chain chain, int index)
+            : base(chain, index, "Unchoked") {}
         }
 
         public static void Unchoke(ISelectParent parent, int index) {
@@ -280,65 +311,53 @@ namespace Apollo.Selection {
 
             if (!(chain[index] is Choke choke)) return;
 
-            Choke init = (Choke)choke.Clone();
+            Program.Project.Undo.AddAndExecute(new UnchokeUndoEntry(
+                chain,
+                index
+            ));
+        }
 
-            Path<Chain> path = new Path<Chain>(chain);
+        public class MuteUndoEntry: SingleParentUndoEntry<ISelectParent> {
+            int left, right;
+            List<bool> u;
+            bool r;
 
-            Program.Project.Undo.Add($"{parent.ChildString} Unchoked", () => {
-                Chain chain = path.Resolve();
+            List<IMutable> GetMutables(ISelectParent parent) => parent.IChildren.Cast<IMutable>().ToList();
 
-                for (int i = index + init.Chain.Count - 1; i >= index; i--)
-                    chain.Remove(i);
-                
-                chain.Insert(index, init.Clone());
+            protected override void Undo(ISelectParent parent) {
+                List<IMutable> items = GetMutables(parent);
 
-            }, () => {
-                Chain chain = path.Resolve();
-                
-                chain.Remove(index);
+                for (int i = left; i <= right; i++)
+                    items[i].Enabled = u[i - left];
+            }
+
+            protected override void Redo(ISelectParent parent) {
+                List<IMutable> items = GetMutables(parent);
+
+                for (int i = left; i <= right; i++)
+                    items[i].Enabled = r;
+            }
             
-                for (int i = 0; i < init.Chain.Count; i++)
-                    chain.Insert(index + i, init.Chain[i].Clone());
-
-                chain.Selection?.Select(chain[index], true);
+            public MuteUndoEntry(ISelectParent parent, int left, int right)
+            : base($"{parent.ChildString} Muted", parent) {
+                this.left = left;
+                this.right = right;
                 
-            }, () => {
-                init.Dispose();
-            });
+                List<IMutable> items = GetMutables(parent);
 
-            chain.Remove(index);
-            
-            for (int i = 0; i < init.Chain.Count; i++)
-                chain.Insert(index + i, init.Chain[i].Clone());
-
-            chain.Selection?.Select(chain[index], true);
+                u = (from i in Enumerable.Range(left, right - left + 1) select items[i].Enabled).ToList();
+                r = !items[left].Enabled;
+            }
         }
 
         public static void Mute(ISelectParent parent, int left, int right) {
             if (!(parent.IChildren[left] is IMutable)) return;
 
-            List<IMutable> items = parent.IChildren.Cast<IMutable>().ToList();
-
-            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select items[i].Enabled).ToList();
-            bool r = !items[left].Enabled;
-
-            Path<ISelect> path = new Path<ISelect>((ISelect)parent);
-
-            Program.Project.Undo.Add($"{parent.ChildString} Muted", () => {
-                List<IMutable> items = ((ISelectParent)path.Resolve()).IChildren.Cast<IMutable>().ToList();
-
-                for (int i = left; i <= right; i++)
-                    items[i].Enabled = u[i - left];
-
-            }, () => {
-                List<IMutable> items = ((ISelectParent)path.Resolve()).IChildren.Cast<IMutable>().ToList();
-
-                for (int i = left; i <= right; i++)
-                    items[i].Enabled = r;
-            });
-
-            for (int i = left; i <= right; i++)
-                items[i].Enabled = r;
+            Program.Project.Undo.AddAndExecute(new MuteUndoEntry(
+                parent,
+                left,
+                right
+            ));
         }
 
         public static void Rename(ISelectParent parent, int left, int right) {
