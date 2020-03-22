@@ -32,6 +32,7 @@ namespace Apollo.Devices {
         public Window IWindow => Window;
         public SelectionManager Selection => Window?.Selection;
 
+        public Type ChildType => typeof(Frame);
         public string ChildString => "Frame";
         public string ChildFileExtension => null;
 

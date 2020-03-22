@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Avalonia.Controls;
@@ -62,6 +63,7 @@ namespace Apollo.Selection {
         Window IWindow { get; }
         SelectionManager Selection { get; }
 
+        Type ChildType { get; }
         string ChildString { get; }
         string ChildFileExtension { get; }
     }

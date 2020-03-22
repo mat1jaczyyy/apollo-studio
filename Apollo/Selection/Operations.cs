@@ -15,43 +15,52 @@ using Apollo.Windows;
 
 namespace Apollo.Selection {
     public static class Operations {
-        static bool InsertCopyable(ISelectParent parent, Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
-            undo = redo = dispose = null;
+        public abstract class SingleParentUndoEntry<T>: PathParentUndoEntry<T> where T: ISelectParent {
+            protected override void UndoPath(params T[] items) => Undo(items[0]);
+            protected virtual void Undo(T item) {}
 
-            List<ISelect> pasted;
-            try {
-                pasted = paste.Contents;
-            } catch (InvalidCastException) {  // TODO test this out a lot
-                return false;
+            protected override void RedoPath(params T[] items) => Redo(items[0]);
+            protected virtual void Redo(T item) {}
+
+            public SingleParentUndoEntry(string desc, T item)
+            : base(desc, item) {}
+        }
+
+        public class InsertCopyableUndoEntry: SingleParentUndoEntry<ISelectParent> {
+            int right;
+            public List<ISelect> init { get; private set; }
+
+            protected override void Undo(ISelectParent parent) {
+                for (int i = init.Count - 1; i >= 0; i--)
+                    parent.Remove(right + i + 1);
+            }
+
+            protected override void Redo(ISelectParent parent) {
+                for (int i = 0; i < init.Count; i++)
+                    parent.IInsert(right + i + 1, init[i].IClone());
+
+                parent.Selection?.Select(parent.IChildren[right + 1], true);
+            }
+
+            public override void Dispose() {
+                foreach (ISelect item in init) item.Dispose();
+                init = null;
             }
             
-            Path<ISelect> path = new Path<ISelect>((ISelect)parent);
+            public InsertCopyableUndoEntry(ISelectParent parent, Copyable copyable, int right, string action)
+            : base($"{parent.ChildString} {action}", parent) {
+                this.right = right;
 
-            undo = () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
+                init = copyable.Contents;
+            }
+        }
 
-                for (int i = paste.Contents.Count - 1; i >= 0; i--)
-                    chain.Remove(right + i + 1);
-            };
-            
-            redo = () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
+        static bool InsertCopyable(ISelectParent parent, Copyable copyable, int right, string action, out InsertCopyableUndoEntry entry) {
+            entry = null;
 
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    chain.IInsert(right + i + 1, pasted[i].IClone());
+            if (!parent.ChildType.IsAssignableFrom(copyable.Type)) return false;
 
-                chain.Selection?.Select(chain.IChildren[right + 1], true);
-            };
-            
-            dispose = () => {
-                foreach (ISelect device in pasted) device.Dispose();
-                pasted = null;
-            };
-
-            for (int i = 0; i < paste.Contents.Count; i++)
-                parent.IInsert(right + i + 1, pasted[i].IClone());
-            
-            parent.Selection?.Select(parent.IChildren[right + 1], true);
+            entry = new InsertCopyableUndoEntry(parent, copyable, right, action);
             
             return true;
         }
@@ -65,34 +74,6 @@ namespace Apollo.Selection {
             return copy;
         }
 
-        static void DeleteRegion(ISelectParent parent, int left, int right, out Action undo, out Action redo, out Action dispose) {
-            List<ISelect> u = (from i in Enumerable.Range(left, right - left + 1) select parent.IChildren[i].IClone()).ToList();
-
-            Path<ISelect> path = new Path<ISelect>((ISelect)parent);
-
-            undo = () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
-
-                for (int i = left; i <= right; i++)
-                    chain.IInsert(i, u[i - left].IClone());
-            };
-
-            redo = () => {
-                ISelectParent chain = (ISelectParent)path.Resolve();
-
-                for (int i = right; i >= left; i--)
-                    chain.Remove(i);
-            };
-
-            dispose = () => {
-               foreach (ISelect device in u) device.Dispose();
-               u = null;
-            };
-
-            for (int i = right; i >= left; i--)
-                parent.Remove(i);
-        }
-
         public static void Copy(ISelectParent parent, int left, int right, bool cut = false) {
             CreateCopyable(parent, left, right).StoreToClipboard();
 
@@ -102,41 +83,79 @@ namespace Apollo.Selection {
         public static async void Paste(ISelectParent parent, int right) {
             Copyable paste = await Copyable.DecodeClipboard();
 
-            if (paste != null && InsertCopyable(parent, paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add($"{parent.ChildString} Pasted", undo, redo, dispose);
+            if (paste != null && InsertCopyable(parent, paste, right, "Pasted", out InsertCopyableUndoEntry entry))
+                Program.Project.Undo.AddAndExecute(entry);
+        }
+        
+        public class DeleteUndoEntry: SingleParentUndoEntry<ISelectParent> {
+            public int left { get; private set; }
+            int right;
+            List<ISelect> init;
+
+            protected override void Undo(ISelectParent parent) {
+                for (int i = left; i <= right; i++)
+                    parent.IInsert(i, init[i - left].IClone());
+            }
+
+            protected override void Redo(ISelectParent parent) {
+                for (int i = right; i >= left; i--)
+                    parent.Remove(i);
+            }
+
+            public override void Dispose() {
+               foreach (ISelect item in init) item.Dispose();
+               init = null;
+            }
+            
+            public DeleteUndoEntry(ISelectParent parent, int left, int right)
+            : base($"{parent.ChildString} Removed", parent) {
+                this.left = left;
+                this.right = right;
+
+                init = (from i in Enumerable.Range(left, right - left + 1) select parent.IChildren[i].IClone()).ToList();
+            }
+        }
+
+        public static void Delete(ISelectParent parent, int left, int right)
+            => Program.Project.Undo.AddAndExecute(new DeleteUndoEntry(parent, left, right));
+        
+        public class ReplaceUndoEntry: SingleParentUndoEntry<ISelectParent> {
+            DeleteUndoEntry delete;
+            InsertCopyableUndoEntry insert;
+
+            protected override void Undo(ISelectParent parent) {
+                delete.Undo();
+                insert.Undo();
+            }
+
+            protected override void Redo(ISelectParent parent) {
+                insert.Redo();
+                delete.Redo();
+
+                parent.Selection?.Select(parent.IChildren[delete.left + insert.init.Count - 1], true);
+            }
+
+            public override void Dispose() {
+               delete.Dispose();
+               insert.Dispose();
+            }
+            
+            public ReplaceUndoEntry(ISelectParent parent, DeleteUndoEntry delete, InsertCopyableUndoEntry insert)
+            : base($"{parent.ChildString} Replaced", parent) {
+                this.delete = delete;
+                this.insert = insert;
+            }
         }
 
         public static async void Replace(ISelectParent parent, int left, int right) {
             Copyable paste = await Copyable.DecodeClipboard();
 
-            if (paste != null && InsertCopyable(parent, paste, right, out Action undo, out Action redo, out Action dispose)) {
-                DeleteRegion(parent, left, right, out Action undo2, out Action redo2, out Action dispose2);
-
-                Path<ISelect> path = new Path<ISelect>((ISelect)parent);
-
-                Program.Project.Undo.Add($"{parent.ChildString} Replaced",
-                    undo2 + undo,
-                    redo + redo2 + (() => {
-                        ISelectParent chain = (ISelectParent)path.Resolve();
-
-                        chain.Selection?.Select(chain.IChildren[left + paste.Contents.Count - 1], true);
-                    }),
-                    dispose2 + dispose
-                );
-                
-                parent.Selection?.Select(parent.IChildren[left + paste.Contents.Count - 1], true);
-            }
-        }
-
-        public abstract class SingleParentUndoEntry<T>: PathParentUndoEntry<T> where T: ISelectParent {
-            protected override void UndoPath(params T[] items) => Undo(items[0]);
-            protected virtual void Undo(T item) {}
-
-            protected override void RedoPath(params T[] items) => Redo(items[0]);
-            protected virtual void Redo(T item) {}
-
-            public SingleParentUndoEntry(string desc, T item)
-            : base(desc, item) {}
+            if (paste != null && InsertCopyable(parent, paste, right, "", out InsertCopyableUndoEntry insert))
+                Program.Project.Undo.AddAndExecute(new ReplaceUndoEntry(
+                    parent,
+                    new DeleteUndoEntry(parent, left, right),
+                    insert
+                ));
         }
 
         public class DuplicateUndoEntry: SingleParentUndoEntry<ISelectParent> {
@@ -161,18 +180,8 @@ namespace Apollo.Selection {
             }
         }
 
-        public static void Duplicate(ISelectParent parent, int left, int right) {
-            Program.Project.Undo.AddAndExecute(new DuplicateUndoEntry(
-                parent,
-                left,
-                right
-            ));
-        }
-
-        public static void Delete(ISelectParent parent, int left, int right) {
-            DeleteRegion(parent, left, right, out Action undo, out Action redo, out Action dispose);
-            Program.Project.Undo.Add($"{parent.ChildString} Removed", undo, redo, dispose);
-        }
+        public static void Duplicate(ISelectParent parent, int left, int right)
+            => Program.Project.Undo.AddAndExecute(new DuplicateUndoEntry(parent, left, right));
 
         public abstract class DeviceEncapsulationUndoEntry: SingleParentUndoEntry<Chain> {
             int left, right;
@@ -197,7 +206,10 @@ namespace Apollo.Selection {
                 chain.Insert(left, Encapsulate(init.Clone()));
             }
 
-            public override void Dispose() => init.Dispose();
+            public override void Dispose() {
+                init.Dispose();
+                init = null;
+            }
             
             public DeviceEncapsulationUndoEntry(Chain chain, int left, int right, string action)
             : base($"{chain.ChildString} {action}", chain) {
@@ -256,11 +268,7 @@ namespace Apollo.Selection {
         public static void Group(ISelectParent parent, int left, int right) {
             if (!(parent is Chain chain)) return;
 
-            Program.Project.Undo.AddAndExecute(new GroupUndoEntry(
-                chain,
-                left,
-                right
-            ));
+            Program.Project.Undo.AddAndExecute(new GroupUndoEntry(chain, left, right));
         }
 
         public class UngroupUndoEntry: DeviceDecapsulationUndoEntry<Group> {
@@ -271,14 +279,9 @@ namespace Apollo.Selection {
         }
 
         public static void Ungroup(ISelectParent parent, int index) {
-            if (!(parent is Chain chain)) return;
+            if (!(parent is Chain chain) || !(chain[index] is Group group) || group.Count != 1) return;
 
-            if (!(chain[index] is Group group) || group.Count != 1) return;
-
-            Program.Project.Undo.AddAndExecute(new UngroupUndoEntry(
-                chain,
-                index
-            ));
+            Program.Project.Undo.AddAndExecute(new UngroupUndoEntry(chain, index));
         }
         
         public class ChokeUndoEntry: DeviceEncapsulationUndoEntry {
@@ -292,11 +295,7 @@ namespace Apollo.Selection {
         public static void Choke(ISelectParent parent, int left, int right) {
             if (!(parent is Chain chain)) return;
             
-            Program.Project.Undo.AddAndExecute(new ChokeUndoEntry(
-                chain,
-                left,
-                right
-            ));
+            Program.Project.Undo.AddAndExecute(new ChokeUndoEntry(chain, left, right));
         }
 
         public class UnchokeUndoEntry: DeviceDecapsulationUndoEntry<Choke> {
@@ -307,14 +306,9 @@ namespace Apollo.Selection {
         }
 
         public static void Unchoke(ISelectParent parent, int index) {
-            if (!(parent is Chain chain)) return;
+            if (!(parent is Chain chain) || !(chain[index] is Choke choke)) return;
 
-            if (!(chain[index] is Choke choke)) return;
-
-            Program.Project.Undo.AddAndExecute(new UnchokeUndoEntry(
-                chain,
-                index
-            ));
+            Program.Project.Undo.AddAndExecute(new UnchokeUndoEntry(chain, index));
         }
 
         public class MuteUndoEntry: SingleParentUndoEntry<ISelectParent> {
@@ -353,11 +347,7 @@ namespace Apollo.Selection {
         public static void Mute(ISelectParent parent, int left, int right) {
             if (!(parent.IChildren[left] is IMutable)) return;
 
-            Program.Project.Undo.AddAndExecute(new MuteUndoEntry(
-                parent,
-                left,
-                right
-            ));
+            Program.Project.Undo.AddAndExecute(new MuteUndoEntry(parent, left, right));
         }
 
         public static void Rename(ISelectParent parent, int left, int right) {
@@ -420,8 +410,8 @@ namespace Apollo.Selection {
         
             Copyable loaded = await Copyable.DecodeFile(path, sender);
             
-            if (loaded != null && InsertCopyable(parent, loaded, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add($"{parent.ChildString} Imported", undo, redo, dispose);
+            if (loaded != null && InsertCopyable(parent, loaded, right, "Imported", out InsertCopyableUndoEntry entry))
+                Program.Project.Undo.AddAndExecute(entry);
         }
     }
 }

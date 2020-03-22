@@ -47,6 +47,7 @@ namespace Apollo.Elements {
         public Window IWindow => Track.Get(this)?.Window;
         public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
 
+        public Type ChildType => typeof(Device);
         public string ChildString => "Device";
         public string ChildFileExtension => "apdev";
 

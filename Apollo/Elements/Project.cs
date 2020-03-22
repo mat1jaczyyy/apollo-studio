@@ -34,6 +34,7 @@ namespace Apollo.Elements {
         public Window IWindow => Window;
         public SelectionManager Selection => Window?.Selection;
         
+        public Type ChildType => typeof(Track);
         public string ChildString => "Track";
         public string ChildFileExtension => "aptrk";
 

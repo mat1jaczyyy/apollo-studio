@@ -25,6 +25,7 @@ namespace Apollo.Devices {
         public Window IWindow => Track.Get(this)?.Window;
         public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
 
+        public Type ChildType => typeof(Chain);
         public string ChildString => "Chain";
         public string ChildFileExtension => "apchn";
 
