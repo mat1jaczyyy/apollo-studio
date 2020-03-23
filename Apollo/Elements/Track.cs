@@ -129,7 +129,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public Track Clone() => new Track(Chain.Clone(), null, Name) {
+        public Track Clone() => new Track(Chain.Clone(), Launchpad, Name) {
             Enabled = Enabled
         };
 
@@ -145,7 +145,7 @@ namespace Apollo.Elements {
         void ChainExit(Signal n) => n.Source?.Render(n);
 
         void MIDIEnter(Signal n) {
-            if (Enabled) Chain?.MIDIEnter(n);
+            if (ParentIndex != null && Enabled) Chain?.MIDIEnter(n);
         }
 
         public void Dispose() {
