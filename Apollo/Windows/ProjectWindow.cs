@@ -550,15 +550,11 @@ namespace Apollo.Windows {
         }
 
         void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
-            List<Track> ut = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
-            List<Launchpad> ul = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Launchpad).ToList();
+            List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
 
             undo = () => {
-                for (int i = left; i <= right; i++) {
-                    Track restored = ut[i - left].Clone();
-                    restored.Launchpad = ul[i - left];
-                    Program.Project.Insert(i, restored);
-                }
+                for (int i = left; i <= right; i++)
+                    Program.Project.Insert(i, u[i - left].Clone());
             };
             
             redo = () => {
@@ -567,8 +563,8 @@ namespace Apollo.Windows {
             };
             
             dispose = () => {
-                foreach (Track track in ut) track.Dispose();
-                ut = null;
+                foreach (Track track in u) track.Dispose();
+                u = null;
             };
 
             for (int i = right; i >= left; i--)
