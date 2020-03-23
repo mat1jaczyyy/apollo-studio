@@ -14,7 +14,7 @@ using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Selection {
-    public static class Operations {
+    static class Operations {
         public abstract class SingleParentUndoEntry<T>: PathParentUndoEntry<T> where T: ISelectParent {
             protected override void UndoPath(params T[] items) => Undo(items[0]);
             protected virtual void Undo(T item) {}
@@ -26,7 +26,30 @@ namespace Apollo.Selection {
             : base(desc, item) {}
         }
 
-        public class InsertCopyableUndoEntry: SingleParentUndoEntry<ISelectParent> {
+        public abstract class PatternDrawProtectedUndoEntry<T>: SingleParentUndoEntry<T> where T: ISelectParent {
+            void SetDraw(T item, bool value) {
+                if (item is Pattern pattern && pattern.Window != null) 
+                    if (pattern.Window.Draw = value)
+                        pattern.Window.Frame_Select(pattern.Expanded);
+            }
+
+            void Action(T item, bool value) {
+                SetDraw(item, false);
+                
+                if (value) base.RedoPath(item);
+                else base.UndoPath(item);
+                
+                SetDraw(item, true);
+            }
+
+            protected override void UndoPath(params T[] items) => Action(items[0], false);
+            protected override void RedoPath(params T[] items) => Action(items[0], true);
+
+            public PatternDrawProtectedUndoEntry(string desc, T item)
+            : base(desc, item) {}
+        }
+
+        public class InsertCopyableUndoEntry: PatternDrawProtectedUndoEntry<ISelectParent> {
             int right;
             public List<ISelect> init { get; private set; }
 
@@ -87,7 +110,7 @@ namespace Apollo.Selection {
                 Program.Project.Undo.AddAndExecute(entry);
         }
         
-        public class DeleteUndoEntry: SingleParentUndoEntry<ISelectParent> {
+        public class DeleteUndoEntry: PatternDrawProtectedUndoEntry<ISelectParent> {
             public int left { get; private set; }
             int right;
             List<ISelect> init;
@@ -116,8 +139,11 @@ namespace Apollo.Selection {
             }
         }
 
-        public static void Delete(ISelectParent parent, int left, int right)
-            => Program.Project.Undo.AddAndExecute(new DeleteUndoEntry(parent, left, right));
+        public static void Delete(ISelectParent parent, int left, int right) {
+            if (parent is Pattern pattern && pattern.Count - (right - left + 1) == 0) return;
+
+            Program.Project.Undo.AddAndExecute(new DeleteUndoEntry(parent, left, right));
+        }
         
         public class ReplaceUndoEntry: SingleParentUndoEntry<ISelectParent> {
             DeleteUndoEntry delete;
@@ -158,7 +184,7 @@ namespace Apollo.Selection {
                 ));
         }
 
-        public class DuplicateUndoEntry: SingleParentUndoEntry<ISelectParent> {
+        public class DuplicateUndoEntry: PatternDrawProtectedUndoEntry<ISelectParent> {
             int left, right;
 
             protected override void Undo(ISelectParent parent) {
@@ -373,6 +399,8 @@ namespace Apollo.Selection {
         };
 
         public static async void Export(ISelectParent parent, int left, int right) {
+            if (parent.ChildFileExtension == null) return;
+
             Window sender = parent.IWindow;
             
             string result = await CreateSFD(parent).ShowAsync(sender);
@@ -384,7 +412,7 @@ namespace Apollo.Selection {
                     Copyable copy = CreateCopyable(parent, left, right);
 
                     try {
-                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
+                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());  // TODO move this to Copyable.StoreToFile?
 
                     } catch (UnauthorizedAccessException) {
                         await MessageWindow.Create(
@@ -399,6 +427,8 @@ namespace Apollo.Selection {
         }
         
         public static async void Import(ISelectParent parent, int right, string path = null) {
+            if (parent.ChildFileExtension == null) return;
+
             Window sender = parent.IWindow;
 
             if (path == null) {

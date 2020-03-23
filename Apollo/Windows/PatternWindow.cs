@@ -128,9 +128,9 @@ namespace Apollo.Windows {
         bool historyShowing = false;
 
         bool _locked = false;
-        bool Locked {
+        public bool Locked {
             get => _locked;
-            set {
+            private set {
                 _locked = value;
 
                 if (Repeats.Enabled) Repeats.DisplayDisabledText = false;
@@ -202,7 +202,7 @@ namespace Apollo.Windows {
 
             FrameDisplay viewer = new FrameDisplay(frame, _pattern);
             viewer.FrameAdded += Frame_Insert;
-            viewer.FrameRemoved += i => Delete(i, i);
+            viewer.FrameRemoved += i => Selection.Action("Delete", _pattern, i, i);
             viewer.FrameSelected += Frame_Select;
             frame.Info = viewer;
 
@@ -599,7 +599,7 @@ namespace Apollo.Windows {
                 Frame_Insert(_pattern.Expanded + 1);
                 
             else if (x == -1 && y == -1) // Down-Left
-                Delete(_pattern.Expanded, _pattern.Expanded);
+                Selection.Action("Delete", _pattern, _pattern.Expanded, _pattern.Expanded);
         }
 
         public void MIDIEnter(Signal n) {
@@ -1125,241 +1125,6 @@ namespace Apollo.Windows {
 
         public ISelect Item => null;
         public ISelectParent ItemParent => _pattern;
-
-        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
-            undo = redo = dispose = null;
-
-            List<Frame> pasted;
-            try {
-                pasted = paste.Contents.Cast<Frame>().ToList();
-            } catch (InvalidCastException) {
-                return false;
-            }
-            
-            Path<Pattern> path = new Path<Pattern>(_pattern);
-
-            undo = () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = paste.Contents.Count - 1; i >= 0; i--)
-                    pattern.Remove(right + i + 1);
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-            };
-            
-            redo = () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    pattern.Insert(right + i + 1, pasted[i].Clone());
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                    pattern.Window.Selection.Select(pattern[right + 1], true);
-                }
-            };
-            
-            dispose = () => {
-                foreach (Frame frame in pasted) frame.Dispose();
-                pasted = null;
-            };
-
-            Draw = false;
-
-            for (int i = 0; i < paste.Contents.Count; i++)
-                _pattern.Insert(right + i + 1, pasted[i].Clone());
-
-            Draw = true;
-
-            Frame_Select(_pattern.Expanded);
-            Selection.Select(_pattern[right + 1], true);
-            
-            return true;
-        }
-
-        bool Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
-            undo = redo = dispose = null;
-
-            if (_pattern.Count - (right - left + 1) == 0) return false;
-
-            List<Frame> u = (from i in Enumerable.Range(left, right - left + 1) select _pattern[i].Clone()).ToList();
-
-            Path<Pattern> path = new Path<Pattern>(_pattern);
-
-            undo = () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = left; i <= right; i++)
-                    pattern.Insert(i, u[i - left].Clone());
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-            };
-            
-            redo = () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = right; i >= left; i--)
-                    pattern.Remove(i);
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-            };
-            
-            dispose = () => {
-                foreach (Frame frame in u) frame.Dispose();
-                u = null;
-            };
-
-            Draw = false;
-
-            for (int i = right; i >= left; i--)
-                _pattern.Remove(i);
-
-            Draw = true;
-
-            Frame_Select(_pattern.Expanded);
-
-            return true;
-        }
-
-        public void Copy(int left, int right, bool cut = false) {
-            if (Locked) return;
-
-            Copyable copy = new Copyable();
-            
-            for (int i = left; i <= right; i++)
-                copy.Contents.Add(_pattern[i]);
-            
-            copy.StoreToClipboard();
-
-            if (cut) Delete(left, right);
-        }
-
-        public async void Paste(int right) {
-            if (Locked) return;
-
-            Copyable paste = await Copyable.DecodeClipboard();
-
-            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Pattern Frame Pasted", undo, redo, dispose);
-        }
-
-        public async void Replace(int left, int right) {
-            if (Locked) return;
-
-            Copyable paste = await Copyable.DecodeClipboard();
-
-            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
-                if (Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2)) {
-
-                    Path<Pattern> path = new Path<Pattern>(_pattern);
-
-                    Program.Project.Undo.Add("Pattern Frame Replaced",
-                        undo2 + undo,
-                        redo + redo2 + (() => {
-                            Pattern pattern = path.Resolve();
-
-                            Track.Get(pattern).Window?.Selection.Select(pattern[left + paste.Contents.Count - 1], true);
-                        }),
-                        dispose2 + dispose + (() => {
-                            foreach (Frame frame in paste.Contents) frame.Dispose();
-                            paste = null;
-                        })
-                    );
-                    
-                    Track.Get(_pattern).Window?.Selection.Select(_pattern[left + paste.Contents.Count - 1], true);
-                
-                } else {
-                    undo.Invoke();
-                    dispose.Invoke();
-                }
-            }
-        }
-
-        public void Duplicate(int left, int right) {
-            if (Locked) return;
-
-            Path<Pattern> path = new Path<Pattern>(_pattern);
-
-            Program.Project.Undo.Add($"Pattern Frame Duplicated", () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = right - left; i >= 0; i--)
-                    pattern.Remove(right + i + 1);
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                }
-
-            }, () => {
-                Pattern pattern = path.Resolve();
-
-                if (pattern.Window != null) pattern.Window.Draw = false;
-
-                for (int i = 0; i <= right - left; i++)
-                    pattern.Insert(right + i + 1, pattern[left + i].Clone());
-
-                if (pattern.Window != null) {
-                    pattern.Window.Draw = true;
-
-                    pattern.Window.Frame_Select(pattern.Expanded);
-                    pattern.Window.Selection.Select(pattern[right + 1], true);
-                }
-            });
-
-            Draw = false;
-
-            for (int i = 0; i <= right - left; i++)
-                _pattern.Insert(right + i + 1, _pattern[left + i].Clone());
-
-            Draw = true;
-
-            Frame_Select(_pattern.Expanded);
-            Selection.Select(_pattern[right + 1], true);
-        }
-
-        public void Delete(int left, int right) {
-            if (Locked) return;
-
-            if (Region_Delete(left, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add($"Pattern Frame Removed", undo, redo, dispose);
-        }
-
-        public void Group(int left, int right) {}
-        public void Ungroup(int index) {}
-        public void Choke(int left, int right) {}
-        public void Unchoke(int index) {}
-
-        public void Mute(int left, int right) {}
-        public void Rename(int left, int right) {}
-
-        public void Export(int left, int right) {}
-        public void Import(int right, string path = null) {}
 
         void BottomCollapse() => BottomLeftPane.Opacity = Convert.ToInt32(BottomLeftPane.IsVisible = CollapseButton.Showing = (BottomLeftPane.MaxHeight = (BottomLeftPane.MaxHeight == 0)? 1000 : 0) != 0);
 

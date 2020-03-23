@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia.Input;
 
 using Apollo.Core;
+using Apollo.Devices;
 
 namespace Apollo.Selection {
     public class SelectionManager {
@@ -126,6 +127,8 @@ namespace Apollo.Selection {
         public void Action(string action, ISelectParent parent, int index) => Action(action, parent, index, index);
 
         public void Action(string action, ISelectParent parent, int left, int right) {
+            if (parent is Pattern pattern && pattern.Window?.Locked == true) return;
+
             if (action == "Cut") Operations.Copy(parent, left, right, true);
             else if (action == "Copy") Operations.Copy(parent, left, right);
             else if (action == "Duplicate") Operations.Duplicate(parent, left, right);

@@ -80,6 +80,7 @@ namespace Apollo.Devices {
         }
 
         public void Remove(int index, bool dispose = true) {
+            Window?.Selection.Select(null);
             Window?.Contents_Remove(index);
 
             if (dispose) Frames[index].Dispose();
