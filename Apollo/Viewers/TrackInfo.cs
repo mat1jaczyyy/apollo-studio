@@ -13,7 +13,6 @@ using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Selection;

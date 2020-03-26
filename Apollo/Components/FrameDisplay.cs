@@ -14,7 +14,6 @@ using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;

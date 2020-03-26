@@ -8,8 +8,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 using Apollo.Components;
-using Apollo.DragDrop;
 using Apollo.Elements;
+using Apollo.Selection;
 
 namespace Apollo.Viewers {
     public class CollapsedDeviceViewer: DeviceViewer {

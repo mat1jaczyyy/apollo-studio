@@ -12,7 +12,6 @@ using Avalonia.Media;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Windows;
@@ -30,8 +29,6 @@ namespace Apollo.Viewers {
             Input = this.Get<TextBox>("Input");
             Indicator = this.Get<Indicator>("Indicator");
         }
-        
-        IDisposable observable;
 
         public delegate void ChainAddedEventHandler(int index);
         public event ChainAddedEventHandler ChainAdded;

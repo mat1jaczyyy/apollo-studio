@@ -9,11 +9,10 @@ using AvaloniaDragDrop = Avalonia.Input.DragDrop;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 
-namespace Apollo.DragDrop {
+namespace Apollo.Selection {
     public class DragDropManager {
         public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy = false) {
             if (!(source[0] is Track) && !copy && Track.PathContains((ISelect)target, source)) return false;
