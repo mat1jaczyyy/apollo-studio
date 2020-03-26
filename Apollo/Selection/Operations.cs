@@ -409,21 +409,8 @@ namespace Apollo.Selection {
             if (result != null) {
                 string[] file = result.Split(Path.DirectorySeparatorChar);
 
-                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                    Copyable copy = CreateCopyable(parent, left, right);
-
-                    try {
-                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());  // TODO move this to Copyable.StoreToFile?
-
-                    } catch (UnauthorizedAccessException) {
-                        await MessageWindow.Create(
-                            $"An error occurred while writing the file.\n\n" +
-                            "You may not have sufficient privileges to write to the destination folder, or\n" +
-                            "the current file already exists but cannot be overwritten.",
-                            null, sender
-                        );
-                    }
-                }
+                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1))))
+                    await CreateCopyable(parent, left, right).StoreToFile(result, sender);
             }
         }
         

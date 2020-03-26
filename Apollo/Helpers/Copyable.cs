@@ -19,6 +19,20 @@ namespace Apollo.Helpers {
 
         public async void StoreToClipboard()
             => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this).ToArray()));
+        
+        public async Task StoreToFile(string path, Window sender) {
+            try {
+                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+
+            } catch (UnauthorizedAccessException) {
+                await MessageWindow.Create(
+                    $"An error occurred while writing the file.\n\n" +
+                    "You may not have sufficient privileges to write to the destination folder, or\n" +
+                    "the current file already exists but cannot be overwritten.",
+                    null, sender
+                );
+            }
+        }
 
         public static async Task<Copyable> DecodeClipboard() {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
