@@ -37,7 +37,7 @@ namespace Apollo.Selection {
                 target.IInsert((point?.IParentIndex.Value?? -1) + i + 1, source[i]);
             }
 
-            SelectionManager selection = ISelect.GetSelection(source.Last(), target);
+            SelectionManager selection = target.Selection;
             selection?.Select(source[0]);
             selection?.Select(source.Last(), true);
             

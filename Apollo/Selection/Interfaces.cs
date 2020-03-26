@@ -4,33 +4,8 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
 
-using Apollo.Core;
-using Apollo.Devices;
-using Apollo.Elements;
-using Apollo.Structures;
-using Apollo.Windows;
-
 namespace Apollo.Selection {
     public interface ISelect {
-        static SelectionManager GetSelection(ISelect item, ISelectParent target) {
-            if (item is Device device) return Track.Get(device)?.Window?.Selection;
-
-            else if (item is Chain chain) {
-                ((Group)chain.Parent).SpecificViewer.Expand(chain.ParentIndex);  // TODO this and Frame_Select are not nice
-                return Track.Get(chain)?.Window?.Selection;
-            
-            } else if (item is Track track) return Program.Project.Window?.Selection;
-            
-            else if (item is Frame frame) {
-                PatternWindow window = ((Pattern)target).Window;
-
-                window?.Frame_Select(item.IParentIndex.Value);
-                return window?.Selection;
-            }
-
-            return null;
-        }
-
         ISelectViewer IInfo { get; }
 
         ISelectParent IParent { get; }
