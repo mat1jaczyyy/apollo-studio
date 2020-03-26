@@ -15,7 +15,7 @@ using Apollo.Windows;
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}
 
-    public class Chain: ISelect, ISelectParent, IMutable {
+    public class Chain: ISelect, ISelectParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -120,7 +120,7 @@ namespace Apollo.Elements {
             get => _name;
             set {
                 _name = value;
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -228,26 +228,6 @@ namespace Apollo.Elements {
             : base($"Device ({device.Name}) Inserted", chain) {
                 this.index = index;
                 this.device = device.Clone();
-            }
-        }
-
-        public class RenamedUndoEntry: SimplePathUndoEntry<Group, List<string>> {
-            int left, right;
-
-            protected override void Action(Group item, List<string> element) {
-                for (int i = left; i <= right; i++)
-                    item[i].Name = element[i - left];
-                
-                TrackWindow window = Track.Get(item)?.Window;
-
-                window?.Selection.Select(item[left]);
-                window?.Selection.Select(item[right], true);
-            }
-            
-            public RenamedUndoEntry(Group group, int left, int right, List<string> u, List<string> r)
-            : base($"Chain Renamed to {r[0]}", group, u.ToList(), r.ToList()) {
-                this.left = left;
-                this.right = right;
             }
         }
     }

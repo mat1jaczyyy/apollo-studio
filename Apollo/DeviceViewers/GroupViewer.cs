@@ -185,7 +185,5 @@ namespace Apollo.DeviceViewers {
 
         public ISelect Item => null;
         public ISelectParent ItemParent => _group;
-        
-        public void Rename(int left, int right) => ((ChainInfo)Contents[left + 1]).StartInput(left, right);
     }
 }

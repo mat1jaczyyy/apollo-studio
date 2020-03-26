@@ -10,7 +10,7 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: ISelect, IChainParent, IMutable {
+    public class Track: ISelect, IChainParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -102,7 +102,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(ProcessedName);
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -172,24 +172,6 @@ namespace Apollo.Elements {
 
             public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
             : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
-        }
-
-        public class RenamedUndoEntry: SimpleUndoEntry<List<string>> {
-            int left, right;
-
-            protected override void Action(List<string> element) {
-                for (int i = left; i <= right; i++)
-                    Program.Project[i].Name = element[i - left];
-                
-                Program.Project.Window?.Selection.Select(Program.Project[left]);
-                Program.Project.Window?.Selection.Select(Program.Project[right], true);
-            }
-            
-            public RenamedUndoEntry(int left, int right, List<string> u, List<string> r)
-            : base($"Track Renamed to {r[0]}", u, r) {
-                this.left = left;
-                this.right = right;
-            }
         }
     }
 }

@@ -444,7 +444,5 @@ namespace Apollo.Windows {
 
         public ISelect Item => null;
         public ISelectParent ItemParent => Program.Project;
-
-        public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
     }
 }

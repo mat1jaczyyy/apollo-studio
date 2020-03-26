@@ -377,7 +377,8 @@ namespace Apollo.Selection {
         }
 
         public static void Rename(ISelectParent parent, int left, int right) {
-            // TODO Implement
+            if (parent.IChildren[left].IInfo is IRenamable renamable)
+                renamable.Rename.StartInput(left, right);
         }
 
         static List<FileDialogFilter> CreateFilters(ISelectParent parent) => new List<FileDialogFilter>() {

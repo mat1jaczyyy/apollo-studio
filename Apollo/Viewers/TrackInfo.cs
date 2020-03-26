@@ -20,7 +20,7 @@ using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
-    public class TrackInfo: UserControl, ISelectViewer, IDraggable {
+    public class TrackInfo: UserControl, ISelectViewer, IDraggable, IRenamable {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -33,8 +33,6 @@ namespace Apollo.Viewers {
             MuteItem = this.Get<MenuItem>("MuteItem");
             Input = this.Get<TextBox>("Input");
         }
-        
-        IDisposable observable;
 
         public delegate void AddedEventHandler(int index);
         public event AddedEventHandler Added;
@@ -42,16 +40,16 @@ namespace Apollo.Viewers {
         Track _track;
         public bool Selected { get; private set; } = false;
 
-        TextBlock NameText;
+        public TextBlock NameText { get; private set; }
         ComboBox PortSelector;
         public TrackAdd TrackAdd;
 
         Grid Draggable;
         Border DropZone;
         MenuItem MuteItem;
-        TextBox Input;
+        public TextBox Input { get; private set; }
         
-        void UpdateText(int index) => NameText.Text = _track.ProcessedName;
+        void UpdateText(int index) => Rename.UpdateText();
 
         public void UpdatePorts() {
             List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
@@ -88,18 +86,18 @@ namespace Apollo.Viewers {
             InitializeComponent();
             
             _track = track;
+            
+            Deselect();
 
-            UpdateText(0);
+            Rename = new RenameManager(this);
+
+            Rename.UpdateText();
             _track.ParentIndexChanged += UpdateText;
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
 
             DragDrop = new DragDropManager(this);
-            
-            Deselect();
-
-            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
         }
@@ -113,7 +111,8 @@ namespace Apollo.Viewers {
             _track.Info = null;
             _track = null;
 
-            observable.Dispose();
+            Rename.Dispose();
+            Rename = null;
 
             DragDrop.Dispose();
             DragDrop = null;
@@ -172,82 +171,6 @@ namespace Apollo.Viewers {
                 ));
         }
 
-        int Input_Left, Input_Right;
-        List<string> Input_Clean;
-        bool Input_Ignore = false;
-
-        void Input_Changed(string text) {
-            if (text == null) return;
-            if (text == "") return;
-
-            if (Input_Ignore) return;
-
-            Input_Ignore = true;
-            for (int i = Input_Left; i <= Input_Right; i++)
-                Program.Project[i].Name = text;
-            Input_Ignore = false;
-        }
-
-        public void StartInput(int left, int right) {
-            Input_Left = left;
-            Input_Right = right;
-
-            Input_Clean = new List<string>();
-            for (int i = left; i <= right; i++)
-                Input_Clean.Add(Program.Project[i].Name);
-
-            Input.Text = _track.Name;
-            Input.SelectionStart = 0;
-            Input.SelectionEnd = Input.Text.Length;
-            Input.CaretIndex = Input.Text.Length;
-
-            Input.Opacity = 1;
-            Input.IsHitTestVisible = true;
-            Input.Focus();
-        }
-        
-        void Input_LostFocus(object sender, RoutedEventArgs e) {
-            Input.Text = _track.Name;
-
-            Input.Opacity = 0;
-            Input.IsHitTestVisible = false;
-            
-            List<string> newName = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
-
-            if (!newName.SequenceEqual(Input_Clean))
-                Program.Project.Undo.Add(new Track.RenamedUndoEntry(
-                    Input_Left,
-                    Input_Right,
-                    Input_Clean,
-                    newName
-                ));
-        }
-
-        public void SetName(string name) {
-            UpdateText(0);
-
-            if (Input_Ignore) return;
-
-            Input_Ignore = true;
-            Input.Text = name;
-            Input_Ignore = false;
-        }
-
-        void Input_KeyDown(object sender, KeyEventArgs e) {
-            if (App.Dragging) return;
-
-            if (e.Key == Key.Return)
-                this.Focus();
-
-            e.Key = Key.None;
-        }
-
-        void Input_KeyUp(object sender, KeyEventArgs e) {
-            if (App.Dragging) return;
-
-            e.Key = Key.None;
-        }
-
-        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        public RenameManager Rename { get; private set; }
     }
 }

@@ -76,4 +76,19 @@ namespace Apollo.Selection {
     public interface IMutable: ISelect {
         bool Enabled { get; set; }
     }
+
+    public interface IName: ISelect {
+        string Name { get; set; }
+        string ProcessedName { get; }
+    }
+
+    public interface IRenamable: IControl, ISelectViewer {
+        RenameManager Rename { get; }
+
+        ISelect Item { get; }
+        ISelectParent ItemParent { get; }
+
+        TextBox Input { get; }
+        TextBlock NameText { get; }
+    }
 }
