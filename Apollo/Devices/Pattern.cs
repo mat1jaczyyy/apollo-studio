@@ -45,9 +45,9 @@ namespace Apollo.Devices {
                 if (value != null && value.Count != 0) {
                     _frames = value;
 
-                    Window?.RecreateFrames();
-
                     Reroute();
+
+                    Window?.RecreateFrames();
                 }
             }
         }
