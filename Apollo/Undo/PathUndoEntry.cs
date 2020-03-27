@@ -21,7 +21,7 @@ namespace Apollo.Undo {
 
     public class PathParentUndoEntry<T>: UndoEntry where T: ISelectParent {
         protected List<Path<ISelect>> Paths;
-        protected T[] Items => Paths.Select(i => ((T)i?.Resolve())?? (T)(ISelectParent)Program.Project).ToArray();
+        protected T[] Items => Paths.Select(i => i == null? (T)(ISelectParent)Program.Project : (T)i.Resolve()).ToArray();
 
         public override void Undo() => UndoPath(Items);
         protected virtual void UndoPath(params T[] items) {}
