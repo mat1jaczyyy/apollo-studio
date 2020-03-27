@@ -161,7 +161,7 @@ namespace Apollo.Viewers {
                 base.UndoPath(items);
                 
                 if (remove != null)
-                    items[1].Remove(remove.Value);
+                    ((ISelect)items[1]).IParent.Remove(remove.Value);
             }
 
             protected override void RedoPath(params ISelectParent[] items) {
