@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,11 +127,11 @@ namespace Apollo.Devices {
             base.Dispose();
         }
         
-        public class ModeUndoEntry: SimplePathUndoEntry<Multi, MultiType> {
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Multi, MultiType> {
             protected override void Action(Multi item, MultiType element) => item.Mode = element;
             
-            public ModeUndoEntry(Multi multi, MultiType u, MultiType r)
-            : base($"Multi Direction Changed to {r.ToString().Replace("Plus", "+")}", multi, u, r) {}
+            public ModeUndoEntry(Multi multi, MultiType u, MultiType r, IEnumerable source)
+            : base("Multi Direction", multi, u, r, source) {}
         }
         
         public class FilterChangedUndoEntry: SimpleIndexPathUndoEntry<Multi, bool[]> {

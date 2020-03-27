@@ -1,3 +1,5 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -115,11 +117,11 @@ namespace Apollo.Devices {
             : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, u, r) {}
         }
         
-        public class GridModeUndoEntry: SimplePathUndoEntry<Move, GridType> {
+        public class GridModeUndoEntry: EnumSimplePathUndoEntry<Move, GridType> {
             protected override void Action(Move item, GridType element) => item.GridMode = element;
             
-            public GridModeUndoEntry(Move move, GridType u, GridType r)
-            : base($"Move Grid Changed to {r.ToString()}", move, u, r) {}
+            public GridModeUndoEntry(Move move, GridType u, GridType r, IEnumerable source)
+            : base("Move Grid", move, u, r, source) {}
         }
         
         public class WrapUndoEntry: SimplePathUndoEntry<Move, bool> {

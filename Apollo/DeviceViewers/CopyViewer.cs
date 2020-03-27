@@ -138,9 +138,10 @@ namespace Apollo.DeviceViewers {
 
             if (_copy.CopyMode != selected)
                 Program.Project.Undo.AddAndExecute(new Copy.CopyModeUndoEntry(
-                    _copy, 
-                    _copy.CopyMode, 
-                    selected
+                    _copy,
+                    _copy.CopyMode,
+                    selected,
+                    CopyMode.Items
                 ));
         }
 
@@ -161,7 +162,8 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.AddAndExecute(new Copy.GridModeUndoEntry(
                     _copy, 
                     _copy.GridMode, 
-                    selected
+                    selected,
+                    GridMode.Items
                 ));
         }
 

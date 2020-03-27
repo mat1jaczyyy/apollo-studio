@@ -1,3 +1,5 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -65,11 +67,11 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: SimplePathUndoEntry<Flip, FlipType> {
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Flip, FlipType> {
             protected override void Action(Flip item, FlipType element) => item.Mode = element;
             
-            public ModeUndoEntry(Flip flip, FlipType u, FlipType r)
-            : base($"Flip Orientation Changed to {r.ToString().Replace('1', '+').Replace('2', '-')}", flip, u, r) {}
+            public ModeUndoEntry(Flip flip, FlipType u, FlipType r, IEnumerable source)
+            : base("Flip Orientation", flip, u, r, source) {}
         }
         
         public class BypassUndoEntry: SimplePathUndoEntry<Flip, bool> {

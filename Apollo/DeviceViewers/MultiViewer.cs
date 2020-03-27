@@ -83,7 +83,8 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.AddAndExecute(new Multi.ModeUndoEntry(
                     _multi,
                     _multi.Mode,
-                    selected
+                    selected,
+                    MultiMode.Items
                 ));
         }
 

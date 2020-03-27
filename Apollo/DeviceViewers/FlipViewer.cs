@@ -46,7 +46,8 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.AddAndExecute(new Flip.ModeUndoEntry(
                     _flip, 
                     _flip.Mode, 
-                    selected
+                    selected,
+                    FlipMode.Items
                 ));
         }
 

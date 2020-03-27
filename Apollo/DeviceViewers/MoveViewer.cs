@@ -96,7 +96,8 @@ namespace Apollo.DeviceViewers {
                 Program.Project.Undo.AddAndExecute(new Move.GridModeUndoEntry(
                     _move, 
                     _move.GridMode, 
-                    selected
+                    selected,
+                    GridMode.Items
                 ));
         }
 

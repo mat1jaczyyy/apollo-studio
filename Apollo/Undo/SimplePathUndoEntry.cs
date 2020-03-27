@@ -1,3 +1,9 @@
+using System;
+using System.Collections;
+using System.Linq;
+
+using Avalonia.Controls;
+
 using Apollo.Selection;
 
 namespace Apollo.Undo {
@@ -16,5 +22,10 @@ namespace Apollo.Undo {
             this.u = undo;
             this.r = redo;
         }
+    }
+
+    public abstract class EnumSimplePathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where T: ISelect where I: Enum {
+        public EnumSimplePathUndoEntry(string desc, T child, I undo, I redo, IEnumerable textSource)
+        : base($"{desc} Changed to {textSource.OfType<ComboBoxItem>().ElementAt((int)(object)redo).Content}", child, undo, redo) {}
     }
 }

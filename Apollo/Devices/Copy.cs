@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -568,18 +569,18 @@ namespace Apollo.Devices {
             : base($"Copy Gate Changed to {r}%", copy, u / 100, r / 100) {}
         }
         
-        public class CopyModeUndoEntry: SimplePathUndoEntry<Copy, CopyType> {
+        public class CopyModeUndoEntry: EnumSimplePathUndoEntry<Copy, CopyType> {
             protected override void Action(Copy item, CopyType element) => item.CopyMode = element;
             
-            public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r)
-            : base($"Copy Mode Changed to {r.ToString()}", copy, u, r) {}
+            public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r, IEnumerable source)
+            : base("Copy Mode", copy, u, r, source) {}
         }
         
-        public class GridModeUndoEntry: SimplePathUndoEntry<Copy, GridType> {
+        public class GridModeUndoEntry: EnumSimplePathUndoEntry<Copy, GridType> {
             protected override void Action(Copy item, GridType element) => item.GridMode = element;
             
-            public GridModeUndoEntry(Copy copy, GridType u, GridType r)
-            : base($"Copy Grid Changed to {r.ToString()}", copy, u, r) {}
+            public GridModeUndoEntry(Copy copy, GridType u, GridType r, IEnumerable source)
+            : base("Copy Grid", copy, u, r, source) {}
         }
         
         public class PinchUndoEntry: SimplePathUndoEntry<Copy, double> {

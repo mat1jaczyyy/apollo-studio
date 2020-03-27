@@ -1,3 +1,5 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -52,11 +54,11 @@ namespace Apollo.Devices {
             InvokeExit(n);
         }
         
-        public class ModeUndoEntry: SimplePathUndoEntry<Rotate, RotateType> {
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Rotate, RotateType> {
             protected override void Action(Rotate item, RotateType element) => item.Mode = element;
             
-            public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r)
-            : base($"Rotate Angle Changed to {r.ToString().Substring(1)}°", rotate, u, r) {}
+            public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r, IEnumerable source)
+            : base("Rotate Angle", rotate, u, r, source) {}
         }
         
         public class BypassUndoEntry: SimplePathUndoEntry<Rotate, bool> {
