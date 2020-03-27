@@ -138,7 +138,7 @@ namespace Apollo.Devices {
             protected override void Action(Multi item, int index, bool[] element) => item[index].SecretMultiFilter = element.ToArray();
             
             public FilterChangedUndoEntry(Multi multi, int index, bool[] u)
-            : base($"Multi Chain {index} Filter Changed", multi, index, u.ToArray(), multi[index].SecretMultiFilter.ToArray()) {}
+            : base($"Multi Chain {index + 1} Filter Changed", multi, index, u.ToArray(), multi[index].SecretMultiFilter.ToArray()) {}
         }
     }
 }
