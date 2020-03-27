@@ -355,6 +355,8 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed && Enabled) {
                 if (e.KeyModifiers.HasFlag(App.ControlKey)) {
+                    Started?.Invoke();
+
                     if (_usingSteps) Length.Step = 5;
                     else RawValue = Default;
                     return;

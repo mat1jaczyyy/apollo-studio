@@ -696,7 +696,7 @@ namespace Apollo.Windows {
         void Duration_Changed(Dial sender, double value, double? old) {
             if (oldTime == null) return;
 
-            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+            if (old != null && !oldTime.SequenceEqual(Selection.Selection.Select(i => ((Frame)i).Time.With(false, free: (int)value)))) {
                 Program.Project.Undo.AddAndExecute(new Pattern.DurationValueUndoEntry(
                     _pattern,
                     Selection.Selection[0].IParentIndex.Value,
@@ -716,7 +716,7 @@ namespace Apollo.Windows {
         void Duration_StepChanged(int value, int? old) {
             if (oldTime == null) return;
 
-            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+            if (old != null && !oldTime.SequenceEqual((Selection.Selection.Select(i => ((Frame)i).Time)))) {
                 Program.Project.Undo.AddAndExecute(new Pattern.DurationStepUndoEntry(
                     _pattern,
                     Selection.Selection[0].IParentIndex.Value,
@@ -736,7 +736,7 @@ namespace Apollo.Windows {
         void Duration_ModeChanged(bool value, bool? old) {
             if (oldTime == null) return;
 
-            if (old != null && !oldTime.SequenceEqual((from i in Selection.Selection select ((Frame)i).Time.Clone()).ToList())) {
+            if (old != null && !oldTime.SequenceEqual(Selection.Selection.Select(i => ((Frame)i).Time.With(value)))) {
                 Program.Project.Undo.AddAndExecute(new Pattern.DurationModeUndoEntry(
                     _pattern,
                     Selection.Selection[0].IParentIndex.Value,

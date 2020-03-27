@@ -506,7 +506,7 @@ namespace Apollo.Devices {
 
         public class DurationStepUndoEntry: DurationUndoEntry<int> {
             protected override void SetValue(Time item, int element) {
-                item.Free = element;
+                item.Length.Step = element;
                 item.Mode = true;
             }
 
