@@ -635,7 +635,7 @@ namespace Apollo.Devices {
             protected override void UndoPath(params Copy[] items) => items[0].Insert(index, offset.Clone());
             protected override void RedoPath(params Copy[] items) => items[0].Remove(index);
             
-            public override void Dispose() => offset.Dispose();
+            protected override void OnDispose() => offset.Dispose();
             
             public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index)
             : base($"Copy Offset {index + 1} Removed", copy) {

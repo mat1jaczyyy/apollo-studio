@@ -65,7 +65,7 @@ namespace Apollo.Selection {
                 parent.Selection?.Select(parent.IChildren[right + 1], true);
             }
 
-            public override void Dispose() {
+            protected override void OnDispose() {
                 foreach (ISelect item in init) item.Dispose();
                 init = null;
             }
@@ -125,7 +125,7 @@ namespace Apollo.Selection {
                     parent.Remove(i);
             }
 
-            public override void Dispose() {
+            protected override void OnDispose() {
                foreach (ISelect item in init) item.Dispose();
                init = null;
             }
@@ -161,7 +161,7 @@ namespace Apollo.Selection {
                 parent.Selection?.Select(parent.IChildren[delete.left + insert.init.Count - 1], true);
             }
 
-            public override void Dispose() {
+            protected override void OnDispose() {
                delete.Dispose();
                insert.Dispose();
             }
@@ -232,7 +232,7 @@ namespace Apollo.Selection {
                 chain.Insert(left, Encapsulate(init.Clone()));
             }
 
-            public override void Dispose() {
+            protected override void OnDispose() {
                 init.Dispose();
                 init = null;
             }
@@ -273,7 +273,7 @@ namespace Apollo.Selection {
                 chain.Selection?.Select(chain[index], true);
             }
 
-            public override void Dispose() => init.Dispose();
+            protected override void OnDispose() => init.Dispose();
             
             public DeviceDecapsulationUndoEntry(Chain chain, int index, string action)
             : base($"{chain.ChildString} {action}", chain) {

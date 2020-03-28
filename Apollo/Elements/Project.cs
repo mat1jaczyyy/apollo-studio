@@ -296,10 +296,10 @@ namespace Apollo.Elements {
             int index;
             Track track;
 
-            public override void Undo() => Program.Project.Remove(index);
-            public override void Redo() => Program.Project.Insert(index, track.Clone());
+            protected override void OnUndo() => Program.Project.Remove(index);
+            protected override void OnRedo() => Program.Project.Insert(index, track.Clone());
 
-            public override void Dispose() => track.Dispose();
+            protected override void OnDispose() => track.Dispose();
             
             public TrackInsertedUndoEntry(int index, Track track)
             : base($"Track {index + 1} Inserted") {

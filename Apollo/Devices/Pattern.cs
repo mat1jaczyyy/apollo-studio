@@ -438,7 +438,7 @@ namespace Apollo.Devices {
             protected override void UndoPath(params Pattern[] items) => items[0].Remove(index);
             protected override void RedoPath(params Pattern[] items) => items[0].Insert(index, frame.Clone());
             
-            public override void Dispose() => frame.Dispose();
+            protected override void OnDispose() => frame.Dispose();
             
             public FrameInsertedUndoEntry(Pattern pattern, int index, Frame frame)
             : base($"Pattern Frame {index + 1} Inserted", pattern) {
@@ -481,7 +481,7 @@ namespace Apollo.Devices {
                 }
             }
             
-            public override void Dispose() {
+            protected override void OnDispose() {
                 foreach (Time time in u) time.Dispose();
                 u = null;
             }
@@ -628,7 +628,7 @@ namespace Apollo.Devices {
                 item.Expanded = element.Expanded;
             }
 
-            protected override void Dispose(Pattern undo, Pattern redo) {
+            protected override void OnDispose(Pattern undo, Pattern redo) {
                 undo.Dispose();
                 redo.Dispose();
             }

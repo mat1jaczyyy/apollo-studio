@@ -123,7 +123,7 @@ namespace Apollo.Devices {
             protected override void UndoPath(params Group[] items) => items[0].Remove(index);
             protected override void RedoPath(params Group[] items) => items[0].Insert(index, chain.Clone());
             
-            public override void Dispose() => chain.Dispose();
+            protected override void OnDispose() => chain.Dispose();
             
             public ChainInsertedUndoEntry(Group group, int index, Chain chain)
             : base($"{group.Name} Chain {index + 1} Inserted", group) {
