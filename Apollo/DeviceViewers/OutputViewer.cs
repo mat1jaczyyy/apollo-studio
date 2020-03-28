@@ -50,8 +50,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value)
                 Program.Project.Undo.AddAndExecute(new Output.TargetUndoEntry(
                     _output,
-                    (int)old.Value - 1,
-                    (int)value - 1
+                    (int)old.Value,
+                    (int)value
                 ));
         }
 

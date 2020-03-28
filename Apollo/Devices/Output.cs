@@ -95,7 +95,7 @@ namespace Apollo.Devices {
             protected override void Action(Output item, int element) => item.Target = element;
             
             public TargetUndoEntry(Output output, int u, int r)
-            : base($"Output Target Changed to {r}", output, u, r) {}
+            : base($"Output Target Changed to {r}", output, u - 1, r - 1) {}
         }
     }
 }
