@@ -485,5 +485,23 @@ namespace Apollo.Devices {
             public PlaybackModeUndoEntry(Fade fade, FadePlaybackType u, FadePlaybackType r)
             : base($"Fade Playback Mode Changed to {r.ToString()}", fade, u, r) {}
         }
+        
+        public class ReverseUndoEntry: SymmetricPathUndoEntry<Fade> {
+            protected override void Action(Fade item) {
+                List<Color> colors = Enumerable.Range(0, item.Count).Select(i => item.GetColor(i)).ToList();
+                List<double> positions = Enumerable.Range(0, item.Count).Select(i => 1 - item.GetPosition(i)).ToList();
+                
+                for (int i = 0; i < item.Count; i++) {
+                    item.SetColor(i, colors[item.Count - i - 1]);
+                    item.SetPosition(i, positions[item.Count - i - 1]);
+                }
+
+                int? expanded = item.Count - item.Expanded - 1;
+                if (expanded != item.Expanded && item.Viewer?.SpecificViewer != null) ((FadeViewer)item.Viewer.SpecificViewer).Expand(expanded);
+            }
+            
+            public ReverseUndoEntry(Fade fade)
+            : base($"Fade Reversed", fade) {}
+        }
     }
 }

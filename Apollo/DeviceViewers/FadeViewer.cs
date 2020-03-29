@@ -159,33 +159,45 @@ namespace Apollo.DeviceViewers {
             _fade.Expanded = index;
         }
 
+        double contextOpenPosition;
+
+        void NewColor() {
+            int index;
+
+            for (index = 0; index < thumbs.Count; index++)
+                if (contextOpenPosition < Canvas.GetLeft(thumbs[index])) break;
+            
+            double pos = contextOpenPosition / Gradient.Width;
+            
+            double time = pos * _fade.Time;
+            
+            int fadeIndex = 0;
+            for (int i = 0; i < fullFade.Count; i++)
+                if (Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time))
+                    fadeIndex = i;
+                    
+            Program.Project.Undo.AddAndExecute(new Fade.ThumbInsertUndoEntry(
+                _fade, 
+                index, 
+                fullFade[fadeIndex].Color.Clone(), 
+                pos, 
+                FadeType.Linear
+            ));
+        }
+
         void Canvas_MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
-                int index;
-                double x = e.GetPosition(canvas).X - 7;
+            contextOpenPosition = e.GetPosition(canvas).X - 7;
 
-                for (index = 0; index < thumbs.Count; index++)
-                    if (x < Canvas.GetLeft(thumbs[index])) break;
-                
-                double pos = x / Gradient.Width;
-                
-                double time = pos * _fade.Time;
-                
-                int fadeIndex = 0;
-                for (int i = 0; i < fullFade.Count; i++)
-                    if (Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time))
-                        fadeIndex = i;
-                        
-                Program.Project.Undo.AddAndExecute(new Fade.ThumbInsertUndoEntry(
-                    _fade, 
-                    index, 
-                    fullFade[fadeIndex].Color.Clone(), 
-                    pos, 
-                    FadeType.Linear
-                ));
-            }
+            if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) NewColor();
+            else if (MouseButton == PointerUpdateKind.RightButtonPressed)
+                ((ApolloContextMenu)this.Resources["GradientContextMenu"]).Open(this);
+        }
+
+        void ContextMenu_Action(string action) {
+            if (action == "New Color") NewColor();
+            else if (action == "Reverse") Program.Project.Undo.AddAndExecute(new Fade.ReverseUndoEntry(_fade));
         }
 
         void Thumb_Delete(FadeThumb sender) {
