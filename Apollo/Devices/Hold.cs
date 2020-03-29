@@ -142,7 +142,7 @@ namespace Apollo.Devices {
                         if (!releasebuffer.ContainsKey(n)) return;
 
                         color = releasebuffer[n];
-                        releasebuffer.TryRemove(n, out Color _);
+                        releasebuffer.TryRemove(n, out _);
                     }
 
                     n.Color = color;

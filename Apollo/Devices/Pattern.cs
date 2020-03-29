@@ -360,7 +360,7 @@ namespace Apollo.Devices {
                                 InvokeExit(n.With((byte)index, new Color(0)));
                     }
 
-                    buffer.Remove(n, out int _);
+                    buffer.Remove(n, out _);
                 }
                     
 

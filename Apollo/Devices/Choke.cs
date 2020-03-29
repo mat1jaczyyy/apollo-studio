@@ -82,7 +82,7 @@ namespace Apollo.Devices {
                 lock (locker) {
                     (Launchpad, int, int) index = (n.Source, n.Index, -n.Layer);
                     if (n.Color.Lit) signals[index] = n.Clone();
-                    else if (signals.ContainsKey(index)) signals.TryRemove(index, out Signal _);
+                    else if (signals.ContainsKey(index)) signals.TryRemove(index, out _);
                 }
             }
         }

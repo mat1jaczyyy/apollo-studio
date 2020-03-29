@@ -348,7 +348,7 @@ namespace Apollo.Devices {
                         }
                         m.Index = (byte)offsets[buffer[n]];
                     
-                    } else buffer.Remove(n, out int _);
+                    } else buffer.Remove(n, out _);
                 }
 
                 if (buffer.ContainsKey(n)) {
@@ -356,7 +356,7 @@ namespace Apollo.Devices {
                     FireCourier((original, offsets), _time * _gate);
                 } else {
                     timers[n].Dispose();
-                    timers.Remove(n, out Courier _);
+                    timers.Remove(n, out _);
                 }
             }
         }
@@ -487,7 +487,7 @@ namespace Apollo.Devices {
 
                 } else {
                     m.Index = (byte)buffer[n];
-                    if (!m.Color.Lit) buffer.Remove(n, out int _);
+                    if (!m.Color.Lit) buffer.Remove(n, out _);
                 }
 
                 ScreenOutput(m, n.Clone());

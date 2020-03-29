@@ -94,7 +94,7 @@ namespace Apollo.Devices {
 
             } else {
                 m.MultiTarget.Push(buffer[n]);
-                if (!m.Color.Lit) buffer.Remove(n, out List<int> _);
+                if (!m.Color.Lit) buffer.Remove(n, out _);
             }
 
             Preprocess.MIDIEnter(m);
