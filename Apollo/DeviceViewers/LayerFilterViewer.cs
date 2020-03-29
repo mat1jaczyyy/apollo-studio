@@ -42,8 +42,8 @@ namespace Apollo.DeviceViewers {
             if (old != null && old != value) 
                 Program.Project.Undo.AddAndExecute(new LayerFilter.TargetUndoEntry(
                     _filter,
-                    (int)value, 
-                    (int)old.Value
+                    (int)old.Value,
+                    (int)value
                 ));
         }
 
