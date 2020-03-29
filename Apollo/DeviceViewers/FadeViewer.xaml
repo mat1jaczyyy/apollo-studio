@@ -12,6 +12,7 @@
       <Separator />
 
       <MenuItem Header="Reverse" />
+      <MenuItem Header="Equalize" />
     </Components:ApolloContextMenu>
   </UserControl.Resources>
 

@@ -198,6 +198,7 @@ namespace Apollo.DeviceViewers {
         void ContextMenu_Action(string action) {
             if (action == "New Color") NewColor();
             else if (action == "Reverse") Program.Project.Undo.AddAndExecute(new Fade.ReverseUndoEntry(_fade));
+            else if (action == "Equalize") Program.Project.Undo.AddAndExecute(new Fade.EqualizeUndoEntry(_fade));
         }
 
         void Thumb_Delete(FadeThumb sender) {

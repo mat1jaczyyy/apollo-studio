@@ -503,5 +503,18 @@ namespace Apollo.Devices {
             public ReverseUndoEntry(Fade fade)
             : base($"Fade Reversed", fade) {}
         }
+        
+        public class EqualizeUndoEntry: SimplePathUndoEntry<Fade, double[]> {
+            protected override void Action(Fade item, double[] element) {
+                for (int i = 1; i < item.Count - 1; i++)
+                    item.SetPosition(i, element[i - 1]);
+            }
+            
+            public EqualizeUndoEntry(Fade fade)
+            : base($"Fade Equalized", fade,
+                Enumerable.Range(1, fade.Count - 2).Select(i => fade.GetPosition(i)).ToArray(),
+                Enumerable.Range(1, fade.Count - 2).Select(i => (double)i / (fade.Count - 1)).ToArray()
+            ) {}
+        }
     }
 }
