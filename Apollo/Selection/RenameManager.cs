@@ -111,14 +111,10 @@ namespace Apollo.Selection {
             Host = null;
         }
 
-        public class RenamedUndoEntry: PathParentUndoEntry<ISelectParent> {
+        public class RenamedUndoEntry: SimplePathUndoEntry<ISelectParent, List<string>> {
             int left, right;
-            List<string> u, r;
 
-            protected override void UndoPath(params ISelectParent[] items) => Action(items[0], u);
-            protected override void RedoPath(params ISelectParent[] items) => Action(items[0], r);
-
-            void Action(ISelectParent item, List<string> element) {
+            protected override void Action(ISelectParent item, List<string> element) {
                 for (int i = left; i <= right; i++)
                     ((IName)item.IChildren[i]).Name = element[i - left];
                 
@@ -127,12 +123,9 @@ namespace Apollo.Selection {
             }
 
             public RenamedUndoEntry(ISelectParent parent, int left, int right, List<string> undo, List<string> redo)
-            : base($"{parent.ChildString} Renamed to {redo[0]}", parent) {
+            : base($"{parent.ChildString} Renamed to {redo[0]}", parent, undo.ToList(), redo.ToList()) {
                 this.left = left;
                 this.right = right;
-
-                u = undo.ToList();
-                r = redo.ToList();
             }
         }
     }

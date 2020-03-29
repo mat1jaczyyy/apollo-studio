@@ -15,18 +15,7 @@ using Apollo.Windows;
 
 namespace Apollo.Selection {
     static class Operations {
-        public abstract class SingleParentUndoEntry<T>: PathParentUndoEntry<T> where T: ISelectParent {
-            protected override void UndoPath(params T[] items) => Undo(items[0]);
-            protected virtual void Undo(T item) {}
-
-            protected override void RedoPath(params T[] items) => Redo(items[0]);
-            protected virtual void Redo(T item) {}
-
-            public SingleParentUndoEntry(string desc, T item)
-            : base(desc, item) {}
-        }
-
-        public abstract class PatternDrawProtectedUndoEntry<T>: SingleParentUndoEntry<T> where T: ISelectParent {
+        public abstract class PatternDrawProtectedUndoEntry<T>: SinglePathUndoEntry<T> {
             void SetDraw(T item, bool value) {
                 if (item is Pattern pattern && pattern.Window != null) 
                     if (pattern.Window.Draw = value)
@@ -145,7 +134,7 @@ namespace Apollo.Selection {
             Program.Project.Undo.AddAndExecute(new DeleteUndoEntry(parent, left, right));
         }
         
-        public class ReplaceUndoEntry: SingleParentUndoEntry<ISelectParent> {
+        public class ReplaceUndoEntry: SinglePathUndoEntry<ISelectParent> {
             DeleteUndoEntry delete;
             InsertCopyableUndoEntry insert;
 
@@ -209,7 +198,7 @@ namespace Apollo.Selection {
         public static void Duplicate(ISelectParent parent, int left, int right)
             => Program.Project.Undo.AddAndExecute(new DuplicateUndoEntry(parent, left, right));
 
-        public abstract class DeviceEncapsulationUndoEntry: SingleParentUndoEntry<Chain> {
+        public abstract class DeviceEncapsulationUndoEntry: SinglePathUndoEntry<Chain> {
             int left, right;
             Chain init;
 
@@ -249,7 +238,7 @@ namespace Apollo.Selection {
             }
         }
 
-        public abstract class DeviceDecapsulationUndoEntry<T>: SingleParentUndoEntry<Chain> where T: Device, IChainParent {
+        public abstract class DeviceDecapsulationUndoEntry<T>: SinglePathUndoEntry<Chain> where T: Device, IChainParent {
             int index;
             T init;
 
@@ -337,7 +326,7 @@ namespace Apollo.Selection {
             Program.Project.Undo.AddAndExecute(new UnchokeUndoEntry(chain, index));
         }
 
-        public class MuteUndoEntry: SingleParentUndoEntry<ISelectParent> {
+        public class MuteUndoEntry: SinglePathUndoEntry<ISelectParent> {
             int left, right;
             List<bool> u;
             bool r;

@@ -72,7 +72,7 @@ namespace Apollo.Undo {
         : base(desc, undo, redo) => this.index = index;
     }
 
-    public abstract class PathUndoEntry<T>: UndoEntry where T: ISelect {
+    public abstract class PathUndoEntry<T>: UndoEntry {
         protected List<Path<T>> Paths;
         protected T[] Items => Paths.Select(i => i.Resolve()).ToArray();
 
@@ -85,25 +85,21 @@ namespace Apollo.Undo {
         public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
     }
 
-    public class PathParentUndoEntry<T>: UndoEntry where T: ISelectParent {
-        protected List<Path<ISelect>> Paths;
-        protected T[] Items => Paths.Select(i => i == null? (T)(ISelectParent)Program.Project : (T)i.Resolve()).ToArray();
+    public abstract class SinglePathUndoEntry<T>: PathUndoEntry<T> {
+        protected override void UndoPath(params T[] items) => Undo(items[0]);
+        protected virtual void Undo(T item) {}
 
-        protected override void OnUndo() => UndoPath(Items);
-        protected virtual void UndoPath(params T[] items) {}
+        protected override void RedoPath(params T[] items) => Redo(items[0]);
+        protected virtual void Redo(T item) {}
 
-        protected override void OnRedo() => RedoPath(Items);
-        protected virtual void RedoPath(params T[] items) {}
-
-        public PathParentUndoEntry(string desc, params T[] items)
-        : base(desc) => Paths = items.Select(i => (i is Project)? null : new Path<ISelect>((ISelect)i)).ToList();
+        public SinglePathUndoEntry(string desc, T item): base(desc, item) {}
     }
 
-    public abstract class SimplePathUndoEntry<T, I>: PathUndoEntry<T> where T: ISelect {
+    public abstract class SimplePathUndoEntry<T, I>: SinglePathUndoEntry<T> {
         I u, r;
 
-        protected override void UndoPath(params T[] items) => Action(items[0], u);
-        protected override void RedoPath(params T[] items) => Action(items[0], r);
+        protected override void Undo(T item) => Action(item, u);
+        protected override void Redo(T item) => Action(item, r);
 
         protected virtual void Action(T item, I element) {}
 
@@ -116,21 +112,21 @@ namespace Apollo.Undo {
         }
     }
 
-    public abstract class EnumSimplePathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where T: ISelect where I: Enum {
+    public abstract class EnumSimplePathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where I: Enum {
         public EnumSimplePathUndoEntry(string desc, T child, I undo, I redo, IEnumerable textSource)
         : base($"{desc} Changed to {textSource.OfType<ComboBoxItem>().ElementAt((int)(object)redo).Content}", child, undo, redo) {}
     }
 
-    public abstract class SymmetricPathUndoEntry<T>: PathUndoEntry<T> where T: ISelect {
-        protected override void UndoPath(params T[] items) => Action(items[0]);
-        protected override void RedoPath(params T[] items) => Action(items[0]);
+    public abstract class SymmetricPathUndoEntry<T>: SinglePathUndoEntry<T> {
+        protected override void Undo(T item) => Action(item);
+        protected override void Redo(T item) => Action(item);
 
         protected virtual void Action(T item) {}
 
         public SymmetricPathUndoEntry(string desc, T child): base(desc, child) {}
     }
 
-    public abstract class SimpleIndexPathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where T: ISelect {
+    public abstract class SimpleIndexPathUndoEntry<T, I>: SimplePathUndoEntry<T, I> {
         int index;
 
         protected override void Action(T item, I element) => Action(item, index, element);

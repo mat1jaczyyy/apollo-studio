@@ -162,7 +162,7 @@ namespace Apollo.Selection {
             Host = null;
         }
         
-        public class DragDropUndoEntry: PathParentUndoEntry<ISelectParent> {
+        public class DragDropUndoEntry: PathUndoEntry<ISelectParent> {
             bool copy;
             int count, before, before_pos, after, after_pos;
 
