@@ -234,8 +234,6 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            Console.WriteLine($"{change} {x}");
-
             Fade.ThumbMoveUndoEntry entry = new Fade.ThumbMoveUndoEntry(
                 _fade,
                 i,
