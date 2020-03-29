@@ -4,6 +4,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Choke: Device, IChainParent {
@@ -106,6 +107,15 @@ namespace Apollo.Devices {
 
             Chain.Dispose();
             base.Dispose();
+        }
+        
+        void SetTarget(int target) => Target = target;
+        
+        public class TargetUndoEntry: SimplePathUndoEntry<Choke, int> {
+            protected override void Action(Choke item, int element) => item.SetTarget(element);
+
+            public TargetUndoEntry(Choke choke, int u, int r)
+            : base($"Choke Target Changed to {r}", choke, u, r) {}
         }
     }
 }

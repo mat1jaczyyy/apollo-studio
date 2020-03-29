@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Loop: Device {
@@ -174,6 +175,48 @@ namespace Apollo.Devices {
             Stop();
 
             base.Dispose();
+        }
+        
+        public class RateUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Free = element;
+            
+            public RateUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Rate Changed to {r}ms", loop, u, r) {}
+        }
+        
+        public class RateModeUndoEntry: SimplePathUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Rate.Mode = element;
+            
+            public RateModeUndoEntry(Loop loop, bool u, bool r)
+            : base($"Loop Rate Switched to {(r? "Steps" : "Free")}", loop, u, r) {}
+        }
+        
+        public class RateStepUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Length.Step = element;
+            
+            public RateStepUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Rate Changed to {Length.Steps[r]}", loop, u, r) {}
+        }
+        
+        public class HoldUndoEntry: SimplePathUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Hold = element;
+            
+            public HoldUndoEntry(Loop loop, bool u, bool r)
+            : base($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", loop, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Loop, double> {
+            protected override void Action(Loop item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Loop loop, double u, double r)
+            : base($"Loop Gate Changed to {r}%", loop, u / 100, r / 100) {}
+        }
+        
+        public class RepeatsUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Repeats = element;
+            
+            public RepeatsUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Repeats Changed to {r}", loop, u, r) {}
         }
     }
 }

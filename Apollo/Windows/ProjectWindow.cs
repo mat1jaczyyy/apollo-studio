@@ -19,7 +19,6 @@ using Humanizer.Localisation;
 using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Selection;
@@ -205,17 +204,10 @@ namespace Apollo.Windows {
         void Track_InsertStart() => Track_Insert(0);
 
         void Track_Insert(int index, Track track) {
-            Track r = track.Clone();
-
-            Program.Project.Undo.Add($"Track {index + 1} Inserted", () => {
-                Program.Project.Remove(index);
-            }, () => {
-                Program.Project.Insert(index, r.Clone());
-            }, () => {
-                r.Dispose();
-            });
-            
-            Program.Project.Insert(index, track);
+            Program.Project.Undo.AddAndExecute(new Project.TrackInsertedUndoEntry(
+                index,
+                track
+            ));
         }
 
         async void HandleKey(object sender, KeyEventArgs e) {
@@ -315,17 +307,12 @@ namespace Apollo.Windows {
         }
 
         void BPM_Unfocus(object sender, RoutedEventArgs e) {
-            if (BPM_Clean != Program.Project.BPM) {
-                int u = BPM_Clean;
-                int r = BPM_Clean = Program.Project.BPM;
-
-                Program.Project.Undo.Add($"BPM Changed to {r}", () => {
-                    Program.Project.BPM = u;
-                }, () => {
-                    Program.Project.BPM = r;
-                });
-            }
-
+            if (BPM_Clean != Program.Project.BPM)
+                Program.Project.Undo.AddAndExecute(new Project.BPMChangedUndoEntry(
+                    BPM_Clean,
+                    BPM_Clean = Program.Project.BPM
+                ));
+                
             BPM_Dirty = false;
         }
 
@@ -358,16 +345,11 @@ namespace Apollo.Windows {
         }
 
         void Author_Unfocus(object sender, RoutedEventArgs e) {
-            if (Author_Clean != Program.Project.Author) {
-                string u = Author_Clean;
-                string r = Author_Clean = Program.Project.Author;
-
-                Program.Project.Undo.Add($"Author Changed to {r}", () => {
-                    Program.Project.Author = u;
-                }, () => {
-                    Program.Project.Author = r;
-                });
-            }
+            if (Author_Clean != Program.Project.Author)
+                Program.Project.Undo.AddAndExecute(new Project.AuthorChangedUndoEntry(
+                    Author_Clean,
+                    Author_Clean = Program.Project.Author
+                ));
 
             Author_Dirty = false;
         }
@@ -461,209 +443,5 @@ namespace Apollo.Windows {
 
         public ISelect Item => null;
         public ISelectParent ItemParent => Program.Project;
-
-        bool Copyable_Insert(Copyable paste, int right, out Action undo, out Action redo, out Action dispose) {
-            undo = redo = dispose = null;
-
-            List<Track> pasted;
-            try {
-                pasted = paste.Contents.Cast<Track>().ToList();
-            } catch (InvalidCastException) {
-                return false;
-            }
-
-            undo = () => {
-                for (int i = paste.Contents.Count - 1; i >= 0; i--)
-                    Program.Project.Remove(right + i + 1);
-            };
-            
-            redo = () => {
-                for (int i = 0; i < paste.Contents.Count; i++)
-                    Program.Project.Insert(right + i + 1, pasted[i].Clone());
-                
-                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
-            };
-            
-            dispose = () => {
-                foreach (Track track in pasted) track.Dispose();
-                pasted = null;
-            };
-            
-            for (int i = 0; i < paste.Contents.Count; i++)
-                Program.Project.Insert(right + i + 1, pasted[i].Clone());
-            
-            Selection.Select(Program.Project[right + 1], true);
-
-            return true;
-        }
-
-        void Region_Delete(int left, int right, out Action undo, out Action redo, out Action dispose) {
-            List<Track> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Clone()).ToList();
-
-            undo = () => {
-                for (int i = left; i <= right; i++)
-                    Program.Project.Insert(i, u[i - left].Clone());
-            };
-            
-            redo = () => {
-                for (int i = right; i >= left; i--)
-                    Program.Project.Remove(i);
-            };
-            
-            dispose = () => {
-                foreach (Track track in u) track.Dispose();
-                u = null;
-            };
-
-            for (int i = right; i >= left; i--)
-                Program.Project.Remove(i);
-        }
-
-        public void Copy(int left, int right, bool cut = false) {
-            Copyable copy = new Copyable();
-            
-            for (int i = left; i <= right; i++)
-                copy.Contents.Add(Program.Project[i]);
-
-            copy.StoreToClipboard();
-
-            if (cut) Delete(left, right);
-        }
-
-        public async void Paste(int right) {            
-            Copyable paste = await Copyable.DecodeClipboard();
-
-            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Track Pasted", undo, redo, dispose);
-        }
-
-        public async void Replace(int left, int right) {
-            Copyable paste = await Copyable.DecodeClipboard();
-
-            if (paste != null && Copyable_Insert(paste, right, out Action undo, out Action redo, out Action dispose)) {
-                Region_Delete(left, right, out Action undo2, out Action redo2, out Action dispose2);
-
-                Program.Project.Undo.Add("Track Replaced",
-                    undo2 + undo,
-                    redo + redo2 + (() => Program.Project.Window?.Selection.Select(Program.Project[left + paste.Contents.Count - 1], true)),
-                    dispose2 + dispose
-                );
-                
-                Selection.Select(Program.Project[left + paste.Contents.Count - 1], true);
-            }
-        }
-
-        public void Duplicate(int left, int right) {
-            Program.Project.Undo.Add($"Track Duplicated", () => {
-                for (int i = right - left; i >= 0; i--)
-                    Program.Project.Remove(right + i + 1);
-
-            }, () => {
-                for (int i = 0; i <= right - left; i++)
-                    Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
-            
-                Program.Project.Window?.Selection.Select(Program.Project[right + 1], true);
-            });
-
-            for (int i = 0; i <= right - left; i++)
-                Program.Project.Insert(right + i + 1, Program.Project[left + i].Clone());
-            
-            Selection.Select(Program.Project[right + 1], true);
-        }
-
-        public void Delete(int left, int right) {
-            Region_Delete(left, right, out Action undo, out Action redo, out Action dispose);
-            Program.Project.Undo.Add($"Track Removed", undo, redo, dispose);
-        }
-
-        public void Group(int left, int right) {}
-        public void Ungroup(int index) {}
-        public void Choke(int left, int right) {}
-        public void Unchoke(int index) {}
-        
-        public void Mute(int left, int right) {
-            List<bool> u = (from i in Enumerable.Range(left, right - left + 1) select Program.Project[i].Enabled).ToList();
-            bool r = !Program.Project[left].Enabled;
-
-            Program.Project.Undo.Add($"Track Muted", () => {
-                for (int i = left; i <= right; i++)
-                    Program.Project[i].Enabled = u[i - left];
-
-            }, () => {
-                for (int i = left; i <= right; i++)
-                    Program.Project[i].Enabled = r;
-            });
-
-            for (int i = left; i <= right; i++)
-                Program.Project[i].Enabled = r;
-        }
-
-        public void Rename(int left, int right) => ((TrackInfo)Contents[left + 1]).StartInput(left, right);
-
-        public async void Export(int left, int right) {
-            SaveFileDialog sfd = new SaveFileDialog() {
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "aptrk"
-                        },
-                        Name = "Apollo Track Preset"
-                    }
-                },
-                Title = "Export Track Preset"
-            };
-            
-            string result = await sfd.ShowAsync(this);
-
-            if (result != null) {
-                string[] file = result.Split(Path.DirectorySeparatorChar);
-
-                if (Directory.Exists(string.Join("/", file.Take(file.Count() - 1)))) {
-                    Copyable copy = new Copyable();
-                    
-                    for (int i = left; i <= right; i++)
-                        copy.Contents.Add(Program.Project[i]);
-
-                    try {
-                        File.WriteAllBytes(result, Encoder.Encode(copy).ToArray());
-
-                    } catch (UnauthorizedAccessException) {
-                        await MessageWindow.Create(
-                            $"An error occurred while writing the file.\n\n" +
-                            "You may not have sufficient privileges to write to the destination folder, or\n" +
-                            "the current file already exists but cannot be overwritten.",
-                            null, this
-                        );
-                    }
-                }
-            }
-        }
-        
-        public async void Import(int right, string path = null) {
-            if (path == null) {
-                OpenFileDialog ofd = new OpenFileDialog() {
-                    AllowMultiple = false,
-                    Filters = new List<FileDialogFilter>() {
-                        new FileDialogFilter() {
-                            Extensions = new List<string>() {
-                                "aptrk"
-                            },
-                            Name = "Apollo Track Preset"
-                        }
-                    },
-                    Title = "Import Track Preset"
-                };
-
-                string[] result = await ofd.ShowAsync(this);
-
-                if (result.Length > 0) path = result[0];
-                else return;
-            }
-
-            Copyable loaded = await Copyable.DecodeFile(path, this);
-
-            if (loaded != null && Copyable_Insert(loaded, right, out Action undo, out Action redo, out Action dispose))
-                Program.Project.Undo.Add("Track Imported", undo, redo, dispose);
-        }
     }
 }

@@ -9,10 +9,10 @@ using AvaloniaDragDrop = Avalonia.Input.DragDrop;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 
-namespace Apollo.DragDrop {
+namespace Apollo.Selection {
     public class DragDropManager {
         public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy = false) {
             if (!(source[0] is Track) && !copy && Track.PathContains((ISelect)target, source)) return false;
@@ -37,7 +37,7 @@ namespace Apollo.DragDrop {
                 target.IInsert((point?.IParentIndex.Value?? -1) + i + 1, source[i]);
             }
 
-            SelectionManager selection = ISelect.GetSelection(source.Last(), target);
+            SelectionManager selection = target.Selection;
             selection?.Select(source[0]);
             selection?.Select(source.Last(), true);
             
@@ -66,52 +66,8 @@ namespace Apollo.DragDrop {
                 if (source_parent == parent && after < before)
                     before_pos += count;
 
-                if (format == "Track") {   // TODO This is a bit bad but undo-redo rewrite will make it nice
-                    Program.Project.Undo.Add($"{format} {(copy? "Copied" : "Moved")}", copy
-                        ? new Action(() => {
-                            for (int i = after + count; i > after; i--)
-                                Program.Project.Remove(i);
-
-                        }) : new Action(() => {
-                            List<ISelect> umoving = (from i in Enumerable.Range(after_pos + 1, count) select (ISelect)Program.Project[i]).ToList();
-
-                            Move(umoving, Program.Project, before_pos);
-
-                    }), () => {
-                        List<ISelect> rmoving = (from i in Enumerable.Range(before + 1, count) select (ISelect)Program.Project[i]).ToList();
-
-                        Move(rmoving, Program.Project, after, copy);
-                    });
-
-                } else {
-                    List<int> sourcepath = Track.GetPath((ISelect)source_parent);
-                    List<int> targetpath = Track.GetPath((ISelect)parent);
-                    
-                    Program.Project.Undo.Add($"{format} {(copy? "Copied" : "Moved")}", copy
-                        ? new Action(() => {
-                            ISelectParent targetparent = (ISelectParent)Track.TraversePath<ISelect>(targetpath);
-
-                            for (int i = after + count; i > after; i--)
-                                targetparent.Remove(i);
-
-                        }) : new Action(() => {
-                            ISelectParent sourceparent = (ISelectParent)Track.TraversePath<ISelect>(sourcepath);
-                            ISelectParent targetparent = (ISelectParent)Track.TraversePath<ISelect>(targetpath);
-
-                            List<ISelect> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetparent.IChildren[i]).ToList();
-
-                            Move(umoving, sourceparent, before_pos);
-
-                    }), () => {
-                        ISelectParent sourceparent = (ISelectParent)Track.TraversePath<ISelect>(sourcepath);
-                        ISelectParent targetparent = (ISelectParent)Track.TraversePath<ISelect>(targetpath);
-
-                        List<ISelect> rmoving = (from i in Enumerable.Range(before + 1, count) select sourceparent.IChildren[i]).ToList();
-
-                        Move(rmoving, targetparent, after, copy);
-                    });
-                }
-            }    
+                Program.Project.Undo.Add(new DragDropUndoEntry(source_parent, parent, copy, count, before, after, before_pos, after_pos, format));
+            }
 
             return result;
         }
@@ -119,7 +75,7 @@ namespace Apollo.DragDrop {
         static bool FileDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
             string path = e.Data.GetFileNames().FirstOrDefault();
 
-            if (path != null) parent.IViewer?.Import(after, path);
+            if (path != null) Operations.Import(parent, after, path);
 
             return true;
         }
@@ -204,6 +160,40 @@ namespace Apollo.DragDrop {
 
             Subscribed = null;
             Host = null;
+        }
+        
+        public class DragDropUndoEntry: PathParentUndoEntry<ISelectParent> {
+            bool copy;
+            int count, before, before_pos, after, after_pos;
+
+            protected override void UndoPath(params ISelectParent[] items) {
+                if (copy)
+                    for (int i = after + count; i > after; i--)
+                        items[1].Remove(i);
+
+                else Move(
+                    (from i in Enumerable.Range(after_pos + 1, count) select items[1].IChildren[i]).ToList(),
+                    items[0],
+                    before_pos
+                );
+            }
+
+            protected override void RedoPath(params ISelectParent[] items) => Move(
+                (from i in Enumerable.Range(before + 1, count) select items[0].IChildren[i]).ToList(),
+                items[1],
+                after,
+                copy
+            );
+            
+            public DragDropUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
+            : base($"{format} {(copy? "Copied" : "Moved")}", sourceparent, targetparent) {
+                this.copy = copy;
+                this.count = count;
+                this.before = before;
+                this.after = after;
+                this.before_pos = before_pos;
+                this.after_pos = after_pos;
+            }
         }
     }
 }

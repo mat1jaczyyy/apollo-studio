@@ -8,6 +8,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Fade: Device {
@@ -391,6 +392,98 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+
+        public class ThumbInsertUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color thumbColor;
+            double pos;
+            FadeType type;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Fade[] items) => items[0].Insert(index, thumbColor, pos, type);
+            
+            public ThumbInsertUndoEntry(Fade fade, int index, Color thumbColor, double pos, FadeType type)
+            : base($"Fade Color {index + 1} Inserted", fade) {
+                this.index = index;
+                this.thumbColor = thumbColor;
+                this.pos = pos;
+                this.type = type;
+            }
+        }
+        
+        public class ThumbRemoveUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color uc;
+            double up;
+            FadeType ut;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Insert(index, uc, up, ut);
+            protected override void RedoPath(params Fade[] items) => items[0].Remove(index);
+            
+            public ThumbRemoveUndoEntry(Fade fade, int index, Color uc, double up, FadeType ut)
+            : base($"Fade Color {index + 1} Removed", fade) {
+                this.index = index;
+                this.uc = uc;
+                this.up = up;
+                this.ut = ut;
+            }
+        }
+        
+        public class ThumbTypeUndoEntry: SimpleIndexPathUndoEntry<Fade, FadeType> {
+            protected override void Action(Fade item, int index, FadeType element) => item.SetFadeType(index, element);
+            
+            public ThumbTypeUndoEntry(Fade fade, int index, FadeType u, FadeType r)
+            : base($"Fade Type {index + 1} Changed to {r.ToString()}", fade, index, u, r) {}
+        }
+        
+        public class ThumbMoveUndoEntry: SimpleIndexPathUndoEntry<Fade, double> {
+            protected override void Action(Fade item, int index, double element) => item.SetPosition(index, element);
+            
+            public ThumbMoveUndoEntry(Fade fade, int index, double u, double r)
+            : base($"Fade Color {index + 1} Moved", fade, index, u, r) {}
+        }
+        
+        public class ColorUndoEntry: SimpleIndexPathUndoEntry<Fade, Color> {
+            protected override void Action(Fade item, int index, Color element) => item.SetColor(index, element.Clone());
+            
+            public ColorUndoEntry(Fade fade, int index, Color u, Color r)
+            : base($"Fade Color {index + 1} Changed to {r.ToHex()}", fade, index, u, r) {}
+        }
+        
+        public class DurationUndoEntry: SimplePathUndoEntry<Fade, int> {
+            protected override void Action(Fade item, int element) => item.Time.Free = element;
+            
+            public DurationUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {r}ms", fade, u, r) {}
+        }
+        
+        public class DurationModeUndoEntry: SimplePathUndoEntry<Fade, bool> {
+            protected override void Action(Fade item, bool element) => item.Time.Mode = element;
+            
+            public DurationModeUndoEntry(Fade fade, bool u, bool r)
+            : base($"Fade Duration Switched to {(r? "Steps" : "Free")}", fade, u, r) {}
+        }
+        
+        public class DurationStepUndoEntry: SimplePathUndoEntry<Fade, int> {
+            protected override void Action(Fade item, int element) => item.Time.Length.Step = element;
+            
+            public DurationStepUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {Length.Steps[r]}", fade, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Fade, double> {
+            protected override void Action(Fade item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Fade fade, double u, double r)
+            : base($"Fade Gate Changed to {r}%", fade, u / 100, r / 100) {}
+        }
+        
+        public class PlaybackModeUndoEntry: SimplePathUndoEntry<Fade, FadePlaybackType> {
+            protected override void Action(Fade item, FadePlaybackType element) => item.PlayMode = element;
+            
+            public PlaybackModeUndoEntry(Fade fade, FadePlaybackType u, FadePlaybackType r)
+            : base($"Fade Playback Mode Changed to {r.ToString()}", fade, u, r) {}
         }
     }
 }

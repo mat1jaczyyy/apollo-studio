@@ -38,19 +38,12 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             ClearType selected = (ClearType)ClearMode.SelectedIndex;
 
-            if (_clear.Mode != selected) {
-                ClearType u = _clear.Mode;
-                ClearType r = selected;
-                List<int> path = Track.GetPath(_clear);
-
-                Program.Project.Undo.Add($"Clear Orientation Changed to {((ComboBoxItem)ClearMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    Track.TraversePath<Clear>(path).Mode = u;
-                }, () => {
-                    Track.TraversePath<Clear>(path).Mode = r;
-                });
-
-                _clear.Mode = selected;
-            }
+            if (_clear.Mode != selected) 
+                Program.Project.Undo.AddAndExecute(new Clear.ModeUndoEntry(
+                    _clear, 
+                    _clear.Mode, 
+                    selected
+                ));
         }
 
         public void SetMode(ClearType mode) => ClearMode.SelectedIndex = (int)mode;

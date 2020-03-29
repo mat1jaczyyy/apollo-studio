@@ -11,8 +11,8 @@ using Avalonia.Input;
 using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Enums;
-using Apollo.Helpers;
 using Apollo.Selection;
+using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -30,6 +30,13 @@ namespace Apollo.Elements {
         }
 
         public void IInsert(int index, ISelect item) => Insert(index, (Track)item);
+        
+        public Window IWindow => Window;
+        public SelectionManager Selection => Window?.Selection;
+        
+        public Type ChildType => typeof(Track);
+        public string ChildString => "Track";
+        public string ChildFileExtension => "aptrk";
 
         public ProjectWindow Window;
 
@@ -283,6 +290,36 @@ namespace Apollo.Elements {
             foreach (Launchpad launchpad in MIDI.Devices) launchpad.Clear();
 
             TimeSpent.Stop();
+        }
+        
+        public class TrackInsertedUndoEntry: UndoEntry {
+            int index;
+            Track track;
+
+            protected override void OnUndo() => Program.Project.Remove(index);
+            protected override void OnRedo() => Program.Project.Insert(index, track.Clone());
+
+            protected override void OnDispose() => track.Dispose();
+            
+            public TrackInsertedUndoEntry(int index, Track track)
+            : base($"Track {index + 1} Inserted") {
+                this.index = index;
+                this.track = track.Clone();
+            }
+        }
+
+        public class BPMChangedUndoEntry: SimpleUndoEntry<int> {
+            protected override void Action(int element) => Program.Project.BPM = element;
+
+            public BPMChangedUndoEntry(int u, int r)
+            : base($"BPM Changed to {r}", u, r) {}
+        }
+
+        public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
+            protected override void Action(string element) => Program.Project.Author = element;
+
+            public AuthorChangedUndoEntry(string u, string r)
+            : base($"Author Changed to {r}", u, r) {}
         }
     }
 }

@@ -11,7 +11,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 
 using Apollo.Core;
-using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;
+using Apollo.Undo;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {

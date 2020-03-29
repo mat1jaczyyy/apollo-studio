@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
-using UndoEntry = Apollo.Helpers.UndoManager.UndoEntry;
+using Apollo.Undo;
 
 namespace Apollo.Viewers {
     public class UndoEntryInfo: UserControl {

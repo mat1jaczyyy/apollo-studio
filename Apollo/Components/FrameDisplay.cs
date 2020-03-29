@@ -14,7 +14,6 @@ using Avalonia.VisualTree;
 
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
@@ -111,7 +110,7 @@ namespace Apollo.Components {
 
         public void DragFailed(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-            
+
             if (MouseButton == PointerUpdateKind.LeftButtonPressed)
                 FrameSelected?.Invoke(Viewer.Frame.ParentIndex.Value);
     

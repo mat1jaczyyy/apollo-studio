@@ -177,53 +177,35 @@ namespace Apollo.DeviceViewers {
                 for (int i = 0; i < fullFade.Count; i++)
                     if (Math.Abs(fullFade[i].Time - time) < Math.Abs(fullFade[fadeIndex].Time - time))
                         fadeIndex = i;
-                
-                Color thumbColor = fullFade[fadeIndex].Color.Clone();
-                
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Color {index + 1} Inserted", () => {
-                    Track.TraversePath<Fade>(path).Remove(index);
-                }, () => {
-                    Track.TraversePath<Fade>(path).Insert(index, thumbColor, pos, FadeType.Linear);
-                });
-
-                _fade.Insert(index, thumbColor.Clone(), pos, FadeType.Linear);
+                        
+                Program.Project.Undo.AddAndExecute(new Fade.ThumbInsertUndoEntry(
+                    _fade, 
+                    index, 
+                    fullFade[fadeIndex].Color.Clone(), 
+                    pos, 
+                    FadeType.Linear
+                ));
             }
         }
 
         void Thumb_Delete(FadeThumb sender) {
             int index = thumbs.IndexOf(sender);
 
-            Color uc = _fade.GetColor(index).Clone();
-            double up = _fade.GetPosition(index);
-            FadeType ut = _fade.GetFadeType(index);
-            List<int> path = Track.GetPath(_fade);
-
-            Program.Project.Undo.Add($"Fade Color {index + 1} Removed", () => {
-                Track.TraversePath<Fade>(path).Insert(index, uc, up, ut);
-            }, () => {
-                Track.TraversePath<Fade>(path).Remove(index);
-            });
-
-            _fade.Remove(index);
+            Program.Project.Undo.AddAndExecute(new Fade.ThumbRemoveUndoEntry(
+                _fade, 
+                thumbs.IndexOf(sender), 
+                _fade.GetColor(index).Clone(), 
+                _fade.GetPosition(index), 
+                _fade.GetFadeType(index)
+            ));
         }
 
-        void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) {
-            int index = thumbs.IndexOf(sender);
-
-            FadeType oldType = _fade.GetFadeType(index);
-
-            List<int> path = Track.GetPath(_fade);
-
-            Program.Project.Undo.Add($"Fade Type {index + 1} Changed to {newType}", () => {
-                Track.TraversePath<Fade>(path).SetFadeType(index, oldType);
-            }, () => {
-                Track.TraversePath<Fade>(path).SetFadeType(index, newType);
-            });
-
-            _fade.SetFadeType(index, newType);
-        }
+        void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) => Program.Project.Undo.AddAndExecute(new Fade.ThumbTypeUndoEntry(
+            _fade, 
+            thumbs.IndexOf(sender), 
+            _fade.GetFadeType(thumbs.IndexOf(sender)), 
+            newType
+        ));
 
         public FadeType GetFadeType(FadeThumb sender) => _fade.GetFadeType(thumbs.IndexOf(sender));
 
@@ -239,20 +221,19 @@ namespace Apollo.DeviceViewers {
             x = (x < left)? left : x;
             x = (x > right)? right : x;
 
-            double pos = x / Gradient.Width;
+            Console.WriteLine($"{change} {x}");
 
-            if (total != null) {
-                double u = (x - total.Value) / Gradient.Width;
-                List<int> path = Track.GetPath(_fade);
+            Fade.ThumbMoveUndoEntry entry = new Fade.ThumbMoveUndoEntry(
+                _fade,
+                i,
+                (x - total?? 0) / Gradient.Width,
+                x / Gradient.Width
+            );
 
-                Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                    Track.TraversePath<Fade>(path).SetPosition(i, u);
-                }, () => {
-                    Track.TraversePath<Fade>(path).SetPosition(i, pos);
-                });
-            }
-
-            _fade.SetPosition(i, pos);
+            if (total != null) 
+                Program.Project.Undo.Add(entry);
+            
+            entry.Redo();
         }
 
         public void SetPosition(int index, double position) {
@@ -265,22 +246,13 @@ namespace Apollo.DeviceViewers {
         void Thumb_Focus(FadeThumb sender) => Expand(thumbs.IndexOf(sender));
 
         void Color_Changed(Color color, Color old) {
-            if (_fade.Expanded != null) {
-                if (old != null) {
-                    Color u = old.Clone();
-                    Color r = color.Clone();
-                    int index = _fade.Expanded.Value;
-                    List<int> path = Track.GetPath(_fade);
-
-                    Program.Project.Undo.Add($"Fade Color {_fade.Expanded + 1} Changed to {r.ToHex()}", () => {
-                        Track.TraversePath<Fade>(path).SetColor(index, u.Clone());
-                    }, () => {
-                        Track.TraversePath<Fade>(path).SetColor(index, r.Clone());
-                    });
-                }
-
-                _fade.SetColor(_fade.Expanded.Value, color);
-            }
+            if (_fade.Expanded != null && old != null)
+                Program.Project.Undo.AddAndExecute(new Fade.ColorUndoEntry(
+                    _fade, 
+                    _fade.Expanded.Value, 
+                    old.Clone(), 
+                    color.Clone()
+                ));
         }
 
         public void SetColor(int index, Color color) {
@@ -312,71 +284,45 @@ namespace Apollo.DeviceViewers {
         }
 
         void Duration_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Duration Changed to {r}{Duration.Unit}", () => {
-                    Track.TraversePath<Fade>(path).Time.Free = u;
-                }, () => {
-                    Track.TraversePath<Fade>(path).Time.Free = r;
-                });
-            }
-
-            _fade.Time.Free = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Fade.DurationUndoEntry(
+                    _fade, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 
         void Duration_ModeChanged(bool value, bool? old) {
-            if (old != null && old != value) {
-                bool u = old.Value;
-                bool r = value;
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Duration Switched to {(r? "Steps" : "Free")}", () => {
-                    Track.TraversePath<Fade>(path).Time.Mode = u;
-                }, () => {
-                    Track.TraversePath<Fade>(path).Time.Mode = r;
-                });
-            }
-
-            _fade.Time.Mode = value;
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new Fade.DurationModeUndoEntry(
+                    _fade, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetMode(bool mode) => Duration.UsingSteps = mode;
 
         void Duration_StepChanged(int value, int? old) {
-            if (old != null && old != value) {
-                int u = old.Value;
-                int r = value;
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Duration Changed to {Length.Steps[r]}", () => {
-                    Track.TraversePath<Fade>(path).Time.Length.Step = u;
-                }, () => {
-                    Track.TraversePath<Fade>(path).Time.Length.Step = r;
-                });
-            }
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new Fade.DurationStepUndoEntry(
+                    _fade, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetDurationStep(Length duration) => Duration.Length = duration;
 
         void Gate_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                double u = old.Value / 100;
-                double r = value / 100;
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Gate Changed to {value}{Gate.Unit}", () => {
-                    Track.TraversePath<Fade>(path).Gate = u;
-                }, () => {
-                    Track.TraversePath<Fade>(path).Gate = r;
-                });
-            }
-
-            _fade.Gate = value / 100;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Fade.GateUndoEntry(
+                    _fade, 
+                    old.Value, 
+                    value
+                ));
         }
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
@@ -384,19 +330,12 @@ namespace Apollo.DeviceViewers {
         void PlaybackMode_Changed(object sender, SelectionChangedEventArgs e) {
             FadePlaybackType selected = (FadePlaybackType)PlaybackMode.SelectedIndex;
 
-            if (_fade.PlayMode != selected) {
-                FadePlaybackType u = _fade.PlayMode;
-                FadePlaybackType r = selected;
-                List<int> path = Track.GetPath(_fade);
-
-                Program.Project.Undo.Add($"Fade Playback Mode Changed to {r}", () => {
-                    Track.TraversePath<Fade>(path).PlayMode = u;
-                }, () => {
-                    Track.TraversePath<Fade>(path).PlayMode = r;
-                });
-
-                _fade.PlayMode = selected;
-            }
+            if (_fade.PlayMode != selected)
+                Program.Project.Undo.AddAndExecute(new Fade.PlaybackModeUndoEntry(
+                    _fade, 
+                    _fade.PlayMode, 
+                    selected
+                ));
         }
 
         public void SetPlaybackMode(FadePlaybackType mode) => PlaybackMode.SelectedIndex = (int)mode;
@@ -468,17 +407,13 @@ namespace Apollo.DeviceViewers {
 
             Input.Opacity = 0;
             Input.IsHitTestVisible = false;
-
-            double u = oldValue / 100;
-            double r = raw;
-            int i = _fade.Expanded.Value;
-            List<int> path = Track.GetPath(_fade);
-
-            Program.Project.Undo.Add($"Fade Color {i + 1} Moved", () => {
-                Track.TraversePath<Fade>(path).SetPosition(i, u);
-            }, () => {
-                Track.TraversePath<Fade>(path).SetPosition(i, r);
-            });
+            
+            Program.Project.Undo.AddAndExecute(new Fade.ThumbMoveUndoEntry(
+                _fade, 
+                _fade.Expanded.Value, 
+                oldValue / 100, 
+                raw
+            ));
         }
 
         void Input_KeyDown(object sender, KeyEventArgs e) {

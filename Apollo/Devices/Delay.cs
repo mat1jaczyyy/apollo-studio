@@ -5,6 +5,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Delay: Device {
@@ -112,6 +113,34 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+        
+        public class DurationUndoEntry: SimplePathUndoEntry<Delay, int> {
+            protected override void Action(Delay item, int element) => item.Time.Free = element;
+            
+            public DurationUndoEntry(Delay delay, int u, int r)
+            : base($"Delay Duration Changed to {r}ms", delay, u, r) {}
+        }
+        
+        public class DurationModeUndoEntry: SimplePathUndoEntry<Delay, bool> {
+            protected override void Action(Delay item, bool element) => item.Time.Mode = element;
+            
+            public DurationModeUndoEntry(Delay delay, bool u, bool r)
+            : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay, u, r) {}
+        }
+        
+        public class DurationStepUndoEntry: SimplePathUndoEntry<Delay, int> {
+            protected override void Action(Delay item, int element) => item.Time.Length.Step = element;
+            
+            public DurationStepUndoEntry(Delay delay, int u, int r)
+            : base($"Delay Duration Changed to {Length.Steps[r]}", delay, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Delay, double> {
+            protected override void Action(Delay item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Delay delay, double u, double r)
+            : base($"Delay Gate Changed to {r}%", delay, u / 100, r / 100) {}
         }
     }
 }

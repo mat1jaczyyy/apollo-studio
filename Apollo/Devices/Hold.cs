@@ -5,6 +5,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Hold: Device {
@@ -169,6 +170,48 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+        
+        public class DurationUndoEntry: SimplePathUndoEntry<Hold, int> {
+            protected override void Action(Hold item, int element) => item.Time.Free = element;
+            
+            public DurationUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {r}ms", hold, u, r) {}
+        }
+        
+        public class DurationModeUndoEntry: SimplePathUndoEntry<Hold, bool> {
+            protected override void Action(Hold item, bool element) => item.Time.Mode = element;
+            
+            public DurationModeUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Duration Switched to {(r? "Steps" : "Free")}", hold, u, r) {}
+        }
+        
+        public class DurationStepUndoEntry: SimplePathUndoEntry<Hold, int> {
+            protected override void Action(Hold item, int element) => item.Time.Length.Step = element;
+            
+            public DurationStepUndoEntry(Hold hold, int u, int r)
+            : base($"Hold Duration Changed to {Length.Steps[r]}", hold, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Hold, double> {
+            protected override void Action(Hold item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Hold hold, double u, double r)
+            : base($"Hold Gate Changed to {r}%", hold, u / 100, r / 100) {}
+        }
+        
+        public class InfiniteUndoEntry: SimplePathUndoEntry<Hold, bool> {
+            protected override void Action(Hold item, bool element) => item.Infinite = element;
+            
+            public InfiniteUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", hold, u, r) {}
+        }
+        
+        public class ReleaseUndoEntry: SimplePathUndoEntry<Hold, bool> {
+            protected override void Action(Hold item, bool element) => item.Release = element;
+            
+            public ReleaseUndoEntry(Hold hold, bool u, bool r)
+            : base($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", hold, u, r) {}
         }
     }
 }

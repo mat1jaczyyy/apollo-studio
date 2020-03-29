@@ -2,16 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Controls;
+
 using Apollo.Devices;
 using Apollo.DeviceViewers;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}
 
-    public class Chain: ISelect, ISelectParent {
+    public class Chain: ISelect, ISelectParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -39,6 +43,13 @@ namespace Apollo.Elements {
         public bool IRoot { 
             get => Parent is Track;
         }
+        
+        public Window IWindow => Track.Get(this)?.Window;
+        public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
+
+        public Type ChildType => typeof(Device);
+        public string ChildString => "Device";
+        public string ChildFileExtension => "apdev";
 
         public ChainInfo Info;
         public ChainViewer Viewer;
@@ -109,7 +120,7 @@ namespace Apollo.Elements {
             get => _name;
             set {
                 _name = value;
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -202,6 +213,22 @@ namespace Apollo.Elements {
             Viewer = null;
             Parent = null;
             _ParentIndex = null;
+        }
+        
+        public class DeviceInsertedUndoEntry: PathUndoEntry<Chain> {
+            int index;
+            Device device;
+
+            protected override void UndoPath(params Chain[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone());
+            
+            protected override void OnDispose() => device.Dispose();
+            
+            public DeviceInsertedUndoEntry(Chain chain, int index, Device device)
+            : base($"Device ({device.Name}) Inserted", chain) {
+                this.index = index;
+                this.device = device.Clone();
+            }
         }
     }
 }

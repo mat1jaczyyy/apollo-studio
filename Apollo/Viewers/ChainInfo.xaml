@@ -36,8 +36,7 @@
           <TextBlock VerticalAlignment="Center" x:Name="Name" Cursor="Hand" />
         </Grid>
         
-        <TextBox Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" Padding="1" x:Name="Input"
-                 LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
+        <TextBox Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" Padding="1" x:Name="Input" />
       </Grid>
     </Grid>
 

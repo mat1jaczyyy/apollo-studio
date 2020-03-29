@@ -43,19 +43,12 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _layer = null;
 
         void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_layer);
-
-                Program.Project.Undo.Add($"Layer Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<Layer>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).Target = r;
-                });
-            }
-
-            _layer.Target = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Layer.TargetUndoEntry(
+                    _layer,
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value;
@@ -63,37 +56,23 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             BlendingType selected = (BlendingType)BlendingMode.SelectedIndex;
 
-            if (_layer.BlendingMode != selected) {
-                BlendingType u = _layer.BlendingMode;
-                BlendingType r = selected;
-                List<int> path = Track.GetPath(_layer);
-
-                Program.Project.Undo.Add($"Layer Blending Changed to {r}", () => {
-                    Track.TraversePath<Layer>(path).BlendingMode = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).BlendingMode = r;
-                });
-
-                _layer.BlendingMode = selected;
-            }
+            if (_layer.BlendingMode != selected)
+                Program.Project.Undo.AddAndExecute(new Layer.ModeUndoEntry(
+                    _layer, 
+                    _layer.BlendingMode, 
+                    selected
+                ));
         }
 
         public void SetMode(BlendingType mode) => Range.Enabled = (BlendingMode.SelectedIndex = (int)mode) > 0;
 
         void Range_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_layer);
-
-                Program.Project.Undo.Add($"Layer Range Changed to {r}{Range.Unit}", () => {
-                    Track.TraversePath<Layer>(path).Range = u;
-                }, () => {
-                    Track.TraversePath<Layer>(path).Range = r;
-                });
-            }
-
-            _layer.Range = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new Layer.RangeUndoEntry(
+                    _layer,
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetRange(int value) => Range.RawValue = value;

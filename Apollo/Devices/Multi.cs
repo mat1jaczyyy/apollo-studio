@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Multi: Group {
@@ -123,6 +125,20 @@ namespace Apollo.Devices {
             Preprocess.Dispose();
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
+        }
+        
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Multi, MultiType> {
+            protected override void Action(Multi item, MultiType element) => item.Mode = element;
+            
+            public ModeUndoEntry(Multi multi, MultiType u, MultiType r, IEnumerable source)
+            : base("Multi Direction", multi, u, r, source) {}
+        }
+        
+        public class FilterChangedUndoEntry: SimpleIndexPathUndoEntry<Multi, bool[]> {
+            protected override void Action(Multi item, int index, bool[] element) => item[index].SecretMultiFilter = element.ToArray();
+            
+            public FilterChangedUndoEntry(Multi multi, int index, bool[] u)
+            : base($"Multi Chain {index + 1} Filter Changed", multi, index, u.ToArray(), multi[index].SecretMultiFilter.ToArray()) {}
         }
     }
 }

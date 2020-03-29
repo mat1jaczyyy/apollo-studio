@@ -5,11 +5,12 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: ISelect, IChainParent {
+    public class Track: ISelect, IChainParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -60,7 +61,7 @@ namespace Apollo.Elements {
                 ? track
                 : Get((Device)chain.Parent)
             ) : null;
-
+            
         public static bool PathContains(ISelect child, List<ISelect> search) {
             ISelect last = child;
 
@@ -76,39 +77,6 @@ namespace Apollo.Elements {
                     ? (ISelect)((Chain)last).Parent
                     : (ISelect)last.IParent;
             }
-        }
-
-        public static List<int> GetPath(ISelect child) {
-            List<int> path = new List<int>();
-            ISelect last = child;
-
-            while (true) {
-                if (last is Chain chain && (chain.Parent is Choke || chain.IRoot))
-                    last = (ISelect)chain.Parent;
-
-                path.Add(last.IParentIndex?? -1);
-
-                if (last is Track) break;
-
-                last = (ISelect)last.IParent;
-            }
-
-            return path;
-        }
-
-        public static T TraversePath<T>(List<int> path) where T: ISelect {
-            ISelectParent ret = Program.Project[path.Last()].Chain;
-
-            if (path.Count == 1) return (T)ret;
-
-            for (int i = path.Count - 2; i > 0; i--)
-                if (path[i] == -1) ret = ((Multi)ret).Preprocess;
-                else if (ret.IChildren[path[i]] is Choke choke) ret = choke.Chain;
-                else ret = (ISelectParent)ret.IChildren[path[i]];
-
-            if (path[0] == -1) return (T)(ISelect)((Multi)ret).Preprocess;
-            else if (ret.IChildren[path[0]] is Choke choke && typeof(T) != typeof(Choke)) return (T)(ISelect)choke.Chain;
-            else return (T)ret.IChildren[path[0]];
         }
 
         public Chain Chain;
@@ -134,7 +102,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(ProcessedName);
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -197,6 +165,13 @@ namespace Apollo.Elements {
             Chain = null;
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
+        }
+
+        public class LaunchpadChangedUndoEntry: SimpleIndexUndoEntry<Launchpad> {
+            protected override void Action(int index, Launchpad element) => Program.Project[index].Launchpad = element;
+
+            public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
+            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
         }
     }
 }

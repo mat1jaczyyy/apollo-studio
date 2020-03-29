@@ -42,19 +42,13 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             RotateType selected = (RotateType)RotateMode.SelectedIndex;
 
-            if (_rotate.Mode != selected) {
-                RotateType u = _rotate.Mode;
-                RotateType r = selected;
-                List<int> path = Track.GetPath(_rotate);
-
-                Program.Project.Undo.Add($"Rotate Angle Changed to {((ComboBoxItem)RotateMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    Track.TraversePath<Rotate>(path).Mode = u;
-                }, () => {
-                    Track.TraversePath<Rotate>(path).Mode = r;
-                });
-
-                _rotate.Mode = selected;
-            }
+            if (_rotate.Mode != selected)
+                Program.Project.Undo.AddAndExecute(new Rotate.ModeUndoEntry(
+                    _rotate, 
+                    _rotate.Mode,
+                    selected,
+                    RotateMode.Items
+                ));
         }
 
         public void SetMode(RotateType mode) => RotateMode.SelectedIndex = (int)mode;
@@ -62,19 +56,12 @@ namespace Apollo.DeviceViewers {
         void Bypass_Changed(object sender, RoutedEventArgs e) {
             bool value = Bypass.IsChecked.Value;
 
-            if (_rotate.Bypass != value) {
-                bool u = _rotate.Bypass;
-                bool r = value;
-                List<int> path = Track.GetPath(_rotate);
-
-                Program.Project.Undo.Add($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", () => {
-                    Track.TraversePath<Rotate>(path).Bypass = u;
-                }, () => {
-                    Track.TraversePath<Rotate>(path).Bypass = r;
-                });
-
-                _rotate.Bypass = value;
-            }
+            if (_rotate.Bypass != value)
+                Program.Project.Undo.AddAndExecute(new Rotate.BypassUndoEntry(
+                    _rotate, 
+                    _rotate.Bypass, 
+                    value
+                ));
         }
 
         public void SetBypass(bool value) => Bypass.IsChecked = value;

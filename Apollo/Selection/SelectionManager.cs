@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia.Input;
 
 using Apollo.Core;
+using Apollo.Devices;
 
 namespace Apollo.Selection {
     public class SelectionManager {
@@ -102,8 +103,8 @@ namespace Apollo.Selection {
         public void MoveChild() {
             Expand();
 
-            if (Start is ISelectParent && ((ISelectParent)Start).IChildren.Count > 0)
-                Select(((ISelectParent)Start).IChildren[0]);
+            if (Start is ISelectParent parent && parent.IChildren.Count > 0)
+                Select(parent.IChildren[0]);
         }
 
         public void Action(string action) {
@@ -126,20 +127,22 @@ namespace Apollo.Selection {
         public void Action(string action, ISelectParent parent, int index) => Action(action, parent, index, index);
 
         public void Action(string action, ISelectParent parent, int left, int right) {
-            if (action == "Cut") parent.IViewer?.Copy(left, right, true);
-            else if (action == "Copy") parent.IViewer?.Copy(left, right);
-            else if (action == "Duplicate") parent.IViewer?.Duplicate(left, right);
-            else if (action == "Paste") parent.IViewer?.Paste(right);
-            else if (action == "Replace") parent.IViewer?.Replace(left, right);
-            else if (action == "Delete") parent.IViewer?.Delete(left, right);
-            else if (action == "Group") parent.IViewer?.Group(left, right);
-            else if (action == "Ungroup") parent.IViewer?.Ungroup(left);
-            else if (action == "Choke") parent.IViewer?.Choke(left, right);
-            else if (action == "Unchoke") parent.IViewer?.Unchoke(left);
-            else if (action == "Mute" || action == "Unmute") parent.IViewer?.Mute(left, right);
-            else if (action == "Rename") parent.IViewer?.Rename(left, right);
-            else if (action == "Export") parent.IViewer?.Export(left, right);
-            else if (action == "Import") parent.IViewer?.Import(right);
+            if (parent is Pattern pattern && pattern.Window?.Locked == true) return;
+
+            if (action == "Cut") Operations.Copy(parent, left, right, true);
+            else if (action == "Copy") Operations.Copy(parent, left, right);
+            else if (action == "Duplicate") Operations.Duplicate(parent, left, right);
+            else if (action == "Paste") Operations.Paste(parent, right);
+            else if (action == "Replace") Operations.Replace(parent, left, right);
+            else if (action == "Delete") Operations.Delete(parent, left, right);
+            else if (action == "Group") Operations.Group(parent, left, right);
+            else if (action == "Ungroup") Operations.Ungroup(parent, left);
+            else if (action == "Choke") Operations.Choke(parent, left, right);
+            else if (action == "Unchoke") Operations.Unchoke(parent, left);
+            else if (action == "Mute" || action == "Unmute") Operations.Mute(parent, left, right);
+            else if (action == "Rename") Operations.Rename(parent, left, right);
+            else if (action == "Export") Operations.Export(parent, left, right);
+            else if (action == "Import") Operations.Import(parent, right);
         }
 
         public bool HandleKey(KeyEventArgs e) {

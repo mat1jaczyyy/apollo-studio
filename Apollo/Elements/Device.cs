@@ -11,7 +11,7 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public abstract class Device: ISelect {
+    public abstract class Device: ISelect, IMutable {
         public readonly string DeviceIdentifier;
         public readonly string Name;
 

@@ -79,19 +79,13 @@ namespace Apollo.DeviceViewers {
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             MultiType selected = (MultiType)MultiMode.SelectedIndex;
 
-            if (_multi.Mode != selected) {
-                MultiType u = _multi.Mode;
-                MultiType r = selected;
-                List<int> path = Track.GetPath(_multi);
-
-                Program.Project.Undo.Add($"Direction Changed to {((ComboBoxItem)MultiMode.ItemContainerGenerator.ContainerFromIndex((int)r)).Content}", () => {
-                    Track.TraversePath<Multi>(path).Mode = u;
-                }, () => {
-                    Track.TraversePath<Multi>(path).Mode = r;
-                });
-
-                _multi.Mode = selected;
-            }
+            if (_multi.Mode != selected)
+                Program.Project.Undo.AddAndExecute(new Multi.ModeUndoEntry(
+                    _multi,
+                    _multi.Mode,
+                    selected,
+                    MultiMode.Items
+                ));
         }
 
         public void SetMode(MultiType mode) {
@@ -117,16 +111,11 @@ namespace Apollo.DeviceViewers {
         void PadFinished(int index) {
             if (old == null) return;
 
-            bool[] u = old.ToArray();
-            bool[] r = _multi[(int)_multi.Expanded].SecretMultiFilter.ToArray();
-            List<int> path = Track.GetPath(_multi);
-            int selected = (int)_multi.Expanded;
-
-            Program.Project.Undo.Add($"MultiFilter Changed", () => {
-                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = u.ToArray();
-            }, () => {
-                Track.TraversePath<Multi>(path)[selected].SecretMultiFilter = r.ToArray();
-            });
+            Program.Project.Undo.Add(new Multi.FilterChangedUndoEntry(
+                _multi,
+                (int)_multi.Expanded,
+                old
+            ));
 
             old = null;
         }

@@ -4,6 +4,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
 using Apollo.Core;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Refresh: Device {
@@ -33,6 +34,13 @@ namespace Apollo.Devices {
             }
             
             InvokeExit(n);
+        }
+        
+        public class MacroUndoEntry: SimpleIndexPathUndoEntry<Refresh, bool> {
+            protected override void Action(Refresh item, int index, bool element) => item.SetMacro(index, element);
+            
+            public MacroUndoEntry(Refresh refresh, int index, bool u, bool r)
+            : base($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", refresh, index, u, r) {}
         }
     }
 }

@@ -2,6 +2,7 @@ using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Switch: Device {
@@ -44,6 +45,20 @@ namespace Apollo.Devices {
                 Program.Project.SetMacro(Target, Value); 
 
             InvokeExit(n);
+        }
+        
+        public class TargetUndoEntry: SimplePathUndoEntry<Switch, int> {
+            protected override void Action(Switch item, int element) => item.Target = element;
+            
+            public TargetUndoEntry(Switch macroswitch, int u, int r)
+            : base($"Switch Target Changed to {r}", macroswitch, u, r) {}
+        }
+        
+        public class ValueUndoEntry: SimplePathUndoEntry<Switch, int> {
+            protected override void Action(Switch item, int element) => item.Value = element;
+            
+            public ValueUndoEntry(Switch macroswitch, int u, int r)
+            : base($"Switch Value Changed to {r}", macroswitch, u, r) {}
         }
     }
 }

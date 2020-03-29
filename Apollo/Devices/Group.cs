@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia.Controls;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent, ISelectParent {
@@ -18,6 +21,13 @@ namespace Apollo.Devices {
         public bool IRoot => false;
 
         public void IInsert(int index, ISelect item) => Insert(index, (Chain)item);
+        
+        public Window IWindow => Track.Get(this)?.Window;
+        public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
+
+        public Type ChildType => typeof(Chain);
+        public string ChildString => "Chain";
+        public string ChildFileExtension => "apchn";
 
         Action<Signal> _midiexit;
         public override Action<Signal> MIDIExit {
@@ -104,6 +114,22 @@ namespace Apollo.Devices {
 
             foreach (Chain chain in Chains) chain.Dispose();
             base.Dispose();
+        }
+                
+        public class ChainInsertedUndoEntry: PathUndoEntry<Group> {
+            int index;
+            Chain chain;
+
+            protected override void UndoPath(params Group[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Group[] items) => items[0].Insert(index, chain.Clone());
+            
+            protected override void OnDispose() => chain.Dispose();
+            
+            public ChainInsertedUndoEntry(Group group, int index, Chain chain)
+            : base($"{group.Name} Chain {index + 1} Inserted", group) {
+                this.index = index;
+                this.chain = chain.Clone();
+            }
         }
     }
 }

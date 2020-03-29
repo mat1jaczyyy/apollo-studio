@@ -12,13 +12,12 @@ using Avalonia.Media;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.DragDrop;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Windows;
 
 namespace Apollo.Viewers {
-    public class ChainInfo: UserControl, ISelectViewer, IDraggable {
+    public class ChainInfo: UserControl, ISelectViewer, IDraggable, IRenamable {
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -30,8 +29,6 @@ namespace Apollo.Viewers {
             Input = this.Get<TextBox>("Input");
             Indicator = this.Get<Indicator>("Indicator");
         }
-        
-        IDisposable observable;
 
         public delegate void ChainAddedEventHandler(int index);
         public event ChainAddedEventHandler ChainAdded;
@@ -43,15 +40,13 @@ namespace Apollo.Viewers {
         public bool Selected { get; private set; } = false;
 
         Grid Root;
-        TextBlock NameText;
+        public TextBlock NameText { get; private set; }
         public VerticalAdd ChainAdd;
         public Indicator Indicator { get; private set; }
 
         Grid Draggable;
         MenuItem MuteItem;
-        TextBox Input;
-
-        void UpdateText() => NameText.Text = _chain.ProcessedName;
+        public TextBox Input { get; private set; }
         
         void ApplyHeaderBrush(IBrush brush) {
             if (IsArrangeValid) Root.Background = brush;
@@ -77,12 +72,12 @@ namespace Apollo.Viewers {
 
             Deselect();
 
-            UpdateText();
-            _chain.ParentIndexChanged += UpdateText;
+            Rename = new RenameManager(this);
+
+            Rename.UpdateText();
+            _chain.ParentIndexChanged += Rename.UpdateText;
 
             DragDrop = new DragDropManager(this);
-
-            observable = Input.GetObservable(TextBox.TextProperty).Subscribe(Input_Changed);
 
             SetEnabled();
         }
@@ -91,11 +86,12 @@ namespace Apollo.Viewers {
             ChainAdded = null;
             ChainExpanded = null;
 
-            _chain.ParentIndexChanged -= UpdateText;
+            _chain.ParentIndexChanged -= Rename.UpdateText;
             _chain.Info = null;
             _chain = null;
 
-            observable.Dispose();
+            Rename.Dispose();
+            Rename = null;
 
             DragDrop.Dispose();
             DragDrop = null;
@@ -104,7 +100,7 @@ namespace Apollo.Viewers {
         public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
         void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
-
+    
         void ContextMenu_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action);
 
         public void Select(PointerPressedEventArgs e) {
@@ -151,45 +147,34 @@ namespace Apollo.Viewers {
                 if (source_chain == target_chain && after < before)
                     before_pos += count;
                 
-                List<int> sourcepath = Track.GetPath(source_chain);
-                List<int> targetpath = Track.GetPath(target_chain);
-                
-                Program.Project.Undo.Add($"{format} {(copy? "Copied" : "Moved")}", copy
-                    ? new Action(() => {
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                        for (int i = after + count; i > after; i--)
-                            targetchain.Remove(i);
-                        
-                        if (remove != null)
-                            ((Group)targetchain.Parent).Remove(remove.Value);
-
-                    }) : new Action(() => {
-                        Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                        Chain targetchain = Track.TraversePath<Chain>(targetpath);
-
-                        List<Device> umoving = (from i in Enumerable.Range(after_pos + 1, count) select targetchain[i]).ToList();
-
-                        DragDropManager.Move(umoving.Cast<ISelect>().ToList(), (ISelectParent)sourcechain, before_pos);
-
-                        if (remove != null)
-                            ((Group)targetchain.Parent).Remove(remove.Value);
-
-                }), () => {
-                    Chain sourcechain = Track.TraversePath<Chain>(sourcepath);
-                    Chain targetchain;
-
-                    if (remove != null) Track.TraversePath<Group>(targetpath.Skip(1).ToList()).Insert(remove.Value, targetchain = new Chain());
-                    else targetchain = Track.TraversePath<Chain>(targetpath);
-
-                    List<Device> rmoving = (from i in Enumerable.Range(before + 1, count) select sourcechain[i]).ToList();
-
-                    DragDropManager.Move(rmoving.Cast<ISelect>().ToList(), (ISelectParent)targetchain, after, copy);
-                });
+                Program.Project.Undo.Add(new DeviceAsChainUndoEntry(source_chain, target_chain, remove, copy, count, before, after, before_pos, after_pos, format));
 
             } else if (remove != null) parent_group.Remove(remove.Value);
 
             return result;
+        }
+
+        public class DeviceAsChainUndoEntry: DragDropManager.DragDropUndoEntry {
+            int? remove;
+
+            protected override void UndoPath(params ISelectParent[] items) {
+                base.UndoPath(items);
+                
+                if (remove != null)
+                    ((ISelect)items[1]).IParent.Remove(remove.Value);
+            }
+
+            protected override void RedoPath(params ISelectParent[] items) {
+                ISelectParent target;
+
+                if (remove != null) ((ISelectParent)Paths[1].Resolve(1)).IInsert(remove.Value, (Chain)(target = new Chain()));
+                else target = (ISelectParent)Paths[1].Resolve();
+
+                base.RedoPath(items[0], target);
+            }
+
+            public DeviceAsChainUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
+            : base(sourceparent, targetparent, copy, count, before, after, before_pos, after_pos, format) => this.remove = remove;
         }
 
         DragDropManager DragDrop;
@@ -222,106 +207,6 @@ namespace Apollo.Viewers {
         
         void Chain_Add() => ChainAdded?.Invoke(_chain.ParentIndex.Value + 1);
 
-        int Input_Left, Input_Right;
-        List<string> Input_Clean;
-        bool Input_Ignore = false;
-
-        void Input_Changed(string text) {
-            if (text == null) return;
-            if (text == "") return;
-
-            if (Input_Ignore) return;
-
-            Input_Ignore = true;
-            for (int i = Input_Left; i <= Input_Right; i++)
-                ((Group)_chain.Parent)[i].Name = text;
-            Input_Ignore = false;
-        }
-
-        public void StartInput(int left, int right) {
-            Input_Left = left;
-            Input_Right = right;
-
-            Input_Clean = new List<string>();
-            for (int i = left; i <= right; i++)
-                Input_Clean.Add(((Group)_chain.Parent)[i].Name);
-
-            Input.Text = _chain.Name;
-            Input.SelectionStart = 0;
-            Input.SelectionEnd = Input.Text.Length;
-            Input.CaretIndex = Input.Text.Length;
-
-            Input.Opacity = 1;
-            Input.IsHitTestVisible = true;
-            Input.Focus();
-        }
-
-        void Input_LostFocus(object sender, RoutedEventArgs e) {
-            Input.Text = _chain.Name;
-
-            Input.Opacity = 0;
-            Input.IsHitTestVisible = false;
-
-            List<string> r = (from i in Enumerable.Range(0, Input_Clean.Count) select Input.Text).ToList();
-
-            if (!r.SequenceEqual(Input_Clean)) {
-                int left = Input_Left;
-                int right = Input_Right;
-                List<string> u = (from i in Input_Clean select i).ToList();
-                List<int> path = Track.GetPath(_chain);
-
-                Program.Project.Undo.Add($"Chain Renamed to {Input.Text}", () => {
-                    Chain chain = Track.TraversePath<Chain>(path);
-                    Group parent = (Group)chain.Parent;
-
-                    for (int i = left; i <= right; i++)
-                        parent[i].Name = u[i - left];
-                    
-                    TrackWindow window = Track.Get(chain)?.Window;
-
-                    window?.Selection.Select(parent[left]);
-                    window?.Selection.Select(parent[right], true);
-                    
-                }, () => {
-                    Chain chain = Track.TraversePath<Chain>(path);
-                    Group parent = (Group)chain.Parent;
-
-                    for (int i = left; i <= right; i++)
-                        parent[i].Name = r[i - left];
-                    
-                    TrackWindow window = Track.Get(chain)?.Window;
-
-                    window?.Selection.Select(parent[left]);
-                    window?.Selection.Select(parent[right], true);
-                });
-            }
-        }
-
-        public void SetName(string name) {
-            UpdateText();
-
-            if (Input_Ignore) return;
-
-            Input_Ignore = true;
-            Input.Text = name;
-            Input_Ignore = false;
-        }
-
-        void Input_KeyDown(object sender, KeyEventArgs e) {
-            if (App.Dragging) return;
-
-            if (e.Key == Key.Return)
-                this.Focus();
-
-            e.Key = Key.None;
-        }
-
-        void Input_KeyUp(object sender, KeyEventArgs e) {
-            if (App.Dragging) return;
-
-            e.Key = Key.None;
-        }
-
-        void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
+        public RenameManager Rename { get; private set; }
     }
 }
