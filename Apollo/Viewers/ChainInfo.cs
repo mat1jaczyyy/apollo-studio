@@ -139,7 +139,7 @@ namespace Apollo.Viewers {
 
             bool result;
 
-            if (result = DragDropManager.Move(moving.Cast<ISelect>().ToList(), (ISelectParent)target_chain, after = ((ISelectParent)target_chain).Count - 1, copy)) {
+            if (result = DragDropManager.Move(moving.Cast<ISelect>().ToList(), (ISelectParent)target_chain, after = ((ISelectParent)target_chain).Count - 1, copy, out Path<ISelectParent> premove)) {
                 int before_pos = before;
                 int after_pos = moving[0].IParentIndex.Value - 1;
                 int count = moving.Count;
@@ -147,7 +147,7 @@ namespace Apollo.Viewers {
                 if (source_chain == target_chain && after < before)
                     before_pos += count;
                 
-                Program.Project.Undo.Add(new DeviceAsChainUndoEntry(source_chain, target_chain, remove, copy, count, before, after, before_pos, after_pos, format));
+                Program.Project.Undo.Add(new DeviceAsChainUndoEntry(source_chain, premove, target_chain, remove, copy, count, before, after, before_pos, after_pos, format));
 
             } else if (remove != null) parent_group.Remove(remove.Value);
 
@@ -157,6 +157,15 @@ namespace Apollo.Viewers {
         public class DeviceAsChainUndoEntry: DragDropManager.DragDropUndoEntry {
             int? remove;
 
+            protected override ISelectParent ResolvePremove() {
+                ISelectParent ret;
+
+                if (remove != null) premove.Resolve(1).IInsert(remove.Value, (Chain)(ret = new Chain()));
+                else ret = premove.Resolve();
+
+                return ret;
+            }
+
             protected override void UndoPath(params ISelectParent[] items) {
                 base.UndoPath(items);
                 
@@ -164,17 +173,8 @@ namespace Apollo.Viewers {
                     ((ISelect)items[1]).IParent.Remove(remove.Value);
             }
 
-            protected override void RedoPath(params ISelectParent[] items) {
-                ISelectParent target;
-
-                if (remove != null) ((ISelectParent)Paths[1].Resolve(1)).IInsert(remove.Value, (Chain)(target = new Chain()));
-                else target = (ISelectParent)Paths[1].Resolve();
-
-                base.RedoPath(items[0], target);
-            }
-
-            public DeviceAsChainUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
-            : base(sourceparent, targetparent, copy, count, before, after, before_pos, after_pos, format) => this.remove = remove;
+            public DeviceAsChainUndoEntry(ISelectParent sourceparent, Path<ISelectParent> premove, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
+            : base(sourceparent, premove, targetparent, copy, count, before, after, before_pos, after_pos, format) => this.remove = remove;
         }
 
         DragDropManager DragDrop;

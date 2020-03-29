@@ -14,7 +14,9 @@ using Apollo.Undo;
 
 namespace Apollo.Selection {
     public class DragDropManager {
-        public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy = false) {
+        public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy, out Path<ISelectParent> premove) {
+            premove = null;
+            
             if (!(source[0] is Track) && !copy && Track.PathContains((ISelect)target, source)) return false;
 
             if (!copy && ((source[0] is Frame && source[0].IParent != target && source[0].IParent.Count == source.Count) ||
@@ -23,6 +25,8 @@ namespace Apollo.Selection {
                     : source.Contains(target.IChildren[position]) || (source[0].IParent == target && source[0].IParentIndex == position + 1)
                 )
             )) return false;
+
+            premove = new Path<ISelectParent>(target);
 
             ISelect point = (position == -1)? null : target.IChildren[position];
 
@@ -58,7 +62,7 @@ namespace Apollo.Selection {
             bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
             bool result;
 
-            if (result = Move(moving, parent, after, copy)) {
+            if (result = Move(moving, parent, after, copy, out Path<ISelectParent> premove)) {
                 int before_pos = before;
                 int after_pos = moving[0].IParentIndex.Value - 1;
                 int count = moving.Count;
@@ -66,7 +70,7 @@ namespace Apollo.Selection {
                 if (source_parent == parent && after < before)
                     before_pos += count;
 
-                Program.Project.Undo.Add(new DragDropUndoEntry(source_parent, parent, copy, count, before, after, before_pos, after_pos, format));
+                Program.Project.Undo.Add(new DragDropUndoEntry(source_parent, premove, parent, copy, count, before, after, before_pos, after_pos, format));
             }
 
             return result;
@@ -163,6 +167,10 @@ namespace Apollo.Selection {
         }
         
         public class DragDropUndoEntry: PathUndoEntry<ISelectParent> {
+            protected Path<ISelectParent> premove { get; private set; }
+
+            protected virtual ISelectParent ResolvePremove() => premove.Resolve();
+
             bool copy;
             int count, before, before_pos, after, after_pos;
 
@@ -174,19 +182,23 @@ namespace Apollo.Selection {
                 else Move(
                     (from i in Enumerable.Range(after_pos + 1, count) select items[1].IChildren[i]).ToList(),
                     items[0],
-                    before_pos
+                    before_pos,
+                    false,
+                    out _
                 );
             }
 
             protected override void RedoPath(params ISelectParent[] items) => Move(
                 (from i in Enumerable.Range(before + 1, count) select items[0].IChildren[i]).ToList(),
-                items[1],
+                ResolvePremove(),
                 after,
-                copy
+                copy,
+                out _
             );
             
-            public DragDropUndoEntry(ISelectParent sourceparent, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
+            public DragDropUndoEntry(ISelectParent sourceparent, Path<ISelectParent> premove, ISelectParent targetparent, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
             : base($"{format} {(copy? "Copied" : "Moved")}", sourceparent, targetparent) {
+                this.premove = premove;
                 this.copy = copy;
                 this.count = count;
                 this.before = before;
