@@ -207,7 +207,7 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, Bilateral, (from i in Frames select i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
+        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, Bilateral, Frames.Select(i => i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -448,7 +448,7 @@ namespace Apollo.Devices {
         }
         
         public class FrameChangedUndoEntry: SimpleIndexPathUndoEntry<Pattern, Color[]> {
-            static Color[] Clone(Color[] arr) => (from i in arr select i.Clone()).ToArray();
+            static Color[] Clone(Color[] arr) => arr.Select(i => i.Clone()).ToArray();
 
             protected override void Action(Pattern item, int index, Color[] element) => item[index].Screen = Clone(element);
             
@@ -489,7 +489,7 @@ namespace Apollo.Devices {
             public DurationUndoEntry(string desc, Pattern pattern, int left, List<Time> u, I r)
             : base(desc, pattern) {
                 this.left = left;
-                this.u = (from i in u select i.Clone()).ToList();
+                this.u = u.Select(i => i.Clone()).ToList();
                 this.r = r;
             }
         }
@@ -620,7 +620,7 @@ namespace Apollo.Devices {
                 item.Gate = element.Gate;
                 item.Pinch = element.Pinch;
                 item.Bilateral = element.Bilateral;
-                item.Frames = (from i in element.Frames select i.Clone()).ToList();
+                item.Frames = element.Frames.Select(i => i.Clone()).ToList();
                 item.Mode = element.Mode;
                 item.Infinite = element.Infinite;
                 item.RootKey = element.RootKey;

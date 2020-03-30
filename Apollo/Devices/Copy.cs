@@ -223,7 +223,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, HashSet<Signal>> screen = new ConcurrentDictionary<Signal, HashSet<Signal>>();
         ConcurrentDictionary<Signal, object> screenlocker = new ConcurrentDictionary<Signal, object>();
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, (from i in Offsets select i.Clone()).ToList(), Angles.ToList()) {
+        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, Offsets.Select(i => i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };

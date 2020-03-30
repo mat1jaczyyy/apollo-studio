@@ -35,7 +35,7 @@ namespace Apollo.Viewers {
         ComboBox Rotation, InputFormatSelector, TargetPortSelector;
 
         public void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown && i.GetType() != typeof(AbletonLaunchpad) select i).ToList();
+            List<Launchpad> ports = MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown && i.GetType() != typeof(AbletonLaunchpad)).ToList();
 
             Launchpad target = null;
 

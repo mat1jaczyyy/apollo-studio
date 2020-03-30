@@ -124,7 +124,7 @@ namespace Apollo.Selection {
                 this.left = left;
                 this.right = right;
 
-                init = (from i in Enumerable.Range(left, right - left + 1) select parent.IChildren[i].IClone()).ToList();
+                init = Enumerable.Range(left, right - left + 1).Select(i => parent.IChildren[i].IClone()).ToList();
             }
         }
 
@@ -354,7 +354,7 @@ namespace Apollo.Selection {
                 
                 List<IMutable> items = GetMutables(parent);
 
-                u = (from i in Enumerable.Range(left, right - left + 1) select items[i].Enabled).ToList();
+                u = Enumerable.Range(left, right - left + 1).Select(i => items[i].Enabled).ToList();
                 r = !items[left].Enabled;
             }
         }

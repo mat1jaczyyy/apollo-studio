@@ -236,7 +236,7 @@ namespace Apollo.Devices {
 
         public int Count => _colors.Count;
 
-        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList(), _types.ToList()) {
+        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, _colors.Select(i => i.Clone()).ToList(), _positions.ToList(), _types.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };

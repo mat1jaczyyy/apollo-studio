@@ -175,7 +175,7 @@ namespace Apollo.Windows {
         void UpdateTopmost(bool value) => Topmost = value;
 
         void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
+            List<Launchpad> ports = MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown).ToList();
             if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == LaunchpadType.Unknown)) ports.Add(Launchpad);
             ports.Add(MIDI.NoOutput);
 
@@ -517,7 +517,7 @@ namespace Apollo.Windows {
                 ? new Color(0)
                 : ColorPicker.Color;
             
-            oldScreen = (from i in _pattern[_pattern.Expanded].Screen select i.Clone()).ToArray();
+            oldScreen = _pattern[_pattern.Expanded].Screen.Select(i => i.Clone()).ToArray();
         }
     
         void PadPressed(int index, KeyModifiers mods = KeyModifiers.None) {

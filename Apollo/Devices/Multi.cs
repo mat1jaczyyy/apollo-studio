@@ -43,7 +43,7 @@ namespace Apollo.Devices {
             base.Reroute();
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), (from i in Chains select i.Clone()).ToList(), Expanded, Mode) {
+        public override Device Clone() => new Multi(Preprocess.Clone(), Chains.Select(i => i.Clone()).ToList(), Expanded, Mode) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };

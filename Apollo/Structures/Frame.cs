@@ -82,7 +82,7 @@ namespace Apollo.Structures {
             if (Info != null) Info.Viewer.Time.Text = ToString();
         }
 
-        public Frame Clone() => new Frame(Time.Clone(), (from i in Screen select i.Clone()).ToArray());
+        public Frame Clone() => new Frame(Time.Clone(), Screen.Select(i => i.Clone()).ToArray());
 
         public Frame(Time time = null, Color[] screen = null) {
             if (screen == null || screen.Length != 101) {

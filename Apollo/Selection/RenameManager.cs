@@ -47,7 +47,7 @@ namespace Apollo.Selection {
             Host.Input.Opacity = 0;
             Host.Input.IsHitTestVisible = false;
             
-            List<string> newName = (from i in Enumerable.Range(0, Clean.Count) select Host.Input.Text).ToList();
+            List<string> newName = Enumerable.Range(0, Clean.Count).Select(i => Host.Input.Text).ToList();
 
             if (!newName.SequenceEqual(Clean))
                 Program.Project.Undo.Add(new RenamedUndoEntry(Host.ItemParent, Left, Right, Clean, newName));

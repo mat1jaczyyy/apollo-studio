@@ -84,7 +84,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Group((from i in Chains select i.Clone()).ToList(), Expanded) {
+        public override Device Clone() => new Group(Chains.Select(i => i.Clone()).ToList(), Expanded) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };

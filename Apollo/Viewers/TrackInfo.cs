@@ -51,7 +51,7 @@ namespace Apollo.Viewers {
         void UpdateText(int index) => Rename.UpdateText();
 
         public void UpdatePorts() {
-            List<Launchpad> ports = (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select i).ToList();
+            List<Launchpad> ports = MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown).ToList();
             if (_track.Launchpad != null && (!_track.Launchpad.Available || _track.Launchpad.Type == LaunchpadType.Unknown)) ports.Add(_track.Launchpad);
             ports.Add(MIDI.NoOutput);
 

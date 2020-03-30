@@ -157,7 +157,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
+        public Chain Clone() => new Chain(Devices.Select(i => i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
             Enabled = Enabled
         };
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Avalonia;
@@ -251,17 +252,20 @@ namespace Apollo.Components {
             
             for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
 
+            IEnumerable<string> ones = Enumerable.Range(0, buttons).Select(i => gridSize);
+            IEnumerable<string> zeros = Enumerable.Range(0, 10 - buttons).Select(i => "0");
+
             View.Child = Grid = new Grid() {
                 RowDefinitions = RowDefinitions.Parse(
                     String.Join(
                         ",",
-                        (from i in Enumerable.Range(0, buttons) select gridSize).Concat(from i in Enumerable.Range(0, 10 - buttons) select "0").ToArray()
+                        ones.Concat(zeros).ToArray()
                     )
                 ),
                 ColumnDefinitions = ColumnDefinitions.Parse(
                     String.Join(
                         ",",
-                        (from i in Enumerable.Range(0, 10 - buttons) select "0").Concat(from i in Enumerable.Range(0, buttons) select gridSize).ToArray()
+                        zeros.Concat(ones).ToArray()
                     )
                 )
             };

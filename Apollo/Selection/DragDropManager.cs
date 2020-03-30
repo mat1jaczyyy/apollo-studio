@@ -180,7 +180,7 @@ namespace Apollo.Selection {
                         items[1].Remove(i);
 
                 else Move(
-                    (from i in Enumerable.Range(after_pos + 1, count) select items[1].IChildren[i]).ToList(),
+                    Enumerable.Range(after_pos + 1, count).Select(i => items[1].IChildren[i]).ToList(),
                     items[0],
                     before_pos,
                     false,
@@ -189,7 +189,7 @@ namespace Apollo.Selection {
             }
 
             protected override void RedoPath(params ISelectParent[] items) => Move(
-                (from i in Enumerable.Range(before + 1, count) select items[0].IChildren[i]).ToList(),
+                Enumerable.Range(before + 1, count).Select(i => items[0].IChildren[i]).ToList(),
                 ResolvePremove(),
                 after,
                 copy,
