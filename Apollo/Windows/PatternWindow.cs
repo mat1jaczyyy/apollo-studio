@@ -175,8 +175,8 @@ namespace Apollo.Windows {
         void UpdateTopmost(bool value) => Topmost = value;
 
         void UpdatePorts() {
-            List<Launchpad> ports = MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown).ToList();
-            if (Launchpad != null && (!Launchpad.Available || Launchpad.Type == LaunchpadType.Unknown)) ports.Add(Launchpad);
+            List<Launchpad> ports = MIDI.UsableDevices;
+            if (Launchpad?.Usable == false) ports.Add(Launchpad);
             ports.Add(MIDI.NoOutput);
 
             PortSelector.Items = ports;
@@ -982,8 +982,7 @@ namespace Apollo.Windows {
             _pattern.MIDIEnter(new StopSignal());
 
             foreach (Launchpad lp in MIDI.Devices)
-                if (lp.Available && lp.Type != LaunchpadType.Unknown)
-                    lp.Clear();
+                if (lp.Usable) lp.Clear();
 
             Editor.RenderFrame(_pattern[start]);
 

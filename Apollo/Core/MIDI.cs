@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices.Infos;
@@ -26,6 +27,8 @@ namespace Apollo.Core {
                 }
             }
         }
+
+        public static List<Launchpad> UsableDevices => Devices.Where(i => i.Usable).ToList();
 
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output", 0);
 

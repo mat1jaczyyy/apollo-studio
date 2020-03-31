@@ -238,7 +238,7 @@ namespace Apollo.Elements {
 
             BPM = bpm;
             Macros = macros?? new int[4] {1, 1, 1, 1};
-            Tracks = tracks?? MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown).Select(i => new Track() { Launchpad = i }).ToList();
+            Tracks = tracks?? MIDI.UsableDevices.Select(i => new Track() { Launchpad = i }).ToList();
             Author = author;
             BaseTime = basetime;
             FilePath = path;

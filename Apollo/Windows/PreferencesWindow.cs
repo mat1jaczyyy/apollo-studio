@@ -119,7 +119,7 @@ namespace Apollo.Windows {
         void UpdatePorts() {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
 
-            foreach (Launchpad lp in MIDI.Devices.Where(i => i.Available && i.Type != LaunchpadType.Unknown))
+            foreach (Launchpad lp in MIDI.UsableDevices)
                 Contents.Insert(Contents.Count - 1, new LaunchpadInfo(lp));
         }
 

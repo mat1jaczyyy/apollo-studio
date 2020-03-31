@@ -176,6 +176,8 @@ namespace Apollo.Elements {
         public string Name { get; protected set; }
         public bool Available { get; protected set; }
 
+        public bool Usable => Available && Type != LaunchpadType.Unknown;
+
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
@@ -304,7 +306,7 @@ namespace Apollo.Elements {
         }
 
         bool SysExSend(byte[] raw) {
-            if (!Available || Type == LaunchpadType.Unknown) return false;
+            if (!Usable) return false;
 
             buffer.Enqueue(new SysExMessage(raw));
             ulong current = signalCount;
@@ -328,7 +330,7 @@ namespace Apollo.Elements {
         }
 
         public virtual void Send(Signal n) {
-            if (!Available || Type == LaunchpadType.Unknown) return;
+            if (!Usable) return;
 
             Signal m = n.Clone();
             Window?.SignalRender(m);
@@ -372,7 +374,7 @@ namespace Apollo.Elements {
         }
 
         public virtual void Clear(bool manual = false) {
-            if (!Available || Type == LaunchpadType.Unknown || (manual && PatternWindow != null)) return;
+            if (!Usable || (manual && PatternWindow != null)) return;
 
             CreateScreen();
 
@@ -456,7 +458,7 @@ namespace Apollo.Elements {
         }
 
         public void Reconnect() {
-            if (this.GetType() != typeof(Launchpad) || Type == LaunchpadType.Unknown || !Available) return;
+            if (!Usable || this.GetType() != typeof(Launchpad)) return;
 
             IMidiInputDeviceInfo input = MidiDeviceManager.Default.InputDevices.FirstOrDefault(i => i.Name == Input.Name);
             IMidiOutputDeviceInfo output = MidiDeviceManager.Default.OutputDevices.FirstOrDefault(o => o.Name == Output.Name);
