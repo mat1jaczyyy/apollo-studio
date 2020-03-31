@@ -496,6 +496,11 @@ namespace Apollo.Devices {
                     item.SetColor(i, colors[item.Count - i - 1]);
                     item.SetPosition(i, positions[item.Count - i - 1]);
                 }
+                
+                List<FadeType> fadetypes = Enumerable.Range(0, item.Count - 1).Select(i => item.GetFadeType(i)).ToList();
+                
+                for (int i = 0; i < item.Count - 1; i++)
+                    item.SetFadeType(i, fadetypes[item.Count - i - 2].Opposite());
 
                 int? expanded = item.Count - item.Expanded - 1;
                 if (expanded != item.Expanded && item.Viewer?.SpecificViewer != null) ((FadeViewer)item.Viewer.SpecificViewer).Expand(expanded);
