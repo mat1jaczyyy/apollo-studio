@@ -234,13 +234,7 @@ namespace Apollo.Windows {
                 }
 
             } catch {
-                await MessageWindow.Create(
-                    $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or\n" +
-                    "the file you're attempting to read is invalid.",
-                    null, this
-                );
-
+                await MessageWindow.CreateReadError(this);
                 return;
             }
             

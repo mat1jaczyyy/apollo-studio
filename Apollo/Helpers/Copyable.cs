@@ -25,12 +25,7 @@ namespace Apollo.Helpers {
                 File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
             } catch (UnauthorizedAccessException) {
-                await MessageWindow.Create(
-                    $"An error occurred while writing the file.\n\n" +
-                    "You may not have sufficient privileges to write to the destination folder, or\n" +
-                    "the current file already exists but cannot be overwritten.",
-                    null, sender
-                );
+                await MessageWindow.CreateWriteError(sender);
             }
         }
 
@@ -52,13 +47,7 @@ namespace Apollo.Helpers {
                     return await Decoder.Decode(file, typeof(Copyable));
 
             } catch {
-                await MessageWindow.Create(
-                    $"An error occurred while reading the file.\n\n" +
-                    "You may not have sufficient privileges to read from the destination folder, or\n" +
-                    "the file you're attempting to read is invalid.",
-                    null, sender
-                );
-
+                await MessageWindow.CreateReadError(sender);
                 return null;
             }
         }

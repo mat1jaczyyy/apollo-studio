@@ -131,13 +131,7 @@ namespace Apollo.Elements {
                 File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
             } catch (UnauthorizedAccessException) {
-                if (sender != null) await MessageWindow.Create(
-                    $"An error occurred while writing the file.\n\n" +
-                    "You may not have sufficient privileges to write to the destination folder, or\n" +
-                    "the current file already exists but cannot be overwritten.",
-                    null, sender
-                );
-
+                if (sender != null) await MessageWindow.CreateWriteError(sender);
                 return false;
             }
 
