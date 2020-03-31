@@ -102,6 +102,8 @@ namespace Apollo.Enums {
         Sharp,
         Fast,
         Slow,
-        Hold
+        Hold,
+        Release
+    }
     }
 }

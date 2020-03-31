@@ -17,6 +17,7 @@
       <MenuItem Header="Fast" />
       <MenuItem Header="Slow" />
       <MenuItem Header="Hold" />
+      <MenuItem Header="Release" />
 
       <Separator x:Name="DeleteSeparator" />
       
