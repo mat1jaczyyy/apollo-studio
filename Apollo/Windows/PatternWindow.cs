@@ -62,7 +62,7 @@ namespace Apollo.Windows {
             Invert = this.Get<Button>("Invert");
 
             Contents = this.Get<StackPanel>("Frames").Children;
-            PortSelector = this.Get<ComboBox>("PortSelector");
+            PortSelector = this.Get<PortSelector>("PortSelector");
 
             ColorPicker = this.Get<ColorPicker>("ColorPicker");
             ColorHistory = this.Get<ColorHistory>("ColorHistory");
@@ -110,7 +110,8 @@ namespace Apollo.Windows {
         UndoButton UndoButton;
         RedoButton RedoButton;
         ScrollViewer FrameList;
-        ComboBox PortSelector, PlaybackMode;
+        PortSelector PortSelector;
+        ComboBox PlaybackMode;
         LaunchpadGrid Editor, RootKey;
         Controls Contents;
         ColorPicker ColorPicker;
@@ -173,18 +174,6 @@ namespace Apollo.Windows {
             => Title = TitleText.Text = TitleCenter.Text = $"Editing Pattern - {name}";
 
         void UpdateTopmost(bool value) => Topmost = value;
-
-        void UpdatePorts() {
-            List<Launchpad> ports = MIDI.UsableDevices;
-            if (Launchpad?.Usable == false) ports.Add(Launchpad);
-            ports.Add(MIDI.NoOutput);
-
-            PortSelector.Items = ports;
-            PortSelector.SelectedIndex = -1;
-            PortSelector.SelectedItem = Launchpad;
-        }
-
-        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
         void SetAlwaysShowing() {
             for (int i = 1; i < Contents.Count; i++)
@@ -271,8 +260,7 @@ namespace Apollo.Windows {
 
             Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 
-            UpdatePorts();
-            MIDI.DevicesUpdated += HandlePorts;
+            PortSelector.Update(Launchpad);
 
             ColorPicker.SetColor(ColorHistory.GetColor(0)?? new Color());
             ColorHistory.Select(ColorPicker.Color.Clone(), true);
@@ -316,8 +304,6 @@ namespace Apollo.Windows {
 
             _launchpad = null;
 
-            MIDI.DevicesUpdated -= HandlePorts;
-
             Selection.Dispose();
             
             _track.ParentIndexChanged -= UpdateTitle;
@@ -353,13 +339,9 @@ namespace Apollo.Windows {
             Editor.Scale = Math.Min(bounds.Width, bounds.Height) / 189.6;
         }
 
-        void Port_Changed(object sender, SelectionChangedEventArgs e) {
-            Launchpad selected = (Launchpad)PortSelector.SelectedItem;
-
-            if (selected != null && Launchpad != selected) {
-                Launchpad = selected;
-                UpdatePorts();
-            }
+        void Port_Changed(Launchpad selected) {
+            if (selected != null && Launchpad != selected)
+                PortSelector.Update(Launchpad = selected);
         }
 
         public void Expand(int? index) {

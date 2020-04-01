@@ -92,7 +92,7 @@ namespace Apollo.Elements {
 
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;
 
-                Info?.UpdatePorts();
+                Info?.PortSelector.Update(_launchpad);
             }
         }
         

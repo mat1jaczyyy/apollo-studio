@@ -26,7 +26,7 @@ namespace Apollo.Viewers {
             NameText = this.Get<TextBlock>("Name");
             Draggable = this.Get<Grid>("Draggable");
 
-            PortSelector = this.Get<ComboBox>("PortSelector");
+            PortSelector = this.Get<PortSelector>("PortSelector");
             DropZone = this.Get<Border>("DropZone");
             TrackAdd = this.Get<TrackAdd>("DropZoneAfter");
             MuteItem = this.Get<MenuItem>("MuteItem");
@@ -40,7 +40,7 @@ namespace Apollo.Viewers {
         public bool Selected { get; private set; } = false;
 
         public TextBlock NameText { get; private set; }
-        ComboBox PortSelector;
+        public PortSelector PortSelector { get; private set; }
         public TrackAdd TrackAdd;
 
         Grid Draggable;
@@ -49,18 +49,6 @@ namespace Apollo.Viewers {
         public TextBox Input { get; private set; }
         
         void UpdateText(int index) => Rename.UpdateText();
-
-        public void UpdatePorts() {
-            List<Launchpad> ports = MIDI.UsableDevices;
-            if (_track.Launchpad?.Usable == false) ports.Add(_track.Launchpad);
-            ports.Add(MIDI.NoOutput);
-
-            PortSelector.Items = ports;
-            PortSelector.SelectedIndex = -1;
-            PortSelector.SelectedItem = _track.Launchpad;
-        }
-
-        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
         
         void ApplyHeaderBrush(string resource) {
             IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
@@ -93,8 +81,7 @@ namespace Apollo.Viewers {
             Rename.UpdateText();
             _track.ParentIndexChanged += UpdateText;
 
-            UpdatePorts();
-            MIDI.DevicesUpdated += HandlePorts;
+            PortSelector.Update(_track.Launchpad);
 
             DragDrop = new DragDropManager(this);
 
@@ -103,8 +90,6 @@ namespace Apollo.Viewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
-            
-            MIDI.DevicesUpdated -= HandlePorts;
 
             _track.ParentIndexChanged -= UpdateText;
             _track.Info = null;
@@ -159,9 +144,7 @@ namespace Apollo.Viewers {
 
         void Track_Add() => Added?.Invoke(_track.ParentIndex.Value + 1);
 
-        void Port_Changed(object sender, SelectionChangedEventArgs e) {
-            Launchpad selected = (Launchpad)PortSelector.SelectedItem;
-
+        void Port_Changed(Launchpad selected) {
             if (selected != null && _track.Launchpad != selected)
                 Program.Project.Undo.AddAndExecute(new Track.LaunchpadChangedUndoEntry(
                     _track,

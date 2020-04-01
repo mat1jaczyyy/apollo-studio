@@ -24,7 +24,7 @@ namespace Apollo.Viewers {
             Popout = this.Get<Popout>("Popout");
             Rotation = this.Get<ComboBox>("Rotation");
             InputFormatSelector = this.Get<ComboBox>("InputFormatSelector");
-            TargetPortSelector = this.Get<ComboBox>("TargetPortSelector");
+            TargetPortSelector = this.Get<PortSelector>("TargetPortSelector");
         }
         
         Launchpad _launchpad;
@@ -32,22 +32,8 @@ namespace Apollo.Viewers {
         Reconnect Reconnect;
         LockToggle LockToggle;
         Popout Popout;
-        ComboBox Rotation, InputFormatSelector, TargetPortSelector;
-
-        public void UpdatePorts() {
-            List<Launchpad> ports = MIDI.UsableDevices.Where(i => i.GetType() != typeof(AbletonLaunchpad)).ToList();
-
-            Launchpad target = (_launchpad is AbletonLaunchpad alp)? alp.Target : null;
-            if (target?.Usable == false) ports.Add(target);
-
-            ports.Add(MIDI.NoOutput);
-
-            TargetPortSelector.Items = ports;
-            TargetPortSelector.SelectedIndex = -1;
-            TargetPortSelector.SelectedItem = target;
-        }
-
-        void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);
+        ComboBox Rotation, InputFormatSelector;
+        PortSelector TargetPortSelector;
 
         public LaunchpadInfo() => new InvalidOperationException();
 
@@ -75,18 +61,13 @@ namespace Apollo.Viewers {
                 LockToggle.SetState(Preferences.VirtualLaunchpads.Contains(vlp.VirtualIndex));
             }
 
-            if (_launchpad is AbletonLaunchpad) {
+            if (_launchpad is AbletonLaunchpad alp) {
                 TargetPortSelector.IsVisible = true;
-
-                UpdatePorts();
-                MIDI.DevicesUpdated += HandlePorts;
+                TargetPortSelector.Update(alp.Target);
             }
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            if (_launchpad.GetType() == typeof(AbletonLaunchpad))
-                MIDI.DevicesUpdated -= HandlePorts;
-            
             _launchpad.Info = null;
             _launchpad = null;
         }
@@ -116,9 +97,7 @@ namespace Apollo.Viewers {
 
         void InputFormat_Changed(object sender, SelectionChangedEventArgs e) => _launchpad.InputFormat = (InputType)InputFormatSelector.SelectedIndex;
 
-        void TargetPort_Changed(object sender, SelectionChangedEventArgs e) {
-            Launchpad selected = (Launchpad)TargetPortSelector.SelectedItem;
-
+        void TargetPort_Changed(Launchpad selected) {
             if (_launchpad is AbletonLaunchpad abletonLaunchpad) {
                 if (selected != null && abletonLaunchpad.Target != selected && abletonLaunchpad.PatternWindow == null && _launchpad.PatternWindow == null)
                     abletonLaunchpad.Target = selected;
