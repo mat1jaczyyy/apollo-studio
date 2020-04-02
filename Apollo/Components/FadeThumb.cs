@@ -29,6 +29,8 @@ namespace Apollo.Components {
         public delegate void FadeThumbEventHandler(FadeThumb sender);
         public event FadeThumbEventHandler Focused;
         public event FadeThumbEventHandler Deleted;
+        public event FadeThumbEventHandler StartHere;
+        public event FadeThumbEventHandler EndHere;
         
         public delegate void TypeChangedEventHandler(FadeThumb sender, FadeType type);
         public event TypeChangedEventHandler TypeChanged;
@@ -42,7 +44,7 @@ namespace Apollo.Components {
         public bool NoDelete {
             get => !DeleteSeparator.IsVisible;
             set {
-                MenuItems.Last().IsVisible = !value;
+                MenuItems.TakeLast(3).ToList().ForEach(i => i.IsVisible = !value);
                 DeleteSeparator.IsVisible = !value;
             }
         }
@@ -67,6 +69,9 @@ namespace Apollo.Components {
             Moved = null;
             Focused = null;
             Deleted = null;
+            StartHere = null;
+            EndHere = null;
+            TypeChanged = null;
 
             Base.RemoveHandler(InputElement.PointerPressedEvent, MouseDown);
             Base.RemoveHandler(InputElement.PointerReleasedEvent, MouseUp);
@@ -122,6 +127,8 @@ namespace Apollo.Components {
         
         public void ContextMenu_Action(MenuItem item, string action) {
             if (action == "Delete") Deleted?.Invoke(this);
+            else if (action == "Start Here") StartHere?.Invoke(this);
+            else if (action == "End Here") EndHere?.Invoke(this);
             else TypeChanged?.Invoke(this, (FadeType)MenuItems.IndexOf(item));
         }
     }

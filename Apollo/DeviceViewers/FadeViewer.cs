@@ -68,10 +68,14 @@ namespace Apollo.DeviceViewers {
             thumb.Moved += Thumb_Move;
             thumb.Focused += Thumb_Focus;
             thumb.Deleted += Thumb_Delete;
+            thumb.StartHere += Thumb_StartHere;
+            thumb.EndHere += Thumb_EndHere;
             thumb.TypeChanged += Thumb_ChangeFadeType;
             
             canvas.Children.Add(thumb);
             if (_fade.Expanded != null && index <= _fade.Expanded) _fade.Expanded++;
+
+            UpdateThumbMenus();
         }
 
         public void Contents_Remove(int index) {
@@ -82,6 +86,8 @@ namespace Apollo.DeviceViewers {
 
             canvas.Children.Remove(thumbs[index]);
             thumbs.RemoveAt(index);
+
+            UpdateThumbMenus();
         }
 
         public FadeViewer() => new InvalidOperationException();
@@ -103,18 +109,8 @@ namespace Apollo.DeviceViewers {
             int? temp = _fade.Expanded;
             _fade.Expanded = null;
             
-            FadeThumb ThumbStart, ThumbEnd;
-
-            thumbs.Add(ThumbStart = this.Get<FadeThumb>("ThumbStart"));
-            ThumbStart.Fill = _fade.GetColor(0).ToBrush();
-
-            for (int i = 1; i < _fade.Count - 1; i++)
+            for (int i = 0; i < _fade.Count; i++)
                 Contents_Insert(i, _fade.GetColor(i));
-
-            thumbs.Add(ThumbEnd = this.Get<FadeThumb>("ThumbEnd"));
-            ThumbEnd.Fill = _fade.GetColor(_fade.Count - 1).ToBrush();
-
-            ThumbStart.Owner = ThumbEnd.Owner = this;
 
             Expand(temp);
 
@@ -159,6 +155,13 @@ namespace Apollo.DeviceViewers {
             _fade.Expanded = index;
         }
 
+        void UpdateThumbMenus() {
+            for (int i = 0; i < thumbs.Count; i++) {
+                thumbs[i].NoDelete = i == 0;
+                thumbs[i].NoMenu = i == thumbs.Count - 1;
+            }
+        }
+
         double contextOpenPosition;
 
         void NewColor() {
@@ -201,22 +204,24 @@ namespace Apollo.DeviceViewers {
             else if (action == "Equalize") Program.Project.Undo.AddAndExecute(new Fade.EqualizeUndoEntry(_fade));
         }
 
-        void Thumb_Delete(FadeThumb sender) {
-            int index = thumbs.IndexOf(sender);
+        void Thumb_Delete(FadeThumb sender) => Program.Project.Undo.AddAndExecute(new Fade.ThumbRemoveUndoEntry(
+            _fade, 
+            thumbs.IndexOf(sender)
+        ));
 
-            Program.Project.Undo.AddAndExecute(new Fade.ThumbRemoveUndoEntry(
-                _fade, 
-                thumbs.IndexOf(sender), 
-                _fade.GetColor(index).Clone(), 
-                _fade.GetPosition(index), 
-                _fade.GetFadeType(index)
-            ));
-        }
+        void Thumb_StartHere(FadeThumb sender) => Program.Project.Undo.AddAndExecute(new Fade.StartHereUndoEntry(
+            _fade, 
+            thumbs.IndexOf(sender)
+        ));
+
+        void Thumb_EndHere(FadeThumb sender) => Program.Project.Undo.AddAndExecute(new Fade.EndHereUndoEntry(
+            _fade, 
+            thumbs.IndexOf(sender)
+        ));
 
         void Thumb_ChangeFadeType(FadeThumb sender, FadeType newType) => Program.Project.Undo.AddAndExecute(new Fade.ThumbTypeUndoEntry(
             _fade, 
-            thumbs.IndexOf(sender), 
-            _fade.GetFadeType(thumbs.IndexOf(sender)), 
+            thumbs.IndexOf(sender),
             newType
         ));
 
@@ -224,6 +229,8 @@ namespace Apollo.DeviceViewers {
 
         void Thumb_Move(FadeThumb sender, double change, double? total) {
             int i = thumbs.IndexOf(sender);
+
+            if (i == 0 || i == thumbs.Count - 1) return;
 
             double left = Canvas.GetLeft(thumbs[i - 1]) + 1;
             double right = Canvas.GetLeft(thumbs[i + 1]) - 1;

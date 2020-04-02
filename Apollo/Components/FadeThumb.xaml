@@ -22,6 +22,8 @@
       <Separator x:Name="DeleteSeparator" />
       
       <MenuItem x:Name="Delete" Header="Delete" />
+      <MenuItem x:Name="StartHere" Header="Start Here" />
+      <MenuItem x:Name="EndHere" Header="End Here" />
     </Components:ApolloContextMenu>
   </UserControl.Resources>
 
