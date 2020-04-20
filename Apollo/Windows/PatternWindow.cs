@@ -886,21 +886,11 @@ namespace Apollo.Windows {
             PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)index, color.Clone()));
         }
 
-        void FireCourier(double time) {
-            Courier courier;
-            PlayTimers.Add(courier = new Courier() {
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
+        void FireCourier(double time)
+            => PlayTimers.Add(new Courier(time, Tick));
 
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier sender) {
             if (_pattern.Disposed || !Locked) return;
-
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
 
             lock (PlayLocker) {
                 if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
@@ -919,7 +909,7 @@ namespace Apollo.Windows {
                     PatternFinish();
                 }
 
-                PlayTimers.Remove(courier);
+                PlayTimers.Remove(sender);
             }
         }
 

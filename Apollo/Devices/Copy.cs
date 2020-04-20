@@ -111,7 +111,7 @@ namespace Apollo.Devices {
             public int index = 0;
             public object locker = new object();
             public List<int> offsets;
-            public List<Courier> timers = new List<Courier>();
+            public List<Courier<PolyInfo>> timers = new List<Courier<PolyInfo>>();
 
             public PolyInfo(Signal init_n, List<int> init_offsets) {
                 n = init_n;
@@ -217,7 +217,7 @@ namespace Apollo.Devices {
 
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, Courier> timers = new ConcurrentDictionary<Signal, Courier>();
+        ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>> timers = new ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
         ConcurrentDictionary<Signal, HashSet<Signal>> screen = new ConcurrentDictionary<Signal, HashSet<Signal>>();
@@ -276,50 +276,34 @@ namespace Apollo.Devices {
             }
         }
 
-        void FireCourier(PolyInfo info, double time) {
-            Courier courier;
+        void FireCourier(PolyInfo info, double time)
+            => info.timers.Add(new Courier<PolyInfo>(time, info, Tick));
 
-            info.timers.Add(courier = new Courier() {
-                Info = info,
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
+        void FireCourier((Signal n, List<int>) info, double time)
+            => timers[info.n.With(info.n.Index, new Color())] = new Courier<ValueTuple<Signal, List<int>>>(time, info, Tick);
 
-        void FireCourier((Signal n, List<int>) info, double time) {
-            Courier courier = timers[info.n.With(info.n.Index, new Color())] = new Courier() {
-                Info = info,
-                AutoReset = false,
-                Interval = time
-            };
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
-
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier<PolyInfo> sender) {
             if (Disposed) return;
-
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
             
-            if ((CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) && courier.Info is PolyInfo info) {
-                lock (info.locker) {
-                    if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
-                        Signal m = info.n.Clone();
-                        m.Index = (byte)info.offsets[info.index];
-                        ScreenOutput(m, info.n.Clone());
+            if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
+                lock (sender.Info.locker) {
+                    if (++sender.Info.index < sender.Info.offsets.Count && sender.Info.offsets[sender.Info.index] != -1) {
+                        Signal m = sender.Info.n.Clone();
+                        m.Index = (byte)sender.Info.offsets[sender.Info.index];
+                        ScreenOutput(m, sender.Info.n.Clone());
 
-                        if (info.index == info.offsets.Count - 1)
-                            poly.Remove(info);
+                        if (sender.Info.index == sender.Info.offsets.Count - 1)
+                            poly.Remove(sender.Info);
                     }
                 }
-
-            } else if (CopyMode == CopyType.RandomLoop && courier.Info is ValueTuple<Signal, List<int>>) {
-                (Signal n, List<int> offsets) = ((Signal, List<int>))courier.Info;
-                HandleRandomLoop(n, offsets);
             }
+        }
+
+        void Tick(Courier<(Signal n, List<int> offsets)> sender) {
+            if (Disposed) return;
+            
+            if (CopyMode == CopyType.RandomLoop)
+                HandleRandomLoop(sender.Info.n, sender.Info.offsets);
         }
 
         void HandleRandomLoop(Signal original, List<int> offsets) {

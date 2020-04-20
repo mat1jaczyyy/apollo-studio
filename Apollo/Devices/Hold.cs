@@ -96,11 +96,8 @@ namespace Apollo.Devices {
             Release = release;
         }
 
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier sender) {
             if (Disposed) return;
-
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
             
             lock (queuelocker) {
                 if (buffer.TryDequeue(out Signal n) && ignores[n]-- <= 0)
@@ -129,13 +126,7 @@ namespace Apollo.Devices {
 
                             buffer.Enqueue(m);
 
-                            Courier courier;
-                            timers.Add(courier = new Courier() {
-                                AutoReset = false,
-                                Interval = _time * _gate,
-                            });
-                            courier.Elapsed += Tick;
-                            courier.Start();
+                            timers.Add(new Courier(_time * _gate, Tick));
                         }
 
                     if (Release) {

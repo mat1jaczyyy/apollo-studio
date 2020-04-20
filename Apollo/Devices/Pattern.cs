@@ -93,7 +93,7 @@ namespace Apollo.Devices {
 
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        ConcurrentDictionary<Signal, List<Courier<Signal>>> timers = new ConcurrentDictionary<Signal, List<Courier<Signal>>>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
         double _gate;
@@ -143,7 +143,7 @@ namespace Apollo.Devices {
             public Signal n;
             public int index = 0;
             public object locker = new object();
-            public List<Courier> timers = new List<Courier>();
+            public List<Courier<PolyInfo>> timers = new List<Courier<PolyInfo>>();
 
             public PolyInfo(Signal init) => n = init;
         }
@@ -265,80 +265,62 @@ namespace Apollo.Devices {
             return false;
         }
 
-        void FireCourier(Signal n, double time) {
-            Courier courier;
+        void FireCourier(Signal n, double time)
+            => timers[n].Add(new Courier<Signal>(time, n, Tick));
 
-            timers[n].Add(courier = new Courier() {
-                Info = n,
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
+        void FireCourier(PolyInfo info, double time)
+            => info.timers.Add(new Courier<PolyInfo>(time, info, Tick));
 
-        void FireCourier(PolyInfo info, double time) {
-            Courier courier;
-
-            info.timers.Add(courier = new Courier() {
-                Info = info,
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
-
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier<Signal> sender) {
             if (Disposed) return;
 
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
+            Signal n = sender.Info;
+            
+            lock (locker[n]) {
+                if (++buffer[n] < Frames.Count * AdjustedRepeats) {
+                    for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
+                        if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
+                                InvokeExit(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
 
-            if (courier.Info is Signal n) {
-                lock (locker[n]) {
-                    if (++buffer[n] < Frames.Count * AdjustedRepeats) {
-                        for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
-                            if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
-                                    InvokeExit(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
+                } else if (Mode == PlaybackType.Mono) {
+                    if (!Infinite)
+                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
+                                InvokeExit(n.With((byte)index, new Color(0)));
 
-                    } else if (Mode == PlaybackType.Mono) {
-                        if (!Infinite)
-                            for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                                if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                    InvokeExit(n.With((byte)index, new Color(0)));
+                } else if (Mode == PlaybackType.Loop) {
+                    for (int i = 0; i < Frames[0].Screen.Length; i++)
+                        if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
+                            InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
 
-                    } else if (Mode == PlaybackType.Loop) {
-                        for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
-                                InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
+                    buffer[n] = 0;
+                    double time = 0;
 
-                        buffer[n] = 0;
-                        double time = 0;
-
-                        for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
-                            time += Frames[i % Frames.Count].Time * _gate;
-                            FireCourier(n, time);
-                        }
+                    for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
+                        time += Frames[i % Frames.Count].Time * _gate;
+                        FireCourier(n, time);
                     }
-
-                    timers[n].Remove(courier);
                 }
 
-            } else if (courier.Info is PolyInfo info) {
-                lock (info.locker) {
-                    if (++info.index < Frames.Count * AdjustedRepeats) {
-                        for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
-                            if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
-                                InvokeExit(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
-                    } else {
-                        poly.Remove(info);
+                timers[n].Remove(sender);
+            }
+        }
 
-                        if (!Infinite)
-                            for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                                if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
-                                    InvokeExit(info.n.With((byte)index, new Color(0)));
-                    }
+        void Tick(Courier<PolyInfo> sender) {
+            if (Disposed) return;
+            
+            lock (sender.Info.locker) {
+                if (++sender.Info.index < Frames.Count * AdjustedRepeats) {
+                    for (int i = 0; i < Frames[sender.Info.index % Frames.Count].Screen.Length; i++)
+                        if (Frames[sender.Info.index % Frames.Count].Screen[i] != Frames[(sender.Info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, sender.Info.n.Index, out int index))
+                            InvokeExit(sender.Info.n.With((byte)index, Frames[sender.Info.index % Frames.Count].Screen[i].Clone()));
+                } else {
+                    poly.Remove(sender.Info);
+
+                    if (!Infinite)
+                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, sender.Info.n.Index, out int index))
+                                InvokeExit(sender.Info.n.With((byte)index, new Color(0)));
                 }
             }
         }
@@ -362,9 +344,8 @@ namespace Apollo.Devices {
 
                     buffer.Remove(n, out _);
                 }
-                    
 
-                timers[n] = new List<Courier>();
+                timers[n] = new List<Courier<Signal>>();
                 buffer[n] = 0;
             }
         }
@@ -403,7 +384,7 @@ namespace Apollo.Devices {
         }
 
         protected override void Stop() {
-            foreach (List<Courier> i in timers.Values) {
+            foreach (List<Courier<Signal>> i in timers.Values) {
                 foreach (Courier j in i) j.Dispose();
                 i.Clear();
             }

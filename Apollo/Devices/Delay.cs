@@ -70,17 +70,14 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier sender) {
             if (Disposed) return;
-            
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
             
             lock (locker) {
                 if (buffer.TryDequeue(out Signal n))
                     InvokeExit(n);
                 
-                timers.Remove(courier);
+                timers.Remove(sender);
             }
         }
 
@@ -88,13 +85,7 @@ namespace Apollo.Devices {
             lock (locker) {
                 buffer.Enqueue(n.Clone());
 
-                Courier courier;
-                timers.Add(courier = new Courier() {
-                    AutoReset = false,
-                    Interval = _time * _gate,
-                });
-                courier.Elapsed += Tick;
-                courier.Start();
+                timers.Add(new Courier(_time * _gate, Tick));
             }
         }
 

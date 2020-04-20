@@ -90,17 +90,8 @@ namespace Apollo.Devices {
             Hold = hold;
         }
         
-        void FireCourier(Signal n, Signal m, double time) {
-            Courier courier;
-
-            timers[n].Add(courier = new Courier() {
-                Info = m.Clone(),
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
+        void FireCourier(Signal n, Signal m, double time)
+            => timers[n].Add(new Courier<Signal>(time, m.Clone(), Tick));
 
         void Start(Signal n, Signal m, int count) {
             if (!timers.ContainsKey(n)) 
@@ -134,30 +125,26 @@ namespace Apollo.Devices {
             } else Start(n, m, Repeats);
         }
         
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier<Signal> sender) {
             if (Disposed) return;
             
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
-            
-            if (courier.Info is Signal n) {
-                Signal m = n.Clone();
+            Signal n = sender.Info;
+            Signal m = n.Clone();
 
-                if (Hold) {
-                    n.Color = new Color();
+            if (Hold) {
+                n.Color = new Color();
 
-                    lock (locker[n]) {
-                        FireCourier(n, m, _rate * _gate);
-                        timers[n].Remove(courier);
-                        
-                        InvokeExit(m.With(m.Index, new Color(0)));
-                        InvokeExit(m);
-                    }
-                
-                } else {
-                    timers[n].Remove(courier);
+                lock (locker[n]) {
+                    FireCourier(n, m, _rate * _gate);
+                    timers[n].Remove(sender);
+                    
+                    InvokeExit(m.With(m.Index, new Color(0)));
                     InvokeExit(m);
                 }
+            
+            } else {
+                timers[n].Remove(sender);
+                InvokeExit(m);
             }
         }
 

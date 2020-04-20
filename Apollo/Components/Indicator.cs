@@ -1,6 +1,4 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
@@ -27,7 +25,11 @@ namespace Apollo.Components {
 
         void SetIndicator(double state) => Dispatcher.UIThread.InvokeAsync(() => Display.Opacity = state);
 
-        public Indicator() => InitializeComponent();
+        public Indicator() {
+            InitializeComponent();
+            
+            Timer = new Courier(200, _ => SetIndicator(0), false);
+        }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             lock (locker) {
@@ -42,16 +44,9 @@ namespace Apollo.Components {
             lock (locker) {
                 if (Disposed) return;
 
-                Timer?.Dispose();
-
-                Timer = new Courier() {
-                    Interval = 200
-                };
-
-                Timer.Elapsed += (_, __) => SetIndicator(0);
-                Timer.Start();
-
                 SetIndicator(lit? 1 : 0.5);
+
+                Timer.Restart();
             }
         }
     }
