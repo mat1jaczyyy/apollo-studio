@@ -162,7 +162,9 @@ namespace Apollo.Elements {
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
             {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
             {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03}).Concat(
-                Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
+                Enumerable.Range(1, 8).SelectMany(i => new int[] { i, 100 + i })
+                    .Concat(Enumerable.Range(10, 90))
+                    .SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
             ).ToArray()}
         };
 
