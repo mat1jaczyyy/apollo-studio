@@ -70,7 +70,6 @@ namespace Apollo.Structures {
         }
 
         public override void Dispose() {
-            Info = default;
             Handler = null;
 
             base.Dispose();
