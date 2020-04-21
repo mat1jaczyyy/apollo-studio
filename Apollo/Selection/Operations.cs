@@ -383,7 +383,7 @@ namespace Apollo.Selection {
         };
 
         static OpenFileDialog CreateOFD(ISelectParent parent) => new OpenFileDialog() {
-            AllowMultiple = false,
+            AllowMultiple = true,
             Filters = CreateFilters(parent),
             Title = $"Import {parent.ChildString} Preset"
         };
@@ -403,19 +403,16 @@ namespace Apollo.Selection {
             }
         }
         
-        public static async void Import(ISelectParent parent, int right, string path = null) {
+        public static async void Import(ISelectParent parent, int right, string[] paths = null) {
             if (parent.ChildFileExtension == null) return;
 
             Window sender = parent.IWindow;
 
-            if (path == null) {
-                string[] result = await CreateOFD(parent).ShowAsync(sender);
-
-                if (result.Length > 0) path = result[0];
-                else return;
-            }
+            paths = paths?? await CreateOFD(parent).ShowAsync(sender);
+            
+            if (!paths.Any()) return;
         
-            Copyable loaded = await Copyable.DecodeFile(path, sender, parent.ChildType);
+            Copyable loaded = await Copyable.DecodeFile(paths, sender, parent.ChildType);
             
             if (loaded != null && InsertCopyable(parent, loaded, right, "Imported", out InsertCopyableUndoEntry entry))
                 Program.Project.Undo.AddAndExecute(entry);

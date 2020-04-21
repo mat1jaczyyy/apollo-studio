@@ -77,9 +77,9 @@ namespace Apollo.Selection {
         }
 
         static bool FileDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
-            string path = e.Data.GetFileNames().FirstOrDefault();
+            string[] paths = e.Data.GetFileNames()?.ToArray();
 
-            if (path != null) Operations.Import(parent, after, path);
+            if (paths != null) Operations.Import(parent, after, paths);
 
             return true;
         }

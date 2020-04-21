@@ -17,6 +17,13 @@ namespace Apollo.Helpers {
 
         public Type Type => Contents.FirstOrDefault()?.GetType();
 
+        public void Merge(Copyable merging) {
+            if (Type != merging.Type && Type != null && merging.Type != null) return;
+
+            foreach (ISelect item in merging.Contents)
+                Contents.Add(item);
+        }
+
         public async void StoreToClipboard()
             => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this).ToArray()));
         
@@ -41,15 +48,21 @@ namespace Apollo.Helpers {
             }
         }
 
-        public static async Task<Copyable> DecodeFile(string path, Window sender, Type ensure) {
+        public static async Task<Copyable> DecodeFile(string[] paths, Window sender, Type ensure) {
+            Copyable ret = new Copyable();
+
             try {
-                Copyable ret;
+                foreach (string path in paths) {
+                    Copyable copyable;
 
-                using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    ret = await Decoder.Decode(file, typeof(Copyable));
+                    using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                        copyable = await Decoder.Decode(file, typeof(Copyable));
 
-                if (!ensure.IsAssignableFrom(ret.Type))
-                    throw new InvalidDataException();
+                    if (!ensure.IsAssignableFrom(copyable.Type))
+                        throw new InvalidDataException();
+                    
+                    ret.Merge(copyable);
+                }
                 
                 return ret;
 
