@@ -6,7 +6,8 @@
     <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
     <PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject>ApolloUpdate.Program</StartupObject>
     <Version>1.0.0</Version>

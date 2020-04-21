@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+
+using Avalonia.Threading;
 
 using RtMidi.Core.Enums;
 using RtMidi.Core.Messages;
@@ -10,12 +13,16 @@ using RtMidi.Core.Messages;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public static class AbletonConnector {
         static readonly IPAddress localhost = new IPAddress(new byte[] {127, 0, 0, 1});
+        const int Port = 1548;
+
         static UdpClient connection;
         static object locker = new object();
+        static bool handlingFileOpen;
 
         static Dictionary<IPEndPoint, AbletonLaunchpad> portMap = new Dictionary<IPEndPoint, AbletonLaunchpad>();
 
@@ -28,26 +35,40 @@ namespace Apollo.Helpers {
 
                 connection?.BeginReceive(new AsyncCallback(Receive), connection);
 
-                if (source.Address.Equals(localhost)) {
-                    if (!portMap.ContainsKey(source)) {
-                        if (message[0] >= 242 && message[0] <= 244)
-                            connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
+                if (!source.Address.Equals(localhost)) return;
 
-                    } else if (message[0] < 128) {
-                        NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
-                        portMap[source].NoteOn(null, in msg);
+                if (!portMap.ContainsKey(source)) {
+                    if (message[0] == 247) {
+                        App.Args = new string[] { Encoding.UTF8.GetString(message.Skip(1).ToArray()) };
+
+                        if (handlingFileOpen) return;
+                        handlingFileOpen = true;
                         
-                    } else if (message[0] == 245) {
-                        MIDI.Disconnect(portMap[source]);
-                        portMap.Remove(source);
+                        Dispatcher.UIThread.InvokeAsync(async () => {
+                            if (Program.Project == null) App.Windows.OfType<SplashWindow>().First().ReadFile(App.Args[0]);
+                            else await Program.Project.AskClose();
+                            
+                            App.Args = null;
+                            handlingFileOpen = false;
+                        });
                     
-                    } else if (message[0] == 246 && Program.Project != null)
-                        Program.Project.BPM = BitConverter.ToUInt16(message, 1);
-                }
+                    } else if (message[0] >= 242 && message[0] <= 244)
+                        connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
+
+                } else if (message[0] < 128) {
+                    NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
+                    portMap[source].NoteOn(null, in msg);
+                    
+                } else if (message[0] == 245) {
+                    MIDI.Disconnect(portMap[source]);
+                    portMap.Remove(source);
+                
+                } else if (message[0] == 246 && Program.Project != null)
+                    Program.Project.BPM = BitConverter.ToUInt16(message, 1);
             }
         }
 
-        private static void Send(AbletonLaunchpad source, byte[] data) =>
+        static void Send(AbletonLaunchpad source, byte[] data) =>
             connection?.SendAsync(data, data.Length, portMap.First(x => x.Value == source).Key);
 
         public static void Send(AbletonLaunchpad source, Signal n) =>
@@ -60,7 +81,7 @@ namespace Apollo.Helpers {
 
         static AbletonConnector() {
             try {
-                connection = new UdpClient(1548);
+                connection = new UdpClient(Port);
             } catch {}
 
             connection?.BeginReceive(new AsyncCallback(Receive), connection);
@@ -73,6 +94,15 @@ namespace Apollo.Helpers {
 
                 connection?.Close();
                 connection = null;
+            }
+        }
+
+        public static void NewInstanceFile(string path) {
+            byte[] data = new byte[] { 247 }.Concat(Encoding.UTF8.GetBytes(path)).ToArray();
+
+            using (UdpClient client = new UdpClient()) {
+                client.Connect(new IPEndPoint(localhost, Port));
+                client.Send(data, data.Length);
             }
         }
     }

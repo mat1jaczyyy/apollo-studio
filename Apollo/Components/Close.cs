@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System.Threading.Tasks;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -18,7 +20,7 @@ namespace Apollo.Components {
         public new delegate void ClickedEventHandler();
         public new event ClickedEventHandler Clicked;
 
-        public delegate void ForceEventHandler(bool force);
+        public delegate Task ForceEventHandler(bool force);
         public event ForceEventHandler ClickedWithForce;
 
         Path Path;
