@@ -257,15 +257,17 @@ namespace Apollo.Elements {
 
             } else if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift)) {
                 if (e.Key == Key.S) await Save(sender, true);
-                else if (e.Key == Key.W) {
-                    if (Window == null) ProjectWindow.Create(sender);
-                    Window.CloseForce(true);
-                
-                } else return false;
+                else if (e.Key == Key.W) await AskClose(sender);
+                else return false;
             
             } else return false;
 
             return true;
+        }
+
+        public async Task AskClose(Window sender = null) {
+            if (Window == null) ProjectWindow.Create(sender?? App.Windows.FirstOrDefault(i => i.IsFocused));
+            await Window.CloseForce(true);
         }
 
         public void Dispose() {

@@ -96,10 +96,17 @@ namespace Apollo.Core {
                 }
 
                 if (!AbletonConnector.Connected) {
-                    lifetime.MainWindow = new MessageWindow(
+                    Args = new string[] { "C:\\Users\\mat1jaczyyy\\Documents\\a.apchn" };
+
+                    if (Args.Length > 0) {
+                        AbletonConnector.NewInstanceFile(App.Args[0]);
+                        Environment.Exit(0);
+
+                    } else lifetime.MainWindow = new MessageWindow(
                         $"Another instance of Apollo Studio is currently running.\n\n" +
                         "Please close other instances of Apollo Studio before launching Apollo Studio."
                     );
+
                     base.OnFrameworkInitializationCompleted();
                     return;
                 }

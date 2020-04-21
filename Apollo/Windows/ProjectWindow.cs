@@ -163,7 +163,7 @@ namespace Apollo.Windows {
             if (!SafeClose) {
                 e.Cancel = true;
 
-                CloseForce(false);
+                _ = CloseForce(false);
                 return;
             }
 
@@ -389,7 +389,7 @@ namespace Apollo.Windows {
             return false;
         }
 
-        public async void CloseForce(bool force) {
+        public async Task CloseForce(bool force) {
             if (SafeClose = await CheckClose(force)) base.Close();
         }
 

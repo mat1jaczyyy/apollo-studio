@@ -197,7 +197,7 @@ namespace Apollo.Windows {
             Close();
         }
 
-        void ReadFile(string path) => ReadFile(path, false);
+        public void ReadFile(string path) => ReadFile(path, false);
         async void ReadFile(string path, bool recovery) {
             Project loaded = null;
             Copyable imported = null;
