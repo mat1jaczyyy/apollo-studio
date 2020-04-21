@@ -41,10 +41,17 @@ namespace Apollo.Helpers {
             }
         }
 
-        public static async Task<Copyable> DecodeFile(string path, Window sender) {
+        public static async Task<Copyable> DecodeFile(string path, Window sender, Type ensure) {
             try {
+                Copyable ret;
+
                 using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                    return await Decoder.Decode(file, typeof(Copyable));
+                    ret = await Decoder.Decode(file, typeof(Copyable));
+
+                if (!ensure.IsAssignableFrom(ret.Type))
+                    throw new InvalidDataException();
+                
+                return ret;
 
             } catch {
                 await MessageWindow.CreateReadError(sender);

@@ -415,7 +415,7 @@ namespace Apollo.Selection {
                 else return;
             }
         
-            Copyable loaded = await Copyable.DecodeFile(path, sender);
+            Copyable loaded = await Copyable.DecodeFile(path, sender, parent.ChildType);
             
             if (loaded != null && InsertCopyable(parent, loaded, right, "Imported", out InsertCopyableUndoEntry entry))
                 Program.Project.Undo.AddAndExecute(entry);
