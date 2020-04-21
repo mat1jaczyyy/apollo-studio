@@ -161,7 +161,9 @@ namespace Apollo.Elements {
             {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
             {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x02, 0x00}).ToArray()}
+            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03}).Concat(
+                Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
+            ).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
