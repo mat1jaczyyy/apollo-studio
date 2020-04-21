@@ -2,12 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Apollo.Interfaces;
+using Avalonia.Controls;
+
+using Apollo.Devices;
+using Apollo.DeviceViewers;
+using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
+using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Chain: ISelect, ISelectParent {
+    public interface IChainParent: ISelect {}
+
+    public class Chain: ISelect, ISelectParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -20,6 +28,10 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
 
+        public void IInsert(int index, ISelect item) => Insert(index, (Device)item);
+        
+        public ISelect IClone() => (ISelect)Clone();
+
         public ISelectParentViewer IViewer {
             get => Viewer;
         }
@@ -31,6 +43,13 @@ namespace Apollo.Elements {
         public bool IRoot { 
             get => Parent is Track;
         }
+        
+        public Window IWindow => Track.Get(this)?.Window;
+        public SelectionManager Selection => Track.Get(this)?.Window?.Selection;
+
+        public Type ChildType => typeof(Device);
+        public string ChildString => "Device";
+        public string ChildFileExtension => "apdev";
 
         public ChainInfo Info;
         public ChainViewer Viewer;
@@ -101,7 +120,7 @@ namespace Apollo.Elements {
             get => _name;
             set {
                 _name = value;
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -127,7 +146,18 @@ namespace Apollo.Elements {
             }
         }
 
-        public Chain Clone() => new Chain((from i in Devices select i.Clone()).ToList(), Name) {
+        bool[] _filter;
+        public bool[] SecretMultiFilter {
+            get => _filter;
+            set {
+                if (value.Length == 101) {
+                    _filter = value;
+                    if (Parent is Multi multi && multi.Viewer?.SpecificViewer != null) ((MultiViewer)multi.Viewer.SpecificViewer).Set(this, _filter);
+                }
+            }
+        }
+
+        public Chain Clone() => new Chain(Devices.Select(i => i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
             Enabled = Enabled
         };
 
@@ -157,9 +187,13 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public Chain(List<Device> init = null, string name = "Chain #") {
+        public Chain(List<Device> init = null, string name = "Chain #", bool[] filter = null) {
             Devices = init?? new List<Device>();
             Name = name;
+
+            if (filter == null || filter.Length != 101) filter = new bool[101];
+            _filter = filter;
+            
             Reroute();
         }
 
@@ -180,59 +214,21 @@ namespace Apollo.Elements {
             Parent = null;
             _ParentIndex = null;
         }
+        
+        public class DeviceInsertedUndoEntry: PathUndoEntry<Chain> {
+            int index;
+            Device device;
 
-        public static bool Move(List<Chain> source, IMultipleChainParent target, int position, bool copy = false) {
-            if (!copy && Track.PathContains((ISelect)target, source.Select(i => (ISelect)i).ToList())) return false;
-
-            return (position == -1)
-                ? Move(source, target, copy)
-                : Move(source, target[position], copy);
-        }
-
-        public static bool Move(List<Chain> source, Chain target, bool copy = false) {
-            if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
-                return false;
+            protected override void UndoPath(params Chain[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone());
             
-            List<Chain> moved = new List<Chain>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                ((IMultipleChainParent)target.Parent).Insert(target.ParentIndex.Value + i + 1, moved.Last());
+            protected override void OnDispose() => device.Dispose();
+            
+            public DeviceInsertedUndoEntry(Chain chain, int index, Device device)
+            : base($"Device ({device.Name}) Inserted", chain) {
+                this.index = index;
+                this.device = device.Clone();
             }
-
-            Track track = Track.Get(moved.First());
-            track?.Window?.Selection.Select(moved.First());
-            track?.Window?.Selection.Select(moved.Last(), true);
-
-            ((IMultipleChainParent)target.Parent).SpecificViewer.Expand(moved.Last().ParentIndex);
-            
-            return true;
-        }
-
-        public static bool Move(List<Chain> source, IMultipleChainParent target, bool copy = false) {
-            if (!copy && target.Count > 0 && source[0] == target[0])
-                return false;
-            
-            List<Chain> moved = new List<Chain>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) ((IMultipleChainParent)source[i].Parent).Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                target.Insert(i, moved.Last());
-            }
-
-            Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
-
-            target.SpecificViewer.Expand(moved.Last().ParentIndex);
-            
-            return true;
         }
     }
 }

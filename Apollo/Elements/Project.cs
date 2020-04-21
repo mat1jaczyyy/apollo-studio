@@ -11,8 +11,8 @@ using Avalonia.Input;
 using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Enums;
-using Apollo.Helpers;
-using Apollo.Interfaces;
+using Apollo.Selection;
+using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
@@ -28,6 +28,15 @@ namespace Apollo.Elements {
         public bool IRoot {
             get => true;
         }
+
+        public void IInsert(int index, ISelect item) => Insert(index, (Track)item);
+        
+        public Window IWindow => Window;
+        public SelectionManager Selection => Window?.Selection;
+        
+        public Type ChildType => typeof(Track);
+        public string ChildString => "Track";
+        public string ChildFileExtension => "aptrk";
 
         public ProjectWindow Window;
 
@@ -122,13 +131,7 @@ namespace Apollo.Elements {
                 File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
 
             } catch (UnauthorizedAccessException) {
-                if (sender != null) await MessageWindow.Create(
-                    $"An error occurred while writing the file.\n\n" +
-                    "You may not have sufficient privileges to write to the destination folder, or\n" +
-                    "the current file already exists but cannot be overwritten.",
-                    null, sender
-                );
-
+                if (sender != null) await MessageWindow.CreateWriteError(sender);
                 return false;
             }
 
@@ -235,7 +238,7 @@ namespace Apollo.Elements {
 
             BPM = bpm;
             Macros = macros?? new int[4] {1, 1, 1, 1};
-            Tracks = tracks?? (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new Track() { Launchpad = i }).ToList();
+            Tracks = tracks?? MIDI.UsableDevices.Select(i => new Track() { Launchpad = i }).ToList();
             Author = author;
             BaseTime = basetime;
             FilePath = path;
@@ -281,6 +284,36 @@ namespace Apollo.Elements {
             foreach (Launchpad launchpad in MIDI.Devices) launchpad.Clear();
 
             TimeSpent.Stop();
+        }
+        
+        public class TrackInsertedUndoEntry: UndoEntry {
+            int index;
+            Track track;
+
+            protected override void OnUndo() => Program.Project.Remove(index);
+            protected override void OnRedo() => Program.Project.Insert(index, track.Clone());
+
+            protected override void OnDispose() => track.Dispose();
+            
+            public TrackInsertedUndoEntry(int index, Track track)
+            : base($"Track {index + 1} Inserted") {
+                this.index = index;
+                this.track = track.Clone();
+            }
+        }
+
+        public class BPMChangedUndoEntry: SimpleUndoEntry<int> {
+            protected override void Action(int element) => Program.Project.BPM = element;
+
+            public BPMChangedUndoEntry(int u, int r)
+            : base($"BPM Changed to {r}", u, r) {}
+        }
+
+        public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
+            protected override void Action(string element) => Program.Project.Author = element;
+
+            public AuthorChangedUndoEntry(string u, string r)
+            : base($"Author Changed to {r}", u, r) {}
         }
     }
 }

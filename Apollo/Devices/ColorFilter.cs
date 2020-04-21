@@ -3,6 +3,7 @@ using System;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class ColorFilter: Device {
@@ -47,7 +48,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _th != value) {
                     _th = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetHueTolerance(Hue);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetHueTolerance(HueTolerance);
                 }
             }
         }
@@ -58,7 +59,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _ts != value) {
                     _ts = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetSaturationTolerance(Saturation);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetSaturationTolerance(SaturationTolerance);
                 }
             }
         }
@@ -69,7 +70,7 @@ namespace Apollo.Devices {
                 if (0 <= value && value <= 1 && _tv != value) {
                     _tv = value;
 
-                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetValueTolerance(Value);
+                    if (Viewer?.SpecificViewer != null) ((ColorFilterViewer)Viewer.SpecificViewer).SetValueTolerance(ValueTolerance);
                 }
             }
         }
@@ -99,6 +100,48 @@ namespace Apollo.Devices {
             }
 
             InvokeExit(n);
+        }
+
+        public class HueUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.Hue = element;
+            
+            public HueUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Hue Changed to {r}°", colorFilter, u, r) {}
+        }
+        
+        public class SaturationUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.Saturation = element;
+            
+            public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Sat Changed to {r}%", colorFilter, u / 100, r / 100) {}
+        }
+        
+        public class ValueUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.Value = element;
+            
+            public ValueUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Value Changed to {r}%", colorFilter, u / 100, r / 100) {}
+        }
+        
+        public class HueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.HueTolerance = element;
+            
+            public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Hue Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
+        }
+        
+        public class SaturationToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.SaturationTolerance = element;
+            
+            public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Sat Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
+        }
+        
+        public class ValueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
+            protected override void Action(ColorFilter item, double element) => item.ValueTolerance = element;
+            
+            public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
+            : base($"Color Filter Value Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
         }
     }
 }

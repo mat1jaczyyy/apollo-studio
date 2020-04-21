@@ -14,8 +14,7 @@ using Avalonia.Platform;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Helpers;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Viewers;
 
 namespace Apollo.Windows {

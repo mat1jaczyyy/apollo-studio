@@ -1,7 +1,10 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Flip: Device {
@@ -62,6 +65,20 @@ namespace Apollo.Devices {
             
             n.Index = (byte)result;
             InvokeExit(n);
+        }
+        
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Flip, FlipType> {
+            protected override void Action(Flip item, FlipType element) => item.Mode = element;
+            
+            public ModeUndoEntry(Flip flip, FlipType u, FlipType r, IEnumerable source)
+            : base("Flip Orientation", flip, u, r, source) {}
+        }
+        
+        public class BypassUndoEntry: SimplePathUndoEntry<Flip, bool> {
+            protected override void Action(Flip item, bool element) => item.Bypass = element;
+            
+            public BypassUndoEntry(Flip flip, bool u, bool r)
+            : base($"Flip Bypass Changed to {(r? "Enabled" : "Disabled")}", flip, u, r) {}
         }
     }
 }

@@ -69,98 +69,46 @@ namespace Apollo.Components {
         void Offset_Remove() => OffsetRemoved?.Invoke(_copy.Offsets.IndexOf(_offset));
 
         void Offset_Changed(int x, int y, int? old_x, int? old_y) {
-            _offset.X = x;
-            _offset.Y = y;
-
-            if (old_x != null && old_y != null) {
-                int ux = old_x.Value;
-                int uy = old_y.Value;
-                int rx = x;
-                int ry = y;
-                int index = _copy.Offsets.IndexOf(_offset);
-
-                List<int> path = Track.GetPath(_copy);
-
-                Program.Project.Undo.Add($"Copy Offset {index + 1} Relative Changed to {rx},{ry}", () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].X = ux;
-                    copy.Offsets[index].Y = uy;
-
-                }, () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].X = rx;
-                    copy.Offsets[index].Y = ry;
-                });
-            }
+            if (old_x != null && old_y != null)
+                Program.Project.Undo.AddAndExecute(new Copy.OffsetRelativeUndoEntry(
+                    _copy,
+                    _copy.Offsets.IndexOf(_offset),
+                    old_x.Value,
+                    old_y.Value,
+                    x,
+                    y
+                ));
         }
 
         void Offset_AbsoluteChanged(int x, int y, int? old_x, int? old_y) {
-            _offset.AbsoluteX = x;
-            _offset.AbsoluteY = y;
-
-            if (old_x != null && old_y != null) {
-                int ux = old_x.Value;
-                int uy = old_y.Value;
-                int rx = x;
-                int ry = y;
-                int index = _copy.Offsets.IndexOf(_offset);
-
-                List<int> path = Track.GetPath(_copy);
-
-                Program.Project.Undo.Add($"Copy Offset {index + 1} Absolute Changed to {rx},{ry}", () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].AbsoluteX = ux;
-                    copy.Offsets[index].AbsoluteY = uy;
-
-                }, () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.Offsets[index].AbsoluteX = rx;
-                    copy.Offsets[index].AbsoluteY = ry;
-                });
-            }
+            if (old_x != null && old_y != null)
+                Program.Project.Undo.AddAndExecute(new Copy.OffsetAbsoluteUndoEntry(
+                    _copy,
+                    _copy.Offsets.IndexOf(_offset),
+                    old_x.Value,
+                    old_y.Value,
+                    x,
+                    y
+                ));
         }
 
-        void Offset_Switched() {
-            bool u = _offset.IsAbsolute;
-            bool r = !_offset.IsAbsolute;
-            int index = _copy.Offsets.IndexOf(_offset);
-
-            List<int> path = Track.GetPath(_copy);
-
-            Program.Project.Undo.Add($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", () => {
-                Copy copy = Track.TraversePath<Copy>(path);
-                copy.Offsets[index].IsAbsolute = u;
-
-            }, () => {
-                Copy copy = Track.TraversePath<Copy>(path);
-                copy.Offsets[index].IsAbsolute = r;
-            });
-
-            _offset.IsAbsolute = !_offset.IsAbsolute;
-        }
+        void Offset_Switched() => Program.Project.Undo.AddAndExecute(new Copy.OffsetSwitchedUndoEntry(
+            _copy,
+            _copy.Offsets.IndexOf(_offset),
+            _offset.IsAbsolute,
+            !_offset.IsAbsolute
+        ));
 
         public void SetOffset(Offset offset) => _viewer.Update(offset);
         
         public void Angle_Changed(Dial sender, double angle, double? old){
-            int index = _copy.Offsets.IndexOf(_offset);
-            
-            if(old != null && old.Value != angle){
-                List<int> path = Track.GetPath(_copy);
-                
-                int u = (int)old.Value;
-                int r = (int)angle;
-
-                Program.Project.Undo.Add($"Copy Angle {index + 1} Changed to {angle}{Angle.Unit}", () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.SetAngle(index, u);
-
-                }, () => {
-                    Copy copy = Track.TraversePath<Copy>(path);
-                    copy.SetAngle(index, r);
-                });
-            }
-            
-            _copy.SetAngle(index, (int)angle);
+            if (old != null && old.Value != angle)
+                Program.Project.Undo.AddAndExecute(new Copy.OffsetAngleUndoEntry(
+                    _copy,
+                    _copy.Offsets.IndexOf(_offset),
+                    (int)old.Value,
+                    (int)angle
+                ));
         }
     
         public void SetAngle(double angle) => Angle.RawValue = angle;

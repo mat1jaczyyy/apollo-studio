@@ -102,6 +102,18 @@ namespace Apollo.Enums {
         Sharp,
         Fast,
         Slow,
-        Hold
+        Hold,
+        Release
+    }
+
+    public static class EnumExtensions {
+        public static FadeType Opposite(this FadeType type) {
+            if (type == FadeType.Fast) return FadeType.Slow;
+            if (type == FadeType.Slow) return FadeType.Fast;
+            if (type == FadeType.Hold) return FadeType.Release;
+            if (type == FadeType.Release) return FadeType.Hold;
+
+            return type;
+        }
     }
 }

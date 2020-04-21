@@ -7,24 +7,8 @@ using Avalonia.Input;
 using Apollo.Core;
 using Apollo.Windows;
 
-namespace Apollo.Helpers {
+namespace Apollo.Undo {
     public class UndoManager {
-        public class UndoEntry {
-            public string Description;
-            public Action Undo;
-            public Action Redo;
-            Action DisposeAction;
-
-            public UndoEntry(string desc, Action undo = null, Action redo = null, Action dispose = null) {
-                Description = desc;
-                Undo = undo?? (() => {});
-                Redo = redo?? (() => {});
-                DisposeAction = dispose?? (() => {});
-            }
-
-            public void Dispose() => DisposeAction?.Invoke();
-        }
-
         public UndoWindow Window;
 
         object locker = new object();
@@ -71,11 +55,11 @@ namespace Apollo.Helpers {
             SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
-        public void Add(string desc, Action undo, Action redo, Action dispose = null) {
+        public void Add(UndoEntry entry) {
             for (int i = History.Count - 1; i > Position; i--)
                 Remove(i);
             
-            History.Add(new UndoEntry(desc, undo, redo, dispose));
+            History.Add(entry);
             Window?.Contents_Insert(History.Count - 1, History.Last());
 
             Position = History.Count - 1;
@@ -85,15 +69,20 @@ namespace Apollo.Helpers {
             Program.Project.WriteCrashBackup();
         }
 
+        public void AddAndExecute(UndoEntry entry) {
+            Add(entry);
+            entry.Redo();
+        }
+
         public void Select(int index) {
             lock (locker) {
                 if (index < Position)
                     for (int i = Position; i > index; i--)
-                        History[i].Undo.Invoke();
+                        History[i].Undo();
                 
                 else if (index > Position)
                     for (int i = Position + 1; i <= index; i++)
-                        History[i].Redo.Invoke();
+                        History[i].Redo();
                 
                 Position = index;
             }

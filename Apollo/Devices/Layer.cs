@@ -2,6 +2,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Layer: Device {
@@ -56,6 +57,27 @@ namespace Apollo.Devices {
             n.BlendingRange = Range;
 
             InvokeExit(n);
+        }
+        
+        public class TargetUndoEntry: SimplePathUndoEntry<Layer, int> {
+            protected override void Action(Layer item, int element) => item.Target = element;
+            
+            public TargetUndoEntry(Layer layer, int u, int r)
+            : base($"Layer Target Changed to {r}", layer, u, r) {}
+        }
+        
+        public class ModeUndoEntry: SimplePathUndoEntry<Layer, BlendingType> {
+            protected override void Action(Layer item, BlendingType element) => item.BlendingMode = element;
+            
+            public ModeUndoEntry(Layer layer, BlendingType u, BlendingType r)
+            : base($"Layer Blending Changed to {r}", layer, u, r) {}
+        }
+        
+        public class RangeUndoEntry: SimplePathUndoEntry<Layer, int> {
+            protected override void Action(Layer item, int element) => item.Range = element;
+            
+            public RangeUndoEntry(Layer layer, int u, int r)
+            : base($"Layer Range Changed to {r}", layer, u, r) {}
         }
     }
 }

@@ -1,7 +1,10 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Move: Device {
@@ -61,6 +64,71 @@ namespace Apollo.Devices {
 
             Offset.Dispose();
             base.Dispose();
+        }
+        
+        public class OffsetUndoEntry: PathUndoEntry<Move> {
+            int ux, uy, rx, ry;
+            
+            protected override void UndoPath(params Move[] items) {
+                items[0].Offset.X = ux;
+                items[0].Offset.Y = uy;
+            }
+            
+            protected override void RedoPath(params Move[] items) {
+                items[0].Offset.X = rx;
+                items[0].Offset.Y = ry;
+            }
+            
+            public OffsetUndoEntry(Move move, int ux, int uy, int rx, int ry)
+            : base($"Move Offset Relative Changed to {rx},{ry}", move) {
+                this.ux = ux;
+                this.uy = uy;
+                this.rx = rx;
+                this.ry = ry;
+            }
+        }
+        
+        public class OffsetAbsoluteUndoEntry: PathUndoEntry<Move> {
+            int ux, uy, rx, ry;
+            
+            protected override void UndoPath(params Move[] items) {
+                items[0].Offset.AbsoluteX = ux;
+                items[0].Offset.AbsoluteY = uy;
+            }
+            
+            protected override void RedoPath(params Move[] items) {
+                items[0].Offset.AbsoluteX = rx;
+                items[0].Offset.AbsoluteY = ry;
+            }
+            
+            public OffsetAbsoluteUndoEntry(Move move, int ux, int uy, int rx, int ry)
+            : base($"Move Offset Absolute Changed to {rx},{ry}", move) {
+                this.ux = ux;
+                this.uy = uy;
+                this.rx = rx;
+                this.ry = ry;
+            }
+        }
+
+        public class OffsetSwitchedUndoEntry: SimplePathUndoEntry<Move, bool> {
+            protected override void Action(Move item, bool element) => item.Offset.IsAbsolute = element;
+            
+            public OffsetSwitchedUndoEntry(Move move, bool u, bool r)
+            : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, u, r) {}
+        }
+        
+        public class GridModeUndoEntry: EnumSimplePathUndoEntry<Move, GridType> {
+            protected override void Action(Move item, GridType element) => item.GridMode = element;
+            
+            public GridModeUndoEntry(Move move, GridType u, GridType r, IEnumerable source)
+            : base("Move Grid", move, u, r, source) {}
+        }
+        
+        public class WrapUndoEntry: SimplePathUndoEntry<Move, bool> {
+            protected override void Action(Move item, bool element) => item.Wrap = element;
+            
+            public WrapUndoEntry(Move move, bool u, bool r)
+            : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", move, u, r) {}
         }
     }
 }

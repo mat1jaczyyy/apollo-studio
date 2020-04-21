@@ -62,14 +62,16 @@ namespace Apollo.Helpers {
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return true;
 
-            IEnumerable<DriverVersion> a = (from j in Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
-                where Path.GetFileName(j).StartsWith("nvnusbaudio.inf")
-                select new DriverVersion((
-                    from i in File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
-                        where i.StartsWith("DriverVer=")
-                        select i
-                ).First().Substring(10).Split(',')[1].Split('.').Where((x, i) => i == 1 || i == 3).Select(x => Convert.ToInt32(x)).ToArray())
-            );
+            IEnumerable<DriverVersion> a = Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
+                .Where(j => Path.GetFileName(j).StartsWith("nvnusbaudio.inf"))
+                .Select(j => new DriverVersion(
+                    File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
+                        .Where(i => i.StartsWith("DriverVer="))
+                        .First().Substring(10).Split(',')[1].Split('.')
+                        .Where((x, i) => i == 1 || i == 3)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToArray()
+                ));
 
             if (a.Count() == 0) {
                 error = CreateDriverError(false);

@@ -58,7 +58,9 @@ namespace Apollo.Structures {
         public Length Length;
         void LengthChanged() => StepChanged?.Invoke(Length);
 
-        public Time Clone() => new Time(_mode, Length.Clone(), _free) {
+        public Time Clone() => With();
+
+        public Time With(bool? mode = null, Length length = null, int? free = null) => new Time(mode?? _mode, length?? Length.Clone(), free?? _free) {
             Minimum = Minimum,
             Maximum = Maximum
         };

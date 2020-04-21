@@ -95,5 +95,19 @@ namespace Apollo.Windows {
 
             return await window.Completed.Task;
         }
+
+        public static async Task<string> CreateReadError(Window sender) => await MessageWindow.Create(
+            $"An error occurred while reading the file.\n\n" +
+            "You may not have sufficient privileges to read from the destination folder, or\n" +
+            "the file you're attempting to read is invalid.",
+            null, sender
+        );
+
+        public static async Task<string> CreateWriteError(Window sender) => await MessageWindow.Create(
+            $"An error occurred while writing the file.\n\n" +
+            "You may not have sufficient privileges to write to the destination folder, or\n" +
+            "the file already exists but cannot be overwritten.",
+            null, sender
+        );
     }
 }

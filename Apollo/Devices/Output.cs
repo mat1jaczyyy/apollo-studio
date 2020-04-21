@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Helpers;
+using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Output: Device {
@@ -44,12 +46,8 @@ namespace Apollo.Devices {
                 if (redoing = method.DeclaringType == typeof(UndoManager) && method.Name == "Select") break;
             }
 
-            if (!redoing) {
-                int u = Target;
-                List<int> path = Track.GetPath(this);
-
-                Program.Project.Undo.History[Program.Project.Undo.History.Count - 1].Undo += () => Track.TraversePath<Output>(path).Target = u;
-            }
+            if (!redoing)
+                Program.Project.Undo.History.Last().AddPost(new IndexRemovedFix(this, Target));
 
             Target = Track.Get(this).ParentIndex.Value;
             if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
@@ -88,6 +86,22 @@ namespace Apollo.Devices {
             Program.Project.Tracks[_target].Disposing -= IndexRemoved;
 
             base.Dispose();
+        }
+        
+        public class TargetUndoEntry: SimplePathUndoEntry<Output, int> {
+            protected override void Action(Output item, int element) => item.Target = element;
+            
+            public TargetUndoEntry(Output output, int u, int r)
+            : base($"Output Target Changed to {r}", output, u - 1, r - 1) {}
+        }
+
+        public class IndexRemovedFix: PathUndoEntry<Output> {
+            int target;
+
+            protected override void UndoPath(params Output[] items) => items[0].Target = target;
+
+            public IndexRemovedFix(Output output, int target)
+            : base(null, output) => this.target = target;
         }
     }
 }

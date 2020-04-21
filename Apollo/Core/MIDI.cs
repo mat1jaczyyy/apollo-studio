@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using RtMidi.Core;
 using RtMidi.Core.Devices.Infos;
@@ -27,6 +28,8 @@ namespace Apollo.Core {
             }
         }
 
+        public static List<Launchpad> UsableDevices => Devices.Where(i => i.Usable).ToList();
+
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output", 0);
 
         public static void ClearState(bool multi = true) {
@@ -49,10 +52,8 @@ namespace Apollo.Core {
             if (!NoOutput.Available)
                 NoOutput.Connect(null, null);
 
-            courier = new Courier() { Interval = 100 };
-            courier.Elapsed += Rescan;
-            courier.Start();
             started = true;
+            courier = new Courier(100, _ => Rescan(), repeat: true);
         }
 
         public static void Stop() {
@@ -169,7 +170,7 @@ namespace Apollo.Core {
             }
         }
 
-        public static void Rescan(object sender, EventArgs e) {
+        public static void Rescan() {
             lock (locker) {
                 foreach (IMidiInputDeviceInfo input in MidiDeviceManager.Default.InputDevices)
                     foreach (IMidiOutputDeviceInfo output in MidiDeviceManager.Default.OutputDevices)

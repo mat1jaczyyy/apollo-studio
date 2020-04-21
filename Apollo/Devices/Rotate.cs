@@ -1,7 +1,10 @@
+using System.Collections;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Rotate: Device {
@@ -49,6 +52,20 @@ namespace Apollo.Devices {
             }
 
             InvokeExit(n);
+        }
+        
+        public class ModeUndoEntry: EnumSimplePathUndoEntry<Rotate, RotateType> {
+            protected override void Action(Rotate item, RotateType element) => item.Mode = element;
+            
+            public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r, IEnumerable source)
+            : base("Rotate Angle", rotate, u, r, source) {}
+        }
+        
+        public class BypassUndoEntry: SimplePathUndoEntry<Rotate, bool> {
+            protected override void Action(Rotate item, bool element) => item.Bypass = element;
+            
+            public BypassUndoEntry(Rotate rotate, bool u, bool r)
+            : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate, u, r) {}
         }
     }
 }

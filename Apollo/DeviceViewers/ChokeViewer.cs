@@ -43,20 +43,13 @@ namespace Apollo.DeviceViewers {
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
 
-        void Target_Changed(Dial sender, double value, double? old) {
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_choke);
-
-                Program.Project.Undo.Add($"Choke Target Changed to {r}{Target.Unit}", () => {
-                    Track.TraversePath<Choke>(path).Target = u;
-                }, () => {
-                    Track.TraversePath<Choke>(path).Target = r;
-                });
-            }
-
-            _choke.Target = (int)value;
+        void Target_Changed(Dial sender, double value, double? old){
+            if (old != null && old != value) 
+                Program.Project.Undo.AddAndExecute(new Choke.TargetUndoEntry(
+                    _choke, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
 
         public void SetTarget(int value) => Target.RawValue = value;

@@ -32,7 +32,8 @@
     </Grid>
 
     <StackPanel>
-      <ComboBox VerticalAlignment="Center" HorizontalAlignment="Right" BorderThickness="0" IsVisible="false" x:Name="TargetPortSelector" SelectionChanged="TargetPort_Changed" />
+      <Components:PortSelector VerticalAlignment="Center" IsVisible="false" NoAbletonLaunchpads="true" x:Name="TargetPortSelector"
+                               PortChanged="TargetPort_Changed" />
     </StackPanel>
   </Grid>
 </UserControl>

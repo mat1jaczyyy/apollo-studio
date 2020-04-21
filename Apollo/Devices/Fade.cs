@@ -8,6 +8,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Fade: Device {
@@ -60,7 +61,7 @@ namespace Apollo.Devices {
         
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
+        ConcurrentDictionary<Signal, List<Courier<Signal>>> timers = new ConcurrentDictionary<Signal, List<Courier<Signal>>>();
 
         static Dictionary<FadeType, Func<double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double>>() { 
             {FadeType.Fast, proportion => Math.Pow(proportion, 2)},
@@ -78,6 +79,7 @@ namespace Apollo.Devices {
         double EaseTime(FadeType type, double start, double end, double val) {
             if (type == FadeType.Linear) return val;
             if (type == FadeType.Hold) return (start != val)? end - 0.1 : start;
+            if (type == FadeType.Release) return start;
 
             double duration = end - start;
             return start + duration * TimeEasing[type].Invoke((val - start) / duration);
@@ -235,7 +237,7 @@ namespace Apollo.Devices {
 
         public int Count => _colors.Count;
 
-        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, (from i in _colors select i.Clone()).ToList(), _positions.ToList(), _types.ToList()) {
+        public override Device Clone() => new Fade(_time.Clone(), _gate, PlayMode, _colors.Select(i => i.Clone()).ToList(), _positions.ToList(), _types.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
@@ -258,7 +260,7 @@ namespace Apollo.Devices {
         public void Remove(int index) {
             _colors.RemoveAt(index);
             _positions.RemoveAt(index);
-            _types.RemoveAt(index);
+            if (index < _types.Count) _types.RemoveAt(index);
 
             if (Viewer?.SpecificViewer != null) ((FadeViewer)Viewer.SpecificViewer).Contents_Remove(index);
 
@@ -290,40 +292,28 @@ namespace Apollo.Devices {
             Program.Project.BPMChanged += Generate;
         }
 
-        void FireCourier(Signal n, double time) {
-            Courier courier;
+        void FireCourier(Signal n, double time)
+            => timers[n].Add(new Courier<Signal>(time, n, Tick));
 
-            timers[n].Add(courier = new Courier() {
-                Info = n,
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
-
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier<Signal> sender) {
             if (Disposed) return;
 
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
+            Signal n = sender.Info;
 
-            if (courier.Info is Signal n) {
-                lock (locker[n]) {
-                    if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(courier)) return;
+            lock (locker[n]) {
+                if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(sender)) return;
 
-                    if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
-                        Stop(n);
-                        
-                        for (int i = 1; i < fade.Count; i++)
-                            FireCourier(n, fade[i].Time);
-                    }
+                if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
+                    Stop(n);
                     
-                    if (buffer[n] < fade.Count) {
-                        Signal m = n.Clone();
-                        m.Color = fade[buffer[n]].Color.Clone();
-                        InvokeExit(m);
-                    }
+                    for (int i = 1; i < fade.Count; i++)
+                        FireCourier(n, fade[i].Time);
+                }
+                
+                if (buffer[n] < fade.Count) {
+                    Signal m = n.Clone();
+                    m.Color = fade[buffer[n]].Color.Clone();
+                    InvokeExit(m);
                 }
             }
         }
@@ -342,7 +332,7 @@ namespace Apollo.Devices {
                     InvokeExit(m);
                 }
 
-                timers[n] = new List<Courier>();
+                timers[n] = new List<Courier<Signal>>();
                 buffer[n] = 0;
             }
         }
@@ -370,7 +360,7 @@ namespace Apollo.Devices {
         }
 
         protected override void Stop() {
-            foreach (List<Courier> i in timers.Values) {
+            foreach (List<Courier<Signal>> i in timers.Values) {
                 foreach (Courier j in i) j.Dispose();
                 i.Clear();
             }
@@ -391,6 +381,188 @@ namespace Apollo.Devices {
 
             Time.Dispose();
             base.Dispose();
+        }
+
+        public class ThumbInsertUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color thumbColor;
+            double pos;
+            FadeType type;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Remove(index);
+            protected override void RedoPath(params Fade[] items) => items[0].Insert(index, thumbColor, pos, type);
+            
+            public ThumbInsertUndoEntry(Fade fade, int index, Color thumbColor, double pos, FadeType type)
+            : base($"Fade Color {index + 1} Inserted", fade) {
+                this.index = index;
+                this.thumbColor = thumbColor;
+                this.pos = pos;
+                this.type = type;
+            }
+        }
+        
+        public class ThumbRemoveUndoEntry: PathUndoEntry<Fade> {
+            int index;
+            Color uc;
+            double up;
+            FadeType ut;
+            
+            protected override void UndoPath(params Fade[] items) => items[0].Insert(index, uc, up, ut);
+            protected override void RedoPath(params Fade[] items) => items[0].Remove(index);
+            
+            public ThumbRemoveUndoEntry(Fade fade, int index)
+            : base($"Fade Color {index + 1} Removed", fade) {
+                this.index = index;
+                
+                uc = fade.GetColor(index);
+                up = fade.GetPosition(index);
+                ut = fade.GetFadeType(index);
+            }
+        }
+        
+        public class ThumbTypeUndoEntry: SimpleIndexPathUndoEntry<Fade, FadeType> {
+            protected override void Action(Fade item, int index, FadeType element) => item.SetFadeType(index, element);
+            
+            public ThumbTypeUndoEntry(Fade fade, int index, FadeType r)
+            : base($"Fade Type {index + 1} Changed to {r.ToString()}", fade, index, fade.GetFadeType(index), r) {}
+        }
+        
+        public class ThumbMoveUndoEntry: SimpleIndexPathUndoEntry<Fade, double> {
+            protected override void Action(Fade item, int index, double element) => item.SetPosition(index, element);
+            
+            public ThumbMoveUndoEntry(Fade fade, int index, double u, double r)
+            : base($"Fade Color {index + 1} Moved", fade, index, u, r) {}
+        }
+        
+        public class ColorUndoEntry: SimpleIndexPathUndoEntry<Fade, Color> {
+            protected override void Action(Fade item, int index, Color element) => item.SetColor(index, element.Clone());
+            
+            public ColorUndoEntry(Fade fade, int index, Color u, Color r)
+            : base($"Fade Color {index + 1} Changed to {r.ToHex()}", fade, index, u, r) {}
+        }
+        
+        public class DurationUndoEntry: SimplePathUndoEntry<Fade, int> {
+            protected override void Action(Fade item, int element) => item.Time.Free = element;
+            
+            public DurationUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {r}ms", fade, u, r) {}
+        }
+        
+        public class DurationModeUndoEntry: SimplePathUndoEntry<Fade, bool> {
+            protected override void Action(Fade item, bool element) => item.Time.Mode = element;
+            
+            public DurationModeUndoEntry(Fade fade, bool u, bool r)
+            : base($"Fade Duration Switched to {(r? "Steps" : "Free")}", fade, u, r) {}
+        }
+        
+        public class DurationStepUndoEntry: SimplePathUndoEntry<Fade, int> {
+            protected override void Action(Fade item, int element) => item.Time.Length.Step = element;
+            
+            public DurationStepUndoEntry(Fade fade, int u, int r)
+            : base($"Fade Duration Changed to {Length.Steps[r]}", fade, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Fade, double> {
+            protected override void Action(Fade item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Fade fade, double u, double r)
+            : base($"Fade Gate Changed to {r}%", fade, u / 100, r / 100) {}
+        }
+        
+        public class PlaybackModeUndoEntry: SimplePathUndoEntry<Fade, FadePlaybackType> {
+            protected override void Action(Fade item, FadePlaybackType element) => item.PlayMode = element;
+            
+            public PlaybackModeUndoEntry(Fade fade, FadePlaybackType u, FadePlaybackType r)
+            : base($"Fade Playback Mode Changed to {r.ToString()}", fade, u, r) {}
+        }
+        
+        public class ReverseUndoEntry: SymmetricPathUndoEntry<Fade> {
+            protected override void Action(Fade item) {
+                List<Color> colors = Enumerable.Range(0, item.Count).Select(i => item.GetColor(i)).ToList();
+                List<double> positions = Enumerable.Range(0, item.Count).Select(i => 1 - item.GetPosition(i)).ToList();
+                
+                for (int i = 0; i < item.Count; i++) {
+                    item.SetColor(i, colors[item.Count - i - 1]);
+                    item.SetPosition(i, positions[item.Count - i - 1]);
+                }
+                
+                List<FadeType> fadetypes = Enumerable.Range(0, item.Count - 1).Select(i => item.GetFadeType(i)).ToList();
+                
+                for (int i = 0; i < item.Count - 1; i++)
+                    item.SetFadeType(i, fadetypes[item.Count - i - 2].Opposite());
+
+                int? expanded = item.Count - item.Expanded - 1;
+                if (expanded != item.Expanded && item.Viewer?.SpecificViewer != null) ((FadeViewer)item.Viewer.SpecificViewer).Expand(expanded);
+            }
+            
+            public ReverseUndoEntry(Fade fade)
+            : base("Fade Reversed", fade) {}
+        }
+        
+        public class EqualizeUndoEntry: SimplePathUndoEntry<Fade, double[]> {
+            protected override void Action(Fade item, double[] element) {
+                for (int i = 1; i < item.Count - 1; i++)
+                    item.SetPosition(i, element[i - 1]);
+            }
+            
+            public EqualizeUndoEntry(Fade fade)
+            : base("Fade Equalized", fade,
+                Enumerable.Range(1, fade.Count - 2).Select(i => fade.GetPosition(i)).ToArray(),
+                Enumerable.Range(1, fade.Count - 2).Select(i => (double)i / (fade.Count - 1)).ToArray()
+            ) {}
+        }
+
+        public abstract class CutUndoEntry: SinglePathUndoEntry<Fade> {
+            List<Color> colors;
+            List<double> positions;
+            List<FadeType> fadetypes;
+            int index;
+
+            protected override void Undo(Fade item) {
+                while (item.Count > 0)
+                    item.Remove(item.Count - 1);
+                
+                for (int i = 0; i < colors.Count; i++)
+                    item.Insert(i, colors[i], positions[i], i < fadetypes.Count? fadetypes[i] : FadeType.Linear);
+            }
+            
+            protected override void Redo(Fade item) => Redo(item, index);
+            protected abstract void Redo(Fade item, int index);
+            
+            public CutUndoEntry(Fade fade, int index, string action)
+            : base($"Fade {action} Here Applied To Color {index + 1}", fade) {
+                this.index = index;
+                
+                colors = Enumerable.Range(0, fade.Count).Select(i => fade.GetColor(i)).ToList();
+                positions = Enumerable.Range(0, fade.Count).Select(i => fade.GetPosition(i)).ToList();
+                fadetypes = Enumerable.Range(0, fade.Count - 1).Select(i => fade.GetFadeType(i)).ToList();
+            }
+        }
+
+        public class StartHereUndoEntry: CutUndoEntry {
+            protected override void Redo(Fade item, int index) {
+                for (int i = index - 1; i >= 0; i--)
+                    item.Remove(i);
+                
+                for (int i = item.Count - 1; i >= 0; i--)
+                    item.SetPosition(i, (item.GetPosition(i) - item.GetPosition(0)) / (1 - item.GetPosition(0)));
+            }
+            
+            public StartHereUndoEntry(Fade fade, int index)
+            : base(fade, index, "Start") {}
+        }
+
+        public class EndHereUndoEntry: CutUndoEntry {
+            protected override void Redo(Fade item, int index) {
+                for (int i = item.Count - 1; i > index; i--)
+                    item.Remove(i);
+                
+                for (int i = 0; i < item.Count; i++)
+                    item.SetPosition(i, item.GetPosition(i) / item.GetPosition(index));
+            }
+            
+            public EndHereUndoEntry(Fade fade, int index)
+            : base(fade, index, "End") {}
         }
     }
 }

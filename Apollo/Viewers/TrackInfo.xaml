@@ -33,11 +33,10 @@
         <Grid Grid.Column="0" Margin="5 0" Background="Transparent" VerticalAlignment="Stretch" x:Name="Draggable" PointerPressed="Drag">
           <TextBlock VerticalAlignment="Center" x:Name="Name" />
 
-          <TextBox Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" VerticalAlignment="Center" Padding="1" x:Name="Input"
-               LostFocus="Input_LostFocus" KeyDown="Input_KeyDown" KeyUp="Input_KeyUp" PointerReleased="Input_MouseUp" />
+          <TextBox Background="{DynamicResource ThemeControlMidBrush}" BorderThickness="0 0 0 1" Opacity="0" IsHitTestVisible="false" HorizontalAlignment="Stretch" VerticalAlignment="Center" Padding="1" x:Name="Input" />
         </Grid>
         
-        <ComboBox Grid.Column="1" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
+        <Components:PortSelector Grid.Column="1" x:Name="PortSelector" PortChanged="Port_Changed" />
       </Grid>
     </Border>
 

@@ -1,6 +1,7 @@
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Tone: Device {
@@ -88,6 +89,41 @@ namespace Apollo.Devices {
             }
 
             InvokeExit(n);
+        }
+        
+        public class HueUndoEntry: SimplePathUndoEntry<Tone, double> {
+            protected override void Action(Tone item, double element) => item.Hue = element;
+            
+            public HueUndoEntry(Tone tone, double u, double r)
+            : base($"Tone Hue Changed to {r}°", tone, u, r) {}
+        }
+        
+        public class SatHighUndoEntry: SimplePathUndoEntry<Tone, double> {
+            protected override void Action(Tone item, double element) => item.SaturationHigh = element;
+            
+            public SatHighUndoEntry(Tone tone, double u, double r)
+            : base($"Tone Sat Hi Changed to {r}%", tone, u / 100, r / 100) {}
+        }
+        
+        public class SatLowUndoEntry: SimplePathUndoEntry<Tone, double> {
+            protected override void Action(Tone item, double element) => item.SaturationLow = element;
+            
+            public SatLowUndoEntry(Tone tone, double u, double r)
+            : base($"Tone Sat Lo Changed to {r}%", tone, u / 100, r / 100) {}
+        }
+        
+        public class ValueHighUndoEntry: SimplePathUndoEntry<Tone, double> {
+            protected override void Action(Tone item, double element) => item.ValueHigh = element;
+            
+            public ValueHighUndoEntry(Tone tone, double u, double r)
+            : base($"Tone Value Hi Changed to {r}%", tone, u / 100, r / 100) {}
+        }
+        
+        public class ValueLowUndoEntry: SimplePathUndoEntry<Tone, double> {
+            protected override void Action(Tone item, double element) => item.ValueLow = element;
+            
+            public ValueLowUndoEntry(Tone tone, double u, double r)
+            : base($"Tone Value Lo Changed to {r}%", tone, u / 100, r / 100) {}
         }
     }
 }

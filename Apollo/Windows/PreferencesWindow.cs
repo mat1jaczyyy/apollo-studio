@@ -17,6 +17,7 @@ using Humanizer.Localisation;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;
@@ -118,8 +119,8 @@ namespace Apollo.Windows {
         void UpdatePorts() {
             for (int i = Contents.Count - 2; i >= 0; i--) Contents.RemoveAt(i);
 
-            foreach (LaunchpadInfo control in (from i in MIDI.Devices where i.Available && i.Type != LaunchpadType.Unknown select new LaunchpadInfo(i)))
-                Contents.Insert(Contents.Count - 1, control);
+            foreach (Launchpad lp in MIDI.UsableDevices)
+                Contents.Insert(Contents.Count - 1, new LaunchpadInfo(lp));
         }
 
         void HandlePorts() => Dispatcher.UIThread.InvokeAsync((Action)UpdatePorts);

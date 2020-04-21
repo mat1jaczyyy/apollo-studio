@@ -116,7 +116,7 @@
           
           <Border Grid.Column="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1 0 0 0">
             <Grid RowDefinitions="Auto,*,Auto,Auto">
-              <ComboBox Grid.Row="0" Margin="7" HorizontalAlignment="Right" BorderThickness="0" x:Name="PortSelector" SelectionChanged="Port_Changed" />
+              <Components:PortSelector Grid.Row="0" Margin="7" x:Name="PortSelector" PortChanged="Port_Changed" />
             
               <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
                 <Components:ColorPicker Margin="7" x:Name="ColorPicker" ColorChanged="ColorPicker_Changed" />

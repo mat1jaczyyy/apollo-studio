@@ -116,8 +116,7 @@ namespace Apollo.Core {
                     MIDI.Update();
                 }
                 
-                Courier autosave = new Courier() { Interval = 180000 };
-                autosave.Elapsed += async (_, __) => {
+                Courier autosave = new Courier(180000, async _ => {
                     if (Preferences.Autosave && Program.Project != null && File.Exists(Program.Project.FilePath) && !Program.Project.Undo.Saved) {
                         try {
                             string dir = Path.Combine(Path.GetDirectoryName(Program.Project.FilePath), $"{Program.Project.FileName} Backups");
@@ -132,8 +131,7 @@ namespace Apollo.Core {
                     }
 
                     Preferences.Save();
-                };
-                autosave.Start();
+                });
 
                 lifetime.Exit += (_, __) => {
                     autosave.Dispose();

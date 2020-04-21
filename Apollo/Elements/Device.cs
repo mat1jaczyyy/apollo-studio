@@ -6,12 +6,12 @@ using System.Reflection;
 using System.Runtime.Serialization;
 
 using Apollo.Devices;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public abstract class Device: ISelect {
+    public abstract class Device: ISelect, IMutable {
         public readonly string DeviceIdentifier;
         public readonly string Name;
 
@@ -26,6 +26,8 @@ namespace Apollo.Elements {
         public int? IParentIndex {
             get => ParentIndex;
         }
+        
+        public ISelect IClone() => (ISelect)Clone();
 
         public DeviceViewer Viewer { get; set; }
         
@@ -86,62 +88,6 @@ namespace Apollo.Elements {
             ParentIndex = null;
             
             Disposed = true;
-        }
-
-        public static bool Move(List<Device> source, Chain target, int position, bool copy = false) {
-            if (!copy && Track.PathContains(target, source.Select(i => (ISelect)i).ToList())) return false;
-
-            return (position == -1)
-                ? Move(source, target, copy)
-                : Move(source, target[position], copy);
-        }
-
-        public static bool Move(List<Device> source, Device target, bool copy = false) {
-            if (!copy && (source.Contains(target) || (source[0].Parent == target.Parent && source[0].ParentIndex == target.ParentIndex + 1)))
-                return false;
-            
-            List<Device> moved = new List<Device>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                if (moved.Last() is Pattern pattern)
-                    pattern.Window?.Close();
-
-                target.Parent.Insert(target.ParentIndex.Value + i + 1, moved.Last());
-            }
-
-            Track track = Track.Get(moved.First());
-            track?.Window?.Selection.Select(moved.First());
-            track?.Window?.Selection.Select(moved.Last(), true);
-            
-            return true;
-        }
-
-        public static bool Move(List<Device> source, Chain target, bool copy = false) {
-            if (!copy && target.Count > 0 && source[0] == target[0])
-                return false;
-            
-            List<Device> moved = new List<Device>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) source[i].Parent.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                if (moved.Last() is Pattern pattern)
-                    pattern.Window?.Close();
-
-                target.Insert(i, moved.Last());
-            }
-
-            Track track = Track.Get(moved.First());
-            track.Window.Selection.Select(moved.First());
-            track.Window.Selection.Select(moved.Last(), true);
-            
-            return true;
         }
 
         public static Device Create(Type device, Chain parent) {

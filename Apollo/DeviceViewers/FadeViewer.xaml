@@ -5,6 +5,17 @@
              Margin="10 5"
              DetachedFromVisualTree="Unloaded">
 
+  <UserControl.Resources>
+    <Components:ApolloContextMenu x:Key="GradientContextMenu" MenuAction="ContextMenu_Action">
+      <MenuItem Header="New Color" />
+      
+      <Separator />
+
+      <MenuItem Header="Reverse" />
+      <MenuItem Header="Equalize" />
+    </Components:ApolloContextMenu>
+  </UserControl.Resources>
+
   <Grid ColumnDefinitions="Auto,Auto">
     <Grid Grid.Column="0" RowDefinitions="*,*">
       <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
@@ -17,9 +28,6 @@
                 <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%" />
               </Rectangle.Fill>
             </Rectangle>
-
-            <Components:FadeThumb Canvas.Left="0" NoDelete="true" x:Name="ThumbStart" Focused="Thumb_Focus" TypeChanged="Thumb_ChangeFadeType"/>
-            <Components:FadeThumb Canvas.Left="200" NoMenu="true" x:Name="ThumbEnd" Focused="Thumb_Focus" />
           </Canvas>
 
           <Grid ColumnDefinitions="Auto,*,Auto" Margin="7 0">

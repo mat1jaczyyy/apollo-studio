@@ -188,9 +188,9 @@
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0" Padding="20 15">
           <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-              <TextBlock TextAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock TextAlignment="Center" Text="2018 - 2020 mat1jaczyyy" />
+            <StackPanel Grid.Column="0">
+              <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 - 2020 mat1jaczyyy" />
             </StackPanel>
 
             <Components:Patreon Grid.Column="1" VerticalAlignment="Center" />

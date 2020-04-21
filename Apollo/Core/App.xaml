@@ -12,6 +12,7 @@
     <StyleInclude Source="avares://Apollo/Themes/Common.xaml" />
 
     <Style Selector="Window">
+      <Setter Property="FontFamily" Value="{DynamicResource Font}" />
       <Setter Property="HasSystemDecorations" Value="false" />
     </Style>
 
@@ -19,18 +20,6 @@
       <Setter Property="Focusable" Value="false"/>
     </Style>
 
-    <Style Selector="TextBlock">
-      <Setter Property="FontFamily" Value="{DynamicResource Font}" />
-    </Style>
-
-    <Style Selector="TextBox">
-      <Setter Property="FontFamily" Value="{DynamicResource Font}" />
-    </Style>
-
-    <Style Selector="ContextMenu">
-      <Setter Property="FontFamily" Value="{DynamicResource Font}" />
-    </Style>
-  
     <Style Selector="Button">
       <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
       <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />

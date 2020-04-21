@@ -3,13 +3,14 @@ using System.Linq;
 
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Interfaces;
+using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: ISelect, IChainParent {
+    public class Track: ISelect, IChainParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -21,6 +22,8 @@ namespace Apollo.Elements {
         public int? IParentIndex {
             get => ParentIndex;
         }
+        
+        public ISelect IClone() => (ISelect)Clone();
 
         public TrackInfo Info;
         public TrackWindow Window;
@@ -58,7 +61,7 @@ namespace Apollo.Elements {
                 ? track
                 : Get((Device)chain.Parent)
             ) : null;
-
+            
         public static bool PathContains(ISelect child, List<ISelect> search) {
             ISelect last = child;
 
@@ -76,39 +79,6 @@ namespace Apollo.Elements {
             }
         }
 
-        public static List<int> GetPath(ISelect child) {
-            List<int> path = new List<int>();
-            ISelect last = child;
-
-            while (true) {
-                if (last is Chain chain && (chain.Parent is Choke || chain.IRoot))
-                    last = (ISelect)chain.Parent;
-
-                path.Add(last.IParentIndex?? -1);
-
-                if (last is Track) break;
-
-                last = (ISelect)last.IParent;
-            }
-
-            return path;
-        }
-
-        public static T TraversePath<T>(List<int> path) where T : ISelect {
-            ISelectParent ret = Program.Project[path.Last()].Chain;
-
-            if (path.Count == 1) return (T)ret;
-
-            for (int i = path.Count - 2; i > 0; i--)
-                if (path[i] == -1) ret = ((Multi)ret).Preprocess;
-                else if (ret.IChildren[path[i]] is Choke choke) ret = choke.Chain;
-                else ret = (ISelectParent)ret.IChildren[path[i]];
-
-            if (path[0] == -1) return (T)(ISelect)((Multi)ret).Preprocess;
-            else if (ret.IChildren[path[0]] is Choke choke && typeof(T) != typeof(Choke)) return (T)(ISelect)choke.Chain;
-            else return (T)ret.IChildren[path[0]];
-        }
-
         public Chain Chain;
         Launchpad _launchpad;
 
@@ -122,7 +92,7 @@ namespace Apollo.Elements {
 
                 if (_launchpad != null) _launchpad.Receive += MIDIEnter;
 
-                Info?.UpdatePorts();
+                Info?.PortSelector.Update(_launchpad);
             }
         }
         
@@ -132,7 +102,7 @@ namespace Apollo.Elements {
             set {
                 _name = value;
                 NameChanged?.Invoke(ProcessedName);
-                Info?.SetName(_name);
+                Info?.Rename.SetName(_name);
             }
         }
 
@@ -159,7 +129,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public Track Clone() => new Track(Chain.Clone(), null, Name) {
+        public Track Clone() => new Track(Chain.Clone(), Launchpad, Name) {
             Enabled = Enabled
         };
 
@@ -175,7 +145,7 @@ namespace Apollo.Elements {
         void ChainExit(Signal n) => n.Source?.Render(n);
 
         void MIDIEnter(Signal n) {
-            if (Enabled) Chain?.MIDIEnter(n);
+            if (ParentIndex != null && Enabled) Chain?.MIDIEnter(n);
         }
 
         public void Dispose() {
@@ -197,48 +167,11 @@ namespace Apollo.Elements {
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
 
-        public static bool Move(List<Track> source, Project target, int position, bool copy = false) => (position == -1)
-            ? Move(source, target, copy)
-            : Move(source, target[position], copy);
+        public class LaunchpadChangedUndoEntry: SimpleIndexUndoEntry<Launchpad> {
+            protected override void Action(int index, Launchpad element) => Program.Project[index].Launchpad = element;
 
-        public static bool Move(List<Track> source, Track target, bool copy = false) {
-            if (!copy && (source.Contains(target) || source[0].ParentIndex == target.ParentIndex + 1))
-                return false;
-            
-            List<Track> moved = new List<Track>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                Program.Project.Insert(target.ParentIndex.Value + i + 1, moved.Last());
-            }
-
-            Program.Project.Window.Selection.Select(moved.First());
-            Program.Project.Window.Selection.Select(moved.Last(), true);
-            
-            return true;
-        }
-
-        public static bool Move(List<Track> source, Project target, bool copy = false) {
-            if (!copy && target.Count > 0 && source[0] == target[0])
-                return false;
-            
-            List<Track> moved = new List<Track>();
-
-            for (int i = 0; i < source.Count; i++) {
-                if (!copy) Program.Project.Remove(source[i].ParentIndex.Value, false);
-
-                moved.Add(copy? source[i].Clone() : source[i]);
-
-                Program.Project.Insert(i, moved.Last());
-            }
-
-            Program.Project.Window.Selection.Select(moved.First());
-            Program.Project.Window.Selection.Select(moved.Last(), true);
-            
-            return true;
+            public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
+            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
         }
     }
 }

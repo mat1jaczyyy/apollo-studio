@@ -50,19 +50,12 @@ namespace Apollo.DeviceViewers {
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Target_Changed(Dial sender, double value, double? old){
-            if (old != null && old != value) {
-                int u = (int)old.Value;
-                int r = (int)value;
-                List<int> path = Track.GetPath(_filter);
-
-                Program.Project.Undo.Add($"MacroFilter Target Changed to {r}", () => {
-                    Track.TraversePath<MacroFilter>(path).Macro = u;
-                }, () => {
-                    Track.TraversePath<MacroFilter>(path).Macro = r;
-                });
-            }
-
-            _filter.Macro = (int)value;
+            if (old != null && old != value)
+                Program.Project.Undo.AddAndExecute(new MacroFilter.TargetUndoEntry(
+                    _filter, 
+                    (int)old.Value, 
+                    (int)value
+                ));
         }
         
         public void SetMacro(int macro) => MacroDial.RawValue = macro;
@@ -96,15 +89,10 @@ namespace Apollo.DeviceViewers {
                 MouseMove(sender, e);
 
                 if (old != null) {
-                    bool[] u = old.ToArray();
-                    bool[] r = _filter.Filter.ToArray();
-                    List<int> path = Track.GetPath(_filter);
-
-                    Program.Project.Undo.Add($"MacroFilter Changed", () => {
-                        Track.TraversePath<MacroFilter>(path).Filter = u.ToArray();
-                    }, () => {
-                        Track.TraversePath<MacroFilter>(path).Filter = r.ToArray();
-                    });
+                    Program.Project.Undo.Add(new MacroFilter.FilterUndoEntry(
+                        _filter, 
+                        old.ToArray()
+                    ));
 
                     old = null;
                 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Loop: Device {
@@ -89,17 +90,8 @@ namespace Apollo.Devices {
             Hold = hold;
         }
         
-        void FireCourier(Signal n, Signal m, double time) {
-            Courier courier;
-
-            timers[n].Add(courier = new Courier() {
-                Info = m.Clone(),
-                AutoReset = false,
-                Interval = time,
-            });
-            courier.Elapsed += Tick;
-            courier.Start();
-        }
+        void FireCourier(Signal n, Signal m, double time)
+            => timers[n].Add(new Courier<Signal>(time, m.Clone(), Tick));
 
         void Start(Signal n, Signal m, int count) {
             if (!timers.ContainsKey(n)) 
@@ -133,30 +125,26 @@ namespace Apollo.Devices {
             } else Start(n, m, Repeats);
         }
         
-        void Tick(object sender, EventArgs e) {
+        void Tick(Courier<Signal> sender) {
             if (Disposed) return;
             
-            Courier courier = (Courier)sender;
-            courier.Elapsed -= Tick;
-            
-            if (courier.Info is Signal n) {
-                Signal m = n.Clone();
+            Signal n = sender.Info;
+            Signal m = n.Clone();
 
-                if (Hold) {
-                    n.Color = new Color();
+            if (Hold) {
+                n.Color = new Color();
 
-                    lock (locker[n]) {
-                        FireCourier(n, m, _rate * _gate);
-                        timers[n].Remove(courier);
-                        
-                        InvokeExit(m.With(m.Index, new Color(0)));
-                        InvokeExit(m);
-                    }
-                
-                } else {
-                    timers[n].Remove(courier);
+                lock (locker[n]) {
+                    FireCourier(n, m, _rate * _gate);
+                    timers[n].Remove(sender);
+                    
+                    InvokeExit(m.With(m.Index, new Color(0)));
                     InvokeExit(m);
                 }
+            
+            } else {
+                timers[n].Remove(sender);
+                InvokeExit(m);
             }
         }
 
@@ -174,6 +162,48 @@ namespace Apollo.Devices {
             Stop();
 
             base.Dispose();
+        }
+        
+        public class RateUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Free = element;
+            
+            public RateUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Rate Changed to {r}ms", loop, u, r) {}
+        }
+        
+        public class RateModeUndoEntry: SimplePathUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Rate.Mode = element;
+            
+            public RateModeUndoEntry(Loop loop, bool u, bool r)
+            : base($"Loop Rate Switched to {(r? "Steps" : "Free")}", loop, u, r) {}
+        }
+        
+        public class RateStepUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Rate.Length.Step = element;
+            
+            public RateStepUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Rate Changed to {Length.Steps[r]}", loop, u, r) {}
+        }
+        
+        public class HoldUndoEntry: SimplePathUndoEntry<Loop, bool> {
+            protected override void Action(Loop item, bool element) => item.Hold = element;
+            
+            public HoldUndoEntry(Loop loop, bool u, bool r)
+            : base($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", loop, u, r) {}
+        }
+        
+        public class GateUndoEntry: SimplePathUndoEntry<Loop, double> {
+            protected override void Action(Loop item, double element) => item.Gate = element;
+            
+            public GateUndoEntry(Loop loop, double u, double r)
+            : base($"Loop Gate Changed to {r}%", loop, u / 100, r / 100) {}
+        }
+        
+        public class RepeatsUndoEntry: SimplePathUndoEntry<Loop, int> {
+            protected override void Action(Loop item, int element) => item.Repeats = element;
+            
+            public RepeatsUndoEntry(Loop loop, int u, int r)
+            : base($"Loop Repeats Changed to {r}", loop, u, r) {}
         }
     }
 }

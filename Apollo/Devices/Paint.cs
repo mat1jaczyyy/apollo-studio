@@ -1,6 +1,7 @@
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Devices {
     public class Paint: Device {
@@ -26,6 +27,13 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (n.Color.Lit) n.Color = Color.Clone();
             InvokeExit(n);
+        }
+        
+        public class ColorUndoEntry: SimplePathUndoEntry<Paint, Color> {
+            protected override void Action(Paint item, Color element) => item.Color = element.Clone();
+            
+            public ColorUndoEntry(Paint paint, Color u, Color r)
+            : base($"Paint Color Changed to {r.ToHex()}", paint, u, r) {}
         }
     }
 }

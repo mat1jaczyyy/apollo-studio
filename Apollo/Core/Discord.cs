@@ -10,10 +10,8 @@ namespace Apollo.Core {
         static DiscordRpcClient Presence;
         static Timestamps Time;
         
-        static Courier courier = new Courier() { Interval = 1000 };
+        static Courier courier;
         static object locker = new object();
-
-        static Discord() => courier.Elapsed += Refresh;
 
         public static void Set(bool state) {
             if (state) Init();
@@ -29,27 +27,28 @@ namespace Apollo.Core {
             Initialized = true;
 
             Refresh();
-            courier.Start();
+
+            courier = new Courier(1000, _ => Refresh(), repeat: true);
         }
 
-        static void Refresh(object sender = null, EventArgs e = null) {
+        static void Refresh() {
             lock (locker) {
-                if (Initialized) {
-                    RichPresence Info = new RichPresence() {
-                        Details = Program.Version,
-                        Timestamps = Time,
-                        Assets = new Assets() {
-                            LargeImageKey = "logo"
-                        }
-                    };
+                if (!Initialized) return;
 
-                    if (Preferences.DiscordFilename && Program.Project != null) {
-                        string s = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Program.Project.FileName);
-                        Info.State = (s.Length > 128)? s.Substring(0, 125) + "..." : s;
+                RichPresence Info = new RichPresence() {
+                    Details = Program.Version,
+                    Timestamps = Time,
+                    Assets = new Assets() {
+                        LargeImageKey = "logo"
                     }
+                };
 
-                    Presence.SetPresence(Info);
+                if (Preferences.DiscordFilename && Program.Project != null) {
+                    string s = "Working on " + ((Program.Project.FilePath == "")? "a new Project" : Program.Project.FileName);
+                    Info.State = (s.Length > 128)? s.Substring(0, 125) + "..." : s;
                 }
+
+                Presence.SetPresence(Info);
             }
         }
 
@@ -57,7 +56,7 @@ namespace Apollo.Core {
             if (!Initialized) return;
 
             lock (locker) {
-                courier.Stop();
+                courier.Dispose();
 
                 Initialized = false;
                 Presence.ClearPresence();
