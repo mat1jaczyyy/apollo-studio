@@ -96,8 +96,6 @@ namespace Apollo.Core {
                 }
 
                 if (!AbletonConnector.Connected) {
-                    Args = new string[] { "C:\\Users\\mat1jaczyyy\\Documents\\a.apchn" };
-
                     if (Args.Length > 0) {
                         AbletonConnector.NewInstanceFile(App.Args[0]);
                         Environment.Exit(0);
