@@ -400,6 +400,14 @@ namespace Apollo.Elements {
                 (byte)(n.Color.Green * (IsGenerationX? 2 : 1)),
                 (byte)(n.Color.Blue * (IsGenerationX? 2 : 1))
             }).ToArray());
+
+            if (Type == LaunchpadType.ProMK3 && 1 <= n.Index && n.Index <= 8)
+                SysExSend(RGBHeader[Type].Concat(new byte[] {
+                    (byte)(n.Index + 100),
+                    (byte)(n.Color.Red * (IsGenerationX? 2 : 1)),
+                    (byte)(n.Color.Green * (IsGenerationX? 2 : 1)),
+                    (byte)(n.Color.Blue * (IsGenerationX? 2 : 1))
+                }).ToArray());
         }
 
         public virtual void Clear(bool manual = false) {
