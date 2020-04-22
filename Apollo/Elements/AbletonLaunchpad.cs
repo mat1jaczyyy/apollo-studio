@@ -45,13 +45,6 @@ namespace Apollo.Elements {
             
             Target?.Clear(manual);
 
-            Signal n = new Signal(this, this, 0, new Color(0));
-
-            for (int i = 0; i < 100; i++) {
-                n.Index = (byte)i;
-                Window?.SignalRender(n);
-            }
-
             if (Version >= 1)
                 AbletonConnector.SendClear(this);
         }
