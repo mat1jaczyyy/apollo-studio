@@ -290,7 +290,7 @@ namespace Apollo.Elements {
                         if (response.Data[8] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 385) // Old Firmware
+                        if (versionInt < 440) // Old Firmware
                             ProMK3FirmwareOld.Set();
 
                         return LaunchpadType.ProMK3;
