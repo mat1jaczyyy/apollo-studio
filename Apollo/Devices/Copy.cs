@@ -282,28 +282,28 @@ namespace Apollo.Devices {
         void FireCourier((Signal n, List<int>) info, double time)
             => timers[info.n.With(info.n.Index, new Color())] = new Courier<ValueTuple<Signal, List<int>>>(time, info, Tick);
 
-        void Tick(Courier<PolyInfo> sender) {
+        void Tick(Courier<PolyInfo> sender, PolyInfo info) {
             if (Disposed) return;
             
             if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
-                lock (sender.Info.locker) {
-                    if (++sender.Info.index < sender.Info.offsets.Count && sender.Info.offsets[sender.Info.index] != -1) {
-                        Signal m = sender.Info.n.Clone();
-                        m.Index = (byte)sender.Info.offsets[sender.Info.index];
-                        ScreenOutput(m, sender.Info.n.Clone());
+                lock (info.locker) {
+                    if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
+                        Signal m = info.n.Clone();
+                        m.Index = (byte)info.offsets[info.index];
+                        ScreenOutput(m, info.n.Clone());
 
-                        if (sender.Info.index == sender.Info.offsets.Count - 1)
-                            poly.Remove(sender.Info);
+                        if (info.index == info.offsets.Count - 1)
+                            poly.Remove(info);
                     }
                 }
             }
         }
 
-        void Tick(Courier<(Signal n, List<int> offsets)> sender) {
+        void Tick(Courier<(Signal n, List<int> offsets)> sender, (Signal n, List<int> offsets) info) {
             if (Disposed) return;
             
             if (CopyMode == CopyType.RandomLoop)
-                HandleRandomLoop(sender.Info.n, sender.Info.offsets);
+                HandleRandomLoop(info.n, info.offsets);
         }
 
         void HandleRandomLoop(Signal original, List<int> offsets) {

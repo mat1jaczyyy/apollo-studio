@@ -295,10 +295,8 @@ namespace Apollo.Devices {
         void FireCourier(Signal n, double time)
             => timers[n].Add(new Courier<Signal>(time, n, Tick));
 
-        void Tick(Courier<Signal> sender) {
+        void Tick(Courier<Signal> sender, Signal n) {
             if (Disposed) return;
-
-            Signal n = sender.Info;
 
             lock (locker[n]) {
                 if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(sender)) return;

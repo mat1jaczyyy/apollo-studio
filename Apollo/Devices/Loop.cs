@@ -125,10 +125,9 @@ namespace Apollo.Devices {
             } else Start(n, m, Repeats);
         }
         
-        void Tick(Courier<Signal> sender) {
+        void Tick(Courier<Signal> sender, Signal n) {
             if (Disposed) return;
             
-            Signal n = sender.Info;
             Signal m = n.Clone();
 
             if (Hold) {

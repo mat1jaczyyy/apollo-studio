@@ -271,10 +271,8 @@ namespace Apollo.Devices {
         void FireCourier(PolyInfo info, double time)
             => info.timers.Add(new Courier<PolyInfo>(time, info, Tick));
 
-        void Tick(Courier<Signal> sender) {
+        void Tick(Courier<Signal> sender, Signal n) {
             if (Disposed) return;
-
-            Signal n = sender.Info;
             
             lock (locker[n]) {
                 if (++buffer[n] < Frames.Count * AdjustedRepeats) {
@@ -306,21 +304,21 @@ namespace Apollo.Devices {
             }
         }
 
-        void Tick(Courier<PolyInfo> sender) {
+        void Tick(Courier<PolyInfo> sender, PolyInfo info) {
             if (Disposed) return;
             
-            lock (sender.Info.locker) {
-                if (++sender.Info.index < Frames.Count * AdjustedRepeats) {
-                    for (int i = 0; i < Frames[sender.Info.index % Frames.Count].Screen.Length; i++)
-                        if (Frames[sender.Info.index % Frames.Count].Screen[i] != Frames[(sender.Info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, sender.Info.n.Index, out int index))
-                            InvokeExit(sender.Info.n.With((byte)index, Frames[sender.Info.index % Frames.Count].Screen[i].Clone()));
+            lock (info.locker) {
+                if (++info.index < Frames.Count * AdjustedRepeats) {
+                    for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
+                        if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
+                            InvokeExit(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
                 } else {
-                    poly.Remove(sender.Info);
+                    poly.Remove(info);
 
                     if (!Infinite)
                         for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, sender.Info.n.Index, out int index))
-                                InvokeExit(sender.Info.n.With((byte)index, new Color(0)));
+                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
+                                InvokeExit(info.n.With((byte)index, new Color(0)));
                 }
             }
         }

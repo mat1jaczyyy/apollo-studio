@@ -360,6 +360,13 @@ namespace Apollo.Windows {
                 this.Focus();
         }
 
+        void Window_LostFocus(object sender, RoutedEventArgs e) {
+            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
+                this.Focus();
+        }
+
+        void Window_Focus(object sender, PointerPressedEventArgs e) => this.Focus();
+
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
         
         void Minimize() => WindowState = WindowState.Minimized;
