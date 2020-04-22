@@ -141,14 +141,6 @@ namespace Apollo.Elements {
             {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()}
         };
 
-        static Dictionary<LaunchpadType, byte[]> ClearMessage = new Dictionary<LaunchpadType, byte[]>() {
-            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()}
-        };
-
         InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
@@ -183,17 +175,19 @@ namespace Apollo.Elements {
 
         protected void InvokeReceive(Signal n) => Receive?.Invoke(n);
 
-        protected Screen screen;
+        protected Screen screen = new Screen();
         ConcurrentQueue<SysExMessage> buffer;
         object locker;
         int[][] inputbuffer;
         ulong signalCount = 0;
 
         protected void CreateScreen() {
-            screen = new Screen() { ScreenExit = Send };
             buffer = new ConcurrentQueue<SysExMessage>();
             locker = new object();
             inputbuffer = Enumerable.Range(0, 101).Select(i => (int[])null).ToArray();
+
+            screen.ScreenExit = Send;
+            screen.Clear();
         }
 
         public Color GetColor(int index) => (PatternWindow == null)
@@ -377,17 +371,6 @@ namespace Apollo.Elements {
             if (!Usable || (manual && PatternWindow != null)) return;
 
             CreateScreen();
-
-            Signal n = new Signal(this, this, 0, new Color(0));
-
-            for (int i = 0; i < 101; i++) {
-                n.Index = (byte)i;
-                Window?.SignalRender(n.Clone());
-            }
-
-            SysExSend(ClearMessage[Type]);
-            
-            if (HasModeLight) Send(n); // Clear Mode Light
         }
 
         public virtual void Render(Signal n) {
