@@ -519,6 +519,7 @@ namespace Apollo.Elements {
                     if (n.Color.Lit) {
                         if (inputbuffer[n.Index] == null)
                             inputbuffer[n.Index] = (int[])Program.Project.Macros.Clone();
+                        else return;
                             
                     } else if (inputbuffer[n.Index] == null) return;
                     
@@ -583,12 +584,26 @@ namespace Apollo.Elements {
 
                 case LaunchpadType.X:
                 case LaunchpadType.MiniMK3:
-                case LaunchpadType.ProMK3:
                     HandleMessage(new Signal(
                         InputType.XY,
                         this,
                         this,
                         (byte)e.Control,
+                        new Color(InputColor(e.Value))
+                    ));
+                    break;
+
+                case LaunchpadType.ProMK3:
+                    byte index = (byte)e.Control;
+
+                    if (101 <= index && index <= 108)
+                        index -= 100;
+
+                    HandleMessage(new Signal(
+                        InputType.XY,
+                        this,
+                        this,
+                        index,
                         new Color(InputColor(e.Value))
                     ));
                     break;
