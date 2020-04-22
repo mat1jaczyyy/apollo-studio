@@ -7,7 +7,7 @@
         Width="440" MinWidth="440" MaxWidth="440"
         Height="640" MinHeight="640" MaxHeight="640"
         Opened="Loaded" Closing="Unloaded"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">
   
   <Grid RowDefinitions="Auto,*">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource ThemeBorderMidBrush}">
