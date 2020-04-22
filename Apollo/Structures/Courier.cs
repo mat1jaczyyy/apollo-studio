@@ -54,15 +54,19 @@ namespace Apollo.Structures {
 
     public class Courier<T>: Courier {
         public T Info { get; private set; }
-        Action<Courier<T>> Handler;
+        Action<Courier<T>, T> Handler;
 
-        public Courier(double time, T info, Action<Courier<T>> handler, bool start = true, bool repeat = false)
+        public Courier(double time, T info, Action<Courier<T>, T> handler, bool start = true, bool repeat = false)
         : base(time, start: start, repeat: repeat) {
             Info = info;
             Handler = handler;
         }
 
-        protected override void Fire() => Handler?.Invoke(this);
+        protected override void Fire() {
+            T info = Info;
+
+            if (info != null) Handler?.Invoke(this, info);
+        }
 
         public void Restart(T info) {
             Info = info;
