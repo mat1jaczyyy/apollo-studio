@@ -59,10 +59,8 @@ namespace Apollo.Components {
         }
 
         public void SetColor(int index, SolidColorBrush color) {
-            if (index == -1) {
-                if (IsArrangeValid) ModeLight.Fill = color;
-                else this.Resources["ModeBrush"] = color;
-            }
+            if (index == -1)
+                this.Resources["ModeBrush"] = ModeLight.Fill = color;
 
             else Elements[index].Stroke = IsPhantom(index)? color : Elements[index].Fill = color;
         }
