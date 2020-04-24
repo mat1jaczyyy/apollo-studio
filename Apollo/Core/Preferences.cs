@@ -22,6 +22,8 @@ namespace Apollo.Core {
         public static bool AlwaysOnTop {
             get => _AlwaysOnTop;
             set {
+                if (_AlwaysOnTop == value) return;
+
                 _AlwaysOnTop = value;
                 AlwaysOnTopChanged?.Invoke(_AlwaysOnTop);
                 Save();
@@ -33,6 +35,8 @@ namespace Apollo.Core {
         public static bool CenterTrackContents {
             get => _CenterTrackContents;
             set {
+                if (_CenterTrackContents == value) return;
+
                 _CenterTrackContents = value;
                 CenterTrackContentsChanged?.Invoke(_CenterTrackContents);
                 Save();
@@ -43,6 +47,8 @@ namespace Apollo.Core {
         public static bool ChainSignalIndicators {
             get => _ChainSignalIndicators;
             set {
+                if (_ChainSignalIndicators == value) return;
+
                 _ChainSignalIndicators = value;
                 Save();
             }
@@ -52,6 +58,8 @@ namespace Apollo.Core {
         public static bool DeviceSignalIndicators {
             get => _DeviceSignalIndicators;
             set {
+                if (_DeviceSignalIndicators == value) return;
+
                 _DeviceSignalIndicators = value;
                 Save();
             }
@@ -62,10 +70,10 @@ namespace Apollo.Core {
         public static ColorDisplayType ColorDisplayFormat {
             get => _ColorDisplayFormat;
             set {
+                if (_ColorDisplayFormat == value) return;
+
                 _ColorDisplayFormat = value;
-                
                 ColorDisplayFormatChanged?.Invoke();
-                
                 Save();
             }
         }
@@ -75,6 +83,8 @@ namespace Apollo.Core {
         public static LaunchpadModels LaunchpadModel {
             get => _LaunchpadModel;
             set {
+                if (_LaunchpadModel == value) return;
+
                 _LaunchpadModel = value;
                 LaunchpadModelChanged?.Invoke();
                 Save();
@@ -86,6 +96,8 @@ namespace Apollo.Core {
         public static LaunchpadStyles LaunchpadStyle {
             get => _LaunchpadStyle;
             set {
+                if (_LaunchpadStyle == value) return;
+
                 _LaunchpadStyle = value;
                 LaunchpadStyleChanged?.Invoke();
                 Save();
@@ -97,6 +109,8 @@ namespace Apollo.Core {
         public static bool LaunchpadGridRotation {
             get => _LaunchpadGridRotation;
             set {
+                if (_LaunchpadGridRotation == value) return;
+
                 _LaunchpadGridRotation = value;
                 LaunchpadGridRotationChanged?.Invoke();
                 Save();
@@ -107,6 +121,8 @@ namespace Apollo.Core {
         public static bool AutoCreateKeyFilter {
             get => _AutoCreateKeyFilter;
             set {
+                if (_AutoCreateKeyFilter == value) return;
+
                 _AutoCreateKeyFilter = value;
                 Save();
             }
@@ -116,6 +132,8 @@ namespace Apollo.Core {
         public static bool AutoCreateMacroFilter {
             get => _AutoCreateMacroFilter;
             set {
+                if (_AutoCreateMacroFilter == value) return;
+
                 _AutoCreateMacroFilter = value;
                 Save();
             }
@@ -125,6 +143,8 @@ namespace Apollo.Core {
         public static bool AutoCreatePattern {
             get => _AutoCreatePattern;
             set {
+                if (_AutoCreatePattern == value) return;
+
                 _AutoCreatePattern = value;
                 Save();
             }
@@ -136,6 +156,8 @@ namespace Apollo.Core {
         public static double FadeSmoothness {
             get => _FadeSmoothness;
             set {
+                if (FadeSmoothnessSlider == value) return;
+
                 if (0 <= value && value <= 1) {
                     FadeSmoothnessSlider = value;
                     _FadeSmoothness = 1000 / (1081.45 * Math.Pow(Math.Log(1 - value), 2) + 2);
@@ -149,6 +171,8 @@ namespace Apollo.Core {
         public static bool CopyPreviousFrame {
             get => _CopyPreviousFrame;
             set {
+                if (_CopyPreviousFrame == value) return;
+
                 _CopyPreviousFrame = value;
                 Save();
             }
@@ -158,6 +182,8 @@ namespace Apollo.Core {
         public static bool CaptureLaunchpad {
             get => _CaptureLaunchpad;
             set {
+                if (_CaptureLaunchpad == value) return;
+
                 _CaptureLaunchpad = value;
                 Save();
             }
@@ -167,6 +193,8 @@ namespace Apollo.Core {
         public static bool EnableGestures {
             get => _EnableGestures;
             set {
+                if (_EnableGestures == value) return;
+
                 _EnableGestures = value;
                 Save();
             }
@@ -176,6 +204,8 @@ namespace Apollo.Core {
         public static string PaletteName {
             get => _PaletteName;
             set {
+                if (_PaletteName == value) return;
+
                 _PaletteName = value;
                 Save();
             }
@@ -185,6 +215,8 @@ namespace Apollo.Core {
         public static Palette CustomPalette {
             get => _CustomPalette;
             set {
+                if (_CustomPalette == value) return;
+
                 _CustomPalette = value;
                 Save();
             }
@@ -194,6 +226,8 @@ namespace Apollo.Core {
         public static Palettes ImportPalette {
             get => _ImportPalette;
             set {
+                if (_ImportPalette == value) return;
+
                 _ImportPalette = value;
 
                 if (_ImportPalette == Palettes.Monochrome) Importer.Palette = Palette.Monochrome;
@@ -208,6 +242,8 @@ namespace Apollo.Core {
         public static ThemeType Theme {
             get => _Theme;
             set {
+                if (_Theme == value) return;
+
                 _Theme = value;
                 Save();
             }
@@ -217,6 +253,8 @@ namespace Apollo.Core {
         public static bool Backup {
             get => _Backup;
             set {
+                if (_Backup == value) return;
+
                 _Backup = value;
                 Save();
             }
@@ -226,6 +264,8 @@ namespace Apollo.Core {
         public static bool Autosave {
             get => _Autosave;
             set {
+                if (_Autosave == value) return;
+
                 _Autosave = value;
                 Save();
             }
@@ -235,6 +275,8 @@ namespace Apollo.Core {
         public static bool UndoLimit {
             get => _UndoLimit;
             set {
+                if (_UndoLimit == value) return;
+
                 if (_UndoLimit = value)
                     Program.Project?.Undo.Limit();
 
@@ -246,6 +288,8 @@ namespace Apollo.Core {
         public static bool DiscordPresence {
             get => _DiscordPresence;
             set {
+                if (_DiscordPresence == value) return;
+
                 _DiscordPresence = value;
                 Discord.Set(DiscordPresence);
                 Save();
@@ -256,6 +300,8 @@ namespace Apollo.Core {
         public static bool DiscordFilename {
             get => _DiscordFilename;
             set {
+                if (_DiscordFilename == value) return;
+
                 _DiscordFilename = value;
                 Discord.Set(DiscordPresence);
                 Save();
@@ -266,6 +312,8 @@ namespace Apollo.Core {
         public static bool CheckForUpdates {
             get => _CheckForUpdates;
             set {
+                if (_CheckForUpdates == value) return;
+
                 _CheckForUpdates = value;
                 Save();
             }
