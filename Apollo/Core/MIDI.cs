@@ -32,7 +32,7 @@ namespace Apollo.Core {
 
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output", 0);
 
-        public static void ClearState(bool multi = true) {
+        public static void ClearState(bool manual = true, bool multi = true) {
             foreach (Track track in Program.Project?.Tracks)
                 track.Chain.MIDIEnter(new StopSignal());
             
@@ -40,7 +40,7 @@ namespace Apollo.Core {
             Preview.InvokeClear();
 
             foreach (Launchpad lp in MIDI.Devices)
-                lp.Clear(true);
+                lp.Clear(manual);
         }
         
         static Courier courier;
