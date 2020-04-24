@@ -232,8 +232,6 @@ namespace Apollo.Windows {
 
             _track = Track.Get(_pattern);
 
-            observables.Add(Editor.GetObservable(Visual.BoundsProperty).Subscribe(Editor_Updated));
-
             SetRootKey(_pattern.RootKey);
             Wrap.IsChecked = _pattern.Wrap;
 
@@ -331,12 +329,6 @@ namespace Apollo.Windows {
 
             TitleText.Opacity = result;
             TitleCenter.Opacity = 1 - result;
-        }
-
-        public void Editor_Updated(Rect bounds) {
-            if (bounds.IsEmpty) return;
-
-            Editor.Scale = Math.Min(bounds.Width, bounds.Height) / 189.6;
         }
 
         void Port_Changed(Launchpad selected) {

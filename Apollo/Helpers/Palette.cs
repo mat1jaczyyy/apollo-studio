@@ -301,5 +301,12 @@ namespace Apollo.Helpers {
         }
         
         public Color GetColor(byte color) => _converter.Invoke(color);
+
+        public static bool operator ==(Palette a, Palette b)
+            => Enumerable.Range(0, 128).Select(i => a.GetColor((byte)i)).SequenceEqual(
+                Enumerable.Range(0, 128).Select(i => b.GetColor((byte)i))
+            );
+        
+        public static bool operator !=(Palette a, Palette b) => !(a == b);
     }
 }

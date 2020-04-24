@@ -56,8 +56,6 @@ namespace Apollo.Windows {
 
             for (int i = 0; i < 100; i++)
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), launchpad.GetColor(i).ToScreenBrush());
-            
-            observables.Add(Grid.GetObservable(Visual.BoundsProperty).Subscribe(Grid_Updated));
 
             observables.Add(this.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
             observables.Add(TitleText.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
@@ -91,12 +89,6 @@ namespace Apollo.Windows {
 
             TitleText.Opacity = result;
             TitleCenter.Opacity = 1 - result;
-        }
-
-        public void Grid_Updated(Rect bounds) {
-            if (bounds.IsEmpty) return;
-
-            Grid.Scale = Math.Min(bounds.Width, bounds.Height) / 200;
         }
 
         void PadChanged(int index, bool state) {

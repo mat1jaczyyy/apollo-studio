@@ -6,19 +6,17 @@
              DetachedFromVisualTree="Unloaded">
 
   <UserControl.Resources>
-    <sys:Double x:Key="CanvasSize">184</sys:Double>
-    <sys:Double x:Key="PadSize">15</sys:Double>
-    <sys:Double x:Key="NovationSize">11</sys:Double>
-    <sys:Double x:Key="HiddenSize">7</sys:Double>
-    <sys:Double x:Key="PadThickness">1</sys:Double>
-    <sys:Double x:Key="PadCut1">3</sys:Double>
-    <sys:Double x:Key="PadCut2">12</sys:Double>
-    <sys:Double x:Key="ModeWidth">4</sys:Double>
-    <sys:Double x:Key="ModeHeight">2</sys:Double>
-    <Thickness x:Key="TopMargin">7 7 7 0</Thickness>
-    <Thickness x:Key="PadMargin">1</Thickness>
-    <Thickness x:Key="ModeMargin">0 5 0 0</Thickness>
-    <CornerRadius x:Key="CornerRadius">1</CornerRadius>
+    <sys:Double x:Key="PadSize">30</sys:Double>
+    <sys:Double x:Key="NovationSize">22</sys:Double>
+    <sys:Double x:Key="HiddenSize">14</sys:Double>
+    <sys:Double x:Key="PadThickness">2</sys:Double>
+    <sys:Double x:Key="PadCut1">6</sys:Double>
+    <sys:Double x:Key="PadCut2">24</sys:Double>
+    <sys:Double x:Key="ModeWidth">8</sys:Double>
+    <sys:Double x:Key="ModeHeight">4</sys:Double>
+    <Thickness x:Key="TopMargin">14</Thickness>
+    <Thickness x:Key="PadMargin">2</Thickness>
+    <CornerRadius x:Key="CornerRadius">2</CornerRadius>
 
     <media:StreamGeometry x:Key="SquareGeometry" />
     <media:StreamGeometry x:Key="CircleGeometry" />
@@ -26,20 +24,17 @@
     <media:StreamGeometry x:Key="HiddenGeometry" />
 
     <media:SolidColorBrush x:Key="ModeBrush" />
-    <sys:Double x:Key="Rotation">0</sys:Double>
   </UserControl.Resources>
   
-  <Canvas Width="{DynamicResource CanvasSize}" Height="{DynamicResource CanvasSize}" HorizontalAlignment="Center" VerticalAlignment="Center">
-    <LayoutTransformControl x:Name="Root" HorizontalAlignment="Center" VerticalAlignment="Center" LayoutUpdated="LayoutChanged" PointerMoved="MouseMove" PointerReleased="MouseUp">
-      <LayoutTransformControl.LayoutTransform>
-        <RotateTransform Angle="{DynamicResource Rotation}" />
-      </LayoutTransformControl.LayoutTransform>
-
+  <Viewbox Stretch="Uniform" Margin="4">
+    <LayoutTransformControl HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="Root"
+                            PointerMoved="MouseMove" PointerReleased="MouseUp">
+      
       <Grid>
         <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="{DynamicResource PadMargin}" CornerRadius="{DynamicResource CornerRadius}" x:Name="Back" />
 
-        <StackPanel>
-          <StackPanel.Styles>
+        <Grid>
+          <Grid.Styles>
             <Style Selector="Path">
               <Setter Property="Cursor" Value="Hand" />
             </Style>
@@ -83,10 +78,10 @@
               <Setter Property="Fill" Value="Transparent" />
               <Setter Property="StrokeThickness" Value="0" />
             </Style>
-          </StackPanel.Styles>
+          </Grid.Styles>
 
-          <Viewbox Margin="{DynamicResource TopMargin}" Stretch="None" x:Name="View">
-            <Viewbox.Styles>
+          <Border Margin="{DynamicResource TopMargin}" x:Name="View">
+            <Border.Styles>
               <Style Selector="Canvas.square">
                 <Setter Property="Width" Value="{DynamicResource PadSize}" />
                 <Setter Property="Height" Value="{DynamicResource PadSize}" />
@@ -124,13 +119,13 @@
               <Style Selector="Path.hidden">
                 <Setter Property="Data" Value="{DynamicResource HiddenGeometry}" />
               </Style>
-            </Viewbox.Styles>
-          </Viewbox>
+            </Border.Styles>
+          </Border>
 
-          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
-                     PointerPressed="MouseDown" />
-        </StackPanel>
+          <Rectangle Margin="{DynamicResource ModeMargin}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource ModeWidth}" Height="{DynamicResource ModeHeight}" x:Name="ModeLight"
+                    PointerPressed="MouseDown" />
+        </Grid>
       </Grid>
     </LayoutTransformControl>
-  </Canvas>
+  </Viewbox>
 </UserControl>

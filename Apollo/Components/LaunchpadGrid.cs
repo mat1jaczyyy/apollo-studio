@@ -19,16 +19,15 @@ namespace Apollo.Components {
             AvaloniaXamlLoader.Load(this);
 
             Root = this.Get<LayoutTransformControl>("Root");
-            View = this.Get<Viewbox>("View");
+            View = this.Get<Border>("View");
             Back = this.Get<Border>("Back");
 
             ModeLight = this.Get<Rectangle>("ModeLight");
         }
         
         LayoutTransformControl Root;
-        Viewbox View;
+        Border View, Back;
         Grid Grid;
-        Border Back;
         Canvas[] Canvases;
         Path[] Elements;
         Rectangle ModeLight;
@@ -81,9 +80,32 @@ namespace Apollo.Components {
         }
 
         void Update_LaunchpadModel() {
-            ApplyScale();
+            bool is10x10 = Preferences.LaunchpadModel == LaunchpadModels.Pro || Preferences.LaunchpadModel == LaunchpadModels.All;
+            int buttons = is10x10? 10 : 9;
+            
+            Grid?.Children.Clear();
+
+            IEnumerable<string> ones = Enumerable.Range(0, buttons).Select(i => "*");
+            IEnumerable<string> zeros = Enumerable.Range(0, 10 - buttons).Select(i => "0");
+
+            View.Child = Grid = new Grid() {
+                RowDefinitions = RowDefinitions.Parse(
+                    String.Join(
+                        ",",
+                        ones.Concat(zeros).ToArray()
+                    )
+                ),
+                ColumnDefinitions = ColumnDefinitions.Parse(
+                    String.Join(
+                        ",",
+                        zeros.Concat(ones).ToArray()
+                    )
+                )
+            };
 
             for (int i = 0; i < 100; i++) {
+                Grid.Children.Add(Canvases[i]);
+
                 int x = i % 10;
                 int y = i / 10;
 
@@ -137,85 +159,42 @@ namespace Apollo.Components {
                 }
             }
 
+            ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = is10x10);
+
             Update_LaunchpadStyle();
         }
 
-        double _scale = 1;
-        public double Scale {
-            get => _scale;
-            set {
-                if ((value = Math.Max(0, value)) != _scale) {
-                    _scale = value;
-
-                    ApplyScale();
-                }
-            }
-        }
-
-        double EffectiveScale => Scale * (Preferences.LaunchpadGridRotation? 0.702 : 1);
-
-        public Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
+        Geometry SquareGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
             ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
-        public Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},{1} A {2},{2} 180 1 1 {0},{3} A {2},{2} 180 1 1 {0},{1} Z",
+        Geometry CircleGeometry => Geometry.Parse(String.Format("M {0},{1} A {2},{2} 180 1 1 {0},{3} A {2},{2} 180 1 1 {0},{1} Z",
             ((double)this.Resources["PadSize"] / 2).ToString(),
             ((double)this.Resources["PadSize"] / 8 + (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadSize"] * 3 / 8 - (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadSize"] * 7 / 8 - (double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
-        public Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
+        Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
             ((double)this.Resources["PadSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadCut1"] + (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadCut2"] - (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
-        public Geometry NovationGeometry => Geometry.Parse(String.Format("F1 M {0},0 L {1},0 C {2},0 0,{2} 0,{1} L 0,{0} C 0,{3} {2},{4} {1},{4} L {0},{4} C {3},{4} {4},{3} {4},{0} L {4},{1} C {4},{2} {3},0 {0},0 Z M {5},{6} L {7},{8} {9},{10} {11},{12} Z M {13},{14} C {15},{16} {17},{18} {19},{20} L {21},{22} {23},{24} {25},{11} {26},{27} C {28},{29} {15},{30} {13},{31} {13},{6} {32},{33} {13},{14} Z",
-            (((double)this.Resources["NovationSize"]) / 11 * 10.08).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 0.8).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 0.32).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 10.56).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 10.88).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 0.96).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 5.28).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 5.6).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 0.48).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 7.84).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 2.72).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 3.2).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 7.52).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.76).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 6.08).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.6).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 6.56).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.44).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 6.88).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.12).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 7.2).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 5.92).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 10.24).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 3.68).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 8).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 8.32).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 8.96).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 3.84).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.28).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 4.16).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 4.48).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 4.96).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 9.92).ToString(),
-            (((double)this.Resources["NovationSize"]) / 11 * 5.76).ToString()
+        static readonly double[] NovationCoordinates = new double[] { 0.916, 0.073, 0.029, 0.96, 0.989, 0.087, 0.48, 0.509, 0.044, 0.713, 0.247, 0.291, 0.684, 0.887, 0.553, 0.873, 0.596, 0.858, 0.625, 0.829, 0.655, 0.538, 0.931, 0.335, 0.727, 0.756, 0.815, 0.349, 0.844, 0.378, 0.407, 0.451, 0.902, 0.524 }; 
+        Geometry NovationGeometry => Geometry.Parse(String.Format(
+            "F1 M {0},0 L {1},0 C {2},0 0,{2} 0,{1} L 0,{0} C 0,{3} {2},{4} {1},{4} L {0},{4} C {3},{4} {4},{3} {4},{0} L {4},{1} C {4},{2} {3},0 {0},0 Z M {5},{6} L {7},{8} {9},{10} {11},{12} Z M {13},{14} C {15},{16} {17},{18} {19},{20} L {21},{22} {23},{24} {25},{11} {26},{27} C {28},{29} {15},{30} {13},{31} {13},{6} {32},{33} {13},{14} Z",
+            NovationCoordinates.Select(i => (i * ((double)this.Resources["NovationSize"])).ToString()).ToArray()
         ));
 
-        public Geometry HiddenGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
+        Geometry HiddenGeometry => Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
             ((double)this.Resources["HiddenSize"] - (double)this.Resources["PadThickness"] / 2).ToString(),
             ((double)this.Resources["PadThickness"] / 2).ToString()
         ));
 
-        public void DrawPath() {
+        void DrawPath() {
             this.Resources["SquareGeometry"] = SquareGeometry;
             this.Resources["CircleGeometry"] = CircleGeometry;
             this.Resources["NovationGeometry"] = NovationGeometry;
@@ -227,66 +206,16 @@ namespace Apollo.Components {
             Elements[55].Data = CreateCornerGeometry("M {3},{1} L {3},{0} {0},{0} {0},{3} {1},{3} Z");
         }
 
-        void ApplyScale() {
-            bool is10x10 = Preferences.LaunchpadModel == LaunchpadModels.Pro || Preferences.LaunchpadModel == LaunchpadModels.All;
-
-            this.Resources["Rotation"] = Preferences.LaunchpadGridRotation? -45.0 : 0.0;
-            this.Resources["CanvasSize"] = (is10x10? 184 : 167) * Scale;
-            this.Resources["PadSize"] = 15 * EffectiveScale;
-            this.Resources["NovationSize"] = 11 * EffectiveScale;
-            this.Resources["HiddenSize"] = 7 * EffectiveScale;
-            this.Resources["PadThickness"] = 1 * EffectiveScale;
-            this.Resources["PadCut1"] = 3 * EffectiveScale;
-            this.Resources["PadCut2"] = 12 * EffectiveScale;
-            this.Resources["ModeWidth"] = 4 * EffectiveScale;
-            this.Resources["ModeHeight"] = 2 * EffectiveScale;
-            this.Resources["TopMargin"] = new Thickness((int)(7 * EffectiveScale), (int)(7 * EffectiveScale), (int)(7 * EffectiveScale), 0);
-            this.Resources["PadMargin"] = new Thickness((int)(1 * EffectiveScale));
-            this.Resources["ModeMargin"] = new Thickness(0, (int)(5 * EffectiveScale), 0, 0);
-            this.Resources["CornerRadius"] = new CornerRadius((int)(1 * EffectiveScale));
-
-            int buttons = is10x10? 10 : 9;
-            string gridSize = (17 * EffectiveScale).ToString();
-            
-            for (int i = 99; i >= 0; i--) Grid.Children.RemoveAt(i);
-
-            IEnumerable<string> ones = Enumerable.Range(0, buttons).Select(i => gridSize);
-            IEnumerable<string> zeros = Enumerable.Range(0, 10 - buttons).Select(i => "0");
-
-            View.Child = Grid = new Grid() {
-                RowDefinitions = RowDefinitions.Parse(
-                    String.Join(
-                        ",",
-                        ones.Concat(zeros).ToArray()
-                    )
-                ),
-                ColumnDefinitions = ColumnDefinitions.Parse(
-                    String.Join(
-                        ",",
-                        zeros.Concat(ones).ToArray()
-                    )
-                )
-            };
-
-            for (int i = 0; i < 100; i++) Grid.Children.Add(Canvases[i]);
-
-            ModeLight.Opacity = Convert.ToInt32(ModeLight.IsHitTestVisible = is10x10);
-            
-            DrawPath();
-        }
+        void Update_LaunchpadRotation()
+            => Root.LayoutTransform = new RotateTransform(Preferences.LaunchpadGridRotation? -45.0 : 0.0);
 
         public LaunchpadGrid() {
             InitializeComponent();
-            
-            View.Child = Grid = new Grid() {
-                RowDefinitions = RowDefinitions.Parse("*,*,*,*,*,*,*,*,*,*"),
-                ColumnDefinitions = ColumnDefinitions.Parse("*,*,*,*,*,*,*,*,*,*")
-            };
 
             Canvases = new Canvas[100];
             Elements = new Path[100];
             for (int i = 0; i < 100; i++) {
-                Grid.Children.Add(Canvases[i] = new Canvas());
+                Canvases[i] = new Canvas();
                 Canvases[i].Children.Add(Elements[i] = new Path());
 
                 Grid.SetRow(Canvases[i], i / 10);
@@ -294,15 +223,17 @@ namespace Apollo.Components {
 
                 AddClass(i, "empty");
             }
+            
+            DrawPath();
 
-            Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
-            Preferences.LaunchpadGridRotationChanged += ApplyScale;
             Preferences.LaunchpadModelChanged += Update_LaunchpadModel;
+            Preferences.LaunchpadStyleChanged += Update_LaunchpadStyle;
+            Preferences.LaunchpadGridRotationChanged += Update_LaunchpadRotation;
 
             Update_LaunchpadModel();
-
+            Update_LaunchpadRotation();
+            
             Clear();
-            ApplyScale();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
@@ -325,12 +256,10 @@ namespace Apollo.Components {
 
             Grid.Children.Clear();
 
-            Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
-            Preferences.LaunchpadGridRotationChanged -= ApplyScale;
             Preferences.LaunchpadModelChanged -= Update_LaunchpadModel;
+            Preferences.LaunchpadStyleChanged -= Update_LaunchpadStyle;
+            Preferences.LaunchpadGridRotationChanged -= Update_LaunchpadRotation;
         }
-
-        void LayoutChanged(object sender, EventArgs e) => DrawPath();
 
         public void RenderFrame(Frame frame) {
             for (int i = 0; i < 101; i++)

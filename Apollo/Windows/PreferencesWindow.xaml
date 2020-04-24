@@ -110,7 +110,7 @@
 
                 <Border />
 
-                <Components:LaunchpadGrid x:Name="Preview" PadPressed="Preview_Pressed" />
+                <Components:LaunchpadGrid MaxWidth="192" x:Name="Preview" PadPressed="Preview_Pressed" />
               </StackPanel>
             </Grid>
             
