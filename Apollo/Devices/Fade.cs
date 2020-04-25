@@ -279,17 +279,19 @@ namespace Apollo.Devices {
             _types = types ?? new List<FadeType>() {FadeType.Linear};
             Expanded = expanded;
 
-            Preferences.FadeSmoothnessChanged += Generate;
-
             if (Program.Project == null) Program.ProjectLoaded += Initialize;
             else Initialize();
         }
 
-        void Initialize() {
+        public void Initialize() {
             if (Disposed) return;
 
             Generate();
-            Program.Project.BPMChanged += Generate;
+
+            Preferences.FadeSmoothnessChanged += Generate;
+
+            if (Program.Project != null)
+                Program.Project.BPMChanged += Generate;
         }
 
         void FireCourier(Signal n, double time)
