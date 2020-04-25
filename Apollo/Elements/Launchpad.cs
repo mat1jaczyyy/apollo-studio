@@ -60,10 +60,10 @@ namespace Apollo.Elements {
 
         public static PortWarning CFWIncompatible { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
-            "performance-optimized custom firmware which is not compatible with Apollo\n" +
-            "Studio.\n\n" +
-            "Update these to the latest version of the firmware using Launchpad Firmware\n" +
-            "Utility to avoid any potential issues with Apollo Studio.",
+            "performance-optimized custom firmware which is not compatible with\n" +
+            "Apollo Studio.\n\n" +
+            "Update these to the latest version of the firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -72,8 +72,8 @@ namespace Apollo.Elements {
 
         public static PortWarning XFirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Xs are running an older version of the\n" + 
-            "official Novation firmware. While they will work with Apollo Studio, this version\n" +
-            "is known to cause performance issues and lags.\n\n" +
+            "official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using Novation Components\n" +
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -87,9 +87,9 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning MiniMK3FirmwareOld { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Mini MK3s are running an older version of the\n" + 
-            "official Novation firmware. While they will work with Apollo Studio, this version\n" +
-            "is known to cause performance issues and lags.\n\n" +
+            "One or more connected Launchpad Mini MK3s are running an older version of\n" + 
+            "the official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using Novation Components\n" +
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -103,9 +103,9 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running an older version of the\n" + 
-            "official Novation firmware which is not compatible with Apollo Studio due to\n" +
-            "not having a dedicated Programmer mode.\n\n" +
+            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
+            "the official Novation firmware which is not compatible with \n" +
+            "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
             "Update these to the latest version of the firmware using the Novation\n" +
             "Components app to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -115,9 +115,9 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running an older version of the\n" + 
-            "official Novation firmware. While they will work with Apollo Studio, this\n" +
-            "version is known to cause performance issues and lags.\n\n" +
+            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
+            "the official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using the Novation\n" +
             "Components app to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
