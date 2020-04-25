@@ -165,6 +165,17 @@ namespace Apollo.Elements {
             {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
         };
 
+        static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
+            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03}).Concat(
+                Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
+            ).ToArray()}
+        };
+
         InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
@@ -319,7 +330,7 @@ namespace Apollo.Elements {
             if ((Type = AttemptIdentify(e)) != LaunchpadType.Unknown) {
                 Input.SysEx -= WaitForIdentification;
 
-                Clear();
+                ForceClear();
 
                 Input.NoteOn += NoteOn;
                 Input.NoteOff += NoteOff;
@@ -408,7 +419,7 @@ namespace Apollo.Elements {
                 RGBSend(n, 100);
         }
 
-        void RGBSend(Signal n, int offset)
+        void RGBSend(Signal n, int offset = 0)
             => SysExSend(RGBHeader[Type].Concat(new byte[] {
                 (byte)(n.Index + offset),
                 (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
@@ -420,6 +431,14 @@ namespace Apollo.Elements {
             if (!Usable || (manual && PatternWindow != null)) return;
 
             CreateScreen();
+        }
+
+        public void ForceClear() {
+            CreateScreen();
+
+            SysExSend(ForceClearMessage[Type]);
+            
+            if (Type.HasModeLight()) RGBSend(new Signal(null, this, 100, new Color(0)));
         }
 
         public virtual void Render(Signal n) {
@@ -513,7 +532,7 @@ namespace Apollo.Elements {
             Input.Open();
             Output.Open();
 
-            Clear();
+            ForceClear();
 
             Input.NoteOn += NoteOn;
             Input.NoteOff += NoteOff;

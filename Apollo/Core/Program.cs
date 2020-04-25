@@ -61,6 +61,8 @@ namespace Apollo.Core {
                     ProjectLoaded?.Invoke();
                     ProjectLoaded = null;
                 }
+
+                MIDI.ClearState(force: true);
             }
         }
 
