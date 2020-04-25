@@ -1,0 +1,66 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Apollo.Components.LaunchpadButton">
+
+  <UserControl.Styles>
+    <!-- TODO: Unify these when Avalonia fixes triple styling bug: Selector="Path.square, Path.circle, Path.corner, Path.hidden" -->
+
+    <Style Selector="Canvas.square">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />
+    </Style>
+    <Style Selector="Path.square">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_PadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_SquareGeometry}" />
+    </Style>
+
+    <Style Selector="Canvas.circle">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />
+    </Style>
+    <Style Selector="Path.circle">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_PadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_CircleGeometry}" />
+    </Style>
+
+    <Style Selector="Canvas.corner">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />
+    </Style>
+    <Style Selector="Path.corner">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_PadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+    </Style>
+
+    <Style Selector="Canvas.hidden">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_HiddenSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_HiddenSize}" />
+    </Style>
+    <Style Selector="Path.hidden">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_PadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_HiddenGeometry}" />
+    </Style>
+
+    <Style Selector="Canvas.novation">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_NovationSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_NovationSize}" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Path.novation">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="0" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_NovationGeometry}" />
+    </Style>
+  </UserControl.Styles>
+  
+  <Canvas Margin="{DynamicResource LPGrid_PadMargin}" Cursor="Hand" x:Name="Canvas">
+    <Path Cursor="Hand" x:Name="Path" />
+  </Canvas>
+</UserControl>
