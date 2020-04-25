@@ -102,6 +102,18 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running an older version of the\n" + 
+            "official Novation firmware which is not compatible with Apollo Studio due to\n" +
+            "not having a dedicated Programmer mode.\n\n" +
+            "Update these to the latest version of the firmware using the Novation\n" +
+            "Components app to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Components Online",
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+            )
+        );
+
         public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pro MK3s are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
@@ -121,6 +133,7 @@ namespace Apollo.Elements {
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
+                if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
                 ProMK3FirmwareOld.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
@@ -286,6 +299,11 @@ namespace Apollo.Elements {
                     case 0x23: // Launchpad Pro MK3
                         if (response.Data[8] == 17) // Bootloader
                             return LaunchpadType.Unknown;
+                        
+                        if (versionInt < 440) { // No Programmer mode
+                            ProMK3FirmwareUnsupported.Set();
+                            return LaunchpadType.Unknown;
+                        }
                         
                         if (versionInt < 450) // Old Firmware
                             ProMK3FirmwareOld.Set();
