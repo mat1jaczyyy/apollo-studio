@@ -139,7 +139,7 @@ namespace Apollo.DeviceViewers {
         protected void Chain_Insert(int index) {
             Chain chain = new Chain();
 
-            if (this.GetType() == typeof(Group)) {
+            if (_group.GetType() == typeof(Group)) {
                 if (Preferences.AutoCreateMacroFilter) chain.Add(new MacroFilter());
                 if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
                 if (Preferences.AutoCreatePattern) chain.Add(new Pattern());

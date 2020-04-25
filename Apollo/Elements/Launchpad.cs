@@ -60,10 +60,10 @@ namespace Apollo.Elements {
 
         public static PortWarning CFWIncompatible { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
-            "performance-optimized custom firmware which is not compatible with Apollo\n" +
-            "Studio.\n\n" +
-            "Update these to the latest version of the firmware using Launchpad Firmware\n" +
-            "Utility to avoid any potential issues with Apollo Studio.",
+            "performance-optimized custom firmware which is not compatible with\n" +
+            "Apollo Studio.\n\n" +
+            "Update these to the latest version of the firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -72,8 +72,8 @@ namespace Apollo.Elements {
 
         public static PortWarning XFirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Xs are running an older version of the\n" + 
-            "official Novation firmware. While they will work with Apollo Studio, this version\n" +
-            "is known to cause performance issues and lags.\n\n" +
+            "official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using Novation Components\n" +
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -87,9 +87,9 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning MiniMK3FirmwareOld { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Mini MK3s are running an older version of the\n" + 
-            "official Novation firmware. While they will work with Apollo Studio, this version\n" +
-            "is known to cause performance issues and lags.\n\n" +
+            "One or more connected Launchpad Mini MK3s are running an older version of\n" + 
+            "the official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
             "Update these to the latest version of the firmware using Novation Components\n" +
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -102,13 +102,39 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
+            "the official Novation firmware which is not compatible with \n" +
+            "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
+            "Update these to the latest version of the firmware using the Novation\n" +
+            "Components app to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Components Online",
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+            )
+        );
+
+        public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
+            "the official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to cause performance issues and lags.\n\n" +
+            "Update these to the latest version of the firmware using the Novation\n" +
+            "Components app to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Components Online",
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+            )
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
-                MiniMK3FirmwareOld.DisplayWarning(sender);
+                if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
+                if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
+                ProMK3FirmwareOld.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -128,17 +154,15 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        bool HasModeLight => Type == LaunchpadType.PRO || Type == LaunchpadType.CFW;
-        public bool IsGenerationX => Type == LaunchpadType.X || Type == LaunchpadType.MiniMK3;
-
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
             {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0B}).ToArray()},
-            {LaunchpadType.PRO, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
+            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, new byte[] {0x6F}},
             {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
+            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
@@ -252,7 +276,7 @@ namespace Apollo.Elements {
                         if (versionInt < 182) // Old Firmware
                             ProFirmwareOld.Set();
 
-                        return LaunchpadType.PRO;
+                        return LaunchpadType.Pro;
 
                     case 0x03: // Launchpad X
                         if (response.Data[8] == 17) // Bootloader
@@ -271,6 +295,20 @@ namespace Apollo.Elements {
                             MiniMK3FirmwareOld.Set();
 
                         return LaunchpadType.MiniMK3;
+                    
+                    case 0x23: // Launchpad Pro MK3
+                        if (response.Data[8] == 17) // Bootloader
+                            return LaunchpadType.Unknown;
+                        
+                        if (versionInt < 440) { // No Programmer mode
+                            ProMK3FirmwareUnsupported.Set();
+                            return LaunchpadType.Unknown;
+                        }
+                        
+                        if (versionInt < 450) // Old Firmware
+                            ProMK3FirmwareOld.Set();
+
+                        return LaunchpadType.ProMK3;
                 }
             }
 
@@ -334,10 +372,6 @@ namespace Apollo.Elements {
 
             n = n.Clone();
 
-            byte r = (byte)(n.Color.Red * (IsGenerationX? 2 : 1));
-            byte g = (byte)(n.Color.Green * (IsGenerationX? 2 : 1));
-            byte b = (byte)(n.Color.Blue * (IsGenerationX? 2 : 1));
-
             if (n.Index != 100) {
                 if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
                 else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
@@ -352,7 +386,7 @@ namespace Apollo.Elements {
                     if (91 <= n.Index && n.Index <= 98) offset = 13;
                     break;
                 
-                case LaunchpadType.PRO:
+                case LaunchpadType.Pro:
                 case LaunchpadType.CFW:
                     if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
                     else if (n.Index == 100) offset = -1;
@@ -362,10 +396,25 @@ namespace Apollo.Elements {
                 case LaunchpadType.MiniMK3:
                     if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
                     break;
+                    
+                case LaunchpadType.ProMK3:
+                    if (n.Index == 0 || n.Index == 9 || n.Index == 100) return;
+                    break;
             }
 
-            SysExSend(RGBHeader[Type].Concat(new byte[] {(byte)(n.Index + offset), r, g, b}).ToArray());
+            RGBSend(n, offset);
+
+            if (Type == LaunchpadType.ProMK3 && 1 <= n.Index && n.Index <= 8)
+                RGBSend(n, 100);
         }
+
+        void RGBSend(Signal n, int offset)
+            => SysExSend(RGBHeader[Type].Concat(new byte[] {
+                (byte)(n.Index + offset),
+                (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
+            }).ToArray());
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -376,6 +425,15 @@ namespace Apollo.Elements {
         public virtual void Render(Signal n) {
             if (PatternWindow == null || n.Origin == PatternWindow)
                 screen?.MIDIEnter(n);
+        }
+
+        void StartIdentification() {
+            Task.Run(() => {
+                Available = true;
+
+                Input.SysEx += WaitForIdentification;
+                Output.Send(in DeviceInquiry);
+            });
         }
 
         public Launchpad() => CreateScreen();
@@ -391,10 +449,7 @@ namespace Apollo.Elements {
 
             Program.Log($"MIDI Created {Name}");
 
-            Available = true;
-
-            Input.SysEx += WaitForIdentification;
-            Output.Send(in DeviceInquiry);
+            StartIdentification();
         }
 
         public Launchpad(string name, InputType format = InputType.DrumRack, RotationType rotation = RotationType.D0) {
@@ -416,12 +471,10 @@ namespace Apollo.Elements {
 
             Program.Log($"MIDI Connected {Name}");
 
-            Available = true;
             Type = LaunchpadType.Unknown;
             doingMK2VersionInquiry = false;
 
-            Input.SysEx += WaitForIdentification;
-            Output.Send(in DeviceInquiry);
+            StartIdentification();
         }
 
         public virtual void Disconnect(bool actuallyClose = true) {
@@ -479,6 +532,7 @@ namespace Apollo.Elements {
                     if (n.Color.Lit) {
                         if (inputbuffer[n.Index] == null)
                             inputbuffer[n.Index] = (int[])Program.Project.Macros.Clone();
+                        else return;
                             
                     } else if (inputbuffer[n.Index] == null) return;
                     
@@ -494,7 +548,7 @@ namespace Apollo.Elements {
         byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
 
         void HandleNote(byte key, byte vel) {
-            if (IsGenerationX && InputFormat == InputType.DrumRack) {
+            if (Type.IsGenerationX() && InputFormat == InputType.DrumRack) {
                 if (108 <= key && key <= 115) key -= 80;
                 else if (key == 116) key = 27;
             }
@@ -525,7 +579,7 @@ namespace Apollo.Elements {
                         ));
                     break;
 
-                case LaunchpadType.PRO:
+                case LaunchpadType.Pro:
                 case LaunchpadType.CFW:
                     if (e.Control == 121) {
                         Multi.InvokeReset();
@@ -548,6 +602,21 @@ namespace Apollo.Elements {
                         this,
                         this,
                         (byte)e.Control,
+                        new Color(InputColor(e.Value))
+                    ));
+                    break;
+
+                case LaunchpadType.ProMK3:
+                    byte index = (byte)e.Control;
+
+                    if (101 <= index && index <= 108)
+                        index -= 100;
+
+                    HandleMessage(new Signal(
+                        InputType.XY,
+                        this,
+                        this,
+                        index,
                         new Color(InputColor(e.Value))
                     ));
                     break;

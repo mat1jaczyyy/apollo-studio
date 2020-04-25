@@ -150,6 +150,8 @@ namespace Apollo.Windows {
             if (Github.AvaloniaVersion() != "")
                 ToolTip.SetTip(Version, $"Avalonia {Github.AvaloniaVersion()}");
 
+            fade.Initialize();
+
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
 

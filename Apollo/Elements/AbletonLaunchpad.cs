@@ -52,7 +52,7 @@ namespace Apollo.Elements {
         public override void Render(Signal n) => Target?.Render(n);
 
         public AbletonLaunchpad(string name) {
-            Type = LaunchpadType.PRO;
+            Type = LaunchpadType.Pro;
             Name = name;
 
             Target = MIDI.NoOutput;

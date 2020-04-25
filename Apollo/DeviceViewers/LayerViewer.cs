@@ -64,7 +64,10 @@ namespace Apollo.DeviceViewers {
                 ));
         }
 
-        public void SetMode(BlendingType mode) => Range.Enabled = (BlendingMode.SelectedIndex = (int)mode) > 0;
+        public void SetMode(BlendingType mode) {
+            BlendingMode.SelectedIndex = (int)mode;
+            Range.Enabled = mode.SupportsRange();
+        }
 
         void Range_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)

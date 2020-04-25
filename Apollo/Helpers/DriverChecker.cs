@@ -9,6 +9,9 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public static class DriverChecker {
+        static readonly string[] Drivers = new string[] { "novationusbmidi.inf", "nvnusbaudio.inf" };
+        static readonly int[] BuildPositions = new int[] { 2, 3 };
+
         class DriverVersion: IComparable {
             public int Minor { get; private set; }
             public int Build { get; private set; }
@@ -44,15 +47,35 @@ namespace Apollo.Helpers {
                     : "Apollo Studio requires the Novation USB Driver which isn't installed on your\n" +
                       "computer.\n\n"
                 ) +
-                "Please install at least version 2.15.5 of the driver before launching Apollo\n" +
+                "Please install at least version 2.17.10 of the driver before launching Apollo\n" +
                 "Studio.",
                 new string[] {"Download Driver", "OK"}
             );
 
             ret.Completed.Task.ContinueWith(result => {
                 if (result.Result == "Download Driver")
-                    App.URL("https://customer.novationmusic.com/sites/customer/files/downloads/Novation%20USB%20Driver-2.15.5.exe");
+                    App.URL("https://fael-downloads-prod.focusrite.com/customer/prod/s3fs-public/downloads/NovationUsbMidi_2.17.10.284_Installer.exe");
             });
+
+            return ret;
+        }
+
+        static IEnumerable<DriverVersion> GetDrivers() {
+            string[] directories = Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"));
+            IEnumerable<DriverVersion> ret = Enumerable.Empty<DriverVersion>();
+            
+            foreach (var (driver, build) in Drivers.Zip(BuildPositions))
+                ret = ret.Concat(
+                    directories.Where(i => Path.GetFileName(i).StartsWith(driver))
+                        .Select(j => new DriverVersion(
+                            File.ReadAllLines(Path.Combine(j, driver))
+                                .Where(i => i.StartsWith("DriverVer="))
+                                .First().Substring(10).Split(',')[1].Split('.')
+                                .Where((x, i) => i == 1 || i == build)
+                                .Select(x => Convert.ToInt32(x))
+                                .ToArray()
+                        ))
+                );
 
             return ret;
         }
@@ -62,23 +85,14 @@ namespace Apollo.Helpers {
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return true;
 
-            IEnumerable<DriverVersion> a = Directory.GetDirectories(Environment.ExpandEnvironmentVariables(@"%SystemRoot%\System32\DriverStore\FileRepository\"))
-                .Where(j => Path.GetFileName(j).StartsWith("nvnusbaudio.inf"))
-                .Select(j => new DriverVersion(
-                    File.ReadAllLines(Path.Combine(j, "nvnusbaudio.inf"))
-                        .Where(i => i.StartsWith("DriverVer="))
-                        .First().Substring(10).Split(',')[1].Split('.')
-                        .Where((x, i) => i == 1 || i == 3)
-                        .Select(x => Convert.ToInt32(x))
-                        .ToArray()
-                ));
+            IEnumerable<DriverVersion> drivers = GetDrivers();
 
-            if (a.Count() == 0) {
+            if (drivers.Count() == 0) {
                 error = CreateDriverError(false);
                 return false;
             }
 
-            if (a.Max() < new DriverVersion(new int[] {15, 5})) { // 2.15.5 required
+            if (drivers.Max() < new DriverVersion(new int[] {17, 10})) { // 2.17.10 required
                 error = CreateDriverError(true);
                 return false;
             }

@@ -1,7 +1,8 @@
 <Style xmlns="https://github.com/avaloniaui"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
        x:Class="Apollo.Themes.Common"
-       xmlns:sys="clr-namespace:System;assembly=mscorlib">
+       xmlns:sys="clr-namespace:System;assembly=mscorlib"
+       xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals">
   
   <Style.Resources>
     <Color x:Key="ThemeAccentColor">#FF0288D1</Color>
@@ -33,5 +34,29 @@
 
     <sys:Double x:Key="ScrollBarThickness">10</sys:Double>
     <sys:Double x:Key="ScrollBarThumbThickness">10</sys:Double>
+
+    <sys:Double x:Key="LPGrid_PadSize">45</sys:Double>
+    <sys:Double x:Key="LPGrid_NovationSize">33</sys:Double>
+    <sys:Double x:Key="LPGrid_HiddenSize">21</sys:Double>
+    <sys:Double x:Key="LPGrid_PadThickness">3</sys:Double>
+    <sys:Double x:Key="LPGrid_PadCut1">9</sys:Double>
+    <sys:Double x:Key="LPGrid_PadCut2">36</sys:Double>
+    <sys:Double x:Key="LPGrid_ModeWidth">12</sys:Double>
+    <sys:Double x:Key="LPGrid_ModeHeight">6</sys:Double>
+    <CornerRadius x:Key="LPGrid_CornerRadius">3</CornerRadius>
+    <Thickness x:Key="LPGrid_TopMargin">21</Thickness>
+    <sys:Double x:Key="LPGrid_PadSpacing">3</sys:Double>
+    <Thickness x:Key="LPGrid_PadMargin">3</Thickness>
+
+    <media:StreamGeometry x:Key="LPGrid_SquareGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_SplitGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_CircleGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_NovationGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_HiddenGeometry" />
+
+    <media:StreamGeometry x:Key="LPGrid_44CornerGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_45CornerGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_54CornerGeometry" />
+    <media:StreamGeometry x:Key="LPGrid_55CornerGeometry" />
   </Style.Resources>
 </Style>

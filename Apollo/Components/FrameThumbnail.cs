@@ -64,6 +64,10 @@ namespace Apollo.Components {
                             case LaunchpadModels.X:
                                 if (x == 0 || y == 0) continue;
                                 break;
+
+                            case LaunchpadModels.ProMK3:
+                                if (i == 0 || i == 9) continue;
+                                break;
                         }
 
                         start[(9 - y) * 10 + x] = _frame.Screen[i].ToUInt32();

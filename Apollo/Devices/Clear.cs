@@ -27,7 +27,7 @@ namespace Apollo.Devices {
         public override void MIDIProcess(Signal n) {
             if (!n.Color.Lit) {
                 if (Mode == ClearType.Multi) Multi.InvokeReset();
-                else MIDI.ClearState(Mode == ClearType.Both);
+                else MIDI.ClearState(multi: Mode == ClearType.Both);
             }
 
             InvokeExit(n);

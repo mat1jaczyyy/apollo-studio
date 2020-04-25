@@ -34,7 +34,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "clearpreferences"; Description: "Clear Preferences"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "nvnusbaudio-2.15.5.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "novationusbmidi.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "..\Build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Registry]
@@ -63,5 +63,5 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Apollo\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\nvnusbaudio-2.15.5.exe"; StatusMsg: Installing Novation USB Driver...
+Filename: "{tmp}\novationusbmidi.exe"; StatusMsg: Installing Novation USB Driver...
 Filename: "{app}\Apollo\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
