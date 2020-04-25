@@ -39,7 +39,7 @@ namespace Apollo.Core {
             if (multi) Multi.InvokeReset();
             Preview.InvokeClear();
 
-            foreach (Launchpad lp in MIDI.Devices)
+            foreach (Launchpad lp in MIDI.UsableDevices)
                 if (force) lp.ForceClear();
                 else lp.Clear(manual);
         }
