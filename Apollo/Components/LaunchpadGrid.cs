@@ -44,10 +44,11 @@ namespace Apollo.Components {
         public static int SignalToGrid(int index) => (index == 100)? -1 : ((9 - (index / 10)) * 10 + index % 10);
 
         public void SetColor(int index, SolidColorBrush color) {
-            if (index == -1)
-                this.Resources["ModeBrush"] = ModeLight.Fill = color;
+            if (index == -1) {
+                if (IsArrangeValid) ModeLight.Fill = color;
+                else this.Resources["ModeBrush"] = color;
 
-            else Buttons[index].SetColor(color);
+            } else Buttons[index].SetColor(color);
         }
 
         public void Clear() {

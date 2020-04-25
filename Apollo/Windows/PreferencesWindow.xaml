@@ -4,7 +4,7 @@
         xmlns:Components="clr-namespace:Apollo.Components"
         Title="Preferences" WindowStartupLocation="CenterOwner" CanResize="false"
         Icon="/Resources/WindowIcon.png"
-        Width="440" MinWidth="440" MaxWidth="440"
+        Width="460" MinWidth="460" MaxWidth="460"
         Height="640" MinHeight="640" MaxHeight="640"
         Opened="Loaded" Closing="Unloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">
@@ -58,8 +58,8 @@
                 <CheckBox Click="ChainSignalIndicators_Changed" x:Name="ChainSignalIndicators">Chain Signal Indicators</CheckBox>
                 <CheckBox Click="DeviceSignalIndicators_Changed" x:Name="DeviceSignalIndicators">Device Signal Indicators</CheckBox>
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                  <TextBlock Text="Color Display Format:" />
-                  <ComboBox x:Name="ColorDisplayFormat" SelectionChanged="ColorDisplayFormat_Changed">
+                  <TextBlock VerticalAlignment="Center" Text="Color Display Format:" />
+                  <ComboBox VerticalAlignment="Center" x:Name="ColorDisplayFormat" SelectionChanged="ColorDisplayFormat_Changed">
                     <ComboBoxItem>Hex</ComboBoxItem>
                     <ComboBoxItem>RGB</ComboBoxItem>
                   </ComboBox>
