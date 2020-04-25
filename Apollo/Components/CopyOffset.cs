@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -48,7 +49,7 @@ namespace Apollo.Components {
             _viewer.Switched += Offset_Switched;
             
             Angle.RawValue = angle;
-            Angle.Enabled = (copy.CopyMode == Enums.CopyType.Interpolate);
+            Angle.Enabled = copy.CopyMode.SupportsAngle();
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {

@@ -141,9 +141,6 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        bool HasModeLight => LaunchpadType.Pro <= Type && Type <= LaunchpadType.CFW;
-        public bool IsGenerationX => Type >= LaunchpadType.X;
-
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
@@ -387,21 +384,19 @@ namespace Apollo.Elements {
                     break;
             }
 
-            SysExSend(RGBHeader[Type].Concat(new byte[] {
-                (byte)(n.Index + offset),
-                (byte)(n.Color.Red * (IsGenerationX? 2 : 1)),
-                (byte)(n.Color.Green * (IsGenerationX? 2 : 1)),
-                (byte)(n.Color.Blue * (IsGenerationX? 2 : 1))
-            }).ToArray());
+            RGBSend(n, offset);
 
             if (Type == LaunchpadType.ProMK3 && 1 <= n.Index && n.Index <= 8)
-                SysExSend(RGBHeader[Type].Concat(new byte[] {
-                    (byte)(n.Index + 100),
-                    (byte)(n.Color.Red * (IsGenerationX? 2 : 1)),
-                    (byte)(n.Color.Green * (IsGenerationX? 2 : 1)),
-                    (byte)(n.Color.Blue * (IsGenerationX? 2 : 1))
-                }).ToArray());
+                RGBSend(n, 100);
         }
+
+        void RGBSend(Signal n, int offset)
+            => SysExSend(RGBHeader[Type].Concat(new byte[] {
+                (byte)(n.Index + offset),
+                (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
+            }).ToArray());
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -535,7 +530,7 @@ namespace Apollo.Elements {
         byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
 
         void HandleNote(byte key, byte vel) {
-            if (IsGenerationX && InputFormat == InputType.DrumRack) {
+            if (Type.IsGenerationX() && InputFormat == InputType.DrumRack) {
                 if (108 <= key && key <= 115) key -= 80;
                 else if (key == 116) key = 27;
             }

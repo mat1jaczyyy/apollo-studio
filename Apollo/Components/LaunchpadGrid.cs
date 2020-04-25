@@ -62,9 +62,9 @@ namespace Apollo.Components {
         }
 
         void Update_LaunchpadModel() {
-            int buttons = Preferences.LaunchpadModel.Is10x10()? 10 : 9;
-            
             Grid?.Children.Clear();
+
+            int buttons = Preferences.LaunchpadModel.GridSize();
 
             IEnumerable<string> ones = Enumerable.Range(0, buttons).Select(i => "*");
             IEnumerable<string> zeros = Enumerable.Range(0, 10 - buttons).Select(i => "0");

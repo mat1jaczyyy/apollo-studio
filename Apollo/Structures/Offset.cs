@@ -69,13 +69,11 @@ namespace Apollo.Structures {
             AbsoluteX = ax;
             AbsoluteY = ay;
         }
-        
-        static int Wrap(int coord, GridType gridMode) => (gridMode == GridType.Square)? ((coord + 7) % 8 + 1) : (coord + 10) % 10;
 
         public static bool Validate(int x, int y, GridType gridMode, bool wrap, out int result) {
             if (wrap) {
-                x = Wrap(x, gridMode);
-                y = Wrap(y, gridMode);
+                x = gridMode.Wrap(x);
+                y = gridMode.Wrap(y);
             }
 
             result = y * 10 + x;

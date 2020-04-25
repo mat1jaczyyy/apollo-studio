@@ -148,11 +148,11 @@ namespace Apollo.DeviceViewers {
         public void SetCopyMode(CopyType mode) {
             CopyMode.SelectedIndex = (int)mode;
 
-            Rate.Enabled = Gate.Enabled = mode != CopyType.Static && mode != CopyType.RandomSingle;
-            Pinch.Enabled = Reverse.IsEnabled = Infinite.IsEnabled = mode == CopyType.Animate || mode == CopyType.Interpolate;
+            Rate.Enabled = Gate.Enabled = mode.SupportsRate();
+            Pinch.Enabled = Reverse.IsEnabled = Infinite.IsEnabled = mode.SupportsPinch();
             
             for (int i = 1; i < Contents.Count; i++)
-                ((CopyOffset)Contents[i]).AngleEnabled = mode == CopyType.Interpolate;
+                ((CopyOffset)Contents[i]).AngleEnabled = mode.SupportsAngle();
         }
 
         void GridMode_Changed(object sender, SelectionChangedEventArgs e) {

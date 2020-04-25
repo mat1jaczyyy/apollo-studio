@@ -158,8 +158,7 @@ namespace Apollo.Windows {
 
                 if (!_locked) {
                     Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-                    Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
-                    Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
+                    SetPlaybackMode(_pattern.Mode);
 
                     Repeats.DisplayDisabledText = Duration.DisplayDisabledText = true;
                 }
@@ -382,9 +381,7 @@ namespace Apollo.Windows {
             Duration.Length = _pattern[_pattern.Expanded].Time.Length;
             Duration.RawValue = _pattern[_pattern.Expanded].Time.Free;
 
-            Duration.Enabled = !(_pattern.Infinite && _pattern.Expanded == _pattern.Count - 1);
-            Repeats.Enabled = !(_pattern.Infinite || _pattern.Mode == PlaybackType.Loop);
-            Repeats.DisabledText = (_pattern.Mode == PlaybackType.Loop)? "Infinite" : "1";
+            Locked = false; // Redraws stuff
 
             if (Draw) {
                 Editor.RenderFrame(_pattern[_pattern.Expanded]);
@@ -558,7 +555,7 @@ namespace Apollo.Windows {
             } else if (x == 0 && y == -1) { // Down
                 if (Locked) return;
                 
-                int index = Launchpad.IsGenerationX? 9 : -1;
+                int index = Launchpad.Type.IsGenerationX()? 9 : -1;
                 PadStarted(index);
                 PadPressed(index);
                 PadFinished(index);

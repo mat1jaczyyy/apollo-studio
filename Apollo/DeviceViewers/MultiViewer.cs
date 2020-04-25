@@ -91,7 +91,7 @@ namespace Apollo.DeviceViewers {
         public void SetMode(MultiType mode) {
             MultiMode.SelectedIndex = (int)mode;
 
-            GridContainer.IsVisible = mode == MultiType.Key;
+            GridContainer.IsVisible = mode.UsesKeySelector();
         }
     
         bool drawingState;

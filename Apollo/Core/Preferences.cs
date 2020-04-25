@@ -215,7 +215,7 @@ namespace Apollo.Core {
         public static Palette CustomPalette {
             get => _CustomPalette;
             set {
-                if (_CustomPalette == value) return;
+                if (_CustomPalette?.Equals(value) != false) return;
 
                 _CustomPalette = value;
                 Save();
