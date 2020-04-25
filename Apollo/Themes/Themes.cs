@@ -16,26 +16,35 @@ namespace Apollo.Themes {
         double GetResource(string name) => (double)this.Resources[$"LPGrid_{name}"];
         void SetResource(string name, Geometry data) => this.Resources[$"LPGrid_{name}"] = data;
 
+        double halfThickness => GetResource("PadThickness") / 2;
+
         Geometry CreateCornerGeometry(string format) => Geometry.Parse(String.Format(format,
-            (GetResource("PadSize") - GetResource("PadThickness") / 2).ToString(),
-            (GetResource("PadCut1") + GetResource("PadThickness") / 2).ToString(),
-            (GetResource("PadCut2") - GetResource("PadThickness") / 2).ToString(),
-            (GetResource("PadThickness") / 2).ToString()
+            (GetResource("PadSize") - halfThickness).ToString(),
+            (GetResource("PadCut1") + halfThickness).ToString(),
+            (GetResource("PadCut2") - halfThickness).ToString(),
+            (halfThickness).ToString()
         ));
         
         public Common() {
             InitializeComponent();
             
             SetResource("SquareGeometry", Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
-                (GetResource("PadSize") - GetResource("PadThickness") / 2).ToString(),
-                (GetResource("PadThickness") / 2).ToString()
+                (GetResource("PadSize") - halfThickness).ToString(),
+                halfThickness.ToString()
+            )));
+            
+            SetResource("SplitGeometry", Geometry.Parse(String.Format("M {3},{3} L {3},{1} {0},{1} {0},{3} Z M {3},{2} L {3},{0} {0},{0} {0},{2} Z",
+                (GetResource("PadSize") - halfThickness).ToString(),
+                (GetResource("PadSize") / 2 - halfThickness - GetResource("PadSpacing")).ToString(),
+                (GetResource("PadSize") / 2 + halfThickness + GetResource("PadSpacing")).ToString(),
+                (halfThickness).ToString()
             )));
 
             SetResource("CircleGeometry", Geometry.Parse(String.Format("M {0},{1} A {2},{2} 180 1 1 {0},{3} A {2},{2} 180 1 1 {0},{1} Z",
                 (GetResource("PadSize") / 2).ToString(),
-                (GetResource("PadSize") / 8 + GetResource("PadThickness") / 2).ToString(),
-                (GetResource("PadSize") * 3 / 8 - GetResource("PadThickness") / 2).ToString(),
-                (GetResource("PadSize") * 7 / 8 - GetResource("PadThickness") / 2).ToString()
+                (GetResource("PadSize") / 8 + halfThickness).ToString(),
+                (GetResource("PadSize") * 3 / 8 - halfThickness).ToString(),
+                (GetResource("PadSize") * 7 / 8 - halfThickness).ToString()
             )));
 
             SetResource("NovationGeometry", Geometry.Parse(String.Format(
@@ -44,8 +53,8 @@ namespace Apollo.Themes {
             )));
 
             SetResource("HiddenGeometry", Geometry.Parse(String.Format("M {1},{1} L {1},{0} {0},{0} {0},{1} Z",
-                (GetResource("HiddenSize") - GetResource("PadThickness") / 2).ToString(),
-                (GetResource("PadThickness") / 2).ToString()
+                (GetResource("HiddenSize") - halfThickness).ToString(),
+                halfThickness.ToString()
             )));
 
             SetResource("44CornerGeometry", CreateCornerGeometry("M {3},{3} L {3},{0} {2},{0} {0},{2} {0},{3} Z"));

@@ -61,8 +61,7 @@ namespace Apollo.Components {
         }
 
         void Update_LaunchpadModel() {
-            bool is10x10 = Preferences.LaunchpadModel == LaunchpadModels.Pro || Preferences.LaunchpadModel == LaunchpadModels.All;
-            int buttons = is10x10? 10 : 9;
+            int buttons = Preferences.LaunchpadModel.Is10x10()? 10 : 9;
             
             Grid?.Children.Clear();
 
@@ -93,7 +92,7 @@ namespace Apollo.Components {
                 Grid.Children.Add(Buttons[i]);
             }
 
-            ModeLight.IsVisible = is10x10;
+            ModeLight.IsVisible = Preferences.LaunchpadModel.HasModeLight();
 
             Update_LaunchpadStyle();
         }

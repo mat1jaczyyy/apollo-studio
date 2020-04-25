@@ -12,7 +12,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadModels {
-        MK2, Pro, X, All
+        MK2, Pro, X, ProMK3, All
     }
 
     public enum LaunchpadStyles {
@@ -115,5 +115,14 @@ namespace Apollo.Enums {
 
             return type;
         }
+        
+        public static bool HasNovationLED(this LaunchpadModels model)
+            => model == LaunchpadModels.X || model == LaunchpadModels.ProMK3;
+        
+        public static bool Is10x10(this LaunchpadModels model)
+            => model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 ||model == LaunchpadModels.All;
+        
+        public static bool HasModeLight(this LaunchpadModels model)
+            => model == LaunchpadModels.Pro || model == LaunchpadModels.All;
     }
 }

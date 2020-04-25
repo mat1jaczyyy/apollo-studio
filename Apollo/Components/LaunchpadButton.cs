@@ -33,7 +33,7 @@ namespace Apollo.Components {
         public bool Empty => Canvas.Classes.Contains("empty");
 
         bool IsPhantom() {
-            if (Preferences.LaunchpadModel == LaunchpadModels.X && Index == 9) return false;
+            if (Preferences.LaunchpadModel.HasNovationLED() && Index == 9) return false;
 
             if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
                 int x = Index % 10;
@@ -85,6 +85,19 @@ namespace Apollo.Components {
 
                         if (Index == 9) AddClass("novation");
                         else if (Index == 44 || Index == 45 || Index == 54 || Index == 55) AddClass("corner");
+                        else AddClass("square");
+                    }
+                    break;
+
+                case LaunchpadModels.ProMK3:
+                    if (Index == 90 || Index == 99) AddClass("empty");
+                    else {
+                        ret++;
+
+                        if (Index == 0) AddClass("hidden");
+                        else if (Index == 9) AddClass("novation");
+                        else if (Index == 44 || Index == 45 || Index == 54 || Index == 55) AddClass("corner");
+                        else if (y == 9) AddClass("split");
                         else AddClass("square");
                     }
                     break;

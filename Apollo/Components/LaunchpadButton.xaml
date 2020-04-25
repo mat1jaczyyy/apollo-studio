@@ -16,6 +16,17 @@
       <Setter Property="Data" Value="{DynamicResource LPGrid_SquareGeometry}" />
     </Style>
 
+    <Style Selector="Canvas.split">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />
+    </Style>
+    <Style Selector="Path.split">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_PadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_SplitGeometry}" />
+    </Style>
+
     <Style Selector="Canvas.circle">
       <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
       <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />

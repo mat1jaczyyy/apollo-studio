@@ -77,7 +77,12 @@ namespace Apollo.Binary {
                 }
 
                 if (version >= 24) {
-                    Preferences.LaunchpadModel = (LaunchpadModels)reader.ReadInt32();
+                    LaunchpadModels model = (LaunchpadModels)reader.ReadInt32();
+
+                    if (version <= 28 && model >= LaunchpadModels.ProMK3)
+                        model++;
+
+                    Preferences.LaunchpadModel = model;
                 }
 
                 Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
