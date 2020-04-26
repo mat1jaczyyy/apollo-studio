@@ -1,6 +1,6 @@
 ﻿using System;
+using Apollo.Core;
 using Apollo.RtMidi.Interface.API;
-using Serilog;
 using System.Runtime.InteropServices;
 namespace Apollo.RtMidi.Interface.Devices
 {
@@ -10,8 +10,6 @@ namespace Apollo.RtMidi.Interface.Devices
     /// </summary>
     internal abstract class RtMidiDevice
     {
-        private static readonly ILogger Log = Serilog.Log.ForContext<RtMidiDevice>();
-
         private IntPtr _handle;
         private readonly uint _portNumber;
         private bool _disposed;
@@ -42,17 +40,16 @@ namespace Apollo.RtMidi.Interface.Devices
 
             if (!EnsureDevice())
             {
-                Log.Debug("Could not create device handle, cannot open port {PortNumber}", _portNumber);
                 return false;
             }
 
             try
             {
-                Log.Debug("Fetching port name, for port {PortNumber}", _portNumber);
+                Program.DebugLog($"Fetching port name, for port {_portNumber}");
                 var portName = RtMidiC.GetPortName(_handle, _portNumber);
                 CheckForError();
 
-                Log.Debug("Opening port {PortNumber} using name {PortName}", _portNumber, portName);
+                Program.DebugLog($"Opening port {_portNumber} using name {portName}");
                 RtMidiC.OpenPort(_handle, _portNumber, portName);
                 CheckForError();
 
@@ -60,9 +57,9 @@ namespace Apollo.RtMidi.Interface.Devices
 
                 return true;
             }
-            catch (Exception e) 
+            catch (Exception) 
             {
-                Log.Error(e, "Unable to open port number {PortNumber}", _portNumber);
+                Program.Log($"Unable to open port number {_portNumber}");
                 return false;
             }
         }
@@ -73,15 +70,15 @@ namespace Apollo.RtMidi.Interface.Devices
 
             try
             {
-                Log.Debug("Closing port number {PortNumber}", _portNumber);
+                Program.DebugLog($"Closing port number {_portNumber}");
                 RtMidiC.ClosePort(_handle);
                 CheckForError();
 
                 _isOpen = false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Unable to close port number {PortNumber}", _portNumber);
+                Program.Log($"Unable to close port number {_portNumber}");
             }
         }
 
@@ -99,9 +96,9 @@ namespace Apollo.RtMidi.Interface.Devices
                 CheckForError();
                 return count;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Error while getting number of ports");
+                Program.Log("Error while getting number of ports");
                 return 0;
             }
         }
@@ -121,9 +118,9 @@ namespace Apollo.RtMidi.Interface.Devices
                 CheckForError();
                 return name;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Error while getting port {PortNumber} name", portNumber);
+                Program.Log($"Error while getting port {portNumber} name");
                 return null;
             }
         }
@@ -149,7 +146,7 @@ namespace Apollo.RtMidi.Interface.Devices
             var wrapper = (RtMidiWrapper)Marshal.PtrToStructure(handle, typeof(RtMidiWrapper));
             if (!wrapper.Ok)
             {
-                Log.Error("Error detected from RtMidi API '{ErrorMessage}'", wrapper.ErrorMessage);
+                Program.Log($"Error detected from RtMidi API '{wrapper.ErrorMessage}'");
                 throw new RtMidiApiException($"Error detected from RtMidi API '{wrapper.ErrorMessage}'");
             }
         }

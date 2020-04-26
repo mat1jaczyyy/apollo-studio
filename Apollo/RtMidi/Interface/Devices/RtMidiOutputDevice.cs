@@ -1,6 +1,6 @@
 ﻿using System;
+using Apollo.Core;
 using Apollo.RtMidi.Interface.API;
-using Serilog;
 namespace Apollo.RtMidi.Interface.Devices
 {
     internal class RtMidiOutputDevice : RtMidiDevice
@@ -23,9 +23,9 @@ namespace Apollo.RtMidi.Interface.Devices
                 CheckForError();
                 return result == 0;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Error while sending message");
+                Program.Log("Error while sending message");
                 return false;
             }
         }
@@ -38,9 +38,9 @@ namespace Apollo.RtMidi.Interface.Devices
                 CheckForError(handle);
                 return handle;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Unable to create default output device");
+                Program.Log("Unable to create default output device");
                 return IntPtr.Zero;
             }
         }
@@ -49,13 +49,13 @@ namespace Apollo.RtMidi.Interface.Devices
         {
             try
             {
-                Log.Debug("Freeing output device handle");
+                Program.DebugLog("Freeing output device handle");
                 RtMidiC.Output.Free(Handle);
                 CheckForError();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Error while freeing output device handle");
+                Program.Log("Error while freeing output device handle");
             }
         }
     }

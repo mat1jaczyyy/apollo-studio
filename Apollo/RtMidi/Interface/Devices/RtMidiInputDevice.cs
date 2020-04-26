@@ -1,6 +1,6 @@
 ﻿using System;
 using Apollo.RtMidi.Interface.API;
-using Serilog;
+using Apollo.Core;
 using System.Runtime.InteropServices;
 namespace Apollo.RtMidi.Interface.Devices
 {
@@ -23,35 +23,35 @@ namespace Apollo.RtMidi.Interface.Devices
             IntPtr handle = IntPtr.Zero;
             try
             {
-                Log.Debug("Creating default input device");
+                Program.DebugLog("Creating default input device");
                 handle = RtMidiC.Input.CreateDefault();
                 CheckForError(handle);
 
-                Log.Debug("Setting types to ignore");
+                Program.DebugLog("Setting types to ignore");
                 RtMidiC.Input.IgnoreTypes(handle, false, true, true);
                 CheckForError(handle);
 
-                Log.Debug("Setting input callback");
+                Program.DebugLog("Setting input callback");
                 RtMidiC.Input.SetCallback(handle, _rtMidiCallbackDelegate, IntPtr.Zero);
                 CheckForError(handle);
 
                 return handle;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Unable to create default input device");
+                Program.Log("Unable to create default input device");
 
                 if (handle != IntPtr.Zero)
                 {
-                    Log.Information("Freeing input device handle");
+                    Program.DebugLog("Freeing input device handle");
                     try
                     {
                         RtMidiC.Input.Free(handle);
                         CheckForError(handle);
                     }
-                    catch (Exception e2)
+                    catch (Exception)
                     {
-                        Log.Error(e2, "Unable to free input device");
+                        Program.Log("Unable to free input device");
                     }
                 }
 
@@ -75,9 +75,9 @@ namespace Apollo.RtMidi.Interface.Devices
                     messageHandlers.Invoke(this, message);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Unexpected exception occurred while receiving MIDI message");
+                Program.Log("Unexpected exception occurred while receiving MIDI message");
                 return;
             }
 
@@ -88,17 +88,17 @@ namespace Apollo.RtMidi.Interface.Devices
         {
             try
             {
-                Log.Debug("Cancelling input callback");
+                Program.DebugLog("Cancelling input callback");
                 RtMidiC.Input.CancelCallback(Handle);
                 CheckForError();
 
-                Log.Debug("Freeing input device handle");
+                Program.DebugLog("Freeing input device handle");
                 RtMidiC.Input.Free(Handle);
                 CheckForError();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Log.Error(e, "Error while freeing input device handle");
+                Program.Log("Error while freeing input device handle");
             }
         }
     }

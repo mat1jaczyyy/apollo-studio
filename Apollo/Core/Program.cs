@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Avalonia;
@@ -42,6 +43,11 @@ namespace Apollo.Core {
         public static Stopwatch TimeSpent = new Stopwatch();
         public static void Log(string text) => Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
 
+        static bool DebugLogging = false;
+        public static void DebugLog(string text) {
+            if (DebugLogging) Log(text);
+        }
+
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
 
@@ -68,6 +74,8 @@ namespace Apollo.Core {
 
         [STAThread]
         static void Main(string[] args) {
+            if (args.Contains("--debug")) DebugLogging = true;
+
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) => {
                 if (!Directory.Exists(CrashDir)) Directory.CreateDirectory(CrashDir);
                 

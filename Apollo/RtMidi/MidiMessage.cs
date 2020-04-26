@@ -1,5 +1,4 @@
 ﻿using Apollo.RtMidi.Devices;
-using Serilog;
 using System;
 using System.Linq;
 
@@ -7,8 +6,6 @@ namespace Apollo.RtMidi
 {
     public readonly struct MidiMessage
     {
-        private static readonly ILogger Log = Serilog.Log.ForContext<MidiMessage>();
-
         public readonly byte[] Data;
 
         public MidiMessage(byte[] data)
