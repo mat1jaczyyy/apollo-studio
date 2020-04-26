@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace Apollo.RtMidi.Unmanaged.API {
     internal static class RtMidiC {
-        private const string LibraryFile = "rtmidi";
+        const string LibraryFile = "rtmidi";
 
         static RtMidiC() {
             if (IntPtr.Size != 8)
-                throw new InvalidProgramException("Only 64-bit RtMIDI is supported!");
+                throw new InvalidProgramException("Only 64-bit RtMidi is supported!");
         }
 
         internal static class Utility {

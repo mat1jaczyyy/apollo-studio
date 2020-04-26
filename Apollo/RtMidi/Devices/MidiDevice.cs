@@ -12,8 +12,8 @@ namespace Apollo.RtMidi.Devices {
     }
 
     public abstract class MidiDevice: IMidiDevice {
-        private readonly RtMidiDevice _rtMidiDevice;
-        private bool _disposed;
+        readonly RtMidiDevice _rtMidiDevice;
+        bool _disposed;
 
         internal MidiDevice(RtMidiDevice rtMidiDevice, string name) {
             _rtMidiDevice = rtMidiDevice?? throw new ArgumentNullException(nameof(rtMidiDevice));

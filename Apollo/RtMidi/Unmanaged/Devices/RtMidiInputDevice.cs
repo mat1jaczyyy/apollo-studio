@@ -7,7 +7,7 @@ using Apollo.RtMidi.Unmanaged.API;
 namespace Apollo.RtMidi.Unmanaged.Devices {
     internal class RtMidiInputDevice: RtMidiDevice {
         // Ensure delegate is not garbage collected (https://stackoverflow.com/questions/6193711/call-has-been-made-on-garbage-collected-delegate-in-c)
-        private readonly RtMidiCallback _rtMidiCallbackDelegate;
+        readonly RtMidiCallback _rtMidiCallbackDelegate;
 
         internal RtMidiInputDevice(uint portNumber): base(portNumber)
             => _rtMidiCallbackDelegate = HandleRtMidiCallback;
@@ -52,13 +52,13 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             }
         }
 
-        private void HandleRtMidiCallback(double timestamp, IntPtr messagePtr, UIntPtr messageSize, IntPtr userData) {
+        void HandleRtMidiCallback(double timestamp, IntPtr messagePtr, UIntPtr messageSize, IntPtr userData) {
             if (Message == null) return;
 
             try {
                 // Copy unmanaged message to managed byte array
-                var size = (int)messageSize;
-                var message = new byte[size];
+                int size = (int)messageSize;
+                byte[] message = new byte[size];
                 Marshal.Copy(messagePtr, message, 0, size);
 
                 Message.Invoke(message);

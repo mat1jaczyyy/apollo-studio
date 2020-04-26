@@ -6,37 +6,34 @@ using Apollo.RtMidi.Unmanaged.API;
 
 namespace Apollo.RtMidi.Unmanaged.Devices {
     internal abstract class RtMidiDevice {
-        private IntPtr _handle;
-        private readonly uint _portNumber;
-        private bool _disposed;
-        private bool _isOpen;
+        protected IntPtr Handle { get; private set; }
+        readonly uint _portNumber;
+        bool _disposed;
+        public bool IsOpen { get; private set; }
 
         protected RtMidiDevice(uint portNumber) {
-            _handle = IntPtr.Zero;
+            Handle = IntPtr.Zero;
             _portNumber = portNumber;
         }
 
         // Ensure Interface handles are freed
         ~RtMidiDevice() => Dispose();
 
-        public bool IsOpen => _isOpen;
-        protected IntPtr Handle => _handle;
-
         public bool Open() {
-            if (_isOpen) return false;
+            if (IsOpen) return false;
 
             if (!EnsureDevice()) return false;
 
             try {
                 Program.DebugLog($"Fetching port name, for port {_portNumber}");
-                var portName = RtMidiC.GetPortName(_handle, _portNumber);
+                string portName = RtMidiC.GetPortName(Handle, _portNumber);
                 CheckForError();
 
                 Program.DebugLog($"Opening port {_portNumber} using name {portName}");
-                RtMidiC.OpenPort(_handle, _portNumber, portName);
+                RtMidiC.OpenPort(Handle, _portNumber, portName);
                 CheckForError();
 
-                _isOpen = true;
+                IsOpen = true;
 
                 return true;
 
@@ -47,14 +44,14 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
         }
 
         public void Close() {
-            if (!_isOpen) return;
+            if (!IsOpen) return;
 
             try {
                 Program.DebugLog($"Closing port number {_portNumber}");
-                RtMidiC.ClosePort(_handle);
+                RtMidiC.ClosePort(Handle);
                 CheckForError();
 
-                _isOpen = false;
+                IsOpen = false;
 
             } catch (Exception) {
                 Program.Log($"Unable to close port number {_portNumber}");
@@ -65,7 +62,7 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             if (!EnsureDevice()) return 0;
 
             try {
-                var count = RtMidiC.GetPortCount(_handle);
+                uint count = RtMidiC.GetPortCount(Handle);
                 CheckForError();
                 return count;
 
@@ -79,7 +76,7 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             if (!EnsureDevice()) return null;
 
             try {
-                var name = RtMidiC.GetPortName(_handle, portNumber);
+                string name = RtMidiC.GetPortName(Handle, portNumber);
                 CheckForError();
                 return name;
 
@@ -89,21 +86,21 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             }
         }
 
-        private bool EnsureDevice() {
-            if (_handle != IntPtr.Zero) return true;
+        bool EnsureDevice() {
+            if (Handle != IntPtr.Zero) return true;
 
-            _handle = CreateDevice();
+            Handle = CreateDevice();
 
-            return _handle != IntPtr.Zero;
+            return Handle != IntPtr.Zero;
         }
 
         protected void CheckForError()
-            => CheckForError(_handle);
+            => CheckForError(Handle);
 
         protected static void CheckForError(IntPtr handle) {
             if (handle == IntPtr.Zero) return;
 
-            var wrapper = (RtMidiWrapper)Marshal.PtrToStructure(handle, typeof(RtMidiWrapper));
+            RtMidiWrapper wrapper = (RtMidiWrapper)Marshal.PtrToStructure(handle, typeof(RtMidiWrapper));
 
             if (!wrapper.Ok) {
                 Program.Log($"Error detected from RtMidi API '{wrapper.ErrorMessage}'");
@@ -114,10 +111,10 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
         public void Dispose() {
             if (_disposed) return;
 
-            if (_isOpen)
+            if (IsOpen)
                 Close();
 
-            if (_handle != IntPtr.Zero) 
+            if (Handle != IntPtr.Zero) 
                 DestroyDevice();
 
             _disposed = true;

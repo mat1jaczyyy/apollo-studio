@@ -7,7 +7,7 @@ namespace Apollo.RtMidi.Devices {
     }
 
     internal class MidiOutputDevice: MidiDevice, IMidiOutputDevice {
-        private readonly RtMidiOutputDevice _outputDevice;
+        readonly RtMidiOutputDevice _outputDevice;
         
         public MidiOutputDevice(RtMidiOutputDevice outputDevice, string name): base(outputDevice, name)
             => _outputDevice = outputDevice;

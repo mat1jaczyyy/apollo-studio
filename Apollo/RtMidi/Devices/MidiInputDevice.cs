@@ -9,7 +9,7 @@ namespace Apollo.RtMidi.Devices {
     }
 
     public class MidiInputDevice: MidiDevice, IMidiInputDevice {
-        private readonly RtMidiInputDevice _inputDevice;
+        readonly RtMidiInputDevice _inputDevice;
 
         internal MidiInputDevice(RtMidiInputDevice rtMidiInputDevice, string name)
         : base(rtMidiInputDevice, name) {
@@ -19,7 +19,7 @@ namespace Apollo.RtMidi.Devices {
         
         public event MidiMessageHandler Received;
 
-        private void RtMidiInputDevice_Message(byte[] message) {
+        void RtMidiInputDevice_Message(byte[] message) {
             if (message == null) {
                 Program.Log("Received null message from device");
                 return;

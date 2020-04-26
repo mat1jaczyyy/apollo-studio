@@ -15,7 +15,7 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             if (!IsOpen) return false;
 
             try {
-                var result = RtMidiC.Output.SendMessage(Handle, message, message.Length);
+                int result = RtMidiC.Output.SendMessage(Handle, message, message.Length);
                 CheckForError();
                 return result == 0;
 
@@ -27,7 +27,7 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
 
         protected override IntPtr CreateDevice() {
             try {
-                var handle = RtMidiC.Output.CreateDefault();
+                IntPtr handle = RtMidiC.Output.CreateDefault();
                 CheckForError(handle);
                 return handle;
 

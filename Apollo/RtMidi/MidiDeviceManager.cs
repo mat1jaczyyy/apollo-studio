@@ -9,12 +9,12 @@ namespace Apollo.RtMidi {
     public sealed class MidiDeviceManager: IDisposable {
         public static MidiDeviceManager Default => DefaultHolder.Value;
 
-        private static readonly Lazy<MidiDeviceManager> DefaultHolder = new Lazy<MidiDeviceManager>(() => new MidiDeviceManager());
+        static readonly Lazy<MidiDeviceManager> DefaultHolder = new Lazy<MidiDeviceManager>(() => new MidiDeviceManager());
 
-        private readonly RtMidiManager _rtDeviceManager;
-        private bool _disposed;
+        readonly RtMidiManager _rtDeviceManager;
+        bool _disposed;
 
-        private MidiDeviceManager()
+        MidiDeviceManager()
             => _rtDeviceManager = RtMidiManager.Default;
 
         ~MidiDeviceManager()
@@ -23,16 +23,16 @@ namespace Apollo.RtMidi {
         // Enumerate all currently available input devices
         public IEnumerable<IMidiInputDeviceInfo> InputDevices {
             get {
-                foreach (var rtInputDeviceInfo in _rtDeviceManager.InputDevices)
-                    yield return new MidiInputDeviceInfo(rtInputDeviceInfo);
+                foreach (var info in _rtDeviceManager.InputDevices)
+                    yield return new MidiInputDeviceInfo(info);
             }
         }
 
         // Enumerate all currently available output devices
         public IEnumerable<IMidiOutputDeviceInfo> OutputDevices {
             get {
-                foreach (var rtOutputDeviceInfo in _rtDeviceManager.OutputDevices)
-                    yield return new MidiOutputDeviceInfo(rtOutputDeviceInfo);
+                foreach (var info in _rtDeviceManager.OutputDevices)
+                    yield return new MidiOutputDeviceInfo(info);
             }
         }
 
