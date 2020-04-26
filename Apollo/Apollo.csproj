@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RuntimeFrameworkVersion>3.1.2</RuntimeFrameworkVersion>
@@ -26,7 +26,7 @@
     </PackageReference>
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="Octokit" Version="0.32.0" />
-    <PackageReference Include="RtMidi.Core" Version="1.0.50" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
   </ItemGroup>
   
@@ -38,5 +38,14 @@
       <SubType>Designer</SubType>
     </AvaloniaResource>
     <AvaloniaResource Include="Resources/*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="librtmidi.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="rtmidi.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

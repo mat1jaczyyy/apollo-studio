@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
-using RtMidi.Core;
-using RtMidi.Core.Devices;
-using RtMidi.Core.Devices.Infos;
-using RtMidi.Core.Messages;
+using Apollo.RtMidi;
+using Apollo.RtMidi.Devices;
+using Apollo.RtMidi.Devices.Infos;
 
 using Apollo.Core;
 using Apollo.Devices;
@@ -154,24 +153,26 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
+        static byte[] SysExStart = new byte[] { 0xF0 };
+        static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
-            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0B}).ToArray()},
-            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0B}).ToArray()},
-            {LaunchpadType.CFW, new byte[] {0x6F}},
-            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
+            {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0B}).ToArray()},
+            {LaunchpadType.CFW, SysExStart.Concat(new byte[] {0x6F}).ToArray()},
+            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
+            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
+            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
         };
 
         static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
-            {LaunchpadType.MK2, NovationHeader.Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.Pro, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.CFW, NovationHeader.Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
-            {LaunchpadType.X, NovationHeader.Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.MiniMK3, NovationHeader.Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
-            {LaunchpadType.ProMK3, NovationHeader.Concat(new byte[] {0x0E, 0x03}).Concat(
+            {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.CFW, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
+            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
+            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).Concat(
                 Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
             ).ToArray()}
         };
@@ -211,13 +212,13 @@ namespace Apollo.Elements {
         protected void InvokeReceive(Signal n) => Receive?.Invoke(n);
 
         protected Screen screen = new Screen();
-        ConcurrentQueue<SysExMessage> buffer;
+        ConcurrentQueue<byte[]> buffer;
         object locker;
         int[][] inputbuffer;
         ulong signalCount = 0;
 
         protected void CreateScreen() {
-            buffer = new ConcurrentQueue<SysExMessage>();
+            buffer = new ConcurrentQueue<byte[]>();
             locker = new object();
             inputbuffer = Enumerable.Range(0, 101).Select(i => (int[])null).ToArray();
 
@@ -229,19 +230,19 @@ namespace Apollo.Elements {
             ? screen.GetColor(index)
             : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
 
-        readonly static SysExMessage DeviceInquiry = new SysExMessage(new byte[] {0x7E, 0x7F, 0x06, 0x01});
-        readonly static SysExMessage VersionInquiry = new SysExMessage(new byte[] {0x00, 0x20, 0x29, 0x00, 0x70});
+        static readonly byte[] DeviceInquiry = new byte[] {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
+        static readonly byte[] VersionInquiry = new byte[] {0xF0, 0x00, 0x20, 0x29, 0x00, 0x70, 0xF7};
 
         bool doingMK2VersionInquiry = false;
 
-        LaunchpadType AttemptIdentify(SysExMessage response) {
+        LaunchpadType AttemptIdentify(MidiMessage response) {
             if (doingMK2VersionInquiry) {
                 doingMK2VersionInquiry = false;
 
-                if (response.Data.Length != 17)
+                if (response.Data.Length != 19)
                     return LaunchpadType.Unknown;
                 
-                if (response.Data[0] == 0x00 && response.Data[1] == 0x20 && response.Data[2] == 0x29 && response.Data[3] == 0x00 && response.Data[4] == 0x70) {
+                if (response.CheckSysExHeader(NovationHeader) && response.Data[5] == 0x70) {
                     int versionInt = int.Parse(string.Join("", response.Data.SkipLast(2).TakeLast(3)));
 
                     if (versionInt < 171) // Old Firmware
@@ -253,17 +254,18 @@ namespace Apollo.Elements {
                 return LaunchpadType.Unknown;
             }
 
-            if (response.Data.Length != 15)
+            if (response.Data.Length != 17)
                 return LaunchpadType.Unknown;
 
-            if (response.Data[0] != 0x7E || response.Data[2] != 0x06 || response.Data[3] != 0x02)
+            if (response.Data[1] != 0x7E || response.Data[3] != 0x06 || response.Data[4] != 0x02)
                 return LaunchpadType.Unknown;
 
-            if (response.Data[4] == 0x00 && response.Data[5] == 0x20 && response.Data[6] == 0x29) { // Manufacturer = Novation
-                string versionStr = string.Join("", response.Data.TakeLast(3).Select(i => (char)i));
-                int versionInt = int.Parse(string.Join("", response.Data.TakeLast(3)));
+            if (response.Data[5] == 0x00 && response.Data[6] == 0x20 && response.Data[7] == 0x29) { // Manufacturer = Novation
+                IEnumerable<byte> version = response.Data.SkipLast(1).TakeLast(3);
+                string versionStr = string.Join("", version.Select(i => (char)i));
+                int versionInt = int.Parse(string.Join("", version));
 
-                switch (response.Data[7]) {
+                switch (response.Data[8]) {
                     case 0x69: // Launchpad MK2
                         if (versionInt < 171) { // Old Firmware or Bootloader?
                             doingMK2VersionInquiry = true;
@@ -290,7 +292,7 @@ namespace Apollo.Elements {
                         return LaunchpadType.Pro;
 
                     case 0x03: // Launchpad X
-                        if (response.Data[8] == 17) // Bootloader
+                        if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
                         if (versionInt < 351) // Old Firmware
@@ -299,7 +301,7 @@ namespace Apollo.Elements {
                         return LaunchpadType.X;
                     
                     case 0x13: // Launchpad Mini MK3
-                        if (response.Data[8] == 17) // Bootloader
+                        if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
                         if (versionInt < 407) // Old Firmware
@@ -308,7 +310,7 @@ namespace Apollo.Elements {
                         return LaunchpadType.MiniMK3;
                     
                     case 0x23: // Launchpad Pro MK3
-                        if (response.Data[8] == 17) // Bootloader
+                        if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
                         if (versionInt < 440) { // No Programmer mode
@@ -326,37 +328,39 @@ namespace Apollo.Elements {
             return LaunchpadType.Unknown;
         }
 
-        void WaitForIdentification(object sender, in SysExMessage e) {
+        void WaitForIdentification(MidiMessage e) {
+            if (!e.IsSysEx) return;
+
             if ((Type = AttemptIdentify(e)) != LaunchpadType.Unknown) {
-                Input.SysEx -= WaitForIdentification;
+                Input.Received -= WaitForIdentification;
 
                 ForceClear();
 
-                Input.NoteOn += NoteOn;
-                Input.NoteOff += NoteOff;
-                Input.ControlChange += ControlChange;
+                Input.Received += HandleMidi;
 
                 MIDI.DoneIdentifying();
 
             } else {
-                Task.Delay(1000).ContinueWith(_ => {
+                Task.Delay(1500).ContinueWith(_ => {
                     if (Available && Type == LaunchpadType.Unknown) {
-                        if (doingMK2VersionInquiry) Output.Send(in VersionInquiry);
-                        else Output.Send(in DeviceInquiry);
+                        if (doingMK2VersionInquiry) Output.Send(VersionInquiry);
+                        else Output.Send(DeviceInquiry);
                     }
                 });
             }
         }
 
-        bool SysExSend(byte[] raw) {
+        bool SysExSend(IEnumerable<byte> raw) {
+            byte[] bytes = raw.Concat(SysExEnd).ToArray();
+
             if (!Usable) return false;
 
-            buffer.Enqueue(new SysExMessage(raw));
+            buffer.Enqueue(bytes);
             ulong current = signalCount;
 
             Task.Run(() => {
                 lock (locker) {
-                    if (buffer.TryDequeue(out SysExMessage msg))
+                    if (buffer.TryDequeue(out byte[] msg))
                         Output.Send(msg);
                     
                     signalCount++;
@@ -425,7 +429,7 @@ namespace Apollo.Elements {
                 (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
                 (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
                 (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
-            }).ToArray());
+            }));
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -450,8 +454,8 @@ namespace Apollo.Elements {
             Task.Run(() => {
                 Available = true;
 
-                Input.SysEx += WaitForIdentification;
-                Output.Send(in DeviceInquiry);
+                Input.Received += WaitForIdentification;
+                Output.Send(DeviceInquiry);
             });
         }
 
@@ -534,12 +538,10 @@ namespace Apollo.Elements {
 
             ForceClear();
 
-            Input.NoteOn += NoteOn;
-            Input.NoteOff += NoteOff;
-            Input.ControlChange += ControlChange;
+            Input.Received += HandleMidi;
         }
 
-        public void HandleMessage(Signal n, bool rotated = false) {
+        public void HandleSignal(Signal n, bool rotated = false) {
             if (Available && Program.Project != null) {
                 if (!rotated && n.Index != 100) {
                     if (Rotation == RotationType.D90) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
@@ -564,80 +566,57 @@ namespace Apollo.Elements {
             }
         }
 
-        byte InputColor(int input) => (byte)(Math.Max(Convert.ToInt32(input > 0), input >> 1));
+        public void HandleSignal(byte key, byte vel, InputType format = InputType.XY)
+            => HandleSignal(new Signal(
+                format,
+                this,
+                this,
+                key,
+                new Color((byte)Math.Max(Convert.ToInt32(vel > 0), vel >> 1))
+            ));
 
-        void HandleNote(byte key, byte vel) {
-            if (Type.IsGenerationX() && InputFormat == InputType.DrumRack) {
+        void HandleMidi(MidiMessage e) {
+            if (e.IsNote) HandleNote(e.Pitch, e.IsNoteOff? (byte)0 : e.Velocity);
+            else if (e.IsCC) HandleCC(e.Pitch, e.Velocity);
+        }
+
+        public void HandleNote(byte key, byte vel) {
+            // X and Mini MK3 old Programmer mode hack note handling
+            if (Type.HasProgrammerFwHack() && InputFormat == InputType.DrumRack) {
                 if (108 <= key && key <= 115) key -= 80;
                 else if (key == 116) key = 27;
             }
 
-            HandleMessage(new Signal(
-                InputFormat,
-                this,
-                this,
-                key,
-                new Color(InputColor(vel))
-            ));
+            HandleSignal(key, vel, InputFormat);
         }
 
-        public void NoteOn(object sender, in NoteOnMessage e) => HandleNote((byte)e.Key, (byte)e.Velocity);
-
-        void NoteOff(object sender, in NoteOffMessage e) => HandleNote((byte)e.Key, 0);
-        
-        void ControlChange(object sender, in ControlChangeMessage e) {
+        void HandleCC(byte key, byte vel) {
             switch (Type) {
                 case LaunchpadType.MK2:
-                    if (104 <= e.Control && e.Control <= 111)
-                        HandleMessage(new Signal(
-                            InputType.XY,
-                            this,
-                            this,
-                            (byte)(e.Control - 13),
-                            new Color(InputColor(e.Value))
-                        ));
+                    if (104 <= key && key <= 111)
+                        HandleSignal(key -= 13, vel);
                     break;
 
                 case LaunchpadType.Pro:
                 case LaunchpadType.CFW:
-                    if (e.Control == 121) {
+                    if (key == 121) {
                         Multi.InvokeReset();
                         return;
                     }
 
-                    HandleMessage(new Signal(
-                        InputType.XY,
-                        this,
-                        this,
-                        (byte)e.Control,
-                        new Color(InputColor(e.Value))
-                    ));
+                    HandleSignal(key, vel);
                     break;
 
                 case LaunchpadType.X:
                 case LaunchpadType.MiniMK3:
-                    HandleMessage(new Signal(
-                        InputType.XY,
-                        this,
-                        this,
-                        (byte)e.Control,
-                        new Color(InputColor(e.Value))
-                    ));
+                    HandleSignal(key, vel);
                     break;
 
                 case LaunchpadType.ProMK3:
-                    byte index = (byte)e.Control;
+                    if (101 <= key && key <= 108)
+                        key -= 100;
 
-                    if (101 <= index && index <= 108)
-                        index -= 100;
-
-                    HandleMessage(new Signal(
-                        InputType.XY,
-                        this,
-                        this,
-                        index,
-                        new Color(InputColor(e.Value))
-                    ));
+                    HandleSignal(key, vel);
                     break;
             }
         }

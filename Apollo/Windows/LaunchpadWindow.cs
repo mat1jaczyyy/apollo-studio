@@ -97,7 +97,7 @@ namespace Apollo.Windows {
             if (_launchpad is AbletonLaunchpad abletonLaunchpad)
                 AbletonConnector.Send(abletonLaunchpad, n);
 
-            _launchpad.HandleMessage(n, true);
+            _launchpad.HandleSignal(n, true);
         }
 
         void PadPressed(int index) => PadChanged(index, true);

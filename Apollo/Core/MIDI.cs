@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using RtMidi.Core;
-using RtMidi.Core.Devices.Infos;
+using Apollo.RtMidi;
+using Apollo.RtMidi.Devices.Infos;
 
 using Apollo.Devices;
 using Apollo.Elements;

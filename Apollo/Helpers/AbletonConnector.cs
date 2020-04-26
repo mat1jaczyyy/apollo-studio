@@ -7,9 +7,6 @@ using System.Text;
 
 using Avalonia.Threading;
 
-using RtMidi.Core.Enums;
-using RtMidi.Core.Messages;
-
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -55,11 +52,10 @@ namespace Apollo.Helpers {
                     } else if (message[0] >= 242 && message[0] <= 244)
                         connection?.SendAsync(new byte[] {244, Convert.ToByte((portMap[source] = MIDI.ConnectAbleton(244 - message[0])).Name.Substring(18))}, 2, source);
 
-                } else if (message[0] < 128) {
-                    NoteOnMessage msg = new NoteOnMessage(Channel.Channel1, (Key)message[0], message[1]);
-                    portMap[source].NoteOn(null, in msg);
+                } else if (message[0] < 128)
+                    portMap[source].HandleNote(message[0], message[1]);
                     
-                } else if (message[0] == 245) {
+                else if (message[0] == 245) {
                     MIDI.Disconnect(portMap[source]);
                     portMap.Remove(source);
                 

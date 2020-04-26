@@ -220,7 +220,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>> timers = new ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>>();
         ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
 
-        ConcurrentDictionary<Signal, HashSet<Signal>> screen = new ConcurrentDictionary<Signal, HashSet<Signal>>();
+        ConcurrentDictionary<Signal, ConcurrentHashSet<Signal>> screen = new ConcurrentDictionary<Signal, ConcurrentHashSet<Signal>>();
         ConcurrentDictionary<Signal, object> screenlocker = new ConcurrentDictionary<Signal, object>();
 
         public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, Offsets.Select(i => i.Clone()).ToList(), Angles.ToList()) {
@@ -258,7 +258,7 @@ namespace Apollo.Devices {
             
             lock (screenlocker[k]) {
                 if (!screen.ContainsKey(k))
-                    screen[k] = new HashSet<Signal>();
+                    screen[k] = new ConcurrentHashSet<Signal>();
 
                 if (on) {
                     if (!screen[k].Contains(i))

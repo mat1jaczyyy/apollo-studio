@@ -108,6 +108,9 @@ namespace Apollo.Enums {
         public static bool IsGenerationX(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.ProMK3;
 
+        public static bool HasProgrammerFwHack(this LaunchpadType type)
+            => LaunchpadType.X <= type && type <= LaunchpadType.MiniMK3;
+
         public static bool SupportsRange(this BlendingType type)
             => type != BlendingType.Normal;
 
