@@ -1,79 +1,46 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
 using System.Collections.Generic;
-using Apollo.RtMidi.Interface;
-using Apollo.RtMidi.Devices.Infos;
-using Apollo.RtMidi.Interface.API;
-using System;
 
-namespace Apollo.RtMidi
-{
-    /// <summary>
-    /// This is the MIDI Device Manager, which you shall use to obtain information
-    /// about all available input and output devices, information is always up-to-date
-    /// so each time you enumerate input or output devices, it will reflect the 
-    /// currently available devices.
-    /// </summary>
-    public sealed class MidiDeviceManager : IDisposable
-    {
-        /// <summary>
-        /// Manager singleton instance to use
-        /// </summary>
+using Apollo.RtMidi.Devices.Infos;
+using Apollo.RtMidi.Unmanaged;
+using Apollo.RtMidi.Unmanaged.API;
+
+namespace Apollo.RtMidi {
+    public sealed class MidiDeviceManager: IDisposable {
         public static MidiDeviceManager Default => DefaultHolder.Value;
 
         private static readonly Lazy<MidiDeviceManager> DefaultHolder = new Lazy<MidiDeviceManager>(() => new MidiDeviceManager());
 
-        private readonly Interface.RtMidiManager _rtDeviceManager;
+        private readonly RtMidiManager _rtDeviceManager;
         private bool _disposed;
 
         private MidiDeviceManager()
-        {
-            _rtDeviceManager = Interface.RtMidiManager.Default;
-        }
+            => _rtDeviceManager = RtMidiManager.Default;
 
-        ~MidiDeviceManager() 
-        {
-            Dispose();
-        }
+        ~MidiDeviceManager()
+            => Dispose();
 
-        /// <summary>
-        /// Enumerate all currently available input devices
-        /// </summary>
-        public IEnumerable<IMidiInputDeviceInfo> InputDevices 
-        {
-            get
-            {
-                foreach (var rtInputDeviceInfo in _rtDeviceManager.InputDevices) 
-                {
+        // Enumerate all currently available input devices
+        public IEnumerable<IMidiInputDeviceInfo> InputDevices {
+            get {
+                foreach (var rtInputDeviceInfo in _rtDeviceManager.InputDevices)
                     yield return new MidiInputDeviceInfo(rtInputDeviceInfo);
-                }
             }
         }
 
-        /// <summary>
-        /// Enumerate all currently available output devices
-        /// </summary>
-        public IEnumerable<IMidiOutputDeviceInfo> OutputDevices
-        {
-            get 
-            {
-                foreach (var rtOutputDeviceInfo in _rtDeviceManager.OutputDevices) 
-                {
+        // Enumerate all currently available output devices
+        public IEnumerable<IMidiOutputDeviceInfo> OutputDevices {
+            get {
+                foreach (var rtOutputDeviceInfo in _rtDeviceManager.OutputDevices)
                     yield return new MidiOutputDeviceInfo(rtOutputDeviceInfo);
-                }
             }
         }
 
-        /// <summary>
-        /// Get the available MIDI API's used by RtMidi (if any)
-        /// </summary>
-        /// <returns>The available midi apis.</returns>
+        // Get the available MIDI API's used by RtMidi (if any)
         public IEnumerable<RtMidiApi> GetAvailableMidiApis()
-        {
-            return RtMidiManager.GetAvailableApis();
-        }
+            => RtMidiManager.GetAvailableApis();
 
-        public void Dispose()
-        {
+        public void Dispose() {
             if (_disposed) return;
 
             _rtDeviceManager.Dispose();

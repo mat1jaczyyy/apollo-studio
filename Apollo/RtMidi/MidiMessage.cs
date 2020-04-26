@@ -1,17 +1,12 @@
-﻿using Apollo.RtMidi.Devices;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace Apollo.RtMidi
-{
-    public readonly struct MidiMessage
-    {
+namespace Apollo.RtMidi {
+    public readonly struct MidiMessage {
         public readonly byte[] Data;
 
         public MidiMessage(byte[] data)
-        {
-            Data = data;
-        }
+            => Data = data;
 
         public byte Status => Data[0];
         public byte End => Data[^1];
@@ -35,8 +30,6 @@ namespace Apollo.RtMidi
                 : false;
 
         public override string ToString()
-        {
-            return string.Join(" ", Data);
-        }
+            => string.Join(" ", Data);
     }
 }

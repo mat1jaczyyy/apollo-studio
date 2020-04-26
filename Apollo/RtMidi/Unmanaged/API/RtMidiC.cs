@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Apollo.RtMidi.Interface.API
-{
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void RtMidiCallback(double timestamp, IntPtr message, UIntPtr messageSize, IntPtr userData);
-
-    internal static class RtMidiC
-    {
+namespace Apollo.RtMidi.Unmanaged.API {
+    internal static class RtMidiC {
         private const string LibraryFile = "rtmidi";
 
         static RtMidiC() {
@@ -15,14 +10,13 @@ namespace Apollo.RtMidi.Interface.API
                 throw new InvalidProgramException("Only 64-bit RtMIDI is supported!");
         }
 
-        internal static class Utility
-        {
+        internal static class Utility {
             [DllImport(LibraryFile, EntryPoint = "rtmidi_sizeof_rtmidi_api", CallingConvention = CallingConvention.Cdecl)]
             internal static extern int SizeofRtMidiApi();
         }
 
         [DllImport(LibraryFile, EntryPoint = "rtmidi_get_compiled_api", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GetCompiledApi(IntPtr apis /* RtMidiApi * */, uint apisSize);
+        internal static extern int GetCompiledApi(/* RtMidiApi* */ IntPtr apis, uint apisSize);
 
         [DllImport(LibraryFile, EntryPoint = "rtmidi_error", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void Error(RtMidiErrorType type, string errorString);
@@ -43,8 +37,7 @@ namespace Apollo.RtMidi.Interface.API
         [return: MarshalAs(UnmanagedType.LPStr)]
         internal static extern string GetPortName(IntPtr device, uint portNumber);
 
-        internal static class Input
-        {
+        internal static class Input {
             [DllImport(LibraryFile, EntryPoint = "rtmidi_in_create_default", CallingConvention = CallingConvention.Cdecl)]
             internal static extern IntPtr CreateDefault();
 
@@ -67,11 +60,10 @@ namespace Apollo.RtMidi.Interface.API
             internal static extern void IgnoreTypes(IntPtr device, bool midiSysex, bool midiTime, bool midiSense);
 
             [DllImport(LibraryFile, EntryPoint = "rtmidi_in_get_message", CallingConvention = CallingConvention.Cdecl)]
-            internal static extern double GetMessage(IntPtr device, /* unsigned char ** */out IntPtr message, /* size_t * */ ref UIntPtr size);
+            internal static extern double GetMessage(IntPtr device, /* unsigned char** */ out IntPtr message, /* size_t* */ ref UIntPtr size);
         }
 
-        internal static class Output
-        {
+        internal static class Output {
             [DllImport(LibraryFile, EntryPoint = "rtmidi_out_create_default", CallingConvention = CallingConvention.Cdecl)]
             internal static extern IntPtr CreateDefault();
 

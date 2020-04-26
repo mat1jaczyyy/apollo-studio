@@ -1,16 +1,16 @@
-﻿using System.Linq;
-using Apollo.RtMidi.Interface.Devices;
+﻿using Apollo.RtMidi.Unmanaged.Devices;
 
-namespace Apollo.RtMidi.Devices
-{
-    internal class MidiOutputDevice : MidiDevice, IMidiOutputDevice
-    {
+namespace Apollo.RtMidi.Devices {
+    public interface IMidiOutputDevice: IMidiDevice {
+        bool Send(byte[] data);
+        bool Send(MidiMessage data);
+    }
+
+    internal class MidiOutputDevice: MidiDevice, IMidiOutputDevice {
         private readonly RtMidiOutputDevice _outputDevice;
         
-        public MidiOutputDevice(RtMidiOutputDevice outputDevice, string name) : base(outputDevice, name)
-        {
-            _outputDevice = outputDevice;
-        }
+        public MidiOutputDevice(RtMidiOutputDevice outputDevice, string name): base(outputDevice, name)
+            => _outputDevice = outputDevice;
 
         public bool Send(byte[] data)
             => _outputDevice.SendMessage(data);

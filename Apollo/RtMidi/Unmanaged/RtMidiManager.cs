@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Apollo.RtMidi.Interface.API;
-using Apollo.RtMidi.Interface.Devices;
-using Apollo.RtMidi.Interface.Devices.Infos;
+using Apollo.RtMidi.Unmanaged.API;
+using Apollo.RtMidi.Unmanaged.Devices;
+using Apollo.RtMidi.Unmanaged.Devices.Infos;
 
-namespace Apollo.RtMidi.Interface
+namespace Apollo.RtMidi.Unmanaged
 {
     internal class RtMidiManager : IDisposable
     {
