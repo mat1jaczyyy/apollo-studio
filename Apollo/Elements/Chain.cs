@@ -10,7 +10,6 @@ using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 using Apollo.Viewers;
-using Apollo.Windows;
 
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}

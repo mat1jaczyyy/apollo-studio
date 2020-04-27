@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -6,7 +5,6 @@ using System.Reflection;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 

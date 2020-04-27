@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaColor = Avalonia.Media.Color;
 using IBrush = Avalonia.Media.IBrush;
 using SolidColorBrush = Avalonia.Media.SolidColorBrush;
-using Avalonia.VisualTree;
 
-using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
 

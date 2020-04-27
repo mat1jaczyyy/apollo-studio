@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,11 +15,9 @@ using Avalonia.Threading;
 using Humanizer;
 using Humanizer.Localisation;
 
-using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
-using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Viewers;
 

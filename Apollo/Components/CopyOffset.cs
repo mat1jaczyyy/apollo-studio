@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -7,7 +6,6 @@ using Avalonia.Markup.Xaml;
 
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Structures;
 

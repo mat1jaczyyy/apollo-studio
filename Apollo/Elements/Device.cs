@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-using Apollo.Devices;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;

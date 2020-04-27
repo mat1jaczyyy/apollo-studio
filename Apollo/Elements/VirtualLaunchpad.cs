@@ -1,7 +1,6 @@
-using Apollo.RtMidi.Devices.Infos;
-
 using Apollo.Core;
 using Apollo.Enums;
+using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 
 namespace Apollo.Elements {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 using Avalonia;
@@ -9,15 +8,12 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
-using Apollo.Binary;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
-using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Viewers;
-using Apollo.Windows;
 
 namespace Apollo.DeviceViewers {
     public class GroupViewer: UserControl, ISelectParentViewer, IDroppable {

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Selection;
-using Apollo.Undo;
 
 namespace Apollo.Structures {
     public class Frame: ISelect {

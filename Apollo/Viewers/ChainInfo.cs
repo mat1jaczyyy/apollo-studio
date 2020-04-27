@@ -5,7 +5,6 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -14,7 +13,6 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Selection;
-using Apollo.Windows;
 
 namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer, IDraggable, IRenamable {

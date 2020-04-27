@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Avalonia;
@@ -12,7 +11,6 @@ using Avalonia.Input;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class MacroFilterViewer: UserControl {

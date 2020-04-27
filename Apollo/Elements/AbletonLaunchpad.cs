@@ -1,10 +1,9 @@
 using Avalonia.Threading;
 
-using Apollo.RtMidi.Devices.Infos;
-
 using Apollo.Core;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 using Apollo.Windows;
 

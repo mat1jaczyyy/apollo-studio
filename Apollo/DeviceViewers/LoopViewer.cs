@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -9,7 +8,6 @@ using Avalonia.Markup.Xaml;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {

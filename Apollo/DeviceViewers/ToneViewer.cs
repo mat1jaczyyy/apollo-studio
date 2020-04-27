@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -8,7 +7,6 @@ using Avalonia.Markup.Xaml;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
-using Apollo.Elements;
 
 namespace Apollo.DeviceViewers {
     public class ToneViewer: UserControl {

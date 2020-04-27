@@ -8,14 +8,13 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
-using Apollo.RtMidi;
-using Apollo.RtMidi.Devices;
-using Apollo.RtMidi.Devices.Infos;
-
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.RtMidi;
+using Apollo.RtMidi.Devices;
+using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 using Apollo.Viewers;
 using Apollo.Windows;

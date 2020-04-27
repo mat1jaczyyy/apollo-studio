@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Apollo.RtMidi;
-using Apollo.RtMidi.Devices.Infos;
-
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.RtMidi;
+using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 
 namespace Apollo.Core {

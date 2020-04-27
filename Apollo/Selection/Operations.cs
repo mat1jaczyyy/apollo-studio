@@ -1,17 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 using Avalonia.Controls;
 
-using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Undo;
-using Apollo.Windows;
 
 namespace Apollo.Selection {
     static class Operations {

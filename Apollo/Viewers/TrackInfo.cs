@@ -5,16 +5,13 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
-using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Windows;
 

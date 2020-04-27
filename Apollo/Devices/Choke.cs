@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 

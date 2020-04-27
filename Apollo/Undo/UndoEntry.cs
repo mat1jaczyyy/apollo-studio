@@ -5,8 +5,6 @@ using System.Linq;
 
 using Avalonia.Controls;
 
-using Apollo.Core;
-using Apollo.Elements;
 using Apollo.Selection;
 
 namespace Apollo.Undo {
