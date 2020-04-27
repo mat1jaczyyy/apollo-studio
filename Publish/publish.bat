@@ -29,10 +29,7 @@ mkdir M4L
 mkdir Update
 
 robocopy ..\Apollo\bin\Release\netcoreapp3.1\win-x64\publish Apollo /E >nul 2>&1
-robocopy ..\Apollo Apollo elevate.exe >nul 2>&1
-
 robocopy ..\ApolloUpdate\bin\Release\netcoreapp3.1\win-x64\publish Update /E >nul 2>&1
-robocopy ..\ApolloUpdate Update handle64.exe >nul 2>&1
 
 robocopy ..\M4L M4L *.amxd >nul 2>&1
 
