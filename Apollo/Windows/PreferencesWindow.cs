@@ -20,6 +20,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.RtMidi;
 using Apollo.Structures;
 using Apollo.Viewers;
 
@@ -149,6 +150,8 @@ namespace Apollo.Windows {
 
             if (Github.AvaloniaVersion() != "")
                 ToolTip.SetTip(Version, $"Avalonia {Github.AvaloniaVersion()}");
+
+            ToolTip.SetTip(this.Get<TextBlock>("LaunchpadHeader"), $"RtMidi APIs:\n{string.Join("- \n", MidiDeviceManager.Default.GetAvailableMidiApis())}");
 
             fade.Initialize();
 

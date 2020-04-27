@@ -117,7 +117,7 @@
             
             <Border />
         
-            <TextBlock Classes="heading" Text="Launchpad Configuration" />
+            <TextBlock Classes="heading" Text="Launchpad Configuration" x:Name="LaunchpadHeader" />
             <StackPanel x:Name="Contents">
               <Components:VerticalAdd AlwaysShowing="true" ToolTip.Tip="Create Virtual Launchpad" Added="Launchpad_Add" />
             </StackPanel>

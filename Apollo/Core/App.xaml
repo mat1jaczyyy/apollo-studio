@@ -63,6 +63,10 @@
         </Transitions>
       </Setter>
     </Style>
+
+    <Style Selector="ToolTip">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+    </Style>
   </Application.Styles>
   
   <NativeMenu.Menu>
