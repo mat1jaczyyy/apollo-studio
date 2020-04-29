@@ -18,91 +18,92 @@ namespace Apollo.Binary {
 
         static void EncodeID(BinaryWriter writer, Type type) => writer.Write((byte)Array.IndexOf(Common.id, type));
 
-        public static MemoryStream Encode(object o) {
-            MemoryStream output = new MemoryStream();
+        static byte[] Encode(Action<BinaryWriter> encoder) {
+            using (MemoryStream output = new MemoryStream()) {
+                using (BinaryWriter writer = new BinaryWriter(output)) {
+                    EncodeHeader(writer);
+                    encoder?.Invoke(writer);
+                }
 
-            using (BinaryWriter writer = new BinaryWriter(output)) {
-                EncodeHeader(writer);
-                Encode(writer, (dynamic)o);
+                return output.ToArray();
             }
-
-            return output;
         }
 
-        public static MemoryStream EncodePreferences() {
-            MemoryStream output = new MemoryStream();
+        public static byte[] EncodeConfig() => Encode(writer => {
+            EncodeID(writer, typeof(Preferences));
 
-            using (BinaryWriter writer = new BinaryWriter(output)) {
-                EncodeHeader(writer);
-                EncodeID(writer, typeof(Preferences));
+            writer.Write(Preferences.AlwaysOnTop);
+            writer.Write(Preferences.CenterTrackContents);
 
-                writer.Write(Preferences.AlwaysOnTop);
-                writer.Write(Preferences.CenterTrackContents);
+            writer.Write(Preferences.ChainSignalIndicators);
+            writer.Write(Preferences.DeviceSignalIndicators);
+            
+            writer.Write((int)Preferences.ColorDisplayFormat);
 
-                writer.Write(Preferences.ChainSignalIndicators);
-                writer.Write(Preferences.DeviceSignalIndicators);
-                
-                writer.Write((int)Preferences.ColorDisplayFormat);
+            writer.Write((int)Preferences.LaunchpadStyle);
+            writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
+            writer.Write((int)Preferences.LaunchpadModel);
 
-                writer.Write((int)Preferences.LaunchpadStyle);
-                writer.Write(Convert.ToInt32(Preferences.LaunchpadGridRotation));
-                writer.Write((int)Preferences.LaunchpadModel);
+            writer.Write(Preferences.AutoCreateKeyFilter);
+            writer.Write(Preferences.AutoCreateMacroFilter);
+            writer.Write(Preferences.AutoCreatePattern);
 
-                writer.Write(Preferences.AutoCreateKeyFilter);
-                writer.Write(Preferences.AutoCreateMacroFilter);
-                writer.Write(Preferences.AutoCreatePattern);
+            writer.Write(Preferences.FadeSmoothnessSlider);
 
-                writer.Write(Preferences.FadeSmoothnessSlider);
+            writer.Write(Preferences.CopyPreviousFrame);
+            writer.Write(Preferences.CaptureLaunchpad);
+            writer.Write(Preferences.EnableGestures);
 
-                writer.Write(Preferences.CopyPreviousFrame);
-                writer.Write(Preferences.CaptureLaunchpad);
-                writer.Write(Preferences.EnableGestures);
+            writer.Write(Preferences.PaletteName);
 
-                writer.Write(Preferences.PaletteName);
+            for (int i = 0; i < 128; i++)
+                Encode(writer, Preferences.CustomPalette.BackingArray[i]);
 
-                for (int i = 0; i < 128; i++)
-                    Encode(writer, Preferences.CustomPalette.BackingArray[i]);
+            writer.Write((int)Preferences.ImportPalette);
 
-                writer.Write((int)Preferences.ImportPalette);
+            writer.Write((int)Preferences.Theme);
 
-                writer.Write((int)Preferences.Theme);
+            writer.Write(Preferences.Backup);
+            writer.Write(Preferences.Autosave);
 
-                writer.Write(Preferences.Backup);
-                writer.Write(Preferences.Autosave);
+            writer.Write(Preferences.UndoLimit);
+            
+            writer.Write(Preferences.DiscordPresence);
+            writer.Write(Preferences.DiscordFilename);
 
-                writer.Write(Preferences.UndoLimit);
-                
-                writer.Write(Preferences.DiscordPresence);
-                writer.Write(Preferences.DiscordFilename);
+            int count;
+            writer.Write(count = Math.Min(64, ColorHistory.Count));
+            for (int i = 0; i < count; i++)
+                Encode(writer, ColorHistory.GetColor(i));
+            
+            writer.Write(MIDI.Devices.Count(i => i.GetType() == typeof(Launchpad)));
+            for (int i = 0; i < MIDI.Devices.Count; i++)
+                if (MIDI.Devices[i].GetType() == typeof(Launchpad))
+                    Encode(writer, MIDI.Devices[i]);
+            
+            writer.Write(Preferences.Recents.Count);
+            for (int i = 0; i < Preferences.Recents.Count; i++)
+                writer.Write(Preferences.Recents[i]);
+            
+            writer.Write(Preferences.VirtualLaunchpads.Count);
+            for (int i = 0; i < Preferences.VirtualLaunchpads.Count; i++)
+                writer.Write(Preferences.VirtualLaunchpads[i]);
+            
+            writer.Write(Preferences.Crashed);
+            writer.Write(Preferences.CrashPath);
+            
+            writer.Write(Preferences.CheckForUpdates);
+        });
 
-                int count;
-                writer.Write(count = Math.Min(64, ColorHistory.Count));
-                for (int i = 0; i < count; i++)
-                    Encode(writer, ColorHistory.GetColor(i));
-                
-                writer.Write(MIDI.Devices.Count(i => i.GetType() == typeof(Launchpad)));
-                for (int i = 0; i < MIDI.Devices.Count; i++)
-                    if (MIDI.Devices[i].GetType() == typeof(Launchpad))
-                        Encode(writer, MIDI.Devices[i]);
-                
-                writer.Write(Preferences.Recents.Count);
-                for (int i = 0; i < Preferences.Recents.Count; i++)
-                    writer.Write(Preferences.Recents[i]);
-                
-                writer.Write(Preferences.VirtualLaunchpads.Count);
-                for (int i = 0; i < Preferences.VirtualLaunchpads.Count; i++)
-                    writer.Write(Preferences.VirtualLaunchpads[i]);
-                
-                writer.Write(Preferences.Crashed);
-                writer.Write(Preferences.CrashPath);
-                
-                writer.Write(Preferences.CheckForUpdates);
+        public static byte[] EncodeStats() => Encode(writer => {
+            EncodeID(writer, typeof(Preferences));
+            
+            writer.Write(Preferences.Time);
+        });
 
-                writer.Write(Preferences.Time);
-            }
-
-            return output;
-        }
+        public static byte[] Encode(object o) => Encode(writer => {
+            Encode(writer, (dynamic)o);
+        });
 
         static void Encode(BinaryWriter writer, Copyable o) {
             EncodeID(writer, typeof(Copyable));
