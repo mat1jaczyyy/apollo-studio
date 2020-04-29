@@ -43,6 +43,9 @@
     <None Update="librtmidi.dylib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="librtmidi.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="rtmidi.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
