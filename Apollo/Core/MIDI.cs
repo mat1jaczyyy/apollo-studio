@@ -31,8 +31,9 @@ namespace Apollo.Core {
         public static readonly Launchpad NoOutput = new VirtualLaunchpad("No Output", 0);
 
         public static void ClearState(bool manual = true, bool multi = true, bool force = false) {
-            foreach (Track track in Program.Project?.Tracks)
-                track.Chain.MIDIEnter(new StopSignal());
+            if (Program.Project?.Tracks != null)
+                foreach (Track track in Program.Project.Tracks)
+                    track.Chain.MIDIEnter(new StopSignal());
             
             if (multi) Multi.InvokeReset();
             Preview.InvokeClear();
