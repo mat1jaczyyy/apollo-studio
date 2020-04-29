@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+
+using Apollo.RtMidi.Unmanaged.API;
 
 namespace Apollo.RtMidi.Unmanaged.Devices.Infos {
     public class RtMidiDeviceInfo {
@@ -25,6 +28,9 @@ namespace Apollo.RtMidi.Unmanaged.Devices.Infos {
             Name = name.EndsWith(port.ToString())
                 ? name.Substring(0, name.LastIndexOf(port.ToString(), StringComparison.Ordinal))
                 : name;
+            
+            if (MidiDeviceManager.Default.GetAvailableMidiApis().FirstOrDefault() == RtMidiApi.RT_MIDI_API_LINUX_ALSA)
+                Name = Name.Split(':', 2).Last();
         }
 
         public uint Port { get; private set; }
