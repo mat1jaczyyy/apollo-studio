@@ -167,6 +167,8 @@ namespace Apollo.Windows {
         }
 
         void Update() {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return;
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Program.LaunchAdmin = true;
             else UpdateWindow.Create(this);
 

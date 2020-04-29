@@ -42,9 +42,11 @@ namespace Apollo.Helpers {
                     await Client.Repository.Release.GetAll("mat1jaczyyy", "apollo-studio")
                 ).First(i => i.Prerelease == false);
                 
-                download = release.Assets.FirstOrDefault(i => i.Name.Contains(
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
-                ));
+                download = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                    ? null
+                    : release.Assets.FirstOrDefault(i => i.Name.Contains(
+                        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
+                    ));
             }
 
             return release;

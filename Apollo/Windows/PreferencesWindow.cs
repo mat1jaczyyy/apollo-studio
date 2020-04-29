@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -68,6 +69,12 @@ namespace Apollo.Windows {
             DiscordFilename = this.Get<CheckBox>("DiscordFilename");
 
             CheckForUpdates = this.Get<CheckBox>("CheckForUpdates");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                CheckForUpdates.IsEnabled = false;
+                CheckForUpdates.IsChecked = false;
+                ToolTip.SetTip(CheckForUpdates, "Auto-updating is not supported on Linux");
+            }
 
             Contents = this.Get<StackPanel>("Contents").Children;
 

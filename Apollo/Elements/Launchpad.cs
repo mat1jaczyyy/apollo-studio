@@ -26,6 +26,7 @@ namespace Apollo.Elements {
             "official Novation firmware which is not compatible with Apollo Studio.\n\n" +
             "Update these to the latest version of the firmware using the official updater or\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            // todo remove official options for linux?
             new PortWarning.Option(
                 "Download Official Updater",
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)

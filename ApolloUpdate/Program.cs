@@ -44,6 +44,9 @@ namespace ApolloUpdate {
                     File.WriteAllBytes(crashName + ".zip", memoryStream.ToArray());
                 }
             };
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                throw new InvalidOperationException("Auto-updating is not supported on Linux");
             
             string temppath = Program.GetBaseFolder("Temp");
 
