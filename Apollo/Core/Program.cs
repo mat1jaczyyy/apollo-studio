@@ -55,6 +55,8 @@ namespace Apollo.Core {
         public static Project Project {
             get => _project;
             set {
+                MIDI.ClearState(force: true);
+
                 _project?.Dispose();
 
                 if ((_project = value) == null) {
@@ -67,8 +69,6 @@ namespace Apollo.Core {
                     ProjectLoaded?.Invoke();
                     ProjectLoaded = null;
                 }
-
-                MIDI.ClearState(force: true);
             }
         }
 
