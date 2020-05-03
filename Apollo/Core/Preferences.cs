@@ -12,6 +12,7 @@ namespace Apollo.Core {
         public static PreferencesWindow Window;
 
         static readonly string FilePath = Path.Combine(Program.UserPath, "Apollo.config");
+        static readonly string StatsPath = Path.Combine(Program.UserPath, "Apollo.stats");
 
         public delegate void CheckBoxChanged(bool newValue);
         public delegate void SmoothnessChanged(double newValue);
@@ -379,22 +380,35 @@ namespace Apollo.Core {
             }
         }
 
+        static bool Loading;
+
         public static void Save() {
+            if (Loading) return;
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
 
             try {
-                File.WriteAllBytes(FilePath, Encoder.EncodePreferences().ToArray());
+                // Save stats first in case config saving fails
+                File.WriteAllBytes(StatsPath, Encoder.EncodeStats());
+                File.WriteAllBytes(FilePath, Encoder.EncodeConfig());
             } catch (IOException) {}
         }
 
+        static void Read(string path, Action<Stream> decoder) {
+            if (!File.Exists(path)) return;
+
+            using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
+                try {
+                    decoder?.Invoke(file);
+                } catch {
+                    Console.WriteLine("Error reading Preferences");
+                }
+        }
+
         static Preferences() {
-            if (File.Exists(FilePath))
-                using (FileStream file = File.Open(FilePath, FileMode.Open, FileAccess.Read))
-                    try {
-                        Decoder.DecodeBlock(file, typeof(Preferences));
-                    } catch {
-                        Console.WriteLine("Error reading Preferences");
-                    }
+            Loading = true;
+            Read(FilePath, Decoder.DecodeConfig);
+            Read(StatsPath, Decoder.DecodeStats);
+            Loading = false;
 
             Save();
 

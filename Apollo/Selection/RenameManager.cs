@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 using Apollo.Core;
 using Apollo.Undo;
@@ -70,7 +71,7 @@ namespace Apollo.Selection {
 
         void MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
 
-        public void StartInput(int left, int right) {
+        public void StartInput(int left, int right) => Dispatcher.UIThread.Post(() => {
             Left = left;
             Right = right;
             Clean = new List<string>();
@@ -86,7 +87,7 @@ namespace Apollo.Selection {
             Host.Input.Opacity = 1;
             Host.Input.IsHitTestVisible = true;
             Host.Input.Focus();
-        }
+        });
 
         public void UpdateText() => Host.NameText.Text = ((IName)Host.Item).ProcessedName;
 

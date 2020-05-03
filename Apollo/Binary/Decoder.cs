@@ -20,6 +20,134 @@ namespace Apollo.Binary {
 
         static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
 
+        static void Decode(Stream input, Action<BinaryReader, int> decoder) {
+            using (BinaryReader reader = new BinaryReader(input)) {
+                if (!DecodeHeader(reader)) throw new InvalidDataException();
+
+                int version = reader.ReadInt32();
+
+                if (version > Common.version) throw new InvalidDataException();
+
+                if (typeof(Preferences) != DecodeID(reader)) throw new InvalidDataException();
+
+                decoder?.Invoke(reader, version);
+            }
+        }
+
+        public static void DecodeConfig(Stream input) => Decode(input, (reader, version) => {
+            Preferences.AlwaysOnTop = reader.ReadBoolean();
+            Preferences.CenterTrackContents = reader.ReadBoolean();
+
+            if (version >= 24) {
+                Preferences.ChainSignalIndicators = reader.ReadBoolean();
+                Preferences.DeviceSignalIndicators = reader.ReadBoolean();
+            } else if (version >= 23) {
+                Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
+            }
+            
+            if (version >= 28) {
+                Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
+            }
+
+            if (version >= 9) {
+                Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
+            }
+
+            if (version >= 14) {
+                Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
+            }
+
+            if (version >= 24) {
+                LaunchpadModels model = (LaunchpadModels)reader.ReadInt32();
+
+                if (version <= 28 && model >= LaunchpadModels.ProMK3)
+                    model++;
+
+                Preferences.LaunchpadModel = model;
+            }
+
+            Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
+            Preferences.AutoCreateMacroFilter = reader.ReadBoolean();
+
+            if (version >= 11) {
+                Preferences.AutoCreatePattern = reader.ReadBoolean();
+            }
+
+            Preferences.FadeSmoothness = reader.ReadDouble();
+            Preferences.CopyPreviousFrame = reader.ReadBoolean();
+
+            if (version >= 7) {
+                Preferences.CaptureLaunchpad = reader.ReadBoolean();
+            }
+            
+            Preferences.EnableGestures = reader.ReadBoolean();
+
+            if (version >= 7) {
+                Preferences.PaletteName = reader.ReadString();
+                Preferences.CustomPalette = new Palette(Enumerable.Range(0, 128).Select(i => (Color)Decode(reader, version)).ToArray());
+                Preferences.ImportPalette = (Palettes)reader.ReadInt32();
+
+                Preferences.Theme = (ThemeType)reader.ReadInt32();
+            }
+
+            if (version >= 10) {
+                Preferences.Backup = reader.ReadBoolean();
+                Preferences.Autosave = reader.ReadBoolean();
+            }
+
+            if (version >= 12) {
+                Preferences.UndoLimit = reader.ReadBoolean();
+            }
+
+            if (version <= 0) {
+                Preferences.DiscordPresence = true;
+                reader.ReadBoolean();
+            } else {
+                Preferences.DiscordPresence = reader.ReadBoolean();
+            }
+            
+            Preferences.DiscordFilename = reader.ReadBoolean();
+
+            ColorHistory.Set(
+                Enumerable.Range(0, reader.ReadInt32()).Select(i => (Color)Decode(reader, version)).ToList()
+            );
+
+            if (version >= 2)
+                MIDI.Devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => (Launchpad)Decode(reader, version)).ToList();
+
+            if (version >= 15) {
+                Preferences.Recents = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadString()).ToList();
+            }
+
+            if (version >= 25) {
+                Preferences.VirtualLaunchpads = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadInt32()).ToList();
+            }
+
+            if (15 <= version && version <= 22) {
+                reader.ReadString();
+                reader.ReadString();
+            }
+
+            if (version >= 23) {
+                Preferences.Crashed = reader.ReadBoolean();
+                Preferences.CrashPath = reader.ReadString();
+            }
+
+            if (version >= 16)
+                Preferences.CheckForUpdates = reader.ReadBoolean();
+
+            if (17 <= version && version <= 28)
+                Preferences.BaseTime = reader.ReadInt64();
+            else
+                reader.ReadInt64();
+        });
+
+        
+        public static void DecodeStats(Stream input) => Decode(input, (reader, version) => {
+            if (version >= 29)
+                Preferences.BaseTime = reader.ReadInt64();
+        });
+
         public static async Task<dynamic> Decode(Stream input, Type ensure) {
             using (BinaryReader reader = new BinaryReader(input)) {
                 if (!DecodeHeader(reader)) throw new InvalidDataException();
@@ -33,134 +161,15 @@ namespace Apollo.Binary {
                     new string[] { "Yes", "No" }, null
                 ) == "No") throw new InvalidDataException();
 
-                return Decode(reader, version, ensure, true);
-            }
-        }
-
-        public static dynamic DecodeBlock(Stream input, Type ensure) {
-            using (BinaryReader reader = new BinaryReader(input)) {
-                if (!DecodeHeader(reader)) throw new InvalidDataException();
-
-                int version = reader.ReadInt32();
-
-                if (version > Common.version) throw new InvalidDataException();
-
-                return Decode(reader, version, ensure, true);
+                return Decode(reader, version, ensure);
             }
         }
         
-        static dynamic Decode(BinaryReader reader, int version, Type ensure = null, bool root = false) {
+        static dynamic Decode(BinaryReader reader, int version, Type ensure = null) {
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) throw new InvalidDataException();
 
-            if (t == typeof(Preferences) && root) {
-                Preferences.AlwaysOnTop = reader.ReadBoolean();
-                Preferences.CenterTrackContents = reader.ReadBoolean();
-
-                if (version >= 24) {
-                    Preferences.ChainSignalIndicators = reader.ReadBoolean();
-                    Preferences.DeviceSignalIndicators = reader.ReadBoolean();
-                } else if (version >= 23) {
-                    Preferences.ChainSignalIndicators = Preferences.DeviceSignalIndicators = reader.ReadBoolean();
-                }
-                
-                if (version >= 28) {
-                    Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
-                }
-
-                if (version >= 9) {
-                    Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
-                }
-
-                if (version >= 14) {
-                    Preferences.LaunchpadGridRotation = reader.ReadInt32() > 0;
-                }
-
-                if (version >= 24) {
-                    LaunchpadModels model = (LaunchpadModels)reader.ReadInt32();
-
-                    if (version <= 28 && model >= LaunchpadModels.ProMK3)
-                        model++;
-
-                    Preferences.LaunchpadModel = model;
-                }
-
-                Preferences.AutoCreateKeyFilter = reader.ReadBoolean();
-                Preferences.AutoCreateMacroFilter = reader.ReadBoolean();
-
-                if (version >= 11) {
-                    Preferences.AutoCreatePattern = reader.ReadBoolean();
-                }
-
-                Preferences.FadeSmoothness = reader.ReadDouble();
-                Preferences.CopyPreviousFrame = reader.ReadBoolean();
-
-                if (version >= 7) {
-                    Preferences.CaptureLaunchpad = reader.ReadBoolean();
-                }
-                
-                Preferences.EnableGestures = reader.ReadBoolean();
-
-                if (version >= 7) {
-                    Preferences.PaletteName = reader.ReadString();
-                    Preferences.CustomPalette = new Palette(Enumerable.Range(0, 128).Select(i => (Color)Decode(reader, version)).ToArray());
-                    Preferences.ImportPalette = (Palettes)reader.ReadInt32();
-
-                    Preferences.Theme = (ThemeType)reader.ReadInt32();
-                }
-
-                if (version >= 10) {
-                    Preferences.Backup = reader.ReadBoolean();
-                    Preferences.Autosave = reader.ReadBoolean();
-                }
-
-                if (version >= 12) {
-                    Preferences.UndoLimit = reader.ReadBoolean();
-                }
-
-                if (version <= 0) {
-                    Preferences.DiscordPresence = true;
-                    reader.ReadBoolean();
-                } else {
-                    Preferences.DiscordPresence = reader.ReadBoolean();
-                }
-                
-                Preferences.DiscordFilename = reader.ReadBoolean();
-
-                ColorHistory.Set(
-                    Enumerable.Range(0, reader.ReadInt32()).Select(i => (Color)Decode(reader, version)).ToList()
-                );
-
-                if (version >= 2)
-                    MIDI.Devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => (Launchpad)Decode(reader, version)).ToList();
-
-                if (version >= 15) {
-                    Preferences.Recents = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadString()).ToList();
-                }
-
-                if (version >= 25) {
-                    Preferences.VirtualLaunchpads = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadInt32()).ToList();
-                }
-
-                if (15 <= version && version <= 22) {
-                    reader.ReadString();
-                    reader.ReadString();
-                }
-
-                if (version >= 23) {
-                    Preferences.Crashed = reader.ReadBoolean();
-                    Preferences.CrashPath = reader.ReadString();
-                }
-
-                if (version >= 16)
-                    Preferences.CheckForUpdates = reader.ReadBoolean();
-
-                if (version >= 17)
-                    Preferences.BaseTime = reader.ReadInt64();
-                
-                return null;
-
-            } else if (t == typeof(Copyable)) {
+            if (t == typeof(Copyable)) {
                 return new Copyable() {
                     Contents = Enumerable.Range(0, reader.ReadInt32()).Select(i => (ISelect)Decode(reader, version)).ToList()
                 };
