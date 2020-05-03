@@ -70,12 +70,6 @@ namespace Apollo.Windows {
 
             CheckForUpdates = this.Get<CheckBox>("CheckForUpdates");
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-                CheckForUpdates.IsEnabled = false;
-                CheckForUpdates.IsChecked = false;
-                ToolTip.SetTip(CheckForUpdates, "Auto-updating is not supported on Linux");
-            }
-
             Contents = this.Get<StackPanel>("Contents").Children;
 
             CurrentSession = this.Get<TextBlock>("CurrentSession");
@@ -201,6 +195,12 @@ namespace Apollo.Windows {
             DiscordFilename.IsChecked = Preferences.DiscordFilename;
 
             CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                CheckForUpdates.IsChecked = false;
+                CheckForUpdates.IsEnabled = false;
+                ToolTip.SetTip((Control)CheckForUpdates.Parent, "Auto-updating is not supported on Linux");
+            }
 
             UpdateTime(null, EventArgs.Empty);
             Timer = new DispatcherTimer() {
