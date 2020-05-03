@@ -30,7 +30,8 @@ namespace Apollo.Elements {
                 "Download Official Updater",
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg"
+                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg",
+                false
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -48,7 +49,8 @@ namespace Apollo.Elements {
                 "Download Official Updater",
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg"
+                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg",
+                false
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",

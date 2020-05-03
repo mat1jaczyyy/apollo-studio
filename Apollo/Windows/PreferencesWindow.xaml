@@ -166,7 +166,9 @@
             <Border />
 
             <TextBlock Classes="heading" Text="Application Management" />
-            <CheckBox Click="CheckForUpdates_Changed" x:Name="CheckForUpdates">Check for Updates on Startup</CheckBox>
+            <StackPanel Background="Transparent">
+              <CheckBox Click="CheckForUpdates_Changed" x:Name="CheckForUpdates">Check for Updates on Startup</CheckBox>
+            </StackPanel>
             <Grid ColumnDefinitions="*,*">
               <Button Grid.Column="0" Margin="0 0 2.5 0" Background="{DynamicResource ThemeControlHighBrush}" Content="Open Crashes Folder" Click="OpenCrashesFolder" />
               <Button Grid.Column="1" Margin="2.5 0 0 0" Background="{DynamicResource ThemeControlHighBrush}" Content="Locate Apollo Connector" Click="LocateApolloConnector" />

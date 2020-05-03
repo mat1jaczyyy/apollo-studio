@@ -65,6 +65,9 @@ namespace Apollo.Windows {
         }
 
         public UpdateWindow() {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                throw new InvalidOperationException("Auto-updating is not supported on Linux");
+
             InitializeComponent();
             #if DEBUG
                 this.AttachDevTools();

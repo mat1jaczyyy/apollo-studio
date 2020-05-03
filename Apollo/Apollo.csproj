@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <RuntimeFrameworkVersion>3.1.2</RuntimeFrameworkVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
     <LangVersion>8.0</LangVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ServerGarbageCollection>false</ServerGarbageCollection>
@@ -40,6 +40,9 @@
   
   <ItemGroup>
     <None Update="librtmidi.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="librtmidi.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="rtmidi.dll">
