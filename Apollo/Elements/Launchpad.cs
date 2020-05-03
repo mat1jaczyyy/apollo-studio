@@ -104,11 +104,15 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware which is not compatible with \n" +
             "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
-            "Update these to the latest version of the firmware using the Novation\n" +
-            "Components app to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using Novation Components\n" +
+            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+            ),
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
             )
         );
 
@@ -116,11 +120,15 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
             "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using the Novation\n" +
-            "Components app to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using Novation Components\n" +
+            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+            ),
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
             )
         );
 
