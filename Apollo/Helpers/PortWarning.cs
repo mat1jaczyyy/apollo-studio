@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -14,10 +15,12 @@ namespace Apollo.Helpers {
     public class PortWarning {
         public class Option {
             public readonly string action, url;
+            public readonly bool linux;
 
-            public Option(string button, string location) {
+            public Option(string button, string location, bool linux = true) {
                 action = button;
                 url = location;
+                this.linux = linux;
             }
         }
 
@@ -27,7 +30,7 @@ namespace Apollo.Helpers {
 
         public PortWarning(string msg, params Option[] opts) {
             message = msg;
-            options = opts;
+            options = opts.Where(i => !RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || i.linux).ToArray();
         }
 
         public void Set() {

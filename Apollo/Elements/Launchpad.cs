@@ -26,12 +26,12 @@ namespace Apollo.Elements {
             "official Novation firmware which is not compatible with Apollo Studio.\n\n" +
             "Update these to the latest version of the firmware using the official updater or\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
-            // todo remove official options for linux?
             new PortWarning.Option(
                 "Download Official Updater",
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg"
+                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg",
+                false
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -49,7 +49,8 @@ namespace Apollo.Elements {
                 "Download Official Updater",
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg"
+                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg",
+                false
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
