@@ -138,8 +138,6 @@ namespace Apollo.Binary {
 
             if (17 <= version && version <= 28)
                 Preferences.BaseTime = reader.ReadInt64();
-            else
-                reader.ReadInt64();
         });
 
         
