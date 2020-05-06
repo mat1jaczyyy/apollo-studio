@@ -5,10 +5,11 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Binary {
     public static class Common {
-        public const int version = 29;
+        public const int version = 30;
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),
@@ -50,7 +51,8 @@ namespace Apollo.Binary {
             typeof(Clear),
             typeof(LayerFilter),
             typeof(Loop),
-            typeof(Refresh)
+            typeof(Refresh),
+            typeof(UndoManager)
         };
     }
 }

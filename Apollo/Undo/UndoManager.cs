@@ -13,14 +13,12 @@ namespace Apollo.Undo {
 
         object locker = new object();
 
-        public List<UndoEntry> History = new List<UndoEntry>() {
-            new UndoEntry("Initial State")
-        };
+        public List<UndoEntry> History;
 
         public delegate void PositionChangedEventHandler(int position);
         public event PositionChangedEventHandler PositionChanged;
 
-        int _position = 0;
+        int _position;
         public int Position { 
             get => _position;
             private set {
@@ -36,20 +34,22 @@ namespace Apollo.Undo {
         public delegate void SavedPositionChangedEventHandler(int? position);
         public event SavedPositionChangedEventHandler SavedPositionChanged;
 
-        int? _saved = null;
-        public int? SavedPosition {
-            get => _saved;
-        }
+        public int? SavedPosition { get; private set; } = null;
         
         public delegate void SavedChangedEventHandler(bool saved);
         public event SavedChangedEventHandler SavedChanged;
 
-        public bool Saved {
-            get => _saved == Position;
+        public bool Saved => SavedPosition == Position;
+
+        public UndoManager(List<UndoEntry> history = null, int position = 0) {
+            History = history?? new List<UndoEntry>() {
+                new UndoEntry("Initial State")
+            };
+            _position = position;
         }
 
         public void SavePosition() {
-            _saved = Position;
+            SavedPosition = Position;
 
             SavedChanged?.Invoke(Saved);
             SavedPositionChanged?.Invoke(SavedPosition.Value);
@@ -98,7 +98,7 @@ namespace Apollo.Undo {
         }
 
         public void Clear(string description = "Undo History Cleared") {
-            _saved = (SavedPosition == Position)? (int?)0 : null;
+            SavedPosition = Saved? (int?)0 : null;
             SavedPositionChanged?.Invoke(SavedPosition);
 
             if (Window != null)
@@ -121,9 +121,9 @@ namespace Apollo.Undo {
             if ((remove = History.Count - 150) > 0) {
                 if (Position < History.Count - 150) return;
 
-                if (_saved != null) {
-                    _saved += -remove;
-                    if (_saved < 0) _saved = null;
+                if (SavedPosition != null) {
+                    SavedPosition += -remove;
+                    if (SavedPosition < 0) SavedPosition = null;
                 }
                 SavedPositionChanged?.Invoke(SavedPosition);
 

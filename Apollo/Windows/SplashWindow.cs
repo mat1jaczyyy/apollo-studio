@@ -296,7 +296,7 @@ namespace Apollo.Windows {
 
             if (Program.Project != null) {
                 Program.Project.FilePath = originalPath;
-                Program.Project.Undo.Clear("Project Restored");
+                Program.Project.Undo.Clear("Project Restored"); // todo clean
             }
 
             ResolveCrash();

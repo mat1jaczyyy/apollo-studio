@@ -76,7 +76,7 @@ namespace Apollo.Elements {
 
         Stopwatch TimeSpent = new Stopwatch();
 
-        public UndoManager Undo = new UndoManager();
+        public UndoManager Undo;
 
         public event ChangedEventHandler TrackOperationFinished;
         bool _trackoperation = false;
@@ -232,7 +232,7 @@ namespace Apollo.Elements {
             TrackOperation = false;
         }
 
-        public Project(int bpm = 150, int[] macros = null, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {
+        public Project(int bpm = 150, int[] macros = null, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, UndoManager undo = null, string path = "") {
             TimeSpent.Start();
 
             BPM = bpm;
@@ -242,6 +242,7 @@ namespace Apollo.Elements {
             BaseTime = basetime;
             FilePath = path;
             Started = (started == 0)? DateTimeOffset.UtcNow : DateTimeOffset.FromUnixTimeSeconds(started);
+            Undo = undo?? new UndoManager();
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
 

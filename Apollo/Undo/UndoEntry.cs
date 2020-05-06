@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Avalonia.Controls;
 
@@ -38,6 +40,29 @@ namespace Apollo.Undo {
         protected virtual void OnDispose() {}
 
         public UndoEntry(string desc) => Description = desc;
+
+        protected UndoEntry(BinaryReader reader, int version) {
+            Description = reader.ReadString();
+
+            if (reader.ReadBoolean()) // has Post
+                Post = DecodeEntry(reader, version);
+        }
+
+        public virtual void Encode(BinaryWriter writer) {
+            writer.Write(Description);
+
+            writer.Write(Post != null);
+            Post?.Encode(writer);
+        }
+
+        public static UndoEntry DecodeEntry(BinaryReader reader, int version)
+            => (UndoEntry)Activator.CreateInstance(
+                UndoBinary.DecodeID(reader),
+                BindingFlags.NonPublic | BindingFlags.Instance,
+                null,
+                new object[] { reader, version },
+                null
+            );
     }
 
     public abstract class SimpleUndoEntry<I>: UndoEntry {
@@ -80,7 +105,19 @@ namespace Apollo.Undo {
         protected override void OnRedo() => RedoPath(Items);
         protected virtual void RedoPath(params T[] items) {}
 
-        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
+        public PathUndoEntry(string desc, params T[] children)
+        : base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
+
+        protected PathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) => Paths = Enumerable.Range(0, reader.ReadInt32()).Select(i => new Path<T>(reader, version)).ToList();
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+
+            writer.Write(Paths.Count);
+            for (int i = 0; i < Paths.Count; i++)
+                Paths[i].Encode(writer);
+        }
     }
 
     public abstract class SinglePathUndoEntry<T>: PathUndoEntry<T> {

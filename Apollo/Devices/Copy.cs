@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Apollo.DeviceViewers;
@@ -648,6 +649,25 @@ namespace Apollo.Devices {
                 this.uy = uy;
                 this.rx = rx;
                 this.ry = ry;
+            }
+
+            OffsetRelativeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                this.index = reader.ReadInt32();
+                this.ux = reader.ReadInt32();
+                this.uy = reader.ReadInt32();
+                this.rx = reader.ReadInt32();
+                this.ry = reader.ReadInt32();
+            }
+
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+
+                writer.Write(index);
+                writer.Write(ux);
+                writer.Write(uy);
+                writer.Write(rx);
+                writer.Write(ry);
             }
         }
 

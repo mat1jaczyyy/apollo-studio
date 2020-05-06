@@ -12,13 +12,14 @@ using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Binary {
     public static class Decoder {
         static bool DecodeHeader(BinaryReader reader) => reader.ReadBytes(4).Select(i => (char)i).SequenceEqual(new char[] {'A', 'P', 'O', 'L'});
 
-        static Type DecodeID(BinaryReader reader) => Common.id[(reader.ReadByte())];
+        static Type DecodeID(BinaryReader reader) => Common.id[reader.ReadByte()];
 
         static void Decode(Stream input, Action<BinaryReader, int> decoder) {
             using (BinaryReader reader = new BinaryReader(input)) {
@@ -187,7 +188,12 @@ namespace Apollo.Binary {
                     started = reader.ReadInt64();
                 }
 
-                return new Project(bpm, macros, tracks, author, time, started);
+                UndoManager undo = null;
+                if (version >= 30) {
+                    undo = (UndoManager)Decode(reader, version);
+                }
+
+                return new Project(bpm, macros, tracks, author, time, started, undo);
             
             } else if (t == typeof(Track)) {
                 Chain chain = (Chain)Decode(reader, version);
@@ -676,6 +682,12 @@ namespace Apollo.Binary {
                 return new Time(
                     reader.ReadBoolean(),
                     Decode(reader, version),
+                    reader.ReadInt32()
+                );
+            
+            else if (t == typeof(UndoManager))
+                return new UndoManager(
+                    Enumerable.Range(0, reader.ReadInt32()).Select(i => UndoEntry.DecodeEntry(reader, version)).ToList(),
                     reader.ReadInt32()
                 );
 
