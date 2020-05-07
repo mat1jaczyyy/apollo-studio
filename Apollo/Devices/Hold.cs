@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-
+using System.IO;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
@@ -167,6 +167,8 @@ namespace Apollo.Devices {
             
             public DurationUndoEntry(Hold hold, int u, int r)
             : base($"Hold Duration Changed to {r}ms", hold, u, r) {}
+            
+            DurationUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class DurationModeUndoEntry: SimplePathUndoEntry<Hold, bool> {
@@ -174,6 +176,8 @@ namespace Apollo.Devices {
             
             public DurationModeUndoEntry(Hold hold, bool u, bool r)
             : base($"Hold Duration Switched to {(r? "Steps" : "Free")}", hold, u, r) {}
+            
+            DurationModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class DurationStepUndoEntry: SimplePathUndoEntry<Hold, int> {
@@ -181,6 +185,8 @@ namespace Apollo.Devices {
             
             public DurationStepUndoEntry(Hold hold, int u, int r)
             : base($"Hold Duration Changed to {Length.Steps[r]}", hold, u, r) {}
+            
+            DurationStepUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Hold, double> {
@@ -188,6 +194,8 @@ namespace Apollo.Devices {
             
             public GateUndoEntry(Hold hold, double u, double r)
             : base($"Hold Gate Changed to {r}%", hold, u / 100, r / 100) {}
+            
+            GateUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class InfiniteUndoEntry: SimplePathUndoEntry<Hold, bool> {
@@ -195,6 +203,8 @@ namespace Apollo.Devices {
             
             public InfiniteUndoEntry(Hold hold, bool u, bool r)
             : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", hold, u, r) {}
+            
+            InfiniteUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class ReleaseUndoEntry: SimplePathUndoEntry<Hold, bool> {
@@ -202,6 +212,8 @@ namespace Apollo.Devices {
             
             public ReleaseUndoEntry(Hold hold, bool u, bool r)
             : base($"Hold Release Changed to {(r? "Enabled" : "Disabled")}", hold, u, r) {}
+            
+            ReleaseUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

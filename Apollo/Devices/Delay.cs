@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-
+using System.IO;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
@@ -110,6 +110,8 @@ namespace Apollo.Devices {
             
             public DurationUndoEntry(Delay delay, int u, int r)
             : base($"Delay Duration Changed to {r}ms", delay, u, r) {}
+            
+            DurationUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class DurationModeUndoEntry: SimplePathUndoEntry<Delay, bool> {
@@ -117,6 +119,8 @@ namespace Apollo.Devices {
             
             public DurationModeUndoEntry(Delay delay, bool u, bool r)
             : base($"Delay Duration Switched to {(r? "Steps" : "Free")}", delay, u, r) {}
+            
+            DurationModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class DurationStepUndoEntry: SimplePathUndoEntry<Delay, int> {
@@ -124,6 +128,8 @@ namespace Apollo.Devices {
             
             public DurationStepUndoEntry(Delay delay, int u, int r)
             : base($"Delay Duration Changed to {Length.Steps[r]}", delay, u, r) {}
+            
+            DurationStepUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Delay, double> {
@@ -131,6 +137,8 @@ namespace Apollo.Devices {
             
             public GateUndoEntry(Delay delay, double u, double r)
             : base($"Delay Gate Changed to {r}%", delay, u / 100, r / 100) {}
+            
+            GateUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

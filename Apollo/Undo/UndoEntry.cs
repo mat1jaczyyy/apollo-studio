@@ -180,7 +180,7 @@ namespace Apollo.Undo {
 
         public override void Encode(BinaryWriter writer) {
             base.Encode(writer);
-
+            
             Encoder.EncodeAnything(writer, u);
             Encoder.EncodeAnything(writer, r);
         }
@@ -189,6 +189,10 @@ namespace Apollo.Undo {
     public abstract class EnumSimplePathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where I: Enum {
         public EnumSimplePathUndoEntry(string desc, T child, I undo, I redo, IEnumerable textSource)
         : base($"{desc} Changed to {textSource.OfType<ComboBoxItem>().ElementAt((int)(object)redo).Content}", child, undo, redo) {}
+        
+        protected EnumSimplePathUndoEntry(BinaryReader reader, int version): base(reader, version){}
+        
+        public override void Encode(BinaryWriter writer) => base.Encode(writer);
     }
 
     public abstract class SymmetricPathUndoEntry<T>: SinglePathUndoEntry<T> {
@@ -201,6 +205,8 @@ namespace Apollo.Undo {
 
         protected SymmetricPathUndoEntry(BinaryReader reader, int version)
         : base(reader, version) {}
+        
+        public override void Encode(BinaryWriter writer) => base.Encode(writer);
     }
 
     public abstract class SimpleIndexPathUndoEntry<T, I>: SimplePathUndoEntry<T, I> {

@@ -13,6 +13,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Selection;
+using System.IO;
 
 namespace Apollo.Viewers {
     public class ChainInfo: UserControl, ISelectViewer, IDraggable, IRenamable {
@@ -173,6 +174,23 @@ namespace Apollo.Viewers {
 
             public DeviceAsChainUndoEntry(ISelectParent sourceparent, Path<ISelectParent> premove, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
             : base(sourceparent, premove, targetparent, copy, count, before, after, before_pos, after_pos, format) => this.remove = remove;
+        
+            DeviceAsChainUndoEntry(BinaryReader reader, int version): base(reader, version){
+                if(reader.ReadBoolean()){
+                    remove = reader.ReadInt32();
+                } else {
+                    remove = null;
+                }
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(remove == null);
+                if(remove != null){
+                    writer.Write(remove.Value);
+                }
+            }
         }
 
         DragDropManager DragDrop;

@@ -1,3 +1,4 @@
+using System.IO;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -38,6 +39,8 @@ namespace Apollo.Devices {
             
             public ModeUndoEntry(Clear clear, ClearType u, ClearType r)
             : base($"Clear Mode Changed to {r.ToString()}", clear, u, r) {}
+            
+            ModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

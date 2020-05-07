@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using Apollo.Binary;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -531,6 +531,8 @@ namespace Apollo.Devices {
             
             public RateUndoEntry(Copy copy, int u, int r)
             : base($"Copy Rate Changed to {r}ms", copy, u, r) {}
+            
+            RateUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }   
         
         public class RateModeUndoEntry: SimplePathUndoEntry<Copy, bool> {
@@ -538,6 +540,8 @@ namespace Apollo.Devices {
             
             public RateModeUndoEntry(Copy copy, bool u, bool r)
             : base($"Copy Rate Switched to {(r? "Steps" : "Free")}", copy, u, r) {}
+            
+            RateModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class RateStepUndoEntry: SimplePathUndoEntry<Copy, int> {
@@ -545,6 +549,8 @@ namespace Apollo.Devices {
             
             public RateStepUndoEntry(Copy copy, int u, int r)
             : base($"Copy Rate Changed to {Length.Steps[r]}", copy, u, r) {}
+            
+            RateStepUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Copy, double> {
@@ -552,6 +558,8 @@ namespace Apollo.Devices {
             
             public GateUndoEntry(Copy copy, double u, double r)
             : base($"Copy Gate Changed to {r}%", copy, u / 100, r / 100) {}
+            
+            GateUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class CopyModeUndoEntry: EnumSimplePathUndoEntry<Copy, CopyType> {
@@ -559,6 +567,8 @@ namespace Apollo.Devices {
             
             public CopyModeUndoEntry(Copy copy, CopyType u, CopyType r, IEnumerable source)
             : base("Copy Mode", copy, u, r, source) {}
+            
+            CopyModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class GridModeUndoEntry: EnumSimplePathUndoEntry<Copy, GridType> {
@@ -566,6 +576,8 @@ namespace Apollo.Devices {
             
             public GridModeUndoEntry(Copy copy, GridType u, GridType r, IEnumerable source)
             : base("Copy Grid", copy, u, r, source) {}
+            
+            GridModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class PinchUndoEntry: SimplePathUndoEntry<Copy, double> {
@@ -573,6 +585,8 @@ namespace Apollo.Devices {
             
             public PinchUndoEntry(Copy copy, double u, double r)
             : base($"Copy Pinch Changed to {r}", copy, u, r) {}
+            
+            PinchUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class BilateralUndoEntry: SimplePathUndoEntry<Copy, bool> {
@@ -580,6 +594,8 @@ namespace Apollo.Devices {
             
             public BilateralUndoEntry(Copy copy, bool u, bool r)
             : base($"Copy Bilateral Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
+            
+            BilateralUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class ReverseUndoEntry: SimplePathUndoEntry<Copy, bool> {
@@ -587,6 +603,8 @@ namespace Apollo.Devices {
             
             public ReverseUndoEntry(Copy copy, bool u, bool r)
             : base($"Copy Reverse Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
+            
+            ReverseUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class InfiniteUndoEntry: SimplePathUndoEntry<Copy, bool> {
@@ -594,6 +612,8 @@ namespace Apollo.Devices {
             
             public InfiniteUndoEntry(Copy copy, bool u, bool r)
             : base($"Copy Infinite Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
+            
+            InfiniteUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class WrapUndoEntry: SimplePathUndoEntry<Copy, bool> {
@@ -601,6 +621,8 @@ namespace Apollo.Devices {
             
             public WrapUndoEntry(Copy copy, bool u, bool r)
             : base($"Copy Wrap Changed to {(r? "Enabled" : "Disabled")}", copy, u, r) {}
+            
+            WrapUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class OffsetInsertUndoEntry: PathUndoEntry<Copy> {
@@ -611,6 +633,16 @@ namespace Apollo.Devices {
             
             public OffsetInsertUndoEntry(Copy copy, int index)
             : base($"Copy Offset {index + 1} Inserted", copy) => this.index = index;
+            
+            OffsetInsertUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+            }
         }
         
         public class OffsetRemoveUndoEntry: PathUndoEntry<Copy> {
@@ -626,6 +658,18 @@ namespace Apollo.Devices {
             : base($"Copy Offset {index + 1} Removed", copy) {
                 this.index = index;
                 this.offset = offset.Clone();
+            }
+            
+            OffsetRemoveUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+                offset = Decoder.DecodeAnything<Offset>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.EncodeAnything(writer, offset);
             }
         }
 
@@ -692,6 +736,26 @@ namespace Apollo.Devices {
                 this.rx = rx;
                 this.ry = ry;
             }
+            
+            OffsetAbsoluteUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                this.index = reader.ReadInt32();
+                this.ux = reader.ReadInt32();
+                this.uy = reader.ReadInt32();
+                this.rx = reader.ReadInt32();
+                this.ry = reader.ReadInt32();
+            }
+
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+
+                writer.Write(index);
+                writer.Write(ux);
+                writer.Write(uy);
+                writer.Write(rx);
+                writer.Write(ry);
+            }
+        
         }
 
         public class OffsetSwitchedUndoEntry: SimpleIndexPathUndoEntry<Copy, bool> {
@@ -699,6 +763,8 @@ namespace Apollo.Devices {
             
             public OffsetSwitchedUndoEntry(Copy copy, int index, bool u, bool r)
             : base($"Copy Offset {index + 1} Switched to {(r? "Absolute" : "Relative")}", copy, index, u, r) {}
+            
+            OffsetSwitchedUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
 
         public class OffsetAngleUndoEntry: SimpleIndexPathUndoEntry<Copy, int> {
@@ -706,6 +772,8 @@ namespace Apollo.Devices {
             
             public OffsetAngleUndoEntry(Copy copy, int index, int u, int r)
             : base($"Copy Angle {index + 1} Changed to {r}°", copy, index, u, r) {}
+            
+            OffsetAngleUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

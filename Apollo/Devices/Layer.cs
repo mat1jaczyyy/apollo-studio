@@ -1,3 +1,4 @@
+using System.IO;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -64,6 +65,8 @@ namespace Apollo.Devices {
             
             public TargetUndoEntry(Layer layer, int u, int r)
             : base($"Layer Target Changed to {r}", layer, u, r) {}
+            
+            TargetUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class ModeUndoEntry: SimplePathUndoEntry<Layer, BlendingType> {
@@ -71,6 +74,8 @@ namespace Apollo.Devices {
             
             public ModeUndoEntry(Layer layer, BlendingType u, BlendingType r)
             : base($"Layer Blending Changed to {r}", layer, u, r) {}
+            
+            ModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class RangeUndoEntry: SimplePathUndoEntry<Layer, int> {
@@ -78,6 +83,8 @@ namespace Apollo.Devices {
             
             public RangeUndoEntry(Layer layer, int u, int r)
             : base($"Layer Range Changed to {r}", layer, u, r) {}
+            
+            RangeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

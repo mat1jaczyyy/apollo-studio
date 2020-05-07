@@ -9,6 +9,8 @@ using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
+using System.IO;
+using Apollo.Binary;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent, ISelectParent {
@@ -129,6 +131,18 @@ namespace Apollo.Devices {
             : base($"{group.Name} Chain {index + 1} Inserted", group) {
                 this.index = index;
                 this.chain = chain.Clone();
+            }
+            
+            ChainInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+                chain = Decoder.DecodeAnything<Chain>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer){ 
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.EncodeAnything(writer, chain);
             }
         }
     }

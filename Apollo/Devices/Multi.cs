@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Apollo.DeviceViewers;
@@ -132,6 +133,8 @@ namespace Apollo.Devices {
             
             public ModeUndoEntry(Multi multi, MultiType u, MultiType r, IEnumerable source)
             : base("Multi Direction", multi, u, r, source) {}
+            
+            ModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
         
         public class FilterChangedUndoEntry: SimpleIndexPathUndoEntry<Multi, bool[]> {
@@ -139,6 +142,8 @@ namespace Apollo.Devices {
             
             public FilterChangedUndoEntry(Multi multi, int index, bool[] u)
             : base($"Multi Chain {index + 1} Filter Changed", multi, index, u.ToArray(), multi[index].SecretMultiFilter.ToArray()) {}
+            
+            FilterChangedUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

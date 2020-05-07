@@ -10,6 +10,8 @@ using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 using Apollo.Viewers;
+using System.IO;
+using Apollo.Binary;
 
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}
@@ -227,6 +229,18 @@ namespace Apollo.Elements {
             : base($"Device ({device.Name}) Inserted", chain) {
                 this.index = index;
                 this.device = device.Clone();
+            }
+            
+            DeviceInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+                device = Decoder.DecodeAnything<Device>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer){
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.EncodeAnything(writer, device);
             }
         }
     }

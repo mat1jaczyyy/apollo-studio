@@ -5,6 +5,7 @@ using Apollo.Elements;
 using Apollo.Structures;
 using Apollo.Core;
 using Apollo.Undo;
+using System.IO;
 
 namespace Apollo.Devices {
     public class Refresh: Device {
@@ -41,6 +42,8 @@ namespace Apollo.Devices {
             
             public MacroUndoEntry(Refresh refresh, int index, bool u, bool r)
             : base($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", refresh, index, u, r) {}
+            
+            MacroUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }

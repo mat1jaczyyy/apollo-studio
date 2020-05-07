@@ -11,6 +11,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 using Apollo.Undo;
+using System.IO;
 
 namespace Apollo.Selection {
     public class DragDropManager {
@@ -205,6 +206,32 @@ namespace Apollo.Selection {
                 this.after = after;
                 this.before_pos = before_pos;
                 this.after_pos = after_pos;
+            }
+        
+            protected DragDropUndoEntry(BinaryReader reader, int version): base(reader, version){
+                premove = new Path<ISelectParent>(reader, version);
+                
+                copy = reader.ReadBoolean();
+                
+                count = reader.ReadInt32();
+                before = reader.ReadInt32();
+                before_pos = reader.ReadInt32();
+                after = reader.ReadInt32();
+                after_pos = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                premove.Encode(writer);
+                
+                writer.Write(copy);
+                
+                writer.Write(count);
+                writer.Write(before);
+                writer.Write(before_pos);
+                writer.Write(after);
+                writer.Write(after_pos);
             }
         }
     }

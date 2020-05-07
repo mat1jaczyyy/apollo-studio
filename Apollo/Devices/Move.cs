@@ -1,5 +1,5 @@
 using System.Collections;
-
+using System.IO;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -86,6 +86,22 @@ namespace Apollo.Devices {
                 this.rx = rx;
                 this.ry = ry;
             }
+            
+            OffsetUndoEntry(BinaryReader reader, int version): base(reader, version){
+                ux = reader.ReadInt32();
+                uy = reader.ReadInt32();
+                rx = reader.ReadInt32();
+                ry = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(ux);
+                writer.Write(uy);
+                writer.Write(rx);
+                writer.Write(ry);
+            }
         }
         
         public class OffsetAbsoluteUndoEntry: PathUndoEntry<Move> {
@@ -107,6 +123,22 @@ namespace Apollo.Devices {
                 this.uy = uy;
                 this.rx = rx;
                 this.ry = ry;
+            }
+            
+            OffsetAbsoluteUndoEntry(BinaryReader reader, int version): base(reader, version){
+                ux = reader.ReadInt32();
+                uy = reader.ReadInt32();
+                rx = reader.ReadInt32();
+                ry = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(ux);
+                writer.Write(uy);
+                writer.Write(rx);
+                writer.Write(ry);
             }
         }
 

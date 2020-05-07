@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -127,6 +128,18 @@ namespace Apollo.Selection {
             : base($"{parent.ChildString} Renamed to {redo[0]}", parent, undo.ToList(), redo.ToList()) {
                 this.left = left;
                 this.right = right;
+            }
+            
+            RenamedUndoEntry(BinaryReader reader, int version): base(reader, version){
+                left = reader.ReadInt32();
+                right = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(left);
+                writer.Write(right);
             }
         }
     }

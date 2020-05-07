@@ -482,30 +482,30 @@ namespace Apollo.Binary {
 
             // REAL IMPLEMENTATION - Will be used in the end. For now, ugly hack skip those which can't be encoded yet
 
-            //writer.Write(o.History.Count);
-            //for (int i = 0; i < o.History.Count; i++) {
-            //    UndoBinary.EncodeID(writer, o.History[i].GetType());
-            //    o.History[i].Encode(writer);
-            //}
-            //writer.Write(o.Position);
-
-            List<UndoEntry> saveable = new List<UndoEntry>();
-            int pos = 0; // sadly this'll break a little if current pos isn't encodable
-
+            writer.Write(o.History.Count);
             for (int i = 0; i < o.History.Count; i++) {
-                if (i == o.Position) pos = saveable.Count;
-
-                if (o.History[i].GetType().GetMethod("Encode").DeclaringType == o.History[i].GetType())
-                    saveable.Add(o.History[i]);
+               UndoBinary.EncodeID(writer, o.History[i].GetType());
+               o.History[i].Encode(writer);
             }
+            writer.Write(o.Position);
 
-            writer.Write(saveable.Count);
-            for (int i = 0; i < saveable.Count; i++) {
-                UndoBinary.EncodeID(writer, saveable[i].GetType());
-                saveable[i].Encode(writer);
-            }
+            // List<UndoEntry> saveable = new List<UndoEntry>();
+            // int pos = 0; // sadly this'll break a little if current pos isn't encodable
 
-            writer.Write(pos);
+            // for (int i = 0; i < o.History.Count; i++) {
+            //     if (i == o.Position) pos = saveable.Count;
+
+            //     if (o.History[i].GetType().GetMethod("Encode").DeclaringType == o.History[i].GetType())
+            //         saveable.Add(o.History[i]);
+            // }
+
+            // writer.Write(saveable.Count);
+            // for (int i = 0; i < saveable.Count; i++) {
+            //     UndoBinary.EncodeID(writer, saveable[i].GetType());
+            //     saveable[i].Encode(writer);
+            // }
+
+            // writer.Write(pos);
         }
     }
 }

@@ -302,6 +302,18 @@ namespace Apollo.Elements {
                 this.index = index;
                 this.track = track.Clone();
             }
+            
+            TrackInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+                track = Decoder.DecodeAnything<Track>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer){
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.EncodeAnything(writer, track);
+            }
         }
 
         public class BPMChangedUndoEntry: SimpleUndoEntry<int> {

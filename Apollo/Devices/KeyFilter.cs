@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 
 using Apollo.DeviceViewers;
@@ -47,6 +48,8 @@ namespace Apollo.Devices {
             
             public ChangedUndoEntry(KeyFilter filter, bool[] u)
             : base($"Key Filter Changed", filter, u.ToArray(), filter.Filter.ToArray()) {}
+            
+            ChangedUndoEntry(BinaryReader reader, int version): base(reader, version){}
         }
     }
 }
