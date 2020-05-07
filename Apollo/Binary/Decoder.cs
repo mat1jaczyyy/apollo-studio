@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using Apollo.Components;
@@ -140,7 +141,6 @@ namespace Apollo.Binary {
             if (17 <= version && version <= 28)
                 Preferences.BaseTime = reader.ReadInt64();
         });
-
         
         public static void DecodeStats(Stream input) => Decode(input, (reader, version) => {
             if (version >= 29)
@@ -162,6 +162,15 @@ namespace Apollo.Binary {
 
                 return Decode(reader, version, ensure);
             }
+        }
+
+        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with enums?
+            MethodInfo decoder = typeof(BinaryReader).GetMethods()
+                .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
+                .FirstOrDefault(i => i.ReturnType == typeof(T));
+
+            if (decoder != null) return (T)decoder.Invoke(reader, new object[0]);
+            else return Decode(reader, version);
         }
         
         static dynamic Decode(BinaryReader reader, int version, Type ensure = null) {

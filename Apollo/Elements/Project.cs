@@ -309,6 +309,13 @@ namespace Apollo.Elements {
 
             public BPMChangedUndoEntry(int u, int r)
             : base($"BPM Changed to {r}", u, r) {}
+
+            BPMChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
+
+            // This is required due to Encoder hack in Encode(UndoManager) - TODO remove all of these before merge
+            // If the final derived UndoEntry doesn't encode any data, override anyway
+            public override void Encode(BinaryWriter writer) => base.Encode(writer);
         }
 
         public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
@@ -316,6 +323,11 @@ namespace Apollo.Elements {
 
             public AuthorChangedUndoEntry(string u, string r)
             : base($"Author Changed to {r}", u, r) {}
+
+            AuthorChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
+
+            public override void Encode(BinaryWriter writer) => base.Encode(writer);
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Microsoft.CSharp.RuntimeBinder;
+
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
@@ -102,6 +104,14 @@ namespace Apollo.Binary {
             
             writer.Write(Preferences.Time);
         });
+        
+        public static void EncodeAnything(BinaryWriter writer, dynamic o) {
+            try {
+                writer.Write(o);
+            } catch (RuntimeBinderException) {
+                Encode(writer, o);
+            }
+        }
 
         public static byte[] Encode(object o) => Encode(writer => {
             Encode(writer, (dynamic)o);
