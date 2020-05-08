@@ -325,10 +325,6 @@ namespace Apollo.Elements {
 
             BPMChangedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {}
-
-            // This is required due to Encoder hack in Encode(UndoManager) - TODO remove all of these before merge
-            // If the final derived UndoEntry doesn't encode any data, override anyway
-            public override void Encode(BinaryWriter writer) => base.Encode(writer);
         }
 
         public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
