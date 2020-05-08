@@ -669,7 +669,7 @@ namespace Apollo.Devices {
             : base(reader, version) {}
         }
         
-        public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, Nullable<int>> {
+        public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, int?> {
             protected override void Action(Pattern item, int? element) => item.RootKey = element;
             
             public RootKeyUndoEntry(Pattern pattern, int? u, int? r)
