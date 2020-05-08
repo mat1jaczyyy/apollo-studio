@@ -71,7 +71,7 @@ namespace Apollo.Selection {
             : base(reader, version) {
                 right = reader.ReadInt32();
 
-                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version)).ToList(); // todo check this
+                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version)).ToList();
             }
             
             public override void Encode(BinaryWriter writer) {
