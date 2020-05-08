@@ -206,7 +206,7 @@ namespace Apollo.Windows {
             try {
                 try {
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        loaded = await Decoder.Decode(file, typeof(Project));
+                        loaded = await Decoder.Decode<Project>(file);
 
                     if (!recovery) {
                         loaded.FilePath = path;
@@ -219,7 +219,7 @@ namespace Apollo.Windows {
 
                 } catch (InvalidDataException) {
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        imported = await Decoder.Decode(file, typeof(Copyable));
+                        imported = await Decoder.Decode<Copyable>(file);
 
                     Program.Project?.Dispose();
                     Program.Project = new Project(

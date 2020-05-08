@@ -405,7 +405,7 @@ namespace Apollo.Devices {
             ThumbInsertUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                thumbColor = Decoder.Decode(reader, version);
+                thumbColor = Decoder.Decode<Color>(reader, version);
                 pos = reader.ReadDouble();
                 type = (FadeType)reader.ReadInt32();
             }
@@ -440,7 +440,7 @@ namespace Apollo.Devices {
             
             ThumbRemoveUndoEntry(BinaryReader reader, int version): base(reader, version){
                 index = reader.ReadInt32();
-                uc = Decoder.Decode(reader, version);
+                uc = Decoder.Decode<Color>(reader, version);
                 up = reader.ReadDouble();
                 ut = (FadeType)reader.ReadInt32();
             }
@@ -605,7 +605,7 @@ namespace Apollo.Devices {
         
             protected CutUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
-                colors = Enumerable.Range(0, reader.ReadInt32()).Select(i => (Color)Decoder.Decode(reader, version)).ToList();
+                colors = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.Decode<Color>(reader, version)).ToList();
                 positions = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadDouble()).ToList();
                 fadetypes = Enumerable.Range(0, reader.ReadInt32()).Select(i => (FadeType)reader.ReadInt32()).ToList();
                 index = reader.ReadInt32();

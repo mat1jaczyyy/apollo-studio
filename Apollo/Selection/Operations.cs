@@ -305,7 +305,7 @@ namespace Apollo.Selection {
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
                 
-                init = Decoder.Decode(reader, version);
+                init = Decoder.Decode<Chain>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -354,7 +354,7 @@ namespace Apollo.Selection {
             protected DeviceDecapsulationUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                init = Decoder.Decode(reader, version);
+                init = (T)Decoder.Decode<Device>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {

@@ -234,7 +234,7 @@ namespace Apollo.Elements {
             DeviceInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                device = Decoder.Decode(reader, version);
+                device = Decoder.Decode<Device>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {

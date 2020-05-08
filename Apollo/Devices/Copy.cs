@@ -673,7 +673,7 @@ namespace Apollo.Devices {
             
             OffsetRemoveUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 index = reader.ReadInt32();
-                offset = Decoder.Decode(reader, version);
+                offset = Decoder.Decode<Offset>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {

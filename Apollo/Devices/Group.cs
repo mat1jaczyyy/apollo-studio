@@ -136,7 +136,7 @@ namespace Apollo.Devices {
             ChainInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                chain = Decoder.Decode(reader, version);
+                chain = Decoder.Decode<Chain>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) { 

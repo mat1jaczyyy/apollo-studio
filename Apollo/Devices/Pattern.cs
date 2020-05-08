@@ -430,7 +430,7 @@ namespace Apollo.Devices {
             FrameInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                frame = Decoder.Decode(reader, version);
+                frame = Decoder.Decode<Frame>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -494,7 +494,7 @@ namespace Apollo.Devices {
         
             protected DurationUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 left = reader.ReadInt32();
-                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => (Time)Decoder.Decode(reader, version)).ToList();
+                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.Decode<Time>(reader, version)).ToList();
                 r = Decoder.DecodeAnything<I>(reader, version);
             }
             

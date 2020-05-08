@@ -306,7 +306,7 @@ namespace Apollo.Elements {
             TrackInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                track = Decoder.Decode(reader, version);
+                track = Decoder.Decode<Track>(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {
