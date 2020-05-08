@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -52,7 +53,8 @@ namespace Apollo.Devices {
             public TargetUndoEntry(LayerFilter filter, int u, int r)
             : base($"Layer Filter Target Changed to {r}", filter, u, r) {}
             
-            TargetUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            TargetUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RangeUndoEntry: SimplePathUndoEntry<LayerFilter, int> {
@@ -61,7 +63,8 @@ namespace Apollo.Devices {
             public RangeUndoEntry(LayerFilter filter, int u, int r)
             : base($"Layer Filter Range Changed to {r}", filter, u, r) {}
             
-            RangeUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            RangeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

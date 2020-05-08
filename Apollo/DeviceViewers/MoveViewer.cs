@@ -56,7 +56,7 @@ namespace Apollo.DeviceViewers {
 
         void Offset_Changed(int x, int y, int? old_x, int? old_y) {
             if (old_x != null && old_y != null)
-                Program.Project.Undo.AddAndExecute(new Move.OffsetUndoEntry(
+                Program.Project.Undo.AddAndExecute(new Move.OffsetRelativeUndoEntry(
                     _move, 
                     old_x.Value, 
                     old_y.Value, 

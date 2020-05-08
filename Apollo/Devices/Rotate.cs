@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
@@ -60,7 +61,8 @@ namespace Apollo.Devices {
             public ModeUndoEntry(Rotate rotate, RotateType u, RotateType r, IEnumerable source)
             : base("Rotate Angle", rotate, u, r, source) {}
             
-            ModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            ModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
 
         }
         
@@ -70,7 +72,8 @@ namespace Apollo.Devices {
             public BypassUndoEntry(Rotate rotate, bool u, bool r)
             : base($"Rotate Bypass Changed to {(r? "Enabled" : "Disabled")}", rotate, u, r) {}
             
-            BypassUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            BypassUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

@@ -9,7 +9,6 @@ using Avalonia;
 using Avalonia.Controls;
 using SelectingItemsControl = Avalonia.Controls.Primitives.SelectingItemsControl;
 using Avalonia.Input;
-using AvaloniaDragDrop = Avalonia.Input.DragDrop;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -106,8 +105,8 @@ namespace Apollo.Windows {
 
             observable = TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
             
-            this.AddHandler(AvaloniaDragDrop.DropEvent, Drop);
-            this.AddHandler(AvaloniaDragDrop.DragOverEvent, DragOver);
+            this.AddHandler(DragDrop.DropEvent, Drop);
+            this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
             
@@ -141,8 +140,8 @@ namespace Apollo.Windows {
         void Unloaded(object sender, CancelEventArgs e) {
             Root.Children.Remove(SplashImage);
 
-            this.RemoveHandler(AvaloniaDragDrop.DropEvent, Drop);
-            this.RemoveHandler(AvaloniaDragDrop.DragOverEvent, DragOver);
+            this.RemoveHandler(DragDrop.DropEvent, Drop);
+            this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
             
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.RecentsCleared += Clear;

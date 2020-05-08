@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia.Controls;
 
+using Apollo.Binary;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
@@ -12,8 +14,6 @@ using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 using Apollo.Windows;
-using System.IO;
-using Apollo.Binary;
 
 namespace Apollo.Devices {
     public class Pattern: Device, ISelectParent {
@@ -427,16 +427,17 @@ namespace Apollo.Devices {
                 this.frame = frame.Clone();
             }
             
-            FrameInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            FrameInsertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 index = reader.ReadInt32();
-                frame = Decoder.DecodeAnything<Frame>(reader, version);
+                frame = Decoder.Decode(reader, version);
             }
             
             public override void Encode(BinaryWriter writer) {
                 base.Encode(writer);
                 
                 writer.Write(index);
-                Encoder.EncodeAnything(writer, frame);
+                Encoder.Encode(writer, frame);
             }
         }
         
@@ -448,7 +449,8 @@ namespace Apollo.Devices {
             public FrameChangedUndoEntry(Pattern pattern, int index, Color[] u)
             : base($"Pattern Frame {index + 1} Changed", pattern, index, Clone(u), Clone(pattern[index].Screen)) {}
             
-            FrameChangedUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            FrameChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class InfiniteUndoEntry: SimplePathUndoEntry<Pattern, bool> {
@@ -457,7 +459,8 @@ namespace Apollo.Devices {
             public InfiniteUndoEntry(Pattern pattern, bool u, bool r)
             : base($"Pattern Infinite Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
             
-            InfiniteUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            InfiniteUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public abstract class DurationUndoEntry<I>: PathUndoEntry<Pattern> {
@@ -473,9 +476,8 @@ namespace Apollo.Devices {
             }
 
             protected override void RedoPath(params Pattern[] items) {
-                for (int i = 0; i < u.Count; i++) {
+                for (int i = 0; i < u.Count; i++)
                     SetValue(items[0][left + i].Time, r);
-                }
             }
             
             protected override void OnDispose() {
@@ -490,10 +492,9 @@ namespace Apollo.Devices {
                 this.r = r;
             }
         
-            protected DurationUndoEntry(BinaryReader reader, int version): base(reader, version){
+            protected DurationUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 left = reader.ReadInt32();
-
-                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<Time>(reader, version)).ToList();
+                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => (Time)Decoder.Decode(reader, version)).ToList();
                 r = Decoder.DecodeAnything<I>(reader, version);
             }
             
@@ -503,9 +504,8 @@ namespace Apollo.Devices {
                 writer.Write(left);
                 
                 writer.Write(u.Count);
-                foreach(Time time in u){
-                    Encoder.EncodeAnything(writer, time);
-                }
+                for (int i = 0; i < u.Count; i++)
+                    Encoder.Encode(writer, u[i]);
                 
                 Encoder.EncodeAnything(writer, r);
             }
@@ -520,7 +520,8 @@ namespace Apollo.Devices {
             public DurationValueUndoEntry(Pattern pattern, int left, List<Time> u, int r)
             : base($"Pattern Frame {pattern.Expanded + 1} Duration Changed to {r}ms", pattern, left, u, r) {}
             
-            DurationValueUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            DurationValueUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class DurationStepUndoEntry: DurationUndoEntry<int> {
@@ -532,7 +533,8 @@ namespace Apollo.Devices {
             public DurationStepUndoEntry(Pattern pattern, int left, List<Time> u, int r)
             : base($"Pattern Frame {pattern.Expanded + 1} Duration Changed to {Length.Steps[r]}", pattern, left, u, r) {}
             
-            DurationStepUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            DurationStepUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class DurationModeUndoEntry: DurationUndoEntry<bool> {
@@ -541,7 +543,8 @@ namespace Apollo.Devices {
             public DurationModeUndoEntry(Pattern pattern, int left, List<Time> u, bool r)
             : base($"Pattern Frame {pattern.Expanded + 1} Duration Switched to {(r? "Steps" : "Free")}", pattern, left, u, r) {}
             
-            DurationModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            DurationModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class FrameReversedUndoEntry: SymmetricPathUndoEntry<Pattern> {
@@ -572,7 +575,8 @@ namespace Apollo.Devices {
                 this.right = right;
             }
         
-            FrameReversedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            FrameReversedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 index = reader.ReadInt32();
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
@@ -601,7 +605,8 @@ namespace Apollo.Devices {
                 this.right = right;
             }
             
-            FrameInvertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            FrameInvertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
             }
@@ -620,7 +625,8 @@ namespace Apollo.Devices {
             public PlaybackModeUndoEntry(Pattern pattern, PlaybackType u, PlaybackType r)
             : base($"Pattern Playback Mode Changed to {r}", pattern, u, r) {}
             
-            PlaybackModeUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            PlaybackModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Pattern, double> {
@@ -629,7 +635,8 @@ namespace Apollo.Devices {
             public GateUndoEntry(Pattern pattern, double u, double r)
             : base($"Pattern Gate Changed to {r}%", pattern, u / 100, r / 100) {}
             
-            GateUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            GateUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RepeatsUndoEntry: SimplePathUndoEntry<Pattern, int> {
@@ -638,7 +645,8 @@ namespace Apollo.Devices {
             public RepeatsUndoEntry(Pattern pattern, int u, int r)
             : base($"Pattern Repeats Changed to {r}", pattern, u, r) {}
             
-            RepeatsUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            RepeatsUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class PinchUndoEntry: SimplePathUndoEntry<Pattern, double> {
@@ -647,7 +655,8 @@ namespace Apollo.Devices {
             public PinchUndoEntry(Pattern pattern, double u, double r)
             : base($"Pattern Pinch Changed to {r}", pattern, u, r) {}
             
-            PinchUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            PinchUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class BilateralUndoEntry: SimplePathUndoEntry<Pattern, bool> {
@@ -656,7 +665,8 @@ namespace Apollo.Devices {
             public BilateralUndoEntry(Pattern pattern, bool u, bool r)
             : base($"Pattern Bilateral Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
             
-            BilateralUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            BilateralUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, int?> {
@@ -665,7 +675,8 @@ namespace Apollo.Devices {
             public RootKeyUndoEntry(Pattern pattern, int? u, int? r)
             : base($"Pattern Root Key Changed", pattern, u, r) {}
             
-            RootKeyUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            RootKeyUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class WrapUndoEntry: SimplePathUndoEntry<Pattern, bool> {
@@ -674,7 +685,8 @@ namespace Apollo.Devices {
             public WrapUndoEntry(Pattern pattern, bool u, bool r)
             : base($"Pattern Wrap Changed to {(r? "Enabled" : "Disabled")}", pattern, u, r) {}
             
-            WrapUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            WrapUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ImportUndoEntry: SimplePathUndoEntry<Pattern, Pattern> {
@@ -699,7 +711,8 @@ namespace Apollo.Devices {
             public ImportUndoEntry(Pattern pattern, string filename, Pattern r)
             : base($"Pattern File Imported from {filename}", pattern, (Pattern)pattern.Clone(), r) {}
             
-            ImportUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            ImportUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

@@ -303,16 +303,17 @@ namespace Apollo.Elements {
                 this.track = track.Clone();
             }
             
-            TrackInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            TrackInsertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 index = reader.ReadInt32();
-                track = Decoder.DecodeAnything<Track>(reader, version);
+                track = Decoder.Decode(reader, version);
             }
             
-            public override void Encode(BinaryWriter writer){
+            public override void Encode(BinaryWriter writer) {
                 base.Encode(writer);
                 
                 writer.Write(index);
-                Encoder.EncodeAnything(writer, track);
+                Encoder.Encode(writer, track);
             }
         }
 
@@ -338,8 +339,6 @@ namespace Apollo.Elements {
 
             AuthorChangedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {}
-
-            public override void Encode(BinaryWriter writer) => base.Encode(writer);
         }
     }
 }

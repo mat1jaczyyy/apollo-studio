@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -130,7 +130,8 @@ namespace Apollo.Selection {
                 this.right = right;
             }
             
-            RenamedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            RenamedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
             }

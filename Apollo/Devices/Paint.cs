@@ -1,4 +1,5 @@
 using System.IO;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -36,7 +37,8 @@ namespace Apollo.Devices {
             public ColorUndoEntry(Paint paint, Color u, Color r)
             : base($"Paint Color Changed to {r.ToHex()}", paint, u, r) {}
             
-            ColorUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            ColorUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

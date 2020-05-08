@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia.Controls;
 using Avalonia.Input;
-using AvaloniaDragDrop = Avalonia.Input.DragDrop;
 
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Structures;
 using Apollo.Undo;
-using System.IO;
 
 namespace Apollo.Selection {
     public class DragDropManager {
@@ -103,8 +102,8 @@ namespace Apollo.Selection {
         public void Subscribe(IControl control) {
             Subscribed.Add(control);
             
-            control.AddHandler(AvaloniaDragDrop.DragOverEvent, DragOver);
-            control.AddHandler(AvaloniaDragDrop.DropEvent, Drop);
+            control.AddHandler(DragDrop.DragOverEvent, DragOver);
+            control.AddHandler(DragDrop.DropEvent, Drop);
         }
 
         public async void Drag(SelectionManager selection, PointerPressedEventArgs e) {
@@ -116,7 +115,7 @@ namespace Apollo.Selection {
             dragData.Set(drag.DragFormat, selection.Selection);
 
             App.Dragging = true;
-            DragDropEffects result = await AvaloniaDragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
+            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
             App.Dragging = false;
 
             if (result == DragDropEffects.None) {
@@ -159,8 +158,8 @@ namespace Apollo.Selection {
 
         public void Dispose() {
             foreach (IControl control in Subscribed) {
-                control.RemoveHandler(AvaloniaDragDrop.DragOverEvent, DragOver);
-                control.RemoveHandler(AvaloniaDragDrop.DropEvent, Drop);
+                control.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+                control.RemoveHandler(DragDrop.DropEvent, Drop);
             }
 
             Subscribed = null;
@@ -208,11 +207,10 @@ namespace Apollo.Selection {
                 this.after_pos = after_pos;
             }
         
-            protected DragDropUndoEntry(BinaryReader reader, int version): base(reader, version){
+            protected DragDropUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 premove = new Path<ISelectParent>(reader, version);
-                
                 copy = reader.ReadBoolean();
-                
                 count = reader.ReadInt32();
                 before = reader.ReadInt32();
                 before_pos = reader.ReadInt32();
@@ -224,9 +222,7 @@ namespace Apollo.Selection {
                 base.Encode(writer);
                 
                 premove.Encode(writer);
-                
                 writer.Write(copy);
-                
                 writer.Write(count);
                 writer.Write(before);
                 writer.Write(before_pos);

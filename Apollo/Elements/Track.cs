@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Selection;
@@ -172,7 +173,8 @@ namespace Apollo.Elements {
             public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
             : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
             
-            LaunchpadChangedUndoEntry(BinaryReader reader, int version): base(reader, version){}
+            LaunchpadChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia.Controls;
 
+using Apollo.Binary;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
-using System.IO;
-using Apollo.Binary;
 
 namespace Apollo.Devices {
     public class Group: Device, IChainParent, ISelectParent {
@@ -133,16 +133,17 @@ namespace Apollo.Devices {
                 this.chain = chain.Clone();
             }
             
-            ChainInsertedUndoEntry(BinaryReader reader, int version): base(reader, version){
+            ChainInsertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
                 index = reader.ReadInt32();
-                chain = Decoder.DecodeAnything<Chain>(reader, version);
+                chain = Decoder.Decode(reader, version);
             }
             
-            public override void Encode(BinaryWriter writer){ 
+            public override void Encode(BinaryWriter writer) { 
                 base.Encode(writer);
                 
                 writer.Write(index);
-                Encoder.EncodeAnything(writer, chain);
+                Encoder.Encode(writer, chain);
             }
         }
     }

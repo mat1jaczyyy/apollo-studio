@@ -164,7 +164,7 @@ namespace Apollo.Binary {
             }
         }
 
-        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with enums?
+        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with enums, arrays, lists, nullables, iselect?
             MethodInfo decoder = typeof(BinaryReader).GetMethods()
                 .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
                 .FirstOrDefault(i => i.ReturnType == typeof(T));
@@ -173,7 +173,7 @@ namespace Apollo.Binary {
             else return Decode(reader, version);
         }
         
-        static dynamic Decode(BinaryReader reader, int version, Type ensure = null) {
+        public static dynamic Decode(BinaryReader reader, int version, Type ensure = null) { // todo refactor ensure
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) throw new InvalidDataException();
 
