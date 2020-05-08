@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -164,13 +165,31 @@ namespace Apollo.Binary {
             }
         }
 
-        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with enums, arrays, lists, nullables, iselect?
+        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with nullables?
             MethodInfo decoder = typeof(BinaryReader).GetMethods()
                 .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
                 .FirstOrDefault(i => i.ReturnType == typeof(T));
 
-            if (decoder != null) return (T)decoder.Invoke(reader, new object[0]);
-            else return Decode<T>(reader, version);
+            if (decoder != null)
+                return (T)decoder.Invoke(reader, new object[0]);
+            
+            else if (typeof(T).IsEnum)
+                return (T)(object)reader.ReadInt32();
+            
+            else if (typeof(IEnumerable).IsAssignableFrom(typeof(T))) { // Lists and Arrays
+                dynamic ret = typeof(Decoder).GetMethod("DecodeEnumerable")
+                    .MakeGenericMethod(typeof(T).GetGenericArguments()[0])
+                    .Invoke(null, new object[] { reader, version });
+                
+                if (typeof(T).IsArray) return ret.ToArray();
+                else return ret.ToList();
+            
+            } else return Decode<T>(reader, version);
+        }
+        
+        static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version) {
+            return Enumerable.Range(0, reader.ReadInt32())
+                .Select(i => DecodeAnything<T>(reader, version));
         }
         
         public static T Decode<T>(BinaryReader reader, int version) {

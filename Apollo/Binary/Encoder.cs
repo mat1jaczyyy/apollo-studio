@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Linq;
 
@@ -106,8 +106,17 @@ namespace Apollo.Binary {
         });
         
         public static void EncodeAnything(BinaryWriter writer, dynamic o) {
-            try {
+            if (o.GetType().IsEnum)
+                writer.Write((int)o);
+
+            else if (o.GetType() != typeof(string) && typeof(IEnumerable).IsAssignableFrom(o.GetType())) { // Lists and Arrays
+                writer.Write(o.Count());
+                for (int i = 0; i < o.Count(); i++)
+                    EncodeAnything(writer, o.ElementAt(i));
+            
+            } else try {
                 writer.Write(o);
+
             } catch (RuntimeBinderException) {
                 Encode(writer, o); // todo special case: if o is device, cast to device!
             }
