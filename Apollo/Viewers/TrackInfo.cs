@@ -143,11 +143,7 @@ namespace Apollo.Viewers {
 
         void Port_Changed(Launchpad selected) {
             if (selected != null && _track.Launchpad != selected)
-                Program.Project.Undo.AddAndExecute(new Track.LaunchpadChangedUndoEntry(
-                    _track,
-                    _track.Launchpad,
-                    selected
-                ));
+                _track.Launchpad = selected;
         }
 
         public RenameManager Rename { get; private set; }

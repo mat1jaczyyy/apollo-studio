@@ -165,12 +165,5 @@ namespace Apollo.Elements {
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
         }
-
-        public class LaunchpadChangedUndoEntry: SimpleIndexUndoEntry<Launchpad> {
-            protected override void Action(int index, Launchpad element) => Program.Project[index].Launchpad = element;
-
-            public LaunchpadChangedUndoEntry(Track track, Launchpad u, Launchpad r)
-            : base($"{track.ProcessedName} Launchpad Changed to {r.Name}", track.ParentIndex.Value, u, r) {}
-        }
     }
 }
