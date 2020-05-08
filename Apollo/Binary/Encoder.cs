@@ -110,9 +110,14 @@ namespace Apollo.Binary {
                 writer.Write((int)o);
 
             else if (o.GetType() != typeof(string) && typeof(IEnumerable).IsAssignableFrom(o.GetType())) { // Lists and Arrays
-                writer.Write(o.Count());
-                for (int i = 0; i < o.Count(); i++)
-                    EncodeAnything(writer, o.ElementAt(i));
+                int count;
+                
+                if(o.GetType().IsArray) count = o.Length;
+                else count = o.Count;
+                
+                writer.Write(count);
+                for (int i = 0; i < count; i++)
+                    EncodeAnything(writer, o[i]);
             
             } else try {
                 writer.Write(o);

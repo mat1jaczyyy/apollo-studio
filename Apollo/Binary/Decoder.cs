@@ -166,30 +166,36 @@ namespace Apollo.Binary {
         }
 
         public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with nullables?
+            Type type = typeof(T);
+            
             MethodInfo decoder = typeof(BinaryReader).GetMethods()
                 .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
-                .FirstOrDefault(i => i.ReturnType == typeof(T));
+                .FirstOrDefault(i => i.ReturnType == type);
 
             if (decoder != null)
                 return (T)decoder.Invoke(reader, new object[0]);
             
-            else if (typeof(T).IsEnum)
+            else if (type.IsEnum)
                 return (T)(object)reader.ReadInt32();
             
-            else if (typeof(IEnumerable).IsAssignableFrom(typeof(T))) { // Lists and Arrays
-                dynamic ret = typeof(Decoder).GetMethod("DecodeEnumerable")
-                    .MakeGenericMethod(typeof(T).GetGenericArguments()[0])
-                    .Invoke(null, new object[] { reader, version });
+            else if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) { // Lists and Arrays
+                Type EnumerableType;
                 
-                if (typeof(T).IsArray) return ret.ToArray();
-                else return ret.ToList();
-            
+                if(type.IsArray) EnumerableType = type.GetElementType();
+                else EnumerableType = type.GetGenericArguments()[0];
+                
+                dynamic decodedList = typeof(Decoder).GetMethod("DecodeEnumerable", BindingFlags.NonPublic | BindingFlags.Static)
+                        .MakeGenericMethod(EnumerableType)
+                        .Invoke(null, new object[] { reader, version });
+                
+                if (type.IsArray) return decodedList.ToArray();
+                return decodedList;
             } else return Decode<T>(reader, version);
         }
         
         static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version) {
             return Enumerable.Range(0, reader.ReadInt32())
-                .Select(i => DecodeAnything<T>(reader, version));
+                .Select(i => DecodeAnything<T>(reader, version)).ToList();
         }
         
         public static T Decode<T>(BinaryReader reader, int version) {
