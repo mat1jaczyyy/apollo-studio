@@ -64,13 +64,21 @@ namespace Apollo.Selection {
             } else if (!(item is ISelectParent)) throw new ArgumentException("Invalid type for Path<T>");
         }
 
-        public Path(BinaryReader reader, int version) 
-            => path = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadInt32()).ToList();
+        public Path(BinaryReader reader, int version) {
+            int count = reader.ReadInt32();
+            
+            if(count == -1) path = null;
+            else path = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadInt32()).ToList();
+        }
 
         public void Encode(BinaryWriter writer) {
-            writer.Write(path.Count);
-            for (int i = 0; i < path.Count; i++)
-                writer.Write(path[i]);
+            if(path == null)
+                writer.Write(-1);
+            else {
+                writer.Write(path.Count);
+                for (int i = 0; i < path.Count; i++)
+                    writer.Write(path[i]);
+            }
         }
     }
 }
