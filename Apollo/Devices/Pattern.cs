@@ -507,7 +507,7 @@ namespace Apollo.Devices {
                 for (int i = 0; i < u.Count; i++)
                     Encoder.Encode(writer, u[i]);
                 
-                Encoder.EncodeAnything(writer, r);
+                Encoder.EncodeAnything<I>(writer, r);
             }
         }
 
@@ -669,7 +669,7 @@ namespace Apollo.Devices {
             : base(reader, version) {}
         }
         
-        public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, int?> {
+        public class RootKeyUndoEntry: SimplePathUndoEntry<Pattern, Nullable<int>> {
             protected override void Action(Pattern item, int? element) => item.RootKey = element;
             
             public RootKeyUndoEntry(Pattern pattern, int? u, int? r)

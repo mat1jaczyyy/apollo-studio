@@ -81,7 +81,7 @@ namespace Apollo.Selection {
                 
                 writer.Write(init.Count);
                 for (int i = 0; i < init.Count; i++)
-                    Encoder.EncodeAnything(writer, init[i]);
+                    Encoder.EncodeAnything<ISelect>(writer, init[i]);
             }
         }
 
@@ -161,7 +161,7 @@ namespace Apollo.Selection {
                 
                 writer.Write(init.Count);
                 for (int i = 0; i < init.Count; i++)
-                    Encoder.EncodeAnything(writer, init[i]);
+                    Encoder.EncodeAnything<ISelect>(writer, init[i]);
             }
         }
 

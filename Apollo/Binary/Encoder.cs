@@ -105,20 +105,26 @@ namespace Apollo.Binary {
             writer.Write(Preferences.Time);
         });
         
-        public static void EncodeAnything(BinaryWriter writer, dynamic o) {
-            if (o.GetType().IsEnum)
+        public static void EncodeAnything<T>(BinaryWriter writer, dynamic o) {      
+            Type oType = typeof(T);          
+            
+            if(Nullable.GetUnderlyingType(typeof(T)) != null) {
+                writer.Write(o != null);
+                if(o != null) writer.Write(o);
+                
+            } else if (oType.IsEnum)
                 writer.Write((int)o);
 
-            else if (o.GetType() != typeof(string) && typeof(IEnumerable).IsAssignableFrom(o.GetType())) { // Lists and Arrays
+            else if (oType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(oType)) { // Lists and Arrays
                 int count;
                 
-                if(o.GetType().IsArray) count = o.Length;
+                if(oType.IsArray) count = o.Length;
                 else count = o.Count;
                 
                 writer.Write(count);
                 for (int i = 0; i < count; i++)
                     EncodeAnything(writer, o[i]);
-            
+
             } else try {
                 writer.Write(o);
 

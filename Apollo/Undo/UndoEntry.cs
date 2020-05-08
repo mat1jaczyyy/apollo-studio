@@ -91,8 +91,8 @@ namespace Apollo.Undo {
         public override void Encode(BinaryWriter writer) {
             base.Encode(writer);
 
-            Encoder.EncodeAnything(writer, u);
-            Encoder.EncodeAnything(writer, r);
+            Encoder.EncodeAnything<I>(writer, u);
+            Encoder.EncodeAnything<I>(writer, r);
         }
     }
 
@@ -181,8 +181,8 @@ namespace Apollo.Undo {
         public override void Encode(BinaryWriter writer) {
             base.Encode(writer);
             
-            Encoder.EncodeAnything(writer, u);
-            Encoder.EncodeAnything(writer, r);
+            Encoder.EncodeAnything<I>(writer, u);
+            Encoder.EncodeAnything<I>(writer, r);
         }
     }
 

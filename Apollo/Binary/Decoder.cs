@@ -165,14 +165,20 @@ namespace Apollo.Binary {
             }
         }
 
-        public static T DecodeAnything<T>(BinaryReader reader, int version) { // todo does it work with nullables?
+        public static T DecodeAnything<T>(BinaryReader reader, int version) {
             Type type = typeof(T);
+            bool nullable = Nullable.GetUnderlyingType(type) != null;
+            Type returnType = nullable ? Nullable.GetUnderlyingType(type) : type;
             
             MethodInfo decoder = typeof(BinaryReader).GetMethods()
                 .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
-                .FirstOrDefault(i => i.ReturnType == type);
-
-            if (decoder != null)
+                .FirstOrDefault(i => i.ReturnType == returnType);
+                
+            if(nullable)
+                if(reader.ReadBoolean()) return (T)decoder.Invoke(reader, new object[0]);
+                else return default(T);
+            
+            else if (decoder != null)
                 return (T)decoder.Invoke(reader, new object[0]);
             
             else if (type.IsEnum)
