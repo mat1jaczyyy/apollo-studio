@@ -108,7 +108,7 @@ namespace Apollo.Binary {
         public static void EncodeAnything<T>(BinaryWriter writer, dynamic o) {      
             Type oType = typeof(T);          
             
-            if(Nullable.GetUnderlyingType(typeof(T)) != null) {
+            if(Nullable.GetUnderlyingType(typeof(T)) != null) { // warning: will probably break if null is passed as reference type
                 writer.Write(o != null);
                 if(o != null) writer.Write(o);
                 
@@ -132,6 +132,7 @@ namespace Apollo.Binary {
                 Encode(writer, o); // todo special case: if o is device, cast to device!
             }
         }
+        
 
         public static byte[] Encode(object o) => Encode(writer => {
             Encode(writer, (dynamic)o);
