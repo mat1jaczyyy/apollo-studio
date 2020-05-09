@@ -293,10 +293,8 @@ namespace Apollo.Windows {
 
             ReadFile(Program.CrashProject, true);
 
-            if (Program.Project != null) {
+            if (Program.Project != null) 
                 Program.Project.FilePath = originalPath;
-                Program.Project.Undo.Clear("Project Restored"); // todo clean
-            }
 
             ResolveCrash();
         }

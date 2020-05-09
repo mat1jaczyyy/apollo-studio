@@ -55,7 +55,7 @@ namespace Apollo.Undo {
             SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
-        public void Add(UndoEntry entry) {
+        public void Add(UndoEntry entry, bool execute = false) {
             for (int i = History.Count - 1; i > Position; i--)
                 Remove(i);
             
@@ -66,13 +66,12 @@ namespace Apollo.Undo {
 
             if (Preferences.UndoLimit) Limit();
 
+            if (execute) entry.Redo();
+
             Program.Project.WriteCrashBackup();
         }
 
-        public void AddAndExecute(UndoEntry entry) {
-            Add(entry);
-            entry.Redo();
-        }
+        public void AddAndExecute(UndoEntry entry) => Add(entry, true);
 
         public void Select(int index) {
             lock (locker) {
