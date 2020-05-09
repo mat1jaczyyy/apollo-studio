@@ -123,13 +123,16 @@ namespace Apollo.Binary {
                 
                 writer.Write(count);
                 for (int i = 0; i < count; i++)
-                    EncodeAnything(writer, o[i]);
+                    EncodeAnything<T>(writer, o[i]);
 
-            } else try {
+            } else if (typeof(Device).IsAssignableFrom(oType)) 
+                Encode(writer, (Device)o);
+                
+            else try {
                 writer.Write(o);
 
             } catch (RuntimeBinderException) {
-                Encode(writer, o); // todo special case: if o is device, cast to device!
+                Encode(writer, o);
             }
         }
         
