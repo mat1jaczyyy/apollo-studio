@@ -68,12 +68,12 @@ namespace Apollo.Selection {
             int count = reader.ReadInt32();
             
             if(count == -1) path = null;
-            else path = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadInt32()).ToList();
+            else path = Enumerable.Range(0, count).Select(i => reader.ReadInt32()).ToList();
         }
 
         public void Encode(BinaryWriter writer) {
             if(path == null)
-                writer.Write(-1);
+                writer.Write(-1); // Just in case T is ISelectParent
             else {
                 writer.Write(path.Count);
                 for (int i = 0; i < path.Count; i++)
