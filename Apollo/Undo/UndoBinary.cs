@@ -20,8 +20,6 @@ namespace Apollo.Undo {
             typeof(Project.BPMChangedUndoEntry),
             typeof(Project.TrackInsertedUndoEntry),
 
-            typeof(Track.LaunchpadChangedUndoEntry),
-
             typeof(Choke.TargetUndoEntry),
 
             typeof(Clear.ModeUndoEntry),
