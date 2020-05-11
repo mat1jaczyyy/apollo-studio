@@ -115,10 +115,12 @@ namespace Apollo.Undo {
             SavedPositionChanged?.Invoke(SavedPosition);
         }
 
+        const int MaxEntries = 500;
+
         public void Limit() {
             int remove;
-            if ((remove = History.Count - 150) > 0) {
-                if (Position < History.Count - 150) return;
+            if ((remove = History.Count - MaxEntries) > 0) {
+                if (Position < History.Count - MaxEntries) return;
 
                 if (SavedPosition != null) {
                     SavedPosition += -remove;
@@ -128,7 +130,7 @@ namespace Apollo.Undo {
 
                 _position += -remove;
 
-                for (int i = History.Count - 151; i >= 0; i--)
+                for (int i = History.Count - MaxEntries - 1; i >= 0; i--)
                     Remove(i);
 
                 Position = Position;
