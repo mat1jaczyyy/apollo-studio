@@ -127,7 +127,7 @@ namespace Apollo.Elements {
 
             try {
                 if (!Directory.Exists(Path.GetDirectoryName(path))) throw new UnauthorizedAccessException();
-                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+                File.WriteAllBytes(path, Encoder.Encode(this));
 
             } catch (UnauthorizedAccessException) {
                 if (sender != null) await MessageWindow.CreateWriteError(sender);

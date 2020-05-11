@@ -168,15 +168,16 @@ namespace Apollo.Binary {
         public static T DecodeAnything<T>(BinaryReader reader, int version) {
             Type type = typeof(T);
             bool nullable = Nullable.GetUnderlyingType(type) != null;
-            Type returnType = nullable ? Nullable.GetUnderlyingType(type) : type;
+            Type returnType = nullable? Nullable.GetUnderlyingType(type) : type;
             
             MethodInfo decoder = typeof(BinaryReader).GetMethods()
                 .Where(i => i.Name != "Read" && i.Name.StartsWith("Read") && !i.GetParameters().Any())
                 .FirstOrDefault(i => i.ReturnType == returnType);
                 
-            if(nullable)
-                if(reader.ReadBoolean()) return (T)decoder.Invoke(reader, new object[0]);
-                else return default(T);
+            if (nullable)
+                return reader.ReadBoolean()
+                    ? (T)decoder.Invoke(reader, new object[0])
+                    : default(T);
             
             else if (decoder != null)
                 return (T)decoder.Invoke(reader, new object[0]);
@@ -185,40 +186,41 @@ namespace Apollo.Binary {
                 return (T)(object)reader.ReadInt32();
             
             else if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) { // Lists and Arrays
-                Type EnumerableType;
-                
-                if(type.IsArray) EnumerableType = type.GetElementType();
-                else EnumerableType = type.GetGenericArguments()[0];
+                Type EnumerableType = type.IsArray
+                    ? type.GetElementType()
+                    : type.GetGenericArguments()[0];
                 
                 dynamic decodedList = typeof(Decoder).GetMethod("DecodeEnumerable", BindingFlags.NonPublic | BindingFlags.Static)
-                        .MakeGenericMethod(EnumerableType)
-                        .Invoke(null, new object[] { reader, version });
+                    .MakeGenericMethod(EnumerableType)
+                    .Invoke(null, new object[] { reader, version });
                 
-                if (type.IsArray) return decodedList.ToArray();
-                return decodedList;
+                return type.IsArray
+                    ? decodedList.ToArray()
+                    : decodedList;
+
             } else return Decode<T>(reader, version);
         }
         
-        static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version) {
-            return Enumerable.Range(0, reader.ReadInt32())
+        static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version)
+            => Enumerable.Range(0, reader.ReadInt32())
                 .Select(i => DecodeAnything<T>(reader, version)).ToList();
-        }
         
-        public static T Decode<T>(BinaryReader reader, int version) {
-            if (typeof(T) == typeof(ISelect)) return (T)Decode(reader, version);
-            return (T)Decode(reader, version, typeof(T));
-        }
+        public static T Decode<T>(BinaryReader reader, int version)
+            => (T)(typeof(T) == typeof(ISelect)
+                ? Decode(reader, version)
+                : Decode(reader, version, typeof(T))
+            );
         
         static dynamic Decode(BinaryReader reader, int version, Type ensure = null) { 
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) throw new InvalidDataException();
 
-            if (t == typeof(Copyable)) {
+            if (t == typeof(Copyable))
                 return new Copyable() {
                     Contents = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<ISelect>(reader, version)).ToList()
                 };
 
-            } else if (t == typeof(Project)) {
+            else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
                 int[] macros = (version >= 25)? Enumerable.Range(0, 4).Select(i => reader.ReadInt32()).ToArray() : new int[4] {reader.ReadInt32(), 1, 1, 1};
                 List<Track> tracks = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Track>(reader, version)).ToList();

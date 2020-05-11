@@ -25,11 +25,11 @@ namespace Apollo.Helpers {
         }
 
         public async void StoreToClipboard()
-            => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this).ToArray()));
+            => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this)));
         
         public async Task StoreToFile(string path, Window sender) {
             try {
-                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+                File.WriteAllBytes(path, Encoder.Encode(this));
 
             } catch (UnauthorizedAccessException) {
                 await MessageWindow.CreateWriteError(sender);

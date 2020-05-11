@@ -106,26 +106,24 @@ namespace Apollo.Binary {
         });
         
         public static void EncodeAnything<T>(BinaryWriter writer, dynamic o) {      
-            Type oType = typeof(T);          
+            Type type = typeof(T);          
             
-            if(Nullable.GetUnderlyingType(typeof(T)) != null) { // warning: will probably break if null is passed as reference type
+            if (Nullable.GetUnderlyingType(type) != null) { // warning: will probably break if null is passed as reference type
                 writer.Write(o != null);
-                if(o != null) writer.Write(o);
+                if (o != null)
+                    writer.Write(o);
                 
-            } else if (oType.IsEnum)
+            } else if (type.IsEnum)
                 writer.Write((int)o);
 
-            else if (oType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(oType)) { // Lists and Arrays
-                int count;
-                
-                if(oType.IsArray) count = o.Length;
-                else count = o.Count;
+            else if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) { // Lists and Arrays
+                int count = type.IsArray? o.Length : o.Count;
                 
                 writer.Write(count);
                 for (int i = 0; i < count; i++)
                     EncodeAnything<T>(writer, o[i]);
 
-            } else if (typeof(Device).IsAssignableFrom(oType)) 
+            } else if (typeof(Device).IsAssignableFrom(type)) 
                 Encode(writer, (Device)o);
                 
             else try {
@@ -135,7 +133,6 @@ namespace Apollo.Binary {
                 Encode(writer, o);
             }
         }
-        
 
         public static byte[] Encode(object o) => Encode(writer => {
             Encode(writer, (dynamic)o);
