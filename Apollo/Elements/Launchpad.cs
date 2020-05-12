@@ -251,7 +251,7 @@ namespace Apollo.Elements {
                 if (response.Data.Length != 19)
                     return LaunchpadType.Unknown;
                 
-                if (response.CheckSysExHeader(NovationHeader) && response.Data[5] == 0x70) {
+                if (response.CheckSysExHeader(new byte[] {0x00, 0x20, 0x29, 0x00}) && response.Data[5] == 0x70) {
                     int versionInt = int.Parse(string.Join("", response.Data.SkipLast(2).TakeLast(3)));
 
                     if (versionInt < 171) // Old Firmware
@@ -351,10 +351,8 @@ namespace Apollo.Elements {
 
             } else {
                 Task.Delay(1500).ContinueWith(_ => {
-                    if (Available && Type == LaunchpadType.Unknown) {
-                        if (doingMK2VersionInquiry) Output.Send(VersionInquiry);
-                        else Output.Send(DeviceInquiry);
-                    }
+                    if (Available && Type == LaunchpadType.Unknown)
+                        Output.Send(doingMK2VersionInquiry? VersionInquiry : DeviceInquiry);
                 });
             }
         }
