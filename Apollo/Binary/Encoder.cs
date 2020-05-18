@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -117,11 +119,13 @@ namespace Apollo.Binary {
                 writer.Write((int)o);
 
             else if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) { // Lists and Arrays
-                int count = type.IsArray? o.Length : o.Count;
+                Type EnumerableType = type.IsArray
+                    ? type.GetElementType()
+                    : type.GetGenericArguments()[0];
                 
-                writer.Write(count);
-                for (int i = 0; i < count; i++)
-                    EncodeAnything<T>(writer, o[i]);
+                typeof(Encoder).GetMethod("EncodeEnumerable", BindingFlags.NonPublic | BindingFlags.Static)
+                    .MakeGenericMethod(EnumerableType)
+                    .Invoke(null, new object[] { writer, o });
 
             } else if (typeof(Device).IsAssignableFrom(type)) 
                 Encode(writer, (Device)o);
@@ -132,6 +136,14 @@ namespace Apollo.Binary {
             } catch (RuntimeBinderException) {
                 Encode(writer, o);
             }
+        }
+
+        static void EncodeEnumerable<T>(BinaryWriter writer, IEnumerable<T> o) {
+            int count = o.Count();
+            
+            writer.Write(count);
+            for (int i = 0; i < count; i++)
+                EncodeAnything<T>(writer, o.ElementAt(i));
         }
 
         public static byte[] Encode(object o) => Encode(writer => {
