@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -167,6 +168,9 @@ namespace Apollo.Devices {
             
             public RateUndoEntry(Loop loop, int u, int r)
             : base($"Loop Rate Changed to {r}ms", loop, u, r) {}
+            
+            RateUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RateModeUndoEntry: SimplePathUndoEntry<Loop, bool> {
@@ -174,6 +178,9 @@ namespace Apollo.Devices {
             
             public RateModeUndoEntry(Loop loop, bool u, bool r)
             : base($"Loop Rate Switched to {(r? "Steps" : "Free")}", loop, u, r) {}
+            
+            RateModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RateStepUndoEntry: SimplePathUndoEntry<Loop, int> {
@@ -181,6 +188,9 @@ namespace Apollo.Devices {
             
             public RateStepUndoEntry(Loop loop, int u, int r)
             : base($"Loop Rate Changed to {Length.Steps[r]}", loop, u, r) {}
+            
+            RateStepUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class HoldUndoEntry: SimplePathUndoEntry<Loop, bool> {
@@ -188,6 +198,9 @@ namespace Apollo.Devices {
             
             public HoldUndoEntry(Loop loop, bool u, bool r)
             : base($"Loop Hold Changed to {(r? "Enabled" : "Disabled")}", loop, u, r) {}
+            
+            HoldUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Loop, double> {
@@ -195,6 +208,9 @@ namespace Apollo.Devices {
             
             public GateUndoEntry(Loop loop, double u, double r)
             : base($"Loop Gate Changed to {r}%", loop, u / 100, r / 100) {}
+            
+            GateUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class RepeatsUndoEntry: SimplePathUndoEntry<Loop, int> {
@@ -202,6 +218,9 @@ namespace Apollo.Devices {
             
             public RepeatsUndoEntry(Loop loop, int u, int r)
             : base($"Loop Repeats Changed to {r}", loop, u, r) {}
+            
+            RepeatsUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

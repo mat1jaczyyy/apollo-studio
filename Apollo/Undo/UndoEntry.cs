@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Avalonia.Controls;
 
+using Apollo.Binary;
 using Apollo.Selection;
 
 namespace Apollo.Undo {
@@ -38,6 +41,29 @@ namespace Apollo.Undo {
         protected virtual void OnDispose() {}
 
         public UndoEntry(string desc) => Description = desc;
+
+        protected UndoEntry(BinaryReader reader, int version) {
+            Description = reader.ReadString();
+
+            if (reader.ReadBoolean()) // has Post
+                Post = DecodeEntry(reader, version);
+        }
+
+        public virtual void Encode(BinaryWriter writer) {
+            writer.Write(Description);
+
+            writer.Write(Post != null);
+            Post?.Encode(writer);
+        }
+
+        public static UndoEntry DecodeEntry(BinaryReader reader, int version)
+            => (UndoEntry)Activator.CreateInstance(
+                UndoBinary.DecodeID(reader),
+                BindingFlags.NonPublic | BindingFlags.Instance,
+                null,
+                new object[] { reader, version },
+                null
+            );
     }
 
     public abstract class SimpleUndoEntry<I>: UndoEntry {
@@ -55,6 +81,19 @@ namespace Apollo.Undo {
             this.u = undo;
             this.r = redo;
         }
+
+        protected SimpleUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) {
+            u = Decoder.DecodeAnything<I>(reader, version);
+            r = Decoder.DecodeAnything<I>(reader, version);
+        }
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+
+            Encoder.EncodeAnything<I>(writer, u);
+            Encoder.EncodeAnything<I>(writer, r);
+        }
     }
 
     public abstract class SimpleIndexUndoEntry<I>: SimpleUndoEntry<I> {
@@ -68,6 +107,15 @@ namespace Apollo.Undo {
 
         public SimpleIndexUndoEntry(string desc, int index, I undo, I redo)
         : base(desc, undo, redo) => this.index = index;
+
+        protected SimpleIndexUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) => index = reader.ReadInt32();
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+
+            writer.Write(index);
+        }
     }
 
     public abstract class PathUndoEntry<T>: UndoEntry {
@@ -80,7 +128,19 @@ namespace Apollo.Undo {
         protected override void OnRedo() => RedoPath(Items);
         protected virtual void RedoPath(params T[] items) {}
 
-        public PathUndoEntry(string desc, params T[] children): base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
+        public PathUndoEntry(string desc, params T[] children)
+        : base(desc) => Paths = children.Select(i => new Path<T>(i)).ToList();
+
+        protected PathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) => Paths = Enumerable.Range(0, reader.ReadInt32()).Select(i => new Path<T>(reader, version)).ToList();
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+
+            writer.Write(Paths.Count);
+            for (int i = 0; i < Paths.Count; i++)
+                Paths[i].Encode(writer);
+        }
     }
 
     public abstract class SinglePathUndoEntry<T>: PathUndoEntry<T> {
@@ -91,6 +151,9 @@ namespace Apollo.Undo {
         protected virtual void Redo(T item) {}
 
         public SinglePathUndoEntry(string desc, T item): base(desc, item) {}
+
+        protected SinglePathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) {}
     }
 
     public abstract class SimplePathUndoEntry<T, I>: SinglePathUndoEntry<T> {
@@ -108,11 +171,27 @@ namespace Apollo.Undo {
             this.u = undo;
             this.r = redo;
         }
+
+        protected SimplePathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) {
+            u = Decoder.DecodeAnything<I>(reader, version);
+            r = Decoder.DecodeAnything<I>(reader, version);
+        }
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+            
+            Encoder.EncodeAnything<I>(writer, u);
+            Encoder.EncodeAnything<I>(writer, r);
+        }
     }
 
     public abstract class EnumSimplePathUndoEntry<T, I>: SimplePathUndoEntry<T, I> where I: Enum {
         public EnumSimplePathUndoEntry(string desc, T child, I undo, I redo, IEnumerable textSource)
         : base($"{desc} Changed to {textSource.OfType<ComboBoxItem>().ElementAt((int)(object)redo).Content}", child, undo, redo) {}
+        
+        protected EnumSimplePathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) {}
     }
 
     public abstract class SymmetricPathUndoEntry<T>: SinglePathUndoEntry<T> {
@@ -122,6 +201,9 @@ namespace Apollo.Undo {
         protected virtual void Action(T item) {}
 
         public SymmetricPathUndoEntry(string desc, T child): base(desc, child) {}
+
+        protected SymmetricPathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) {}
     }
 
     public abstract class SimpleIndexPathUndoEntry<T, I>: SimplePathUndoEntry<T, I> {
@@ -132,5 +214,14 @@ namespace Apollo.Undo {
 
         public SimpleIndexPathUndoEntry(string desc, T child, int index, I undo, I redo)
         : base(desc, child, undo, redo) => this.index = index;
+        
+        protected SimpleIndexPathUndoEntry(BinaryReader reader, int version)
+        : base(reader, version) => index = reader.ReadInt32();
+
+        public override void Encode(BinaryWriter writer) {
+            base.Encode(writer);
+
+            writer.Write(index);
+        }
     }
 }

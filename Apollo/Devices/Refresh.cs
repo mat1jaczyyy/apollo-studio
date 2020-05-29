@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 
 using Apollo.DeviceViewers;
@@ -41,6 +42,9 @@ namespace Apollo.Devices {
             
             public MacroUndoEntry(Refresh refresh, int index, bool u, bool r)
             : base($"Refresh Macro {index + 1} changed to {(r? "Enabled" : "Disabled")}", refresh, index, u, r) {}
+            
+            MacroUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

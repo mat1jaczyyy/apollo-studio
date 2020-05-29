@@ -238,6 +238,7 @@ namespace Apollo.DeviceViewers {
         void Offset_Remove(int index) => Program.Project.Undo.AddAndExecute(new Copy.OffsetRemoveUndoEntry(
             _copy, 
             _copy.Offsets[index].Clone(), 
+            _copy.GetAngle(index),
             index
         ));
 

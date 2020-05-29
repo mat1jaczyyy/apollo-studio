@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -91,6 +92,9 @@ namespace Apollo.Devices {
             
             public TargetUndoEntry(Output output, int u, int r)
             : base($"Output Target Changed to {r}", output, u - 1, r - 1) {}
+            
+            TargetUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class IndexRemovedFix: PathUndoEntry<Output> {
@@ -100,6 +104,15 @@ namespace Apollo.Devices {
 
             public IndexRemovedFix(Output output, int target)
             : base(null, output) => this.target = target;
+            
+            IndexRemovedFix(BinaryReader reader, int version)
+            : base(reader, version) => target = reader.ReadInt32();
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(target);
+            }
         }
     }
 }

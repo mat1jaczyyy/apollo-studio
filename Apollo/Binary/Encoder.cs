@@ -1,6 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+
+using Microsoft.CSharp.RuntimeBinder;
 
 using Apollo.Components;
 using Apollo.Core;
@@ -8,6 +13,7 @@ using Apollo.Devices;
 using Apollo.Elements;
 using Apollo.Helpers;
 using Apollo.Structures;
+using Apollo.Undo;
 
 namespace Apollo.Binary {
     public static class Encoder {
@@ -100,12 +106,51 @@ namespace Apollo.Binary {
             
             writer.Write(Preferences.Time);
         });
+        
+        public static void EncodeAnything<T>(BinaryWriter writer, dynamic o) {      
+            Type type = typeof(T);          
+            
+            if (Nullable.GetUnderlyingType(type) != null) { // warning: will probably break if null is passed as reference type
+                writer.Write(o != null);
+                if (o != null)
+                    writer.Write(o);
+                
+            } else if (type.IsEnum)
+                writer.Write((int)o);
+
+            else if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) { // Lists and Arrays
+                Type EnumerableType = type.IsArray
+                    ? type.GetElementType()
+                    : type.GetGenericArguments()[0];
+                
+                typeof(Encoder).GetMethod("EncodeEnumerable", BindingFlags.NonPublic | BindingFlags.Static)
+                    .MakeGenericMethod(EnumerableType)
+                    .Invoke(null, new object[] { writer, o });
+
+            } else if (typeof(Device).IsAssignableFrom(type)) 
+                Encode(writer, (Device)o);
+                
+            else try {
+                writer.Write(o);
+
+            } catch (RuntimeBinderException) {
+                Encode(writer, o);
+            }
+        }
+
+        static void EncodeEnumerable<T>(BinaryWriter writer, IEnumerable<T> o) {
+            int count = o.Count();
+            
+            writer.Write(count);
+            for (int i = 0; i < count; i++)
+                EncodeAnything<T>(writer, o.ElementAt(i));
+        }
 
         public static byte[] Encode(object o) => Encode(writer => {
             Encode(writer, (dynamic)o);
         });
 
-        static void Encode(BinaryWriter writer, Copyable o) {
+        public static void Encode(BinaryWriter writer, Copyable o) {
             EncodeID(writer, typeof(Copyable));
             
             writer.Write(o.Contents.Count);
@@ -114,7 +159,7 @@ namespace Apollo.Binary {
                 else Encode(writer, (dynamic)o.Contents[i]);
         }
 
-        static void Encode(BinaryWriter writer, Project o) {
+        public static void Encode(BinaryWriter writer, Project o) {
             EncodeID(writer, typeof(Project));
 
             writer.Write(o.BPM);
@@ -129,9 +174,11 @@ namespace Apollo.Binary {
             writer.Write(o.Author);
             writer.Write(o.Time);
             writer.Write(o.Started.ToUnixTimeSeconds());
+
+            Encode(writer, o.Undo);
         }
 
-        static void Encode(BinaryWriter writer, Track o) {
+        public static void Encode(BinaryWriter writer, Track o) {
             EncodeID(writer, typeof(Track));
 
             Encode(writer, o.Chain);
@@ -141,7 +188,7 @@ namespace Apollo.Binary {
             writer.Write(o.Enabled);
         }
 
-        static void Encode(BinaryWriter writer, Chain o) {
+        public static void Encode(BinaryWriter writer, Chain o) {
             EncodeID(writer, typeof(Chain));
 
             writer.Write(o.Count);
@@ -155,7 +202,7 @@ namespace Apollo.Binary {
                 writer.Write(o.SecretMultiFilter[i]);
         }
 
-        static void Encode(BinaryWriter writer, Device o) {
+        public static void Encode(BinaryWriter writer, Device o) {
             EncodeID(writer, typeof(Device));
 
             writer.Write(o.Collapsed);
@@ -164,7 +211,7 @@ namespace Apollo.Binary {
             Encode(writer, (dynamic)o);
         }
 
-        static void Encode(BinaryWriter writer, Launchpad o) {
+        public static void Encode(BinaryWriter writer, Launchpad o) {
             EncodeID(writer, typeof(Launchpad));
 
             if (o == MIDI.NoOutput)
@@ -176,7 +223,7 @@ namespace Apollo.Binary {
             }
         }
 
-        static void Encode(BinaryWriter writer, Group o) {
+        public static void Encode(BinaryWriter writer, Group o) {
             EncodeID(writer, typeof(Group));
 
             writer.Write(o.Count);
@@ -188,20 +235,20 @@ namespace Apollo.Binary {
                 writer.Write(o.Expanded.Value);
         }
 
-        static void Encode(BinaryWriter writer, Choke o) {
+        public static void Encode(BinaryWriter writer, Choke o) {
             EncodeID(writer, typeof(Choke));
 
             writer.Write(o.Target);
             Encode(writer, o.Chain);
         }
 
-        static void Encode(BinaryWriter writer, Clear o) {
+        public static void Encode(BinaryWriter writer, Clear o) {
             EncodeID(writer, typeof(Clear));
 
             writer.Write((int)o.Mode);
         }
         
-        static void Encode(BinaryWriter writer, ColorFilter o) {
+        public static void Encode(BinaryWriter writer, ColorFilter o) {
             EncodeID(writer, typeof(ColorFilter));
 
             writer.Write(o.Hue);
@@ -213,7 +260,7 @@ namespace Apollo.Binary {
             writer.Write(o.ValueTolerance);
         }
 
-        static void Encode(BinaryWriter writer, Copy o) {
+        public static void Encode(BinaryWriter writer, Copy o) {
             EncodeID(writer, typeof(Copy));
 
             Encode(writer, o.Time);
@@ -236,14 +283,14 @@ namespace Apollo.Binary {
                 writer.Write(o.GetAngle(i));
         }
 
-        static void Encode(BinaryWriter writer, Delay o) {
+        public static void Encode(BinaryWriter writer, Delay o) {
             EncodeID(writer, typeof(Delay));
 
             Encode(writer, o.Time);
             writer.Write(o.Gate);
         }
 
-        static void Encode(BinaryWriter writer, Fade o) {
+        public static void Encode(BinaryWriter writer, Fade o) {
             EncodeID(writer, typeof(Fade));
 
             Encode(writer, o.Time);
@@ -265,14 +312,14 @@ namespace Apollo.Binary {
                 writer.Write(o.Expanded.Value);
         }
 
-        static void Encode(BinaryWriter writer, Flip o) {
+        public static void Encode(BinaryWriter writer, Flip o) {
             EncodeID(writer, typeof(Flip));
 
             writer.Write((int)o.Mode);
             writer.Write(o.Bypass);
         }
 
-        static void Encode(BinaryWriter writer, Hold o) {
+        public static void Encode(BinaryWriter writer, Hold o) {
             EncodeID(writer, typeof(Hold));
 
             Encode(writer, o.Time);
@@ -282,14 +329,14 @@ namespace Apollo.Binary {
             writer.Write(o.Release);
         }
 
-        static void Encode(BinaryWriter writer, KeyFilter o) {
+        public static void Encode(BinaryWriter writer, KeyFilter o) {
             EncodeID(writer, typeof(KeyFilter));
 
             for (int i = 0; i < 101; i++)
                 writer.Write(o[i]);
         }
 
-        static void Encode(BinaryWriter writer, Layer o) {
+        public static void Encode(BinaryWriter writer, Layer o) {
             EncodeID(writer, typeof(Layer));
 
             writer.Write(o.Target);
@@ -297,14 +344,14 @@ namespace Apollo.Binary {
             writer.Write(o.Range);
         }
 
-        static void Encode(BinaryWriter writer, LayerFilter o) {
+        public static void Encode(BinaryWriter writer, LayerFilter o) {
             EncodeID(writer, typeof(LayerFilter));
 
             writer.Write(o.Target);
             writer.Write(o.Range);
         }
         
-        static void Encode(BinaryWriter writer, Loop o){
+        public static void Encode(BinaryWriter writer, Loop o){
             EncodeID(writer, typeof(Loop));
             
             Encode(writer, o.Rate);
@@ -314,7 +361,7 @@ namespace Apollo.Binary {
             writer.Write(o.Hold);
         }
 
-        static void Encode(BinaryWriter writer, Move o) {
+        public static void Encode(BinaryWriter writer, Move o) {
             EncodeID(writer, typeof(Move));
 
             Encode(writer, o.Offset);
@@ -322,7 +369,7 @@ namespace Apollo.Binary {
             writer.Write(o.Wrap);
         }
 
-        static void Encode(BinaryWriter writer, Multi o) {
+        public static void Encode(BinaryWriter writer, Multi o) {
             EncodeID(writer, typeof(Multi));
 
             Encode(writer, o.Preprocess);
@@ -338,13 +385,13 @@ namespace Apollo.Binary {
             writer.Write((int)o.Mode);
         }
 
-        static void Encode(BinaryWriter writer, Output o) {
+        public static void Encode(BinaryWriter writer, Output o) {
             EncodeID(writer, typeof(Output));
 
             writer.Write(o.Target);
         }
 
-        static void Encode(BinaryWriter writer, MacroFilter o) {
+        public static void Encode(BinaryWriter writer, MacroFilter o) {
             EncodeID(writer, typeof(MacroFilter));
 
             writer.Write(o.Macro);
@@ -353,20 +400,20 @@ namespace Apollo.Binary {
                 writer.Write(o[i]);
         }
 
-        static void Encode(BinaryWriter writer, Switch o) {
+        public static void Encode(BinaryWriter writer, Switch o) {
             EncodeID(writer, typeof(Switch));
 
             writer.Write(o.Target);
             writer.Write(o.Value);
         }
 
-        static void Encode(BinaryWriter writer, Paint o) {
+        public static void Encode(BinaryWriter writer, Paint o) {
             EncodeID(writer, typeof(Paint));
 
             Encode(writer, o.Color);
         }
 
-        static void Encode(BinaryWriter writer, Pattern o) {
+        public static void Encode(BinaryWriter writer, Pattern o) {
             EncodeID(writer, typeof(Pattern));
 
             writer.Write(o.Repeats);
@@ -391,25 +438,25 @@ namespace Apollo.Binary {
             writer.Write(o.Expanded);
         }
 
-        static void Encode(BinaryWriter writer, Preview o) {
+        public static void Encode(BinaryWriter writer, Preview o) {
             EncodeID(writer, typeof(Preview));
         }
 
-        static void Encode(BinaryWriter writer, Rotate o) {
+        public static void Encode(BinaryWriter writer, Rotate o) {
             EncodeID(writer, typeof(Rotate));
 
             writer.Write((int)o.Mode);
             writer.Write(o.Bypass);
         }
 
-        static void Encode(BinaryWriter writer, Refresh o) {
+        public static void Encode(BinaryWriter writer, Refresh o) {
             EncodeID(writer, typeof(Refresh));
 
             for (int i = 0; i < 4; i++)
                 writer.Write(o.GetMacro(i));
         }
 
-        static void Encode(BinaryWriter writer, Tone o) {
+        public static void Encode(BinaryWriter writer, Tone o) {
             EncodeID(writer, typeof(Tone));
 
             writer.Write(o.Hue);
@@ -421,7 +468,7 @@ namespace Apollo.Binary {
             writer.Write(o.ValueLow);
         }
 
-        static void Encode(BinaryWriter writer, Color o) {
+        public static void Encode(BinaryWriter writer, Color o) {
             EncodeID(writer, typeof(Color));
 
             writer.Write(o.Red);
@@ -429,7 +476,7 @@ namespace Apollo.Binary {
             writer.Write(o.Blue);
         }
 
-        static void Encode(BinaryWriter writer, Frame o) {
+        public static void Encode(BinaryWriter writer, Frame o) {
             EncodeID(writer, typeof(Frame));
 
             Encode(writer, o.Time);
@@ -438,13 +485,13 @@ namespace Apollo.Binary {
                 Encode(writer, o.Screen[i]);
         }
 
-        static void Encode(BinaryWriter writer, Length o) {
+        public static void Encode(BinaryWriter writer, Length o) {
             EncodeID(writer, typeof(Length));
 
             writer.Write(o.Step);
         }
 
-        static void Encode(BinaryWriter writer, Offset o) {
+        public static void Encode(BinaryWriter writer, Offset o) {
             EncodeID(writer, typeof(Offset));
 
             writer.Write(o.X);
@@ -455,12 +502,24 @@ namespace Apollo.Binary {
             writer.Write(o.AbsoluteY);
         }
 
-        static void Encode(BinaryWriter writer, Time o) {
+        public static void Encode(BinaryWriter writer, Time o) {
             EncodeID(writer, typeof(Time));
 
             writer.Write(o.Mode);
             Encode(writer, o.Length);
             writer.Write(o.Free);
+        }
+
+        public static void Encode(BinaryWriter writer, UndoManager o) {
+            EncodeID(writer, typeof(UndoManager));
+
+            writer.Write(o.History.Count);
+            for (int i = 0; i < o.History.Count; i++) {
+                UndoBinary.EncodeID(writer, o.History[i].GetType());
+                o.History[i].Encode(writer);
+            }
+
+            writer.Write(o.Position);
         }
     }
 }

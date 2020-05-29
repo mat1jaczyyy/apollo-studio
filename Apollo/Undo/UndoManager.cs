@@ -13,14 +13,12 @@ namespace Apollo.Undo {
 
         object locker = new object();
 
-        public List<UndoEntry> History = new List<UndoEntry>() {
-            new UndoEntry("Initial State")
-        };
+        public List<UndoEntry> History;
 
         public delegate void PositionChangedEventHandler(int position);
         public event PositionChangedEventHandler PositionChanged;
 
-        int _position = 0;
+        int _position;
         public int Position { 
             get => _position;
             private set {
@@ -36,26 +34,28 @@ namespace Apollo.Undo {
         public delegate void SavedPositionChangedEventHandler(int? position);
         public event SavedPositionChangedEventHandler SavedPositionChanged;
 
-        int? _saved = null;
-        public int? SavedPosition {
-            get => _saved;
-        }
+        public int? SavedPosition { get; private set; } = null;
         
         public delegate void SavedChangedEventHandler(bool saved);
         public event SavedChangedEventHandler SavedChanged;
 
-        public bool Saved {
-            get => _saved == Position;
+        public bool Saved => SavedPosition == Position;
+
+        public UndoManager(List<UndoEntry> history = null, int position = 0) {
+            History = history?? new List<UndoEntry>() {
+                new UndoEntry("Initial State")
+            };
+            _position = position;
         }
 
         public void SavePosition() {
-            _saved = Position;
+            SavedPosition = Position;
 
             SavedChanged?.Invoke(Saved);
             SavedPositionChanged?.Invoke(SavedPosition.Value);
         }
 
-        public void Add(UndoEntry entry) {
+        public void Add(UndoEntry entry, bool execute = false) {
             for (int i = History.Count - 1; i > Position; i--)
                 Remove(i);
             
@@ -66,13 +66,12 @@ namespace Apollo.Undo {
 
             if (Preferences.UndoLimit) Limit();
 
+            if (execute) entry.Redo();
+
             Program.Project.WriteCrashBackup();
         }
 
-        public void AddAndExecute(UndoEntry entry) {
-            Add(entry);
-            entry.Redo();
-        }
+        public void AddAndExecute(UndoEntry entry) => Add(entry, true);
 
         public void Select(int index) {
             lock (locker) {
@@ -98,7 +97,7 @@ namespace Apollo.Undo {
         }
 
         public void Clear(string description = "Undo History Cleared") {
-            _saved = (SavedPosition == Position)? (int?)0 : null;
+            SavedPosition = Saved? (int?)0 : null;
             SavedPositionChanged?.Invoke(SavedPosition);
 
             if (Window != null)
@@ -116,20 +115,22 @@ namespace Apollo.Undo {
             SavedPositionChanged?.Invoke(SavedPosition);
         }
 
+        const int MaxEntries = 500;
+
         public void Limit() {
             int remove;
-            if ((remove = History.Count - 150) > 0) {
-                if (Position < History.Count - 150) return;
+            if ((remove = History.Count - MaxEntries) > 0) {
+                if (Position < History.Count - MaxEntries) return;
 
-                if (_saved != null) {
-                    _saved += -remove;
-                    if (_saved < 0) _saved = null;
+                if (SavedPosition != null) {
+                    SavedPosition += -remove;
+                    if (SavedPosition < 0) SavedPosition = null;
                 }
                 SavedPositionChanged?.Invoke(SavedPosition);
 
                 _position += -remove;
 
-                for (int i = History.Count - 151; i >= 0; i--)
+                for (int i = History.Count - MaxEntries - 1; i >= 0; i--)
                     Remove(i);
 
                 Position = Position;

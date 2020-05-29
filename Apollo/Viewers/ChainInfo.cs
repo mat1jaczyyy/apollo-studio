@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia;
@@ -173,6 +174,17 @@ namespace Apollo.Viewers {
 
             public DeviceAsChainUndoEntry(ISelectParent sourceparent, Path<ISelectParent> premove, ISelectParent targetparent, int? remove, bool copy, int count, int before, int after, int before_pos, int after_pos, string format)
             : base(sourceparent, premove, targetparent, copy, count, before, after, before_pos, after_pos, format) => this.remove = remove;
+        
+            DeviceAsChainUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) => remove = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(remove.HasValue);
+                if (remove.HasValue)
+                    writer.Write(remove.Value);
+            }
         }
 
         DragDropManager DragDrop;

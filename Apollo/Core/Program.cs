@@ -87,7 +87,7 @@ namespace Apollo.Core {
                         
                         if (Project != null) {
                             try {
-                                byte[] project = Encoder.Encode(Project).ToArray();
+                                byte[] project = Encoder.Encode(Project);
 
                                 File.WriteAllBytes(CrashProject, project);
 

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
+using Apollo.Binary;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -399,6 +401,23 @@ namespace Apollo.Devices {
                 this.pos = pos;
                 this.type = type;
             }
+            
+            ThumbInsertUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                index = reader.ReadInt32();
+                thumbColor = Decoder.Decode<Color>(reader, version);
+                pos = reader.ReadDouble();
+                type = (FadeType)reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.Encode(writer, thumbColor);
+                writer.Write(pos);
+                writer.Write((int)type);
+            }
         }
         
         public class ThumbRemoveUndoEntry: PathUndoEntry<Fade> {
@@ -418,6 +437,22 @@ namespace Apollo.Devices {
                 up = fade.GetPosition(index);
                 ut = fade.GetFadeType(index);
             }
+            
+            ThumbRemoveUndoEntry(BinaryReader reader, int version): base(reader, version){
+                index = reader.ReadInt32();
+                uc = Decoder.Decode<Color>(reader, version);
+                up = reader.ReadDouble();
+                ut = (FadeType)reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.Encode(writer, uc);
+                writer.Write(up);
+                writer.Write((int)ut);
+            }
         }
         
         public class ThumbTypeUndoEntry: SimpleIndexPathUndoEntry<Fade, FadeType> {
@@ -425,6 +460,9 @@ namespace Apollo.Devices {
             
             public ThumbTypeUndoEntry(Fade fade, int index, FadeType r)
             : base($"Fade Type {index + 1} Changed to {r.ToString()}", fade, index, fade.GetFadeType(index), r) {}
+            
+            ThumbTypeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ThumbMoveUndoEntry: SimpleIndexPathUndoEntry<Fade, double> {
@@ -432,6 +470,9 @@ namespace Apollo.Devices {
             
             public ThumbMoveUndoEntry(Fade fade, int index, double u, double r)
             : base($"Fade Color {index + 1} Moved", fade, index, u, r) {}
+            
+            ThumbMoveUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ColorUndoEntry: SimpleIndexPathUndoEntry<Fade, Color> {
@@ -439,6 +480,9 @@ namespace Apollo.Devices {
             
             public ColorUndoEntry(Fade fade, int index, Color u, Color r)
             : base($"Fade Color {index + 1} Changed to {r.ToHex()}", fade, index, u, r) {}
+            
+            ColorUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class DurationUndoEntry: SimplePathUndoEntry<Fade, int> {
@@ -446,6 +490,9 @@ namespace Apollo.Devices {
             
             public DurationUndoEntry(Fade fade, int u, int r)
             : base($"Fade Duration Changed to {r}ms", fade, u, r) {}
+            
+            DurationUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class DurationModeUndoEntry: SimplePathUndoEntry<Fade, bool> {
@@ -453,6 +500,9 @@ namespace Apollo.Devices {
             
             public DurationModeUndoEntry(Fade fade, bool u, bool r)
             : base($"Fade Duration Switched to {(r? "Steps" : "Free")}", fade, u, r) {}
+            
+            DurationModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class DurationStepUndoEntry: SimplePathUndoEntry<Fade, int> {
@@ -460,6 +510,9 @@ namespace Apollo.Devices {
             
             public DurationStepUndoEntry(Fade fade, int u, int r)
             : base($"Fade Duration Changed to {Length.Steps[r]}", fade, u, r) {}
+            
+            DurationStepUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class GateUndoEntry: SimplePathUndoEntry<Fade, double> {
@@ -467,6 +520,9 @@ namespace Apollo.Devices {
             
             public GateUndoEntry(Fade fade, double u, double r)
             : base($"Fade Gate Changed to {r}%", fade, u / 100, r / 100) {}
+            
+            GateUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class PlaybackModeUndoEntry: SimplePathUndoEntry<Fade, FadePlaybackType> {
@@ -474,6 +530,9 @@ namespace Apollo.Devices {
             
             public PlaybackModeUndoEntry(Fade fade, FadePlaybackType u, FadePlaybackType r)
             : base($"Fade Playback Mode Changed to {r.ToString()}", fade, u, r) {}
+            
+            PlaybackModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ReverseUndoEntry: SymmetricPathUndoEntry<Fade> {
@@ -497,6 +556,9 @@ namespace Apollo.Devices {
             
             public ReverseUndoEntry(Fade fade)
             : base("Fade Reversed", fade) {}
+            
+            ReverseUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class EqualizeUndoEntry: SimplePathUndoEntry<Fade, double[]> {
@@ -510,6 +572,9 @@ namespace Apollo.Devices {
                 Enumerable.Range(1, fade.Count - 2).Select(i => fade.GetPosition(i)).ToArray(),
                 Enumerable.Range(1, fade.Count - 2).Select(i => (double)i / (fade.Count - 1)).ToArray()
             ) {}
+            
+            EqualizeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public abstract class CutUndoEntry: SinglePathUndoEntry<Fade> {
@@ -537,6 +602,32 @@ namespace Apollo.Devices {
                 positions = Enumerable.Range(0, fade.Count).Select(i => fade.GetPosition(i)).ToList();
                 fadetypes = Enumerable.Range(0, fade.Count - 1).Select(i => fade.GetFadeType(i)).ToList();
             }
+        
+            protected CutUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                colors = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.Decode<Color>(reader, version)).ToList();
+                positions = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadDouble()).ToList();
+                fadetypes = Enumerable.Range(0, reader.ReadInt32()).Select(i => (FadeType)reader.ReadInt32()).ToList();
+                index = reader.ReadInt32();
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(colors.Count);
+                for (int i = 0; i < colors.Count; i++)
+                    Encoder.Encode(writer, colors[i]);
+                
+                writer.Write(positions.Count);
+                for (int i = 0; i < positions.Count; i++)
+                     writer.Write(positions[i]);
+                
+                writer.Write(fadetypes.Count);
+                for (int i = 0; i < fadetypes.Count; i++)
+                    writer.Write((int)fadetypes[i]);
+                
+                writer.Write(index);
+            }
         }
 
         public class StartHereUndoEntry: CutUndoEntry {
@@ -550,6 +641,9 @@ namespace Apollo.Devices {
             
             public StartHereUndoEntry(Fade fade, int index)
             : base(fade, index, "Start") {}
+            
+            StartHereUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class EndHereUndoEntry: CutUndoEntry {
@@ -563,6 +657,9 @@ namespace Apollo.Devices {
             
             public EndHereUndoEntry(Fade fade, int index)
             : base(fade, index, "End") {}
+            
+            EndHereUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

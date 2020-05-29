@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Apollo.Core;
@@ -61,6 +62,22 @@ namespace Apollo.Selection {
                 }
 
             } else if (!(item is ISelectParent)) throw new ArgumentException("Invalid type for Path<T>");
+        }
+
+        public Path(BinaryReader reader, int version) {
+            int count = reader.ReadInt32();
+            
+            if (count != -1)
+                path = Enumerable.Range(0, count).Select(i => reader.ReadInt32()).ToList();
+        }
+
+        public void Encode(BinaryWriter writer) {
+            if (path == null) writer.Write(-1); // In case T is ISelectParent (only happens for Project)
+            else {
+                writer.Write(path.Count);
+                for (int i = 0; i < path.Count; i++)
+                    writer.Write(path[i]);
+            }
         }
     }
 }

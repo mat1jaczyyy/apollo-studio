@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -115,6 +116,9 @@ namespace Apollo.Devices {
 
             public TargetUndoEntry(Choke choke, int u, int r)
             : base($"Choke Target Changed to {r}", choke, u, r) {}
+            
+            TargetUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

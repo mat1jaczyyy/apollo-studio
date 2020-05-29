@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Avalonia.Controls;
 
+using Apollo.Binary;
 using Apollo.Devices;
 using Apollo.DeviceViewers;
 using Apollo.Selection;
@@ -227,6 +229,19 @@ namespace Apollo.Elements {
             : base($"Device ({device.Name}) Inserted", chain) {
                 this.index = index;
                 this.device = device.Clone();
+            }
+            
+            DeviceInsertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                index = reader.ReadInt32();
+                device = Decoder.Decode<Device>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.Encode(writer, device);
             }
         }
     }

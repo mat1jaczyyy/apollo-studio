@@ -1,3 +1,5 @@
+using System.IO;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
@@ -96,6 +98,9 @@ namespace Apollo.Devices {
             
             public HueUndoEntry(Tone tone, double u, double r)
             : base($"Tone Hue Changed to {r}°", tone, u, r) {}
+            
+            HueUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class SatHighUndoEntry: SimplePathUndoEntry<Tone, double> {
@@ -103,6 +108,9 @@ namespace Apollo.Devices {
             
             public SatHighUndoEntry(Tone tone, double u, double r)
             : base($"Tone Sat Hi Changed to {r}%", tone, u / 100, r / 100) {}
+            
+            SatHighUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class SatLowUndoEntry: SimplePathUndoEntry<Tone, double> {
@@ -110,6 +118,9 @@ namespace Apollo.Devices {
             
             public SatLowUndoEntry(Tone tone, double u, double r)
             : base($"Tone Sat Lo Changed to {r}%", tone, u / 100, r / 100) {}
+            
+            SatLowUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ValueHighUndoEntry: SimplePathUndoEntry<Tone, double> {
@@ -117,6 +128,9 @@ namespace Apollo.Devices {
             
             public ValueHighUndoEntry(Tone tone, double u, double r)
             : base($"Tone Value Hi Changed to {r}%", tone, u / 100, r / 100) {}
+            
+            ValueHighUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ValueLowUndoEntry: SimplePathUndoEntry<Tone, double> {
@@ -124,6 +138,9 @@ namespace Apollo.Devices {
             
             public ValueLowUndoEntry(Tone tone, double u, double r)
             : base($"Tone Value Lo Changed to {r}%", tone, u / 100, r / 100) {}
+            
+            ValueLowUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

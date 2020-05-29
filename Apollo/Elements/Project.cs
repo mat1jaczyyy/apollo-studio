@@ -76,7 +76,7 @@ namespace Apollo.Elements {
 
         Stopwatch TimeSpent = new Stopwatch();
 
-        public UndoManager Undo = new UndoManager();
+        public UndoManager Undo;
 
         public event ChangedEventHandler TrackOperationFinished;
         bool _trackoperation = false;
@@ -127,7 +127,7 @@ namespace Apollo.Elements {
 
             try {
                 if (!Directory.Exists(Path.GetDirectoryName(path))) throw new UnauthorizedAccessException();
-                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+                File.WriteAllBytes(path, Encoder.Encode(this));
 
             } catch (UnauthorizedAccessException) {
                 if (sender != null) await MessageWindow.CreateWriteError(sender);
@@ -232,7 +232,7 @@ namespace Apollo.Elements {
             TrackOperation = false;
         }
 
-        public Project(int bpm = 150, int[] macros = null, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, string path = "") {
+        public Project(int bpm = 150, int[] macros = null, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, UndoManager undo = null, string path = "") {
             TimeSpent.Start();
 
             BPM = bpm;
@@ -242,6 +242,7 @@ namespace Apollo.Elements {
             BaseTime = basetime;
             FilePath = path;
             Started = (started == 0)? DateTimeOffset.UtcNow : DateTimeOffset.FromUnixTimeSeconds(started);
+            Undo = undo?? new UndoManager();
 
             if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
 
@@ -301,6 +302,19 @@ namespace Apollo.Elements {
                 this.index = index;
                 this.track = track.Clone();
             }
+            
+            TrackInsertedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                index = reader.ReadInt32();
+                track = Decoder.Decode<Track>(reader, version);
+            }
+            
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+                
+                writer.Write(index);
+                Encoder.Encode(writer, track);
+            }
         }
 
         public class BPMChangedUndoEntry: SimpleUndoEntry<int> {
@@ -308,6 +322,9 @@ namespace Apollo.Elements {
 
             public BPMChangedUndoEntry(int u, int r)
             : base($"BPM Changed to {r}", u, r) {}
+
+            BPMChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class AuthorChangedUndoEntry: SimpleUndoEntry<string> {
@@ -315,6 +332,9 @@ namespace Apollo.Elements {
 
             public AuthorChangedUndoEntry(string u, string r)
             : base($"Author Changed to {r}", u, r) {}
+
+            AuthorChangedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

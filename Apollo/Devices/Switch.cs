@@ -1,3 +1,5 @@
+using System.IO;
+
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -52,6 +54,9 @@ namespace Apollo.Devices {
             
             public TargetUndoEntry(Switch macroswitch, int u, int r)
             : base($"Switch Target Changed to {r}", macroswitch, u, r) {}
+            
+            TargetUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ValueUndoEntry: SimplePathUndoEntry<Switch, int> {
@@ -59,6 +64,9 @@ namespace Apollo.Devices {
             
             public ValueUndoEntry(Switch macroswitch, int u, int r)
             : base($"Switch Value Changed to {r}", macroswitch, u, r) {}
+            
+            ValueUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -65,49 +66,68 @@ namespace Apollo.Devices {
             Offset.Dispose();
             base.Dispose();
         }
-        
-        public class OffsetUndoEntry: PathUndoEntry<Move> {
+
+        public abstract class OffsetUpdatedUndoEntry: PathUndoEntry<Move> {
             int ux, uy, rx, ry;
+
+            protected abstract void Action(Offset item, int u, int r);
+
+            protected override void UndoPath(params Move[] item)
+                => Action(item[0].Offset, ux, uy);
+
+            protected override void RedoPath(params Move[] item)
+                => Action(item[0].Offset, rx, ry);
             
-            protected override void UndoPath(params Move[] items) {
-                items[0].Offset.X = ux;
-                items[0].Offset.Y = uy;
-            }
-            
-            protected override void RedoPath(params Move[] items) {
-                items[0].Offset.X = rx;
-                items[0].Offset.Y = ry;
-            }
-            
-            public OffsetUndoEntry(Move move, int ux, int uy, int rx, int ry)
-            : base($"Move Offset Relative Changed to {rx},{ry}", move) {
+            public OffsetUpdatedUndoEntry(string kind, Move move, int ux, int uy, int rx, int ry)
+            : base($"Move Offset {kind} Changed to {rx},{ry}", move) {
                 this.ux = ux;
                 this.uy = uy;
                 this.rx = rx;
                 this.ry = ry;
+            }
+
+            protected OffsetUpdatedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {
+                this.ux = reader.ReadInt32();
+                this.uy = reader.ReadInt32();
+                this.rx = reader.ReadInt32();
+                this.ry = reader.ReadInt32();
+            }
+
+            public override void Encode(BinaryWriter writer) {
+                base.Encode(writer);
+
+                writer.Write(ux);
+                writer.Write(uy);
+                writer.Write(rx);
+                writer.Write(ry);
             }
         }
         
-        public class OffsetAbsoluteUndoEntry: PathUndoEntry<Move> {
-            int ux, uy, rx, ry;
-            
-            protected override void UndoPath(params Move[] items) {
-                items[0].Offset.AbsoluteX = ux;
-                items[0].Offset.AbsoluteY = uy;
+        public class OffsetRelativeUndoEntry: OffsetUpdatedUndoEntry {
+            protected override void Action(Offset item, int x, int y) {
+                item.X = x;
+                item.Y = y;
             }
             
-            protected override void RedoPath(params Move[] items) {
-                items[0].Offset.AbsoluteX = rx;
-                items[0].Offset.AbsoluteY = ry;
+            public OffsetRelativeUndoEntry(Move move, int ux, int uy, int rx, int ry)
+            : base("Relative", move, ux, uy, rx, ry) {}
+            
+            OffsetRelativeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
+        }
+        
+        public class OffsetAbsoluteUndoEntry: OffsetUpdatedUndoEntry {
+            protected override void Action(Offset item, int x, int y) {
+                item.AbsoluteX = x;
+                item.AbsoluteY = y;
             }
             
             public OffsetAbsoluteUndoEntry(Move move, int ux, int uy, int rx, int ry)
-            : base($"Move Offset Absolute Changed to {rx},{ry}", move) {
-                this.ux = ux;
-                this.uy = uy;
-                this.rx = rx;
-                this.ry = ry;
-            }
+            : base("Absolute", move, ux, uy, rx, ry) {}
+            
+            OffsetAbsoluteUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
 
         public class OffsetSwitchedUndoEntry: SimplePathUndoEntry<Move, bool> {

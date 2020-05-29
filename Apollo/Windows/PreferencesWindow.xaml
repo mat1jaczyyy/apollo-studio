@@ -155,7 +155,7 @@
             <Border />
 
             <TextBlock Classes="heading" Text="Undo History" />
-            <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 150 entries</CheckBox>
+            <CheckBox Click="UndoLimit_Changed" x:Name="UndoLimit">Limit Undo History to 500 entries</CheckBox>
 
             <Border />
 

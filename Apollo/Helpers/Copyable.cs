@@ -25,11 +25,11 @@ namespace Apollo.Helpers {
         }
 
         public async void StoreToClipboard()
-            => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this).ToArray()));
+            => await Application.Current.Clipboard.SetTextAsync(Convert.ToBase64String(Encoder.Encode(this)));
         
         public async Task StoreToFile(string path, Window sender) {
             try {
-                File.WriteAllBytes(path, Encoder.Encode(this).ToArray());
+                File.WriteAllBytes(path, Encoder.Encode(this));
 
             } catch (UnauthorizedAccessException) {
                 await MessageWindow.CreateWriteError(sender);
@@ -41,11 +41,12 @@ namespace Apollo.Helpers {
 
             if (b64 == null) return null;
             
-            try {
-                return await Decoder.Decode(new MemoryStream(Convert.FromBase64String(b64)), typeof(Copyable));
-            } catch (Exception) {
-                return null;
-            }
+            using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(b64)))
+                try {
+                    return await Decoder.Decode<Copyable>(ms);
+                } catch (Exception) {
+                    return null;
+                }
         }
 
         public static async Task<Copyable> DecodeFile(string[] paths, Window sender, Type ensure) {
@@ -56,7 +57,7 @@ namespace Apollo.Helpers {
                     Copyable copyable;
 
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        copyable = await Decoder.Decode(file, typeof(Copyable));
+                        copyable = await Decoder.Decode<Copyable>(file);
 
                     if (!ensure.IsAssignableFrom(copyable.Type))
                         throw new InvalidDataException();

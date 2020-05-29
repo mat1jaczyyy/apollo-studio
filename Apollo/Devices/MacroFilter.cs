@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 
 using Apollo.Core;
@@ -66,6 +67,9 @@ namespace Apollo.Devices {
             
             public TargetUndoEntry(MacroFilter filter, int u, int r)
             : base($"Macro Filter Target Changed to {r}", filter, u, r) {}
+            
+            TargetUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class FilterUndoEntry: SimplePathUndoEntry<MacroFilter, bool[]> {
@@ -73,6 +77,9 @@ namespace Apollo.Devices {
             
             public FilterUndoEntry(MacroFilter filter, bool[] u)
             : base($"Macro Filter Changed", filter, u.ToArray(), filter.Filter.ToArray()) {}
+            
+            FilterUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }

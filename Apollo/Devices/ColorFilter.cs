@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -107,6 +108,9 @@ namespace Apollo.Devices {
             
             public HueUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Hue Changed to {r}°", colorFilter, u, r) {}
+            
+            HueUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class SaturationUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
@@ -114,6 +118,9 @@ namespace Apollo.Devices {
             
             public SaturationUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Sat Changed to {r}%", colorFilter, u / 100, r / 100) {}
+            
+            SaturationUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ValueUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
@@ -121,6 +128,9 @@ namespace Apollo.Devices {
             
             public ValueUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Value Changed to {r}%", colorFilter, u / 100, r / 100) {}
+            
+            ValueUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class HueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
@@ -128,6 +138,9 @@ namespace Apollo.Devices {
             
             public HueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Hue Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
+            
+            HueToleranceUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class SaturationToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
@@ -135,6 +148,9 @@ namespace Apollo.Devices {
             
             public SaturationToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Sat Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
+            
+            SaturationToleranceUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class ValueToleranceUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
@@ -142,6 +158,9 @@ namespace Apollo.Devices {
             
             public ValueToleranceUndoEntry(ColorFilter colorFilter, double u, double r) 
             : base($"Color Filter Value Tol Changed to {r}%", colorFilter, u / 100, r / 100) {}
+            
+            ValueToleranceUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }
