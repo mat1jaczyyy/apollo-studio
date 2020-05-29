@@ -130,11 +130,13 @@ namespace Apollo.Binary {
             } else if (typeof(Device).IsAssignableFrom(type)) 
                 Encode(writer, (Device)o);
                 
-            else try {
-                writer.Write(o);
+            else {
+                MethodInfo encoder = typeof(BinaryWriter).GetMethods()
+                    .Where(i => i.Name == "Write" && i.GetParameters().Count() == 1)
+                    .FirstOrDefault(i => i.GetParameters().First().ParameterType == type);
 
-            } catch (RuntimeBinderException) {
-                Encode(writer, o);
+                if (encoder == null) Encode(writer, o);
+                else encoder.Invoke(writer, new object[] { o });
             }
         }
 
