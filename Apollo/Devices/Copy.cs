@@ -659,21 +659,24 @@ namespace Apollo.Devices {
         public class OffsetRemoveUndoEntry: PathUndoEntry<Copy> {
             int index;
             Offset offset;
+            int angle;
             
-            protected override void UndoPath(params Copy[] items) => items[0].Insert(index, offset.Clone());
+            protected override void UndoPath(params Copy[] items) => items[0].Insert(index, offset.Clone(), angle);
             protected override void RedoPath(params Copy[] items) => items[0].Remove(index);
             
             protected override void OnDispose() => offset.Dispose();
             
-            public OffsetRemoveUndoEntry(Copy copy, Offset offset, int index)
+            public OffsetRemoveUndoEntry(Copy copy, Offset offset, int angle, int index)
             : base($"Copy Offset {index + 1} Removed", copy) {
                 this.index = index;
                 this.offset = offset.Clone();
+                this.angle = angle;
             }
             
             OffsetRemoveUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 index = reader.ReadInt32();
                 offset = Decoder.Decode<Offset>(reader, version);
+                angle = reader.ReadInt32();
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -681,6 +684,7 @@ namespace Apollo.Devices {
                 
                 writer.Write(index);
                 Encoder.Encode(writer, offset);
+                writer.Write(angle);
             }
         }
 
