@@ -517,7 +517,7 @@ namespace Apollo.Binary {
 
             writer.Write(UndoBinary.Version);
 
-            using (MemoryStream undoData = new MemoryStream()) {
+            using (MemoryStream undoData = new MemoryStream())
                 using (BinaryWriter undoWriter = new BinaryWriter(undoData)) {
                     undoWriter.Write(o.History.Count);
 
@@ -527,11 +527,10 @@ namespace Apollo.Binary {
                     }
 
                     undoWriter.Write(o.Position);
-                }
 
-                writer.Write((int)undoData.Length);
-                writer.Write(undoData.ToArray());
-            }
+                    writer.Write((int)undoData.Length);
+                    writer.Write(undoData.ToArray());
+                }
         }
     }
 }

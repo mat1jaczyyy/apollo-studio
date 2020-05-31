@@ -736,7 +736,7 @@ namespace Apollo.Binary {
                 int undoVersion = reader.ReadInt32();
                 int size = reader.ReadInt32();
 
-                if (version == UndoBinary.Version)
+                if (undoVersion == UndoBinary.Version)
                     return new UndoManager(
                         Enumerable.Range(0, reader.ReadInt32()).Select(i => UndoEntry.DecodeEntry(reader, version)).ToList(),
                         reader.ReadInt32()
