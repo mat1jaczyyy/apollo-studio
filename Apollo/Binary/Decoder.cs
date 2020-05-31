@@ -732,11 +732,19 @@ namespace Apollo.Binary {
                     reader.ReadInt32()
                 );
             
-            else if (t == typeof(UndoManager))
-                return new UndoManager(
-                    Enumerable.Range(0, reader.ReadInt32()).Select(i => UndoEntry.DecodeEntry(reader, version)).ToList(),
-                    reader.ReadInt32()
-                );
+            else if (t == typeof(UndoManager)) {
+                int undoVersion = reader.ReadInt32();
+                int size = reader.ReadInt32();
+
+                if (version == UndoBinary.Version)
+                    return new UndoManager(
+                        Enumerable.Range(0, reader.ReadInt32()).Select(i => UndoEntry.DecodeEntry(reader, version)).ToList(),
+                        reader.ReadInt32()
+                    );
+                
+                reader.ReadBytes(size);
+                return new UndoManager();
+            }
 
             throw new InvalidDataException();
         }

@@ -515,13 +515,23 @@ namespace Apollo.Binary {
         public static void Encode(BinaryWriter writer, UndoManager o) {
             EncodeID(writer, typeof(UndoManager));
 
-            writer.Write(o.History.Count);
-            for (int i = 0; i < o.History.Count; i++) {
-                UndoBinary.EncodeID(writer, o.History[i].GetType());
-                o.History[i].Encode(writer);
-            }
+            writer.Write(UndoBinary.Version);
 
-            writer.Write(o.Position);
+            using (MemoryStream undoData = new MemoryStream()) {
+                using (BinaryWriter undoWriter = new BinaryWriter(undoData)) {
+                    undoWriter.Write(o.History.Count);
+
+                    for (int i = 0; i < o.History.Count; i++) {
+                        UndoBinary.EncodeID(undoWriter, o.History[i].GetType());
+                        o.History[i].Encode(undoWriter);
+                    }
+
+                    undoWriter.Write(o.Position);
+                }
+
+                writer.Write((int)undoData.Length);
+                writer.Write(undoData.ToArray());
+            }
         }
     }
 }
