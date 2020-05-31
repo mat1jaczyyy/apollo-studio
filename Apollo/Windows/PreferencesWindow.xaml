@@ -184,7 +184,7 @@
 
             <TextBlock Classes="heading" Text="Thanks to our Patreon supporters:" />
             <StackPanel>
-              <TextBlock Text="Mikhail Trofimov, Ezra Selga, Gabe Walls, Tuchan, Xiao Meng" />
+              <TextBlock Text="Alexay Forest, Gabe Walls, Tuchan, Xiao Meng" />
             </StackPanel>
           </StackPanel>
         </ScrollViewer>
