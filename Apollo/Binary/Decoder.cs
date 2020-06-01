@@ -198,7 +198,10 @@ namespace Apollo.Binary {
                     ? decodedList.ToArray()
                     : decodedList;
 
-            } else return Decode<T>(reader, version);
+            } else if (typeof(Device).IsAssignableFrom(type))
+                return (T)(object)Decode<Device>(reader, version);
+
+            else return Decode<T>(reader, version);
         }
         
         static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version)
