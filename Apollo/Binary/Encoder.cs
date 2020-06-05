@@ -522,7 +522,6 @@ namespace Apollo.Binary {
                     undoWriter.Write(o.History.Count);
 
                     for (int i = 0; i < o.History.Count; i++) {
-                        UndoBinary.EncodeID(undoWriter, o.History[i].GetType());
                         o.History[i].Encode(undoWriter);
                     }
 

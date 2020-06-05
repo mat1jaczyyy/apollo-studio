@@ -50,6 +50,7 @@ namespace Apollo.Undo {
         }
 
         public virtual void Encode(BinaryWriter writer) {
+            UndoBinary.EncodeID(writer, this.GetType());
             writer.Write(Description);
 
             writer.Write(Post != null);
