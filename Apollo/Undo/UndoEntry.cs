@@ -65,6 +65,15 @@ namespace Apollo.Undo {
                 new object[] { reader, version },
                 null
             );
+            
+        public static T DecodeKnownEntry<T>(BinaryReader reader, int version) where T: UndoEntry 
+            => (T)Activator.CreateInstance(
+                typeof(T),
+                BindingFlags.NonPublic | BindingFlags.Instance,
+                null,
+                new object[] { reader, version },
+                null
+            );
     }
 
     public abstract class SimpleUndoEntry<I>: UndoEntry {
