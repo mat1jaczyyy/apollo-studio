@@ -200,8 +200,13 @@ namespace Apollo.Selection {
             
             ReplaceUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
-                delete = (DeleteUndoEntry)DecodeEntry(reader, version);
-                insert = (InsertCopyableUndoEntry)DecodeEntry(reader, version);
+                if (version < 31) {
+                    delete = DecodeKnownEntry<DeleteUndoEntry>(reader, version);
+                    insert = DecodeKnownEntry<InsertCopyableUndoEntry>(reader, version);
+                } else {
+                    delete = (DeleteUndoEntry)DecodeEntry(reader, version);
+                    insert = (InsertCopyableUndoEntry)DecodeEntry(reader, version);
+                }
             }
             
             public override void Encode(BinaryWriter writer) {
