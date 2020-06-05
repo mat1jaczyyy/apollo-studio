@@ -135,6 +135,9 @@ namespace Apollo.Devices {
             
             public OffsetSwitchedUndoEntry(Move move, bool u, bool r)
             : base($"Move Offset Switched to {(r? "Absolute" : "Relative")}", move, u, r) {}
+            
+            OffsetSwitchedUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class GridModeUndoEntry: EnumSimplePathUndoEntry<Move, GridType> {
@@ -142,6 +145,9 @@ namespace Apollo.Devices {
             
             public GridModeUndoEntry(Move move, GridType u, GridType r, IEnumerable source)
             : base("Move Grid", move, u, r, source) {}
+            
+            GridModeUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
         
         public class WrapUndoEntry: SimplePathUndoEntry<Move, bool> {
@@ -149,6 +155,9 @@ namespace Apollo.Devices {
             
             public WrapUndoEntry(Move move, bool u, bool r)
             : base($"Move Wrap Changed to {(r? "Enabled" : "Disabled")}", move, u, r) {}
+            
+            WrapUndoEntry(BinaryReader reader, int version)
+            : base(reader, version) {}
         }
     }
 }
