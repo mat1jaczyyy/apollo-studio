@@ -11,6 +11,7 @@ namespace Apollo.Components {
         protected abstract IBrush Fill { get; set; }
 
         protected bool AllowRightClick = false;
+        protected bool AllowRightClickEvenIfDisabled = false;
 
         bool _enabled = true;
         protected bool Enabled {
@@ -57,12 +58,14 @@ namespace Apollo.Components {
         protected void MouseUp(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            if (mouseHeld && (MouseButton == PointerUpdateKind.LeftButtonReleased || (AllowRightClick && MouseButton == PointerUpdateKind.RightButtonReleased))) {
+            bool isRightClick = AllowRightClick && MouseButton == PointerUpdateKind.RightButtonReleased;
+
+            if (mouseHeld && (MouseButton == PointerUpdateKind.LeftButtonReleased || isRightClick)) {
                 mouseHeld = false;
 
                 MouseEnter(sender, null);
 
-                if (Enabled) Click(e);
+                if (Enabled || (isRightClick && AllowRightClickEvenIfDisabled)) Click(e);
             }
         }
 

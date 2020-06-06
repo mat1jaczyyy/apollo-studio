@@ -23,6 +23,7 @@ namespace Apollo.Components {
             InitializeComponent();
 
             AllowRightClick = true;
+            AllowRightClickEvenIfDisabled = true;
             base.MouseLeave(this, null);
 
             Program.Project.Undo.PositionChanged += Update_Position;
