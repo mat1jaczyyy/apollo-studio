@@ -33,13 +33,13 @@ namespace Apollo.Structures {
         void Tick(object sender, EventArgs e) {
             if (!Expecting) return;
 
-            Expecting = Timer.AutoReset;
+            Expecting = Timer?.AutoReset?? false;
             Fire();
         }
 
         public void Cancel() {
             Expecting = false;
-            Timer.Stop();
+            Timer?.Stop();
         }
 
         public virtual void Dispose() {
@@ -47,7 +47,7 @@ namespace Apollo.Structures {
 
             Cancel();
 
-            Timer.Dispose();
+            Timer?.Dispose();
             Timer = null;
         }
     }
