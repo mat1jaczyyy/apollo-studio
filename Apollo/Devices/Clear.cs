@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class Clear: Device {
         ClearType _mode;
         public ClearType Mode {

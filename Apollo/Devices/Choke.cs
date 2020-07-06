@@ -7,6 +7,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //! Heaven incompatible
     public class Choke: Device, IChainParent {
         public delegate void ChokedEventHandler(Choke sender, int index);
         public static event ChokedEventHandler Choked;

@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class Flip: Device {
         FlipType _mode;
         public FlipType Mode {

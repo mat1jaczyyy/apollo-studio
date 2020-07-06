@@ -13,6 +13,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class Group: Device, IChainParent, ISelectParent {
         public GroupViewer SpecificViewer => (GroupViewer)Viewer?.SpecificViewer;
 

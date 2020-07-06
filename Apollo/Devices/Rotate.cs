@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class Rotate: Device {
         RotateType _mode;
         public RotateType Mode {

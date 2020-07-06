@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //! Heaven incompatible
     public class Delay: Device {
         Time _time;
         public Time Time {
@@ -56,10 +57,6 @@ namespace Apollo.Devices {
             }
         }
 
-        ConcurrentQueue<Signal> buffer = new ConcurrentQueue<Signal>();
-        object locker = new object();
-        ConcurrentHashSet<Courier> timers = new ConcurrentHashSet<Courier>();
-
         public override Device Clone() => new Delay(_time.Clone(), _gate) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -70,31 +67,12 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        void Tick(Courier sender) {
-            if (Disposed) return;
-            
-            lock (locker) {
-                if (buffer.TryDequeue(out Signal n))
-                    InvokeExit(n);
-                
-                timers.Remove(sender);
-            }
-        }
-
         public override void MIDIProcess(Signal n) {
-            lock (locker) {
-                buffer.Enqueue(n.Clone());
 
-                timers.Add(new Courier(_time * _gate, Tick));
-            }
         }
 
         protected override void Stop() {
-            foreach (Courier i in timers) i.Dispose();
-            timers.Clear();
-            
-            buffer.Clear();
-            locker = new object();
+
         }
 
         public override void Dispose() {

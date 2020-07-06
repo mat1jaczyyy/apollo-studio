@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class Loop: Device {
         Time _rate;
         public Time Rate {

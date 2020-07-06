@@ -20,6 +20,8 @@ namespace Apollo.Structures {
         public Stack<List<int>> MultiTarget = new Stack<List<int>>();
         public bool HashIndex = true;
 
+        public int Delay = 0;
+
         public byte Index {
             get => _index;
             set {
@@ -50,7 +52,8 @@ namespace Apollo.Structures {
         public Stack<List<int>> CopyMultiTarget() => new Stack<List<int>>(MultiTarget.ToArray().Select(i => i.ToList()).ToArray());
 
         public Signal Clone() => new Signal(Origin, Source, Index, Color.Clone(), (int[])Macros?.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
-            HashIndex = HashIndex
+            HashIndex = HashIndex,
+            Delay = Delay
         };
 
         public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, (int[])Macros.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget());

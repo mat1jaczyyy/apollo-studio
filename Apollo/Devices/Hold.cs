@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //! Heaven incompatible
     public class Hold: Device {
         Time _time;
         public Time Time {
@@ -76,14 +77,6 @@ namespace Apollo.Devices {
             }
         }
 
-        ConcurrentDictionary<Signal, Color> releasebuffer = new ConcurrentDictionary<Signal, Color>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-
-        ConcurrentQueue<Signal> buffer = new ConcurrentQueue<Signal>();
-        object queuelocker = new object();
-        ConcurrentHashSet<Courier> timers = new ConcurrentHashSet<Courier>();
-        ConcurrentDictionary<Signal, int> ignores = new ConcurrentDictionary<Signal, int>();
-
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -96,62 +89,12 @@ namespace Apollo.Devices {
             Release = release;
         }
 
-        void Tick(Courier sender) {
-            if (Disposed) return;
-            
-            lock (queuelocker) {
-                if (buffer.TryDequeue(out Signal n) && ignores[n]-- <= 0)
-                    InvokeExit(n.Clone());
-            }
-        }
-
         public override void MIDIProcess(Signal n) {
-            Color color = n.Color.Clone();
-            n.Color = new Color(0);
             
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-            
-            lock (locker[n]) {
-                if (color.Lit && Release) releasebuffer[n] = color;
-
-                if (color.Lit != Release) {
-                    if (!Infinite)
-                        lock (queuelocker) {
-                            Signal m = n.Clone();
-
-                            if (!ignores.ContainsKey(m))
-                                ignores[m] = -1;
-                            
-                            ignores[m]++;
-
-                            buffer.Enqueue(m);
-
-                            timers.Add(new Courier(_time * _gate, Tick));
-                        }
-
-                    if (Release) {
-                        if (!releasebuffer.ContainsKey(n)) return;
-
-                        color = releasebuffer[n];
-                        releasebuffer.TryRemove(n, out _);
-                    }
-
-                    n.Color = color;
-                    InvokeExit(n);
-                }
-            }
         }
 
         protected override void Stop() {
-            foreach (Courier i in timers) i.Dispose();
-            timers.Clear();
             
-            buffer.Clear();
-            queuelocker = new object();
-
-            releasebuffer.Clear();
-            locker.Clear();
-            ignores.Clear();
         }
 
         public override void Dispose() {

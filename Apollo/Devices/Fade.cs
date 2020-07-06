@@ -13,6 +13,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //! Heaven incompatible
     public class Fade: Device {
         public class FadeInfo {
             public Color Color;
@@ -60,10 +61,6 @@ namespace Apollo.Devices {
                 Generate();
             }
         }
-        
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier<Signal>>> timers = new ConcurrentDictionary<Signal, List<Courier<Signal>>>();
 
         static Dictionary<FadeType, Func<double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double>>() { 
             {FadeType.Fast, proportion => Math.Pow(proportion, 2)},
@@ -296,80 +293,12 @@ namespace Apollo.Devices {
                 Program.Project.BPMChanged += Generate;
         }
 
-        void FireCourier(Signal n, double time)
-            => timers[n].Add(new Courier<Signal>(time, n, Tick));
-
-        void Tick(Courier<Signal> sender, Signal n) {
-            if (Disposed) return;
-
-            lock (locker[n]) {
-                if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(sender)) return;
-
-                if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
-                    Stop(n);
-                    
-                    for (int i = 1; i < fade.Count; i++)
-                        FireCourier(n, fade[i].Time);
-                }
-                
-                if (buffer[n] < fade.Count) {
-                    Signal m = n.Clone();
-                    m.Color = fade[buffer[n]].Color.Clone();
-                    InvokeExit(m);
-                }
-            }
-        }
-
-        void Stop(Signal n) {
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-
-            lock (locker[n]) {
-                if (timers.ContainsKey(n))
-                    for (int i = 0; i < timers[n].Count; i++)
-                        timers[n][i].Dispose();
-                
-                if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
-                    Signal m = n.Clone();
-                    m.Color = fade.Last().Color.Clone();
-                    InvokeExit(m);
-                }
-
-                timers[n] = new List<Courier<Signal>>();
-                buffer[n] = 0;
-            }
-        }
-
         public override void MIDIProcess(Signal n) {
-            if (_colors.Count > 0) {
-                bool lit = n.Color.Lit;
-                n.Color = new Color();
-
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-
-                lock (locker[n]) {
-                    if ((PlayMode == FadePlaybackType.Mono && lit) || PlayMode == FadePlaybackType.Loop) Stop(n);
-
-                    if (lit) {
-                        Signal m = n.Clone();
-                        m.Color = fade[0].Color.Clone();
-                        InvokeExit(m);
-                        
-                        for (int i = 1; i < fade.Count; i++)
-                            FireCourier(n, fade[i].Time);
-                    }
-                }
-            }
+            
         }
 
         protected override void Stop() {
-            foreach (List<Courier<Signal>> i in timers.Values) {
-                foreach (Courier j in i) j.Dispose();
-                i.Clear();
-            }
-            timers.Clear();
 
-            buffer.Clear();
-            locker.Clear();
         }
 
         public override void Dispose() {

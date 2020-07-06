@@ -7,6 +7,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //+ Heaven compatible
     public class ColorFilter: Device {
         double _h, _s, _v, _th, _ts, _tv;
 

@@ -3,6 +3,7 @@ using Apollo.Elements;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
+    //? might work after screen gets implemented
     public class Preview: Device {
         public delegate void PreviewResetHandler();
         public static event PreviewResetHandler Clear;

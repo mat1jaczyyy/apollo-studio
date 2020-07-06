@@ -8,6 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //? just check global macros?
     public class MacroFilter: Device {
         bool[] _filter;
         public bool[] Filter {

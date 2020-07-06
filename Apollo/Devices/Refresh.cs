@@ -8,6 +8,7 @@ using Apollo.Core;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
+    //? Yeah wtf
     public class Refresh: Device {
         bool[] _macros = new bool[4];
 
