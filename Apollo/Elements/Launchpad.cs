@@ -12,6 +12,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.RtMidi;
 using Apollo.RtMidi.Devices;
 using Apollo.RtMidi.Devices.Infos;

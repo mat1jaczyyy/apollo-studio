@@ -5,6 +5,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Rendering;
 using Apollo.Undo;
 using Apollo.Viewers;
 using Apollo.Windows;
@@ -142,7 +143,7 @@ namespace Apollo.Elements {
             Name = name;
         }
 
-        void ChainExit(Signal n) => n.Source?.Render(n);
+        void ChainExit(Signal n) => Renderer.Current.MIDIEnter(n);
 
         void MIDIEnter(Signal n) {
             if (ParentIndex != null && Enabled) Chain?.MIDIEnter(n);

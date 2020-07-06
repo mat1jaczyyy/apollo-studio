@@ -56,7 +56,9 @@ namespace Apollo.Structures {
             Delay = Delay
         };
 
-        public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, (int[])Macros.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget());
+        public Signal With(byte index = 11, Color color = null) => new Signal(Origin, Source, index, color, (int[])Macros.Clone(), Layer, BlendingMode, BlendingRange, CopyMultiTarget()) {
+            Delay = Delay
+        };
 
         public Signal(object origin, Launchpad source, byte index = 11, Color color = null, int[] macros = null, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<List<int>> multiTarget = null) {
             Origin = origin;

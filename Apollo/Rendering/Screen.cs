@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 
 using Apollo.Enums;
+using Apollo.Structures;
 
-namespace Apollo.Structures {
+namespace Apollo.Rendering {
     public class Screen {
         class Pixel {
             public Action<Signal> Exit = null;
