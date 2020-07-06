@@ -68,11 +68,12 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(Signal n) {
-
+            n.Delay += (int)(_time * _gate);
+            InvokeExit(n);
         }
 
         protected override void Stop() {
-
+            // TODO Implement
         }
 
         public override void Dispose() {
