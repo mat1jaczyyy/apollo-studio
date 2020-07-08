@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 
 using Apollo.DeviceViewers;
@@ -89,8 +90,9 @@ namespace Apollo.Devices {
             Release = release;
         }
 
-        public override void MIDIProcess(Signal n) {
-            
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            // TODO Implement
+            return n;
         }
 
         protected override void Stop() {

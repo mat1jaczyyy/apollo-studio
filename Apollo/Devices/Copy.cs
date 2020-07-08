@@ -243,12 +243,13 @@ namespace Apollo.Devices {
                 offset.Changed += OffsetChanged;
         }
 
-        public override void MIDIProcess(Signal n) {
-            
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            // TODO Implement Copy
+            return n;
         }
 
         protected override void Stop() {
-
+            
         }
 
         public override void Dispose() {

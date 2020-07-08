@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -67,13 +69,13 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        public override void MIDIProcess(Signal n) {
-            n.Delay += (int)(_time * _gate);
-            InvokeExit(n);
-        }
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
+            i.Delay += (int)(_time * _gate);
+            return i;
+        });
 
         protected override void Stop() {
-            // TODO Implement
+            // TODO Heaven Implement invalidation
         }
 
         public override void Dispose() {

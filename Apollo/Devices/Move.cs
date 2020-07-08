@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -8,7 +10,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
+    //+ Heaven complete
     public class Move: Device {
         GridType _gridmode;
         public GridType GridMode {
@@ -49,17 +51,15 @@ namespace Apollo.Devices {
             Offset.Changed += OffsetChanged;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (n.Index == 100) {
-                InvokeExit(n);
-                return;
-            }
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n)
+            => n.Where(i => i.Index == 100).Concat(n.SelectMany(i => {
+                if (Offset.Apply(i.Index, GridMode, Wrap, out int x, out int y, out int result)) {
+                    i.Index = (byte)result;
+                    return new [] {i};
+                }
 
-            if (Offset.Apply(n.Index, GridMode, Wrap, out int x, out int y, out int result)) {
-                n.Index = (byte)result;
-                InvokeExit(n);
-            }
-        }
+                return Enumerable.Empty<Signal>();
+            }));
 
         public override void Dispose() {
             if (Disposed) return;

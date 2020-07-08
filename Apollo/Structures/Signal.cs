@@ -103,6 +103,7 @@ namespace Apollo.Structures {
         public override string ToString() => $"{((Source == null)? "null" : Source.Name)} -> {Index} @ {Layer} + {BlendingMode} & {MultiTarget} = {Color}";
     }
 
+    //! Heaven incompatible wtf
     public class StopSignal: Signal {
         public StopSignal(): base(null, null) {}
     }

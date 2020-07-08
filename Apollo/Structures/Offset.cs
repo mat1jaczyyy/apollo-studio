@@ -95,6 +95,9 @@ namespace Apollo.Structures {
         }
 
         public bool Apply(int index, GridType gridMode, bool wrap, out int x, out int y, out int result) {
+            x = y = result = 0;
+            if (index == 100) return false;
+
             if (IsAbsolute) {
                 x = AbsoluteX;
                 y = AbsoluteY;
@@ -104,10 +107,8 @@ namespace Apollo.Structures {
             x = index % 10;
             y = index / 10;
 
-            if (gridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9)) {
-                result = 0;
+            if (gridMode == GridType.Square && (x == 0 || x == 9 || y == 0 || y == 9))
                 return false;
-            }
 
             x += X;
             y += Y;

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -80,19 +82,19 @@ namespace Apollo.Devices {
             ValueLow = value_low;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (n.Color.Lit) {
-                (double hue, double saturation, double value) = n.Color.ToHSV();
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
+            if (i.Color.Lit) {
+                (double hue, double saturation, double value) = i.Color.ToHSV();
 
                 hue = (hue + Hue + 360) % 360;
                 saturation = saturation * (SaturationHigh - SaturationLow) + SaturationLow;
                 value = value * (ValueHigh - ValueLow) + ValueLow;
 
-                n.Color = Color.FromHSV(hue, saturation, value);
+                i.Color = Color.FromHSV(hue, saturation, value);
             }
 
-            InvokeExit(n);
-        }
+            return i;
+        });
         
         public class HueUndoEntry: SimplePathUndoEntry<Tone, double> {
             protected override void Action(Tone item, double element) => item.Hue = element;

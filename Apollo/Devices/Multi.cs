@@ -62,8 +62,8 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public override void MIDIProcess(Signal n) {
-            Signal m = n.Clone();
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            /*Signal m = n.Clone();
             n.Color = new Color();
 
             if (!buffer.ContainsKey(n)) {
@@ -99,11 +99,14 @@ namespace Apollo.Devices {
                 if (!m.Color.Lit) buffer.Remove(n, out _);
             }
 
-            Preprocess.MIDIEnter(m);
+            Preprocess.MIDIEnter(m);*/
+
+            // TODO Implement
+            return n;
         }
 
         void PreprocessExit(Signal n) {
-            if (n is StopSignal) return;
+            /*if (n is StopSignal) return;
 
             List<int> target = n.MultiTarget.Pop();
             
@@ -111,7 +114,7 @@ namespace Apollo.Devices {
             else {
                 foreach (int i in target)
                 Chains[i].MIDIEnter(n.Clone());
-            }
+            }*/
         }
         
         protected override void Stop() {

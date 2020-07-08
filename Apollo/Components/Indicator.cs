@@ -38,7 +38,7 @@ namespace Apollo.Components {
             }
         }
 
-        public void Trigger(bool lit) {
+        public void Trigger(bool lit = true) { //(bool lit) { TODO Heaven rewrite?
             if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
 
             lock (locker) {

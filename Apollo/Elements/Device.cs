@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +10,7 @@ using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public abstract class Device: ISelect, IMutable {
+    public abstract class Device: SignalReceiver, ISelect, IMutable {
         public readonly string DeviceIdentifier;
         public readonly string Name;
 
@@ -33,11 +34,6 @@ namespace Apollo.Elements {
         public int? ParentIndex;
         public virtual Action<Signal> MIDIExit { get; set; } = null;
 
-        protected void InvokeExit(Signal n) {
-            Viewer?.Indicator.Trigger(n.Color.Lit);
-            MIDIExit?.Invoke(n);
-        }
-
         public bool Collapsed = false;
         
         bool _enabled = true;
@@ -59,18 +55,16 @@ namespace Apollo.Elements {
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
 
-        public abstract void MIDIProcess(Signal n);
+        public abstract IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n);
 
-        public void MIDIEnter(Signal n) {
-            if (Disposed) return;
+        public override IEnumerable<Signal> MIDIEnter(IEnumerable<Signal> n) {
+            if (Disposed) return n;
 
-            if (n is StopSignal) Stop();
-            else if (Enabled) {
-                MIDIProcess(n);
-                return;
-            }
+            if (n.FirstOrDefault() is StopSignal) Stop();
+            else if (Enabled)
+                return MIDIProcess(n);
             
-            InvokeExit(n);
+            return n;
         }
 
         protected virtual void Stop() {}

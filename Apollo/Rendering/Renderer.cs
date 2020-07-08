@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 
 using Apollo.Structures;
 
@@ -11,6 +11,6 @@ namespace Apollo.Rendering {
             Current = new Heaven();
         }
 
-        public abstract void MIDIEnter(Signal n);
+        public abstract void MIDIEnter(IEnumerable<Signal> n);
     }
 }

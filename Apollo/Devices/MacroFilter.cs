@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,7 +9,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //? just check global macros?
+    //+ Heaven complete
     public class MacroFilter: Device {
         bool[] _filter;
         public bool[] Filter {
@@ -58,10 +59,8 @@ namespace Apollo.Devices {
             _filter = init;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (_filter[n.GetMacro(Macro) - 1])
-                InvokeExit(n);
-        }
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n)
+            => n.Where(i => _filter[i.GetMacro(Macro) - 1]);
         
         public class TargetUndoEntry: SimplePathUndoEntry<MacroFilter, int> {
             protected override void Action(MacroFilter item, int element) => item.Macro = element;

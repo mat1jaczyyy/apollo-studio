@@ -293,8 +293,8 @@ namespace Apollo.Devices {
                 Program.Project.BPMChanged += Generate;
         }
 
-        public override void MIDIProcess(Signal n) {
-            
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            return n; // TODO Heaven implement
         }
 
         protected override void Stop() {

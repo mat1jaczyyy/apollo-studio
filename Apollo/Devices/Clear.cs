@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.Core;
 using Apollo.DeviceViewers;
@@ -27,13 +29,13 @@ namespace Apollo.Devices {
 
         public Clear(ClearType mode = ClearType.Lights): base("clear") => Mode = mode;
 
-        public override void MIDIProcess(Signal n) {
-            if (!n.Color.Lit) {
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            if (n.Any(i => !i.Color.Lit)) {  // TODO If unlit signal has delay, then this go big gay
                 if (Mode == ClearType.Multi) Multi.InvokeReset();
                 else MIDI.ClearState(multi: Mode == ClearType.Both);
             }
 
-            InvokeExit(n);
+            return n;
         }
         
         public class ModeUndoEntry: SimplePathUndoEntry<Clear, ClearType> {

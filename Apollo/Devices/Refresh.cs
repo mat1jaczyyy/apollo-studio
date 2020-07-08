@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Structures;
-using Apollo.Core;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
@@ -29,13 +30,16 @@ namespace Apollo.Devices {
             _macros = macros;
         }
 
-        public override void MIDIProcess(Signal n) {
-            for (int i = 0; i < 4; i++) {
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            /*for (int i = 0; i < 4; i++) {
                 if (_macros[i])
                     n.Macros[i] = (int)Program.Project.GetMacro(i + 1);
             }
             
-            InvokeExit(n);
+            InvokeExit(n);*/
+
+            // TODO Implement invalidation
+            return n;
         }
         
         public class MacroUndoEntry: SimpleIndexPathUndoEntry<Refresh, bool> {

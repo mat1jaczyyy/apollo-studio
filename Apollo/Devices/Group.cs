@@ -46,7 +46,7 @@ namespace Apollo.Devices {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;
                 Chains[i].ParentIndex = i;
-                Chains[i].MIDIExit = ChainExit;
+                Chains[i].MIDIExit = null;
             }
         }
 
@@ -99,13 +99,13 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        protected void ChainExit(Signal n) => InvokeExit(n);
-
-        public override void MIDIProcess(Signal n) {
-            if (Chains.Count == 0) ChainExit(n);
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            IEnumerable<Signal> ret = Enumerable.Empty<Signal>();
 
             foreach (Chain chain in Chains)
-                chain.MIDIEnter(n.Clone());
+                ret = ret.Concat(chain.MIDIEnter(n.Select(i => i.Clone())));
+
+            return ret;
         }
         
         protected override void Stop() {

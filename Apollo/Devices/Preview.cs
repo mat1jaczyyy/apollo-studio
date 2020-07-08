@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    //? might work after screen gets implemented
+    //! Heaven incompatible
     public class Preview: Device {
         public delegate void PreviewResetHandler();
         public static event PreviewResetHandler Clear;
@@ -33,10 +35,11 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((PreviewViewer)Viewer.SpecificViewer).Signal(n);
         }
 
-        public override void MIDIProcess(Signal n) {
-            Signal m = n.Clone();
-            InvokeExit(n);
-            screen.MIDIEnter(m);
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            foreach (Signal i in n)
+                screen.MIDIEnter(i.Clone());  // TODO this shit broke, idk what do with it
+
+            return n;
         }
 
         public override void Dispose() {

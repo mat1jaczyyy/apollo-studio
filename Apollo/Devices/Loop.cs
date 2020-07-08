@@ -8,7 +8,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
+    //! Heaven incompatible
     public class Loop: Device {
         Time _rate;
         public Time Rate {
@@ -79,9 +79,6 @@ namespace Apollo.Devices {
             }
         }
         
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        
         public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
         
         public Loop(Time rate = null, double gate = 1, int repeats = 2, bool hold = false): base("loop") {
@@ -91,69 +88,13 @@ namespace Apollo.Devices {
             Hold = hold;
         }
         
-        void FireCourier(Signal n, Signal m, double time)
-            => timers[n].Add(new Courier<Signal>(time, m.Clone(), Tick));
-
-        void Start(Signal n, Signal m, int count) {
-            if (!timers.ContainsKey(n)) 
-                timers[n] = new List<Courier>();
-
-            InvokeExit(m.Clone());
-
-            if (!Hold || m.Color.Lit)
-                for (int i = 1; i < count; i++)
-                    FireCourier(n, m, i * _rate * _gate);
-        }
-        
-        public override void MIDIProcess(Signal n) {
-            Signal m = n.Clone();
-
-            if (Hold) {
-                n.Color = new Color();
-                
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-
-                lock (locker[n]) {
-                    if (timers.ContainsKey(n))
-                        for (int i = 0; i < timers[n].Count; i++)
-                            timers[n][i].Dispose();
-                    
-                    timers[n] = new List<Courier>();
-
-                    Start(n, m, 2);
-                }
-            
-            } else Start(n, m, Repeats);
-        }
-        
-        void Tick(Courier<Signal> sender, Signal n) {
-            if (Disposed) return;
-            
-            Signal m = n.Clone();
-
-            if (Hold) {
-                n.Color = new Color();
-
-                lock (locker[n]) {
-                    FireCourier(n, m, _rate * _gate);
-                    timers[n].Remove(sender);
-                    
-                    InvokeExit(m.With(m.Index, new Color(0)));
-                    InvokeExit(m);
-                }
-            
-            } else {
-                timers[n].Remove(sender);
-                InvokeExit(m);
-            }
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            // TODO Implement
+            return n;
         }
 
         protected override void Stop() {
-            foreach (List<Courier> i in timers.Values) {
-                foreach (Courier j in i) j.Dispose();
-                i.Clear();
-            }
-            timers.Clear();
+            
         }
         
         public override void Dispose() {
