@@ -105,7 +105,8 @@ namespace Apollo.Devices {
             return n;
         }
 
-        void PreprocessExit(Signal n) {
+        IEnumerable<Signal> PreprocessExit(IEnumerable<Signal> n) {
+            return n;
             /*if (n is StopSignal) return;
 
             List<int> target = n.MultiTarget.Pop();

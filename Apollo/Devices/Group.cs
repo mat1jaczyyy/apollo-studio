@@ -32,8 +32,8 @@ namespace Apollo.Devices {
         public string ChildString => "Chain";
         public string ChildFileExtension => "apchn";
 
-        Action<Signal> _midiexit;
-        public override Action<Signal> MIDIExit {
+        Func<IEnumerable<Signal>, IEnumerable<Signal>> _midiexit;
+        public override Func<IEnumerable<Signal>, IEnumerable<Signal>> MIDIExit {
             get => _midiexit;
             set {
                 _midiexit = value;
@@ -46,7 +46,7 @@ namespace Apollo.Devices {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;
                 Chains[i].ParentIndex = i;
-                Chains[i].MIDIExit = null;
+                Chains[i].MIDIExit = InvokeExit;
             }
         }
 
@@ -103,7 +103,7 @@ namespace Apollo.Devices {
             IEnumerable<Signal> ret = Enumerable.Empty<Signal>();
 
             foreach (Chain chain in Chains)
-                ret = ret.Concat(chain.MIDIEnter(n.Select(i => i.Clone())));
+                ret = ret.Concat(chain.MIDIEnter(n));
 
             return ret;
         }

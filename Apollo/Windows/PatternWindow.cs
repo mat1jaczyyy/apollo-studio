@@ -961,7 +961,7 @@ namespace Apollo.Windows {
         void PatternFire(int start = 0) {
             PlayExit = n => {
                 n.Layer = 0;
-                _pattern.MIDIExit(n);
+                //_pattern.MIDIExit(n); //TODO Heaven
             };
             PatternPlay(Fire, start);
         }

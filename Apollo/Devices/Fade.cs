@@ -310,7 +310,7 @@ namespace Apollo.Devices {
                     if (!resolved)
                         if (object.ReferenceEquals(buffer[k], v)) {
                             if (PlayMode == FadePlaybackType.Loop && cnt == fade.Count - 1)
-                                extra = CreateFade(k, k, v);
+                                extra = MIDIExit.Invoke(CreateFade(k, k, v));
 
                             return true;
 
@@ -320,7 +320,7 @@ namespace Apollo.Devices {
                             if (PlayMode == FadePlaybackType.Loop) {
                                 Signal c = k.Clone();
                                 c.Color = new Color(0);
-                                extra = new List<Signal>() {c};
+                                extra = MIDIExit.Invoke(new [] {c});
 
                             } else if (!buffer[k].Color.Lit) {
                                 v = buffer[k];

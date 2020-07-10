@@ -72,8 +72,8 @@ namespace Apollo.Elements {
             }
         }
 
-        Action<Signal> _midiexit = null;
-        public Action<Signal> MIDIExit {  // TODO Heaven delete this (leave this for end)
+        Func<IEnumerable<Signal>, IEnumerable<Signal>> _midiexit = null;
+        public override Func<IEnumerable<Signal>, IEnumerable<Signal>> MIDIExit {
             get => _midiexit;
             set {
                 _midiexit = value;
@@ -81,9 +81,9 @@ namespace Apollo.Elements {
             }
         }
 
-        void InvokeExit(Signal n) {
-            Info?.Indicator.Trigger(n.Color.Lit);
-            MIDIExit?.Invoke(n);
+        IEnumerable<Signal> InvokeExit(IEnumerable<Signal> n) {
+            //Info?.Indicator.Trigger(n.Color.Lit); // TODO Heaven indicators
+            return MIDIExit.Invoke(n);
         }
 
         public List<Device> Devices = new List<Device>();
@@ -92,6 +92,13 @@ namespace Apollo.Elements {
             for (int i = 0; i < Devices.Count; i++) {
                 Devices[i].Parent = this;
                 Devices[i].ParentIndex = i;
+            }
+            
+            if (Devices.Count > 0) {
+                for (int i = 1; i < Devices.Count; i++)
+                    Devices[i - 1].MIDIExit = Devices[i].ChainEnter;
+                
+                Devices[Devices.Count - 1].MIDIExit = InvokeExit;
             }
         }
 
@@ -186,6 +193,8 @@ namespace Apollo.Elements {
         }
 
         public override IEnumerable<Signal> MIDIEnter(IEnumerable<Signal> n) {
+            n = n.Select(i => i.Clone());
+
             if (n.FirstOrDefault() is StopSignal) return Travel(n);  // TODO Heaven Stopping stuff
             else if (Enabled) {
                 Viewer?.Indicator.Trigger();

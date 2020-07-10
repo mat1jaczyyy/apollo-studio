@@ -32,9 +32,13 @@ namespace Apollo.Elements {
         
         public Chain Parent;
         public int? ParentIndex;
-        public virtual Action<Signal> MIDIExit { get; set; } = null;
 
         public bool Collapsed = false;
+    
+        protected IEnumerable<Signal> InvokeExit(IEnumerable<Signal> n) {
+            //Viewer?.Indicator.Trigger(n.Color.Lit); TODO Heaven indicators
+            return MIDIExit.Invoke(n);
+        }
         
         bool _enabled = true;
         public bool Enabled {
@@ -58,6 +62,8 @@ namespace Apollo.Elements {
         public abstract IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n);
 
         public override IEnumerable<Signal> MIDIEnter(IEnumerable<Signal> n) {
+            n = n.Select(i => i.Clone());
+
             if (Disposed) return n;
 
             if (n.FirstOrDefault() is StopSignal) Stop();
@@ -66,6 +72,9 @@ namespace Apollo.Elements {
             
             return n;
         }
+
+        public IEnumerable<Signal> ChainEnter(IEnumerable<Signal> n)
+            => InvokeExit(MIDIEnter(n));
 
         protected virtual void Stop() {}
 

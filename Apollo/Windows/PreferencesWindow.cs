@@ -211,8 +211,6 @@ namespace Apollo.Windows {
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
-
-            fade.MIDIExit = FadeExit;
         }
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));

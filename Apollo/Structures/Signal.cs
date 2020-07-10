@@ -99,7 +99,7 @@ namespace Apollo.Structures {
                 ? HashCode.Combine(x.First(), GetListHashCode(x.Skip(1)))
                 : HashCode.Combine(x.First());
         
-        public override string ToString() => $"{((Source == null)? "null" : Source.Name)} -> {Index} @ {Layer} + {BlendingMode} & {MultiTarget} = {Color}";
+        public override string ToString() => $"{((Source == null)? "null" : Source.Name)} -> {Index} @ {Layer} + {BlendingMode} = {Color}";
     
         public delegate bool ValidatorDelegate(out IEnumerable<Signal> extra);
         List<ValidatorDelegate> Validators;
