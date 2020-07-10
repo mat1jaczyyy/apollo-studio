@@ -293,9 +293,61 @@ namespace Apollo.Devices {
                 Program.Project.BPMChanged += Generate;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            return n; // TODO Heaven implement
+        ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
+
+        IEnumerable<Signal> CreateFade(Signal n, Signal k, Signal v) {
+            bool resolved = false;
+
+            return fade.Select((i, cnt) => {
+                Signal m = n.Clone();
+                
+                m.Color = i.Color.Clone();
+                m.Delay += (int)i.Time;
+
+                m.AddValidator((out IEnumerable<Signal> extra) => {
+                    extra = null;
+                    
+                    if (!resolved)
+                        if (object.ReferenceEquals(buffer[k], v)) {
+                            if (PlayMode == FadePlaybackType.Loop && cnt == fade.Count - 1)
+                                extra = CreateFade(k, k, v);
+
+                            return true;
+
+                        } else {
+                            resolved = true;
+
+                            if (PlayMode == FadePlaybackType.Loop) {
+                                Signal c = k.Clone();
+                                c.Color = new Color(0);
+                                extra = new List<Signal>() {c};
+
+                            } else if (!buffer[k].Color.Lit) {
+                                v = buffer[k];
+                                resolved = false;
+                            }
+                        }
+
+                    return !resolved;
+                });
+
+                return m;
+            }).ToList();
         }
+
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(i => {
+            Signal k = i.Clone();
+            Signal v = i.Clone();
+
+            k.Color = new Color();
+            k.Delay = v.Delay = 0;
+
+            buffer[k] = v;
+
+            return i.Color.Lit
+                ? CreateFade(i, k, v)
+                : Enumerable.Empty<Signal>();
+        });
 
         protected override void Stop() {
 
