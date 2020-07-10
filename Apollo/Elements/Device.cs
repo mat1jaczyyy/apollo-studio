@@ -68,7 +68,7 @@ namespace Apollo.Elements {
 
             if (n.FirstOrDefault() is StopSignal) Stop();
             else if (Enabled)
-                return MIDIProcess(n);
+                return MIDIProcess(n).ToList();
             
             return n;
         }
