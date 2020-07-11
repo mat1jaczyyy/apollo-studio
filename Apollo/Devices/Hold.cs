@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
@@ -9,7 +9,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
+    //! Heaven complete
     public class Hold: Device {
         Time _time;
         public Time Time {
@@ -89,11 +89,31 @@ namespace Apollo.Devices {
             Infinite = infinite;
             Release = release;
         }
+        
+        ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            // TODO Implement
-            return n;
-        }
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(s => {
+            Signal id = s.With(s.Index, new Color());
+            
+            if(s.Color.Lit)
+                buffer[id] = s.Color;
+            
+            if (s.Color.Lit ^ Release) {
+                s.Color = buffer[id];
+                
+                if (Infinite) return new [] { s };
+                
+                Signal off = s.With(s.Index, new Color(0));
+                off.Delay += (int)(_time * _gate);
+                off.AddValidator((out IEnumerable<Signal> extra) => {
+                    extra = Enumerable.Empty<Signal>();
+                    return ReferenceEquals(buffer[id], s.Color);
+                });
+                
+                return new []{ s, off };
+            }
+            return Enumerable.Empty<Signal>();
+        });
 
         protected override void Stop() {
             
