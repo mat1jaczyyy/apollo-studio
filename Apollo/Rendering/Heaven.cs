@@ -55,8 +55,7 @@ namespace Apollo.Rendering {
                         }
                     }
 
-                    //if (signals.Count == 0)
-                    //    Console.WriteLine("No signals left");
+                    Screen.Draw();
                 }
             });
         }

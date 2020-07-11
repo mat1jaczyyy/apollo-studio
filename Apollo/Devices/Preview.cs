@@ -26,13 +26,16 @@ namespace Apollo.Devices {
         };
 
         public Preview(): base("preview") {
-            screen = new Screen() { ScreenExit = PreviewExit };
+            screen = new Screen() { ScreenExit = PreviewExit }; // TODO heaven dispose
             
             Clear += HandleClear;
         }
         
-        public void PreviewExit(Signal n) {
-            if (Viewer?.SpecificViewer != null) ((PreviewViewer)Viewer.SpecificViewer).Signal(n);
+        public void PreviewExit(List<Signal> n) {
+            if (Viewer?.SpecificViewer != null) {
+                foreach (Signal i in n)
+                    ((PreviewViewer)Viewer.SpecificViewer).Signal(i);
+            }
         }
 
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {

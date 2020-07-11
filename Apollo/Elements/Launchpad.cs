@@ -171,9 +171,9 @@ namespace Apollo.Elements {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
             {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, SysExStart.Concat(new byte[] {0x6F}).ToArray()},
-            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03}).ToArray()},
+            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03}).ToArray()},
+            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()}
         };
 
         static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
@@ -384,60 +384,85 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public virtual void Send(Signal n) {
-            if (!Usable) return;
+        public void Send(Signal n) => Send(new List<Signal>() {n});
+        
+        public virtual void Send(List<Signal> n) {
+            if (!n.Any() || !Usable) return;
 
-            Signal m = n.Clone();
-            Window?.SignalRender(m);
+            // TODO Heaven Grid/Row/All optimization? Likely to be extremely device specific...
 
-            foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                alp.Window?.SignalRender(m);
+            List<byte[]> output = n.SelectMany(i => {
+                Signal m = i.Clone();
+                Window?.SignalRender(m);
 
-            n = n.Clone();
+                foreach (AbletonLaunchpad alp in AbletonLaunchpads)
+                    alp.Window?.SignalRender(m);
 
-            if (n.Index != 100) {
-                if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
-                else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
-                else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
-            }
+                i = i.Clone();  // TODO might be unnecessary
 
-            int offset = 0;
+                if (i.Index != 100) {
+                    if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+                    else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
+                    else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
+                }
 
-            switch (Type) {
-                case LaunchpadType.MK2:
-                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 99 || n.Index == 100) return;
-                    if (91 <= n.Index && n.Index <= 98) offset = 13;
-                    break;
-                
-                case LaunchpadType.Pro:
-                case LaunchpadType.CFW:
-                    if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
-                    else if (n.Index == 100) offset = -1;
-                    break;
+                IEnumerable<byte[]> ret = Enumerable.Empty<byte[]>();
 
-                case LaunchpadType.X:
-                case LaunchpadType.MiniMK3:
-                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
-                    break;
+                int offset = 0;
+
+                switch (Type) {
+                    case LaunchpadType.MK2:
+                        if (i.Index % 10 == 0 || i.Index < 11 || i.Index == 99 || i.Index == 100) return ret;
+                        if (91 <= i.Index && i.Index <= 98) offset = 13;
+                        break;
                     
-                case LaunchpadType.ProMK3:
-                    if (n.Index == 0 || n.Index == 9 || n.Index == 100) return;
-                    break;
-            }
+                    case LaunchpadType.Pro:
+                    case LaunchpadType.CFW:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99) return ret;
+                        else if (i.Index == 100) offset = -1;
+                        break;
 
-            RGBSend(n, offset);
+                    case LaunchpadType.X:
+                    case LaunchpadType.MiniMK3:
+                        if (i.Index % 10 == 0 || i.Index < 11 || i.Index == 100) return ret;
+                        break;
+                        
+                    case LaunchpadType.ProMK3:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 100) return ret;
+                        break;
+                }
 
-            if (Type == LaunchpadType.ProMK3 && 1 <= n.Index && n.Index <= 8)
-                RGBSend(n, 100);
+                ret = new [] { RGBCreate(i, offset) };
+
+                if (Type == LaunchpadType.ProMK3 && 1 <= i.Index && i.Index <= 8)
+                    ret = ret.Append(RGBCreate(i, 100));
+                
+                return ret.ToArray();
+            }).ToList();
+
+            // TODO Heaven CFW compatibility - a CFW update will be required for this, because dumb me never implemented fast multimessaging
+
+            if (Type == LaunchpadType.Pro) {
+                // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
+                // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
+                for (int i = 0; i < output.Count; i += 78)
+                    RGBSend(output.Skip(i).Take(78).ToList());
+            
+            } else RGBSend(output);
         }
 
-        void RGBSend(Signal n, int offset = 0)
-            => SysExSend(RGBHeader[Type].Concat(new byte[] {
+        byte[] RGBCreate(Signal n, int offset = 0) {
+            IEnumerable<byte> ret = Type.IsGenerationX()? new byte[] { 0x03 } : Enumerable.Empty<byte>();
+
+            return ret.Concat(new byte[] {
                 (byte)(n.Index + offset),
                 (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
                 (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
                 (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
-            }));
+            }).ToArray();
+        }
+
+        void RGBSend(List<byte[]> rgb) => SysExSend(RGBHeader[Type].Concat(rgb.SelectMany(i => i)));
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -450,7 +475,9 @@ namespace Apollo.Elements {
 
             SysExSend(ForceClearMessage[Type]);
             
-            if (Type.HasModeLight()) RGBSend(new Signal(null, this, 100, new Color(0)));
+            if (Type.HasModeLight()) RGBSend(new List<byte[]>() {
+                RGBCreate(new Signal(null, this, 100, new Color(0)), -1)
+            });
         }
 
         public virtual void Render(Signal n) {
