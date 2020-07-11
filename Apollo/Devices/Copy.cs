@@ -109,19 +109,6 @@ namespace Apollo.Devices {
             }
         }
 
-        class PolyInfo {
-            public Signal n;
-            public int index = 0;
-            public object locker = new object();
-            public List<int> offsets;
-            public List<Courier<PolyInfo>> timers = new List<Courier<PolyInfo>>();
-
-            public PolyInfo(Signal init_n, List<int> init_offsets) {
-                n = init_n;
-                offsets = init_offsets;
-            }
-        }
-
         class DoubleTuple {
             public double X;
             public double Y;
@@ -242,12 +229,200 @@ namespace Apollo.Devices {
             foreach (Offset offset in Offsets)
                 offset.Changed += OffsetChanged;
         }
+        
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            // TODO Implement Copy
-            return n;
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => ScreenOutput(n.SelectMany(s => {
+            if (s.Index == 100)
+                return new []{ s.Clone() };
+            
+            int px = s.Index % 10;
+            int py = s.Index / 10;
+
+            List<int> validOffsets = new List<int>() {s.Index};
+            List<int> interpolatedOffsets = new List<int>() {s.Index};
+
+            for (int i = 0; i < Offsets.Count; i++) {
+                if (Offsets[i].Apply(s.Index, GridMode, Wrap, out int _x, out int _y, out int result))
+                    validOffsets.Add(result);
+
+                if (CopyMode == CopyType.Interpolate) {
+                    double angle = Angles[i] / 90.0 * Math.PI;
+                    
+                    double x = _x;
+                    double y = _y;
+                    
+                    int pointCount;
+                    Func<int, DoubleTuple> pointGenerator;
+
+                    DoubleTuple source = new DoubleTuple(px, py);
+                    DoubleTuple target = new DoubleTuple(_x, _y);
+
+                    if (angle != 0) {
+                        // https://www.desmos.com/calculator/hizsxmojxz
+
+                        double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
+                        double commonTan = Math.Atan((px - x) / (y - py));
+
+                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2)) * (((y - py) >= 0)? 1 : -1);
+                        
+                        DoubleTuple center = new DoubleTuple(
+                            (px + x) / 2 + Math.Cos(commonTan) * cord,
+                            (py + y) / 2 + Math.Sin(commonTan) * cord
+                        );
+                        
+                        double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
+                        
+                        double u = (Convert.ToInt32(angle < 0) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
+                        double v = (Convert.ToInt32(angle < 0) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        v += (u <= v)? 0 : 2 * Math.PI;
+                        
+                        double startAngle = (angle < 0)? v : u;
+                        double endAngle = (angle < 0)? u : v;
+
+                        pointCount = (int)(Math.Abs(radius) * Math.Abs(endAngle - startAngle) * 1.5);
+                        pointGenerator = t => CircularInterp(center, radius, startAngle, endAngle, t, pointCount);
+                        
+                    } else {
+                        IntTuple p = new IntTuple(px, py);
+
+                        IntTuple d = new IntTuple(
+                            _x - px,
+                            _y - py
+                        );
+
+                        IntTuple a = d.Apply(v => Math.Abs(v));
+                        IntTuple b = d.Apply(v => (v < 0)? -1 : 1);
+
+                        pointCount = Math.Max(a.X, a.Y);
+                        pointGenerator = t => LineGenerator(p, a, b, t);
+                    }
+                        
+                    for (int p = 1; p <= pointCount; p++) {
+                        DoubleTuple doublepoint = pointGenerator.Invoke(p);
+                        IntTuple point = doublepoint.Round();
+
+                        if (Math.Pow(doublepoint.X - point.X, 2.16) + Math.Pow(doublepoint.Y - point.Y, 2.16) > .25) continue;
+
+                        bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
+
+                        if (iresult != interpolatedOffsets.Last())
+                            interpolatedOffsets.Add(valid? iresult : -1);
+                    }
+                }
+
+                px = _x;
+                py = _y;
+            }
+            
+            switch(CopyMode) {
+            case CopyType.Static:
+                return validOffsets.Select(offset => {
+                    Signal m = s.Clone();
+                    m.Index = (byte)offset;
+                    return m;
+                });
+                
+            case CopyType.Interpolate:
+                validOffsets = interpolatedOffsets;
+                goto case CopyType.Animate;
+                
+            case CopyType.Animate:
+                if (Reverse) validOffsets.Reverse();
+                
+                double total = _time * _gate * (validOffsets.Count - 1);
+                
+                return validOffsets.SelectMany((offset, index) => {
+                    if (offset == -1 || !(
+                        !Infinite || 
+                        index < validOffsets.Count - 1 || 
+                        s.Color.Lit
+                    )) 
+                        return Enumerable.Empty<Signal>();
+                    
+                    Signal signal = s.Clone();
+                    signal.Delay += (int)Pincher.ApplyPinch(_time * _gate * index, total, Pinch, Bilateral);
+                    signal.Index = (byte)offset;
+                    return new []{ signal };
+                });
+                
+            case CopyType.RandomSingle:
+                Signal m = s.Clone();
+                s.Color = new Color();
+                
+                if (!buffer.ContainsKey(s)) {
+                    if (!m.Color.Lit) break;
+                    buffer[s] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
+                } else {
+                    m.Index = (byte)buffer[s];
+                    if (!m.Color.Lit) buffer.Remove(s, out _);
+                }
+                
+                return new []{ m };
+            
+            case CopyType.RandomLoop:
+                Signal k = s.With(s.Index, new Color());
+                
+                return HandleRandomLoop(s, k, validOffsets);
+            }
+            
+            return Enumerable.Empty<Signal>();
+        }));
+
+        IEnumerable<Signal> HandleRandomLoop(Signal o, Signal k, List<int> offsets) {            
+            IEnumerable<Signal> ret = Enumerable.Empty<Signal>();
+            
+            if (o.Color.Lit) {
+                if (!buffer.ContainsKey(k)) buffer[k] = RNG.Next(offsets.Count);
+                else if (offsets.Count > 1) {
+                    int old = buffer[k];
+                    buffer[k] = RNG.Next(offsets.Count - 1);
+                    if (buffer[k] >= old) buffer[k]++;
+                }
+                
+                Signal on = o.With((byte)offsets[buffer[k]], o.Color.Clone());
+                Signal off = on.With(on.Index, new Color(0));
+                
+                off.Delay += (int)(_time * _gate);
+                off.AddValidator((out IEnumerable<Signal> extra) => {
+                    if (buffer.ContainsKeyReference(k)) {
+                        extra = MIDIExit.Invoke(HandleRandomLoop(o, k, offsets));
+                        return true;
+                    } else {
+                        extra = Enumerable.Empty<Signal>();
+                        return false;
+                    }
+                });
+                
+                ret = ret.Concat(new []{ on, off });
+            } else {
+                ret = ret.Append(o.With((byte)offsets[buffer[k]], new Color(0)));
+                buffer.Remove(k, out _);
+            };
+            
+            return ret;
         }
-
+        
+        ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        IEnumerable<Signal> ScreenOutput(IEnumerable<Signal> n) => n.SelectMany(s => {
+            bool on = s.Color.Lit;
+            Signal m = s.With(s.Index, new Color());
+            
+            if (!screen.ContainsKey(m))
+                screen[m] = 0;
+            
+            if(on) {
+                screen[m]++;
+                return new []{ s };
+            } else {
+                if(screen[m] > 0) screen[m]--;
+                if(screen[m] == 0) return new []{ s };
+            }
+            
+            return Enumerable.Empty<Signal>();
+        });
+        
         protected override void Stop() {
             
         }
@@ -261,6 +436,25 @@ namespace Apollo.Devices {
             Time.Dispose();
             base.Dispose();
         }
+        
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t, double pointCount) {
+            double angle = startAngle + (endAngle - startAngle) * ((double)t / pointCount);
+
+            return new DoubleTuple(
+                center.X + radius * Math.Cos(angle),
+                center.Y + radius * Math.Sin(angle)
+            );
+        }
+        
+        DoubleTuple LineGenerator(IntTuple p, IntTuple a, IntTuple b, int t) => (a.X > a.Y)
+            ? new DoubleTuple(
+                p.X + t * b.X,
+                p.Y + (int)Math.Round((double)t / a.X * a.Y) * b.Y
+            )
+            : new DoubleTuple(
+                p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
+                p.Y + t * b.Y
+            );
             
         public class RateUndoEntry: SimplePathUndoEntry<Copy, int> {
             protected override void Action(Copy item, int element) => item.Time.Free = element;
