@@ -470,7 +470,9 @@ namespace Apollo.Elements {
             CreateScreen();
         }
 
-        public void ForceClear() {
+        public virtual void ForceClear() {
+            if (!Usable) return;
+            
             CreateScreen();
 
             SysExSend(ForceClearMessage[Type]);

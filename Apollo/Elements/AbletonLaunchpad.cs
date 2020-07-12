@@ -43,12 +43,12 @@ namespace Apollo.Elements {
 
         public override void Clear(bool manual = false) {
             if (!Available || (manual && PatternWindow != null)) return;
-            
-            Target?.Clear(manual);
 
             if (Version >= 1)
                 AbletonConnector.SendClear(this);
         }
+
+        public override void ForceClear() => Clear();
 
         public override void Render(Signal n) => Target?.Render(n);
 
