@@ -9,6 +9,14 @@ namespace Apollo.Elements {
 
         public override void Send(Signal n) => Window?.SignalRender(n);
 
+        public override void ForceClear() {
+            if (!Usable) return;
+            
+            CreateScreen();
+
+            Window?.Clear();
+        }
+
         public VirtualLaunchpad(string name, int index) {
             Type = LaunchpadType.Pro;
             Name = name;

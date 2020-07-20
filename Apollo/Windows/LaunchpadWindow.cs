@@ -107,6 +107,8 @@ namespace Apollo.Windows {
             Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
         });
 
+        public void Clear() => Dispatcher.UIThread.InvokeAsync(Grid.Clear);
+    
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
