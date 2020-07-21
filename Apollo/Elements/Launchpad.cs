@@ -288,12 +288,12 @@ namespace Apollo.Elements {
                         if (versionStr == "\0\0\0") // Bootloader
                             return LaunchpadType.Unknown;
 
-                        if (versionStr == "cfw") { // Old Custom Firmware
+                        if (versionStr == "cfw" || versionStr == "cfx") { // Old Custom Firmware
                             CFWIncompatible.Set();
                             return LaunchpadType.Unknown;
                         }
 
-                        if (versionStr == "cfx") // Custom Firmware
+                        if (versionStr == "cfy") // Custom Firmware
                             return LaunchpadType.CFW;
                         
                         if (versionInt < 182) // Old Firmware
