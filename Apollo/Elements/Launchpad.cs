@@ -163,6 +163,11 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
+        static Dictionary<LaunchpadType, int> MaxRepeats = new Dictionary<LaunchpadType, int>() {
+            {LaunchpadType.Pro, 78},
+            {LaunchpadType.CFW, 79}
+        };
+
         static byte[] SysExStart = new byte[] { 0xF0 };
         static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
@@ -175,6 +180,8 @@ namespace Apollo.Elements {
             {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03}).ToArray()},
             {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()}
         };
+
+        static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
 
         static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
@@ -384,14 +391,22 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public void Send(Signal n) => Send(new List<Signal>() {n});
+        class RawUpdate {
+            public byte Index;
+            public Color Color;
+
+            public RawUpdate(Signal n, int offset) {
+                Index = (byte)(n.Index + offset);
+                Color = n.Color.Clone();
+            }
+        }
+
+        public void Send(Signal n) => Send(null, new List<Signal>() {n});
         
-        public virtual void Send(List<Signal> n) {
+        public virtual void Send(Screen sender, List<Signal> n) {
             if (!n.Any() || !Usable) return;
 
-            // TODO Heaven Grid/Row/All optimization? Likely to be extremely device specific...
-
-            List<byte[]> output = n.SelectMany(i => {
+            List<RawUpdate> output = n.SelectMany(i => {
                 Signal m = i.Clone();
                 Window?.SignalRender(m);
 
@@ -406,7 +421,7 @@ namespace Apollo.Elements {
                     else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
                 }
 
-                IEnumerable<byte[]> ret = Enumerable.Empty<byte[]>();
+                IEnumerable<RawUpdate> ret = Enumerable.Empty<RawUpdate>();
 
                 int offset = 0;
 
@@ -429,40 +444,78 @@ namespace Apollo.Elements {
                         
                     case LaunchpadType.ProMK3:
                         if (i.Index == 0 || i.Index == 9 || i.Index == 100) return ret;
+                        if (1 <= i.Index && i.Index <= 8) ret = ret.Append(new RawUpdate(i, 100));
                         break;
                 }
-
-                ret = new [] { RGBCreate(i, offset) };
-
-                if (Type == LaunchpadType.ProMK3 && 1 <= i.Index && i.Index <= 8)
-                    ret = ret.Append(RGBCreate(i, 100));
                 
-                return ret.ToArray();
+                return ret.Append(new RawUpdate(i, offset)).ToArray();
             }).ToList();
 
-            // TODO Heaven CFW compatibility - a CFW update will be required for this, because dumb me never implemented fast multimessaging
+            if (CFWOptimize(output, out IEnumerable<byte> sysex)) {
+                SysExSend(sysex);
+                return;
+            }
 
-            if (Type == LaunchpadType.Pro) {
-                // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
-                // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
-                for (int i = 0; i < output.Count; i += 78)
-                    RGBSend(output.Skip(i).Take(78).ToList());
+            // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
+            // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
+            if (Type.IsPro() && output.Count > MaxRepeats[Type]) {
+                if (sender != null) {
+                    SysExSend(ProGridMessage.Concat(Enumerable.Range(0, 100)
+                        .Select(i => sender.GetColor(i))
+                        .SelectMany(i => new byte[] { i.Red, i.Green, i.Blue })
+                        .Concat(SysExEnd)
+                    ));
+                    
+                    RawUpdate mode = output.FirstOrDefault(i => i.Index == 99);
+                    if (mode != null) RGBSend(new List<RawUpdate>() { mode });
+
+                } else 
+                    for (int i = 0; i < output.Count; i += MaxRepeats[Type])
+                        RGBSend(output.Skip(i).Take(MaxRepeats[Type]).ToList());
+                
+                return;
+            }
             
-            } else RGBSend(output);
+            RGBSend(output);
         }
 
-        byte[] RGBCreate(Signal n, int offset = 0) {
-            IEnumerable<byte> ret = Type.IsGenerationX()? new byte[] { 0x03 } : Enumerable.Empty<byte>();
+        bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
+            ret = null;
+            
+            if (Type != LaunchpadType.CFW) return false;
 
-            return ret.Concat(new byte[] {
-                (byte)(n.Index + offset),
-                (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
-                (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
-                (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
-            }).ToArray();
+            IEnumerable<Color> colors = updates.Select(i => i.Color).Distinct();
+            if (colors.Count() > 79) return false;
+
+            ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
+                colors.SelectMany(i => {
+                    IEnumerable<byte> positions = updates.Where(j => j.Color == i).Select(j => j.Index);
+                    List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
+                    
+                    if (positions.Count() > 1) chunk.Add((byte)positions.Count());
+                    else chunk[0] |= 0x40;
+
+                    // TODO Heaven row/column/direction matching
+                    foreach (byte index in positions)
+                        chunk.Add(index);
+                    
+                    return chunk;
+                })
+            );
+
+            return ret.Count() <= 319; // Hard limit is 320 but this doesn't include SysExEnd
         }
 
-        void RGBSend(List<byte[]> rgb) => SysExSend(RGBHeader[Type].Concat(rgb.SelectMany(i => i)));
+        void RGBSend(List<RawUpdate> rgb) {
+            IEnumerable<byte> colorspec = Type.IsGenerationX()? new byte[] { 0x03 } : Enumerable.Empty<byte>();
+
+            SysExSend(RGBHeader[Type].Concat(rgb.SelectMany(i => colorspec.Concat(new byte[] {
+                i.Index,
+                (byte)(i.Color.Red * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(i.Color.Green * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(i.Color.Blue * (Type.IsGenerationX()? 2 : 1))
+            }))));
+        }
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -477,8 +530,8 @@ namespace Apollo.Elements {
 
             SysExSend(ForceClearMessage[Type]);
             
-            if (Type.HasModeLight()) RGBSend(new List<byte[]>() {
-                RGBCreate(new Signal(null, this, 100, new Color(0)), -1)
+            if (Type.IsPro()) RGBSend(new List<RawUpdate>() {
+                new RawUpdate(new Signal(null, this, 100, new Color(0)), -1)
             });
         }
 

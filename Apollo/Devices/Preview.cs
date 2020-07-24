@@ -31,7 +31,7 @@ namespace Apollo.Devices {
             Clear += HandleClear;
         }
         
-        public void PreviewExit(List<Signal> n) {
+        public void PreviewExit(Screen sender, List<Signal> n) {
             if (Viewer?.SpecificViewer != null) {
                 foreach (Signal i in n)
                     ((PreviewViewer)Viewer.SpecificViewer).Signal(i);

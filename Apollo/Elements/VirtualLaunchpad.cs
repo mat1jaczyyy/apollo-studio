@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 using Apollo.Core;
 using Apollo.Enums;
+using Apollo.Rendering;
 using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 
@@ -9,7 +10,7 @@ namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public int VirtualIndex = 0;
 
-        public override void Send(List<Signal> n) {
+        public override void Send(Screen sender, List<Signal> n) {
             foreach (Signal i in n)
                 Window?.SignalRender(i);
         }

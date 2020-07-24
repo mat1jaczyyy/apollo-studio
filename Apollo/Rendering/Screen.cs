@@ -58,7 +58,7 @@ namespace Apollo.Rendering {
             }
         }
 
-        public Action<List<Signal>> ScreenExit;
+        public Action<Screen, List<Signal>> ScreenExit;
 
         Pixel[] _screen = new Pixel[101];
 
@@ -82,7 +82,7 @@ namespace Apollo.Rendering {
             }
 
             if (ret.Count > 0)
-                ScreenExit?.Invoke(ret);
+                ScreenExit?.Invoke(this, ret);
         }
 
         delegate void DrawingHandler();
@@ -99,7 +99,8 @@ namespace Apollo.Rendering {
             Drawing += Snapshot;
         }
 
-        public Color GetColor(int index) => _screen[index].GetColor();
+        // Not cloning for performance reasons!
+        public Color GetColor(int index) => snapshot[index]; 
 
         public void MIDIEnter(Signal n) => _screen[n.Index].MIDIEnter(n);
 
