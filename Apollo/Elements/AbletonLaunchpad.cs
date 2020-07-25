@@ -40,7 +40,7 @@ namespace Apollo.Elements {
             set {}
         }
 
-        public override void Send(Screen sender, List<Signal> n) => Target?.Send(sender, n);
+        public override void Send(Color[] previous, Color[] snapshot, List<RawUpdate> n) => Target?.Send(previous, snapshot, n);
 
         public override void Clear(bool manual = false) {
             if (!Available || (manual && PatternWindow != null)) return;

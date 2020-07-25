@@ -391,29 +391,21 @@ namespace Apollo.Elements {
             return true;
         }
 
-        class RawUpdate {
-            public byte Index;
-            public Color Color;
-
-            public RawUpdate(Signal n, int offset) {
-                Index = (byte)(n.Index + offset);
-                Color = n.Color.Clone();
-            }
-        }
-
-        public void Send(Signal n) => Send(null, new List<Signal>() {n});
+        public void Send(Signal n) {} //=> Send(null, new List<Signal>() {n});
         
-        public virtual void Send(Screen sender, List<Signal> n) {
+        public virtual void Send(Color[] previous, Color[] snapshot, List<RawUpdate> n) {
             if (!n.Any() || !Usable) return;
 
+            if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
+                SysExSend(sysex);
+                return;
+            }
+
             List<RawUpdate> output = n.SelectMany(i => {
-                Signal m = i.Clone();
-                Window?.SignalRender(m);
+                Window?.Render(i);
 
                 foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                    alp.Window?.SignalRender(m);
-
-                i = i.Clone();  // TODO might be unnecessary
+                    alp.Window?.Render(i);
 
                 if (i.Index != 100) {
                     if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
@@ -448,20 +440,17 @@ namespace Apollo.Elements {
                         break;
                 }
                 
-                return ret.Append(new RawUpdate(i, offset)).ToArray();
-            }).ToList();
+                i.Offset(offset);
+                return ret.Append(i).ToArray();
 
-            if (CFWOptimize(output, out IEnumerable<byte> sysex)) {
-                SysExSend(sysex);
-                return;
-            }
+            }).ToList();
 
             // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
             // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
             if (Type.IsPro() && output.Count > MaxRepeats[Type]) {
-                if (sender != null) {
+                if (snapshot != null) {  // TODO Heaven see if we can remove this check?
                     SysExSend(ProGridMessage.Concat(Enumerable.Range(0, 100)
-                        .Select(i => sender.GetColor(i))
+                        .Select(i => snapshot[i])
                         .SelectMany(i => new byte[] { i.Red, i.Green, i.Blue })
                         .Concat(SysExEnd)
                     ));
@@ -495,6 +484,7 @@ namespace Apollo.Elements {
                     if (positions.Count() > 1) chunk.Add((byte)positions.Count());
                     else chunk[0] |= 0x40;
 
+                    // NOTE MODE LIGHT INDEX IS 100 HERE, NOT 99 (SCREEN IS UNFILTERED)
                     // TODO Heaven row/column/direction matching
                     foreach (byte index in positions)
                         chunk.Add(index);
@@ -531,7 +521,7 @@ namespace Apollo.Elements {
             SysExSend(ForceClearMessage[Type]);
             
             if (Type.IsPro()) RGBSend(new List<RawUpdate>() {
-                new RawUpdate(new Signal(null, this, 100, new Color(0)), -1)
+                new RawUpdate(100, new Color(0))
             });
         }
 

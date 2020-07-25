@@ -16,7 +16,7 @@ namespace Apollo.Devices {
         Screen screen;
 
         void HandleClear() {
-            screen = new Screen() { ScreenExit = PreviewExit };
+            screen = new Screen() { /*ScreenExit = PreviewExit*/ };
             if (Viewer?.SpecificViewer != null) ((PreviewViewer)Viewer.SpecificViewer).Clear();
         }
 
@@ -26,7 +26,7 @@ namespace Apollo.Devices {
         };
 
         public Preview(): base("preview") {
-            screen = new Screen() { ScreenExit = PreviewExit }; // TODO heaven dispose
+            screen = new Screen() { /*ScreenExit = PreviewExit*/ }; // TODO heaven dispose
             
             Clear += HandleClear;
         }

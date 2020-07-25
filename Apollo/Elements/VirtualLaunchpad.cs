@@ -10,9 +10,9 @@ namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public int VirtualIndex = 0;
 
-        public override void Send(Screen sender, List<Signal> n) {
-            foreach (Signal i in n)
-                Window?.SignalRender(i);
+        public override void Send(Color[] previous, Color[] snapshot, List<RawUpdate> n) {
+            foreach (RawUpdate i in n)
+                Window?.Render(i);
         }
 
         public VirtualLaunchpad(string name, int index) {

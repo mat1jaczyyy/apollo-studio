@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Apollo.Enums;
 using Apollo.Structures;
@@ -58,7 +59,7 @@ namespace Apollo.Rendering {
             }
         }
 
-        public Action<Screen, List<Signal>> ScreenExit;
+        public Action<Color[], Color[], List<RawUpdate>> ScreenExit;
 
         Pixel[] _screen = new Pixel[101];
 
@@ -68,21 +69,24 @@ namespace Apollo.Rendering {
         }
 
         Color[] snapshot = new Color[101];
+        Color[] previous = new Color[101];
 
         void Snapshot() {
-            List<Signal> ret = new List<Signal>();
+            List<RawUpdate> ret = new List<RawUpdate>();
+
+            previous = snapshot.Select(i => i.Clone()).ToArray();
 
             for (int i = 0; i < 101; i++) {
                 Color n = _screen[i].GetColor();
 
                 if (snapshot[i] != n) {
-                    ret.Add(new Signal(null, null, (byte)i, n.Clone()));
+                    ret.Add(new RawUpdate(i, n.Clone()));
                     snapshot[i] = n;
                 }
             }
 
             if (ret.Count > 0)
-                ScreenExit?.Invoke(this, ret);
+                ScreenExit?.Invoke(previous, snapshot, ret);
         }
 
         delegate void DrawingHandler();
