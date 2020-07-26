@@ -59,7 +59,7 @@ namespace Apollo.Rendering {
             }
         }
 
-        public Action<Color[], Color[], List<RawUpdate>> ScreenExit;
+        public Action<List<RawUpdate>, Color[]> ScreenExit;
 
         Pixel[] _screen = new Pixel[101];
 
@@ -69,12 +69,9 @@ namespace Apollo.Rendering {
         }
 
         Color[] snapshot = new Color[101];
-        Color[] previous = new Color[101];
 
         void Snapshot() {
             List<RawUpdate> ret = new List<RawUpdate>();
-
-            previous = snapshot.Select(i => i.Clone()).ToArray();
 
             for (int i = 0; i < 101; i++) {
                 Color n = _screen[i].GetColor();
@@ -86,7 +83,7 @@ namespace Apollo.Rendering {
             }
 
             if (ret.Count > 0)
-                ScreenExit?.Invoke(previous, snapshot, ret);
+                ScreenExit?.Invoke(ret, snapshot);
         }
 
         delegate void DrawingHandler();

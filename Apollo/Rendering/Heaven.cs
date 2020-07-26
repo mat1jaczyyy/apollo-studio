@@ -55,7 +55,7 @@ namespace Apollo.Rendering {
                         }
                     }
 
-                    Screen.Draw();
+                    Screen.Draw(); // TODO BRUH ONLY IF STH CHANGED
                 }
             });
         }

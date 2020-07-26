@@ -10,7 +10,7 @@ namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public int VirtualIndex = 0;
 
-        public override void Send(Color[] previous, Color[] snapshot, List<RawUpdate> n) {
+        public override void Send(List<RawUpdate> n, Color[] snapshot) {
             foreach (RawUpdate i in n)
                 Window?.Render(i);
         }

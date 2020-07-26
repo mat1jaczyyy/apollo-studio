@@ -375,8 +375,10 @@ namespace Apollo.Elements {
 
             Task.Run(() => {
                 lock (locker) {
-                    if (buffer.TryDequeue(out byte[] msg))
+                    if (buffer.TryDequeue(out byte[] msg)) {
+                        //Console.WriteLine($"SysEx OUT {string.Join(", ", msg.Select(i => i.ToString()))}");
                         Output.Send(msg);
+                    }
                     
                     signalCount++;
                 }
@@ -393,7 +395,7 @@ namespace Apollo.Elements {
 
         public void Send(Signal n) {} //=> Send(null, new List<Signal>() {n});
         
-        public virtual void Send(Color[] previous, Color[] snapshot, List<RawUpdate> n) {
+        public virtual void Send(List<RawUpdate> n, Color[] snapshot) {
             if (!n.Any() || !Usable) return;
 
             if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
@@ -468,6 +470,10 @@ namespace Apollo.Elements {
             RGBSend(output);
         }
 
+        static IEnumerable<byte> allMap = Enumerable.Range(1, 98).Except(new int[] {9, 90}).Select(i => (byte)i);
+        static IEnumerable<byte> rowMap(int index) => Enumerable.Range(1, 8).Select(i => (byte)(index * 10 + i));
+        static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
+
         bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
             ret = null;
             
@@ -478,16 +484,34 @@ namespace Apollo.Elements {
 
             ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
                 colors.SelectMany(i => {
-                    IEnumerable<byte> positions = updates.Where(j => j.Color == i).Select(j => j.Index);
+                    IEnumerable<byte> positions = updates.Where(j => j.Color == i).Select(j => j.Index).Except(new byte[] {0, 9, 90, 99}).Select(j => j == 100? (byte)99 : j);
+                    IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
                     List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
-                    
-                    if (positions.Count() > 1) chunk.Add((byte)positions.Count());
-                    else chunk[0] |= 0x40;
 
-                    // NOTE MODE LIGHT INDEX IS 100 HERE, NOT 99 (SCREEN IS UNFILTERED)
-                    // TODO Heaven row/column/direction matching
-                    foreach (byte index in positions)
-                        chunk.Add(index);
+                    if (positions.Intersect(allMap).Count() == 96) {
+                        finalPos = finalPos.Append((byte)0);
+                        if (positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
+                    
+                    } else {
+                        finalPos = positions.ToList();
+
+                        for (int j = 0; j < 10; j++) {
+                            IEnumerable<byte> row = rowMap(j);
+                            IEnumerable<byte> col = colMap(j);
+
+                            if (positions.Intersect(row).Count() == 8)
+                                finalPos = finalPos.Except(row).Append((byte)(100 + j));
+
+                            if (positions.Intersect(col).Count() == 8)
+                                finalPos = finalPos.Except(col).Append((byte)(110 + j));
+                        }
+                    }
+                    
+                    if (finalPos.Count() > 7) chunk.Add((byte)finalPos.Count());
+                    else for (int j = 0; j < 3; j++)
+                        chunk[j] = (byte)(chunk[j] | ((finalPos.Count() & (4 >> j)) > 0? 0x40 : 0));
+
+                    chunk.AddRange(finalPos);
                     
                     return chunk;
                 })
@@ -521,7 +545,7 @@ namespace Apollo.Elements {
             SysExSend(ForceClearMessage[Type]);
             
             if (Type.IsPro()) RGBSend(new List<RawUpdate>() {
-                new RawUpdate(100, new Color(0))
+                new RawUpdate(99, new Color(0))
             });
         }
 
