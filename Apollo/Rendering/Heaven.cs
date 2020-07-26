@@ -30,32 +30,47 @@ namespace Apollo.Rendering {
 
         public Heaven() {
             Task.Run(() => {
-                Stopwatch time = new Stopwatch();  // TODO Heaven this can be moved outside, assign timestamp to Signals as they go out, and then add Delay to that
-                time.Start();                      //      Should make it more precise, and allow us to introduce a buffer (control the +1 value at start of MIDIEnter)
+                Stopwatch time = new Stopwatch();
+                time.Start();
 
                 while (true) {
-                    if (time.ElapsedMilliseconds <= prev) continue;
+                    if (time.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps for non-CFW
 
                     while (queue.TryDequeue(out List<Signal> n))
                         Process(n, prev);
 
-                    long last = prev;
-                    prev = time.ElapsedMilliseconds;
+                    bool changed = false;
 
-                    for (long i = last + 1; i <= prev; i++) {
-                        if (signals.ContainsKey(i)) {
-                            foreach (Signal n in signals[i]) {
-                                if (n.Validate(out List<Signal> extra))
-                                    n.Source?.Render(n);
+                    while (true) {
+                        long last = prev;
+                        prev = time.ElapsedMilliseconds;
 
-                                if (extra != null) Process(extra, i);
+                        for (long i = last + 1; i <= prev; i++) {
+                            if (signals.ContainsKey(i)) {
+                                foreach (Signal n in signals[i]) {
+                                    if (n.Validate(out List<Signal> extra)) {
+                                        changed = true;
+                                        n.Source?.Render(n);
+                                    }
+
+                                    if (extra != null) Process(extra, i);
+                                }
+
+                                signals.Remove(i);
                             }
-
-                            signals.Remove(i);
                         }
-                    }
 
-                    Screen.Draw(); // TODO BRUH ONLY IF STH CHANGED
+                        // Frame skipping
+                        // TODO Heaven Make toggleable in Preferences
+                        for (long i = prev + 1; i < time.ElapsedMilliseconds; i++)
+                            if (signals.ContainsKey(i))
+                                continue;
+
+                        if (changed)
+                            Screen.Draw();
+
+                        break;
+                    }
                 }
             });
         }
