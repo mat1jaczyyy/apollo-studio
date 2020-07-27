@@ -52,6 +52,13 @@ namespace Apollo.Rendering {
                         long last = prev;
                         prev = Program.TimeSpent.ElapsedMilliseconds;
 
+                        long diff = prev - last;
+
+                        Task.Run(() => {
+                            if (diff >= 8)
+                                Console.WriteLine($"[Heaven] Long wait: {diff}");
+                        });
+
                         for (long i = last + 1; i <= prev; i++) {
                             if (signals.ContainsKey(i)) {
                                 foreach (Signal n in signals[i]) {
