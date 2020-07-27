@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Rendering {
@@ -12,10 +13,13 @@ namespace Apollo.Rendering {
         Dictionary<long, List<Signal>> signals = new Dictionary<long, List<Signal>>();
         ConcurrentQueue<List<Signal>> queue = new ConcurrentQueue<List<Signal>>();
 
-        long prev = -1;
+        long prev;
         object locker = new object();
 
-        public override void MIDIEnter(IEnumerable<Signal> n) => queue.Enqueue(n.ToList());
+        public override void MIDIEnter(IEnumerable<Signal> n) {
+            queue.Enqueue(n.ToList());
+            Wake();
+        }
 
         void Process(List<Signal> n, long start) {
             foreach (Signal i in n) {
@@ -28,13 +32,16 @@ namespace Apollo.Rendering {
             }
         }
 
-        public Heaven() {
-            Task.Run(() => {
-                Stopwatch time = new Stopwatch();
-                time.Start();
+        Task RenderThread; 
 
-                while (true) {
-                    if (time.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps for non-CFW
+        void Wake() {
+            if (RenderThread?.IsCompleted == false) return;
+
+            RenderThread = Task.Run(() => {
+                prev = Program.TimeSpent.ElapsedMilliseconds - 1;
+                
+                while (queue.Any() || signals.Any()) {
+                    if (Program.TimeSpent.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps for non-CFW
 
                     while (queue.TryDequeue(out List<Signal> n))
                         Process(n, prev);
@@ -43,7 +50,7 @@ namespace Apollo.Rendering {
 
                     while (true) {
                         long last = prev;
-                        prev = time.ElapsedMilliseconds;
+                        prev = Program.TimeSpent.ElapsedMilliseconds;
 
                         for (long i = last + 1; i <= prev; i++) {
                             if (signals.ContainsKey(i)) {
@@ -62,9 +69,9 @@ namespace Apollo.Rendering {
 
                         // Frame skipping
                         // TODO Heaven Make toggleable in Preferences
-                        for (long i = prev + 1; i < time.ElapsedMilliseconds; i++)
-                            if (signals.ContainsKey(i))
-                                continue;
+                        //for (long i = prev + 1; i < Program.TimeSpent.ElapsedMilliseconds; i++)
+                            //if (signals.ContainsKey(i))
+                                //continue;
 
                         if (changed)
                             Screen.Draw();
