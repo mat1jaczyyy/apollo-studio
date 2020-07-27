@@ -9,19 +9,19 @@ using Apollo.Core;
 using Apollo.Structures;
 
 namespace Apollo.Rendering {
-    class Heaven: Renderer { 
-        Dictionary<long, List<Signal>> signals = new Dictionary<long, List<Signal>>();
-        ConcurrentQueue<List<Signal>> queue = new ConcurrentQueue<List<Signal>>();
+    public static class Heaven { 
+        static Dictionary<long, List<Signal>> signals = new Dictionary<long, List<Signal>>();
+        static ConcurrentQueue<List<Signal>> queue = new ConcurrentQueue<List<Signal>>();
 
-        long prev;
-        object locker = new object();
+        static long prev;
+        static object locker = new object();
 
-        public override void MIDIEnter(IEnumerable<Signal> n) {
+        public static void MIDIEnter(IEnumerable<Signal> n) {
             queue.Enqueue(n.ToList());
             Wake();
         }
 
-        void Process(List<Signal> n, long start) {
+        static void Process(List<Signal> n, long start) {
             foreach (Signal i in n) {
                 long target = start + i.Delay + 1;
 
@@ -32,9 +32,9 @@ namespace Apollo.Rendering {
             }
         }
 
-        Task RenderThread; 
+        static Task RenderThread; 
 
-        void Wake() {
+        static void Wake() {
             if (RenderThread?.IsCompleted == false) return;
 
             RenderThread = Task.Run(() => {
@@ -76,9 +76,9 @@ namespace Apollo.Rendering {
 
                         // Frame skipping
                         // TODO Heaven Make toggleable in Preferences
-                        //for (long i = prev + 1; i < Program.TimeSpent.ElapsedMilliseconds; i++)
-                            //if (signals.ContainsKey(i))
-                                //continue;
+                        for (long i = prev + 1; i < Program.TimeSpent.ElapsedMilliseconds; i++)
+                            if (signals.ContainsKey(i))
+                                continue;
 
                         if (changed)
                             Screen.Draw();

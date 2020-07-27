@@ -145,7 +145,7 @@ namespace Apollo.Elements {
 
         void MIDIEnter(Signal n) {
             if (ParentIndex != null && Enabled && Chain != null)
-                Renderer.Current.MIDIEnter(Chain.MIDIEnter(n));
+                Heaven.MIDIEnter(Chain.MIDIEnter(n));
         }
 
         public void Dispose() {
