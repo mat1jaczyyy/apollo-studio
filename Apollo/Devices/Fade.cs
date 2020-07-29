@@ -295,58 +295,68 @@ namespace Apollo.Devices {
 
         ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
 
-        IEnumerable<Signal> CreateFade(Signal n, Signal k, Signal v) {
-            bool resolved = false;
-
-            return fade.Select((i, cnt) => {
-                Signal m = n.Clone();
-                
-                m.Color = i.Color.Clone();
-                m.Delay += (int)i.Time;
-
-                m.AddValidator((out IEnumerable<Signal> extra) => {
-                    extra = null;
-                    
-                    if (!resolved)
-                        if (object.ReferenceEquals(buffer[k], v)) {
-                            if (PlayMode == FadePlaybackType.Loop && cnt == fade.Count - 1)
-                                extra = MIDIExit.Invoke(CreateFade(k, k, v));
-
-                            return true;
-
-                        } else {
-                            resolved = true;
-
-                            if (PlayMode == FadePlaybackType.Loop) {
-                                Signal c = k.Clone();
-                                c.Color = new Color(0);
-                                extra = MIDIExit.Invoke(new [] {c});
-
-                            } else if (!buffer[k].Color.Lit) {
-                                v = buffer[k];
-                                resolved = false;
-                            }
-                        }
-
-                    return !resolved;
-                });
-
-                return m;
-            }).ToList();
-        }
-
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(i => {
             Signal k = i.Clone();
             Signal v = i.Clone();
 
-            k.Color = new Color();
+            k.Color = new Color(0);
             k.Delay = v.Delay = 0;
+
+            Signal p = buffer.TryGetValue(k, out p)? p : null;
 
             buffer[k] = v;
 
-            return i.Color.Lit
-                ? CreateFade(i, k, v)
-                : Enumerable.Empty<Signal>();
+            if (i.Color.Lit) {
+                int index = 0;
+
+                Signal m = i.Clone();
+                m.Color = fade[0].Color.Clone();
+
+                Signal.ValidatorDelegate next = null;
+                next = (out IEnumerable<Signal> extra) => {
+                    extra = null;
+
+                    if (!object.ReferenceEquals(buffer[k], v)) {
+                        if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
+                            v = buffer[k];
+                        
+                        else return false;
+                    }
+
+                    if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
+                        index = 0;
+                
+                    if (index < fade.Count) {
+                        if (index < fade.Count - 1) {
+                            Signal m = i.Clone();
+                            m.Color = fade[index == fade.Count - 2 && PlayMode == FadePlaybackType.Loop? 0 : index + 1].Color.Clone();
+                            m.Delay = (int)(fade[index + 1].Time - fade[index].Time);
+                            m.AddValidator(next);
+
+                            extra = MIDIExit.Invoke(new [] {m});
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                };
+                
+                Signal o = i.Clone();
+                o.Color = fade[1].Color.Clone();
+                o.Delay = (int)(fade[1].Time - fade[0].Time);
+
+                o.AddValidator(next);
+
+                return new [] {m, o};
+            
+            } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
+                buffer[k] = null;
+
+                return new [] {k};
+            }
+
+            return Enumerable.Empty<Signal>();
         });
 
         protected override void Stop() {
