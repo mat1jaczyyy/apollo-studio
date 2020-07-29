@@ -344,7 +344,7 @@ namespace Apollo.Devices {
                 
                 Signal o = i.Clone();
                 o.Color = fade[1].Color.Clone();
-                o.Delay = (int)(fade[1].Time - fade[0].Time);
+                o.Delay = (int)fade[1].Time;
 
                 o.AddValidator(next);
 
