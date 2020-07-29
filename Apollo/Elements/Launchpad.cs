@@ -473,6 +473,9 @@ namespace Apollo.Elements {
         static IEnumerable<byte> allMap = Enumerable.Range(1, 98).Except(new int[] {9, 90}).Select(i => (byte)i);
         static IEnumerable<byte> rowMap(int index) => Enumerable.Range(1, 8).Select(i => (byte)(index * 10 + i));
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
+        static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
+        static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
+
 
         bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
             ret = null;
@@ -505,6 +508,9 @@ namespace Apollo.Elements {
                             if (positions.Intersect(col).Count() == 8)
                                 finalPos = finalPos.Except(col).Append((byte)(110 + j));
                         }
+
+                        if (finalPos.Intersect(squares).Count() == 16)
+                            finalPos = finalPos.Except(cols);
                     }
                     
                     if (finalPos.Count() > 7) chunk.Add((byte)finalPos.Count());
