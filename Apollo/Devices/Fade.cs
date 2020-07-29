@@ -330,7 +330,7 @@ namespace Apollo.Devices {
                         if (index < fade.Count - 1) {
                             Signal m = i.Clone();
                             m.Color = fade[index == fade.Count - 2 && PlayMode == FadePlaybackType.Loop? 0 : index + 1].Color.Clone();
-                            m.Delay = (int)(fade[index + 1].Time - fade[index].Time);
+                            m.Delay = (int)fade[index + 1].Time - (int)fade[index].Time;
                             m.AddValidator(next);
 
                             extra = MIDIExit.Invoke(new [] {m});
