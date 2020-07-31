@@ -9,6 +9,7 @@ using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -312,43 +313,33 @@ namespace Apollo.Devices {
                 Signal m = i.Clone();
                 m.Color = fade[0].Color.Clone();
 
-                Signal.ValidatorDelegate next = null;
-                next = (out IEnumerable<Signal> extra) => {
-                    extra = null;
-
+                Func<IEnumerable<Signal>> next = null;
+                next = () => {
                     if (!object.ReferenceEquals(buffer[k], v)) {
                         if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
                             v = buffer[k];
                         
-                        else return false;
+                        else return Enumerable.Empty<Signal>();
                     }
 
                     if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
                         index = 0;
                 
                     if (index < fade.Count) {
-                        if (index < fade.Count - 1) {
-                            Signal m = i.Clone();
-                            m.Color = fade[index == fade.Count - 2 && PlayMode == FadePlaybackType.Loop? 0 : index + 1].Color.Clone();
-                            m.Delay = (int)fade[index + 1].Time - (int)fade[index].Time;
-                            m.AddValidator(next);
+                        Signal m = i.Clone();
+                        m.Color = fade[index].Color.Clone();
 
-                            extra = MIDIExit.Invoke(new [] {m});
-                        }
+                        if (index < fade.Count - 1) Heaven.Schedule(next, fade[index + 1].Time - fade[index].Time);
 
-                        return true;
+                        return MIDIExit.Invoke(new [] {m});
                     }
 
-                    return false;
+                    return Enumerable.Empty<Signal>();
                 };
-                
-                Signal o = i.Clone();
-                o.Color = fade[1].Color.Clone();
-                o.Delay = (int)fade[1].Time;
 
-                o.AddValidator(next);
+                Heaven.Schedule(next, fade[1].Time - fade[0].Time);
 
-                return new [] {m, o};
+                return new [] {m};
             
             } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
                 buffer[k] = null;
