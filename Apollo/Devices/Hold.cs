@@ -93,7 +93,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
 
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(s => {
-            Signal id = s.With(s.Index, new Color());
+            /*Signal id = s.With(s.Index, new Color());
             
             if(s.Color.Lit)
                 buffer[id] = s.Color;
@@ -111,7 +111,7 @@ namespace Apollo.Devices {
                 });
                 
                 return new []{ s, off };
-            }
+            }*/
             return Enumerable.Empty<Signal>();
         });
 

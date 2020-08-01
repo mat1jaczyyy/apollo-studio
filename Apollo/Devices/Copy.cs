@@ -233,7 +233,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
 
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => ScreenOutput(n.SelectMany(s => {
-            if (s.Index == 100)
+            /*if (s.Index == 100)
                 return new []{ s.Clone() };
             
             int px = s.Index % 10;
@@ -364,12 +364,12 @@ namespace Apollo.Devices {
                 Signal k = s.With(s.Index, new Color());
                 
                 return HandleRandomLoop(s, k, validOffsets);
-            }
+            }*/
             
             return Enumerable.Empty<Signal>();
         }));
 
-        IEnumerable<Signal> HandleRandomLoop(Signal o, Signal k, List<int> offsets) {            
+        /*IEnumerable<Signal> HandleRandomLoop(Signal o, Signal k, List<int> offsets) {            
             IEnumerable<Signal> ret = Enumerable.Empty<Signal>();
             
             if (o.Color.Lit) {
@@ -401,7 +401,7 @@ namespace Apollo.Devices {
             };
             
             return ret;
-        }
+        }*/
         
         ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();

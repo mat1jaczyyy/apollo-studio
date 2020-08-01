@@ -297,20 +297,19 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
 
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(i => {
-            if (i.Delay > 0) {
+            /*if (i.Delay > 0) {
                 Heaven.Schedule(() => {
                     i.Delay = 0;
                     return MIDIExit.Invoke(MIDIProcess(new [] {i}));
                 }, i.Delay);
-                
+
                 return Enumerable.Empty<Signal>();
-            }
+            }*/
 
             Signal k = i.Clone();
             Signal v = i.Clone();
 
             k.Color = new Color(0);
-            k.Delay = v.Delay = 0;
 
             Signal p = buffer.TryGetValue(k, out p)? p : null;
 

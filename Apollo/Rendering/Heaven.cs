@@ -31,7 +31,7 @@ namespace Apollo.Rendering {
 
         static void Process(List<Signal> n, long start) {
             foreach (Signal i in n) {
-                long target = start + i.Delay + 1;
+                long target = start + 1;
 
                 if (!signals.ContainsKey(target))
                     signals.Add(target, new List<Signal>());
@@ -90,14 +90,11 @@ namespace Apollo.Rendering {
 
                     for (long i = last + 1; i <= prev; i++) {
                         if (signals.ContainsKey(i)) {
-                            foreach (Signal n in signals[i]) {
-                                if (n.Validate(out List<Signal> extra)) {
+                            foreach (Signal n in signals[i])
+                                if (n.Source != null) {
+                                    n.Source.Render(n);
                                     changed = true;
-                                    n.Source?.Render(n);
                                 }
-
-                                if (extra != null) Process(extra, i);
-                            }
 
                             signals.Remove(i);
                         }

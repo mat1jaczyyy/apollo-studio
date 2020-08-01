@@ -70,7 +70,7 @@ namespace Apollo.Devices {
         }
 
         public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
-            i.Delay += (int)(_time * _gate);
+            //i.Delay += (int)(_time * _gate);
             return i;
         });
 
