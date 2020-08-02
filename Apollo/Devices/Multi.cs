@@ -62,7 +62,7 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*Signal m = n.Clone();
             n.Color = new Color();
 

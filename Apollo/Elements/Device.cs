@@ -33,11 +33,9 @@ namespace Apollo.Elements {
         public Chain Parent;
         public int? ParentIndex;
 
-        protected void InvokeExit(IEnumerable<Signal> n) {
-            List<Signal> l = n.ToList();
-
-            Viewer?.Indicator.Trigger(l);
-            MIDIExit?.Invoke(l);
+        protected void InvokeExit(List<Signal> n) {
+            Viewer?.Indicator.Trigger(n);
+            MIDIExit?.Invoke(n);
         }
 
         public bool Collapsed = false;
@@ -61,9 +59,9 @@ namespace Apollo.Elements {
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
 
-        public abstract void MIDIProcess(IEnumerable<Signal> n);
+        public abstract void MIDIProcess(List<Signal> n);
 
-        public override void MIDIEnter(IEnumerable<Signal> n) {
+        public override void MIDIEnter(List<Signal> n) {
             if (Disposed) return;
 
             if (n is StopSignal) Stop();

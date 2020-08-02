@@ -82,7 +82,7 @@ namespace Apollo.Devices {
             ValueLow = value_low;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (n.Color.Lit) {
                 (double hue, double saturation, double value) = n.Color.ToHSV();
 

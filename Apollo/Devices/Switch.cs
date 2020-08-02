@@ -45,7 +45,7 @@ namespace Apollo.Devices {
             Value = value;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (!n.Color.Lit)
                 Program.Project.SetMacro(Target, Value); */
 

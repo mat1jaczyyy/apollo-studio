@@ -72,8 +72,8 @@ namespace Apollo.Elements {
             }
         }
 
-        Action<IEnumerable<Signal>> _midiexit = null;
-        public override Action<IEnumerable<Signal>> MIDIExit {
+        Action<List<Signal>> _midiexit = null;
+        public override Action<List<Signal>> MIDIExit {
             get => _midiexit;
             set {
                 _midiexit = value;
@@ -81,15 +81,13 @@ namespace Apollo.Elements {
             }
         }
 
-        void InvokeExit(IEnumerable<Signal> n) {
-            List<Signal> l = n.ToList();
-
-            Info?.Indicator.Trigger(l);
-            MIDIExit?.Invoke(l);
+        void InvokeExit(List<Signal> n) {
+            Info?.Indicator.Trigger(n);
+            MIDIExit?.Invoke(n);
         }
 
         public List<Device> Devices = new List<Device>();
-        Action<IEnumerable<Signal>> _chainenter = null;
+        Action<List<Signal>> _chainenter = null;
 
         void Reroute() {
             for (int i = 0; i < Devices.Count; i++) {
@@ -200,7 +198,7 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public override void MIDIEnter(IEnumerable<Signal> n) {
+        public override void MIDIEnter(List<Signal> n) {
             if (n is StopSignal) _chainenter?.Invoke(n);
             else if (Enabled) {
                 Viewer?.Indicator.Trigger(n);

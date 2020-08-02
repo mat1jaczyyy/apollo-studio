@@ -105,7 +105,7 @@ namespace Apollo.Devices {
                     FireCourier(n, m, i * _rate * _gate);*/
         }
         
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*Signal m = n.Clone();
 
             if (Hold) {

@@ -296,7 +296,7 @@ namespace Apollo.Devices {
 
         ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
 
-        public override void MIDIProcess(IEnumerable<Signal> n)
+        public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.SelectMany(i => {
                 Signal k = i.Clone();
                 Signal v = i.Clone();
@@ -331,7 +331,7 @@ namespace Apollo.Devices {
 
                             if (index < fade.Count - 1) Heaven.Schedule(next, fade[index + 1].Time - fade[index].Time);
 
-                            InvokeExit(new [] {m});
+                            InvokeExit(new List<Signal>() {m});
                         }
                     };
 
@@ -346,7 +346,7 @@ namespace Apollo.Devices {
                 }
 
                 return Enumerable.Empty<Signal>();
-            }));
+            }).ToList());
 
         protected override void Stop() {
 

@@ -51,7 +51,7 @@ namespace Apollo.Devices {
             Offset.Changed += OffsetChanged;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n)
+        public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.Where(i => i.Index == 100).Concat(n.SelectMany(i => {
                 if (Offset.Apply(i.Index, GridMode, Wrap, out int x, out int y, out int result)) {
                     i.Index = (byte)result;
@@ -59,7 +59,7 @@ namespace Apollo.Devices {
                 }
 
                 return Enumerable.Empty<Signal>();
-            })));
+            })).ToList());
 
         public override void Dispose() {
             if (Disposed) return;

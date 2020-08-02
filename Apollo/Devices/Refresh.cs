@@ -29,7 +29,7 @@ namespace Apollo.Devices {
             _macros = macros;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*for (int i = 0; i < 4; i++) {
                 if (_macros[i])
                     n.Macros[i] = (int)Program.Project.GetMacro(i + 1);

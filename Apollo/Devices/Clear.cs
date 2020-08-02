@@ -28,7 +28,7 @@ namespace Apollo.Devices {
 
         public Clear(ClearType mode = ClearType.Lights): base("clear") => Mode = mode;
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (!n.Color.Lit) {
                 if (Mode == ClearType.Multi) Multi.InvokeReset();
                 else MIDI.ClearState(multi: Mode == ClearType.Both);

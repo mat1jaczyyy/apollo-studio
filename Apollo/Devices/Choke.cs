@@ -90,7 +90,7 @@ namespace Apollo.Devices {
             }*/
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (choked && n.Color.Lit) {
                 Choked?.Invoke(this, Target);
                 choked = false;

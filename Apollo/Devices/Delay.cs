@@ -69,7 +69,7 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             Heaven.Schedule(() => InvokeExit(n), _time * _gate);
         }
 

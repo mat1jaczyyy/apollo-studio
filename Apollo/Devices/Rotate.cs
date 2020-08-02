@@ -42,7 +42,7 @@ namespace Apollo.Devices {
             Bypass = bypass;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (Bypass) InvokeExit(n.Clone());
             
             if (Mode == RotateType.D90) {

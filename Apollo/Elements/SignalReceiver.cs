@@ -5,10 +5,10 @@ using Apollo.Structures;
 
 namespace Apollo.Elements {
     public abstract class SignalReceiver {
-        public virtual Action<IEnumerable<Signal>> MIDIExit { get; set; }
+        public virtual Action<List<Signal>> MIDIExit { get; set; }
 
-        public abstract void MIDIEnter(IEnumerable<Signal> n);
+        public abstract void MIDIEnter(List<Signal> n);
         
-        public void MIDIEnter(Signal n) => MIDIEnter(new [] {n});
+        public void MIDIEnter(Signal n) => MIDIEnter(new List<Signal> { n });
     }
 }

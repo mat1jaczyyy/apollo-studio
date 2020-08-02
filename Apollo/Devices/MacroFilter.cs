@@ -58,7 +58,7 @@ namespace Apollo.Devices {
             _filter = init;
         }
 
-        public override void MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) {
             /*if (_filter[n.GetMacro(Macro) - 1])*/
                 InvokeExit(n);
         }
