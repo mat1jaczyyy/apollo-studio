@@ -46,8 +46,8 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            /*if (!n.Color.Lit)
-                Program.Project.SetMacro(Target, Value); */
+            if (n.Any(i => !i.Color.Lit))
+                Program.Project.SetMacro(Target, Value);
 
             InvokeExit(n);
         }

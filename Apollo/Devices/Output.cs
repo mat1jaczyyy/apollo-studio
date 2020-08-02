@@ -11,7 +11,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Output: Device {
         int _target;
         public int Target {
@@ -76,7 +75,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            //n.Source = Launchpad;
+            n.ForEach(i => i.Source = Launchpad);
             InvokeExit(n);
         }
 

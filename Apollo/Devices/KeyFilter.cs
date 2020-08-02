@@ -8,7 +8,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class KeyFilter: Device {
         bool[] _filter;
         public bool[] Filter {
@@ -40,10 +39,8 @@ namespace Apollo.Devices {
             _filter = init;
         }
 
-        public override void MIDIProcess(List<Signal> n) {
-            /*if (_filter[n.Index])*/
-                InvokeExit(n);
-        }
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.Where(i => _filter[i.Index]).ToList());
         
         public class ChangedUndoEntry: SimplePathUndoEntry<KeyFilter, bool[]> {
             protected override void Action(KeyFilter item, bool[] element) => item.Filter = element.ToArray();

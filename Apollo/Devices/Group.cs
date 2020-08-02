@@ -13,7 +13,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Group: Device, IChainParent, ISelectParent {
         public GroupViewer SpecificViewer => (GroupViewer)Viewer?.SpecificViewer;
 
@@ -46,7 +45,7 @@ namespace Apollo.Devices {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;
                 Chains[i].ParentIndex = i;
-                Chains[i].MIDIExit = ChainExit;
+                Chains[i].MIDIExit = InvokeExit;
             }
         }
 
@@ -99,10 +98,8 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        protected void ChainExit(IEnumerable<Signal> n) => InvokeExit(n.ToList());
-
         public override void MIDIProcess(List<Signal> n) {
-            if (Chains.Count == 0) ChainExit(n);
+            if (Chains.Count == 0) InvokeExit(n);
 
             foreach (Chain chain in Chains)
                 chain.MIDIEnter(n.Select(i => i.Clone()).ToList());

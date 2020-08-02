@@ -58,10 +58,8 @@ namespace Apollo.Devices {
             _filter = init;
         }
 
-        public override void MIDIProcess(List<Signal> n) {
-            /*if (_filter[n.GetMacro(Macro) - 1])*/
-                InvokeExit(n);
-        }
+        public override void MIDIProcess(List<Signal> n) 
+            => InvokeExit(n.Where(i => _filter[i.GetMacro(Macro) - 1]).ToList());
         
         public class TargetUndoEntry: SimplePathUndoEntry<MacroFilter, int> {
             protected override void Action(MacroFilter item, int element) => item.Macro = element;

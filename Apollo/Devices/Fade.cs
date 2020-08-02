@@ -14,7 +14,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
     public class Fade: Device {
         public class FadeInfo {
             public Color Color;

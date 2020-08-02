@@ -7,7 +7,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Paint: Device {
         Color _color;
         public Color Color {
@@ -29,7 +28,11 @@ namespace Apollo.Devices {
         public Paint(Color color = null): base("paint") => Color = color?? new Color();
 
         public override void MIDIProcess(List<Signal> n) {
-            /*if (n.Color.Lit) n.Color = Color.Clone();*/
+            n.ForEach(i => {
+                if (i.Color.Lit)
+                    i.Color = Color.Clone();
+            });
+
             InvokeExit(n);
         }
         

@@ -10,7 +10,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
     public class Delay: Device {
         Time _time;
         public Time Time {
@@ -69,9 +68,8 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        public override void MIDIProcess(List<Signal> n) {
-            Heaven.Schedule(() => InvokeExit(n), _time * _gate);
-        }
+        public override void MIDIProcess(List<Signal> n)
+            => Heaven.Schedule(() => InvokeExit(n), _time * _gate);
 
         protected override void Stop() {
             // TODO Implement

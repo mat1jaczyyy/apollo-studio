@@ -83,15 +83,17 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            /*if (n.Color.Lit) {
-                (double hue, double saturation, double value) = n.Color.ToHSV();
+            n.ForEach(i => {
+                if (i.Color.Lit) {
+                    (double hue, double saturation, double value) = i.Color.ToHSV();
 
-                hue = (hue + Hue + 360) % 360;
-                saturation = saturation * (SaturationHigh - SaturationLow) + SaturationLow;
-                value = value * (ValueHigh - ValueLow) + ValueLow;
+                    hue = (hue + Hue + 360) % 360;
+                    saturation = saturation * (SaturationHigh - SaturationLow) + SaturationLow;
+                    value = value * (ValueHigh - ValueLow) + ValueLow;
 
-                n.Color = Color.FromHSV(hue, saturation, value);
-            }*/
+                    i.Color = Color.FromHSV(hue, saturation, value);
+                }
+            });
 
             InvokeExit(n);
         }

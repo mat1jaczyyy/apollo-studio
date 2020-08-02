@@ -16,7 +16,6 @@ using Apollo.Undo;
 using Apollo.Windows;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
     public class Pattern: Device, ISelectParent {
         public ISelectParentViewer IViewer {
             get => Window;

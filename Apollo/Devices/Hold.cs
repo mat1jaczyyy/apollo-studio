@@ -10,7 +10,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven complete
     public class Hold: Device {
         Time _time;
         public Time Time {

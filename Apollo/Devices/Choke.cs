@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -9,7 +9,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
     public class Choke: Device, IChainParent {
         public delegate void ChokedEventHandler(Choke sender, int index);
         public static event ChokedEventHandler Choked;

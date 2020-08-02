@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class LayerFilter: Device {
         int _target;
         public int Target {
@@ -44,10 +44,8 @@ namespace Apollo.Devices {
             Range = range;
         }
 
-        public override void MIDIProcess(List<Signal> n) {
-            /*if (Math.Abs(n.Layer - Target) <= Range)*/
-                InvokeExit(n);
-        }
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.Where(i => Math.Abs(i.Layer - Target) <= Range).ToList());
         
         public class TargetUndoEntry: SimplePathUndoEntry<LayerFilter, int> {
             protected override void Action(LayerFilter item, int element) => item.Target = element;

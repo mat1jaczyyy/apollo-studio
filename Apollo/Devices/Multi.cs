@@ -12,7 +12,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Multi: Group {
         public delegate void MultiResetHandler();
         public static event MultiResetHandler Reset;

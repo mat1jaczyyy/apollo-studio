@@ -30,10 +30,12 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            /*for (int i = 0; i < 4; i++) {
-                if (_macros[i])
-                    n.Macros[i] = (int)Program.Project.GetMacro(i + 1);
-            }*/
+            n.ForEach(i => {
+                for (int j = 0; j < 4; j++) {
+                    if (_macros[j])
+                        i.Macros[j] = (int)Program.Project.GetMacro(j + 1);
+                }
+            });
             
             InvokeExit(n);
         }

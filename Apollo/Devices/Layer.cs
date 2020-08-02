@@ -9,7 +9,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Layer: Device {
         int _target;
         public int Target {
@@ -57,9 +56,11 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            /*n.Layer = Target;
-            n.BlendingMode = BlendingMode;
-            n.BlendingRange = Range;*/
+            n.ForEach(i => {
+                i.Layer = Target;
+                i.BlendingMode = BlendingMode;
+                i.BlendingRange = Range;
+            });
 
             InvokeExit(n);
         }
