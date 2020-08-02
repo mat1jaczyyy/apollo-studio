@@ -398,17 +398,19 @@ namespace Apollo.Elements {
         public virtual void Send(List<RawUpdate> n, Color[] snapshot) {
             if (!n.Any() || !Usable) return;
 
+            Dispatcher.UIThread.InvokeAsync(() => n.ForEach(i => {
+                Window?.Render(i);
+
+                foreach (AbletonLaunchpad alp in AbletonLaunchpads)
+                    alp.Window?.Render(i);
+            }));
+
             if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
                 SysExSend(sysex);
                 return;
             }
 
             List<RawUpdate> output = n.SelectMany(i => {
-                Window?.Render(i);
-
-                foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                    alp.Window?.Render(i);
-
                 if (i.Index != 100) {
                     if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
                     else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
