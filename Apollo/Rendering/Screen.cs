@@ -64,8 +64,10 @@ namespace Apollo.Rendering {
         Pixel[] _screen = new Pixel[101];
 
         public void Clear() {
-            foreach (Pixel pixel in _screen)
-                pixel.Clear();
+            for (int i = 0; i < 101; i++) {
+                snapshot[i].Red = snapshot[i].Green = snapshot[i].Blue = 0;
+                _screen[i].Clear();
+            }
         }
 
         Color[] snapshot = new Color[101];
@@ -105,8 +107,6 @@ namespace Apollo.Rendering {
 
         public void MIDIEnter(Signal n) => _screen[n.Index].MIDIEnter(n);
 
-        public void Dispose() {
-            Drawing -= Snapshot;
-        }
+        public void Dispose() => Drawing -= Snapshot;
     }
 }

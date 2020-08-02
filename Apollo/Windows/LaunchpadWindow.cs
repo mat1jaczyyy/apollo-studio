@@ -104,9 +104,7 @@ namespace Apollo.Windows {
         void PadPressed(int index) => PadChanged(index, true);
         void PadReleased(int index) => PadChanged(index, false);
 
-        public void Render(RawUpdate n) => Dispatcher.UIThread.InvokeAsync(() => {
-            Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
-        });
+        public void Render(RawUpdate n) => Grid.RawUpdate(n);
 
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;

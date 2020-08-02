@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -7,7 +6,6 @@ using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.Devices {
-    //? might work after screen gets implemented
     public class Preview: Device {
         public delegate void PreviewResetHandler();
         public static event PreviewResetHandler Clear;
@@ -17,7 +15,7 @@ namespace Apollo.Devices {
         Screen screen;
 
         void HandleClear() {
-            screen = new Screen() { /*ScreenExit = PreviewExit*/ };
+            screen.Clear();
             if (Viewer?.SpecificViewer != null) ((PreviewViewer)Viewer.SpecificViewer).Clear();
         }
 
@@ -27,27 +25,25 @@ namespace Apollo.Devices {
         };
 
         public Preview(): base("preview") {
-            screen = new Screen() { /*ScreenExit = PreviewExit*/ }; // TODO heaven dispose
+            screen = new Screen() { ScreenExit = PreviewExit };
             
             Clear += HandleClear;
         }
         
-        public void PreviewExit(Screen sender, List<Signal> n) {
-            if (Viewer?.SpecificViewer != null) {
-                foreach (Signal i in n)
-                    ((PreviewViewer)Viewer.SpecificViewer).Signal(i);
-            }
+        public void PreviewExit(List<RawUpdate> n, Color[] snapshot) {
+            if (Viewer?.SpecificViewer != null)
+                n.ForEach(((PreviewViewer)Viewer.SpecificViewer).Render);
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            //Signal m = n.Clone();
+            n.ForEach(screen.MIDIEnter);
             InvokeExit(n);
-            //screen.MIDIEnter(m);
         }
 
         public override void Dispose() {
             if (Disposed) return;
 
+            screen.Dispose();
             Clear -= HandleClear;
 
             base.Dispose();
