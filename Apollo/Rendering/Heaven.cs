@@ -10,34 +10,22 @@ using Apollo.Structures;
 
 namespace Apollo.Rendering {
     public static class Heaven { 
-        static Dictionary<long, List<Signal>> signals = new Dictionary<long, List<Signal>>();
-        static ConcurrentQueue<List<Signal>> queue = new ConcurrentQueue<List<Signal>>();
+        static ConcurrentQueue<List<Signal>> signalQueue = new ConcurrentQueue<List<Signal>>();
 
-        static Dictionary<long, List<Action>> scheduled = new Dictionary<long, List<Action>>();
-        static ConcurrentQueue<(long, Action)> squeue = new ConcurrentQueue<(long, Action)>();
+        static SortedDictionary<long, List<Action>> jobs = new SortedDictionary<long, List<Action>>();
+        static ConcurrentQueue<(long, Action)> jobQueue = new ConcurrentQueue<(long, Action)>();
 
-        static long prev, sprev;
+        static long prev;
         static object locker = new object();
 
-        public static void MIDIEnter(IEnumerable<Signal> n) {
-            queue.Enqueue(n.ToList());
+        public static void MIDIEnter(List<Signal> n) {
+            signalQueue.Enqueue(n);
             Wake();
         }
         
         public static void Schedule(Action job, double time) {
-            squeue.Enqueue(((long)time, job));
+            jobQueue.Enqueue(((long)time, job));
             Wake();
-        }
-
-        static void Process(List<Signal> n, long start) {
-            foreach (Signal i in n) {
-                long target = start + 1;
-
-                if (!signals.ContainsKey(target))
-                    signals.Add(target, new List<Signal>());
-
-                signals[target].Add(i);
-            }
         }
 
         static Task RenderThread; 
@@ -46,59 +34,43 @@ namespace Apollo.Rendering {
             if (RenderThread?.IsCompleted == false) return;
 
             RenderThread = Task.Run(() => {
-                sprev = Program.TimeSpent.ElapsedMilliseconds - 1;
                 prev = Program.TimeSpent.ElapsedMilliseconds - 1;
                 
-                while (squeue.Any() || scheduled.Any() || queue.Any() || signals.Any()) {
-                    if (Program.TimeSpent.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps for non-CFW
+                while (jobQueue.Any() || jobs.Any() || signalQueue.Any()) {
+                    if (Program.TimeSpent.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps?
 
-                    while (squeue.TryDequeue(out (long a, Action b) a)) {
-                        long target = sprev + a.a + 1;
+                    while (jobQueue.TryDequeue(out (long Time, Action Job) task)) {
+                        long target = prev + task.Time + 1;
 
-                        if (!scheduled.ContainsKey(target))
-                            scheduled[target] = new List<Action>();
+                        if (!jobs.ContainsKey(target))
+                            jobs[target] = new List<Action>();
 
-                        scheduled[target].Add(a.b);
+                        jobs[target].Add(task.Job);
                     }
 
-                    long last = sprev;
-                    sprev = Program.TimeSpent.ElapsedMilliseconds;
+                    long last = prev;
+                    prev = Program.TimeSpent.ElapsedMilliseconds;
 
-                    for (long i = last + 1; i <= sprev; i++) {
-                        if (scheduled.ContainsKey(i)) {
-                            foreach (Action job in scheduled[i])
-                                job.Invoke();
-                            
-                            scheduled.Remove(i);
-                        }
+                    if (prev - last >= 10) {
+                        // TODO Heaven Lagspike occurred! Maybe indicate?
                     }
 
-                    while (queue.TryDequeue(out List<Signal> n))
-                        Process(n, prev);
+                    foreach (long i in jobs.Keys.TakeWhile(i => i <= prev).ToList()) {
+                        foreach (Action job in jobs[i])
+                            job.Invoke();
+                        
+                        jobs.Remove(i);
+                    }
 
                     bool changed = false;
 
-                    last = prev;
-                    prev = Program.TimeSpent.ElapsedMilliseconds;
-
-                    long diff = prev - last;
-
-                    Task.Run(() => {
-                        if (diff >= 8)
-                            Console.WriteLine($"[Heaven] Long wait: {diff}");
-                    });
-
-                    for (long i = last + 1; i <= prev; i++) {
-                        if (signals.ContainsKey(i)) {
-                            foreach (Signal n in signals[i])
-                                if (n.Source != null) {
-                                    n.Source.Render(n);
-                                    changed = true;
-                                }
-
-                            signals.Remove(i);
-                        }
-                    }
+                    while (signalQueue.TryDequeue(out List<Signal> n))
+                        n.ForEach(i => {
+                            if (i.Source != null) {
+                                i.Source.Render(i);
+                                changed = true;
+                            }
+                        });
 
                     if (changed)
                         Screen.Draw();
