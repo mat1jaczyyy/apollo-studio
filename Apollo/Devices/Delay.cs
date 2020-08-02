@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -69,10 +70,11 @@ namespace Apollo.Devices {
             Gate = gate;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
-            //i.Delay += (int)(_time * _gate);
-            return i;
-        });
+        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+            Heaven.Schedule(() => MIDIExit?.Invoke(n), _time * _gate);
+
+            return Enumerable.Empty<Signal>();
+        }
 
         protected override void Stop() {
             // TODO Heaven Implement invalidation
