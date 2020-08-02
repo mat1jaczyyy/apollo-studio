@@ -64,10 +64,10 @@ namespace Apollo.Rendering {
         Pixel[] _screen = new Pixel[101];
 
         public void Clear() {
-            for (int i = 0; i < 101; i++) {
-                snapshot[i].Red = snapshot[i].Green = snapshot[i].Blue = 0;
-                _screen[i].Clear();
-            }
+            foreach (Pixel pixel in _screen)
+                pixel.Clear();
+            
+            Snapshot();
         }
 
         Color[] snapshot = new Color[101];
