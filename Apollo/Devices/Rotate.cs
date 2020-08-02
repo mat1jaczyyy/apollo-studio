@@ -10,7 +10,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven complete
+    //+ Heaven compatible
     public class Rotate: Device {
         RotateType _mode;
         public RotateType Mode {
@@ -42,23 +42,20 @@ namespace Apollo.Devices {
             Bypass = bypass;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            IEnumerable<Signal> ret = Bypass
-                ? n.Select(i => i.Clone())
-                : Enumerable.Empty<Signal>();
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            /*if (Bypass) InvokeExit(n.Clone());
             
-            return ret.Concat(n.Select(i => {
-                if (Mode == RotateType.D90)
-                    i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
+            if (Mode == RotateType.D90) {
+                n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
 
-                else if (Mode == RotateType.D180)
-                    i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
+            } else if (Mode == RotateType.D180) {
+                n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
 
-                else if (Mode == RotateType.D270)
-                    i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+            } else if (Mode == RotateType.D270) {
+                n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
+            }*/
 
-                return i;
-            }));
+            InvokeExit(n);
         }
         
         public class ModeUndoEntry: EnumSimplePathUndoEntry<Rotate, RotateType> {

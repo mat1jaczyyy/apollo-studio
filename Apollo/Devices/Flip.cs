@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -10,7 +10,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven complete
+    //+ Heaven compatible
     public class Flip: Device {
         FlipType _mode;
         public FlipType Mode {
@@ -42,35 +42,33 @@ namespace Apollo.Devices {
             Bypass = bypass;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            IEnumerable<Signal> ret = Bypass
-                ? n.Select(i => i.Clone())
-                : Enumerable.Empty<Signal>();
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            /*if (Bypass) InvokeExit(n.Clone());
             
-            return ret.Concat(n.Select(i => {
-                int x = i.Index % 10;
-                int y = i.Index / 10;
+            int x = n.Index % 10;
+            int y = n.Index / 10;
 
-                if (Mode == FlipType.Horizontal) x = 9 - x;
-                else if (Mode == FlipType.Vertical) y = 9 - y;
+            if (Mode == FlipType.Horizontal) x = 9 - x;
+            else if (Mode == FlipType.Vertical) y = 9 - y;
 
-                else if (Mode == FlipType.Diagonal1) {
-                    int temp = x;
-                    x = y;
-                    y = temp;
-                
-                } else if (Mode == FlipType.Diagonal2) {
-                    x = 9 - x;
-                    y = 9 - y;
+            else if (Mode == FlipType.Diagonal1) {
+                int temp = x;
+                x = y;
+                y = temp;
+            
+            } else if (Mode == FlipType.Diagonal2) {
+                x = 9 - x;
+                y = 9 - y;
 
-                    int temp = x;
-                    x = y;
-                    y = temp;
-                }
+                int temp = x;
+                x = y;
+                y = temp;
+            }
 
-                i.Index = (byte)(y * 10 + x);
-                return i;
-            }));
+            int result = y * 10 + x;
+            
+            n.Index = (byte)result;*/
+            InvokeExit(n);
         }
         
         public class ModeUndoEntry: EnumSimplePathUndoEntry<Flip, FlipType> {

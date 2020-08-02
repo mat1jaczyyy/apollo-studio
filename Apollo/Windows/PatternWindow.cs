@@ -228,7 +228,7 @@ namespace Apollo.Windows {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             _pattern = pattern;
-            _pattern.MIDIEnter(new StopSignal());
+            _pattern.MIDIEnter(StopSignal.Instance);
 
             _track = Track.Get(_pattern);
 
@@ -922,7 +922,7 @@ namespace Apollo.Windows {
         void PatternPlay(Button sender, int start = 0) {
             if (Locked) {
                 PatternStop();
-                _pattern.MIDIEnter(new StopSignal());
+                _pattern.MIDIEnter(StopSignal.Instance);
 
                 PatternFinish();
                 return;
@@ -938,7 +938,7 @@ namespace Apollo.Windows {
             });
             
             PatternStop(false, start);
-            _pattern.MIDIEnter(new StopSignal());
+            _pattern.MIDIEnter(StopSignal.Instance);
 
             MIDI.ClearState(false);
 

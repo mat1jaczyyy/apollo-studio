@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 
 using Apollo.DeviceViewers;
@@ -40,19 +41,19 @@ namespace Apollo.Devices {
                 if (_chain != null) {
                     Chain.Parent = this;
                     Chain.ParentIndex = 0;
-                    Chain.MIDIExit = null;
+                    Chain.MIDIExit = ChainExit;
                 }
             }
         }
 
         bool choked = true;
         object locker = new object();
-        ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
+        //ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
 
         void HandleChoke(Choke sender, int index) {
             /*if (Target == index && sender != this && !choked) {
                 choked = true;
-                Chain.MIDIEnter(new StopSignal());
+                Chain.MIDIEnter(StopSignal.Create());
                 
                 lock (locker) {
                     foreach (Signal i in signals.Values) {
@@ -63,7 +64,6 @@ namespace Apollo.Devices {
                     signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
                 }
             }*/
-            // TODO Heaven invalidate Signals
         }
 
         public override Device Clone() => new Choke(Target, Chain.Clone()) {
@@ -78,7 +78,7 @@ namespace Apollo.Devices {
             Choked += HandleChoke;
         }
 
-        void ChainExit(Signal n) {
+        void ChainExit(IEnumerable<Signal> n) {
             /*if (!choked) {
                 InvokeExit(n.Clone());
                 
@@ -90,19 +90,18 @@ namespace Apollo.Devices {
             }*/
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(IEnumerable<Signal> n) {
             /*if (choked && n.Color.Lit) {
                 Choked?.Invoke(this, Target);
                 choked = false;
             }
 
-            if (!choked) Chain.MIDIEnter(n.Clone());*/
-            // TODO Heaven invalidate Signals
-            return n;
+            if (!choked) Chain.MIDIEnter(n);  // TODO Heaven There was a .Clone here, maybe .Select(i => i.Clone()).ToList()?
+            */
         }
         
         protected override void Stop() {
-            //Chain.MIDIEnter(new StopSignal());
+            Chain.MIDIEnter(StopSignal.Instance);
         }
 
         public override void Dispose() {

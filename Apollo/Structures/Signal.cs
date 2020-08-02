@@ -95,8 +95,7 @@ namespace Apollo.Structures {
         public override string ToString() => $"{((Source == null)? "null" : Source.Name)} -> {Index} @ {Layer} + {BlendingMode} = {Color}";
     }
 
-    //! Heaven incompatible wtf
-    public class StopSignal: Signal {
-        public StopSignal(): base(null, null) {}
+    public interface StopSignal: IEnumerable<Signal> {
+        readonly static StopSignal Instance = (StopSignal)(IEnumerable<Signal>)Enumerable.Empty<Signal>();
     }
 }

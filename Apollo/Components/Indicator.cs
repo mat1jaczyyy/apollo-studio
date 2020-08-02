@@ -1,4 +1,7 @@
-﻿using Avalonia;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
@@ -38,8 +41,10 @@ namespace Apollo.Components {
             }
         }
 
-        public void Trigger(bool lit = true) { //(bool lit) { TODO Heaven rewrite?
+        public void Trigger(IEnumerable<Signal> triggering) {
             if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
+
+            bool lit = triggering.Any(i => i.Color.Lit);
 
             lock (locker) {
                 if (Disposed) return;

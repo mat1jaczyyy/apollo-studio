@@ -9,7 +9,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //? Yeah wtf
     public class Refresh: Device {
         bool[] _macros = new bool[4];
 
@@ -30,16 +29,13 @@ namespace Apollo.Devices {
             _macros = macros;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
+        public override void MIDIProcess(IEnumerable<Signal> n) {
             /*for (int i = 0; i < 4; i++) {
                 if (_macros[i])
                     n.Macros[i] = (int)Program.Project.GetMacro(i + 1);
-            }
+            }*/
             
-            InvokeExit(n);*/
-
-            // TODO Implement invalidation
-            return n;
+            InvokeExit(n);
         }
         
         public class MacroUndoEntry: SimpleIndexPathUndoEntry<Refresh, bool> {

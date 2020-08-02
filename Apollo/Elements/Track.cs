@@ -137,15 +137,14 @@ namespace Apollo.Elements {
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
             Chain = init?? new Chain();
             Chain.Parent = this;
-            Chain.MIDIExit = i => i;
+            Chain.MIDIExit = Heaven.MIDIEnter;
 
             Launchpad = launchpad;
             Name = name;
         }
 
         void MIDIEnter(Signal n) {
-            if (ParentIndex != null && Enabled && Chain != null)
-                Heaven.MIDIEnter(Chain.MIDIEnter(n));
+            if (ParentIndex != null && Enabled) Chain?.MIDIEnter(n);
         }
 
         public void Dispose() {

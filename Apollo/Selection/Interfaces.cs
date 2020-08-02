@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
 
-using Apollo.Structures;
-
 namespace Apollo.Selection {
     public interface ISelect {
         ISelectViewer IInfo { get; }

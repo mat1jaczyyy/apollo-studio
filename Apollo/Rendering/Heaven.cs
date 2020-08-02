@@ -13,8 +13,8 @@ namespace Apollo.Rendering {
         static Dictionary<long, List<Signal>> signals = new Dictionary<long, List<Signal>>();
         static ConcurrentQueue<List<Signal>> queue = new ConcurrentQueue<List<Signal>>();
 
-        static Dictionary<long, List<Func<IEnumerable<Signal>>>> scheduled = new Dictionary<long, List<Func<IEnumerable<Signal>>>>();
-        static ConcurrentQueue<(long, Func<IEnumerable<Signal>>)> squeue = new ConcurrentQueue<(long, Func<IEnumerable<Signal>>)>();
+        static Dictionary<long, List<Action>> scheduled = new Dictionary<long, List<Action>>();
+        static ConcurrentQueue<(long, Action)> squeue = new ConcurrentQueue<(long, Action)>();
 
         static long prev, sprev;
         static object locker = new object();
@@ -24,7 +24,7 @@ namespace Apollo.Rendering {
             Wake();
         }
         
-        public static void Schedule(Func<IEnumerable<Signal>> job, double time) {
+        public static void Schedule(Action job, double time) {
             squeue.Enqueue(((long)time, job));
             Wake();
         }
@@ -52,11 +52,11 @@ namespace Apollo.Rendering {
                 while (squeue.Any() || scheduled.Any() || queue.Any() || signals.Any()) {
                     if (Program.TimeSpent.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps for non-CFW
 
-                    while (squeue.TryDequeue(out (long a, Func<IEnumerable<Signal>> b) a)) {
+                    while (squeue.TryDequeue(out (long a, Action b) a)) {
                         long target = sprev + a.a + 1;
 
                         if (!scheduled.ContainsKey(target))
-                            scheduled[target] = new List<Func<IEnumerable<Signal>>>();
+                            scheduled[target] = new List<Action>();
 
                         scheduled[target].Add(a.b);
                     }
@@ -66,8 +66,8 @@ namespace Apollo.Rendering {
 
                     for (long i = last + 1; i <= sprev; i++) {
                         if (scheduled.ContainsKey(i)) {
-                            foreach (Func<IEnumerable<Signal>> job in scheduled[i])
-                                Heaven.MIDIEnter(job.Invoke());
+                            foreach (Action job in scheduled[i])
+                                job.Invoke();
                             
                             scheduled.Remove(i);
                         }

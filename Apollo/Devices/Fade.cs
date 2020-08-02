@@ -296,67 +296,57 @@ namespace Apollo.Devices {
 
         ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(i => {
-            /*if (i.Delay > 0) {
-                Heaven.Schedule(() => {
-                    i.Delay = 0;
-                    return MIDIExit.Invoke(MIDIProcess(new [] {i}));
-                }, i.Delay);
+        public override void MIDIProcess(IEnumerable<Signal> n)
+            => InvokeExit(n.SelectMany(i => {
+                Signal k = i.Clone();
+                Signal v = i.Clone();
+
+                k.Color = new Color(0);
+
+                Signal p = buffer.TryGetValue(k, out p)? p : null;
+
+                buffer[k] = v;
+
+                if (i.Color.Lit) {
+                    int index = 0;
+
+                    Signal m = i.Clone();
+                    m.Color = fade[0].Color.Clone();
+
+                    Action next = null;
+                    next = () => {
+                        if (!object.ReferenceEquals(buffer[k], v)) {
+                            if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
+                                v = buffer[k];
+                            
+                            else return;
+                        }
+
+                        if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
+                            index = 0;
+                    
+                        if (index < fade.Count) {
+                            Signal m = i.Clone();
+                            m.Color = fade[index].Color.Clone();
+
+                            if (index < fade.Count - 1) Heaven.Schedule(next, fade[index + 1].Time - fade[index].Time);
+
+                            InvokeExit(new [] {m});
+                        }
+                    };
+
+                    Heaven.Schedule(next, fade[1].Time - fade[0].Time);
+
+                    return new [] {m};
+                
+                } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
+                    buffer[k] = null;
+
+                    return new [] {k};
+                }
 
                 return Enumerable.Empty<Signal>();
-            }*/
-
-            Signal k = i.Clone();
-            Signal v = i.Clone();
-
-            k.Color = new Color(0);
-
-            Signal p = buffer.TryGetValue(k, out p)? p : null;
-
-            buffer[k] = v;
-
-            if (i.Color.Lit) {
-                int index = 0;
-
-                Signal m = i.Clone();
-                m.Color = fade[0].Color.Clone();
-
-                Func<IEnumerable<Signal>> next = null;
-                next = () => {
-                    if (!object.ReferenceEquals(buffer[k], v)) {
-                        if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
-                            v = buffer[k];
-                        
-                        else return Enumerable.Empty<Signal>();
-                    }
-
-                    if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
-                        index = 0;
-                
-                    if (index < fade.Count) {
-                        Signal m = i.Clone();
-                        m.Color = fade[index].Color.Clone();
-
-                        if (index < fade.Count - 1) Heaven.Schedule(next, fade[index + 1].Time - fade[index].Time);
-
-                        return MIDIExit.Invoke(new [] {m});
-                    }
-
-                    return Enumerable.Empty<Signal>();
-                };
-
-                Heaven.Schedule(next, fade[1].Time - fade[0].Time);
-
-                return new [] {m};
-            
-            } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
-                buffer[k] = null;
-
-                return new [] {k};
-            }
-
-            return Enumerable.Empty<Signal>();
-        });
+            }));
 
         protected override void Stop() {
 

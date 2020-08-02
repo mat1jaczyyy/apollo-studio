@@ -72,8 +72,8 @@ namespace Apollo.Elements {
             }
         }
 
-        Func<IEnumerable<Signal>, IEnumerable<Signal>> _midiexit = null;
-        public override Func<IEnumerable<Signal>, IEnumerable<Signal>> MIDIExit {
+        Action<IEnumerable<Signal>> _midiexit = null;
+        public override Action<IEnumerable<Signal>> MIDIExit {
             get => _midiexit;
             set {
                 _midiexit = value;
@@ -81,12 +81,15 @@ namespace Apollo.Elements {
             }
         }
 
-        IEnumerable<Signal> InvokeExit(IEnumerable<Signal> n) {
-            //Info?.Indicator.Trigger(n.Color.Lit); // TODO Heaven indicators
-            return MIDIExit.Invoke(n);
+        void InvokeExit(IEnumerable<Signal> n) {
+            List<Signal> l = n.ToList();
+
+            Info?.Indicator.Trigger(l);
+            MIDIExit?.Invoke(l);
         }
 
         public List<Device> Devices = new List<Device>();
+        Action<IEnumerable<Signal>> _chainenter = null;
 
         void Reroute() {
             for (int i = 0; i < Devices.Count; i++) {
@@ -94,9 +97,14 @@ namespace Apollo.Elements {
                 Devices[i].ParentIndex = i;
             }
             
-            if (Devices.Count > 0) {
+            if (Devices.Count == 0)
+                _chainenter = InvokeExit;
+
+            else {
+                _chainenter = Devices[0].MIDIEnter;
+                
                 for (int i = 1; i < Devices.Count; i++)
-                    Devices[i - 1].MIDIExit = Devices[i].ChainEnter;
+                    Devices[i - 1].MIDIExit = Devices[i].MIDIEnter;
                 
                 Devices[Devices.Count - 1].MIDIExit = InvokeExit;
             }
@@ -192,25 +200,12 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public override IEnumerable<Signal> MIDIEnter(IEnumerable<Signal> n) {
-            n = n.Select(i => i.Clone());
-
-            if (n.FirstOrDefault() is StopSignal) return Travel(n);  // TODO Heaven Stopping stuff
+        public override void MIDIEnter(IEnumerable<Signal> n) {
+            if (n is StopSignal) _chainenter?.Invoke(n);
             else if (Enabled) {
-                Viewer?.Indicator.Trigger();
-                return Travel(n);
+                Viewer?.Indicator.Trigger(n);
+                _chainenter?.Invoke(n);
             }
-
-            return n;
-        }
-
-        IEnumerable<Signal> Travel(IEnumerable<Signal> n) {
-            IEnumerable<Signal> ret = n;
-
-            foreach (Device device in Devices)
-                ret = device.MIDIEnter(ret);
-            
-            return ret;
         }
 
         public void Dispose() {

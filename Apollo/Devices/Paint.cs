@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -8,7 +7,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven complete
+    //+ Heaven compatible
     public class Paint: Device {
         Color _color;
         public Color Color {
@@ -29,12 +28,10 @@ namespace Apollo.Devices {
 
         public Paint(Color color = null): base("paint") => Color = color?? new Color();
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
-            if (i.Color.Lit)
-                i.Color = Color.Clone();
-
-            return i;
-        });
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            /*if (n.Color.Lit) n.Color = Color.Clone();*/
+            InvokeExit(n);
+        }
         
         public class ColorUndoEntry: SimplePathUndoEntry<Paint, Color> {
             protected override void Action(Paint item, Color element) => item.Color = element.Clone();

@@ -9,7 +9,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven complete
+    //+ Heaven compatible
     public class Layer: Device {
         int _target;
         public int Target {
@@ -56,13 +56,13 @@ namespace Apollo.Devices {
             Range = range;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
-            i.Layer = Target;
-            i.BlendingMode = BlendingMode;
-            i.BlendingRange = Range;
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            /*n.Layer = Target;
+            n.BlendingMode = BlendingMode;
+            n.BlendingRange = Range;*/
 
-            return i;
-        });
+            InvokeExit(n);
+        }
         
         public class TargetUndoEntry: SimplePathUndoEntry<Layer, int> {
             protected override void Action(Layer item, int element) => item.Target = element;

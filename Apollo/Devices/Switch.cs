@@ -45,11 +45,11 @@ namespace Apollo.Devices {
             Value = value;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) {
-            if (n.Any(i => !i.Color.Lit))  // TODO If unlit signal has delay, then this go big gay
-                Program.Project.SetMacro(Target, Value);
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            /*if (!n.Color.Lit)
+                Program.Project.SetMacro(Target, Value); */
 
-            return n;
+            InvokeExit(n);
         }
         
         public class TargetUndoEntry: SimplePathUndoEntry<Switch, int> {

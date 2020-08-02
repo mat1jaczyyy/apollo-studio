@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +11,7 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven complete
+    //+ Heaven compatible
     public class Output: Device {
         int _target;
         public int Target {
@@ -75,10 +75,10 @@ namespace Apollo.Devices {
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.Select(i => {
-            i.Source = Launchpad;
-            return i;
-        });
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            //n.Source = Launchpad;
+            InvokeExit(n);
+        }
 
         public override void Dispose() {
             if (Disposed) return;

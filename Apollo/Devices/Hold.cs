@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
@@ -92,8 +93,8 @@ namespace Apollo.Devices {
         
         ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
 
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(s => {
-            /*Signal id = s.With(s.Index, new Color());
+        /*public override Is MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(s => {
+            Signal id = s.With(s.Index, new Color());
             
             if(s.Color.Lit)
                 buffer[id] = s.Color;
@@ -111,9 +112,14 @@ namespace Apollo.Devices {
                 });
                 
                 return new []{ s, off };
-            }*/
+            }
             return Enumerable.Empty<Signal>();
         });
+        */
+        
+        public override void MIDIProcess(IEnumerable<Signal> n) {
+            
+        }
 
         protected override void Stop() {
             
