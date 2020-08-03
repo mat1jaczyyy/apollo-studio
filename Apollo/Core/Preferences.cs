@@ -15,7 +15,7 @@ namespace Apollo.Core {
         static readonly string StatsPath = Path.Combine(Program.UserPath, "Apollo.stats");
 
         public delegate void CheckBoxChanged(bool newValue);
-        public delegate void SmoothnessChanged(double newValue);
+        public delegate void FPSChanged(int newValue);
         public delegate void Changed();
 
         public static event CheckBoxChanged AlwaysOnTopChanged;
@@ -151,20 +151,18 @@ namespace Apollo.Core {
             }
         }
 
-        public static event SmoothnessChanged FadeSmoothnessChanged;
-        public static double FadeSmoothnessSlider { get; private set; } = 1;
-        static double _FadeSmoothness;
-        public static double FadeSmoothness {
-            get => _FadeSmoothness;
+        public static event FPSChanged FPSLimitChanged;
+        static int _FPSLimit;
+        public static int FPSLimit {
+            get => _FPSLimit;
             set {
-                if (FadeSmoothnessSlider == value) return;
+                value = Math.Max(10, Math.Min(500, value));
 
-                if (0 <= value && value <= 1) {
-                    FadeSmoothnessSlider = value;
-                    _FadeSmoothness = 1000 / (1081.45 * Math.Pow(Math.Log(1 - value), 2) + 2);
-                    FadeSmoothnessChanged?.Invoke(_FadeSmoothness);
-                    Save();
-                }
+                if (_FPSLimit == value) return;
+
+                _FPSLimit = value;
+                FPSLimitChanged?.Invoke(_FPSLimit);
+                Save();
             }
         }
 

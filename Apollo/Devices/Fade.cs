@@ -148,9 +148,11 @@ namespace Apollo.Devices {
         public delegate void GeneratedEventHandler(List<FadeInfo> points);
         public event GeneratedEventHandler Generated;
 
-        public void Generate() => Generate(Preferences.FadeSmoothness);
+        public void Generate() => Generate(Preferences.FPSLimit);
 
-        void Generate(double smoothness) {
+        void Generate(int fps) {
+            double frameTime = 1000.0 / fps;
+
             if (_colors.Count < 2 || _positions.Count < 2) return;
             if (_types.Count < _colors.Count - 1) return;
 
@@ -220,12 +222,12 @@ namespace Apollo.Devices {
             fade.Add(fullFade.First());
 
             for (int i = 1; i < fullFade.Count; i++) {
-                double cutoff = fade.Last().Time + smoothness;
+                double cutoff = fade.Last().Time + frameTime;
 
                 if (cutoff < fullFade[i].Time)
                     fade.Add(fullFade[i]);
                     
-                else if (fade.Last().Time + 2 * smoothness <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
+                else if (fade.Last().Time + 2 * frameTime <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
                     fade.Add(fullFade[i].WithTime(cutoff));
             }
 
@@ -287,7 +289,7 @@ namespace Apollo.Devices {
 
             Generate();
 
-            Preferences.FadeSmoothnessChanged += Generate;
+            Preferences.FPSLimitChanged += Generate;
 
             if (Program.Project != null)
                 Program.Project.BPMChanged += Generate;
@@ -355,7 +357,7 @@ namespace Apollo.Devices {
             if (Disposed) return;
 
             Generated = null;
-            Preferences.FadeSmoothnessChanged -= Generate;
+            Preferences.FPSLimitChanged -= Generate;
 
             if (Program.Project != null)
                 Program.Project.BPMChanged -= Generate;

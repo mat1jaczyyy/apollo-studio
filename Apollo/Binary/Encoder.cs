@@ -54,7 +54,7 @@ namespace Apollo.Binary {
             writer.Write(Preferences.AutoCreateMacroFilter);
             writer.Write(Preferences.AutoCreatePattern);
 
-            writer.Write(Preferences.FadeSmoothnessSlider);
+            writer.Write(Preferences.FPSLimit);
 
             writer.Write(Preferences.CopyPreviousFrame);
             writer.Write(Preferences.CaptureLaunchpad);

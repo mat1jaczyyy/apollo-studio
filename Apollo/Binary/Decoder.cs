@@ -75,8 +75,13 @@ namespace Apollo.Binary {
             if (version >= 11) {
                 Preferences.AutoCreatePattern = reader.ReadBoolean();
             }
+            
+            if (version >= 30) {   // TODO Heaven set version >= 31 when done beta testing
+                Preferences.FPSLimit = reader.ReadInt32();
+            } else {
+                Preferences.FPSLimit = Math.Max(180, (int)(1081.45 * Math.Pow(Math.Log(1 - reader.ReadDouble()), 2) + 2));
+            }
 
-            Preferences.FadeSmoothness = reader.ReadDouble();
             Preferences.CopyPreviousFrame = reader.ReadBoolean();
 
             if (version >= 7) {

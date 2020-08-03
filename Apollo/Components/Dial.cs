@@ -79,6 +79,26 @@ namespace Apollo.Components {
             }
         }
 
+        protected double? _errorvalue = null;
+        public double? ErrorValue {
+            get => _errorvalue;
+            set {
+                if (_errorvalue != value) {
+                    _errorvalue = value;
+                    DrawArcAuto();
+                }
+            }
+        }
+
+        string _errortext = "";
+        public string ErrorText {
+            get => _errortext;
+            set {
+                _errortext = value;
+                DrawArcAuto();
+            }
+        }
+
         int _round = 0;
         public int Round {
             get => _round;
@@ -262,6 +282,8 @@ namespace Apollo.Components {
         protected string ValueString => _usingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         protected virtual void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
+            if (Parent != null) ToolTip.SetIsOpen((Control)Parent, false);
+
             double angle_starting = FillStart
                 ? (_centered? angle_center: angle_start)
                 : angle_start - Math.Abs(angle_end - angle_start) * value * 0.94;
@@ -312,11 +334,19 @@ namespace Apollo.Components {
         protected void DrawArcBase() => DrawArc(ArcBase, 1, true);
 
         protected void DrawArcValue() {
-            if (!_usingSteps) DrawArc(Arc, _value, false);
+            if (!_usingSteps) {
+                bool erroring = ErrorValue != null? ErrorValue < RawValue : false;
+
+                DrawArc(Arc, _value, false, erroring? "ErrorBrush" : "ThemeAccentBrush");
+                ToolTip.SetTip((Control)Parent, erroring && ErrorText != ""? ErrorText : null);
+            }
         }
 
         protected void DrawArcSteps() {
-            if (_usingSteps) DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
+            if (_usingSteps) {
+                DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
+                ToolTip.SetTip((Control)Parent, null);
+            }
         }
 
         protected virtual void DrawArcAuto() {
