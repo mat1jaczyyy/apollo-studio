@@ -15,8 +15,11 @@ namespace Apollo.Rendering {
         static SortedDictionary<long, List<Action>> jobs = new SortedDictionary<long, List<Action>>();
         static ConcurrentQueue<(long, Action)> jobQueue = new ConcurrentQueue<(long, Action)>();
 
+        static long lastRender = -1;
+        static bool shouldRender = false;
         static long prev;
-        static object locker = new object();
+
+        static long MSToTicks(double ms) => (long)(ms / 1000 * Stopwatch.Frequency);
 
         public static void MIDIEnter(List<Signal> n) {
             signalQueue.Enqueue(n);
@@ -24,7 +27,7 @@ namespace Apollo.Rendering {
         }
         
         public static void Schedule(Action job, double time) {
-            jobQueue.Enqueue(((long)time, job));
+            jobQueue.Enqueue((MSToTicks(time), job));
             Wake();
         }
 
@@ -34,11 +37,9 @@ namespace Apollo.Rendering {
             if (RenderThread?.IsCompleted == false) return;
 
             RenderThread = Task.Run(() => {
-                prev = Program.TimeSpent.ElapsedMilliseconds - 1;
+                prev = Program.TimeSpent.ElapsedTicks - 1;
                 
-                while (jobQueue.Any() || jobs.Any() || signalQueue.Any()) {
-                    if (Program.TimeSpent.ElapsedMilliseconds <= prev) continue; // TODO Heaven cap fps?
-
+                while (jobQueue.Any() || jobs.Any() || signalQueue.Any() || shouldRender) {
                     while (jobQueue.TryDequeue(out (long Time, Action Job) task)) {
                         long target = prev + task.Time + 1;
 
@@ -49,9 +50,9 @@ namespace Apollo.Rendering {
                     }
 
                     long last = prev;
-                    prev = Program.TimeSpent.ElapsedMilliseconds;
+                    prev = Program.TimeSpent.ElapsedTicks;
 
-                    if (prev - last >= 10) {
+                    if (prev - last >= MSToTicks(10)) {
                         // TODO Heaven Lagspike occurred! Maybe indicate?
                     }
 
@@ -72,8 +73,13 @@ namespace Apollo.Rendering {
                             }
                         });
 
-                    if (changed)
+                    if (changed) shouldRender = true;
+
+                    if (shouldRender && prev > lastRender + MSToTicks(33)) {  // TODO Heaven Read MAX FPS from Preferences
                         Screen.Draw();
+                        lastRender = prev;
+                        shouldRender = false;
+                    }
                 }
             });
         }
