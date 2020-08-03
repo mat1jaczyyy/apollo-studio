@@ -72,7 +72,10 @@ namespace Apollo.Rendering {
                         });
 
                     if (changed && renderAt < 0)
-                        renderAt = Math.Max(prev + MSToTicks(4), lastRender + MSToTicks(33)); // TODO Heaven Read MAX FPS from Preferences
+                        renderAt = Math.Max(
+                            prev + MSToTicks(250.0 / Preferences.FPSLimit),         // Buffer for collecting extra signals
+                            lastRender + MSToTicks(1000.0 / Preferences.FPSLimit)   // FPS limit
+                        );
 
                     else if (renderAt >= 0 && prev > renderAt) {  
                         Screen.Draw();
