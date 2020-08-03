@@ -30,7 +30,11 @@ namespace Apollo.Core {
 
         public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
-        ), ".apollostudio");
+        ), ".apollostudio"
+            #if PRERELEASE
+                + "-prerelease"
+            #endif
+        );
 
         public static readonly string CrashDir = Path.Combine(UserPath, "Crashes");
         public static readonly string CrashProject = Path.Combine(CrashDir, "crash.approj");

@@ -311,7 +311,13 @@ namespace Apollo.Core {
 
         static bool _CheckForUpdates = true;
         public static bool CheckForUpdates {
-            get => _CheckForUpdates;
+            get => 
+                #if PRERELEASE
+                    false
+                #else
+                    _CheckForUpdates
+                #endif
+            ;
             set {
                 if (_CheckForUpdates == value) return;
 

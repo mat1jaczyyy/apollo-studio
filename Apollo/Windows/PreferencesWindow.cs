@@ -196,11 +196,18 @@ namespace Apollo.Windows {
 
             CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
 
+#if !PRERELEASE
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 CheckForUpdates.IsChecked = false;
+#endif
                 CheckForUpdates.IsEnabled = false;
+                
+#if PRERELEASE
+                ToolTip.SetTip((Control)CheckForUpdates.Parent, "Auto-updating is not supported on prerelease");
+#else
                 ToolTip.SetTip((Control)CheckForUpdates.Parent, "Auto-updating is not supported on Linux");
             }
+#endif
 
             UpdateTime(null, EventArgs.Empty);
             Timer = new DispatcherTimer() {
