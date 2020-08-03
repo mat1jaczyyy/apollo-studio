@@ -15,9 +15,7 @@ namespace Apollo.Rendering {
         static SortedDictionary<long, List<Action>> jobs = new SortedDictionary<long, List<Action>>();
         static ConcurrentQueue<(long, Action)> jobQueue = new ConcurrentQueue<(long, Action)>();
 
-        static long lastRender = -1;
-        static bool shouldRender = false;
-        static long prev;
+        static long prev, lastRender = -1, renderAt = -1;
 
         static long MSToTicks(double ms) => (long)(ms / 1000 * Stopwatch.Frequency);
 
@@ -39,7 +37,7 @@ namespace Apollo.Rendering {
             RenderThread = Task.Run(() => {
                 prev = Program.TimeSpent.ElapsedTicks - 1;
                 
-                while (jobQueue.Any() || jobs.Any() || signalQueue.Any() || shouldRender) {
+                while (renderAt >= 0 || jobQueue.Any() || jobs.Any() || signalQueue.Any()) {
                     while (jobQueue.TryDequeue(out (long Time, Action Job) task)) {
                         long target = prev + task.Time + 1;
 
@@ -73,12 +71,13 @@ namespace Apollo.Rendering {
                             }
                         });
 
-                    if (changed) shouldRender = true;
+                    if (changed && renderAt < 0)
+                        renderAt = Math.Max(prev + MSToTicks(4), lastRender + MSToTicks(33)); // TODO Heaven Read MAX FPS from Preferences
 
-                    if (shouldRender && prev > lastRender + MSToTicks(33)) {  // TODO Heaven Read MAX FPS from Preferences
+                    else if (renderAt >= 0 && prev > renderAt) {  
                         Screen.Draw();
                         lastRender = prev;
-                        shouldRender = false;
+                        renderAt = -1;
                     }
                 }
             });
