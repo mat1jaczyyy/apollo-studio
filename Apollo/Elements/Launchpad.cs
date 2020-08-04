@@ -477,7 +477,7 @@ namespace Apollo.Elements {
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
-        static IEnumerable<byte> excludedIndexes = new byte[]{ 0, 9, 90, 99 };
+        static HashSet<byte> excludedIndexes = new HashSet<byte>() {0, 9, 90, 99};
 
         bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
             ret = null;
