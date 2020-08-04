@@ -299,10 +299,8 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.SelectMany(i => {
-                Signal k = i.Clone();
+                Signal k = i.With(color: new Color(0));
                 Signal v = i.Clone();
-
-                k.Color = new Color(0);
 
                 Signal p = buffer.TryGetValue(k, out p)? p : null;
 
@@ -310,12 +308,8 @@ namespace Apollo.Devices {
 
                 if (i.Color.Lit) {
                     int index = 0;
-
-                    Signal m = i.Clone();
-                    m.Color = fade[0].Color.Clone();
-
-                    Action next = null;
-                    next = () => {
+                    
+                    void Next() {
                         if (!object.ReferenceEquals(buffer[k], v)) {
                             if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
                                 v = buffer[k];
@@ -327,18 +321,15 @@ namespace Apollo.Devices {
                             index = 0;
                     
                         if (index < fade.Count) {
-                            Signal m = i.Clone();
-                            m.Color = fade[index].Color.Clone();
+                            if (index < fade.Count - 1) Heaven.Schedule(Next, fade[index + 1].Time - fade[index].Time);
 
-                            if (index < fade.Count - 1) Heaven.Schedule(next, fade[index + 1].Time - fade[index].Time);
-
-                            InvokeExit(new List<Signal>() {m});
+                            InvokeExit(new List<Signal>() {i.With(color: fade[index].Color.Clone())});
                         }
                     };
 
-                    Heaven.Schedule(next, fade[1].Time - fade[0].Time);
+                    Heaven.Schedule(Next, fade[1].Time - fade[0].Time);
 
-                    return new [] {m};
+                    return new [] {i.With(color: fade[0].Color.Clone())};
                 
                 } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
                     buffer[k] = null;

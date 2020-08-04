@@ -282,7 +282,7 @@ namespace Apollo.Components {
         protected string ValueString => _usingSteps? _length.ToString() : $"{((_centered && RawValue > 0)? "+" : "")}{RawValue}{Unit}";
 
         protected virtual void DrawArc(Path Arc, double value, bool overrideBase, string color = "ThemeAccentBrush") {
-            if (Parent != null) ToolTip.SetIsOpen((Control)Parent, false);
+            if (Parent is Control control) ToolTip.SetIsOpen(control, false);
 
             double angle_starting = FillStart
                 ? (_centered? angle_center: angle_start)
@@ -338,14 +338,14 @@ namespace Apollo.Components {
                 bool erroring = ErrorValue != null? ErrorValue < RawValue : false;
 
                 DrawArc(Arc, _value, false, erroring? "ErrorBrush" : "ThemeAccentBrush");
-                if(Parent != null) ToolTip.SetTip((Control)Parent, erroring && ErrorText != ""? ErrorText : null);
+                if (Parent is Control control) ToolTip.SetTip(control, erroring && ErrorText != ""? ErrorText : null);
             }
         }
 
         protected void DrawArcSteps() {
             if (_usingSteps) {
                 DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
-                if(Parent != null) ToolTip.SetTip((Control)Parent, null);
+                if (Parent is Control control) ToolTip.SetTip(control, null);
             }
         }
 

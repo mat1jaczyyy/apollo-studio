@@ -92,41 +92,40 @@ namespace Apollo.Devices {
         
         ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
         
-        public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
-            if (Hold) {
-                Signal k = s.Clone();
-                k.Color = new Color();
-                
-                if (s.Color.Lit) { 
-                    buffer[k] = s;
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.SelectMany(s => {
+                if (Hold) {
+                    Signal k = s.With(color: new Color());
                     
-                    Action next = null;
-                    next = () => {
-                        if(buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
-                            Heaven.Schedule(next, _rate * _gate);
-                            InvokeExit(new List<Signal>() { s });
+                    if (s.Color.Lit) { 
+                        buffer[k] = s;
+                        
+                        void Next() {
+                            if (buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
+                                Heaven.Schedule(Next, _rate * _gate);
+                                InvokeExit(new List<Signal>() {s});
+                            }
+                        };
+                        
+                        Heaven.Schedule(Next, _rate * _gate);
+
+                    } else buffer.TryRemove(k, out _);
+                    
+                } else {
+                    int index = 1;
+                    
+                    void Next() {
+                        if (++index <= Repeats) {
+                            Heaven.Schedule(Next, _rate * _gate);
+                            InvokeExit(new List<Signal>() {s});
                         }
                     };
                     
-                    Heaven.Schedule(next, _rate * _gate);
+                    Heaven.Schedule(Next, _rate * _gate);
                 }
-                else buffer.TryRemove(k, out _);
-                
-            } else {
-                int index = 1;
-                Action next = null;
-                
-                next = () => {
-                    if(++index <= Repeats) {
-                        Heaven.Schedule(next, _rate * _gate);
-                        InvokeExit(new List<Signal>() { s });
-                    }
-                };
-                
-                Heaven.Schedule(next, _rate * _gate);
-            }
-            return new [] { s.Clone() };
-        }).ToList());
+
+                return new [] {s.Clone()};
+            }).ToList());
 
         protected override void Stop() {
             
