@@ -338,14 +338,14 @@ namespace Apollo.Components {
                 bool erroring = ErrorValue != null? ErrorValue < RawValue : false;
 
                 DrawArc(Arc, _value, false, erroring? "ErrorBrush" : "ThemeAccentBrush");
-                ToolTip.SetTip((Control)Parent, erroring && ErrorText != ""? ErrorText : null);
+                if(Parent != null) ToolTip.SetTip((Control)Parent, erroring && ErrorText != ""? ErrorText : null);
             }
         }
 
         protected void DrawArcSteps() {
             if (_usingSteps) {
                 DrawArc(Arc, _length.Step / 9.0, false, "ThemeExtraBrush");
-                ToolTip.SetTip((Control)Parent, null);
+                if(Parent != null) ToolTip.SetTip((Control)Parent, null);
             }
         }
 
