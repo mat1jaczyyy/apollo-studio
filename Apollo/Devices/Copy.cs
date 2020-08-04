@@ -440,43 +440,6 @@ namespace Apollo.Devices {
                 ScreenOutput(new []{ m });
                 Heaven.Schedule(() => HandleRandomLoop(original, offsets), _time * _gate);
             }
-            
-            // Signal n = original.With(original.Index, new Color());
-            // Signal m = original.Clone();
-
-            // if (!locker.ContainsKey(n)) locker[n] = new object();
-
-            // lock (locker[n]) {
-            //     if (!buffer.ContainsKey(n)) {
-            //         if (!m.Color.Lit) return;
-            //         buffer[n] = RNG.Next(offsets.Count);
-            //         m.Index = (byte)offsets[buffer[n]];
-
-            //     } else {
-            //         Signal o = original.Clone();
-            //         o.Index = (byte)offsets[buffer[n]];
-            //         o.Color = new Color(0);
-            //         ScreenOutput(o, original.Clone());
-
-            //         if (m.Color.Lit) {
-            //             if (offsets.Count > 1) {
-            //                 int old = buffer[n];
-            //                 buffer[n] = RNG.Next(offsets.Count - 1);
-            //                 if (buffer[n] >= old) buffer[n]++;
-            //             }
-            //             m.Index = (byte)offsets[buffer[n]];
-                    
-            //         } else buffer.Remove(n, out _);
-            //     }
-
-            //     if (buffer.ContainsKey(n)) {
-            //         ScreenOutput(m, original.Clone());
-            //         FireCourier((original, offsets), _time * _gate);
-            //     } else {
-            //         timers[n].Dispose();
-            //         timers.Remove(n, out _);
-            //     }
-            // }
         }
         
         ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
