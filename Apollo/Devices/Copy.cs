@@ -10,6 +10,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -231,11 +232,9 @@ namespace Apollo.Devices {
         }
         
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-
-        /*
-        public override IEnumerable<Signal> MIDIProcess(IEnumerable<Signal> n) => ScreenOutput(n.SelectMany(s => {
-            /*if (s.Index == 100)
-                return new []{ s.Clone() };
+        
+        public override void MIDIProcess(List<Signal> n) => ScreenOutput(n.SelectMany((s => {
+            if (s.Index == 100) return new []{ s.Clone() };
             
             int px = s.Index % 10;
             int py = s.Index / 10;
@@ -315,7 +314,7 @@ namespace Apollo.Devices {
                 px = _x;
                 py = _y;
             }
-            
+                    
             switch(CopyMode) {
             case CopyType.Static:
                 return validOffsets.Select(offset => {
@@ -323,30 +322,33 @@ namespace Apollo.Devices {
                     m.Index = (byte)offset;
                     return m;
                 });
-                
             case CopyType.Interpolate:
                 validOffsets = interpolatedOffsets;
                 goto case CopyType.Animate;
-                
+            
+            
             case CopyType.Animate:
                 if (Reverse) validOffsets.Reverse();
                 
                 double total = _time * _gate * (validOffsets.Count - 1);
                 
-                return validOffsets.SelectMany((offset, index) => {
-                    if (offset == -1 || !(
-                        !Infinite || 
-                        index < validOffsets.Count - 1 || 
-                        s.Color.Lit
-                    )) 
-                        return Enumerable.Empty<Signal>();
-                    
-                    Signal signal = s.Clone();
-                    signal.Delay += (int)Pincher.ApplyPinch(_time * _gate * index, total, Pinch, Bilateral);
-                    signal.Index = (byte)offset;
-                    return new []{ signal };
-                });
-                
+                int index = 0;
+                Action next = null;
+                next = () => {
+                    index++;
+                    if(index < validOffsets.Count) {
+                        if(index < validOffsets.Count - 1) Heaven.Schedule(next, Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) - Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral));
+                        
+                        if(validOffsets[index] == -1 || !(!Infinite || index < validOffsets.Count - 1 || s.Color.Lit)) return;
+                        
+                        Signal m = s.Clone();
+                        m.Index = (byte)validOffsets[index];
+                        ScreenOutput(new []{m});
+                    }
+                };
+                Heaven.Schedule(next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
+                return new []{ s.Clone() };
+            
             case CopyType.RandomSingle:
                 Signal m = s.Clone();
                 s.Color = new Color();
@@ -362,56 +364,124 @@ namespace Apollo.Devices {
                 return new []{ m };
             
             case CopyType.RandomLoop:
-                Signal k = s.With(s.Index, new Color());
+                Signal k = s.Clone();
+                k.Color = new Color();
+                Signal v = s.Clone();
                 
-                return HandleRandomLoop(s, k, validOffsets);
-            }*//*
-            
-            return Enumerable.Empty<Signal>();
-        }));
-        */
-
-        public override void MIDIProcess(List<Signal> n) {
-            
-        }
-
-        /*IEnumerable<Signal> HandleRandomLoop(Signal o, Signal k, List<int> offsets) {            
-            IEnumerable<Signal> ret = Enumerable.Empty<Signal>();
-            
-            if (o.Color.Lit) {
-                if (!buffer.ContainsKey(k)) buffer[k] = RNG.Next(offsets.Count);
-                else if (offsets.Count > 1) {
-                    int old = buffer[k];
-                    buffer[k] = RNG.Next(offsets.Count - 1);
-                    if (buffer[k] >= old) buffer[k]++;
+                if(!buffer.ContainsKey(k)) {
+                    if(!v.Color.Lit) break;
+                    buffer[k] = RNG.Next(validOffsets.Count);
+                    v.Index = (byte)validOffsets[buffer[k]];
+                } else {
+                    if(v.Color.Lit) break;
+                    v.Index = (byte)validOffsets[buffer[k]];
+                    buffer.Remove(k, out _);
+                    return new []{ v };
                 }
                 
-                Signal on = o.With((byte)offsets[buffer[k]], o.Color.Clone());
-                Signal off = on.With(on.Index, new Color(0));
+                if (validOffsets.Count > 1) {
+                    Action randNext = null;
+                    randNext = () => {
+                        IEnumerable ret = Enumerable.Empty<Signal>();
+                        
+                        if(buffer.Keys.Any(key => ReferenceEquals(key, k))){
+                            int old = buffer[k];
+                            
+                            Signal o = s.Clone();
+                            o.Color = new Color(0);
+                            o.Index = (byte)validOffsets[old];
+                            
+                            buffer[k] = RNG.Next(validOffsets.Count - 1);
+                            if(buffer[k] >= old) buffer[k]++;
+                            
+                            Signal n = s.Clone();
+                            n.Index = (byte)validOffsets[buffer[k]];
+                            
+                            Heaven.Schedule(randNext, _time * _gate);
+                            
+                            ScreenOutput(new []{ o, n });
+                        }
+                    };
+                    
+                    Heaven.Schedule(randNext, _time * _gate);
+                }
                 
-                off.Delay += (int)(_time * _gate);
-                off.AddValidator((out IEnumerable<Signal> extra) => {
-                    if (buffer.ContainsKeyReference(k)) {
-                        extra = MIDIExit.Invoke(HandleRandomLoop(o, k, offsets));
-                        return true;
-                    } else {
-                        extra = Enumerable.Empty<Signal>();
-                        return false;
-                    }
-                });
-                
-                ret = ret.Concat(new []{ on, off });
-            } else {
-                ret = ret.Append(o.With((byte)offsets[buffer[k]], new Color(0)));
-                buffer.Remove(k, out _);
-            };
+                return new []{ v };
+            }
+            return Enumerable.Empty<Signal>();
             
-            return ret;
-        }*/
+        })));
+        
+        void HandleRandomLoop(Signal original, List<int> offsets) {
+            Signal k = original.With(original.Index, new Color());
+            Signal m = original.Clone();
+            
+            if(!buffer.ContainsKey(k)) {
+                if(!m.Color.Lit) return;
+                buffer[k] = RNG.Next(offsets.Count);
+                m.Index = (byte)offsets[buffer[k]];
+            } else {
+                Signal o = original.Clone();
+                o.Index = (byte)offsets[buffer[k]];
+                o.Color = new Color(0);
+                ScreenOutput(new []{ o });
+                
+                if(m.Color.Lit) {
+                    if(offsets.Count > 1) {
+                        int old = buffer[k];
+                        buffer[k] = RNG.Next(offsets.Count - 1);
+                        if(buffer[k] >= old) buffer[k]++;
+                    }
+                    m.Index = (byte)offsets[buffer[k]];
+                } else buffer.Remove(k, out _);
+            }
+            
+            if(buffer.ContainsKey(k)) {
+                ScreenOutput(new []{ m });
+                Heaven.Schedule(() => HandleRandomLoop(original, offsets), _time * _gate);
+            }
+            
+            // Signal n = original.With(original.Index, new Color());
+            // Signal m = original.Clone();
+
+            // if (!locker.ContainsKey(n)) locker[n] = new object();
+
+            // lock (locker[n]) {
+            //     if (!buffer.ContainsKey(n)) {
+            //         if (!m.Color.Lit) return;
+            //         buffer[n] = RNG.Next(offsets.Count);
+            //         m.Index = (byte)offsets[buffer[n]];
+
+            //     } else {
+            //         Signal o = original.Clone();
+            //         o.Index = (byte)offsets[buffer[n]];
+            //         o.Color = new Color(0);
+            //         ScreenOutput(o, original.Clone());
+
+            //         if (m.Color.Lit) {
+            //             if (offsets.Count > 1) {
+            //                 int old = buffer[n];
+            //                 buffer[n] = RNG.Next(offsets.Count - 1);
+            //                 if (buffer[n] >= old) buffer[n]++;
+            //             }
+            //             m.Index = (byte)offsets[buffer[n]];
+                    
+            //         } else buffer.Remove(n, out _);
+            //     }
+
+            //     if (buffer.ContainsKey(n)) {
+            //         ScreenOutput(m, original.Clone());
+            //         FireCourier((original, offsets), _time * _gate);
+            //     } else {
+            //         timers[n].Dispose();
+            //         timers.Remove(n, out _);
+            //     }
+            // }
+        }
         
         ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        IEnumerable<Signal> ScreenOutput(IEnumerable<Signal> n) => n.SelectMany(s => {
+        void ScreenOutput(IEnumerable<Signal> n) => InvokeExit(n.SelectMany(s => {
             bool on = s.Color.Lit;
             Signal m = s.With(s.Index, new Color());
             
@@ -427,7 +497,7 @@ namespace Apollo.Devices {
             }
             
             return Enumerable.Empty<Signal>();
-        });
+        }).ToList());
         
         protected override void Stop() {
 
