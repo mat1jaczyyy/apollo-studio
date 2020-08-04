@@ -6,6 +6,7 @@ using System.Linq;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -91,34 +92,28 @@ namespace Apollo.Devices {
         }
         
         ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
-
-        /*public override Is MIDIProcess(IEnumerable<Signal> n) => n.SelectMany(s => {
-            Signal id = s.With(s.Index, new Color());
-            
-            if(s.Color.Lit)
-                buffer[id] = s.Color;
-            
-            if (s.Color.Lit ^ Release) {
-                s.Color = buffer[id];
-                
-                if (Infinite) return new [] { s };
-                
-                Signal off = s.With(s.Index, new Color(0));
-                off.Delay += (int)(_time * _gate);
-                off.AddValidator((out IEnumerable<Signal> extra) => {
-                    extra = Enumerable.Empty<Signal>();
-                    return ReferenceEquals(buffer[id], s.Color);
-                });
-                
-                return new []{ s, off };
-            }
-            return Enumerable.Empty<Signal>();
-        });
-        */
         
-        public override void MIDIProcess(List<Signal> n) {
+        public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
+            Signal k = s.With(color: new Color());
             
-        }
+            if (s.Color.Lit)
+                buffer[k] = s.Color;
+            
+            if (s.Color.Lit != Release) {
+                s.Color = buffer[k];
+                
+                if (Infinite) return new [] {s};
+                
+                Heaven.Schedule(() => {
+                    if (ReferenceEquals(buffer[k], s.Color))
+                        InvokeExit(new List<Signal>() {s.With(color: new Color(0))});
+                }, _time * _gate);
+                
+                return new [] {s};
+            }
+            
+            return Enumerable.Empty<Signal>();
+        }).ToList());
 
         protected override void Stop() {
             
