@@ -477,19 +477,21 @@ namespace Apollo.Elements {
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
-
+        static IEnumerable<byte> excludedIndexes = new byte[]{ 0, 9, 90, 99 };
 
         bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
             ret = null;
             
             if (Type != LaunchpadType.CFW) return false;
 
-            IEnumerable<Color> colors = updates.Select(i => i.Color).Distinct();
+            List<RawUpdate> filteredUpdates = updates.Where(u => !excludedIndexes.Contains(u.Index)).ToList();
+
+            IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
             if (colors.Count() > 79) return false;
 
             ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
                 colors.SelectMany(i => {
-                    IEnumerable<byte> positions = updates.Where(j => j.Color == i).Select(j => j.Index).Except(new byte[] {0, 9, 90, 99}).Select(j => j == 100? (byte)99 : j);
+                    IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index).Select(j => j == 100? (byte)99 : j);
                     IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
                     List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
 
