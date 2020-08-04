@@ -51,7 +51,9 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n)
-            => InvokeExit(n.Where(i => i.Index == 100).Concat(n.SelectMany(i => {
+            => InvokeExit(n.SelectMany((i => {
+                if (i.Index == 100) return new [] {i};
+
                 if (Offset.Apply(i.Index, GridMode, Wrap, out int x, out int y, out int result)) {
                     i.Index = (byte)result;
                     return new [] {i};
