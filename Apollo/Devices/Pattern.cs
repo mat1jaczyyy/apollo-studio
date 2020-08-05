@@ -14,6 +14,7 @@ using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 using Apollo.Windows;
+using Apollo.Rendering;
 
 namespace Apollo.Devices {
     public class Pattern: Device, ISelectParent {
@@ -252,9 +253,174 @@ namespace Apollo.Devices {
              
             return false;
         }
+        
+        Dictionary<Signal, (Signal, int)> buffer = new Dictionary<Signal, (Signal, int)>();
+        Signal monoRoot = null;
+        int monoFrame = -1;
+        Signal loopRoot = null;
+        int loopFrame = -1;
+        
+        void ScheduleWithPinch(Action Next, Time time, ref double total) {
+            total += time * _gate;
+            Heaven.Schedule(Next, ApplyPinch(total) - ApplyPinch(total - time * _gate));
+        }
 
         public override void MIDIProcess(List<Signal> n) {
-            // TODO implement
+            if (n.Count == 0) return;
+            
+            if (Frames.Count > 0) {
+                Signal root = n.LastOrDefault(i => i.Color.Lit);
+                
+                switch (Mode) {
+                    case PlaybackType.Mono:
+                        if (!(root is null)) {
+                            List<Signal> ret = new List<Signal>();
+                            
+                            if (monoFrame >= 0 && !(monoRoot is null)) 
+                                for (int i = 0; i < Frames[monoFrame % Frames.Count].Screen.Length; i++)
+                                    if (Frames[monoFrame % Frames.Count].Screen[i].Lit && ApplyRootKey(i, monoRoot.Index, out int index))
+                                        ret.Add(monoRoot.With((byte)index, new Color(0)));
+                            
+                            monoFrame = 0;
+                            monoRoot = root;
+                            double total = 0;
+                            
+                            for (int i = 0; i < Frames[0].Screen.Length; i++)
+                                if (Frames[0].Screen[i].Lit && ApplyRootKey(i, monoRoot.Index, out int index))
+                                    ret.Add(monoRoot.With((byte)index, Frames[0].Screen[i].Clone()));
+                            
+                            void Next() {
+                                if (!ReferenceEquals(monoRoot, root)) return;
+                                List<Signal> ret = new List<Signal>();
+                                
+                                if (++monoFrame < Frames.Count * AdjustedRepeats) {
+                                    for (int i = 0; i < Frames[monoFrame % Frames.Count].Screen.Length; i++) 
+                                        if (Frames[monoFrame % Frames.Count].Screen[i] != Frames[(monoFrame - 1) % Frames.Count].Screen[i]
+                                            && ApplyRootKey(i, monoRoot.Index, out int index))
+                                            
+                                            ret.Add(monoRoot.With((byte)index, Frames[monoFrame % Frames.Count].Screen[i].Clone()));
+                                    
+                                    ScheduleWithPinch(Next, Frames[monoFrame % Frames.Count].Time, ref total);
+                                }
+                                else {
+                                    if (!Infinite) 
+                                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
+                                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, root.Index, out int index))
+                                                ret.Add(root.With((byte)index, new Color(0)));
+                                    
+                                    monoFrame = -1;
+                                    monoRoot = null;
+                                }
+                                    
+                                InvokeExit(ret);
+                            }
+                            
+                            ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                            InvokeExit(ret);
+                        }
+                        break;
+                        
+                    case PlaybackType.Poly:
+                        foreach (Signal s in n.Where(s => s.Color.Lit)) {
+                            List<Signal> ret = new List<Signal>();
+                            
+                            int frameIndex = 0;
+                            double total = 0;
+                            
+                            for (int i = 0; i < Frames[0].Screen.Length; i++)
+                                if (Frames[0].Screen[i].Lit && ApplyRootKey(i, s.Index, out int index))
+                                    ret.Add(s.With((byte)index, Frames[0].Screen[i].Clone()));
+
+                            void Next() {
+                                List<Signal> ret = new List<Signal>();
+                                
+                                if (++frameIndex < Frames.Count * AdjustedRepeats) {
+                                    for (int i = 0; i < Frames[frameIndex % Frames.Count].Screen.Length; i++) 
+                                        if (Frames[frameIndex % Frames.Count].Screen[i] != Frames[(frameIndex - 1) % Frames.Count].Screen[i]
+                                            && ApplyRootKey(i, s.Index, out int index))
+                                            
+                                            ret.Add(s.With((byte)index, Frames[frameIndex % Frames.Count].Screen[i].Clone()));
+                                    
+                                    ScheduleWithPinch(Next, Frames[frameIndex % Frames.Count].Time, ref total);
+                                }
+                                else if (!Infinite) 
+                                    for (int i = 0; i < Frames.Last().Screen.Length; i++) 
+                                        if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, s.Index, out int index))
+                                            ret.Add(s.With((byte)index, new Color(0)));
+                                    
+                                InvokeExit(ret);
+                            }
+                            
+                            ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                            InvokeExit(ret);
+                        }
+                        break;
+                        
+                    case PlaybackType.Loop:
+                        if (!(root is null)) {
+                            List<Signal> ret = new List<Signal>();
+                            
+                            if (loopFrame >= 0 && !(loopRoot is null)) 
+                                for (int i = 0; i < Frames[loopFrame].Screen.Length; i++)
+                                    if (Frames[loopFrame].Screen[i].Lit && ApplyRootKey(i, loopRoot.Index, out int index))
+                                        ret.Add(loopRoot.With((byte)index, new Color(0)));
+                            
+                            for (int i = 0; i < Frames[0].Screen.Length; i++)
+                                if (Frames[0].Screen[i].Lit && ApplyRootKey(i, root.Index, out int index))
+                                    ret.Add(root.With((byte)index, Frames[0].Screen[i].Clone()));
+                            
+                            loopFrame = 0;
+                            loopRoot = root;
+                            
+                            double total = 0;
+                            
+                            void Next() {
+                                if (!ReferenceEquals(loopRoot, root)) return;
+                                List<Signal> nextRet = new List<Signal>();
+                                
+                                if (++loopFrame < Frames.Count) {
+                                    for (int i = 0; i < Frames[loopFrame].Screen.Length; i++) 
+                                        if ((loopFrame > 0 && Frames[loopFrame].Screen[i] != Frames[loopFrame - 1].Screen[i])
+                                            && ApplyRootKey(i, root.Index, out int index))
+                                            
+                                            nextRet.Add(root.With((byte)index, Frames[loopFrame].Screen[i].Clone()));
+                                    
+                                    ScheduleWithPinch(Next, Frames[loopFrame].Time, ref total);
+                                } else {
+                                    for (int i = 0; i < Frames[0].Screen.Length; i++)
+                                        if ((Infinite ? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames.Last().Screen[i]) && ApplyRootKey(i, loopRoot.Index, out int index))
+                                            nextRet.Add(loopRoot.With((byte)index, Frames[0].Screen[i].Clone()));
+                                            
+                                    loopFrame = 0;
+                                    
+                                    ScheduleWithPinch(Next, Frames.Last().Time, ref total);
+                                }
+                                    
+                                InvokeExit(nextRet);
+                            }
+                            
+                            ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                            InvokeExit(ret); 
+                        }
+                        else {
+                            if (loopFrame > -1 && !(loopRoot is null) && 
+                               (!Infinite || loopFrame != Frames.Count - 1)) {
+                                    
+                                List<Signal> ret = new List<Signal>();
+                                
+                                for (int i = 0; i < Frames[loopFrame].Screen.Length; i++) 
+                                    if (Frames[loopFrame].Screen[i].Lit && ApplyRootKey(i, loopRoot.Index, out int index))
+                                        ret.Add(loopRoot.With((byte)index, new Color(0)));
+                                
+                                InvokeExit(ret);
+                            }
+                                
+                            loopFrame = -1;
+                            loopRoot = null;
+                        }
+                        break;
+                }
+            }
         }
 
         protected override void Stop() {
