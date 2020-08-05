@@ -94,7 +94,7 @@ namespace Apollo.Devices {
         ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
         
         public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
-            Signal k = s.With(color: new Color());
+            Signal k = s.With(color: new Color(0));
             
             if (s.Color.Lit)
                 buffer[k] = s.Color;
@@ -102,17 +102,15 @@ namespace Apollo.Devices {
             if (s.Color.Lit != Release) {
                 s.Color = buffer[k];
                 
-                if (Infinite) return new [] {s};
-                
-                Heaven.Schedule(() => {
+                if (!Infinite) Heaven.Schedule(() => {
                     if (ReferenceEquals(buffer[k], s.Color))
-                        InvokeExit(new List<Signal>() {s.With(color: new Color(0))});
+                        InvokeExit(new List<Signal>() {k});
                 }, _time * _gate);
                 
                 return new [] {s};
             }
             
-            return Enumerable.Empty<Signal>();
+            return Enumerable.Empty<Signal>(); 
         }).ToList());
 
         protected override void Stop() {

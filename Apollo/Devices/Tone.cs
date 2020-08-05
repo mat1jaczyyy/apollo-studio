@@ -8,7 +8,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Tone: Device {
         double _h, _sh, _sl, _vh, _vl;
 
