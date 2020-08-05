@@ -478,7 +478,7 @@ namespace Apollo.Windows {
 
         void RenderHistory() {
             if (!historyShowing) return;
-            ColorHistory.Render(Launchpad, this);
+            ColorHistory.Render(Launchpad);
         }
 
         Color drawingState;

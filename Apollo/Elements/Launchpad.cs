@@ -393,7 +393,7 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public void Send(Signal n) {} //=> Send(null, new List<Signal>() {n});
+        public void DirectSend(RawUpdate n) => RGBSend(new List<RawUpdate>() {n});
         
         public virtual void Send(List<RawUpdate> n, Color[] snapshot) {
             if (!n.Any() || !Usable) return;
