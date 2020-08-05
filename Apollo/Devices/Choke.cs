@@ -46,23 +46,19 @@ namespace Apollo.Devices {
         }
 
         bool choked = true;
-        object locker = new object();
-        //ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
+        ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
 
         void HandleChoke(Choke sender, int index) {
-            /*if (Target == index && sender != this && !choked) {
+            if (Target == index && sender != this && !choked) {
                 choked = true;
-                Chain.MIDIEnter(StopSignal.Create());
+                Chain.MIDIEnter(StopSignal.Instance);
                 
-                lock (locker) {
-                    foreach (Signal i in signals.Values) {
-                        i.Color = new Color(0);
-                        InvokeExit(i);
-                    }
+                List<Signal> o = signals.Values.ToList();
+                o.ForEach(i => i.Color = new Color(0));
+                InvokeExit(o);
 
-                    signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
-                }
-            }*/
+                signals.Clear();
+            }
         }
 
         public override Device Clone() => new Choke(Target, Chain.Clone()) {
@@ -77,30 +73,40 @@ namespace Apollo.Devices {
             Choked += HandleChoke;
         }
 
-        void ChainExit(IEnumerable<Signal> n) {
-            /*if (!choked) {
-                InvokeExit(n.Clone());
-                
-                lock (locker) {
-                    (Launchpad, int, int) index = (n.Source, n.Index, -n.Layer);
-                    if (n.Color.Lit) signals[index] = n.Clone();
-                    else if (signals.ContainsKey(index)) signals.TryRemove(index, out _);
-                }
-            }*/
+        void ChainExit(List<Signal> n) {
+            if (choked) return;
+
+            InvokeExit(n);
+            
+            n.ForEach(i => {
+                (Launchpad, int, int) index = (i.Source, i.Index, -i.Layer);
+                if (i.Color.Lit) signals[index] = i.Clone();
+                else if (signals.ContainsKey(index)) signals.TryRemove(index, out _);
+            });
         }
 
         public override void MIDIProcess(List<Signal> n) {
-            /*if (choked && n.Color.Lit) {
-                Choked?.Invoke(this, Target);
-                choked = false;
+            IEnumerable<Signal> o = n;
+
+            if (choked) {
+                IEnumerable<Signal> m = n.SkipWhile(i => !i.Color.Lit);
+
+                if (m.Any()) {
+                    Choked?.Invoke(this, Target);
+                    choked = false;
+
+                    o = m;
+                }
             }
 
-            if (!choked) Chain.MIDIEnter(n);  // TODO Heaven There was a .Clone here, maybe .Select(i => i.Clone()).ToList()?
-            */
+            if (!choked) Chain.MIDIEnter(o.Select(i => i.Clone()).ToList());  // TODO Heaven There was a .Clone here, maybe .Select(i => i.Clone()).ToList()?
         }
         
         protected override void Stopped() {
             Chain.MIDIEnter(StopSignal.Instance);
+
+            signals.Clear();
+            choked = false;
         }
 
         public override void Dispose() {
