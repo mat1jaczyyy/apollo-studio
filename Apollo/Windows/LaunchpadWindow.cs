@@ -106,6 +106,8 @@ namespace Apollo.Windows {
 
         public void Render(RawUpdate n) => Grid.RawUpdate(n);
 
+        public void Clear() => Dispatcher.UIThread.InvokeAsync(Grid.Clear);
+    
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
