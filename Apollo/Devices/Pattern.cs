@@ -256,7 +256,7 @@ namespace Apollo.Devices {
 
             result = y * 10 + x;
 
-            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9)
                 return true;
             
             if (y == -1 && 4 <= x && x <= 5) {
