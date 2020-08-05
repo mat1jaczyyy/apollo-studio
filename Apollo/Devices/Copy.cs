@@ -15,7 +15,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //! Heaven incompatible
     public class Copy: Device {
         Random RNG = new Random();
         

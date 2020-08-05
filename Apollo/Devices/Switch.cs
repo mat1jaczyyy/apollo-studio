@@ -9,7 +9,6 @@ using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    //+ Heaven compatible
     public class Switch: Device {
         int _target = 1;
         public int Target {
