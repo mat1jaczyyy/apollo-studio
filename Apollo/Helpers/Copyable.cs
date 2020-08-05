@@ -40,13 +40,13 @@ namespace Apollo.Helpers {
             string b64 = await Application.Current.Clipboard.GetTextAsync();
 
             if (b64 == null) return null;
-            
-            using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(b64)))
-                try {
+
+            try {
+                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(b64)))
                     return await Decoder.Decode<Copyable>(ms);
-                } catch (Exception) {
-                    return null;
-                }
+            } catch (Exception) {
+                return null;
+            }
         }
 
         public static async Task<Copyable> DecodeFile(string[] paths, Window sender, Type ensure) {
