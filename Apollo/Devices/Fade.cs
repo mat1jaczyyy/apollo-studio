@@ -321,13 +321,13 @@ namespace Apollo.Devices {
                             index = 0;
                     
                         if (index < fade.Count) {
-                            if (index < fade.Count - 1) Heaven.Schedule(Next, fade[index + 1].Time - fade[index].Time);
+                            if (index < fade.Count - 1) Schedule(Next, fade[index + 1].Time - fade[index].Time);
 
                             InvokeExit(new List<Signal>() {i.With(color: fade[index].Color.Clone())});
                         }
                     };
 
-                    Heaven.Schedule(Next, fade[1].Time - fade[0].Time);
+                    Schedule(Next, fade[1].Time - fade[0].Time);
 
                     return new [] {i.With(color: fade[0].Color.Clone())};
                 
@@ -340,9 +340,7 @@ namespace Apollo.Devices {
                 return Enumerable.Empty<Signal>();
             }).ToList());
 
-        protected override void Stop() {
-
-        }
+        protected override void Stopped() => buffer.Clear();
 
         public override void Dispose() {
             if (Disposed) return;

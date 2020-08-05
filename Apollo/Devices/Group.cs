@@ -105,8 +105,9 @@ namespace Apollo.Devices {
                 chain.MIDIEnter(n.Select(i => i.Clone()).ToList());
         }
         
-        protected override void Stop() {
-            foreach (Chain chain in Chains) chain.MIDIEnter(StopSignal.Instance);
+        protected override void Stopped() {
+            foreach (Chain chain in Chains)
+                chain.MIDIEnter(StopSignal.Instance);
         }
 
         public override void Dispose() {

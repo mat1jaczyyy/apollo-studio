@@ -262,7 +262,7 @@ namespace Apollo.Devices {
         
         void ScheduleWithPinch(Action Next, Time time, ref double total) {
             total += time * _gate;
-            Heaven.Schedule(Next, ApplyPinch(total) - ApplyPinch(total - time * _gate));
+            Schedule(Next, ApplyPinch(total) - ApplyPinch(total - time * _gate));
         }
 
         public override void MIDIProcess(List<Signal> n) {
@@ -423,9 +423,7 @@ namespace Apollo.Devices {
             }
         }
 
-        protected override void Stop() {
-            
-        }
+        protected override void Stopped() => buffer.Clear();
 
         public override void Dispose() {
             if (Disposed) return;

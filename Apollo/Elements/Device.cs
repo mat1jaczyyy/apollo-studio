@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+using Apollo.Rendering;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;
@@ -33,11 +34,6 @@ namespace Apollo.Elements {
         public Chain Parent;
         public int? ParentIndex;
 
-        protected void InvokeExit(List<Signal> n) {
-            Viewer?.Indicator.Trigger(n);
-            MIDIExit?.Invoke(n);
-        }
-
         public bool Collapsed = false;
         
         bool _enabled = true;
@@ -59,6 +55,11 @@ namespace Apollo.Elements {
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
 
+        protected void InvokeExit(List<Signal> n) {
+            Viewer?.Indicator.Trigger(n);
+            MIDIExit?.Invoke(n);
+        }
+
         public abstract void MIDIProcess(List<Signal> n);
 
         public override void MIDIEnter(List<Signal> n) {
@@ -73,7 +74,26 @@ namespace Apollo.Elements {
             InvokeExit(n);
         }
 
-        protected virtual void Stop() {}
+        protected void Stop() {
+            jobs.Clear();
+            Stopped();
+        }
+
+        protected virtual void Stopped() {}
+
+        HashSet<Action> jobs = new HashSet<Action>();
+
+        protected void Schedule(Action job, double time) {
+            void Job() {
+                if (!jobs.Contains(Job)) return;
+                jobs.Remove(Job);
+
+                job.Invoke();
+            };
+
+            jobs.Add(Job);
+            Heaven.Schedule(Job, time);
+        }
 
         public bool Disposed { get; private set; } = false;
 

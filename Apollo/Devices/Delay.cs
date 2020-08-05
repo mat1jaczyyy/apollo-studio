@@ -69,11 +69,7 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n)
-            => Heaven.Schedule(() => InvokeExit(n), _time * _gate);
-
-        protected override void Stop() {
-            // TODO Implement
-        }
+            => Schedule(() => InvokeExit(n), _time * _gate);
 
         public override void Dispose() {
             if (Disposed) return;

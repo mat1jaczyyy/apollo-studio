@@ -126,8 +126,8 @@ namespace Apollo.Devices {
             }
         }
         
-        protected override void Stop() {
-            base.Stop();
+        protected override void Stopped() {
+            base.Stopped();
             Preprocess.MIDIEnter(StopSignal.Instance);
         }
 

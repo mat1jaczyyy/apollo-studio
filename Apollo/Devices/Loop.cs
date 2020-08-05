@@ -102,12 +102,12 @@ namespace Apollo.Devices {
                         
                         void Next() {
                             if (buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
-                                Heaven.Schedule(Next, _rate * _gate);
+                                Schedule(Next, _rate * _gate);
                                 InvokeExit(new List<Signal>() {s});
                             }
                         };
                         
-                        Heaven.Schedule(Next, _rate * _gate);
+                        Schedule(Next, _rate * _gate);
 
                     } else buffer.TryRemove(k, out _);
                     
@@ -116,20 +116,18 @@ namespace Apollo.Devices {
                     
                     void Next() {
                         if (++index <= Repeats) {
-                            Heaven.Schedule(Next, _rate * _gate);
+                            Schedule(Next, _rate * _gate);
                             InvokeExit(new List<Signal>() {s});
                         }
                     };
                     
-                    Heaven.Schedule(Next, _rate * _gate);
+                    Schedule(Next, _rate * _gate);
                 }
 
                 return new [] {s.Clone()};
             }).ToList());
 
-        protected override void Stop() {
-            
-        }
+        protected override void Stopped() => buffer.Clear();
         
         public override void Dispose() {
             if (Disposed) return;

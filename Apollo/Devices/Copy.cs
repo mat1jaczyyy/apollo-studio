@@ -368,7 +368,7 @@ namespace Apollo.Devices {
                         void Next() {
                             index++;
                             if (index < validOffsets.Count) {
-                                if (index < validOffsets.Count - 1) Heaven.Schedule(Next,
+                                if (index < validOffsets.Count - 1) Schedule(Next,
                                     Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) -
                                     Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral)
                                 );
@@ -379,7 +379,7 @@ namespace Apollo.Devices {
                             }
                         };
 
-                        Heaven.Schedule(Next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
+                        Schedule(Next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
                         return new [] {s.Clone()};
                     
                     case CopyType.RandomSingle:
@@ -416,7 +416,7 @@ namespace Apollo.Devices {
                                     buffer[k] = RNG.Next(validOffsets.Count - 1);
                                     if (buffer[k] >= old) buffer[k]++;
                                     
-                                    Heaven.Schedule(RandNext, _time * _gate);
+                                    Schedule(RandNext, _time * _gate);
                                     
                                     ScreenOutput(new [] {
                                         s.With((byte)validOffsets[old], new Color(0)),
@@ -424,7 +424,7 @@ namespace Apollo.Devices {
                                     });
                                 };
                                 
-                                Heaven.Schedule(RandNext, _time * _gate);
+                                Schedule(RandNext, _time * _gate);
                             }
 
                         } else {
@@ -440,8 +440,9 @@ namespace Apollo.Devices {
                 return Enumerable.Empty<Signal>();
             })));
         
-        protected override void Stop() {
-
+        protected override void Stopped() {
+            buffer.Clear();
+            screen.Clear();
         }
 
         public override void Dispose() {

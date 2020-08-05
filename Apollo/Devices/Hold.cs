@@ -102,7 +102,7 @@ namespace Apollo.Devices {
             if (s.Color.Lit != Release) {
                 s.Color = buffer[k];
                 
-                if (!Infinite) Heaven.Schedule(() => {
+                if (!Infinite) Schedule(() => {
                     if (ReferenceEquals(buffer[k], s.Color))
                         InvokeExit(new List<Signal>() {k});
                 }, _time * _gate);
@@ -110,12 +110,10 @@ namespace Apollo.Devices {
                 return new [] {s};
             }
             
-            return Enumerable.Empty<Signal>(); 
+            return Enumerable.Empty<Signal>();
         }).ToList());
 
-        protected override void Stop() {
-            
-        }
+        protected override void Stopped() => buffer.Clear();
 
         public override void Dispose() {
             if (Disposed) return;

@@ -99,7 +99,7 @@ namespace Apollo.Devices {
             */
         }
         
-        protected override void Stop() {
+        protected override void Stopped() {
             Chain.MIDIEnter(StopSignal.Instance);
         }
 
