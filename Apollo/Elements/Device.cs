@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+using Apollo.Helpers;
 using Apollo.Rendering;
 using Apollo.Selection;
 using Apollo.Structures;
@@ -81,7 +82,7 @@ namespace Apollo.Elements {
 
         protected virtual void Stopped() {}
 
-        HashSet<Action> jobs = new HashSet<Action>();
+        ConcurrentHashSet<Action> jobs = new ConcurrentHashSet<Action>();
 
         protected void Schedule(Action job, double time) {
             void Job() {
