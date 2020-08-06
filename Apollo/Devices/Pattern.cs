@@ -292,7 +292,7 @@ namespace Apollo.Devices {
                     if (!(root is null)) {
                         List<Signal> ret = new List<Signal>();
                         
-                        if (monoFrame >= 0 && !(monoRoot is null))
+                        if (monoFrame >= 0 && !(monoRoot is null) && !(Infinite && monoFrame == Frames.Count - 1))
                             RenderFrame(ret, monoFrame, monoRoot, false);
                         
                         monoFrame = 0;
