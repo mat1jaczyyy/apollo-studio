@@ -377,8 +377,6 @@ namespace Apollo.Devices {
                                 for (int i = 0; i < Frames[loopFrame].Screen.Length; i++) 
                                     if (loopFrame > 0 && Frames[loopFrame].Screen[i] != Frames[loopFrame - 1].Screen[i] && ApplyRootKey(i, root.Index, out int index))
                                         nextRet.Add(root.With((byte)index, Frames[loopFrame].Screen[i].Clone()));
-                                
-                                ScheduleWithPinch(Next, Frames[loopFrame].Time, ref total);
 
                             } else {
                                 for (int i = 0; i < Frames[0].Screen.Length; i++)
@@ -386,9 +384,10 @@ namespace Apollo.Devices {
                                         nextRet.Add(loopRoot.With((byte)index, Frames[0].Screen[i].Clone()));
                                         
                                 loopFrame = 0;
-                                
-                                ScheduleWithPinch(Next, Frames.Last().Time, ref total);
+                                total = 0;
                             }
+
+                            ScheduleWithPinch(Next, Frames[loopFrame].Time, ref total);
                                 
                             InvokeExit(nextRet);
                         }
