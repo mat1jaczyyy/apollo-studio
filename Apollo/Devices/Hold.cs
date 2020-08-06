@@ -95,15 +95,16 @@ namespace Apollo.Devices {
         
         public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
             Signal k = s.With(color: new Color(0));
+            Color c = s.Color.Clone();
             
             if (s.Color.Lit)
-                buffer[k] = s.Color;
+                buffer[k] = c;
             
             if (s.Color.Lit != Release) {
                 s.Color = buffer[k];
                 
                 if (!Infinite) Schedule(() => {
-                    if (ReferenceEquals(buffer[k], s.Color))
+                    if (ReferenceEquals(buffer[k], c))
                         InvokeExit(new List<Signal>() {k});
                 }, _time * _gate);
                 
