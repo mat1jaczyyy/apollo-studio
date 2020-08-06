@@ -152,7 +152,7 @@ namespace Apollo.Core {
         }
 
         public static event FPSChanged FPSLimitChanged;
-        static int _FPSLimit;
+        static int _FPSLimit = 150;
         public static int FPSLimit {
             get => _FPSLimit;
             set {
