@@ -259,8 +259,24 @@ namespace Apollo.Devices {
         int monoFrame = -1;
         Signal loopRoot = null;
         int loopFrame = -1;
+
+        void RenderFrame(List<Signal> list, int n, Signal s, bool on = true)
+            => list.AddRange(Frames[n % Frames.Count].Screen.SelectMany((f, i) =>
+                (f.Lit && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, on? f.Clone() : new Color(0))}
+                    : Enumerable.Empty<Signal>()
+            ));
+
+        void RenderFrameDifference(List<Signal> list, int n, Signal s)
+            => list.AddRange(Frames[n % Frames.Count].Screen.Zip(Frames[(n + Frames.Count - 1) % Frames.Count].Screen).SelectMany((f, i) =>
+                (f.First != f.Second && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, f.First.Clone())}
+                    : Enumerable.Empty<Signal>()
+            ));
         
-        void ScheduleWithPinch(Action Next, Time time, ref double total) {
+        void ScheduleWithPinch(Action Next, int index, ref double total) {
+            double time = Frames[index % Frames.Count].Time;
+
             total += time * _gate;
             Schedule(Next, ApplyPinch(total) - ApplyPinch(total - time * _gate));
         }
@@ -269,84 +285,70 @@ namespace Apollo.Devices {
             if (Frames.Count == 0 || !n.Any()) return;
             
             Signal root = n.LastOrDefault(i => i.Color.Lit);
+            double total = 0;
             
             switch (Mode) {
                 case PlaybackType.Mono:
                     if (!(root is null)) {
                         List<Signal> ret = new List<Signal>();
                         
-                        if (monoFrame >= 0 && !(monoRoot is null)) 
-                            for (int i = 0; i < Frames[monoFrame % Frames.Count].Screen.Length; i++)
-                                if (Frames[monoFrame % Frames.Count].Screen[i].Lit && ApplyRootKey(i, monoRoot.Index, out int index))
-                                    ret.Add(monoRoot.With((byte)index, new Color(0)));
+                        if (monoFrame >= 0 && !(monoRoot is null))
+                            RenderFrame(ret, monoFrame, monoRoot, false);
                         
                         monoFrame = 0;
                         monoRoot = root;
-                        double total = 0;
                         
-                        for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i].Lit && ApplyRootKey(i, monoRoot.Index, out int index))
-                                ret.Add(monoRoot.With((byte)index, Frames[0].Screen[i].Clone()));
-                        
+                        RenderFrame(ret, 0, monoRoot);
+
                         void Next() {
                             if (!ReferenceEquals(monoRoot, root)) return;
                             List<Signal> ret = new List<Signal>();
                             
                             if (++monoFrame < Frames.Count * AdjustedRepeats) {
-                                for (int i = 0; i < Frames[monoFrame % Frames.Count].Screen.Length; i++) 
-                                    if (Frames[monoFrame % Frames.Count].Screen[i] != Frames[(monoFrame - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, monoRoot.Index, out int index))
-                                        ret.Add(monoRoot.With((byte)index, Frames[monoFrame % Frames.Count].Screen[i].Clone()));
+                                RenderFrameDifference(ret, monoFrame, monoRoot);
                                 
-                                ScheduleWithPinch(Next, Frames[monoFrame % Frames.Count].Time, ref total);
+                                ScheduleWithPinch(Next, monoFrame, ref total);
                                 
                             } else {
                                 if (!Infinite)
-                                    for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                                        if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, root.Index, out int index))
-                                            ret.Add(root.With((byte)index, new Color(0)));
+                                    RenderFrame(ret, Frames.Count - 1, monoRoot, false);
                                 
                                 monoFrame = -1;
                                 monoRoot = null;
                             }
-                                
+                            
                             InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                        ScheduleWithPinch(Next, 0, ref total);
                         InvokeExit(ret);
                     }
                     break;
                     
                 case PlaybackType.Poly:
-                    foreach (Signal s in n.Where(s => s.Color.Lit)) {
+                    foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
                         List<Signal> ret = new List<Signal>();
                         
-                        int frameIndex = 0;
-                        double total = 0;
-                        
-                        for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i].Lit && ApplyRootKey(i, s.Index, out int index))
-                                ret.Add(s.With((byte)index, Frames[0].Screen[i].Clone()));
+                        int polyFrame = 0;
+
+                        RenderFrame(ret, 0, polyRoot);
 
                         void Next() {
                             List<Signal> ret = new List<Signal>();
                             
-                            if (++frameIndex < Frames.Count * AdjustedRepeats) {
-                                for (int i = 0; i < Frames[frameIndex % Frames.Count].Screen.Length; i++) 
-                                    if (Frames[frameIndex % Frames.Count].Screen[i] != Frames[(frameIndex - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, s.Index, out int index))
-                                        ret.Add(s.With((byte)index, Frames[frameIndex % Frames.Count].Screen[i].Clone()));
+                            if (++polyFrame < Frames.Count * AdjustedRepeats) {
+                                RenderFrameDifference(ret, polyFrame, polyRoot);
                                 
-                                ScheduleWithPinch(Next, Frames[frameIndex % Frames.Count].Time, ref total);
+                                ScheduleWithPinch(Next, polyFrame, ref total);
 
-                            } else if (!Infinite) 
-                                for (int i = 0; i < Frames.Last().Screen.Length; i++) 
-                                    if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, s.Index, out int index))
-                                        ret.Add(s.With((byte)index, new Color(0)));
+                            } else if (!Infinite)
+                                RenderFrame(ret, Frames.Count - 1, polyRoot, false);
                             
                             InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                        ScheduleWithPinch(Next, 0, ref total);
+
                         InvokeExit(ret);
                     }
                     break;
@@ -355,55 +357,42 @@ namespace Apollo.Devices {
                     if (!(root is null)) {
                         List<Signal> ret = new List<Signal>();
                         
-                        if (loopFrame >= 0 && !(loopRoot is null)) 
-                            for (int i = 0; i < Frames[loopFrame].Screen.Length; i++)
-                                if (Frames[loopFrame].Screen[i].Lit && ApplyRootKey(i, loopRoot.Index, out int index))
-                                    ret.Add(loopRoot.With((byte)index, new Color(0)));
-                        
-                        for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i].Lit && ApplyRootKey(i, root.Index, out int index))
-                                ret.Add(root.With((byte)index, Frames[0].Screen[i].Clone()));
+                        if (loopFrame >= 0 && !(loopRoot is null))
+                            RenderFrame(ret, loopFrame, loopRoot, false);
                         
                         loopFrame = 0;
                         loopRoot = root;
                         
-                        double total = 0;
+                        RenderFrame(ret, 0, loopRoot);
                         
                         void Next() {
                             if (!ReferenceEquals(loopRoot, root)) return;
-                            List<Signal> nextRet = new List<Signal>();
+                            List<Signal> ret = new List<Signal>();
                             
                             if (++loopFrame < Frames.Count) {
-                                for (int i = 0; i < Frames[loopFrame].Screen.Length; i++) 
-                                    if (loopFrame > 0 && Frames[loopFrame].Screen[i] != Frames[loopFrame - 1].Screen[i] && ApplyRootKey(i, root.Index, out int index))
-                                        nextRet.Add(root.With((byte)index, Frames[loopFrame].Screen[i].Clone()));
+                                RenderFrameDifference(ret, loopFrame, loopRoot);
 
                             } else {
-                                for (int i = 0; i < Frames[0].Screen.Length; i++)
-                                    if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames.Last().Screen[i]) && ApplyRootKey(i, loopRoot.Index, out int index))
-                                        nextRet.Add(loopRoot.With((byte)index, Frames[0].Screen[i].Clone()));
-                                        
                                 loopFrame = 0;
                                 total = 0;
+
+                                if (Infinite) RenderFrame(ret, loopFrame, loopRoot);
+                                else RenderFrameDifference(ret, loopFrame, loopRoot);
                             }
 
-                            ScheduleWithPinch(Next, Frames[loopFrame].Time, ref total);
+                            ScheduleWithPinch(Next, loopFrame, ref total);
                                 
-                            InvokeExit(nextRet);
+                            InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, Frames[0].Time, ref total);
+                        ScheduleWithPinch(Next, 0, ref total);
                         InvokeExit(ret);
                         
                     } else {
-                        if (loopFrame > -1 && !(loopRoot is null) && 
-                            (!Infinite || loopFrame != Frames.Count - 1)) {
-                                
+                        if (loopFrame > -1 && !(loopRoot is null) && (!Infinite || loopFrame != Frames.Count - 1)) {
                             List<Signal> ret = new List<Signal>();
                             
-                            for (int i = 0; i < Frames[loopFrame].Screen.Length; i++) 
-                                if (Frames[loopFrame].Screen[i].Lit && ApplyRootKey(i, loopRoot.Index, out int index))
-                                    ret.Add(loopRoot.With((byte)index, new Color(0)));
+                            RenderFrame(ret, loopFrame, loopRoot, false);
                             
                             InvokeExit(ret);
                         }
