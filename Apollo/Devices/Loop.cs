@@ -103,7 +103,7 @@ namespace Apollo.Devices {
                         void Next() {
                             if (buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
                                 Schedule(Next, _rate * _gate);
-                                InvokeExit(new List<Signal>() {s});
+                                InvokeExit(new List<Signal>() {s.Clone()});
                             }
                         };
                         
@@ -117,7 +117,7 @@ namespace Apollo.Devices {
                     void Next() {
                         if (++index <= Repeats) {
                             Schedule(Next, _rate * _gate);
-                            InvokeExit(new List<Signal>() {s});
+                            InvokeExit(new List<Signal>() {s.Clone()});
                         }
                     };
                     
