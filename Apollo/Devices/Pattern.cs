@@ -295,7 +295,7 @@ namespace Apollo.Devices {
                         if (monoFrame >= 0 && !(monoRoot is null) && !(Infinite && monoFrame == Frames.Count - 1))
                             RenderFrame(ret, monoFrame, monoRoot, false);
                         
-                        monoFrame = 0;
+                        int frame = 0;
                         monoRoot = root;
                         
                         RenderFrame(ret, 0, monoRoot);
@@ -304,10 +304,12 @@ namespace Apollo.Devices {
                             if (!ReferenceEquals(monoRoot, root)) return;
                             List<Signal> ret = new List<Signal>();
                             
-                            if (++monoFrame < Frames.Count * AdjustedRepeats) {
+                            if (++frame < Frames.Count * AdjustedRepeats) {
                                 RenderFrameDifference(ret, monoFrame, monoRoot);
                                 
-                                ScheduleWithPinch(Next, monoFrame, ref total);
+                                ScheduleWithPinch(Next, frame, ref total);
+                                
+                                if(ReferenceEquals(monoRoot, root)) monoFrame = frame;
                                 
                             } else {
                                 if (!Infinite)
