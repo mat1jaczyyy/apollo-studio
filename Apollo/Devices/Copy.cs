@@ -251,9 +251,10 @@ namespace Apollo.Devices {
         
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
+        ConcurrentHashSet<Signal> offbuf = new ConcurrentHashSet<Signal>();
         
-        void ScreenOutput(IEnumerable<Signal> n)
-            => InvokeExit(n.SelectMany(s => {
+        void ScreenOutput(IEnumerable<Signal> n, bool output = true) {
+            List<Signal> data = n.SelectMany(s => {
                 Signal m = s.With(s.Index, new Color());
                 
                 if (!screen.ContainsKey(m))
@@ -261,188 +262,209 @@ namespace Apollo.Devices {
                 
                 if (s.Color.Lit) {
                     screen[m]++;
+                    Console.WriteLine($"SCREEN[M] => {screen[m]}");
                     return new [] {s};
 
                 } else {
                     if (screen[m] > 0) screen[m]--;
+                    Console.WriteLine($"SCREEN[M] => {screen[m]}");
                     if (screen[m] == 0) return new [] {s};
                 }
+
+                Console.WriteLine($"SCREEN[M] => {screen[m]} didnt return owo");
                 
                 return Enumerable.Empty<Signal>();
-            }).ToList());
+            }).ToList();
+
+            if (output) InvokeExit(data);
+        }
+
+        IEnumerable<Signal> CopyCalc(Signal s, bool output = true) {
+            int px = s.Index % 10;
+            int py = s.Index / 10;
+
+            List<int> validOffsets = new List<int>() {s.Index};
+
+            for (int i = 0; i < Offsets.Count; i++) {
+                if (Offsets[i].Apply(s.Index, GridMode, Wrap, out int _x, out int _y, out int result) && CopyMode != CopyType.Interpolate)
+                    validOffsets.Add(result);
+
+                if (CopyMode == CopyType.Interpolate) {
+                    double angle = Angles[i] / 90.0 * Math.PI;
+                    
+                    double x = _x;
+                    double y = _y;
+                    
+                    int pointCount;
+                    Func<int, DoubleTuple> pointGenerator;
+
+                    DoubleTuple source = new DoubleTuple(px, py);
+                    DoubleTuple target = new DoubleTuple(_x, _y);
+
+                    if (angle != 0) {
+                        // https://www.desmos.com/calculator/hizsxmojxz
+
+                        double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
+                        double commonTan = Math.Atan((px - x) / (y - py));
+
+                        double cord = diam / (2 * Math.Tan(Math.PI - angle / 2)) * (((y - py) >= 0)? 1 : -1);
+                        
+                        DoubleTuple center = new DoubleTuple(
+                            (px + x) / 2 + Math.Cos(commonTan) * cord,
+                            (py + y) / 2 + Math.Sin(commonTan) * cord
+                        );
+                        
+                        double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
+                        
+                        double u = (Convert.ToInt32(angle < 0) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
+                        double v = (Convert.ToInt32(angle < 0) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
+                        v += (u <= v)? 0 : 2 * Math.PI;
+                        
+                        double startAngle = (angle < 0)? v : u;
+                        double endAngle = (angle < 0)? u : v;
+
+                        pointCount = (int)(Math.Abs(radius) * Math.Abs(endAngle - startAngle) * 1.5);
+                        pointGenerator = t => CircularInterp(center, radius, startAngle, endAngle, t, pointCount);
+                        
+                    } else {
+                        IntTuple p = new IntTuple(px, py);
+
+                        IntTuple d = new IntTuple(
+                            _x - px,
+                            _y - py
+                        );
+
+                        IntTuple a = d.Apply(v => Math.Abs(v));
+                        IntTuple b = d.Apply(v => (v < 0)? -1 : 1);
+
+                        pointCount = Math.Max(a.X, a.Y);
+                        pointGenerator = t => LineGenerator(p, a, b, t);
+                    }
+                        
+                    for (int p = 1; p <= pointCount; p++) {
+                        DoubleTuple doublepoint = pointGenerator.Invoke(p);
+                        IntTuple point = doublepoint.Round();
+
+                        if (Math.Pow(doublepoint.X - point.X, 2.16) + Math.Pow(doublepoint.Y - point.Y, 2.16) > .25) continue;
+
+                        bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
+
+                        if (iresult != validOffsets.Last())
+                            validOffsets.Add(valid? iresult : -1);
+                    }
+                }
+
+                px = _x;
+                py = _y;
+            }
+                    
+            switch (CopyMode) {
+                case CopyType.Static:
+                    return validOffsets.Select(offset => s.With((byte)offset));
+
+                case CopyType.Animate:
+                case CopyType.Interpolate:
+                    if (Reverse) validOffsets.Reverse();
+                    
+                    int index = 0;
+                    
+                    double total = _time * _gate * (validOffsets.Count - 1);
+
+                    void Next() {
+                        index++;
+                        if (index < validOffsets.Count) {
+                            if (index < validOffsets.Count - 1) Schedule(Next,
+                                Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) -
+                                Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral)
+                            );
+                            
+                            if (validOffsets[index] == -1 || !(!Infinite || index < validOffsets.Count - 1 || s.Color.Lit)) return;
+                            
+                            ScreenOutput(new [] {s.With((byte)validOffsets[index])}, output);
+                        }
+                    };
+
+                    Schedule(Next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
+                    return new [] {s.Clone()};
+                
+                case CopyType.RandomSingle:
+                    Signal m = s.Clone();
+                    s.Color = new Color();
+                    
+                    if (!buffer.ContainsKey(s)) {
+                        if (!m.Color.Lit) break;
+                        buffer[s] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
+
+                    } else {
+                        m.Index = (byte)buffer[s];
+                        if (!m.Color.Lit) buffer.Remove(s, out _);
+                    }
+                    
+                    return new [] {m};
+                
+                case CopyType.RandomLoop:
+                    Signal k = s.With(color: new Color());
+                    Signal v;
+                    
+                    if (!buffer.ContainsKey(k)) {
+                        if (!s.Color.Lit) break;
+
+                        buffer[k] = RNG.Next(validOffsets.Count);
+                        v = s.With((byte)validOffsets[buffer[k]]);
+
+                        if (validOffsets.Count > 1) {
+                            void RandNext() {
+                                if (!buffer.Keys.Any(key => ReferenceEquals(key, k))) return;
+
+                                int old = buffer[k];
+                                
+                                buffer[k] = RNG.Next(validOffsets.Count - 1);
+                                if (buffer[k] >= old) buffer[k]++;
+                                
+                                Schedule(RandNext, _time * _gate);
+                                
+                                ScreenOutput(new [] {
+                                    s.With((byte)validOffsets[old], new Color(0)),
+                                    s.With((byte)validOffsets[buffer[k]])
+                                }, output);
+                            };
+                            
+                            Schedule(RandNext, _time * _gate);
+                        }
+
+                    } else {
+                        if (s.Color.Lit) break;
+
+                        v = s.With((byte)validOffsets[buffer[k]]);
+                        buffer.Remove(k, out _);
+                    }
+
+                    return new [] {v};
+            }
+
+            return Enumerable.Empty<Signal>();
+        }
         
         public override void MIDIProcess(List<Signal> n)
             => ScreenOutput(n.SelectMany((s => {
                 if (s.Index == 100) return new [] {s};
+
+                Signal off = s.With(color: new Color(0));
+                if (s.Color.Lit) {
+                    if (offbuf.Contains(off))
+                        ScreenOutput(CopyCalc(off, false), false);
+
+                    else offbuf.Add(off);
                 
-                int px = s.Index % 10;
-                int py = s.Index / 10;
-
-                List<int> validOffsets = new List<int>() {s.Index};
-
-                for (int i = 0; i < Offsets.Count; i++) {
-                    if (Offsets[i].Apply(s.Index, GridMode, Wrap, out int _x, out int _y, out int result) && CopyMode != CopyType.Interpolate)
-                        validOffsets.Add(result);
-
-                    if (CopyMode == CopyType.Interpolate) {
-                        double angle = Angles[i] / 90.0 * Math.PI;
-                        
-                        double x = _x;
-                        double y = _y;
-                        
-                        int pointCount;
-                        Func<int, DoubleTuple> pointGenerator;
-
-                        DoubleTuple source = new DoubleTuple(px, py);
-                        DoubleTuple target = new DoubleTuple(_x, _y);
-
-                        if (angle != 0) {
-                            // https://www.desmos.com/calculator/hizsxmojxz
-
-                            double diam = Math.Sqrt(Math.Pow(px - x, 2) + Math.Pow(py - y, 2));
-                            double commonTan = Math.Atan((px - x) / (y - py));
-
-                            double cord = diam / (2 * Math.Tan(Math.PI - angle / 2)) * (((y - py) >= 0)? 1 : -1);
-                            
-                            DoubleTuple center = new DoubleTuple(
-                                (px + x) / 2 + Math.Cos(commonTan) * cord,
-                                (py + y) / 2 + Math.Sin(commonTan) * cord
-                            );
-                            
-                            double radius = diam / (2 * Math.Sin(Math.PI - angle / 2));
-                            
-                            double u = (Convert.ToInt32(angle < 0) * (Math.PI + angle) + Math.Atan2(py - center.Y, px - center.X)) % (2 * Math.PI);
-                            double v = (Convert.ToInt32(angle < 0) * (Math.PI - angle) + Math.Atan2(y - center.Y, x - center.X)) % (2 * Math.PI);
-                            v += (u <= v)? 0 : 2 * Math.PI;
-                            
-                            double startAngle = (angle < 0)? v : u;
-                            double endAngle = (angle < 0)? u : v;
-
-                            pointCount = (int)(Math.Abs(radius) * Math.Abs(endAngle - startAngle) * 1.5);
-                            pointGenerator = t => CircularInterp(center, radius, startAngle, endAngle, t, pointCount);
-                            
-                        } else {
-                            IntTuple p = new IntTuple(px, py);
-
-                            IntTuple d = new IntTuple(
-                                _x - px,
-                                _y - py
-                            );
-
-                            IntTuple a = d.Apply(v => Math.Abs(v));
-                            IntTuple b = d.Apply(v => (v < 0)? -1 : 1);
-
-                            pointCount = Math.Max(a.X, a.Y);
-                            pointGenerator = t => LineGenerator(p, a, b, t);
-                        }
-                            
-                        for (int p = 1; p <= pointCount; p++) {
-                            DoubleTuple doublepoint = pointGenerator.Invoke(p);
-                            IntTuple point = doublepoint.Round();
-
-                            if (Math.Pow(doublepoint.X - point.X, 2.16) + Math.Pow(doublepoint.Y - point.Y, 2.16) > .25) continue;
-
-                            bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
-
-                            if (iresult != validOffsets.Last())
-                                validOffsets.Add(valid? iresult : -1);
-                        }
-                    }
-
-                    px = _x;
-                    py = _y;
-                }
-                        
-                switch (CopyMode) {
-                    case CopyType.Static:
-                        return validOffsets.Select(offset => s.With((byte)offset));
-
-                    case CopyType.Animate:
-                    case CopyType.Interpolate:
-                        if (Reverse) validOffsets.Reverse();
-                        
-                        int index = 0;
-                        
-                        double total = _time * _gate * (validOffsets.Count - 1);
-
-                        void Next() {
-                            index++;
-                            if (index < validOffsets.Count) {
-                                if (index < validOffsets.Count - 1) Schedule(Next,
-                                    Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) -
-                                    Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral)
-                                );
-                                
-                                if (validOffsets[index] == -1 || !(!Infinite || index < validOffsets.Count - 1 || s.Color.Lit)) return;
-                                
-                                ScreenOutput(new [] {s.With((byte)validOffsets[index])});
-                            }
-                        };
-
-                        Schedule(Next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
-                        return new [] {s.Clone()};
-                    
-                    case CopyType.RandomSingle:
-                        Signal m = s.Clone();
-                        s.Color = new Color();
-                        
-                        if (!buffer.ContainsKey(s)) {
-                            if (!m.Color.Lit) break;
-                            buffer[s] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
-
-                        } else {
-                            m.Index = (byte)buffer[s];
-                            if (!m.Color.Lit) buffer.Remove(s, out _);
-                        }
-                        
-                        return new [] {m};
-                    
-                    case CopyType.RandomLoop:
-                        Signal k = s.With(color: new Color());
-                        Signal v;
-                        
-                        if (!buffer.ContainsKey(k)) {
-                            if (!s.Color.Lit) break;
-
-                            buffer[k] = RNG.Next(validOffsets.Count);
-                            v = s.With((byte)validOffsets[buffer[k]]);
-
-                            if (validOffsets.Count > 1) {
-                                void RandNext() {
-                                    if (!buffer.Keys.Any(key => ReferenceEquals(key, k))) return;
-
-                                    int old = buffer[k];
-                                    
-                                    buffer[k] = RNG.Next(validOffsets.Count - 1);
-                                    if (buffer[k] >= old) buffer[k]++;
-                                    
-                                    Schedule(RandNext, _time * _gate);
-                                    
-                                    ScreenOutput(new [] {
-                                        s.With((byte)validOffsets[old], new Color(0)),
-                                        s.With((byte)validOffsets[buffer[k]])
-                                    });
-                                };
-                                
-                                Schedule(RandNext, _time * _gate);
-                            }
-
-                        } else {
-                            if (s.Color.Lit) break;
-
-                            v = s.With((byte)validOffsets[buffer[k]]);
-                            buffer.Remove(k, out _);
-                        }
-
-                        return new [] {v};
-                }
-
-                return Enumerable.Empty<Signal>();
+                } else offbuf.Remove(off);
+                
+                return CopyCalc(s);
             })));
         
         protected override void Stopped() {
             buffer.Clear();
             screen.Clear();
+            offbuf.Clear();
         }
 
         public override void Dispose() {
