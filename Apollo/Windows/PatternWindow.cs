@@ -21,6 +21,7 @@ using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Structures;
+using Apollo.Rendering;
 
 namespace Apollo.Windows {
     public class PatternWindow: Window, ISelectParentViewer, IDroppable {
@@ -93,7 +94,7 @@ namespace Apollo.Windows {
                     _launchpad.PatternWindow?.Close();
                     _launchpad.PatternWindow = this;
                     _launchpad.Clear();
-                    PlayExit = _launchpad.Render;
+                    PlayExit = (Signal n) => Heaven.MIDIEnter(new List<Signal>() {n});
 
                 } else PlayExit = null;
 
@@ -101,8 +102,9 @@ namespace Apollo.Windows {
 
                 if (historyShowing) RenderHistory();
                 else if (IsArrangeValid)
-                    for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                        _launchpad?.Render(new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000));
+                    Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                        new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000)
+                    ).ToList());
             }
         }
 
@@ -285,9 +287,6 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, CancelEventArgs e) {
             Locked = false;
-            
-            foreach (Courier i in PlayTimers) i.Dispose();
-            PlayTimers.Clear();
 
             foreach (Frame frame in _pattern.Frames)
                 frame.Info = null;
@@ -386,8 +385,9 @@ namespace Apollo.Windows {
             if (Draw) {
                 Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
-                for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                    Launchpad?.Render(new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000));
+                Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                    new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000)
+                ).ToList());
             }
         }
 
@@ -512,7 +512,7 @@ namespace Apollo.Windows {
             
             ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw();
 
-            Launchpad?.Render(new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex], layer: -1000));
+            Heaven.MIDIEnter(new List<Signal>() {new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex], layer: -1000)});
         }
 
         void PadFinished(int _) {
@@ -532,8 +532,9 @@ namespace Apollo.Windows {
             if (_pattern.Expanded == index) {
                 Editor.RenderFrame(frame);
 
-                for (int i = 0; i < frame.Screen.Length; i++)
-                    _launchpad?.Render(new Signal(this, Launchpad, (byte)i, frame.Screen[i], layer: -1000));
+                Heaven.MIDIEnter(frame.Screen.Select((c, i) => 
+                    new Signal(this, Launchpad, (byte)i, frame.Screen[i], layer: -1000)
+                ).ToList());
             }
         }
 
@@ -876,47 +877,17 @@ namespace Apollo.Windows {
             PlayExit?.Invoke(new Signal(this, _track.Launchpad, (byte)index, color.Clone(), layer: -1000));
         }
 
-        void FireCourier(double time)
-            => PlayTimers.Add(new Courier(time, Tick));
-
-        void Tick(Courier sender) {
-            if (_pattern.Disposed || !Locked) return;
-
-            lock (PlayLocker) {
-                if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
-                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
-                        if (_pattern[PlayIndex % _pattern.Count].Screen[i] != _pattern[(PlayIndex - 1) % _pattern.Count].Screen[i])
-                            PlayColor(i, _pattern[PlayIndex % _pattern.Count].Screen[i]);
-
-                } else {
-                    for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
-                        if (_pattern.Frames.Last().Screen[i].Lit)
-                            PlayColor(i, new Color(0));
-
-                    PatternFinish();
-                }
-
-                PlayTimers.Remove(sender);
-            }
-        }
-
         int PlayIndex = 0;
-        object PlayLocker = new object();
-        List<Courier> PlayTimers = new List<Courier>();
+        object PlayLocker;
 
         void PatternStop(bool send = true, int start = 0) {
-            lock (PlayLocker) {
-                for (int i = 0; i < PlayTimers.Count; i++)
-                    PlayTimers[i].Dispose();
-                
-                if (send && PlayIndex < _pattern.Count * _pattern.AdjustedRepeats)
-                    for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
-                        if (_pattern[PlayIndex % _pattern.Count].Screen[i].Lit)
-                            PlayColor(i, new Color(0));
+            if (send && PlayIndex < _pattern.Count * _pattern.AdjustedRepeats)
+                for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                    if (_pattern[PlayIndex % _pattern.Count].Screen[i].Lit)
+                        PlayColor(i, new Color(0));
 
-                PlayTimers = new List<Courier>();
-                PlayIndex = start;
-            }
+            PlayLocker = null;
+            PlayIndex = start;
         }
 
         void PatternPlay(Button sender, int start = 0) {
@@ -950,18 +921,39 @@ namespace Apollo.Windows {
             double time = Enumerable.Sum(_pattern.Frames.Take(start).Select(i => (double)i.Time)) * _pattern.Gate;
             double starttime = _pattern.ApplyPinch(time);
 
+            object locker = PlayLocker = new object();
+            
             for (int i = start; i < _pattern.Count * _pattern.AdjustedRepeats; i++) {
                 time += _pattern[i % _pattern.Count].Time * _pattern.Gate;
                 double pinched = _pattern.ApplyPinch(time);
 
-                FireCourier(pinched - starttime);
+                Heaven.Schedule(() => {
+                    if(ReferenceEquals(locker, PlayLocker)) RenderFrame();
+                }, pinched - starttime);
+            }
+        }
+        
+        void RenderFrame() {
+            if (_pattern.Disposed) return;
+            
+            if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
+                for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
+                    if (_pattern[PlayIndex % _pattern.Count].Screen[i] != _pattern[(PlayIndex - 1) % _pattern.Count].Screen[i])
+                        PlayColor(i, _pattern[PlayIndex % _pattern.Count].Screen[i]);
+
+            } else {
+                for (int i = 0; i < _pattern.Frames.Last().Screen.Length; i++)
+                    if (_pattern.Frames.Last().Screen[i].Lit)
+                        PlayColor(i, new Color(0));
+
+                PatternFinish();
             }
         }
 
         void PatternFire(int start = 0) {
             PlayExit = n => {
                 n.Layer = 0;
-                //_pattern.MIDIExit(n); //TODO Heaven
+                _pattern.MIDIExit(new List<Signal> () {n});
             };
             PatternPlay(Fire, start);
         }
@@ -976,11 +968,12 @@ namespace Apollo.Windows {
                 Fire.Content = "Fire";
             });
 
-            if (_launchpad != null) PlayExit = Launchpad.Render;
+            if (_launchpad != null) PlayExit = (Signal n) => Heaven.MIDIEnter(new List<Signal>() {n});
             else PlayExit = null;
 
-            for (int i = 0; i < _pattern[_pattern.Expanded].Screen.Length; i++)
-                Launchpad?.Render(new Signal(this, _track.Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000));
+            Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                new Signal(this, _track.Launchpad, (byte)i, c, layer: -1000)
+            ).ToList());
         }
 
         void PlayButton(object sender, RoutedEventArgs e) => PatternPlay(Play);
