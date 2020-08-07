@@ -331,7 +331,7 @@ namespace Apollo.Devices {
 
                     return new [] {i.With(color: fade[0].Color.Clone())};
                 
-                } else if (PlayMode == FadePlaybackType.Loop && !object.ReferenceEquals(p, null)) {
+                } else if (PlayMode == FadePlaybackType.Loop && !(p is null)) {
                     buffer[k] = null;
 
                     return new [] {k};
