@@ -251,27 +251,29 @@ namespace Apollo.Devices {
         
         ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
         ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
         ConcurrentHashSet<Signal> offbuf = new ConcurrentHashSet<Signal>();
         
         void ScreenOutput(IEnumerable<Signal> n, bool output = true) {
             List<Signal> data = n.SelectMany(s => {
                 Signal m = s.With(s.Index, new Color());
                 
-                if (!screen.ContainsKey(m))
-                    screen[m] = 0;
-                
-                if (s.Color.Lit) {
-                    screen[m]++;
-                    Console.WriteLine($"SCREEN[M] => {screen[m]}");
-                    return new [] {s};
+                if (!locker.ContainsKey(m))
+                    locker[m] = new object();
 
-                } else {
-                    if (screen[m] > 0) screen[m]--;
-                    Console.WriteLine($"SCREEN[M] => {screen[m]}");
-                    if (screen[m] == 0) return new [] {s};
+                lock (locker[m]) {
+                    if (!screen.ContainsKey(m))
+                        screen[m] = 0;
+                    
+                    if (s.Color.Lit) {
+                        screen[m]++;
+                        return new [] {s};
+
+                    } else {
+                        screen[m]--;
+                        if (screen[m] <= 0) return new [] {s};
+                    }
                 }
-
-                Console.WriteLine($"SCREEN[M] => {screen[m]} didnt return owo");
                 
                 return Enumerable.Empty<Signal>();
             }).ToList();
@@ -464,6 +466,7 @@ namespace Apollo.Devices {
         protected override void Stopped() {
             buffer.Clear();
             screen.Clear();
+            locker.Clear();
             offbuf.Clear();
         }
 
