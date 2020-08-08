@@ -56,7 +56,7 @@ namespace Apollo.Elements {
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
 
-        protected void InvokeExit(List<Signal> n) {
+        public void InvokeExit(List<Signal> n) {
             Viewer?.Indicator.Trigger(n);
             MIDIExit?.Invoke(n);
         }

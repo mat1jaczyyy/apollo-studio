@@ -259,7 +259,7 @@ namespace Apollo.Windows {
 
             Selection = new SelectionManager(() => _pattern.Frames.FirstOrDefault());
 
-            Launchpad = Preferences.CaptureLaunchpad? Launchpad : MIDI.NoOutput;
+            Launchpad = Preferences.CaptureLaunchpad? _track.Launchpad : MIDI.NoOutput;
 
             PortSelector.Update(Launchpad);
 
@@ -605,6 +605,7 @@ namespace Apollo.Windows {
                         ColorHistory.Input(i);
 
                         historyShowing = Locked = false;
+                        MIDI.ClearState(force: true);
                         Frame_Select(_pattern.Expanded);
                     });
 
@@ -958,7 +959,7 @@ namespace Apollo.Windows {
             PlayExit = n => {
                 n.Layer = 0;
                 n.Source = _track.Launchpad;
-                _pattern.MIDIExit(new List<Signal> () {n});
+                _pattern.InvokeExit(new List<Signal> () {n});
             };
             PatternPlay(Fire, start);
         }
