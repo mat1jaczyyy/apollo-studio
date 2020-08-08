@@ -94,7 +94,7 @@ namespace Apollo.Windows {
                     _launchpad.PatternWindow?.Close();
                     _launchpad.PatternWindow = this;
                     _launchpad.Clear();
-                    PlayExit = (Signal n) => Heaven.MIDIEnter(new List<Signal>() {n});
+                    PlayExit = Heaven.MIDIEnter;
 
                 } else PlayExit = null;
 
@@ -103,7 +103,7 @@ namespace Apollo.Windows {
                 if (historyShowing) RenderHistory();
                 else if (IsArrangeValid)
                     if (Launchpad != null) 
-                        Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                        PlayExit?.Invoke(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
                             new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000)
                         ).ToList());
             }
@@ -168,7 +168,7 @@ namespace Apollo.Windows {
             }
         }
 
-        Action<Signal> PlayExit;
+        Action<List<Signal>> PlayExit;
         
         void UpdateTitle() => UpdateTitle(_track.ParentIndex.Value, _track.ProcessedName);
         void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
@@ -387,7 +387,7 @@ namespace Apollo.Windows {
                 Editor.RenderFrame(_pattern[_pattern.Expanded]);
 
                 if (Launchpad != null)
-                    Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                    PlayExit?.Invoke(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
                         new Signal(this, Launchpad, (byte)i, _pattern[_pattern.Expanded].Screen[i], layer: -1000)
                     ).ToList());
             }
@@ -515,7 +515,7 @@ namespace Apollo.Windows {
             ((FrameDisplay)Contents[_pattern.Expanded + 1]).Viewer.Draw();
 
             if (Launchpad != null) 
-                Heaven.MIDIEnter(new List<Signal>() {new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex], layer: -1000)});
+                PlayExit?.Invoke(new List<Signal>() {new Signal(this, Launchpad, (byte)signalIndex, _pattern[_pattern.Expanded].Screen[signalIndex], layer: -1000)});
         }
 
         void PadFinished(int _) {
@@ -536,7 +536,7 @@ namespace Apollo.Windows {
                 Editor.RenderFrame(frame);
 
                 if (Launchpad != null)
-                    Heaven.MIDIEnter(frame.Screen.Select((c, i) => 
+                    PlayExit?.Invoke(frame.Screen.Select((c, i) => 
                         new Signal(this, Launchpad, (byte)i, frame.Screen[i], layer: -1000)
                     ).ToList());
             }
@@ -878,7 +878,7 @@ namespace Apollo.Windows {
                 Editor.SetColor(LaunchpadGrid.SignalToGrid(index), color.ToScreenBrush());
             });
 
-            PlayExit?.Invoke(new Signal(this, Launchpad, (byte)index, color.Clone(), layer: -1000));
+            PlayExit?.Invoke(new List<Signal>() {new Signal(this, Launchpad, (byte)index, color.Clone(), layer: -1000)});
         }
 
         int PlayIndex = 0;
@@ -918,9 +918,8 @@ namespace Apollo.Windows {
             MIDI.ClearState(false);
 
             Editor.RenderFrame(_pattern[start]);
-
-            for (int i = 0; i < _pattern[start].Screen.Length; i++)
-                PlayExit?.Invoke(new Signal(this, Launchpad, (byte)i, _pattern[start].Screen[i].Clone(), layer: -1000));
+            
+            PlayExit?.Invoke(_pattern[start].Screen.Select((c, i) => new Signal(this, Launchpad, (byte)i, c.Clone(), layer: -1000)).ToList());
 
             double time = Enumerable.Sum(_pattern.Frames.Take(start).Select(i => (double)i.Time)) * _pattern.Gate;
             double starttime = _pattern.ApplyPinch(time);
@@ -956,9 +955,11 @@ namespace Apollo.Windows {
 
         void PatternFire(int start = 0) {
             PlayExit = n => {
-                n.Layer = 0;
-                n.Source = _track.Launchpad;
-                _pattern.MIDIExit(new List<Signal> () {n});
+                n.ForEach(s => {
+                    s.Layer = 0;
+                    s.Source = _track.Launchpad;
+                });
+                _pattern.MIDIExit(n);
             };
             PatternPlay(Fire, start);
         }
@@ -974,14 +975,13 @@ namespace Apollo.Windows {
             });
 
             if (_launchpad != null) {
-                PlayExit = (Signal n) => Heaven.MIDIEnter(new List<Signal>() {n});
+                PlayExit = Heaven.MIDIEnter;
                 
-                Heaven.MIDIEnter(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
+                PlayExit(_pattern[_pattern.Expanded].Screen.Select((c, i) => 
                     new Signal(this, Launchpad, (byte)i, c, layer: -1000)
                 ).ToList());
             }
             else PlayExit = null;
-            
         }
 
         void PlayButton(object sender, RoutedEventArgs e) => PatternPlay(Play);
