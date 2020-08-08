@@ -27,9 +27,7 @@ namespace Apollo.Components {
             HistoryChanged?.Invoke();
         }
 
-        public static int Count {
-            get => History.Count;
-        }
+        public static int Count => History.Count;
 
         static void Use(Color color) {
             if (History.Contains(color)) History.Remove(color);
@@ -65,6 +63,8 @@ namespace Apollo.Components {
         
         UniformGrid Grid;
         int CurrentIndex;
+
+        public int AdjustedCount => History.Count + Convert.ToInt32(CurrentIndex == -1);
 
         public void Use() {
             if (Current == new Color(0)) return;
