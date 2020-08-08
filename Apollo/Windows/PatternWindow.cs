@@ -596,7 +596,7 @@ namespace Apollo.Windows {
                     
                     int i = 64 - y * 8 + x - 1;
 
-                    if (i < ColorHistory.Count) Dispatcher.UIThread.InvokeAsync(() => {
+                    if (i < ColorHistory.AdjustedCount) Dispatcher.UIThread.InvokeAsync(() => {
                         ColorHistory.Input(i);
 
                         historyShowing = Locked = false;
