@@ -304,7 +304,8 @@ namespace Apollo.Devices {
 
                 Signal p = buffer.TryGetValue(k, out p)? p : null;
 
-                buffer[k] = v;
+                if (!(PlayMode == FadePlaybackType.Mono && !i.Color.Lit && buffer.ContainsKey(k) && (buffer[k]?.Color.Lit?? false)))
+                    buffer[k] = v;
 
                 if (i.Color.Lit) {
                     int index = 0;
