@@ -399,10 +399,12 @@ namespace Apollo.Elements {
             if (!n.Any() || !Usable) return;
 
             Dispatcher.UIThread.InvokeAsync(() => n.ForEach(i => {
-                Window?.Render(i);
+                RawUpdate c = i.Clone();
+
+                Window?.Render(c);
 
                 foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                    alp.Window?.Render(i);
+                    alp.Window?.Render(c);
             }));
 
             if (CFWOptimize(n, out IEnumerable<byte> sysex)) {

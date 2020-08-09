@@ -229,6 +229,9 @@ namespace Apollo.Devices {
                     
                 else if (fade.Last().Time + 2 * frameTime <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
                     fade.Add(fullFade[i].WithTime(cutoff));
+
+                else if (i == fullFade.Count - 1 && fullFade[i].Color.Lit)
+                    fade.Add(fullFade[i]);
             }
 
             fade.Add(new FadeInfo(_steps.Last(), _time * _gate));
@@ -304,7 +307,8 @@ namespace Apollo.Devices {
 
                 Signal p = buffer.TryGetValue(k, out p)? p : null;
 
-                buffer[k] = v;
+                if (!(PlayMode == FadePlaybackType.Mono && !i.Color.Lit && buffer.ContainsKey(k) && (buffer[k]?.Color.Lit?? false)))
+                    buffer[k] = v;
 
                 if (i.Color.Lit) {
                     double start = Heaven.Time;
