@@ -94,6 +94,8 @@ namespace Apollo.Devices {
         
         public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.SelectMany(s => {
+                double start = Heaven.Time;
+
                 if (Hold) {
                     Signal k = s.With(color: new Color());
                     
@@ -102,12 +104,12 @@ namespace Apollo.Devices {
                         
                         void Next() {
                             if (buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
-                                Schedule(Next, _rate * _gate);
+                                Schedule(Next, start += _rate * _gate);
                                 InvokeExit(new List<Signal>() {s.Clone()});
                             }
                         };
                         
-                        Schedule(Next, _rate * _gate);
+                        Schedule(Next, start += _rate * _gate);
 
                     } else buffer.TryRemove(k, out _);
                     
@@ -116,12 +118,12 @@ namespace Apollo.Devices {
                     
                     void Next() {
                         if (++index <= Repeats) {
-                            Schedule(Next, _rate * _gate);
+                            Schedule(Next, start += _rate * _gate);
                             InvokeExit(new List<Signal>() {s.Clone()});
                         }
                     };
                     
-                    Schedule(Next, _rate * _gate);
+                    Schedule(Next, start += _rate * _gate);
                 }
 
                 return new [] {s.Clone()};

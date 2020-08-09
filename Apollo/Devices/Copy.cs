@@ -360,6 +360,8 @@ namespace Apollo.Devices {
                 py = _y;
             }
                     
+            double start = Heaven.Time;
+                    
             switch (CopyMode) {
                 case CopyType.Static:
                     return validOffsets.Select(offset => s.With((byte)offset));
@@ -369,16 +371,15 @@ namespace Apollo.Devices {
                     if (Reverse) validOffsets.Reverse();
                     
                     int index = 0;
-                    
                     double total = _time * _gate * (validOffsets.Count - 1);
 
                     void Next() {
                         index++;
                         if (index < validOffsets.Count) {
-                            if (index < validOffsets.Count - 1) Schedule(Next,
+                            if (index < validOffsets.Count - 1) Schedule(Next, start += (
                                 Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) -
                                 Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral)
-                            );
+                            ));
                             
                             if (validOffsets[index] == -1 || !(!Infinite || index < validOffsets.Count - 1 || s.Color.Lit)) return;
                             
@@ -386,7 +387,7 @@ namespace Apollo.Devices {
                         }
                     };
 
-                    Schedule(Next, Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
+                    Schedule(Next, start += Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
                     return new [] {s.Clone()};
                 
                 case CopyType.RandomSingle:
@@ -423,7 +424,7 @@ namespace Apollo.Devices {
                                 buffer[k] = RNG.Next(validOffsets.Count - 1);
                                 if (buffer[k] >= old) buffer[k]++;
                                 
-                                Schedule(RandNext, _time * _gate);
+                                Schedule(RandNext, start += _time * _gate);
                                 
                                 ScreenOutput(new [] {
                                     s.With((byte)validOffsets[old], new Color(0)),
@@ -431,7 +432,7 @@ namespace Apollo.Devices {
                                 }, output);
                             };
                             
-                            Schedule(RandNext, _time * _gate);
+                            Schedule(RandNext, start += _time * _gate);
                         }
 
                     } else {

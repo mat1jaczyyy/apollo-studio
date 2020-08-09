@@ -106,7 +106,7 @@ namespace Apollo.Devices {
                 if (!Infinite) Schedule(() => {
                     if (ReferenceEquals(buffer[k], c))
                         InvokeExit(new List<Signal>() {k});
-                }, _time * _gate);
+                }, Heaven.Time + _time * _gate);
                 
                 return new [] {s};
             }

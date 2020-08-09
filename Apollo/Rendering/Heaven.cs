@@ -29,7 +29,15 @@ namespace Apollo.Rendering {
             Wake();
         }
 
-        static Task RenderThread; 
+        static Task RenderThread;
+        static bool Awake => RenderThread?.IsCompleted != false;
+
+        public static double Time {
+            get {
+                if (RenderThread?.IsCompleted != false) prev = Program.TimeSpent.ElapsedTicks - 1;
+                return prev * 1000.0 / Stopwatch.Frequency;
+            }
+        }
 
         static void Wake() {
             if (RenderThread?.IsCompleted == false) return;
@@ -39,7 +47,7 @@ namespace Apollo.Rendering {
                 
                 while (renderAt >= 0 || jobQueue.Any() || jobs.Any() || signalQueue.Any()) {
                     while (jobQueue.TryDequeue(out (long Time, Action Job) task)) {
-                        long target = prev + task.Time + 1;
+                        long target = task.Time;
 
                         if (!jobs.ContainsKey(target))
                             jobs[target] = new List<Action>();

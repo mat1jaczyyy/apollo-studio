@@ -274,17 +274,19 @@ namespace Apollo.Devices {
                     : Enumerable.Empty<Signal>()
             ));
         
-        void ScheduleWithPinch(Action Next, int index, ref double total) {
+        void ScheduleWithPinch(Action Next, int index, ref double start, ref double total) {
             double time = Frames[index % Frames.Count].Time;
 
             total += time * _gate;
-            Schedule(Next, ApplyPinch(total) - ApplyPinch(total - time * _gate));
+            Schedule(Next, start += (ApplyPinch(total) - ApplyPinch(total - time * _gate)));
         }
 
         public override void MIDIProcess(List<Signal> n) {
             if (Frames.Count == 0 || !n.Any()) return;
             
             Signal root = n.LastOrDefault(i => i.Color.Lit);
+            
+            double start = Heaven.Time;
             double total = 0;
             
             switch (Mode) {
@@ -307,7 +309,7 @@ namespace Apollo.Devices {
                             if (++frame < Frames.Count * AdjustedRepeats) {
                                 RenderFrameDifference(ret, frame, monoRoot);
                                 
-                                ScheduleWithPinch(Next, frame, ref total);
+                                ScheduleWithPinch(Next, frame, ref start, ref total);
                                 
                                 if (ReferenceEquals(monoRoot, root)) monoFrame = frame;
                                 
@@ -324,7 +326,7 @@ namespace Apollo.Devices {
                             InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, 0, ref total);
+                        ScheduleWithPinch(Next, 0, ref start, ref total);
                         InvokeExit(ret);
                     }
                     break;
@@ -343,7 +345,7 @@ namespace Apollo.Devices {
                             if (++polyFrame < Frames.Count * AdjustedRepeats) {
                                 RenderFrameDifference(ret, polyFrame, polyRoot);
                                 
-                                ScheduleWithPinch(Next, polyFrame, ref total);
+                                ScheduleWithPinch(Next, polyFrame, ref start, ref total);
 
                             } else if (!Infinite)
                                 RenderFrame(ret, Frames.Count - 1, polyRoot, false);
@@ -351,7 +353,7 @@ namespace Apollo.Devices {
                             InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, 0, ref total);
+                        ScheduleWithPinch(Next, 0, ref start, ref total);
 
                         InvokeExit(ret);
                     }
@@ -384,12 +386,12 @@ namespace Apollo.Devices {
                                 else RenderFrameDifference(ret, loopFrame, loopRoot);
                             }
 
-                            ScheduleWithPinch(Next, loopFrame, ref total);
+                            ScheduleWithPinch(Next, loopFrame, ref start, ref total);
                                 
                             InvokeExit(ret);
                         }
                         
-                        ScheduleWithPinch(Next, 0, ref total);
+                        ScheduleWithPinch(Next, 0, ref start, ref total);
                         InvokeExit(ret);
                         
                     } else {

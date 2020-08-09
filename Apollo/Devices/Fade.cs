@@ -307,6 +307,7 @@ namespace Apollo.Devices {
                 buffer[k] = v;
 
                 if (i.Color.Lit) {
+                    double start = Heaven.Time;
                     int index = 0;
                     
                     void Next() {
@@ -319,15 +320,15 @@ namespace Apollo.Devices {
 
                         if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
                             index = 0;
-                    
+                        
                         if (index < fade.Count) {
-                            if (index < fade.Count - 1) Schedule(Next, fade[index + 1].Time - fade[index].Time);
+                            if (index < fade.Count - 1) Schedule(Next, start += fade[index + 1].Time - fade[index].Time);
 
                             InvokeExit(new List<Signal>() {i.With(color: fade[index].Color.Clone())});
                         }
                     };
 
-                    Schedule(Next, fade[1].Time - fade[0].Time);
+                    Schedule(Next, start += fade[1].Time - fade[0].Time);
 
                     return new [] {i.With(color: fade[0].Color.Clone())};
                 
