@@ -8,6 +8,8 @@ namespace Apollo.Rendering {
         public void Offset(int offset) 
             => Index = (byte)(Index + offset);
 
+        public RawUpdate Clone() => new RawUpdate(Index, Color);
+
         public RawUpdate(int index, Color color) {
             Index = (byte)index;
             Color = color.Clone();
