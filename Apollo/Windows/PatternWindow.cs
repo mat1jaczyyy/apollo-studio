@@ -287,6 +287,8 @@ namespace Apollo.Windows {
         }
 
         void Unloaded(object sender, CancelEventArgs e) {
+            if (historyShowing) MIDI.ClearState(force: true);
+
             Locked = false;
 
             foreach (Frame frame in _pattern.Frames)
@@ -601,7 +603,7 @@ namespace Apollo.Windows {
                     
                     int i = 64 - y * 8 + x - 1;
 
-                    if (i < ColorHistory.Count) Dispatcher.UIThread.InvokeAsync(() => {
+                    if (i < ColorHistory.AdjustedCount) Dispatcher.UIThread.InvokeAsync(() => {
                         ColorHistory.Input(i);
 
                         historyShowing = Locked = false;

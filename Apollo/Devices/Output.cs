@@ -104,7 +104,7 @@ namespace Apollo.Devices {
             protected override void UndoPath(params Output[] items) => items[0].Target = target;
 
             public IndexRemovedFix(Output output, int target)
-            : base(null, output) => this.target = target;
+            : base("Output Index Removed Fix", output) => this.target = target;
             
             IndexRemovedFix(BinaryReader reader, int version)
             : base(reader, version) => target = reader.ReadInt32();
