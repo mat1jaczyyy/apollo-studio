@@ -398,14 +398,16 @@ namespace Apollo.Elements {
         public virtual void Send(List<RawUpdate> n, Color[] snapshot) {
             if (!n.Any() || !Usable) return;
 
-            Dispatcher.UIThread.InvokeAsync(() => n.ForEach(i => {
-                RawUpdate c = i.Clone();
+            if (Window != null || AbletonLaunchpads.Any(i => i.Window != null)) {
+                List<RawUpdate> c = n.Select(i => i.Clone()).ToList();
 
-                Window?.Render(c);
+                Dispatcher.UIThread.InvokeAsync(() => c.ForEach(i => {
+                    Window?.Render(i);
 
-                foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                    alp.Window?.Render(c);
-            }));
+                    foreach (AbletonLaunchpad alp in AbletonLaunchpads)
+                        alp.Window?.Render(i);
+                }));
+            }
 
             if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
                 SysExSend(sysex);
