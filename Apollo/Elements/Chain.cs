@@ -82,6 +82,8 @@ namespace Apollo.Elements {
         }
 
         void InvokeExit(List<Signal> n) {
+            if (!(n is StopSignal) && !n.Any()) return;
+            
             Info?.Indicator.Trigger(n);
             MIDIExit?.Invoke(n);
         }
