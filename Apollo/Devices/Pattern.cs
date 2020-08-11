@@ -288,78 +288,42 @@ namespace Apollo.Devices {
             Signal root = n.LastOrDefault(i => i.Color.Lit);
             
             n.ForEach(s => {
+                bool lit = s.Color.Lit;
                 s.HashIndex = false;
                 s.Color = new Color();
                 
-                if ((Mode == PlaybackType.Mono && s.Color.Lit) || Mode == PlaybackType.Loop) { 
+                if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop) { 
                     Stop(s, root, ret);
                 }
             });
             
             if (!(root is null)) {
-                bool lit = root.Color.Lit;
-                               
-                if (lit) {
-                    RenderFrame(ret, 0, root);
-                    
-                    if (Mode == PlaybackType.Poly) {
-                        foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
-                            PlayingState state = new PlayingState(polyRoot);
+                RenderFrame(ret, 0, root);
                 
-                            double start = Heaven.Time;
-                            double total = 0;
-                           
-                            poly.Add(state);
-                           
-                            void Next() {
-                                if(!poly.Contains(state)) return;
-                                
-                                List<Signal> ret = new List<Signal>();
-                               
-                                if(++state.Frame < Frames.Count * AdjustedRepeats) {
-                                    RenderFrameDifference(ret, state.Frame, state.Root);
-                                    
-                                    ScheduleWithPinch(Next, state.Frame, ref start, ref total);
-                                }
-                                else {
-                                    poly.Remove(state);
-                                    
-                                    if (!Infinite)
-                                        RenderFrame(ret, state.Frame - 1, state.Root, false);
-                                }
-                                
-                                InvokeExit(ret);
-                            }
-                            
-                            ScheduleWithPinch(Next, 0, ref start, ref total);
-                        }
-                    } else {
+                if (Mode == PlaybackType.Poly) {
+                    foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
+                        PlayingState state = new PlayingState(polyRoot);
+            
                         double start = Heaven.Time;
                         double total = 0;
-                        
+                       
+                        poly.Add(state);
+                       
                         void Next() {
-                            if (!ReferenceEquals(buffer[root].Root, root)) return;
+                            if(!poly.Contains(state)) return;
                             
                             List<Signal> ret = new List<Signal>();
-                            
-                            if (++buffer[root].Frame < Frames.Count * AdjustedRepeats) {
-                                RenderFrameDifference(ret, buffer[root].Frame, root);
+                           
+                            if(++state.Frame < Frames.Count * AdjustedRepeats) {
+                                RenderFrameDifference(ret, state.Frame, state.Root);
                                 
-                                ScheduleWithPinch(Next, buffer[root].Frame, ref start, ref total);
+                                ScheduleWithPinch(Next, state.Frame, ref start, ref total);
                             }
-                            else if (Mode == PlaybackType.Mono) {
+                            else {
+                                poly.Remove(state);
+                                
                                 if (!Infinite)
-                                    RenderFrame(ret, buffer[root].Frame - 1, root, false);
-                            }       
-                            else if (Mode == PlaybackType.Loop) {
-                                if (Infinite) RenderFrame(ret, 0, root);
-                                else RenderFrameDifference(ret, 0, root);
-                                
-                                if (ReferenceEquals(buffer[root].Root, root)) buffer[root].Frame = 0;
-                                start = Heaven.Time;
-                                total = 0;
-                                
-                                ScheduleWithPinch(Next, 0, ref start, ref total);
+                                    RenderFrame(ret, state.Frame - 1, state.Root, false);
                             }
                             
                             InvokeExit(ret);
@@ -367,6 +331,39 @@ namespace Apollo.Devices {
                         
                         ScheduleWithPinch(Next, 0, ref start, ref total);
                     }
+                } else {
+                    double start = Heaven.Time;
+                    double total = 0;
+                    
+                    void Next() {
+                        if (!ReferenceEquals(buffer[root].Root, root)) return;
+                        
+                        List<Signal> ret = new List<Signal>();
+                        
+                        if (++buffer[root].Frame < Frames.Count * AdjustedRepeats) {
+                            RenderFrameDifference(ret, buffer[root].Frame, root);
+                            
+                            ScheduleWithPinch(Next, buffer[root].Frame, ref start, ref total);
+                        }
+                        else if (Mode == PlaybackType.Mono) {
+                            if (!Infinite)
+                                RenderFrame(ret, buffer[root].Frame - 1, root, false);
+                        }       
+                        else if (Mode == PlaybackType.Loop) {
+                            if (Infinite) RenderFrame(ret, 0, root);
+                            else RenderFrameDifference(ret, 0, root);
+                            
+                            if (ReferenceEquals(buffer[root].Root, root)) buffer[root].Frame = 0;
+                            start = Heaven.Time;
+                            total = 0;
+                            
+                            ScheduleWithPinch(Next, 0, ref start, ref total);
+                        }
+                        
+                        InvokeExit(ret);
+                    }
+                    
+                    ScheduleWithPinch(Next, 0, ref start, ref total);
                 }
             }
             
