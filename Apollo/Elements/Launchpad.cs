@@ -456,7 +456,7 @@ namespace Apollo.Elements {
             // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
             // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
             if (Type.IsPro() && output.Count > MaxRepeats[Type]) {
-                if (snapshot != null) {  // TODO Heaven see if we can remove this check?
+                if (snapshot != null) {
                     SysExSend(ProGridMessage.Concat(Enumerable.Range(0, 100)
                         .Select(i => snapshot[i])
                         .SelectMany(i => new byte[] { i.Red, i.Green, i.Blue })
