@@ -94,6 +94,8 @@ namespace Apollo.Undo {
             History[index].Dispose();
             History.RemoveAt(index);
             Window?.Contents_Remove(index);
+
+            if (index == SavedPosition) SavedPosition = null;
         }
 
         public void Clear(string description = "Undo History Cleared") {
