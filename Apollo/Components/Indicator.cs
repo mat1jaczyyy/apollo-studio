@@ -41,7 +41,7 @@ namespace Apollo.Components {
             }
         }
 
-        public void Trigger(IEnumerable<Signal> triggering) {
+        public void Trigger(List<Signal> triggering) {
             if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
 
             bool lit = triggering.Any(i => i.Color.Lit);
