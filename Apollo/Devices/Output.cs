@@ -103,6 +103,8 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params Output[] items) => items[0].Target = target;
 
+            protected override void OnRedo() {}
+
             public IndexRemovedFix(Output output, int target)
             : base("Output Index Removed Fix", output) => this.target = target;
             

@@ -257,6 +257,7 @@ namespace Apollo.Elements {
 
             } else if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift)) {
                 if (e.Key == Key.S) await Save(sender, true);
+                else if (e.Key == Key.F) MIDI.ClearState(force: true);
                 else if (e.Key == Key.W) await AskClose(sender);
                 else return false;
             
