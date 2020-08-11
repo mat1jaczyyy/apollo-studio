@@ -27,6 +27,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => MIDI.ClearState();
+        protected override void Click(PointerReleasedEventArgs e) => MIDI.ClearState(force: e.KeyModifiers == KeyModifiers.Shift);
     }
 }
