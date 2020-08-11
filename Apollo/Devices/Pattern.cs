@@ -254,31 +254,37 @@ namespace Apollo.Devices {
             return false;
         }
         
-        Dictionary<Signal, (Signal, int)> buffer = new Dictionary<Signal, (Signal, int)>();
-        Signal monoRoot = null;
-        int monoFrame = -1;
-        Signal loopRoot = null;
-        int loopFrame = -1;
-
-        void RenderFrame(List<Signal> list, int n, Signal s, bool on = true)
-            => list.AddRange(Frames[n % Frames.Count].Screen.SelectMany((f, i) =>
-                (f.Lit && ApplyRootKey(i, s.Index, out int index))
-                    ? new [] {s.With((byte)index, on? f.Clone() : new Color(0))}
-                    : Enumerable.Empty<Signal>()
-            ));
-
-        void RenderFrameDifference(List<Signal> list, int n, Signal s)
-            => list.AddRange(Frames[n % Frames.Count].Screen.Zip(Frames[(n + Frames.Count - 1) % Frames.Count].Screen).SelectMany((f, i) =>
-                (f.First != f.Second && ApplyRootKey(i, s.Index, out int index))
-                    ? new [] {s.With((byte)index, f.First.Clone())}
-                    : Enumerable.Empty<Signal>()
-            ));
         
         void ScheduleWithPinch(Action Next, int index, ref double start, ref double total) {
             double time = Frames[index % Frames.Count].Time;
 
             total += time * _gate;
             Schedule(Next, start += (ApplyPinch(total) - ApplyPinch(total - time * _gate)));
+        }
+        
+        ConcurrentDictionary<Signal, BufferState> buffer = new ConcurrentDictionary<Signal, BufferState>();
+        Signal loopRoot = null;
+        int loopFrame = -1; 
+        
+        class BufferState {
+            public Signal Root;
+            public int Frame;
+            
+            public BufferState(Signal _root, int _frame) {
+                Root = _root;
+                Frame = _frame;
+            }
+        }
+        
+        void Stop(Signal n, List<Signal> ret) {
+            if(buffer.ContainsKey(n)) {
+                if(buffer[n].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite)) 
+                    RenderFrame(ret, buffer[n].Frame, buffer[n].Root, false);
+                
+                buffer.Remove(n, out _);
+            }
+            
+            buffer[n] = new BufferState(null, 0);
         }
 
         public override void MIDIProcess(List<Signal> n) {
@@ -292,35 +298,29 @@ namespace Apollo.Devices {
             switch (Mode) {
                 case PlaybackType.Mono:
                     if (!(root is null)) {
+                        Signal k = root.Clone();
+                        k.HashIndex = false;
+                        
                         List<Signal> ret = new List<Signal>();
                         
-                        if (monoFrame >= 0 && !(monoRoot is null) && !(Infinite && monoFrame == Frames.Count - 1))
-                            RenderFrame(ret, monoFrame, monoRoot, false);
+                        Stop(k, ret);
                         
-                        int frame = monoFrame = 0;
-                        monoRoot = root;
+                        buffer[k].Root = root;
                         
-                        RenderFrame(ret, 0, monoRoot);
+                        RenderFrame(ret, 0, root);
 
                         void Next() {
-                            if (!ReferenceEquals(monoRoot, root)) return;
+                            if (!ReferenceEquals(buffer[k].Root, root)) return;
                             List<Signal> ret = new List<Signal>();
                             
-                            if (++frame < Frames.Count * AdjustedRepeats) {
-                                RenderFrameDifference(ret, frame, monoRoot);
+                            if (++buffer[k].Frame < Frames.Count * AdjustedRepeats) {
+                                RenderFrameDifference(ret, buffer[k].Frame, buffer[k].Root);
                                 
-                                ScheduleWithPinch(Next, frame, ref start, ref total);
-                                
-                                if (ReferenceEquals(monoRoot, root)) monoFrame = frame;
+                                ScheduleWithPinch(Next, buffer[k].Frame, ref start, ref total);
                                 
                             } else {
                                 if (!Infinite)
-                                    RenderFrame(ret, Frames.Count - 1, monoRoot, false);
-                            
-                                if (ReferenceEquals(monoRoot, root)) {
-                                    monoRoot = null;
-                                    monoFrame = -1;
-                                }
+                                    RenderFrame(ret, Frames.Count - 1, buffer[k].Root, false);
                             }
                             
                             InvokeExit(ret);
@@ -423,6 +423,20 @@ namespace Apollo.Devices {
             foreach (Frame frame in Frames) frame.Dispose();
             base.Dispose();
         }
+        
+        void RenderFrame(List<Signal> list, int n, Signal s, bool on = true)
+            => list.AddRange(Frames[n % Frames.Count].Screen.SelectMany((f, i) =>
+                (f.Lit && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, on? f.Clone() : new Color(0))}
+                    : Enumerable.Empty<Signal>()
+            ));
+
+        void RenderFrameDifference(List<Signal> list, int n, Signal s)
+            => list.AddRange(Frames[n % Frames.Count].Screen.Zip(Frames[(n + Frames.Count - 1) % Frames.Count].Screen).SelectMany((f, i) =>
+                (f.First != f.Second && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, f.First.Clone())}
+                    : Enumerable.Empty<Signal>()
+            ));
         
         public class FrameInsertedUndoEntry: PathUndoEntry<Pattern> {
             int index;

@@ -18,6 +18,7 @@ namespace Apollo.Structures {
         public BlendingType BlendingMode;
         int _range = 200;
         public Stack<List<int>> MultiTarget = new Stack<List<int>>();
+        public bool HashIndex = true;
 
         public byte Index {
             get => _index;
@@ -81,10 +82,10 @@ namespace Apollo.Structures {
             return this == (Signal)obj;
         }
 
-        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && a.Index == b.Index && a.Color == b.Color && a.Macros.SequenceEqual(b.Macros) && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.PeekMultiTarget == b.PeekMultiTarget;
+        public static bool operator ==(Signal a, Signal b) => a.Source == b.Source && ((a.HashIndex && b.HashIndex)? a.Index == b.Index : true) && a.Color == b.Color && a.Macros.SequenceEqual(b.Macros) && a.Layer == b.Layer && a.BlendingMode == b.BlendingMode && a.PeekMultiTarget == b.PeekMultiTarget;
         public static bool operator !=(Signal a, Signal b) => !(a == b);
         
-        public override int GetHashCode() => HashCode.Combine(Source, Index, Color, HashCode.Combine(Macros[0], Macros[1], Macros[2], Macros[3]), Layer, BlendingMode, BlendingRange, GetListHashCode(PeekMultiTarget));
+        public override int GetHashCode() => HashCode.Combine(Source, HashIndex? Index : 11, Color, HashCode.Combine(Macros[0], Macros[1], Macros[2], Macros[3]), Layer, BlendingMode, BlendingRange, GetListHashCode(PeekMultiTarget));
         
         int GetListHashCode(IEnumerable<int> x) => (x == null || x.Count() == 0)
             ? HashCode.Combine((int?)null)
