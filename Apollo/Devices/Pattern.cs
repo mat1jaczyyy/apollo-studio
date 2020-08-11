@@ -262,155 +262,121 @@ namespace Apollo.Devices {
             Schedule(Next, start += (ApplyPinch(total) - ApplyPinch(total - time * _gate)));
         }
         
-        ConcurrentDictionary<Signal, BufferState> buffer = new ConcurrentDictionary<Signal, BufferState>();
-        Signal loopRoot = null;
-        int loopFrame = -1; 
+        ConcurrentDictionary<Signal, PlayingState> buffer = new ConcurrentDictionary<Signal, PlayingState>();
+        ConcurrentHashSet<PlayingState> poly = new ConcurrentHashSet<PlayingState>();
         
-        class BufferState {
+        class PlayingState {
             public Signal Root;
-            public int Frame;
+            public int Frame = 0;
             
-            public BufferState(Signal _root, int _frame) {
-                Root = _root;
-                Frame = _frame;
-            }
+            public PlayingState(Signal init) => Root = init;
         }
         
-        void Stop(Signal n, List<Signal> ret) {
-            if(buffer.ContainsKey(n)) {
-                if(buffer[n].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite)) 
-                    RenderFrame(ret, buffer[n].Frame, buffer[n].Root, false);
-                
-                buffer.Remove(n, out _);
-            }
+        void Stop(Signal k, Signal r, List<Signal> ret) {
+            if(buffer.ContainsKey(k))
+                if(buffer[k].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite) && !(buffer[k].Root is null)) 
+                    RenderFrame(ret, buffer[k].Frame, buffer[k].Root, false);
             
-            buffer[n] = new BufferState(null, 0);
+            buffer[k] = new PlayingState(r);
         }
 
         public override void MIDIProcess(List<Signal> n) {
             if (Frames.Count == 0 || !n.Any()) return;
             
+            List<Signal> ret = new List<Signal>();
+            
             Signal root = n.LastOrDefault(i => i.Color.Lit);
             
-            double start = Heaven.Time;
-            double total = 0;
+            n.ForEach(s => {
+                s.HashIndex = false;
+                s.Color = new Color();
+                
+                if ((Mode == PlaybackType.Mono && s.Color.Lit) || Mode == PlaybackType.Loop) { 
+                    Stop(s, root, ret);
+                }
+            });
             
-            switch (Mode) {
-                case PlaybackType.Mono:
-                    if (!(root is null)) {
-                        Signal k = root.Clone();
-                        k.HashIndex = false;
-                        
-                        List<Signal> ret = new List<Signal>();
-                        
-                        Stop(k, ret);
-                        
-                        buffer[k].Root = root;
-                        
-                        RenderFrame(ret, 0, root);
-
-                        void Next() {
-                            if (!ReferenceEquals(buffer[k].Root, root)) return;
-                            List<Signal> ret = new List<Signal>();
-                            
-                            if (++buffer[k].Frame < Frames.Count * AdjustedRepeats) {
-                                RenderFrameDifference(ret, buffer[k].Frame, buffer[k].Root);
+            if (!(root is null)) {
+                bool lit = root.Color.Lit;
+                               
+                if (lit) {
+                    RenderFrame(ret, 0, root);
+                    
+                    if (Mode == PlaybackType.Poly) {
+                        foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
+                            PlayingState state = new PlayingState(polyRoot);
+                
+                            double start = Heaven.Time;
+                            double total = 0;
+                           
+                            poly.Add(state);
+                           
+                            void Next() {
+                                if(!poly.Contains(state)) return;
                                 
-                                ScheduleWithPinch(Next, buffer[k].Frame, ref start, ref total);
+                                List<Signal> ret = new List<Signal>();
+                               
+                                if(++state.Frame < Frames.Count * AdjustedRepeats) {
+                                    RenderFrameDifference(ret, state.Frame, state.Root);
+                                    
+                                    ScheduleWithPinch(Next, state.Frame, ref start, ref total);
+                                }
+                                else {
+                                    poly.Remove(state);
+                                    
+                                    if (!Infinite)
+                                        RenderFrame(ret, state.Frame - 1, state.Root, false);
+                                }
                                 
-                            } else {
-                                if (!Infinite)
-                                    RenderFrame(ret, Frames.Count - 1, buffer[k].Root, false);
+                                InvokeExit(ret);
                             }
                             
-                            InvokeExit(ret);
+                            ScheduleWithPinch(Next, 0, ref start, ref total);
                         }
-                        
-                        ScheduleWithPinch(Next, 0, ref start, ref total);
-                        InvokeExit(ret);
-                    }
-                    break;
-                    
-                case PlaybackType.Poly:
-                    foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
-                        List<Signal> ret = new List<Signal>();
-                        
-                        int polyFrame = 0;
-
-                        RenderFrame(ret, 0, polyRoot);
-
-                        void Next() {
-                            List<Signal> ret = new List<Signal>();
-                            
-                            if (++polyFrame < Frames.Count * AdjustedRepeats) {
-                                RenderFrameDifference(ret, polyFrame, polyRoot);
-                                
-                                ScheduleWithPinch(Next, polyFrame, ref start, ref total);
-
-                            } else if (!Infinite)
-                                RenderFrame(ret, Frames.Count - 1, polyRoot, false);
-                            
-                            InvokeExit(ret);
-                        }
-                        
-                        ScheduleWithPinch(Next, 0, ref start, ref total);
-
-                        InvokeExit(ret);
-                    }
-                    break;
-                    
-                case PlaybackType.Loop:
-                    if (!(root is null)) {
-                        List<Signal> ret = new List<Signal>();
-                        
-                        if (loopFrame >= 0 && !(loopRoot is null))
-                            RenderFrame(ret, loopFrame, loopRoot, false);
-                        
-                        loopFrame = 0;
-                        loopRoot = root;
-                        
-                        RenderFrame(ret, 0, loopRoot);
-                        
-                        void Next() {
-                            if (!ReferenceEquals(loopRoot, root)) return;
-                            List<Signal> ret = new List<Signal>();
-                            
-                            if (++loopFrame < Frames.Count) {
-                                RenderFrameDifference(ret, loopFrame, loopRoot);
-
-                            } else {
-                                loopFrame = 0;
-                                total = 0;
-
-                                if (Infinite) RenderFrame(ret, loopFrame, loopRoot);
-                                else RenderFrameDifference(ret, loopFrame, loopRoot);
-                            }
-
-                            ScheduleWithPinch(Next, loopFrame, ref start, ref total);
-                                
-                            InvokeExit(ret);
-                        }
-                        
-                        ScheduleWithPinch(Next, 0, ref start, ref total);
-                        InvokeExit(ret);
-                        
                     } else {
-                        if (loopFrame > -1 && !(loopRoot is null) && (!Infinite || loopFrame != Frames.Count - 1)) {
+                        double start = Heaven.Time;
+                        double total = 0;
+                        
+                        void Next() {
+                            if (!ReferenceEquals(buffer[root].Root, root)) return;
+                            
                             List<Signal> ret = new List<Signal>();
                             
-                            RenderFrame(ret, loopFrame, loopRoot, false);
+                            if (++buffer[root].Frame < Frames.Count * AdjustedRepeats) {
+                                RenderFrameDifference(ret, buffer[root].Frame, root);
+                                
+                                ScheduleWithPinch(Next, buffer[root].Frame, ref start, ref total);
+                            }
+                            else if (Mode == PlaybackType.Mono) {
+                                if (!Infinite)
+                                    RenderFrame(ret, buffer[root].Frame - 1, root, false);
+                            }       
+                            else if (Mode == PlaybackType.Loop) {
+                                if (Infinite) RenderFrame(ret, 0, root);
+                                else RenderFrameDifference(ret, 0, root);
+                                
+                                if (ReferenceEquals(buffer[root].Root, root)) buffer[root].Frame = 0;
+                                start = Heaven.Time;
+                                total = 0;
+                                
+                                ScheduleWithPinch(Next, 0, ref start, ref total);
+                            }
                             
                             InvokeExit(ret);
                         }
-                            
-                        loopFrame = -1;
-                        loopRoot = null;
+                        
+                        ScheduleWithPinch(Next, 0, ref start, ref total);
                     }
-                    break;
+                }
             }
+            
+            InvokeExit(ret);
         }
 
-        protected override void Stopped() => buffer.Clear();
+        protected override void Stopped() {
+            buffer.Clear();
+            poly.Clear();
+        }
 
         public override void Dispose() {
             if (Disposed) return;
