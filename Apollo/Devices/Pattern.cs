@@ -254,7 +254,6 @@ namespace Apollo.Devices {
             return false;
         }
         
-        
         void ScheduleWithPinch(Action Next, int index, ref double start, ref double total) {
             double time = Frames[index % Frames.Count].Time;
 
@@ -273,8 +272,8 @@ namespace Apollo.Devices {
         }
         
         void Stop(Signal k, Signal r, List<Signal> ret) {
-            if(buffer.ContainsKey(k))
-                if(buffer[k].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite) && !(buffer[k].Root is null)) 
+            if (buffer.ContainsKey(k))
+                if (buffer[k].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite) && !(buffer[k].Root is null)) 
                     RenderFrame(ret, buffer[k].Frame, buffer[k].Root, false);
             
             buffer[k] = new PlayingState(r);
@@ -292,9 +291,8 @@ namespace Apollo.Devices {
                 s.HashIndex = false;
                 s.Color = new Color();
                 
-                if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop) { 
+                if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop)
                     Stop(s, root, ret);
-                }
             });
             
             if (!(root is null)) {
@@ -306,20 +304,20 @@ namespace Apollo.Devices {
             
                         double start = Heaven.Time;
                         double total = 0;
-                       
+                        
                         poly.Add(state);
-                       
+                        
                         void Next() {
-                            if(!poly.Contains(state)) return;
+                            if (!poly.Contains(state)) return;
                             
                             List<Signal> ret = new List<Signal>();
                            
-                            if(++state.Frame < Frames.Count * AdjustedRepeats) {
+                            if (++state.Frame < Frames.Count * AdjustedRepeats) {
                                 RenderFrameDifference(ret, state.Frame, state.Root);
                                 
                                 ScheduleWithPinch(Next, state.Frame, ref start, ref total);
-                            }
-                            else {
+
+                            } else {
                                 poly.Remove(state);
                                 
                                 if (!Infinite)
@@ -331,6 +329,7 @@ namespace Apollo.Devices {
                         
                         ScheduleWithPinch(Next, 0, ref start, ref total);
                     }
+
                 } else {
                     double start = Heaven.Time;
                     double total = 0;
@@ -344,12 +343,12 @@ namespace Apollo.Devices {
                             RenderFrameDifference(ret, buffer[root].Frame, root);
                             
                             ScheduleWithPinch(Next, buffer[root].Frame, ref start, ref total);
-                        }
-                        else if (Mode == PlaybackType.Mono) {
+
+                        } else if (Mode == PlaybackType.Mono) {
                             if (!Infinite)
                                 RenderFrame(ret, buffer[root].Frame - 1, root, false);
-                        }       
-                        else if (Mode == PlaybackType.Loop) {
+                                
+                        } else if (Mode == PlaybackType.Loop) {
                             if (Infinite) RenderFrame(ret, 0, root);
                             else RenderFrameDifference(ret, 0, root);
                             
