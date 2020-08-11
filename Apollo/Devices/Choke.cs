@@ -99,14 +99,14 @@ namespace Apollo.Devices {
                 }
             }
 
-            if (!choked) Chain.MIDIEnter(o.Select(i => i.Clone()).ToList());  // TODO Heaven There was a .Clone here, maybe .Select(i => i.Clone()).ToList()?
+            if (!choked) Chain.MIDIEnter(o.Select(i => i.Clone()).ToList());
         }
         
         protected override void Stopped() {
             Chain.MIDIEnter(StopSignal.Instance);
 
             signals.Clear();
-            choked = false;
+            choked = true;
         }
 
         public override void Dispose() {
