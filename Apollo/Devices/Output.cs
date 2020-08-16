@@ -36,7 +36,9 @@ namespace Apollo.Devices {
         }
 
         void IndexRemoved() {
-            if (Program.Project.IsDisposing || Track.Get(this)?.IsDisposing != false) return;
+            Track owner = Track.Get(this);
+
+            if (Program.Project.IsDisposing || owner?.IsDisposing != false || owner?.ParentIndex == null) return;
 
             bool redoing = false;
 
@@ -48,7 +50,7 @@ namespace Apollo.Devices {
             if (!redoing)
                 Program.Project.Undo.History.Last().AddPost(new IndexRemovedFix(this, Target));
 
-            Target = Track.Get(this).ParentIndex.Value;
+            Target = owner.ParentIndex.Value;
             if (Viewer?.SpecificViewer != null) ((OutputViewer)Viewer.SpecificViewer).SetTarget(Target);
         }
 
@@ -102,8 +104,10 @@ namespace Apollo.Devices {
 
             protected override void UndoPath(params Output[] items) => items[0].Target = target;
 
+            protected override void OnRedo() {}
+
             public IndexRemovedFix(Output output, int target)
-            : base(null, output) => this.target = target;
+            : base("Output Index Removed Fix", output) => this.target = target;
             
             IndexRemovedFix(BinaryReader reader, int version)
             : base(reader, version) => target = reader.ReadInt32();
