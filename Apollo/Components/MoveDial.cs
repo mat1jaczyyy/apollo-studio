@@ -343,7 +343,14 @@ namespace Apollo.Components {
             
             if (e.Key == Key.Tab && sender is TextBox textBox) {
                 SkipLostFocus = true;
-                ((textBox == InputX)? InputY : InputX).Focus();
+
+                TextBox i = (textBox == InputX)? InputY : InputX;
+                
+                i.SelectionStart = 0;
+                i.SelectionEnd = i.Text.Length;
+                i.CaretIndex = i.Text.Length;
+
+                i.Focus();
             }
 
             e.Key = Key.None;
