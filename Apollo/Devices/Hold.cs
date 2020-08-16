@@ -104,14 +104,14 @@ namespace Apollo.Devices {
                 
                 if (!Infinite) Schedule(() => {
                     if (ReferenceEquals(buffer[k], s.Color))
-                        InvokeExit(new List<Signal>() {k});
+                        InvokeExit(new List<Signal>() {k.Clone()});
                 }, Heaven.Time + _time * _gate);
                 
                 return new [] {s};
             }
             
             return Enumerable.Empty<Signal>();
-        }).ToList());
+        }).Select(i => i.Clone()).ToList());
 
         protected override void Stopped() => buffer.Clear();
 
