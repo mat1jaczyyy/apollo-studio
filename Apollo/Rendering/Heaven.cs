@@ -55,12 +55,7 @@ namespace Apollo.Rendering {
                         jobs[target].Add(task.Job);
                     }
 
-                    long last = prev;
                     prev = Program.TimeSpent.ElapsedTicks;
-
-                    if (prev - last >= MSToTicks(10)) {
-                        // TODO Heaven Lagspike occurred! Maybe indicate?
-                    }
 
                     foreach (long i in jobs.Keys.TakeWhile(i => i <= prev).ToList()) {
                         foreach (Action job in jobs[i])
