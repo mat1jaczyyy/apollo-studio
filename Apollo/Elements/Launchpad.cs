@@ -59,6 +59,18 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning ProFirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pros are running the official Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs considerably worse than the optimized custom firmware.\n\n" +
+            "Update these to the latest version of the custom firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
         public static PortWarning CFWIncompatible { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "performance-optimized custom firmware which is not compatible with\n" +
@@ -139,6 +151,7 @@ namespace Apollo.Elements {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
+                if (ProFirmwareStock.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
@@ -306,6 +319,7 @@ namespace Apollo.Elements {
                         if (versionInt < 182) // Old Firmware
                             ProFirmwareOld.Set();
 
+                        ProFirmwareStock.Set();
                         return LaunchpadType.Pro;
 
                     case 0x03: // Launchpad X
