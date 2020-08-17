@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Apollo.Enums;
 using Apollo.Structures;

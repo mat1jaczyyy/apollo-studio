@@ -5,7 +5,6 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
-using Apollo.Helpers;
 using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
