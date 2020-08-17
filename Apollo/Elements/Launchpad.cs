@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -111,7 +111,7 @@ namespace Apollo.Elements {
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -127,7 +127,7 @@ namespace Apollo.Elements {
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
