@@ -60,7 +60,8 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning ProFirmwareStock { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pros are running the official Novation firmware.\n" + 
+            "One or more connected Launchpad Pros are running the official\n" + 
+            "Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
             "performs considerably worse than the optimized custom firmware.\n\n" +
             "Update these to the latest version of the custom firmware using\n" +
