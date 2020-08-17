@@ -83,6 +83,7 @@ namespace Apollo.Helpers {
                         
                         res += string.Join("", Enumerable.Repeat(compressedChar, numCount));
                         
+                        count = "";
                         inCompressed = false;
                         readingChar = false;
                         break;
