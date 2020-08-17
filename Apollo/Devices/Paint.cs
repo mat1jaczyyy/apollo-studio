@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 
 using Apollo.DeviceViewers;
@@ -26,8 +27,12 @@ namespace Apollo.Devices {
 
         public Paint(Color color = null): base("paint") => Color = color?? new Color();
 
-        public override void MIDIProcess(Signal n) {
-            if (n.Color.Lit) n.Color = Color.Clone();
+        public override void MIDIProcess(List<Signal> n) {
+            n.ForEach(i => {
+                if (i.Color.Lit)
+                    i.Color = Color.Clone();
+            });
+
             InvokeExit(n);
         }
         

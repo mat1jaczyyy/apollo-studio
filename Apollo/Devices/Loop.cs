@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -77,10 +80,7 @@ namespace Apollo.Devices {
                 if (Viewer?.SpecificViewer != null) ((LoopViewer)Viewer.SpecificViewer).SetHold(Hold);
             }
         }
-        
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier>> timers = new ConcurrentDictionary<Signal, List<Courier>>();
-        
+               
         public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
         
         public Loop(Time rate = null, double gate = 1, int repeats = 2, bool hold = false): base("loop") {
@@ -90,70 +90,46 @@ namespace Apollo.Devices {
             Hold = hold;
         }
         
-        void FireCourier(Signal n, Signal m, double time)
-            => timers[n].Add(new Courier<Signal>(time, m.Clone(), Tick));
-
-        void Start(Signal n, Signal m, int count) {
-            if (!timers.ContainsKey(n)) 
-                timers[n] = new List<Courier>();
-
-            InvokeExit(m.Clone());
-
-            if (!Hold || m.Color.Lit)
-                for (int i = 1; i < count; i++)
-                    FireCourier(n, m, i * _rate * _gate);
-        }
+        ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
         
-        public override void MIDIProcess(Signal n) {
-            Signal m = n.Clone();
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.SelectMany(s => {
+                double start = Heaven.Time;
 
-            if (Hold) {
-                n.Color = new Color();
-                
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-
-                lock (locker[n]) {
-                    if (timers.ContainsKey(n))
-                        for (int i = 0; i < timers[n].Count; i++)
-                            timers[n][i].Dispose();
+                if (Hold) {
+                    Signal k = s.With(color: new Color());
                     
-                    timers[n] = new List<Courier>();
+                    if (s.Color.Lit) { 
+                        buffer[k] = s;
+                        
+                        void Next() {
+                            if (buffer.ContainsKey(k) && ReferenceEquals(buffer[k], s)) {
+                                Schedule(Next, start += _rate * _gate);
+                                InvokeExit(new List<Signal>() {s.Clone()});
+                            }
+                        };
+                        
+                        Schedule(Next, start += _rate * _gate);
 
-                    Start(n, m, 2);
-                }
-            
-            } else Start(n, m, Repeats);
-        }
-        
-        void Tick(Courier<Signal> sender, Signal n) {
-            if (Disposed) return;
-            
-            Signal m = n.Clone();
-
-            if (Hold) {
-                n.Color = new Color();
-
-                lock (locker[n]) {
-                    FireCourier(n, m, _rate * _gate);
-                    timers[n].Remove(sender);
+                    } else buffer.TryRemove(k, out _);
                     
-                    InvokeExit(m.With(m.Index, new Color(0)));
-                    InvokeExit(m);
+                } else {
+                    int index = 1;
+                    
+                    void Next() {
+                        if (++index <= Repeats) {
+                            Schedule(Next, start += _rate * _gate);
+                            InvokeExit(new List<Signal>() {s.Clone()});
+                        }
+                    };
+                    
+                    Schedule(Next, start += _rate * _gate);
                 }
-            
-            } else {
-                timers[n].Remove(sender);
-                InvokeExit(m);
-            }
-        }
 
-        protected override void Stop() {
-            foreach (List<Courier> i in timers.Values) {
-                foreach (Courier j in i) j.Dispose();
-                i.Clear();
-            }
-            timers.Clear();
-        }
+                return new [] {s.Clone()};
+            }).ToList());
+
+        protected override void Stopped() => buffer.Clear();
         
         public override void Dispose() {
             if (Disposed) return;

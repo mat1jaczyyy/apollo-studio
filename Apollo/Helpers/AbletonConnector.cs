@@ -73,7 +73,12 @@ namespace Apollo.Helpers {
         public static void SendClear(AbletonLaunchpad source) =>
             Send(source, new byte[] {0xB0, 0x78, 0x00});
 
-        public static bool Connected => connection != null;
+        public static bool Connected => 
+            #if PRERELEASE
+                true;
+            #else
+                connection != null;
+            #endif
 
         static AbletonConnector() {
             try {

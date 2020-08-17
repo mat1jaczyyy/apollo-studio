@@ -9,7 +9,7 @@ using Apollo.Undo;
 
 namespace Apollo.Binary {
     public static class Common {
-        public const int version = 30;
+        public const int version = 31;
 
         public static readonly Type[] id = new Type[] {
             typeof(Preferences),

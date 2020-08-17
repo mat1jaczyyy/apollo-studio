@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -53,10 +55,12 @@ namespace Apollo.Devices {
             Range = range;
         }
 
-        public override void MIDIProcess(Signal n) {
-            n.Layer = Target;
-            n.BlendingMode = BlendingMode;
-            n.BlendingRange = Range;
+        public override void MIDIProcess(List<Signal> n) {
+            n.ForEach(i => {
+                i.Layer = Target;
+                i.BlendingMode = BlendingMode;
+                i.BlendingRange = Range;
+            });
 
             InvokeExit(n);
         }

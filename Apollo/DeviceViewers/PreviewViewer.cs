@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
@@ -44,9 +45,7 @@ namespace Apollo.DeviceViewers {
         void PadPressed(int index) => PadChanged(index, true);
         void PadReleased(int index) => PadChanged(index, false);
 
-        public void Signal(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
-            Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
-        });
+        public void Render(RawUpdate n) => Grid.RawUpdate(n);
 
         public void Clear() => Dispatcher.UIThread.InvokeAsync(() => {
             Grid.Clear();

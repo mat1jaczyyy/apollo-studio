@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+
 using Apollo.Core;
 using Apollo.Enums;
+using Apollo.Rendering;
 using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 
@@ -7,7 +10,10 @@ namespace Apollo.Elements {
     public class VirtualLaunchpad: Launchpad {
         public int VirtualIndex = 0;
 
-        public override void Send(Signal n) => Window?.SignalRender(n);
+        public override void Send(List<RawUpdate> n, Color[] snapshot) {
+            foreach (RawUpdate i in n)
+                Window?.Render(i);
+        }
 
         public override void ForceClear() {
             if (!Usable) return;

@@ -13,6 +13,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.Windows {
@@ -103,9 +104,7 @@ namespace Apollo.Windows {
         void PadPressed(int index) => PadChanged(index, true);
         void PadReleased(int index) => PadChanged(index, false);
 
-        public void SignalRender(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
-            Grid.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
-        });
+        public void Render(RawUpdate n) => Grid.RawUpdate(n);
 
         public void Clear() => Dispatcher.UIThread.InvokeAsync(Grid.Clear);
     

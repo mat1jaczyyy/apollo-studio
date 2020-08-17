@@ -9,6 +9,7 @@ using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -60,10 +61,6 @@ namespace Apollo.Devices {
                 Generate();
             }
         }
-        
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier<Signal>>> timers = new ConcurrentDictionary<Signal, List<Courier<Signal>>>();
 
         static Dictionary<FadeType, Func<double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double>>() { 
             {FadeType.Fast, proportion => Math.Pow(proportion, 2)},
@@ -151,9 +148,11 @@ namespace Apollo.Devices {
         public delegate void GeneratedEventHandler(List<FadeInfo> points);
         public event GeneratedEventHandler Generated;
 
-        public void Generate() => Generate(Preferences.FadeSmoothness);
+        public void Generate() => Generate(Preferences.FPSLimit);
 
-        void Generate(double smoothness) {
+        void Generate(int fps) {
+            double frameTime = 1000.0 / fps;
+
             if (_colors.Count < 2 || _positions.Count < 2) return;
             if (_types.Count < _colors.Count - 1) return;
 
@@ -223,12 +222,12 @@ namespace Apollo.Devices {
             fade.Add(fullFade.First());
 
             for (int i = 1; i < fullFade.Count; i++) {
-                double cutoff = fade.Last().Time + smoothness;
+                double cutoff = fade.Last().Time + frameTime;
 
                 if (cutoff < fullFade[i].Time)
                     fade.Add(fullFade[i]);
                     
-                else if (fade.Last().Time + 2 * smoothness <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
+                else if (fade.Last().Time + 2 * frameTime <= ((i < fullFade.Count - 1)? fullFade[i + 1].Time : _time * _gate))
                     fade.Add(fullFade[i].WithTime(cutoff));
 
                 else if (i == fullFade.Count - 1 && fullFade[i].Color.Lit)
@@ -293,93 +292,66 @@ namespace Apollo.Devices {
 
             Generate();
 
-            Preferences.FadeSmoothnessChanged += Generate;
+            Preferences.FPSLimitChanged += Generate;
 
             if (Program.Project != null)
                 Program.Project.BPMChanged += Generate;
         }
 
-        void FireCourier(Signal n, double time)
-            => timers[n].Add(new Courier<Signal>(time, n, Tick));
+        ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
 
-        void Tick(Courier<Signal> sender, Signal n) {
-            if (Disposed) return;
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.SelectMany(i => {
+                Signal k = i.With(color: new Color(0));
+                Signal v = i.Clone();
 
-            lock (locker[n]) {
-                if (PlayMode == FadePlaybackType.Loop && !timers[n].Contains(sender)) return;
+                Signal p = buffer.TryGetValue(k, out p)? p : null;
 
-                if (++buffer[n] == fade.Count - 1 && PlayMode == FadePlaybackType.Loop) {
-                    Stop(n);
+                if (!(PlayMode == FadePlaybackType.Mono && !i.Color.Lit && buffer.ContainsKey(k) && (buffer[k]?.Color.Lit?? false)))
+                    buffer[k] = v;
+
+                if (i.Color.Lit) {
+                    double start = Heaven.Time;
+                    int index = 0;
                     
-                    for (int i = 1; i < fade.Count; i++)
-                        FireCourier(n, fade[i].Time);
-                }
-                
-                if (buffer[n] < fade.Count) {
-                    Signal m = n.Clone();
-                    m.Color = fade[buffer[n]].Color.Clone();
-                    InvokeExit(m);
-                }
-            }
-        }
+                    void Next() {
+                        if (!object.ReferenceEquals(buffer[k], v)) {
+                            if (PlayMode == FadePlaybackType.Mono && !buffer[k].Color.Lit)
+                                v = buffer[k];
+                            
+                            else return;
+                        }
 
-        void Stop(Signal n) {
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-
-            lock (locker[n]) {
-                if (timers.ContainsKey(n))
-                    for (int i = 0; i < timers[n].Count; i++)
-                        timers[n][i].Dispose();
-                
-                if (PlayMode == FadePlaybackType.Loop && buffer.ContainsKey(n) && buffer[n] < fade.Count - 1) {
-                    Signal m = n.Clone();
-                    m.Color = fade.Last().Color.Clone();
-                    InvokeExit(m);
-                }
-
-                timers[n] = new List<Courier<Signal>>();
-                buffer[n] = 0;
-            }
-        }
-
-        public override void MIDIProcess(Signal n) {
-            if (_colors.Count > 0) {
-                bool lit = n.Color.Lit;
-                n.Color = new Color();
-
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-
-                lock (locker[n]) {
-                    if ((PlayMode == FadePlaybackType.Mono && lit) || PlayMode == FadePlaybackType.Loop) Stop(n);
-
-                    if (lit) {
-                        Signal m = n.Clone();
-                        m.Color = fade[0].Color.Clone();
-                        InvokeExit(m);
+                        if (++index == fade.Count - 1 && PlayMode == FadePlaybackType.Loop)
+                            index = 0;
                         
-                        for (int i = 1; i < fade.Count; i++)
-                            FireCourier(n, fade[i].Time);
-                    }
+                        if (index < fade.Count) {
+                            if (index < fade.Count - 1) Schedule(Next, start += fade[index + 1].Time - fade[index].Time);
+
+                            InvokeExit(new List<Signal>() {i.With(color: fade[index].Color.Clone())});
+                        }
+                    };
+
+                    Schedule(Next, start += fade[1].Time - fade[0].Time);
+
+                    return new [] {i.With(color: fade[0].Color.Clone())};
+                
+                } else if (PlayMode == FadePlaybackType.Loop && !(p is null)) {
+                    buffer[k] = null;
+
+                    return new [] {k};
                 }
-            }
-        }
 
-        protected override void Stop() {
-            foreach (List<Courier<Signal>> i in timers.Values) {
-                foreach (Courier j in i) j.Dispose();
-                i.Clear();
-            }
-            timers.Clear();
+                return Enumerable.Empty<Signal>();
+            }).ToList());
 
-            buffer.Clear();
-            locker.Clear();
-        }
+        protected override void Stopped() => buffer.Clear();
 
         public override void Dispose() {
             if (Disposed) return;
 
             Generated = null;
-            Preferences.FadeSmoothnessChanged -= Generate;
+            Preferences.FPSLimitChanged -= Generate;
 
             if (Program.Project != null)
                 Program.Project.BPMChanged -= Generate;

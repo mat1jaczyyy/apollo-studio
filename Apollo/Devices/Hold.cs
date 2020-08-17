@@ -1,9 +1,12 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -76,14 +79,6 @@ namespace Apollo.Devices {
             }
         }
 
-        ConcurrentDictionary<Signal, Color> releasebuffer = new ConcurrentDictionary<Signal, Color>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-
-        ConcurrentQueue<Signal> buffer = new ConcurrentQueue<Signal>();
-        object queuelocker = new object();
-        ConcurrentHashSet<Courier> timers = new ConcurrentHashSet<Courier>();
-        ConcurrentDictionary<Signal, int> ignores = new ConcurrentDictionary<Signal, int>();
-
         public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -95,64 +90,30 @@ namespace Apollo.Devices {
             Infinite = infinite;
             Release = release;
         }
-
-        void Tick(Courier sender) {
-            if (Disposed) return;
+        
+        ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
+        
+        public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
+            Signal k = s.With(color: new Color(0));
             
-            lock (queuelocker) {
-                if (buffer.TryDequeue(out Signal n) && ignores[n]-- <= 0)
-                    InvokeExit(n.Clone());
+            if (s.Color.Lit)
+                buffer[k] = s.Color;
+            
+            if (s.Color.Lit != Release) {
+                s.Color = buffer[k];
+                
+                if (!Infinite) Schedule(() => {
+                    if (ReferenceEquals(buffer[k], s.Color))
+                        InvokeExit(new List<Signal>() {k.Clone()});
+                }, Heaven.Time + _time * _gate);
+                
+                return new [] {s};
             }
-        }
-
-        public override void MIDIProcess(Signal n) {
-            Color color = n.Color.Clone();
-            n.Color = new Color(0);
             
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-            
-            lock (locker[n]) {
-                if (color.Lit && Release) releasebuffer[n] = color;
+            return Enumerable.Empty<Signal>();
+        }).Select(i => i.Clone()).ToList());
 
-                if (color.Lit != Release) {
-                    if (!Infinite)
-                        lock (queuelocker) {
-                            Signal m = n.Clone();
-
-                            if (!ignores.ContainsKey(m))
-                                ignores[m] = -1;
-                            
-                            ignores[m]++;
-
-                            buffer.Enqueue(m);
-
-                            timers.Add(new Courier(_time * _gate, Tick));
-                        }
-
-                    if (Release) {
-                        if (!releasebuffer.ContainsKey(n)) return;
-
-                        color = releasebuffer[n];
-                        releasebuffer.TryRemove(n, out _);
-                    }
-
-                    n.Color = color;
-                    InvokeExit(n);
-                }
-            }
-        }
-
-        protected override void Stop() {
-            foreach (Courier i in timers) i.Dispose();
-            timers.Clear();
-            
-            buffer.Clear();
-            queuelocker = new object();
-
-            releasebuffer.Clear();
-            locker.Clear();
-            ignores.Clear();
-        }
+        protected override void Stopped() => buffer.Clear();
 
         public override void Dispose() {
             if (Disposed) return;

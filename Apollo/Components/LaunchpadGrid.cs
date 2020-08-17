@@ -8,9 +8,11 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Input;
+using Avalonia.Threading;
 
 using Apollo.Core;
 using Apollo.Enums;
+using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -50,6 +52,10 @@ namespace Apollo.Components {
 
             } else Buttons[index].SetColor(color);
         }
+
+        public void RawUpdate(RawUpdate n) => Dispatcher.UIThread.InvokeAsync(() => {
+            SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        });
 
         public void Clear() {
             SolidColorBrush color = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");

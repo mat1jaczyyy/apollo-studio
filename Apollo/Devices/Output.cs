@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -75,8 +76,8 @@ namespace Apollo.Devices {
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
 
-        public override void MIDIProcess(Signal n) {
-            n.Source = Launchpad;
+        public override void MIDIProcess(List<Signal> n) {
+            n.ForEach(i => i.Source = Launchpad);
             InvokeExit(n);
         }
 

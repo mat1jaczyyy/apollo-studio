@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -48,17 +50,17 @@ namespace Apollo.Devices {
             Offset.Changed += OffsetChanged;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (n.Index == 100) {
-                InvokeExit(n);
-                return;
-            }
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.SelectMany((i => {
+                if (i.Index == 100) return new [] {i};
 
-            if (Offset.Apply(n.Index, GridMode, Wrap, out int x, out int y, out int result)) {
-                n.Index = (byte)result;
-                InvokeExit(n);
-            }
-        }
+                if (Offset.Apply(i.Index, GridMode, Wrap, out int x, out int y, out int result)) {
+                    i.Index = (byte)result;
+                    return new [] {i};
+                }
+
+                return Enumerable.Empty<Signal>();
+            })).ToList());
 
         public override void Dispose() {
             if (Disposed) return;
