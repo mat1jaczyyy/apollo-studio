@@ -42,7 +42,10 @@ namespace Apollo.Devices {
         }
 
         public override void MIDIProcess(List<Signal> n)
-            => InvokeExit((Bypass? n.Select(i => i.Clone()) : Enumerable.Empty<Signal>()).Concat(n.Select(i => {
+            => InvokeExit((Bypass? n.Select(i => i.Clone()) : Enumerable.Empty<Signal>()).Concat(n.SelectMany(i => {
+                if (i.Index == 100) 
+                    return Bypass? Enumerable.Empty<Signal>() : new [] {i};
+
                 if (Mode == RotateType.D90)
                     i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
 
@@ -52,7 +55,7 @@ namespace Apollo.Devices {
                 else if (Mode == RotateType.D270)
                     i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
 
-                return i;
+                return new [] {i};
             })).ToList());
         
         public class ModeUndoEntry: EnumSimplePathUndoEntry<Rotate, RotateType> {
