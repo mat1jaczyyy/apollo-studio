@@ -46,7 +46,10 @@ namespace Apollo.Windows {
             AutoCreateMacroFilter = this.Get<CheckBox>("AutoCreateMacroFilter");
             AutoCreatePattern = this.Get<CheckBox>("AutoCreatePattern");
 
-            FadeSmoothness = this.Get<HorizontalDial>("FadeSmoothness");
+            FPSLimit = this.Get<HorizontalDial>("FPSLimit");
+            FPSLimit.ErrorText = $"Use values above {FPSLimit.ErrorValue} FPS with caution, as they usually\n" +
+                                 "bring little noticable improvement while severely limiting\n" +
+                                 "performance (especially on non-CFW Launchpads).";
 
             CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
             CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
@@ -82,7 +85,7 @@ namespace Apollo.Windows {
         ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
-        HorizontalDial FadeSmoothness;
+        HorizontalDial FPSLimit;
         Controls Contents;
         DispatcherTimer Timer;
         LaunchpadGrid Preview;
@@ -172,7 +175,7 @@ namespace Apollo.Windows {
             AutoCreateMacroFilter.IsChecked = Preferences.AutoCreateMacroFilter;
             AutoCreatePattern.IsChecked = Preferences.AutoCreatePattern;
 
-            FadeSmoothness.Value = Preferences.FadeSmoothnessSlider;
+            FPSLimit.RawValue = Preferences.FPSLimit;
 
             CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
             CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
@@ -196,11 +199,18 @@ namespace Apollo.Windows {
 
             CheckForUpdates.IsChecked = Preferences.CheckForUpdates;
 
+#if !PRERELEASE
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 CheckForUpdates.IsChecked = false;
+#endif
                 CheckForUpdates.IsEnabled = false;
+                
+#if PRERELEASE
+                ToolTip.SetTip((Control)CheckForUpdates.Parent, "Auto-updating is not supported on prerelease");
+#else
                 ToolTip.SetTip((Control)CheckForUpdates.Parent, "Auto-updating is not supported on Linux");
             }
+#endif
 
             UpdateTime(null, EventArgs.Empty);
             Timer = new DispatcherTimer() {
@@ -211,8 +221,6 @@ namespace Apollo.Windows {
 
             UpdatePorts();
             MIDI.DevicesUpdated += HandlePorts;
-
-            fade.MIDIExit = FadeExit;
         }
 
         void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
@@ -258,7 +266,7 @@ namespace Apollo.Windows {
 
         void AutoCreatePattern_Changed(object sender, RoutedEventArgs e) => Preferences.AutoCreatePattern = AutoCreatePattern.IsChecked.Value;
 
-        void FadeSmoothness_Changed(Dial sender, double value, double? old) => Preferences.FadeSmoothness = value / 100;
+        void FPSLimit_Changed(Dial sender, double value, double? old) => Preferences.FPSLimit = (int)value;
 
         void CaptureLaunchpad_Changed(object sender, RoutedEventArgs e) => Preferences.CaptureLaunchpad = CaptureLaunchpad.IsChecked.Value;
 

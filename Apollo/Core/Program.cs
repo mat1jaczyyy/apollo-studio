@@ -15,7 +15,7 @@ using Apollo.Elements;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Version 1.6.4";
+        public static readonly string Version = "Version 1.7.0";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
@@ -30,7 +30,11 @@ namespace Apollo.Core {
 
         public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
-        ), ".apollostudio");
+        ), ".apollostudio"
+            #if PRERELEASE
+                + "-prerelease"
+            #endif
+        );
 
         public static readonly string CrashDir = Path.Combine(UserPath, "Crashes");
         public static readonly string CrashProject = Path.Combine(CrashDir, "crash.approj");

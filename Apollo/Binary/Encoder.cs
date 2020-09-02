@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.CSharp.RuntimeBinder;
-
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
@@ -54,7 +52,7 @@ namespace Apollo.Binary {
             writer.Write(Preferences.AutoCreateMacroFilter);
             writer.Write(Preferences.AutoCreatePattern);
 
-            writer.Write(Preferences.FadeSmoothnessSlider);
+            writer.Write(Preferences.FPSLimit);
 
             writer.Write(Preferences.CopyPreviousFrame);
             writer.Write(Preferences.CaptureLaunchpad);

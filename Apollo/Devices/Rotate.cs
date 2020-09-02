@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -39,21 +41,22 @@ namespace Apollo.Devices {
             Bypass = bypass;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (Bypass) InvokeExit(n.Clone());
-            
-            if (Mode == RotateType.D90) {
-                n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit((Bypass? n.Select(i => i.Clone()) : Enumerable.Empty<Signal>()).Concat(n.SelectMany(i => {
+                if (i.Index == 100) 
+                    return Bypass? Enumerable.Empty<Signal>() : new [] {i};
 
-            } else if (Mode == RotateType.D180) {
-                n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
+                if (Mode == RotateType.D90)
+                    i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
 
-            } else if (Mode == RotateType.D270) {
-                n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
-            }
+                else if (Mode == RotateType.D180)
+                    i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
 
-            InvokeExit(n);
-        }
+                else if (Mode == RotateType.D270)
+                    i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+
+                return new [] {i};
+            })).ToList());
         
         public class ModeUndoEntry: EnumSimplePathUndoEntry<Rotate, RotateType> {
             protected override void Action(Rotate item, RotateType element) => item.Mode = element;

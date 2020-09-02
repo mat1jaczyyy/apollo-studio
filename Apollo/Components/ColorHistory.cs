@@ -10,6 +10,7 @@ using Avalonia.Input;
 
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Rendering;
 using Apollo.Structures;
 
 namespace Apollo.Components {
@@ -26,9 +27,7 @@ namespace Apollo.Components {
             HistoryChanged?.Invoke();
         }
 
-        public static int Count {
-            get => History.Count;
-        }
+        public static int Count => History.Count;
 
         static void Use(Color color) {
             if (History.Contains(color)) History.Remove(color);
@@ -64,6 +63,8 @@ namespace Apollo.Components {
         
         UniformGrid Grid;
         int CurrentIndex;
+
+        public int AdjustedCount => History.Count + Convert.ToInt32(CurrentIndex == -1);
 
         public void Use() {
             if (Current == new Color(0)) return;
@@ -125,13 +126,13 @@ namespace Apollo.Components {
             }
         }
 
-        public void Render(Launchpad launchpad, object origin) {
+        public void Render(Launchpad launchpad) {
             launchpad?.Clear();
             int offset = 0;
 
             if (CurrentIndex == -1) {
                 offset = 1;
-                launchpad?.Send(new Signal(origin, launchpad, 81, Current));
+                launchpad?.DirectSend(new RawUpdate(81, Current));
             }
 
             int x = 8;
@@ -139,7 +140,7 @@ namespace Apollo.Components {
 
             for (int i = 0; i < 64 - offset; i++) {
                 if (i < History.Count) {
-                    launchpad?.Send(new Signal(origin, launchpad, (byte)(x * 10 + (y++)), History[i]));
+                    launchpad?.DirectSend(new RawUpdate((byte)(x * 10 + y++), History[i]));
 
                     if (y > 8) {
                         x--;

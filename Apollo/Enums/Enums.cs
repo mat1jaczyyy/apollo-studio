@@ -102,7 +102,7 @@ namespace Apollo.Enums {
         public static bool UsesKeySelector(this MultiType type)
             => type == MultiType.Key;
 
-        public static bool HasModeLight(this LaunchpadType type)
+        public static bool IsPro(this LaunchpadType type)
             => LaunchpadType.Pro <= type && type <= LaunchpadType.CFW;
 
         public static bool IsGenerationX(this LaunchpadType type)

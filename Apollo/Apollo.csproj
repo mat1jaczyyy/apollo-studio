@@ -11,6 +11,7 @@
     <StartupObject>Apollo.Core.Program</StartupObject>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!--<DefineConstants>PRERELEASE</DefineConstants>-->
   </PropertyGroup>
   
   <ItemGroup>

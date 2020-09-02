@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+
 using Avalonia.Threading;
 
 using Apollo.Core;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 using Apollo.Windows;
@@ -37,7 +40,7 @@ namespace Apollo.Elements {
             set {}
         }
 
-        public override void Send(Signal n) => Target?.Send(n);
+        public override void Send(List<RawUpdate> n, Color[] snapshot) => Target?.Send(n, snapshot);
 
         public override void Clear(bool manual = false) {
             if (!Available || (manual && PatternWindow != null)) return;

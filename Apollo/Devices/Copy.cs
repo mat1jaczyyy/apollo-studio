@@ -10,6 +10,7 @@ using Apollo.DeviceViewers;
 using Apollo.Elements;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -108,49 +109,6 @@ namespace Apollo.Devices {
             }
         }
 
-        class PolyInfo {
-            public Signal n;
-            public int index = 0;
-            public object locker = new object();
-            public List<int> offsets;
-            public List<Courier<PolyInfo>> timers = new List<Courier<PolyInfo>>();
-
-            public PolyInfo(Signal init_n, List<int> init_offsets) {
-                n = init_n;
-                offsets = init_offsets;
-            }
-        }
-
-        class DoubleTuple {
-            public double X;
-            public double Y;
-
-            public DoubleTuple(double x = 0, double y = 0) {
-                X = x;
-                Y = y;
-            }
-
-            public IntTuple Round() => new IntTuple((int)Math.Round(X), (int)Math.Round(Y));
-
-            public static DoubleTuple operator *(DoubleTuple t, double f) => new DoubleTuple(t.X * f, t.Y * f);
-            public static DoubleTuple operator +(DoubleTuple a, DoubleTuple b) => new DoubleTuple(a.X + b.X, a.Y + b.Y);
-        };
-
-        class IntTuple {
-            public int X;
-            public int Y;
-
-            public IntTuple(int x, int y) {
-                X = x;
-                Y = y;
-            }
-
-            public IntTuple Apply(Func<int, int> action) => new IntTuple(
-                action.Invoke(X),
-                action.Invoke(Y)
-            );
-        }
-
         CopyType _copymode;
         public CopyType CopyMode {
             get => _copymode;
@@ -217,14 +175,6 @@ namespace Apollo.Devices {
             }
         }
 
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>> timers = new ConcurrentDictionary<Signal, Courier<ValueTuple<Signal, List<int>>>>();
-        ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
-
-        ConcurrentDictionary<Signal, ConcurrentHashSet<Signal>> screen = new ConcurrentDictionary<Signal, ConcurrentHashSet<Signal>>();
-        ConcurrentDictionary<Signal, object> screenlocker = new ConcurrentDictionary<Signal, object>();
-
         public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, Offsets.Select(i => i.Clone()).ToList(), Angles.ToList()) {
             Collapsed = Collapsed,
             Enabled = Enabled
@@ -250,117 +200,95 @@ namespace Apollo.Devices {
                 offset.Changed += OffsetChanged;
         }
 
-        void ScreenOutput(Signal o, Signal i) {
-            bool on = i.Color.Lit;
-            i.Color = new Color();
-            Signal k = o.With(o.Index, new Color());
+        class DoubleTuple {
+            public double X;
+            public double Y;
 
-            if (!screenlocker.ContainsKey(k))
-                screenlocker[k] = new object();
-            
-            lock (screenlocker[k]) {
-                if (!screen.ContainsKey(k))
-                    screen[k] = new ConcurrentHashSet<Signal>();
-
-                if (on) {
-                    if (!screen[k].Contains(i))
-                        screen[k].Add(i);
-
-                    InvokeExit(o.Clone());
-
-                } else {
-                    if (screen[k].Contains(i))
-                        screen[k].Remove(i);
-                    
-                    if (screen[k].Count == 0)
-                        InvokeExit(o.Clone());
-                }
+            public DoubleTuple(double x = 0, double y = 0) {
+                X = x;
+                Y = y;
             }
+
+            public IntTuple Round() => new IntTuple((int)Math.Round(X), (int)Math.Round(Y));
+
+            public static DoubleTuple operator *(DoubleTuple t, double f) => new DoubleTuple(t.X * f, t.Y * f);
+            public static DoubleTuple operator +(DoubleTuple a, DoubleTuple b) => new DoubleTuple(a.X + b.X, a.Y + b.Y);
+        };
+
+        class IntTuple {
+            public int X;
+            public int Y;
+
+            public IntTuple(int x, int y) {
+                X = x;
+                Y = y;
+            }
+
+            public IntTuple Apply(Func<int, int> action) => new IntTuple(
+                action.Invoke(X),
+                action.Invoke(Y)
+            );
         }
+        
+        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t, double pointCount) {
+            double angle = startAngle + (endAngle - startAngle) * ((double)t / pointCount);
 
-        void FireCourier(PolyInfo info, double time)
-            => info.timers.Add(new Courier<PolyInfo>(time, info, Tick));
+            return new DoubleTuple(
+                center.X + radius * Math.Cos(angle),
+                center.Y + radius * Math.Sin(angle)
+            );
+        }
+        
+        DoubleTuple LineGenerator(IntTuple p, IntTuple a, IntTuple b, int t) => (a.X > a.Y)
+            ? new DoubleTuple(
+                p.X + t * b.X,
+                p.Y + (int)Math.Round((double)t / a.X * a.Y) * b.Y
+            )
+            : new DoubleTuple(
+                p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
+                p.Y + t * b.Y
+            );
+        
+        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
+        ConcurrentHashSet<Signal> offbuf = new ConcurrentHashSet<Signal>();
+        
+        void ScreenOutput(IEnumerable<Signal> n, bool output = true) {
+            List<Signal> data = n.SelectMany(s => {
+                Signal m = s.With(s.Index, new Color());
+                
+                if (!locker.ContainsKey(m))
+                    locker[m] = new object();
 
-        void FireCourier((Signal n, List<int>) info, double time)
-            => timers[info.n.With(info.n.Index, new Color())] = new Courier<ValueTuple<Signal, List<int>>>(time, info, Tick);
+                lock (locker[m]) {
+                    if (!screen.ContainsKey(m))
+                        screen[m] = 0;
+                    
+                    if (s.Color.Lit) {
+                        screen[m]++;
+                        return new [] {s};
 
-        void Tick(Courier<PolyInfo> sender, PolyInfo info) {
-            if (Disposed) return;
-            
-            if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
-                lock (info.locker) {
-                    if (++info.index < info.offsets.Count && info.offsets[info.index] != -1) {
-                        Signal m = info.n.Clone();
-                        m.Index = (byte)info.offsets[info.index];
-                        ScreenOutput(m, info.n.Clone());
-
-                        if (info.index == info.offsets.Count - 1)
-                            poly.Remove(info);
+                    } else {
+                        screen[m]--;
+                        if (screen[m] <= 0) return new [] {s};
                     }
                 }
-            }
+                
+                return Enumerable.Empty<Signal>();
+            }).ToList();
+
+            if (output) InvokeExit(data);
         }
 
-        void Tick(Courier<(Signal n, List<int> offsets)> sender, (Signal n, List<int> offsets) info) {
-            if (Disposed) return;
-            
-            if (CopyMode == CopyType.RandomLoop)
-                HandleRandomLoop(info.n, info.offsets);
-        }
+        IEnumerable<Signal> CopyCalc(Signal s, bool output = true) {
+            int px = s.Index % 10;
+            int py = s.Index / 10;
 
-        void HandleRandomLoop(Signal original, List<int> offsets) {
-            Signal n = original.With(original.Index, new Color());
-            Signal m = original.Clone();
-
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-
-            lock (locker[n]) {
-                if (!buffer.ContainsKey(n)) {
-                    if (!m.Color.Lit) return;
-                    buffer[n] = RNG.Next(offsets.Count);
-                    m.Index = (byte)offsets[buffer[n]];
-
-                } else {
-                    Signal o = original.Clone();
-                    o.Index = (byte)offsets[buffer[n]];
-                    o.Color = new Color(0);
-                    ScreenOutput(o, original.Clone());
-
-                    if (m.Color.Lit) {
-                        if (offsets.Count > 1) {
-                            int old = buffer[n];
-                            buffer[n] = RNG.Next(offsets.Count - 1);
-                            if (buffer[n] >= old) buffer[n]++;
-                        }
-                        m.Index = (byte)offsets[buffer[n]];
-                    
-                    } else buffer.Remove(n, out _);
-                }
-
-                if (buffer.ContainsKey(n)) {
-                    ScreenOutput(m, original.Clone());
-                    FireCourier((original, offsets), _time * _gate);
-                } else {
-                    timers[n].Dispose();
-                    timers.Remove(n, out _);
-                }
-            }
-        }
-
-        public override void MIDIProcess(Signal n) {
-            if (n.Index == 100) {
-                ScreenOutput(n.Clone(), n.Clone());
-                return;
-            }
-
-            int px = n.Index % 10;
-            int py = n.Index / 10;
-
-            List<int> validOffsets = new List<int>() {n.Index};
-            List<int> interpolatedOffsets = new List<int>() {n.Index};
+            List<int> validOffsets = new List<int>() {s.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
-                if (Offsets[i].Apply(n.Index, GridMode, Wrap, out int _x, out int _y, out int result))
+                if (Offsets[i].Apply(s.Index, GridMode, Wrap, out int _x, out int _y, out int result) && CopyMode != CopyType.Interpolate)
                     validOffsets.Add(result);
 
                 if (CopyMode == CopyType.Interpolate) {
@@ -423,79 +351,124 @@ namespace Apollo.Devices {
 
                         bool valid = Offset.Validate(point.X, point.Y, GridMode, Wrap, out int iresult);
 
-                        if (iresult != interpolatedOffsets.Last())
-                            interpolatedOffsets.Add(valid? iresult : -1);
+                        if (iresult != validOffsets.Last())
+                            validOffsets.Add(valid? iresult : -1);
                     }
                 }
 
                 px = _x;
                 py = _y;
             }
-
-            if (CopyMode == CopyType.Interpolate) validOffsets = interpolatedOffsets;
-
-            if (CopyMode == CopyType.Static) {
-                ScreenOutput(n.Clone(), n.Clone());
-
-                for (int i = 1; i < validOffsets.Count; i++) {
-                    Signal m = n.Clone();
-                    m.Index = (byte)validOffsets[i];
-
-                    ScreenOutput(m, n.Clone());
-                }
-
-            } else if (CopyMode == CopyType.Animate || CopyMode == CopyType.Interpolate) {
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-                
-                lock (locker[n]) {
-                    if (Reverse) validOffsets.Reverse();
-
-                    if (validOffsets[0] != -1)
-                        ScreenOutput(n.With((byte)validOffsets[0], n.Color), n.Clone());
                     
-                    PolyInfo info = new PolyInfo(n.Clone(), validOffsets);
-                    poly.Add(info);
+            double start = Heaven.Time;
+                    
+            switch (CopyMode) {
+                case CopyType.Static:
+                    return validOffsets.Select(offset => s.With((byte)offset));
 
+                case CopyType.Animate:
+                case CopyType.Interpolate:
+                    if (Reverse) validOffsets.Reverse();
+                    
+                    int index = 0;
                     double total = _time * _gate * (validOffsets.Count - 1);
 
-                    for (int i = 1; i < validOffsets.Count; i++)
-                        if (!Infinite || i < validOffsets.Count - 1 || n.Color.Lit)
-                            FireCourier(info, Pincher.ApplyPinch(_time * _gate * i, total, Pinch, Bilateral));
-                }
+                    void Next() {
+                        index++;
+                        if (index < validOffsets.Count) {
+                            if (index < validOffsets.Count - 1) Schedule(Next, start += (
+                                Pincher.ApplyPinch(_time * _gate * (index + 1), total, Pinch, Bilateral) -
+                                Pincher.ApplyPinch(_time * _gate * (index), total, Pinch, Bilateral)
+                            ));
+                            
+                            if (validOffsets[index] == -1 || !(!Infinite || index < validOffsets.Count - 1 || s.Color.Lit)) return;
+                            
+                            ScreenOutput(new [] {s.With((byte)validOffsets[index])}, output);
+                        }
+                    };
 
-            } else if (CopyMode == CopyType.RandomSingle) {
-                Signal m = n.Clone();
-                n.Color = new Color();
+                    Schedule(Next, start += Pincher.ApplyPinch(_time * _gate, total, Pinch, Bilateral));
+                    return new [] {s.Clone()};
+                
+                case CopyType.RandomSingle:
+                    Signal m = s.Clone();
+                    s.Color = new Color();
+                    
+                    if (!buffer.ContainsKey(s)) {
+                        if (!m.Color.Lit) break;
+                        buffer[s] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
 
-                if (!buffer.ContainsKey(n)) {
-                    if (!m.Color.Lit) return;
-                    buffer[n] = m.Index = (byte)validOffsets[RNG.Next(validOffsets.Count)];
+                    } else {
+                        m.Index = (byte)buffer[s];
+                        if (!m.Color.Lit) buffer.Remove(s, out _);
+                    }
+                    
+                    return new [] {m};
+                
+                case CopyType.RandomLoop:
+                    Signal k = s.With(color: new Color());
+                    Signal v;
+                    
+                    if (!buffer.ContainsKey(k)) {
+                        if (!s.Color.Lit) break;
 
-                } else {
-                    m.Index = (byte)buffer[n];
-                    if (!m.Color.Lit) buffer.Remove(n, out _);
-                }
+                        buffer[k] = RNG.Next(validOffsets.Count);
+                        v = s.With((byte)validOffsets[buffer[k]]);
 
-                ScreenOutput(m, n.Clone());
+                        if (validOffsets.Count > 1) {
+                            void RandNext() {
+                                if (!buffer.Keys.Any(key => ReferenceEquals(key, k))) return;
 
-            } else if (CopyMode == CopyType.RandomLoop) HandleRandomLoop(n, validOffsets);
-        }
+                                int old = buffer[k];
+                                
+                                buffer[k] = RNG.Next(validOffsets.Count - 1);
+                                if (buffer[k] >= old) buffer[k]++;
+                                
+                                Schedule(RandNext, start += _time * _gate);
+                                
+                                ScreenOutput(new [] {
+                                    s.With((byte)validOffsets[old], new Color(0)),
+                                    s.With((byte)validOffsets[buffer[k]])
+                                }, output);
+                            };
+                            
+                            Schedule(RandNext, start += _time * _gate);
+                        }
 
-        protected override void Stop() {
-            foreach (Courier i in timers.Values) i.Dispose();
-            timers.Clear();
+                    } else {
+                        if (s.Color.Lit) break;
 
-            foreach (PolyInfo info in poly) {
-                foreach (Courier i in info.timers) i.Dispose();
-                info.timers.Clear();
+                        v = s.With((byte)validOffsets[buffer[k]]);
+                        buffer.Remove(k, out _);
+                    }
+
+                    return new [] {v};
             }
-            poly.Clear();
 
+            return Enumerable.Empty<Signal>();
+        }
+        
+        public override void MIDIProcess(List<Signal> n)
+            => ScreenOutput(n.SelectMany((s => {
+                if (s.Index == 100) return new [] {s};
+
+                Signal off = s.With(color: new Color(0));
+                if (s.Color.Lit) {
+                    if (offbuf.Contains(off))
+                        ScreenOutput(CopyCalc(off, false), false);
+
+                    else offbuf.Add(off);
+                
+                } else offbuf.Remove(off);
+                
+                return CopyCalc(s);
+            })));
+        
+        protected override void Stopped() {
             buffer.Clear();
-            locker.Clear();
-
             screen.Clear();
-            screenlocker.Clear();
+            locker.Clear();
+            offbuf.Clear();
         }
 
         public override void Dispose() {
@@ -507,25 +480,6 @@ namespace Apollo.Devices {
             Time.Dispose();
             base.Dispose();
         }
-    
-        DoubleTuple CircularInterp(DoubleTuple center, double radius, double startAngle, double endAngle, double t, double pointCount) {
-            double angle = startAngle + (endAngle - startAngle) * ((double)t / pointCount);
-
-            return new DoubleTuple(
-                center.X + radius * Math.Cos(angle),
-                center.Y + radius * Math.Sin(angle)
-            );
-        }
-        
-        DoubleTuple LineGenerator(IntTuple p, IntTuple a, IntTuple b, int t) => (a.X > a.Y)
-            ? new DoubleTuple(
-                p.X + t * b.X,
-                p.Y + (int)Math.Round((double)t / a.X * a.Y) * b.Y
-            )
-            : new DoubleTuple(
-                p.X + (int)Math.Round((double)t / a.Y * a.X) * b.X,
-                p.Y + t * b.Y
-            );
             
         public class RateUndoEntry: SimplePathUndoEntry<Copy, int> {
             protected override void Action(Copy item, int element) => item.Time.Free = element;

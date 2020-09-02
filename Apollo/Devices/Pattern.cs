@@ -14,6 +14,7 @@ using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
 using Apollo.Windows;
+using Apollo.Rendering;
 
 namespace Apollo.Devices {
     public class Pattern: Device, ISelectParent {
@@ -93,11 +94,6 @@ namespace Apollo.Devices {
             Window?.Selection.Select(Frames[Expanded]);
         }
 
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentDictionary<Signal, List<Courier<Signal>>> timers = new ConcurrentDictionary<Signal, List<Courier<Signal>>>();
-        ConcurrentHashSet<PolyInfo> poly = new ConcurrentHashSet<PolyInfo>();
-
         double _gate;
         public double Gate {
             get => _gate;
@@ -140,15 +136,6 @@ namespace Apollo.Devices {
             Pinch,
             Bilateral
         );
-
-        class PolyInfo {
-            public Signal n;
-            public int index = 0;
-            public object locker = new object();
-            public List<Courier<PolyInfo>> timers = new List<Courier<PolyInfo>>();
-
-            public PolyInfo(Signal init) => n = init;
-        }
 
         PlaybackType _mode;
         public PlaybackType Mode {
@@ -256,7 +243,7 @@ namespace Apollo.Devices {
 
             result = y * 10 + x;
 
-            if (0 <= x && x <= 9 && 0 <= y && y <= 9 && 1 <= result && result <= 98 && result != 9 && result != 90)
+            if (0 <= x && x <= 9 && 0 <= y && y <= 9)
                 return true;
             
             if (y == -1 && 4 <= x && x <= 5) {
@@ -266,138 +253,125 @@ namespace Apollo.Devices {
              
             return false;
         }
+        
+        void ScheduleWithPinch(Action Next, int index, ref double start, ref double total) {
+            double time = Frames[index % Frames.Count].Time;
 
-        void FireCourier(Signal n, double time)
-            => timers[n].Add(new Courier<Signal>(time, n, Tick));
-
-        void FireCourier(PolyInfo info, double time)
-            => info.timers.Add(new Courier<PolyInfo>(time, info, Tick));
-
-        void Tick(Courier<Signal> sender, Signal n) {
-            if (Disposed) return;
+            total += time * _gate;
+            Schedule(Next, start += (ApplyPinch(total) - ApplyPinch(total - time * _gate)));
+        }
+        
+        ConcurrentDictionary<Signal, PlayingState> buffer = new ConcurrentDictionary<Signal, PlayingState>();
+        ConcurrentHashSet<PlayingState> poly = new ConcurrentHashSet<PlayingState>();
+        
+        class PlayingState {
+            public Signal Root;
+            public int Frame = 0;
             
-            lock (locker[n]) {
-                if (++buffer[n] < Frames.Count * AdjustedRepeats) {
-                    for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
-                        if (Frames[buffer[n] % Frames.Count].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, n.Index, out int index))
-                                InvokeExit(n.With((byte)index, Frames[buffer[n] % Frames.Count].Screen[i].Clone()));
-
-                } else if (Mode == PlaybackType.Mono) {
-                    if (!Infinite)
-                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                InvokeExit(n.With((byte)index, new Color(0)));
-
-                } else if (Mode == PlaybackType.Loop) {
-                    for (int i = 0; i < Frames[0].Screen.Length; i++)
-                        if ((Infinite? Frames[0].Screen[i].Lit : Frames[0].Screen[i] != Frames[(buffer[n] - 1) % Frames.Count].Screen[i]) && ApplyRootKey(i, n.Index, out int index))
-                            InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
-
-                    buffer[n] = 0;
-                    double time = 0;
-
-                    for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
-                        time += Frames[i % Frames.Count].Time * _gate;
-                        FireCourier(n, time);
-                    }
-                }
-
-                timers[n].Remove(sender);
-            }
+            public PlayingState(Signal init) => Root = init;
+        }
+        
+        void Stop(Signal k, Signal r, List<Signal> ret) {
+            if (buffer.ContainsKey(k))
+                if (buffer[k].Frame < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite) && !(buffer[k].Root is null)) 
+                    RenderFrame(ret, buffer[k].Frame, buffer[k].Root, false);
+            
+            buffer[k] = new PlayingState(r);
         }
 
-        void Tick(Courier<PolyInfo> sender, PolyInfo info) {
-            if (Disposed) return;
+        public override void MIDIProcess(List<Signal> n) {
+            if (Frames.Count == 0 || !n.Any()) return;
             
-            lock (info.locker) {
-                if (++info.index < Frames.Count * AdjustedRepeats) {
-                    for (int i = 0; i < Frames[info.index % Frames.Count].Screen.Length; i++)
-                        if (Frames[info.index % Frames.Count].Screen[i] != Frames[(info.index - 1) % Frames.Count].Screen[i] && ApplyRootKey(i, info.n.Index, out int index))
-                            InvokeExit(info.n.With((byte)index, Frames[info.index % Frames.Count].Screen[i].Clone()));
-                } else {
-                    poly.Remove(info);
-
-                    if (!Infinite)
-                        for (int i = 0; i < Frames.Last().Screen.Length; i++)
-                            if (Frames.Last().Screen[i].Lit && ApplyRootKey(i, info.n.Index, out int index))
-                                InvokeExit(info.n.With((byte)index, new Color(0)));
-                }
-            }
-        }
-
-        void Stop(Signal n) {
-            if (!locker.ContainsKey(n)) locker[n] = new object();
-
-            lock (locker[n]) {
-                if (timers.ContainsKey(n))
-                    for (int i = 0; i < timers[n].Count; i++)
-                        timers[n][i].Dispose();
+            List<Signal> ret = new List<Signal>();
+            
+            Signal root = n.LastOrDefault(i => i.Color.Lit);
+            
+            n.ForEach(s => {
+                bool lit = s.Color.Lit;
+                s.HashIndex = false;
+                s.Color = new Color();
                 
-                if (buffer.ContainsKey(n)) {
-                    if (buffer[n] < Frames.Count * AdjustedRepeats - Convert.ToInt32(Infinite)) {
-                        int originalIndex = buffer.Keys.First(x => x == n).Index;
-
-                        for (int i = 0; i < Frames[buffer[n] % Frames.Count].Screen.Length; i++)
-                            if (Frames[buffer[n] % Frames.Count].Screen[i].Lit && ApplyRootKey(i, originalIndex, out int index))
-                                InvokeExit(n.With((byte)index, new Color(0)));
-                    }
-
-                    buffer.Remove(n, out _);
-                }
-
-                timers[n] = new List<Courier<Signal>>();
-                buffer[n] = 0;
-            }
-        }
-
-        public override void MIDIProcess(Signal n) {
-            if (Frames.Count > 0) {
-                bool lit = n.Color.Lit;
-                n.HashIndex = false;
-                n.Color = new Color();
-
-                if (!locker.ContainsKey(n)) locker[n] = new object();
-
-                lock (locker[n]) {
-                    if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop) Stop(n);
-
-                    if (lit) {
-                        for (int i = 0; i < Frames[0].Screen.Length; i++)
-                            if (Frames[0].Screen[i].Lit && ApplyRootKey(i, n.Index, out int index))
-                                InvokeExit(n.With((byte)index, Frames[0].Screen[i].Clone()));
+                if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop)
+                    Stop(s, root, ret);
+            });
+            
+            if (!(root is null)) {
+                RenderFrame(ret, 0, root);
+                
+                if (Mode == PlaybackType.Poly) {
+                    foreach (Signal polyRoot in n.Where(i => i.Color.Lit)) {
+                        PlayingState state = new PlayingState(polyRoot);
+            
+                        double start = Heaven.Time;
+                        double total = 0;
                         
-                        double time = 0;
+                        poly.Add(state);
+                        
+                        void Next() {
+                            if (!poly.Contains(state)) return;
+                            
+                            List<Signal> ret = new List<Signal>();
+                           
+                            if (++state.Frame < Frames.Count * AdjustedRepeats) {
+                                RenderFrameDifference(ret, state.Frame, state.Root);
+                                
+                                ScheduleWithPinch(Next, state.Frame, ref start, ref total);
 
-                        PolyInfo info = new PolyInfo(n);
-                        poly.Add(info);
-
-                        for (int i = 0; i < Frames.Count * AdjustedRepeats; i++) {
-                            time += Frames[i % Frames.Count].Time * _gate;
-                            double pinched = ApplyPinch(time);
-
-                            if (Mode == PlaybackType.Poly) FireCourier(info, pinched);
-                            else FireCourier(n, pinched);
+                            } else {
+                                poly.Remove(state);
+                                
+                                if (!Infinite)
+                                    RenderFrame(ret, state.Frame - 1, state.Root, false);
+                            }
+                            
+                            InvokeExit(ret);
                         }
+                        
+                        ScheduleWithPinch(Next, 0, ref start, ref total);
                     }
+
+                } else {
+                    double start = Heaven.Time;
+                    double total = 0;
+                    
+                    void Next() {
+                        if (!ReferenceEquals(buffer[root].Root, root)) return;
+                        
+                        List<Signal> ret = new List<Signal>();
+                        
+                        if (++buffer[root].Frame < Frames.Count * AdjustedRepeats) {
+                            RenderFrameDifference(ret, buffer[root].Frame, root);
+                            
+                            ScheduleWithPinch(Next, buffer[root].Frame, ref start, ref total);
+
+                        } else if (Mode == PlaybackType.Mono) {
+                            if (!Infinite)
+                                RenderFrame(ret, buffer[root].Frame - 1, root, false);
+                                
+                        } else if (Mode == PlaybackType.Loop) {
+                            if (Infinite) RenderFrame(ret, 0, root);
+                            else RenderFrameDifference(ret, 0, root);
+                            
+                            if (ReferenceEquals(buffer[root].Root, root)) buffer[root].Frame = 0;
+                            start = Heaven.Time;
+                            total = 0;
+                            
+                            ScheduleWithPinch(Next, 0, ref start, ref total);
+                        }
+                        
+                        InvokeExit(ret);
+                    }
+                    
+                    ScheduleWithPinch(Next, 0, ref start, ref total);
                 }
             }
+            
+            InvokeExit(ret);
         }
 
-        protected override void Stop() {
-            foreach (List<Courier<Signal>> i in timers.Values) {
-                foreach (Courier j in i) j.Dispose();
-                i.Clear();
-            }
-            timers.Clear();
-
-            foreach (PolyInfo info in poly) {
-                foreach (Courier i in info.timers) i.Dispose();
-                info.timers.Clear();
-            }
-            poly.Clear();
-
+        protected override void Stopped() {
             buffer.Clear();
-            locker.Clear();
+            poly.Clear();
         }
 
         public override void Dispose() {
@@ -411,6 +385,20 @@ namespace Apollo.Devices {
             foreach (Frame frame in Frames) frame.Dispose();
             base.Dispose();
         }
+        
+        void RenderFrame(List<Signal> list, int n, Signal s, bool on = true)
+            => list.AddRange(Frames[n % Frames.Count].Screen.SelectMany((f, i) =>
+                (f.Lit && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, on? f.Clone() : new Color(0))}
+                    : Enumerable.Empty<Signal>()
+            ));
+
+        void RenderFrameDifference(List<Signal> list, int n, Signal s)
+            => list.AddRange(Frames[n % Frames.Count].Screen.Zip(Frames[(n + Frames.Count - 1) % Frames.Count].Screen).SelectMany((f, i) =>
+                (f.First != f.Second && ApplyRootKey(i, s.Index, out int index))
+                    ? new [] {s.With((byte)index, f.First.Clone())}
+                    : Enumerable.Empty<Signal>()
+            ));
         
         public class FrameInsertedUndoEntry: PathUndoEntry<Pattern> {
             int index;

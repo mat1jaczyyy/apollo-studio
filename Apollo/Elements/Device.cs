@@ -1,15 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Viewers;
 
 namespace Apollo.Elements {
-    public abstract class Device: ISelect, IMutable {
+    public abstract class Device: SignalReceiver, ISelect, IMutable {
         public readonly string DeviceIdentifier;
         public readonly string Name;
 
@@ -31,12 +34,6 @@ namespace Apollo.Elements {
         
         public Chain Parent;
         public int? ParentIndex;
-        public virtual Action<Signal> MIDIExit { get; set; } = null;
-
-        protected void InvokeExit(Signal n) {
-            Viewer?.Indicator.Trigger(n.Color.Lit);
-            MIDIExit?.Invoke(n);
-        }
 
         public bool Collapsed = false;
         
@@ -59,9 +56,16 @@ namespace Apollo.Elements {
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
 
-        public abstract void MIDIProcess(Signal n);
+        public void InvokeExit(List<Signal> n) {
+            if (!(n is StopSignal) && !n.Any()) return;
 
-        public void MIDIEnter(Signal n) {
+            Viewer?.Indicator.Trigger(n);
+            MIDIExit?.Invoke(n);
+        }
+
+        public abstract void MIDIProcess(List<Signal> n);
+
+        public override void MIDIEnter(List<Signal> n) {
             if (Disposed) return;
 
             if (n is StopSignal) Stop();
@@ -73,7 +77,26 @@ namespace Apollo.Elements {
             InvokeExit(n);
         }
 
-        protected virtual void Stop() {}
+        protected void Stop() {
+            jobs.Clear();
+            Stopped();
+        }
+
+        protected virtual void Stopped() {}
+
+        ConcurrentHashSet<Action> jobs = new ConcurrentHashSet<Action>();
+
+        protected void Schedule(Action job, double time) {
+            void Job() {
+                if (!jobs.Contains(Job)) return;
+                jobs.Remove(Job);
+
+                job.Invoke();
+            };
+
+            jobs.Add(Job);
+            Heaven.Schedule(Job, time);
+        }
 
         public bool Disposed { get; private set; } = false;
 

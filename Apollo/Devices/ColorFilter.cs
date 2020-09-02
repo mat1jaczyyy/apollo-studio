@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
@@ -91,17 +93,16 @@ namespace Apollo.Devices {
             ValueTolerance = value_t;
         }
 
-        public override void MIDIProcess(Signal n) {
-            if (n.Color.Lit) {
-                (double hue, double saturation, double value) = n.Color.ToHSV();
+        public override void MIDIProcess(List<Signal> n)
+            => InvokeExit(n.Where(i => {
+                if (!i.Color.Lit) return true;
 
-                if (!((180 - Math.Abs(Math.Abs(hue - (Hue + 360) % 360) - 180)) / 180 <= HueTolerance &&
-                    Math.Abs(saturation - Saturation) <= SaturationTolerance &&
-                    Math.Abs(value - Value) <= ValueTolerance)) return;
-            }
+                (double hue, double saturation, double value) = i.Color.ToHSV();
 
-            InvokeExit(n);
-        }
+                return (180 - Math.Abs(Math.Abs(hue - (Hue + 360) % 360) - 180)) / 180 <= HueTolerance &&
+                        Math.Abs(saturation - Saturation) <= SaturationTolerance &&
+                        Math.Abs(value - Value) <= ValueTolerance;
+            }).ToList());
 
         public class HueUndoEntry: SimplePathUndoEntry<ColorFilter, double> {
             protected override void Action(ColorFilter item, double element) => item.Hue = element;

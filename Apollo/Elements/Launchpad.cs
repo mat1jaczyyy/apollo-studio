@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -12,6 +12,7 @@ using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Enums;
 using Apollo.Helpers;
+using Apollo.Rendering;
 using Apollo.RtMidi;
 using Apollo.RtMidi.Devices;
 using Apollo.RtMidi.Devices.Infos;
@@ -52,6 +53,19 @@ namespace Apollo.Elements {
                     : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg",
                 false
             ),
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
+        public static PortWarning ProFirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pros are running the official\n" + 
+            "Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs considerably worse than the optimized custom firmware.\n\n" +
+            "Update these to the latest version of the custom firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -110,7 +124,7 @@ namespace Apollo.Elements {
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -126,7 +140,7 @@ namespace Apollo.Elements {
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -138,6 +152,7 @@ namespace Apollo.Elements {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
+                if (ProFirmwareStock.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
@@ -162,6 +177,11 @@ namespace Apollo.Elements {
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
+        static Dictionary<LaunchpadType, int> MaxRepeats = new Dictionary<LaunchpadType, int>() {
+            {LaunchpadType.Pro, 78},
+            {LaunchpadType.CFW, 79}
+        };
+
         static byte[] SysExStart = new byte[] { 0xF0 };
         static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
@@ -170,10 +190,12 @@ namespace Apollo.Elements {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
             {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, SysExStart.Concat(new byte[] {0x6F}).ToArray()},
-            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03, 0x03}).ToArray()},
-            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03, 0x03}).ToArray()}
+            {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03}).ToArray()},
+            {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03}).ToArray()},
+            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()}
         };
+
+        static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
 
         static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
@@ -287,17 +309,18 @@ namespace Apollo.Elements {
                         if (versionStr == "\0\0\0") // Bootloader
                             return LaunchpadType.Unknown;
 
-                        if (versionStr == "cfw") { // Old Custom Firmware
+                        if (versionStr == "cfw" || versionStr == "cfx") { // Old Custom Firmware
                             CFWIncompatible.Set();
                             return LaunchpadType.Unknown;
                         }
 
-                        if (versionStr == "cfx") // Custom Firmware
+                        if (versionStr == "cfy") // Custom Firmware
                             return LaunchpadType.CFW;
                         
                         if (versionInt < 182) // Old Firmware
                             ProFirmwareOld.Set();
 
+                        ProFirmwareStock.Set();
                         return LaunchpadType.Pro;
 
                     case 0x03: // Launchpad X
@@ -367,8 +390,10 @@ namespace Apollo.Elements {
 
             Task.Run(() => {
                 lock (locker) {
-                    if (buffer.TryDequeue(out byte[] msg))
+                    if (buffer.TryDequeue(out byte[] msg)) {
+                        //Console.WriteLine($"SysEx OUT {string.Join(", ", msg.Select(i => i.ToString()))}");
                         Output.Send(msg);
+                    }
                     
                     signalCount++;
                 }
@@ -383,60 +408,157 @@ namespace Apollo.Elements {
             return true;
         }
 
-        public virtual void Send(Signal n) {
-            if (!Usable) return;
+        public void DirectSend(RawUpdate n) => RGBSend(new List<RawUpdate>() {n});
+        
+        public virtual void Send(List<RawUpdate> n, Color[] snapshot) {
+            if (!n.Any() || !Usable) return;
 
-            Signal m = n.Clone();
-            Window?.SignalRender(m);
+            if (Window != null || AbletonLaunchpads.Any(i => i.Window != null)) {
+                List<RawUpdate> c = n.Select(i => i.Clone()).ToList();
 
-            foreach (AbletonLaunchpad alp in AbletonLaunchpads)
-                alp.Window?.SignalRender(m);
+                Dispatcher.UIThread.InvokeAsync(() => c.ForEach(i => {
+                    Window?.Render(i);
 
-            n = n.Clone();
-
-            if (n.Index != 100) {
-                if (Rotation == RotationType.D90) n.Index = (byte)((n.Index % 10) * 10 + 9 - n.Index / 10);
-                else if (Rotation == RotationType.D180) n.Index = (byte)((9 - n.Index / 10) * 10 + 9 - n.Index % 10);
-                else if (Rotation == RotationType.D270) n.Index = (byte)((9 - n.Index % 10) * 10 + n.Index / 10);
+                    foreach (AbletonLaunchpad alp in AbletonLaunchpads)
+                        alp.Window?.Render(i);
+                }));
             }
 
-            int offset = 0;
+            if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
+                SysExSend(sysex);
+                return;
+            }
 
-            switch (Type) {
-                case LaunchpadType.MK2:
-                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 99 || n.Index == 100) return;
-                    if (91 <= n.Index && n.Index <= 98) offset = 13;
-                    break;
-                
-                case LaunchpadType.Pro:
-                case LaunchpadType.CFW:
-                    if (n.Index == 0 || n.Index == 9 || n.Index == 90 || n.Index == 99) return;
-                    else if (n.Index == 100) offset = -1;
-                    break;
+            List<RawUpdate> output = n.SelectMany(i => {
+                if (i.Index != 100) {
+                    if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+                    else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
+                    else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
+                }
 
-                case LaunchpadType.X:
-                case LaunchpadType.MiniMK3:
-                    if (n.Index % 10 == 0 || n.Index < 11 || n.Index == 100) return;
-                    break;
+                IEnumerable<RawUpdate> ret = Enumerable.Empty<RawUpdate>();
+
+                int offset = 0;
+
+                switch (Type) {
+                    case LaunchpadType.MK2:
+                        if (i.Index % 10 == 0 || i.Index < 11 || i.Index == 99 || i.Index == 100) return ret;
+                        if (91 <= i.Index && i.Index <= 98) offset = 13;
+                        break;
                     
-                case LaunchpadType.ProMK3:
-                    if (n.Index == 0 || n.Index == 9 || n.Index == 100) return;
-                    break;
+                    case LaunchpadType.Pro:
+                    case LaunchpadType.CFW:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99) return ret;
+                        else if (i.Index == 100) offset = -1;
+                        break;
+
+                    case LaunchpadType.X:
+                    case LaunchpadType.MiniMK3:
+                        if (i.Index % 10 == 0 || i.Index < 11 || i.Index == 100) return ret;
+                        break;
+                        
+                    case LaunchpadType.ProMK3:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 100) return ret;
+                        if (1 <= i.Index && i.Index <= 8) ret = ret.Append(new RawUpdate(i, 100));
+                        break;
+                }
+                
+                i.Offset(offset);
+                return ret.Append(i).ToArray();
+
+            }).ToList();
+
+            // https://customer.novationmusic.com/sites/customer/files/novation/downloads/10598/launchpad-pro-programmers-reference-guide_0.pdf
+            // Page 22: The <LED> <Red> <Green> <Blue> group may be repeated in the message up to 78 times.
+            if (Type.IsPro() && output.Count > MaxRepeats[Type]) {
+                if (snapshot != null) {
+                    SysExSend(ProGridMessage.Concat(Enumerable.Range(0, 100)
+                        .Select(i => snapshot[i])
+                        .SelectMany(i => new byte[] { i.Red, i.Green, i.Blue })
+                        .Concat(SysExEnd)
+                    ));
+                    
+                    RawUpdate mode = output.FirstOrDefault(i => i.Index == 99);
+                    if (mode != null) RGBSend(new List<RawUpdate>() { mode });
+
+                } else 
+                    for (int i = 0; i < output.Count; i += MaxRepeats[Type])
+                        RGBSend(output.Skip(i).Take(MaxRepeats[Type]).ToList());
+                
+                return;
             }
-
-            RGBSend(n, offset);
-
-            if (Type == LaunchpadType.ProMK3 && 1 <= n.Index && n.Index <= 8)
-                RGBSend(n, 100);
+            
+            RGBSend(output);
         }
 
-        void RGBSend(Signal n, int offset = 0)
-            => SysExSend(RGBHeader[Type].Concat(new byte[] {
-                (byte)(n.Index + offset),
-                (byte)(n.Color.Red * (Type.IsGenerationX()? 2 : 1)),
-                (byte)(n.Color.Green * (Type.IsGenerationX()? 2 : 1)),
-                (byte)(n.Color.Blue * (Type.IsGenerationX()? 2 : 1))
-            }));
+        static IEnumerable<byte> allMap = Enumerable.Range(1, 98).Except(new int[] {9, 90}).Select(i => (byte)i);
+        static IEnumerable<byte> rowMap(int index) => Enumerable.Range(1, 8).Select(i => (byte)(index * 10 + i));
+        static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
+        static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
+        static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
+        static HashSet<byte> excludedIndexes = new HashSet<byte>() {0, 9, 90, 99};
+
+        bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
+            ret = null;
+            
+            if (Type != LaunchpadType.CFW) return false;
+
+            List<RawUpdate> filteredUpdates = updates.Where(u => !excludedIndexes.Contains(u.Index)).ToList();
+
+            IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
+            if (colors.Count() > 79) return false;
+
+            ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
+                colors.SelectMany(i => {
+                    IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index).Select(j => j == 100? (byte)99 : j);
+                    IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
+                    List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
+
+                    if (positions.Intersect(allMap).Count() == 96) {
+                        finalPos = finalPos.Append((byte)0);
+                        if (positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
+                    
+                    } else {
+                        finalPos = positions.ToList();
+
+                        for (int j = 0; j < 10; j++) {
+                            IEnumerable<byte> row = rowMap(j);
+                            IEnumerable<byte> col = colMap(j);
+
+                            if (positions.Intersect(row).Count() == 8)
+                                finalPos = finalPos.Except(row).Append((byte)(100 + j));
+
+                            if (positions.Intersect(col).Count() == 8)
+                                finalPos = finalPos.Except(col).Append((byte)(110 + j));
+                        }
+
+                        if (finalPos.Intersect(squares).Count() == 16)
+                            finalPos = finalPos.Except(cols);
+                    }
+                    
+                    if (finalPos.Count() > 7) chunk.Add((byte)finalPos.Count());
+                    else for (int j = 0; j < 3; j++)
+                        chunk[j] = (byte)(chunk[j] | ((finalPos.Count() & (4 >> j)) > 0? 0x40 : 0));
+
+                    chunk.AddRange(finalPos);
+                    
+                    return chunk;
+                })
+            );
+
+            return ret.Count() <= 319; // Hard limit is 320 but this doesn't include SysExEnd
+        }
+
+        void RGBSend(List<RawUpdate> rgb) {
+            IEnumerable<byte> colorspec = Type.IsGenerationX()? new byte[] { 0x03 } : Enumerable.Empty<byte>();
+
+            SysExSend(RGBHeader[Type].Concat(rgb.SelectMany(i => colorspec.Concat(new byte[] {
+                i.Index,
+                (byte)(i.Color.Red * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(i.Color.Green * (Type.IsGenerationX()? 2 : 1)),
+                (byte)(i.Color.Blue * (Type.IsGenerationX()? 2 : 1))
+            }))));
+        }
 
         public virtual void Clear(bool manual = false) {
             if (!Usable || (manual && PatternWindow != null)) return;
@@ -451,7 +573,9 @@ namespace Apollo.Elements {
 
             SysExSend(ForceClearMessage[Type]);
             
-            if (Type.HasModeLight()) RGBSend(new Signal(null, this, 100, new Color(0)));
+            if (Type.IsPro()) RGBSend(new List<RawUpdate>() {
+                new RawUpdate(99, new Color(0))
+            });
         }
 
         public virtual void Render(Signal n) {

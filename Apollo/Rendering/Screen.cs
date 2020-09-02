@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 
 using Apollo.Enums;
+using Apollo.Structures;
 
-namespace Apollo.Structures {
-    public class Screen {
+namespace Apollo.Rendering {
+    public class Screen: IDisposable {
         class Pixel {
-            public Action<Signal> Exit = null;
-
             byte Index;
             
             SortedList<int, Signal> _signals = new SortedList<int, Signal>();
@@ -20,8 +19,6 @@ namespace Apollo.Structures {
                 lock (locker) {
                     _signals.Clear();
                     _signals.Add(10000, new Signal(null, null, color: new Color(0), layer: -100));
-
-                    Update();
                 }
             }
 
@@ -48,15 +45,6 @@ namespace Apollo.Structures {
                 return ret;
             }
 
-            void Update() {
-                Color newState = GetColor();
-                    
-                if (newState != state) {
-                    state = newState;
-                    Exit?.Invoke(new Signal(null, null, Index, newState));
-                }
-            }
-
             public void MIDIEnter(Signal n) {
                 lock (locker) {
                     if (n.Index != Index) return;
@@ -66,28 +54,58 @@ namespace Apollo.Structures {
                     if (n.Color.Lit) _signals[layer] = n.Clone();
                     else if (_signals.ContainsKey(layer)) _signals.Remove(layer);
                     else return;
-
-                    Update();
                 }
             }
         }
 
-        public Action<Signal> ScreenExit;
+        public Action<List<RawUpdate>, Color[]> ScreenExit;
 
         Pixel[] _screen = new Pixel[101];
 
         public void Clear() {
             foreach (Pixel pixel in _screen)
                 pixel.Clear();
+            
+            Snapshot();
         }
+
+        Color[] snapshot = new Color[101];
+
+        void Snapshot() {
+            List<RawUpdate> ret = new List<RawUpdate>();
+
+            for (int i = 0; i < 101; i++) {
+                Color n = _screen[i].GetColor();
+
+                if (snapshot[i] != n) {
+                    ret.Add(new RawUpdate(i, n.Clone()));
+                    snapshot[i] = n;
+                }
+            }
+
+            if (ret.Count > 0)
+                ScreenExit?.Invoke(ret, snapshot);
+        }
+
+        delegate void DrawingHandler();
+        static event DrawingHandler Drawing;
+
+        public static void Draw() => Drawing?.Invoke();
 
         public Screen() {
-            for (int i = 0; i < 101; i++)
-                _screen[i] = new Pixel(i) { Exit = n => ScreenExit?.Invoke(n) };
+            for (int i = 0; i < 101; i++) {
+                snapshot[i] = new Color(0);
+                _screen[i] = new Pixel(i);
+            }
+            
+            Drawing += Snapshot;
         }
 
-        public Color GetColor(int index) => _screen[index].GetColor();
+        // Not cloning for performance reasons!
+        public Color GetColor(int index) => snapshot[index]; 
 
         public void MIDIEnter(Signal n) => _screen[n.Index].MIDIEnter(n);
+
+        public void Dispose() => Drawing -= Snapshot;
     }
 }

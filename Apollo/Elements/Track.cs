@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Selection;
 using Apollo.Structures;
-using Apollo.Undo;
+using Apollo.Rendering;
 using Apollo.Viewers;
 using Apollo.Windows;
 
@@ -136,13 +135,11 @@ namespace Apollo.Elements {
         public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
             Chain = init?? new Chain();
             Chain.Parent = this;
-            Chain.MIDIExit = ChainExit;
+            Chain.MIDIExit = Heaven.MIDIEnter;
 
             Launchpad = launchpad;
             Name = name;
         }
-
-        void ChainExit(Signal n) => n.Source?.Render(n);
 
         void MIDIEnter(Signal n) {
             if (ParentIndex != null && Enabled) Chain?.MIDIEnter(n);

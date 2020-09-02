@@ -16,7 +16,7 @@ using Apollo.Viewers;
 namespace Apollo.Elements {
     public interface IChainParent: ISelect {}
 
-    public class Chain: ISelect, ISelectParent, IMutable, IName {
+    public class Chain: SignalReceiver, ISelect, ISelectParent, IMutable, IName {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -72,8 +72,8 @@ namespace Apollo.Elements {
             }
         }
 
-        Action<Signal> _midiexit = null;
-        public Action<Signal> MIDIExit {
+        Action<List<Signal>> _midiexit = null;
+        public override Action<List<Signal>> MIDIExit {
             get => _midiexit;
             set {
                 _midiexit = value;
@@ -81,13 +81,15 @@ namespace Apollo.Elements {
             }
         }
 
-        void InvokeExit(Signal n) {
-            Info?.Indicator.Trigger(n.Color.Lit);
+        void InvokeExit(List<Signal> n) {
+            if (!(n is StopSignal) && !n.Any()) return;
+            
+            Info?.Indicator.Trigger(n);
             MIDIExit?.Invoke(n);
         }
 
         public List<Device> Devices = new List<Device>();
-        Action<Signal> _chainenter = null;
+        Action<List<Signal>> _chainenter = null;
 
         void Reroute() {
             for (int i = 0; i < Devices.Count; i++) {
@@ -198,10 +200,10 @@ namespace Apollo.Elements {
             Reroute();
         }
 
-        public void MIDIEnter(Signal n) {
+        public override void MIDIEnter(List<Signal> n) {
             if (n is StopSignal) _chainenter?.Invoke(n);
             else if (Enabled) {
-                Viewer?.Indicator.Trigger(n.Color.Lit);
+                Viewer?.Indicator.Trigger(n);
                 _chainenter?.Invoke(n);
             }
         }

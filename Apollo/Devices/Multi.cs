@@ -61,61 +61,74 @@ namespace Apollo.Devices {
             Reroute();
         }
 
-        public override void MIDIProcess(Signal n) {
-            Signal m = n.Clone();
-            n.Color = new Color();
+        public override void MIDIProcess(List<Signal> n)
+            => Preprocess.MIDIEnter(n.SelectMany(i => {
+                Signal m = i.Clone();
+                i.Color = new Color();
 
-            if (!buffer.ContainsKey(n)) {
-                if (!m.Color.Lit) return;
+                if (!buffer.ContainsKey(i)) {
+                    if (!m.Color.Lit) return Enumerable.Empty<Signal>();
 
-                List<int> target = new List<int>();
+                    List<int> target = new List<int>();
 
-                if (Mode == MultiType.Forward) {
-                    if (++current >= Chains.Count) current = 0;
-                
-                } else if (Mode == MultiType.Backward) {
-                    if (--current < 0) current = Chains.Count - 1;
-                
-                } else if (Mode == MultiType.Random || current == -1)
-                    current = RNG.Next(Chains.Count);
-                
-                else if (Mode == MultiType.RandomPlus) {
-                    int old = current;
-                    if (Chains.Count <= 1) current = 0;
-                    else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
+                    if (Mode == MultiType.Forward) {
+                        if (++current >= Chains.Count) current = 0;
                     
-                } else if (Mode == MultiType.Key) {
-                    for (int index = 0; index < Chains.Count; index++)
-                        if (Chains[index].SecretMultiFilter[m.Index]) target.Add(index);
+                    } else if (Mode == MultiType.Backward) {
+                        if (--current < 0) current = Chains.Count - 1;
+                    
+                    } else if (Mode == MultiType.Random || current == -1)
+                        current = RNG.Next(Chains.Count);
+                    
+                    else if (Mode == MultiType.RandomPlus) {
+                        int old = current;
+                        if (Chains.Count <= 1) current = 0;
+                        else if ((current = RNG.Next(Chains.Count - 1)) >= old) current++;
+                        
+                    } else if (Mode == MultiType.Key) {
+                        for (int index = 0; index < Chains.Count; index++)
+                            if (Chains[index].SecretMultiFilter[m.Index]) target.Add(index);
+                    }
+
+                    if (Mode != MultiType.Key) target.Add(current);
+
+                    m.MultiTarget.Push(buffer[i] = target);
+
+                } else {
+                    m.MultiTarget.Push(buffer[i]);
+                    if (!m.Color.Lit) buffer.Remove(i, out _);
                 }
 
-                if (Mode != MultiType.Key) target.Add(current);
+                return new [] {m};
+            }).ToList());
 
-                m.MultiTarget.Push(buffer[n] = target);
-
-            } else {
-                m.MultiTarget.Push(buffer[n]);
-                if (!m.Color.Lit) buffer.Remove(n, out _);
-            }
-
-            Preprocess.MIDIEnter(m);
-        }
-
-        void PreprocessExit(Signal n) {
+        void PreprocessExit(List<Signal> n) {
             if (n is StopSignal) return;
-
-            List<int> target = n.MultiTarget.Pop();
             
-            if (Chains.Count == 0) InvokeExit(n);
-            else {
-                foreach (int i in target)
-                Chains[i].MIDIEnter(n.Clone());
+            if (Chains.Count == 0) {
+                n.ForEach(i => i.MultiTarget.Pop());
+                InvokeExit(n);
+            
+            } else {
+                Dictionary<int, List<Signal>> output = new Dictionary<int, List<Signal>>();
+                
+                foreach (Signal i in n) {
+                    foreach (int j in i.MultiTarget.Pop()) {
+                        if (!output.ContainsKey(j))
+                            output[j] = new List<Signal>();
+                            
+                        output[j].Add(i.Clone());
+                    }
+                }
+                
+                foreach (int i in output.Keys)
+                    Chains[i].MIDIEnter(output[i]);
             }
         }
         
-        protected override void Stop() {
-            base.Stop();
-            Preprocess.MIDIEnter(new StopSignal());
+        protected override void Stopped() {
+            base.Stopped();
+            Preprocess.MIDIEnter(StopSignal.Instance);
         }
 
         public override void Dispose() {

@@ -33,7 +33,7 @@ namespace Apollo.Core {
         public static void ClearState(bool manual = true, bool multi = true, bool force = false) {
             if (Program.Project?.Tracks != null)
                 foreach (Track track in Program.Project.Tracks)
-                    track.Chain.MIDIEnter(new StopSignal());
+                    track.Chain.MIDIEnter(StopSignal.Instance);
             
             if (multi) Multi.InvokeReset();
             Preview.InvokeClear();
