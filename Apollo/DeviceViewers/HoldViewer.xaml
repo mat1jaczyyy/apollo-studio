@@ -14,7 +14,7 @@
     </Border>
     
     <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="5 5 5 0">
-      <Components:Dial Grid.Column="0" Margin="0 0 5 0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" DisabledText="Infinite" AllowSteps="true"
+      <Components:Dial Grid.Column="0" Margin="0 0 5 0" x:Name="Duration" Title="Duration" Minimum="1" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Unit="ms" DisabledText="Infinite" AllowSteps="true"
                        ValueChanged="Duration_Changed" ModeChanged="Duration_ModeChanged" StepChanged="Duration_StepChanged" />
     
       <Components:Dial Grid.Column="1" Margin="5 0 0 0" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%"

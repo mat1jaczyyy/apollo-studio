@@ -65,7 +65,7 @@ namespace Apollo.Devices {
                 _time = value;
 
                 if (_time != null) {
-                    _time.Minimum = 10;
+                    _time.Minimum = 1;
                     _time.Maximum = 5000;
 
                     _time.FreeChanged += FreeChanged;
