@@ -935,7 +935,7 @@ namespace Apollo.Windows {
 
                 Heaven.Schedule(() => {
                     if(ReferenceEquals(locker, PlayLocker)) RenderFrame();
-                }, pinched - starttime);
+                }, Heaven.Time + pinched - starttime);
             }
         }
         
