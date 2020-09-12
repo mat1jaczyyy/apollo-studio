@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Avalonia.Input;
 
@@ -68,7 +69,7 @@ namespace Apollo.Undo {
 
             if (execute) entry.Redo();
 
-            Program.Project.WriteCrashBackup();
+            Task.Run(Program.Project.WriteCrashBackup);
         }
 
         public void AddAndExecute(UndoEntry entry) => Add(entry, true);

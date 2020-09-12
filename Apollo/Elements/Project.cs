@@ -116,10 +116,16 @@ namespace Apollo.Elements {
         
         public int GetMacro(int target) => Macros[target - 1];
 
+        bool savingCrash;
+
         public async void WriteCrashBackup() {
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
             
+            if (savingCrash) return;
+
+            savingCrash = true;
             await WriteFile(null, Program.CrashProject, false);
+            savingCrash = false;
         }
 
         public async Task<bool> WriteFile(Window sender, string path = null, bool store = true) {
