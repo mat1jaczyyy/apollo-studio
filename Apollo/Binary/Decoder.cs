@@ -90,6 +90,10 @@ namespace Apollo.Binary {
             
             Preferences.EnableGestures = reader.ReadBoolean();
 
+            if (version >= 32) {
+                Preferences.RememberPatternPosition = reader.ReadBoolean();
+            }
+
             if (version >= 7) {
                 Preferences.PaletteName = reader.ReadString();
                 Preferences.CustomPalette = new Palette(Enumerable.Range(0, 128).Select(i => Decode<Color>(reader, version)).ToArray());

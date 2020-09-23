@@ -199,6 +199,17 @@ namespace Apollo.Core {
             }
         }
 
+        static bool _RememberPatternPosition = false;
+        public static bool RememberPatternPosition {
+            get => _RememberPatternPosition;
+            set {
+                if (_RememberPatternPosition == value) return;
+
+                _RememberPatternPosition = value;
+                Save();
+            }
+        }
+
         static string _PaletteName = "mat1jaczyyyPalette";
         public static string PaletteName {
             get => _PaletteName;

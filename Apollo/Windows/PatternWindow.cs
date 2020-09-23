@@ -281,7 +281,7 @@ namespace Apollo.Windows {
         }
 
         void Loaded(object sender, EventArgs e) {
-            if (_x.HasValue) {
+            if (Preferences.RememberPatternPosition && _x.HasValue) {
                 Position = new PixelPoint(_x.Value, _y);
                 Width = _w;
                 Height = _h;

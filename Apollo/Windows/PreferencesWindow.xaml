@@ -137,6 +137,7 @@
             <CheckBox Click="CopyPreviousFrame_Changed" x:Name="CopyPreviousFrame">Copy previous Frame when adding a new Frame</CheckBox>
             <CheckBox Click="CaptureLaunchpad_Changed" x:Name="CaptureLaunchpad">Capture Launchpad when opening Editor</CheckBox>
             <CheckBox Click="EnableGestures_Changed" x:Name="EnableGestures">Enable on-Launchpad Gestures</CheckBox>
+            <CheckBox Click="RememberPatternPosition_Changed" x:Name="RememberPatternPosition">Remember the Editor's window position</CheckBox>
             <Button Background="{DynamicResource ThemeControlHighBrush}" Content="Clear Color History" Click="ClearColorHistory" />
 
             <Border />
