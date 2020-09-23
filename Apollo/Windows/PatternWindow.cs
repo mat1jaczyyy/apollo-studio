@@ -25,6 +25,10 @@ using Apollo.Rendering;
 
 namespace Apollo.Windows {
     public class PatternWindow: Window, ISelectParentViewer, IDroppable {
+        static int? _x = null;
+        static int _y;
+        static double _w, _h;
+
         public int? IExpanded {
             get => _pattern.Expanded;
         }
@@ -277,6 +281,12 @@ namespace Apollo.Windows {
         }
 
         void Loaded(object sender, EventArgs e) {
+            if (_x.HasValue) {
+                Position = new PixelPoint(_x.Value, _y);
+                Width = _w;
+                Height = _h;
+            }
+
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             _track.ParentIndexChanged += UpdateTitle;
@@ -319,7 +329,12 @@ namespace Apollo.Windows {
             foreach (IDisposable observable in observables)
                 observable.Dispose();
 
-            this.Content = null;
+            Content = null;
+
+            _x = Position.X;
+            _y = Position.Y;
+            _w = Width;
+            _h = Height;
 
             App.WindowClosed(this);
         }
