@@ -8,7 +8,7 @@ using Apollo.Viewers;
 
 namespace Apollo.Undo {
     public static class UndoBinary {
-        public const int Version = 1;
+        public const int Version = 2;
 
         public static Type DecodeID(BinaryReader reader) => id[reader.ReadUInt16()];
         public static void EncodeID(BinaryWriter writer, Type type) => writer.Write((ushort)Array.IndexOf(id, type));
