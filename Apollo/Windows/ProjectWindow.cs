@@ -372,7 +372,7 @@ namespace Apollo.Windows {
             if (!force && Program.Project.Tracks.FirstOrDefault(i => i.Window != null) != null) return true;
 
             string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
-                "You have unsaved changes. Do you want to save before closing?\n",
+                "You have unsaved changes. Do you want to save before closing?\n ",
                 new string[] {"Yes", "No", "Cancel"}, this
             );
 
