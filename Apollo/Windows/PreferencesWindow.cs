@@ -157,6 +157,7 @@ namespace Apollo.Windows {
 
             ToolTip.SetTip(this.Get<TextBlock>("LaunchpadHeader"), $"RtMidi APIs:\n{string.Join("- \n", MidiDeviceManager.Default.GetAvailableMidiApis())}");
 
+            fade.MIDIExit = FadeExit;
             fade.Initialize();
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
@@ -361,8 +362,9 @@ namespace Apollo.Windows {
         void Preview_Pressed(int index) =>
             fade.MIDIEnter(new Signal(null, null, (byte)LaunchpadGrid.GridToSignal(index), new Color()));
 
-        void FadeExit(Signal n) => Dispatcher.UIThread.InvokeAsync(() => {
-            Preview?.SetColor(LaunchpadGrid.SignalToGrid(n.Index), n.Color.ToScreenBrush());
+        void FadeExit(List<Signal> n) => Dispatcher.UIThread.InvokeAsync(() => {
+            foreach (Signal s in n)
+                Preview?.SetColor(LaunchpadGrid.SignalToGrid(s.Index), s.Color.ToScreenBrush());
         });
 
         async void HandleKey(object sender, KeyEventArgs e) {
