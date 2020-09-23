@@ -44,7 +44,7 @@
         </Border>
         
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Width="165" Margin="5 5 5 0">
-          <Components:Dial Grid.Column="0" Margin="0 0 5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="10" Maximum="5000" Default="500" Exponent="3.348186161" Round="0" Unit="ms" DisabledText="Unused" AllowSteps="true"
+          <Components:Dial Grid.Column="0" Margin="0 0 5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Rate" Title="Rate" Minimum="1" Maximum="5000" Default="500" Exponent="3.348186161" Round="0" Unit="ms" DisabledText="Unused" AllowSteps="true"
                            ValueChanged="Rate_ValueChanged" ModeChanged="Rate_ModeChanged" StepChanged="Rate_StepChanged" />
         
           <Components:Dial Grid.Column="1" Margin="5 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="Gate" Title="Gate" Minimum="1" Maximum="400" Default="100" Exponent="2.0108883161" Round="0" Unit="%" DisabledText="Unused"

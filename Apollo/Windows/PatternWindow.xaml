@@ -128,7 +128,7 @@
 
               <Border Grid.Row="3" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0">
                 <Grid Margin="7"  ColumnDefinitions="*,*">
-                  <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="10" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Scale="0.8" Unit="ms" DisabledText="Infinite" AllowSteps="true"
+                  <Components:Dial Grid.Column="0" x:Name="Duration" Title="Duration" Minimum="1" Maximum="30000" Default="1000" Exponent="4.9209091868" Round="0" Scale="0.8" Unit="ms" DisabledText="Infinite" AllowSteps="true"
                                    Started="Duration_Started" ValueChanged="Duration_Changed" StepChanged="Duration_StepChanged" ModeChanged="Duration_ModeChanged" />
                   
                   <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10 0" Spacing="5">
