@@ -373,7 +373,10 @@ namespace Apollo.Components {
             observable.Dispose();
         }
 
-        protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
+        protected void LayoutChanged(object sender, EventArgs e) {
+            DrawArcAuto();
+            ((Grid)Content).LayoutUpdated -= LayoutChanged;
+        }
 
         bool mouseHeld = false;
         double oldValue;
