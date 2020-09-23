@@ -482,10 +482,17 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
+                HoldType holdmode;
+                if (version <= 31) {
+                    holdmode = reader.ReadBoolean()? HoldType.Infinite : HoldType.Trigger;
+                } else {
+                    holdmode = (HoldType)reader.ReadInt32();
+                }
+
                 return new Hold(
                     time,
                     gate,
-                    reader.ReadBoolean(),
+                    holdmode,
                     reader.ReadBoolean()
                 );
                 

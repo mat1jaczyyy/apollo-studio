@@ -325,7 +325,7 @@ namespace Apollo.Binary {
             Encode(writer, o.Time);
             writer.Write(o.Gate);
 
-            writer.Write(o.Infinite);
+            writer.Write((int)o.HoldMode);
             writer.Write(o.Release);
         }
 

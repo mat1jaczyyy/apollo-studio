@@ -26,7 +26,7 @@ namespace Apollo.Enums {
     public enum CopyType {
         Static, Animate, Interpolate, RandomSingle, RandomLoop
     }
-        
+    
     public enum GridType {
         Full, Square
     }
@@ -38,7 +38,11 @@ namespace Apollo.Enums {
     public enum FlipType {
         Horizontal, Vertical, Diagonal1, Diagonal2
     }
-        
+    
+    public enum HoldType {
+        Trigger, Minimum, Infinite
+    }
+    
     public enum MultiType {
         Forward, Backward, Random, RandomPlus, Key
     }

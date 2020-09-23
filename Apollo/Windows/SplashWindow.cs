@@ -236,6 +236,8 @@ namespace Apollo.Windows {
 
             } catch {
                 await MessageWindow.CreateReadError(this);
+                Program.Project = null;
+
                 return;
             }
             

@@ -84,8 +84,10 @@ namespace Apollo.Devices {
         public override void Dispose() {
             if (Disposed) return;
 
-            Program.Project.Tracks[_target].ParentIndexChanged -= IndexChanged;
-            Program.Project.Tracks[_target].Disposing -= IndexRemoved;
+            if (Program.Project.Tracks.ElementAtOrDefault(_target) is Track track) {
+                track.ParentIndexChanged -= IndexChanged;
+                track.Disposing -= IndexRemoved;
+            }
 
             base.Dispose();
         }
