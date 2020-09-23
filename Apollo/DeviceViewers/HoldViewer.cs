@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Enums;
 using Apollo.Structures;
 
 namespace Apollo.DeviceViewers {
@@ -19,14 +20,15 @@ namespace Apollo.DeviceViewers {
 
             Duration = this.Get<Dial>("Duration");
             Gate = this.Get<Dial>("Gate");
-            Infinite = this.Get<CheckBox>("Infinite");
+            HoldMode = this.Get<ComboBox>("HoldMode");
             Release = this.Get<CheckBox>("Release");
         }
         
         Hold _hold;
 
         Dial Duration, Gate;
-        CheckBox Infinite, Release;
+        ComboBox HoldMode;
+        CheckBox Release;
 
         public HoldViewer() => new InvalidOperationException();
 
@@ -41,7 +43,7 @@ namespace Apollo.DeviceViewers {
 
             Gate.RawValue = _hold.Gate * 100;
 
-            SetInfinite(_hold.Infinite); // required to set Dial Enabled properties
+            SetHoldMode(_hold.HoldMode); // required to set Dial Enabled properties
 
             Release.IsChecked = _hold.Release;
         }
@@ -92,20 +94,23 @@ namespace Apollo.DeviceViewers {
 
         public void SetGate(double gate) => Gate.RawValue = gate * 100;
 
-        void Infinite_Changed(object sender, RoutedEventArgs e) {
-            bool value = Infinite.IsChecked.Value;
+        void HoldMode_Changed(object sender, SelectionChangedEventArgs e) {
+            HoldType selected = (HoldType)HoldMode.SelectedIndex;
 
-            if (_hold.Infinite != value)
-                Program.Project.Undo.AddAndExecute(new Hold.InfiniteUndoEntry(
-                    _hold, 
-                    _hold.Infinite, 
-                    value
+            if (_hold.HoldMode != selected) 
+                Program.Project.Undo.AddAndExecute(new Hold.HoldModeUndoEntry(
+                    _hold,
+                    _hold.HoldMode,
+                    selected,
+                    HoldMode.Items
                 ));
         }
 
-        public void SetInfinite(bool value) {
-            Infinite.IsChecked = value;
-            Duration.Enabled = Gate.Enabled = !value;
+        public void SetHoldMode(HoldType value) {
+            HoldMode.SelectedIndex = (int)value;
+            
+            Duration.Enabled = Gate.Enabled = value != HoldType.Infinite;
+            Release.IsEnabled = value != HoldType.Minimum;
         }
 
         void Release_Changed(object sender, RoutedEventArgs e) {

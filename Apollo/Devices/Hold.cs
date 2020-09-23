@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -5,6 +6,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
@@ -58,13 +60,15 @@ namespace Apollo.Devices {
             }
         }
 
-        bool _infinite;
-        public bool Infinite {
-            get => _infinite;
+        HoldType _holdmode;
+        public HoldType HoldMode {
+            get => _holdmode;
             set {
-                _infinite = value;
+                _holdmode = value;
                 
-                if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetInfinite(Infinite);
+                if (Viewer?.SpecificViewer != null) ((HoldViewer)Viewer.SpecificViewer).SetHoldMode(HoldMode);
+
+                Stop();
             }
         }
 
@@ -78,19 +82,22 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Hold(_time.Clone(), _gate, Infinite, Release) {
+        bool ActualRelease => HoldMode == HoldType.Minimum? false : Release;
+
+        public override Device Clone() => new Hold(_time.Clone(), _gate, HoldMode, Release) {
             Collapsed = Collapsed,
             Enabled = Enabled
         };
 
-        public Hold(Time time = null, double gate = 1, bool infinite = false, bool release = false): base("hold") {
+        public Hold(Time time = null, double gate = 1, HoldType holdmode = HoldType.Trigger, bool release = false): base("hold") {
             Time = time?? new Time();
             Gate = gate;
-            Infinite = infinite;
+            HoldMode = holdmode;
             Release = release;
         }
         
         ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
+        ConcurrentDictionary<Signal, int> minimum = new ConcurrentDictionary<Signal, int>();
         
         public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
             Signal k = s.With(color: new Color(0));
@@ -98,21 +105,39 @@ namespace Apollo.Devices {
             if (s.Color.Lit)
                 buffer[k] = s.Color;
             
-            if (s.Color.Lit != Release) {
+            if (s.Color.Lit != ActualRelease) {
                 s.Color = buffer[k];
                 
-                if (!Infinite) Schedule(() => {
-                    if (ReferenceEquals(buffer[k], s.Color))
-                        InvokeExit(new List<Signal>() {k.Clone()});
-                }, Heaven.Time + _time * _gate);
+                if (HoldMode != HoldType.Infinite) {
+                    if (HoldMode == HoldType.Minimum) minimum[k] = 0;
+
+                    Schedule(() => {
+                        if (ReferenceEquals(buffer[k], s.Color)) {
+                            if (HoldMode == HoldType.Minimum && minimum[k] == 0) {
+                                minimum[k] = 2;
+                                return;
+                            }
+
+                            InvokeExit(new List<Signal>() {k.Clone()});
+                        }
+                    }, Heaven.Time + _time * _gate);
+                }
                 
                 return new [] {s};
+
+            } else if (HoldMode == HoldType.Minimum) {
+                if (minimum[k] == 0) minimum[k] = 1;
+                else if (minimum[k] == 2)
+                    InvokeExit(new List<Signal>() {k.Clone()});
             }
             
             return Enumerable.Empty<Signal>();
         }).Select(i => i.Clone()).ToList());
 
-        protected override void Stopped() => buffer.Clear();
+        protected override void Stopped() {
+            buffer.Clear();
+            minimum.Clear();
+        }
 
         public override void Dispose() {
             if (Disposed) return;
@@ -163,13 +188,13 @@ namespace Apollo.Devices {
             : base(reader, version) {}
         }
         
-        public class InfiniteUndoEntry: SimplePathUndoEntry<Hold, bool> {
-            protected override void Action(Hold item, bool element) => item.Infinite = element;
+        public class HoldModeUndoEntry: EnumSimplePathUndoEntry<Hold, HoldType> {
+            protected override void Action(Hold item, HoldType element) => item.HoldMode = element;
             
-            public InfiniteUndoEntry(Hold hold, bool u, bool r)
-            : base($"Hold Infinite Changed to {(r? "Enabled" : "Disabled")}", hold, u, r) {}
+            public HoldModeUndoEntry(Hold hold, HoldType u, HoldType r, IEnumerable source)
+            : base("Hold Mode", hold, u, r, source) {}
             
-            InfiniteUndoEntry(BinaryReader reader, int version)
+            HoldModeUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {}
         }
         

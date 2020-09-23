@@ -80,7 +80,7 @@ namespace Apollo.Undo {
             typeof(Hold.DurationStepUndoEntry),
             typeof(Hold.DurationUndoEntry),
             typeof(Hold.GateUndoEntry),
-            typeof(Hold.InfiniteUndoEntry),
+            typeof(Hold.HoldModeUndoEntry),
             typeof(Hold.ReleaseUndoEntry),
 
             typeof(KeyFilter.ChangedUndoEntry),
