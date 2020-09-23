@@ -57,6 +57,7 @@ namespace Apollo.Binary {
             writer.Write(Preferences.CopyPreviousFrame);
             writer.Write(Preferences.CaptureLaunchpad);
             writer.Write(Preferences.EnableGestures);
+            writer.Write(Preferences.RememberPatternPosition);
 
             writer.Write(Preferences.PaletteName);
 

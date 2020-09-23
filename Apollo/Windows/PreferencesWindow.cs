@@ -54,6 +54,7 @@ namespace Apollo.Windows {
             CopyPreviousFrame = this.Get<CheckBox>("CopyPreviousFrame");
             CaptureLaunchpad = this.Get<CheckBox>("CaptureLaunchpad");
             EnableGestures = this.Get<CheckBox>("EnableGestures");
+            RememberPatternPosition = this.Get<CheckBox>("RememberPatternPosition");
 
             Monochrome = this.Get<RadioButton>("Monochrome");
             NovationPalette = this.Get<RadioButton>("NovationPalette");
@@ -81,7 +82,7 @@ namespace Apollo.Windows {
             Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
+        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, RememberPatternPosition, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
@@ -181,6 +182,7 @@ namespace Apollo.Windows {
             CopyPreviousFrame.IsChecked = Preferences.CopyPreviousFrame;
             CaptureLaunchpad.IsChecked = Preferences.CaptureLaunchpad;
             EnableGestures.IsChecked = Preferences.EnableGestures;
+            RememberPatternPosition.IsChecked = Preferences.RememberPatternPosition;
 
             Monochrome.IsChecked = Preferences.ImportPalette == Palettes.Monochrome;
             NovationPalette.IsChecked = Preferences.ImportPalette == Palettes.NovationPalette;
@@ -274,6 +276,8 @@ namespace Apollo.Windows {
         void CopyPreviousFrame_Changed(object sender, RoutedEventArgs e) => Preferences.CopyPreviousFrame = CopyPreviousFrame.IsChecked.Value;
 
         void EnableGestures_Changed(object sender, RoutedEventArgs e) => Preferences.EnableGestures = EnableGestures.IsChecked.Value;
+
+        void RememberPatternPosition_Changed(object sender, RoutedEventArgs e) => Preferences.RememberPatternPosition = RememberPatternPosition.IsChecked.Value;
 
         void ClearColorHistory(object sender, RoutedEventArgs e) => ColorHistory.Clear();
 
