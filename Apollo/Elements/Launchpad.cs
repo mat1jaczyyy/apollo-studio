@@ -699,9 +699,8 @@ namespace Apollo.Elements {
             }
         }
 
-        public void HandleSignal(byte key, byte vel, InputType format = InputType.XY)
+        public void HandleSignal(byte key, byte vel)
             => HandleSignal(new Signal(
-                format,
                 this,
                 this,
                 key,
@@ -714,13 +713,25 @@ namespace Apollo.Elements {
         }
 
         public void HandleNote(byte key, byte vel) {
-            // X and Mini MK3 old Programmer mode hack note handling
-            if (Type.HasProgrammerFwHack() && InputFormat == InputType.DrumRack) {
-                if (108 <= key && key <= 115) key -= 80;
-                else if (key == 116) key = 27;
+            bool xy = false;
+
+            if (InputFormat == InputType.DrumRack) {
+                // X and Mini MK3 old Programmer mode hack note handling
+                if (Type.HasProgrammerFwHack()) {
+                    if (108 <= key && key <= 115) key -= 80;
+                    else if (key == 116) key = 27;
+
+                } else if (Type == LaunchpadType.ProMK3) {
+                    xy = true;
+                    if (key == 124) key = 90;  // Shift key
+                    else if (28 <= key && key <= 35) key -= 27;   // Extra bottom row
+                    else xy = false;
+                }
             }
 
-            HandleSignal(key, vel, InputFormat);
+            if (!xy) key = (InputFormat == InputType.DrumRack)? Converter.DRtoXY(key) : ((key == 99)? (byte)100 : key);
+
+            HandleSignal(key, vel);
         }
 
         void HandleCC(byte key, byte vel) {
