@@ -42,6 +42,8 @@ namespace Apollo.Rendering {
         static void Wake() {
             if (RenderThread?.IsCompleted == false) return;
 
+            prev = Program.TimeSpent.ElapsedTicks - 1;
+
             RenderThread = Task.Run(() => {
                 prev = Program.TimeSpent.ElapsedTicks - 1;
                 
