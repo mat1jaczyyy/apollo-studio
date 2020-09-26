@@ -119,7 +119,7 @@ namespace Apollo.Elements {
         public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware which is not compatible with \n" +
-            "Apollo Studio due to not having a dedicated Programmer or Legacy mode.\n\n" +
+            "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
             "Update these to the latest version of the firmware using Novation Components\n" +
             "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
@@ -345,12 +345,12 @@ namespace Apollo.Elements {
                         if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 440) { // No Programmer/Legacy mode
+                        if (versionInt < 440) { // No Programmer mode
                             ProMK3FirmwareUnsupported.Set();
                             return LaunchpadType.Unknown;
                         }
                         
-                        if (versionInt < 461) // Old Firmware
+                        if (versionInt < 450) // Old Firmware
                             ProMK3FirmwareOld.Set();
 
                         return LaunchpadType.ProMK3;
