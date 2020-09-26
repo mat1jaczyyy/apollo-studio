@@ -148,6 +148,17 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning ProMK3LegacyRGBBroke { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running a broken version of\n" + 
+            "the official Novation firmware. While they will work with Apollo Studio,\n" +
+            "this version is known to not render RGB LEDs in Legacy mode.\n\n" +
+            "There is no fix at the moment. You should use Programmer mode.",
+            new PortWarning.Option(
+                "Scream at Novation to fix it",
+                "https://twitter.com/WeAreNovation"
+            )
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
@@ -157,7 +168,8 @@ namespace Apollo.Elements {
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
-                ProMK3FirmwareOld.DisplayWarning(sender);
+                if (ProMK3FirmwareOld.DisplayWarning(sender)) return;
+                ProMK3LegacyRGBBroke.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -352,6 +364,9 @@ namespace Apollo.Elements {
                         
                         if (versionInt < 450) // Old Firmware
                             ProMK3FirmwareOld.Set();
+
+                        if (versionInt == 461) // Broke Legacy mode
+                            ProMK3LegacyRGBBroke.Set();
 
                         return LaunchpadType.ProMK3;
                 }
