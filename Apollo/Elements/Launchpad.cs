@@ -100,6 +100,19 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning XFirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Xs are running the official\n" + 
+            "Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs slightly worse than the modded fast stock firmware.\n\n" +
+            "Update these to the modded fast custom firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
         public static PortWarning MiniMK3FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Mini MK3s are running an older version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
@@ -166,6 +179,7 @@ namespace Apollo.Elements {
                 if (ProFirmwareStock.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
+                if (XFirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareOld.DisplayWarning(sender)) return;
@@ -249,6 +263,8 @@ namespace Apollo.Elements {
 
         public bool Usable => Available && Type != LaunchpadType.Unknown;
 
+        bool SupportsCompression;
+
         public delegate void ReceiveEventHandler(Signal n);
         public event ReceiveEventHandler Receive;
 
@@ -326,8 +342,10 @@ namespace Apollo.Elements {
                             return LaunchpadType.Unknown;
                         }
 
-                        if (versionStr == "cfy") // Custom Firmware
+                        if (versionStr == "cfy") { // Custom Firmware
+                            SupportsCompression = true;
                             return LaunchpadType.CFW;
+                        }
                         
                         if (versionInt < 182) // Old Firmware
                             ProFirmwareOld.Set();
@@ -341,6 +359,11 @@ namespace Apollo.Elements {
                         
                         if (versionInt < 351) // Old Firmware
                             XFirmwareOld.Set();
+                        
+                        if (versionInt == 352)
+                            SupportsCompression = true;
+
+                        else XFirmwareStock.Set();
 
                         return LaunchpadType.X;
                     
@@ -439,7 +462,7 @@ namespace Apollo.Elements {
                 }));
             }
 
-            if (CFWOptimize(n, out IEnumerable<byte> sysex)) {
+            if (Optimize(n, out IEnumerable<byte> sysex)) {
                 SysExSend(sysex);
                 return;
             }
@@ -511,32 +534,37 @@ namespace Apollo.Elements {
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
-        static HashSet<byte> excludedIndexes = new HashSet<byte>() {0, 9, 90, 99};
+        static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new Dictionary<LaunchpadType, HashSet<byte>>() {
+            {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
+            {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
+        };
 
-        bool CFWOptimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
+        bool Optimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
             ret = null;
             
-            if (Type != LaunchpadType.CFW) return false;
+            if (!SupportsCompression) return false;
 
-            List<RawUpdate> filteredUpdates = updates.Where(u => !excludedIndexes.Contains(u.Index)).ToList();
+            List<RawUpdate> filteredUpdates = updates.Where(u => !excludedIndexes[Type].Contains(u.Index)).ToList();
 
             IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
-            if (colors.Count() > 79) return false;
+            if (Type.IsPro() && colors.Count() > 79) return false; // CFW Hard Limit
 
             ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
                 colors.SelectMany(i => {
-                    IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index).Select(j => j == 100? (byte)99 : j);
+                    IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index);
+                    if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);
+
                     IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
                     List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
 
-                    if (positions.Intersect(allMap).Count() == 96) {
+                    if (positions.Intersect(allMap).Count() == 100 - excludedIndexes[Type].Count + Convert.ToInt32(excludedIndexes[Type].Contains(100))) {
                         finalPos = finalPos.Append((byte)0);
-                        if (positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
+                        if (Type.IsPro() && positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
                     
                     } else {
                         finalPos = positions.ToList();
 
-                        for (int j = 0; j < 10; j++) {
+                        for (int j = Convert.ToInt32(!Type.IsPro()); j < 10; j++) {
                             IEnumerable<byte> row = rowMap(j);
                             IEnumerable<byte> col = colMap(j);
 
@@ -561,7 +589,7 @@ namespace Apollo.Elements {
                 })
             );
 
-            return ret.Count() <= 319; // Hard limit is 320 but this doesn't include SysExEnd
+            return Type.IsPro()? ret.Count() <= 319 : true; // CFW Hard limit is 320 but this doesn't include SysExEnd
         }
 
         void RGBSend(List<RawUpdate> rgb) {
