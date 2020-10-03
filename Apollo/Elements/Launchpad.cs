@@ -456,12 +456,10 @@ namespace Apollo.Elements {
             }
         }
 
-        bool SysExSend(IEnumerable<byte> raw) {
-            byte[] bytes = raw.Concat(SysExEnd).ToArray();
+        void SysExSend(IEnumerable<byte> raw) {
+            if (!Usable || raw is null) return;
 
-            if (!Usable) return false;
-
-            buffer.Enqueue(bytes);
+            buffer.Enqueue(raw.Concat(SysExEnd).ToArray());
             ulong current = signalCount;
 
             Task.Run(() => {
@@ -480,8 +478,6 @@ namespace Apollo.Elements {
                 if (signalCount <= current)
                     Disconnect(false);
             });
-
-            return true;
         }
 
         public void DirectSend(RawUpdate n) => RGBSend(new List<RawUpdate>() {n});
@@ -585,6 +581,7 @@ namespace Apollo.Elements {
             if (!SupportsCompression) return false;
 
             List<RawUpdate> filteredUpdates = updates.Where(u => !excludedIndexes[Type].Contains(u.Index)).ToList();
+            if (!filteredUpdates.Any()) return true;
 
             IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
             if (Type.IsPro() && colors.Count() > 79) return false; // CFW Hard Limit
