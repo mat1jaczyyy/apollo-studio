@@ -669,6 +669,7 @@ namespace Apollo.Elements {
         void StartIdentification() {
             Task.Run(() => {
                 Available = true;
+                SupportsCompression = false;
 
                 Input.Received += WaitForIdentification;
                 Output.Send(DeviceInquiry);
