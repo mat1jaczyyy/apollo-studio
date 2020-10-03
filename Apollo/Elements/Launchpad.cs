@@ -40,6 +40,19 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning MK2FirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad MK2s are running the official\n" + 
+            "Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs slightly worse than the modded fast stock firmware.\n\n" +
+            "Update these to the modded fast firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
         public static PortWarning ProFirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
@@ -105,7 +118,7 @@ namespace Apollo.Elements {
             "Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
             "performs slightly worse than the modded fast stock firmware.\n\n" +
-            "Update these to the modded fast custom firmware using\n" +
+            "Update these to the modded fast firmware using\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -123,6 +136,19 @@ namespace Apollo.Elements {
                 "Launch Components Online",
                 "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
             ),
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
+        public static PortWarning MiniMK3FirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Mini MK3s are running the official\n" + 
+            "Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs slightly worse than the modded fast stock firmware.\n\n" +
+            "Update these to the modded fast firmware using\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -175,12 +201,14 @@ namespace Apollo.Elements {
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
+                if (MK2FirmwareStock.DisplayWarning(sender)) return;
                 if (ProFirmwareOld.DisplayWarning(sender)) return;
                 if (ProFirmwareStock.DisplayWarning(sender)) return;
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (XFirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
+                if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareOld.DisplayWarning(sender)) return;
                 ProMK3LegacyRGBBroke.DisplayWarning(sender);
@@ -330,6 +358,11 @@ namespace Apollo.Elements {
                             doingMK2VersionInquiry = true;
                             return LaunchpadType.Unknown;
                         }
+                        
+                        if (versionInt == 172)
+                            SupportsCompression = true;
+
+                        else MK2FirmwareStock.Set();
 
                         return LaunchpadType.MK2;
                     
@@ -373,6 +406,11 @@ namespace Apollo.Elements {
                         
                         if (versionInt < 407) // Old Firmware
                             MiniMK3FirmwareOld.Set();
+                        
+                        if (versionInt == 408)
+                            SupportsCompression = true;
+
+                        else MiniMK3FirmwareStock.Set();
 
                         return LaunchpadType.MiniMK3;
                     
@@ -535,8 +573,10 @@ namespace Apollo.Elements {
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
         static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new Dictionary<LaunchpadType, HashSet<byte>>() {
+            {LaunchpadType.MK2, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99}},
             {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
+            {LaunchpadType.MiniMK3, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
         };
 
         bool Optimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
