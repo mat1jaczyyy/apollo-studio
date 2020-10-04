@@ -416,7 +416,7 @@ namespace Apollo.Elements {
                         if (versionInt < 450) // Old Firmware
                             ProMK3FirmwareOld.Set();
 
-                        if (versionInt == 461) // Broke Legacy mode
+                        if (versionInt == 464) // Broke Legacy mode
                             ProMK3LegacyRGBBroke.Set();
 
                         return LaunchpadType.ProMK3;
