@@ -25,15 +25,8 @@ namespace Apollo.Elements {
         public static PortWarning MK2FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad MK2s are running an older version of the\n" + 
             "official Novation firmware which is not compatible with Apollo Studio.\n\n" +
-            "Update these to the latest version of the firmware using the official updater or\n" +
+            "Update these to the faster, modded firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
-            new PortWarning.Option(
-                "Download Official Updater",
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/13333/launchpad-mk2-updater-1.0.dmg",
-                false
-            ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -41,11 +34,11 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning MK2FirmwareStock { get; private set; } = new PortWarning(
-            "One or more connected Launchpad MK2s are running the official\n" + 
-            "Novation firmware.\n" + 
+            "One or more connected Launchpad MK2s are running\n" + 
+            "the official Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
-            "performs slightly worse than the modded fast stock firmware.\n\n" +
-            "Update these to the modded fast firmware using\n" +
+            "performs slightly worse than the faster, modded stock firmware.\n\n" +
+            "Update these to the faster, modded firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -57,15 +50,8 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio, this\n" +
             "version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using the official updater or\n" +
+            "Update these to the latest version of the firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
-            new PortWarning.Option(
-                "Download Official Updater",
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.exe"
-                    : "https://customer.novationmusic.com/sites/customer/files/novation/downloads/15481/launchpad-pro-updater-1.2.dmg",
-                false
-            ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
@@ -73,11 +59,11 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning ProFirmwareStock { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pros are running the official\n" + 
-            "Novation firmware.\n" + 
+            "One or more connected Launchpad Pros are running\n" + 
+            "the official Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
             "performs considerably worse than the optimized custom firmware.\n\n" +
-            "Update these to the latest version of the custom firmware using\n" +
+            "Update these to the latest version of the custom firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -89,7 +75,7 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pros are running an older version of the\n" + 
             "performance-optimized custom firmware which is not compatible with\n" +
             "Apollo Studio.\n\n" +
-            "Update these to the latest version of the firmware using\n" +
+            "Update these to the latest version of the custom firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -101,8 +87,9 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Xs are running an older version of the\n" + 
             "official Novation firmware. While they will work with Apollo Studio,\n" +
             "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using Novation Components\n" +
-            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using the\n" +
+            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
+            "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
                 "https://components.novationmusic.com/launchpad-x/firmware"
@@ -114,11 +101,11 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning XFirmwareStock { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Xs are running the official\n" + 
-            "Novation firmware.\n" + 
+            "One or more connected Launchpad Xs are running\n" + 
+            "the official Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
-            "performs slightly worse than the modded fast stock firmware.\n\n" +
-            "Update these to the modded fast firmware using\n" +
+            "performs slightly worse than the faster, modded stock firmware.\n\n" +
+            "Update these to the faster, modded firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -130,8 +117,9 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Mini MK3s are running an older version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
             "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using Novation Components\n" +
-            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using the\n" +
+            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
+            "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
                 "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
@@ -143,11 +131,11 @@ namespace Apollo.Elements {
         );
 
         public static PortWarning MiniMK3FirmwareStock { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Mini MK3s are running the official\n" + 
-            "Novation firmware.\n" + 
+            "One or more connected Launchpad Mini MK3s are running\n" + 
+            "the official Novation firmware.\n" + 
             "While they will work with Apollo Studio, the official firmware\n" +
-            "performs slightly worse than the modded fast stock firmware.\n\n" +
-            "Update these to the modded fast firmware using\n" +
+            "performs slightly worse than the faster, modded stock firmware.\n\n" +
+            "Update these to the faster, modded firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -159,8 +147,9 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware which is not compatible with \n" +
             "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
-            "Update these to the latest version of the firmware using Novation Components\n" +
-            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using the\n" +
+            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
+            "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
                 "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
@@ -175,8 +164,9 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
             "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using Novation Components\n" +
-            "or Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            "Update these to the latest version of the firmware using the\n" +
+            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
+            "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
                 "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
