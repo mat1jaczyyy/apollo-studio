@@ -72,6 +72,8 @@ namespace Apollo.Devices {
         }
 
         void Initialize() {
+            if (Disposed) return;
+            
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
