@@ -55,6 +55,8 @@ namespace Apollo.Core {
         public delegate void ProjectLoadedEventHandler();
         public static event ProjectLoadedEventHandler ProjectLoaded;
 
+        public static void ClearProjectLoaded() => ProjectLoaded = null;
+
         static Project _project;
         public static Project Project {
             get => _project;
