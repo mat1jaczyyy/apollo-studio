@@ -240,7 +240,6 @@ namespace Apollo.Elements {
 
         public Project(int bpm = 150, int[] macros = null, List<Track> tracks = null, string author = "", long basetime = 0, long started = 0, UndoManager undo = null, string path = "") {
             TimeSpent.Start();
-            Program.ClearProjectLoaded();
 
             BPM = bpm;
             Macros = macros?? new int[4] {1, 1, 1, 1};

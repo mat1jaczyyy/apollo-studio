@@ -280,16 +280,13 @@ namespace Apollo.Devices {
 
             _colors = colors?? new List<Color>() {new Color(), new Color(0)};
             _positions = positions?? new List<double>() {0, 1};
-            _types = types ?? new List<FadeType>() {FadeType.Linear};
+            _types = types?? new List<FadeType>() {FadeType.Linear};
             Expanded = expanded;
 
-            if (Program.Project == null) Program.ProjectLoaded += Initialize;
-            else Initialize();
+            Initialize();
         }
 
-        public void Initialize() {
-            if (Disposed) return;
-
+        protected override void Initialized() {
             Generate();
 
             Preferences.FPSLimitChanged += Generate;
