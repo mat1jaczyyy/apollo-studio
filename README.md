@@ -2,7 +2,10 @@
 
 ### Fly your Launchpad to the moon. ☆.。.:*・°☆
 
-![Logo](Assets/readme.png)
+<p align="center">
+  <img src="https://github.com/mat1jaczyyy/apollo-studio/raw/master/Assets/readme.png">
+</p>
+<br>
 
 Apollo Studio is a standalone editor and live playback engine for Launchpad light effects, inspired by the traditional workflow of Ableton Live. The innovation lies in support for true RGB colors (all 262k of them!), an improved workflow and better resource management. Apollo Studio has no audio capabilities whatsoever, as it's designed to run alongside Ableton Live which has proven its robustness when it comes to running audio-related tasks. Taking all that load off Live's engine should improve audio quality and input lag, too. Apollo Studio takes full advantage of the multithreading capabilities of modern processors and also allows for adjusting the intensity of the light effects globally, making sure everyone can run all project files as much as their setup can support them.
 
@@ -12,10 +15,23 @@ Apollo Studio solves all the problems we experience every day in Live including 
 
 Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apollo Studio. See for yourself what our software is capable of.
 
-[![Terravita x Chime x Akylla - Go Higher](http://img.youtube.com/vi/a-MwTVH-wX8/mqdefault.jpg)](https://www.youtube.com/watch?v=a-MwTVH-wX8 "Terravita x Chime x Akylla - Go Higher")
-[![Owl City - Fireflies](http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg)](http://www.youtube.com/watch?v=DDJ0JPgd8fw "Owl City - Fireflies")
-[![Borgeous, Taylr Renee - Sweeter Without You](http://img.youtube.com/vi/yA-bFsYRG4I/mqdefault.jpg)](http://www.youtube.com/watch?v=yA-bFsYRG4I "Borgeous, Taylr Renee - Sweeter Without You")
-[![Jonas Aden, Castion, Danny Leax - Tell Me A Lie](http://img.youtube.com/vi/caiNv3bC5YI/mqdefault.jpg)](https://www.youtube.com/watch?v=caiNv3bC5YI "Jonas Aden, Castion, Danny Leax - Tell Me A Lie")
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=a-MwTVH-wX8" title="Terravita x Chime x Akylla - Go Higher">
+    <img src="http://img.youtube.com/vi/a-MwTVH-wX8/mqdefault.jpg">
+  </a>
+
+  <a href="https://www.youtube.com/watch?v=DDJ0JPgd8fw" title="Owl City - Fireflies">
+    <img src="http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg">
+  </a>
+
+  <a href="https://www.youtube.com/watch?v=yA-bFsYRG4I" title="Borgeous, Taylr Renee - Sweeter Without You">
+    <img src="http://img.youtube.com/vi/yA-bFsYRG4I/mqdefault.jpg">
+  </a>
+
+  <a href="https://www.youtube.com/watch?v=caiNv3bC5YI" title="Jonas Aden, Castion, Danny Leax - Tell Me A Lie">
+    <img src="http://img.youtube.com/vi/caiNv3bC5YI/mqdefault.jpg">
+  </a>
+</p>
 
 ## Getting Started
 
