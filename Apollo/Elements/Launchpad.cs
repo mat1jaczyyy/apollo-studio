@@ -181,10 +181,16 @@ namespace Apollo.Elements {
             "One or more connected Launchpad Pro MK3s are running a broken version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
             "this version is known to not render RGB LEDs in Legacy mode.\n\n" +
-            "There is no fix at the moment. You should use Programmer mode.",
+            "Update these to the latest version of the firmware using the\n" +
+            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
+            "any potential issues with Apollo Studio.",
             new PortWarning.Option(
-                "Scream at Novation to fix it",
-                "https://twitter.com/WeAreNovation"
+                "Launch Components Online",
+                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
+            ),
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
             )
         );
 
