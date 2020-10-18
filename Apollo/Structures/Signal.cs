@@ -65,18 +65,6 @@ namespace Apollo.Structures {
             MultiTarget = multiTarget?? new Stack<List<int>>();
         }
 
-        public Signal(InputType input, object origin, Launchpad source, byte index = 11, Color color = null, int[] macros = null, int layer = 0, BlendingType blending = BlendingType.Normal, int blendingrange = 200, Stack<List<int>> multiTarget = null): this(
-            origin,
-            source,
-            (input == InputType.DrumRack)? Converter.DRtoXY(index) : ((index == 99)? (byte)100 : index),
-            color,
-            macros,
-            layer,
-            blending,
-            blendingrange,
-            multiTarget
-        ) {}
-
         public override bool Equals(object obj) {
             if (!(obj is Signal)) return false;
             return this == (Signal)obj;
