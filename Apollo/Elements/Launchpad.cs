@@ -146,7 +146,7 @@ namespace Apollo.Elements {
         public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware which is not compatible with \n" +
-            "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
+            "Apollo Studio due to not having a dedicated Legacy mode.\n\n" +
             "Update these to the latest version of the firmware using the\n" +
             "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
             "any potential issues with Apollo Studio.",
@@ -157,34 +157,6 @@ namespace Apollo.Elements {
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
-            )
-        );
-
-        public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
-            "the official Novation firmware. While they will work with Apollo Studio,\n" +
-            "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using the\n" +
-            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
-            "any potential issues with Apollo Studio.",
-            new PortWarning.Option(
-                "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
-            ),
-            new PortWarning.Option(
-                "Launch Firmware Utility",
-                "https://fw.mat1jaczyyy.com"
-            )
-        );
-
-        public static PortWarning ProMK3LegacyRGBBroke { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running a broken version of\n" + 
-            "the official Novation firmware. While they will work with Apollo Studio,\n" +
-            "this version is known to not render RGB LEDs in Legacy mode.\n\n" +
-            "There is no fix at the moment. You should use Programmer mode.",
-            new PortWarning.Option(
-                "Scream at Novation to fix it",
-                "https://twitter.com/WeAreNovation"
             )
         );
 
@@ -199,9 +171,7 @@ namespace Apollo.Elements {
                 if (XFirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
-                if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
-                if (ProMK3FirmwareOld.DisplayWarning(sender)) return;
-                ProMK3LegacyRGBBroke.DisplayWarning(sender);
+                ProMK3FirmwareUnsupported.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -408,16 +378,10 @@ namespace Apollo.Elements {
                         if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 440) { // No Programmer mode
+                        if (versionInt < 465) { // No Legacy mode
                             ProMK3FirmwareUnsupported.Set();
                             return LaunchpadType.Unknown;
                         }
-                        
-                        if (versionInt < 450) // Old Firmware
-                            ProMK3FirmwareOld.Set();
-
-                        if (versionInt == 464) // Broke Legacy mode
-                            ProMK3LegacyRGBBroke.Set();
 
                         return LaunchpadType.ProMK3;
                 }
@@ -795,7 +759,7 @@ namespace Apollo.Elements {
                 } else if (Type == LaunchpadType.ProMK3) {
                     xy = true;
                     if (key == 124) key = 90;  // Shift key
-                    else if (28 <= key && key <= 35) key -= 27;   // Extra bottom row
+                    else if (12 <= key && key <= 19) key -= 11;  // Extra bottom row
                     else xy = false;
                 }
             }
