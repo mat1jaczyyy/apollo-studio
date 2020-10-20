@@ -759,7 +759,7 @@ namespace Apollo.Elements {
                 } else if (Type == LaunchpadType.ProMK3) {
                     xy = true;
                     if (key == 124) key = 90;  // Shift key
-                    else if (28 <= key && key <= 35) key -= 27;   // Extra bottom row
+                    else if (12 <= key && key <= 19) key -= 11;  // Extra bottom row
                     else xy = false;
                 }
             }
