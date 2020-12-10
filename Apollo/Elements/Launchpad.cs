@@ -450,13 +450,10 @@ namespace Apollo.Elements {
                 }));
             }
 
-            foreach (RawUpdate i in n)
-            {
-                if (i.Index != 100) {
-                    if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
-                    else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
-                    else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
-                }
+            foreach (RawUpdate i in n.Where(i => i.Index != 100)) {
+                if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+                else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
+                else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
             }
 
             if (Optimize(n, out IEnumerable<byte> sysex)) {
