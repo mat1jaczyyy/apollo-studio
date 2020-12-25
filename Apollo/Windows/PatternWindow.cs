@@ -949,13 +949,14 @@ namespace Apollo.Windows {
                 double pinched = _pattern.ApplyPinch(time);
 
                 Heaven.Schedule(() => {
-                    if(ReferenceEquals(locker, PlayLocker)) RenderFrame();
+                    if (ReferenceEquals(locker, PlayLocker)) 
+                        RenderFrame();
                 }, Heaven.Time + pinched - starttime);
             }
         }
         
         void RenderFrame() {
-            if (_pattern.Disposed) return;
+            if (_pattern?.Disposed != false) return;
             
             if (++PlayIndex < _pattern.Count * _pattern.AdjustedRepeats) {
                 for (int i = 0; i < _pattern[PlayIndex % _pattern.Count].Screen.Length; i++)
