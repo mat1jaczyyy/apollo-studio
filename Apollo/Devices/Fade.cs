@@ -329,6 +329,8 @@ namespace Apollo.Devices {
                         }
                     };
 
+                    if (fade == null) Initialize();
+
                     Schedule(Next, start += fade[1].Time - fade[0].Time);
 
                     return new [] {i.With(color: fade[0].Color.Clone())};
