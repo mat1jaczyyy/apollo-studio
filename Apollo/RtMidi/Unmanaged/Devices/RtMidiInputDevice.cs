@@ -55,17 +55,20 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
         void HandleRtMidiCallback(double timestamp, IntPtr messagePtr, UIntPtr messageSize, IntPtr userData) {
             if (Message == null) return;
 
+            byte[] message;
+
             try {
                 // Copy unmanaged message to managed byte array
                 int size = (int)messageSize;
-                byte[] message = new byte[size];
+                message = new byte[size];
                 Marshal.Copy(messagePtr, message, 0, size);
-
-                Message.Invoke(message);
 
             } catch (Exception) {
                 Program.Log("Unexpected exception occurred while receiving MIDI message");
+                return;
             }
+
+            Message.Invoke(message);
         }
 
         protected override void DestroyDevice() {
