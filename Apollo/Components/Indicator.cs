@@ -35,24 +35,22 @@ namespace Apollo.Components {
         }
 
         void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            Disposed = true;
+
             lock (locker) {
                 Timer?.Dispose();
-                Disposed = true;
+                Timer = null;
             }
         }
 
         public void Trigger(List<Signal> triggering) {
+            if (Disposed) return;
             if (ChainKind? !Preferences.ChainSignalIndicators : !Preferences.DeviceSignalIndicators) return;
 
-            bool lit = triggering.Any(i => i.Color.Lit);
+            SetIndicator(triggering.Any(i => i.Color.Lit)? 1 : 0.5);
 
-            lock (locker) {
-                if (Disposed) return;
-
-                SetIndicator(lit? 1 : 0.5);
-
-                Timer.Restart();
-            }
+            lock (locker)
+                Timer?.Restart();
         }
     }
 }
