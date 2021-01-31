@@ -78,17 +78,14 @@ namespace Apollo.Selection {
                 return true;
             }
 
-            try {
-                if (right) {
-                    target = target.IParent.IChildren[target.IParentIndex.Value + 1];
+            if (right) {
+                if (target.IParentIndex.Value + 1 >= target.IParent.IChildren.Count) return false;
+                target = target.IParent.IChildren[target.IParentIndex.Value + 1];
 
-                } else {
-                    if (target.IParentIndex.Value == 0 && target.IParent is ISelect && !target.IParent.IRoot) target = (ISelect)target.IParent;
-                    else target = target.IParent.IChildren[target.IParentIndex.Value - 1];
-                }
-
-            } catch (ArgumentOutOfRangeException) {
-                return false;
+            } else {
+                if (target.IParentIndex.Value == 0 && target.IParent is ISelect && !target.IParent.IRoot) target = (ISelect)target.IParent;
+                else if (target.IParentIndex.Value - 1 < 0) return false;
+                else target = target.IParent.IChildren[target.IParentIndex.Value - 1];
             }
 
             Select(target, shift);

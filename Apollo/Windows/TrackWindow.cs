@@ -31,7 +31,7 @@ namespace Apollo.Windows {
             Contents = this.Get<ScrollViewer>("Contents");
         }
 
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
 
         Track _track;
 

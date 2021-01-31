@@ -73,7 +73,7 @@ namespace Apollo.Structures {
             double r = Red / 63.0;
             double g = Green / 63.0;
             double b = Blue / 63.0;
-            double[] colors = new double[] {r, g, b};
+            double[] colors = new [] {r, g, b};
 
             double min = colors.Min();
             double max = colors.Max();

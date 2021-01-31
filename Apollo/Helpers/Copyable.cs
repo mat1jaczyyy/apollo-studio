@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using StringBuilder = System.Text.StringBuilder;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -13,7 +14,7 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public class Copyable {
-        public List<ISelect> Contents = new List<ISelect>();
+        public List<ISelect> Contents = new();
 
         public Type Type => Contents.FirstOrDefault()?.GetType();
 
@@ -42,34 +43,47 @@ namespace Apollo.Helpers {
             char[] arr = input.ToCharArray();
 
             char current = '\0';
-            List<Seq> data = new List<Seq>();
+            List<Seq> data = new();
 
             foreach (char c in arr) {
                 if (c == current) data.Last().n++;
                 else data.Add(new Seq(current = c, 1));
             }
             
-            return data.Aggregate("", (a, t) => {
-                int log = (int)Math.Floor(Math.Log(t.n, 64)) + 1;
+            StringBuilder a = new StringBuilder();
+
+            foreach (Seq t in data) {
+                int log = (int)Math.Log(t.n, 64) + 1;
                 
                 if (3 + log < t.n) {
                     char[] chars = new char[log];
+
                     for (int j = 0; j < log; j++) {
                         chars[j] = (char)(t.n % 64 + 48); 
                         t.n = t.n >> 6;
                     }
-                    chars = chars.Reverse().ToArray();
-                    return a + $"{{{t.c}{string.Join("", chars)}}}";
-                } else return a + string.Concat(Enumerable.Repeat(t.c, t.n));
-            });
+
+                    a.Append('{');
+                    a.Append(t.c);
+
+                    foreach (char i in chars.Reverse())
+                        a.Append(i);
+
+                    a.Append('}');
+
+                } else for (int i = 0; i < t.n; i++) 
+                    a.Append(t.c);
+            }
+
+            return a.ToString();
         }
         
         public static byte[] FromCompressedBase64(string inString) {
             bool inCompressed = false;
             bool readingChar = true;
             char compressedChar = ' ';
-            string count = "";
-            string res = "";
+            StringBuilder count = new StringBuilder();
+            StringBuilder res = new StringBuilder();
             
             foreach (char c in inString) {
                 switch (c) {
@@ -79,15 +93,15 @@ namespace Apollo.Helpers {
                         break;
 
                     case '}':
-                        char[] countPlaces = count.Reverse().ToArray();
                         int numCount = 0;
                         
-                        for (int i = 0; i < countPlaces.Length; i++)
-                            numCount += ((int)countPlaces[i] - 48) * (int)Math.Pow(64, i);
+                        for (int i = count.Length - 1; i >= 0; i--)
+                            numCount |= ((int)count[i] - 48) << (6 * (count.Length - i - 1));
                         
-                        res += string.Join("", Enumerable.Repeat(compressedChar, numCount));
+                        for (int i = 0; i < numCount; i++)
+                            res.Append(compressedChar);
                         
-                        count = "";
+                        count.Clear();
                         inCompressed = false;
                         readingChar = false;
                         break;
@@ -98,14 +112,14 @@ namespace Apollo.Helpers {
                                 compressedChar = c;
                                 readingChar = false;
 
-                            } else count += c;
+                            } else count.Append(c);
 
-                        } else res += c;
+                        } else res.Append(c);
                         break;
                 }
             }
             
-            return Convert.FromBase64String(res);
+            return Convert.FromBase64String(res.ToString());
         }
         
         public async Task StoreToFile(string path, Window sender) {

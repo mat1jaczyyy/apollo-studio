@@ -18,7 +18,7 @@ namespace Apollo.Components {
         public delegate void HistoryChangedEventHandler();
         public static event HistoryChangedEventHandler HistoryChanged;
 
-        static List<Color> History = new List<Color>();
+        static List<Color> History = new();
 
         public static Color GetColor(int index) => (index < Count)? History[index] : null;
 
@@ -37,7 +37,7 @@ namespace Apollo.Components {
         }
 
         public static void Clear() {
-            History = new List<Color>();
+            History.Clear();
             HistoryChanged?.Invoke();
         }
         

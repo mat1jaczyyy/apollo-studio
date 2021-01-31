@@ -89,7 +89,7 @@ namespace Apollo.Devices {
             Hold = hold;
         }
         
-        ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
+        ConcurrentDictionary<Signal, Signal> buffer = new();
         
         public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.SelectMany(s => {

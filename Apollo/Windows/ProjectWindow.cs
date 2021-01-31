@@ -52,7 +52,7 @@ namespace Apollo.Windows {
             Started = this.Get<TextBlock>("Started");
         }
 
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
 
         TextBlock TitleText, TitleCenter, TimeSpent, Started;
         StackPanel CenteringLeft, CenteringRight, MacroDials, BottomPane;

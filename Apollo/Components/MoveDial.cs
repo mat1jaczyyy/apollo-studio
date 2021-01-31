@@ -32,7 +32,7 @@ namespace Apollo.Components {
             InputY = this.Get<TextBox>("InputY");
         }
 
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
 
         public delegate void ChangedEventHandler(int x, int y, int? old_x, int? old_y);
         public event ChangedEventHandler Changed, AbsoluteChanged;

@@ -108,9 +108,9 @@ namespace Apollo.Undo {
                     Window.Contents_Remove(i);
 
             foreach (UndoEntry entry in History) entry.Dispose();
-            History = new List<UndoEntry>() {
-                new UndoEntry(description)
-            };
+
+            History.Clear();
+            History.Add(new UndoEntry(description));
 
             Window?.Contents_Insert(0, History[0]);
 

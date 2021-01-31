@@ -146,7 +146,7 @@ namespace Apollo.Elements {
         public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
             "the official Novation firmware which is not compatible with \n" +
-            "Apollo Studio due to not having a dedicated Programmer mode.\n\n" +
+            "Apollo Studio due to not having a dedicated Legacy mode.\n\n" +
             "Update these to the latest version of the firmware using the\n" +
             "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
             "any potential issues with Apollo Studio.",
@@ -157,34 +157,6 @@ namespace Apollo.Elements {
             new PortWarning.Option(
                 "Launch Firmware Utility",
                 "https://fw.mat1jaczyyy.com"
-            )
-        );
-
-        public static PortWarning ProMK3FirmwareOld { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
-            "the official Novation firmware. While they will work with Apollo Studio,\n" +
-            "this version is known to cause performance issues and lags.\n\n" +
-            "Update these to the latest version of the firmware using the\n" +
-            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
-            "any potential issues with Apollo Studio.",
-            new PortWarning.Option(
-                "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
-            ),
-            new PortWarning.Option(
-                "Launch Firmware Utility",
-                "https://fw.mat1jaczyyy.com"
-            )
-        );
-
-        public static PortWarning ProMK3LegacyRGBBroke { get; private set; } = new PortWarning(
-            "One or more connected Launchpad Pro MK3s are running a broken version of\n" + 
-            "the official Novation firmware. While they will work with Apollo Studio,\n" +
-            "this version is known to not render RGB LEDs in Legacy mode.\n\n" +
-            "There is no fix at the moment. You should use Programmer mode.",
-            new PortWarning.Option(
-                "Scream at Novation to fix it",
-                "https://twitter.com/WeAreNovation"
             )
         );
 
@@ -199,9 +171,7 @@ namespace Apollo.Elements {
                 if (XFirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
-                if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
-                if (ProMK3FirmwareOld.DisplayWarning(sender)) return;
-                ProMK3LegacyRGBBroke.DisplayWarning(sender);
+                ProMK3FirmwareUnsupported.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
 
@@ -214,14 +184,14 @@ namespace Apollo.Elements {
             set => _patternwindow = value;
         }
 
-        public List<AbletonLaunchpad> AbletonLaunchpads = new List<AbletonLaunchpad>();
+        public List<AbletonLaunchpad> AbletonLaunchpads = new();
 
         IMidiInputDevice Input;
         IMidiOutputDevice Output;
 
         public LaunchpadType Type { get; protected set; } = LaunchpadType.Unknown;
 
-        static Dictionary<LaunchpadType, int> MaxRepeats = new Dictionary<LaunchpadType, int>() {
+        static Dictionary<LaunchpadType, int> MaxRepeats = new() {
             {LaunchpadType.Pro, 78},
             {LaunchpadType.CFW, 79}
         };
@@ -230,7 +200,7 @@ namespace Apollo.Elements {
         static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
 
-        static Dictionary<LaunchpadType, byte[]> RGBHeader = new Dictionary<LaunchpadType, byte[]>() {
+        static Dictionary<LaunchpadType, byte[]> RGBHeader = new() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
             {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0B}).ToArray()},
             {LaunchpadType.CFW, SysExStart.Concat(new byte[] {0x6F}).ToArray()},
@@ -241,7 +211,7 @@ namespace Apollo.Elements {
 
         static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
 
-        static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new Dictionary<LaunchpadType, byte[]>() {
+        static Dictionary<LaunchpadType, byte[]> ForceClearMessage = new() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.Pro, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
             {LaunchpadType.CFW, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0E, 0x00}).ToArray()},
@@ -408,16 +378,10 @@ namespace Apollo.Elements {
                         if (response.Data[9] == 17) // Bootloader
                             return LaunchpadType.Unknown;
                         
-                        if (versionInt < 440) { // No Programmer mode
+                        if (versionInt < 465) { // No Legacy mode
                             ProMK3FirmwareUnsupported.Set();
                             return LaunchpadType.Unknown;
                         }
-                        
-                        if (versionInt < 450) // Old Firmware
-                            ProMK3FirmwareOld.Set();
-
-                        if (versionInt == 464) // Broke Legacy mode
-                            ProMK3LegacyRGBBroke.Set();
 
                         return LaunchpadType.ProMK3;
                 }
@@ -486,18 +450,18 @@ namespace Apollo.Elements {
                 }));
             }
 
+            foreach (RawUpdate i in n.Where(i => i.Index != 100)) {
+                if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
+                else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
+                else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
+            }
+
             if (Optimize(n, out IEnumerable<byte> sysex)) {
                 SysExSend(sysex);
                 return;
             }
 
-            List<RawUpdate> output = n.SelectMany(i => {
-                if (i.Index != 100) {
-                    if (Rotation == RotationType.D90) i.Index = (byte)((i.Index % 10) * 10 + 9 - i.Index / 10);
-                    else if (Rotation == RotationType.D180) i.Index = (byte)((9 - i.Index / 10) * 10 + 9 - i.Index % 10);
-                    else if (Rotation == RotationType.D270) i.Index = (byte)((9 - i.Index % 10) * 10 + i.Index / 10);
-                }
-
+            List<RawUpdate> output = n.SelectMany(i => {              
                 IEnumerable<RawUpdate> ret = Enumerable.Empty<RawUpdate>();
 
                 int offset = 0;
@@ -558,7 +522,7 @@ namespace Apollo.Elements {
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
-        static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new Dictionary<LaunchpadType, HashSet<byte>>() {
+        static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new() {
             {LaunchpadType.MK2, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99}},
             {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
@@ -582,7 +546,7 @@ namespace Apollo.Elements {
                     if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);
 
                     IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
-                    List<byte> chunk = new List<byte>() { i.Red, i.Green, i.Blue };
+                    List<byte> chunk = new() { i.Red, i.Green, i.Blue };
 
                     if (positions.Intersect(allMap).Count() == 100 - excludedIndexes[Type].Count + Convert.ToInt32(excludedIndexes[Type].Contains(100))) {
                         finalPos = finalPos.Append((byte)0);
@@ -795,7 +759,7 @@ namespace Apollo.Elements {
                 } else if (Type == LaunchpadType.ProMK3) {
                     xy = true;
                     if (key == 124) key = 90;  // Shift key
-                    else if (28 <= key && key <= 35) key -= 27;   // Extra bottom row
+                    else if (12 <= key && key <= 19) key -= 11;  // Extra bottom row
                     else xy = false;
                 }
             }

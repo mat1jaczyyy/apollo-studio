@@ -96,8 +96,8 @@ namespace Apollo.Devices {
             Release = release;
         }
         
-        ConcurrentDictionary<Signal, Color> buffer = new ConcurrentDictionary<Signal, Color>();
-        ConcurrentDictionary<Signal, int> minimum = new ConcurrentDictionary<Signal, int>();
+        ConcurrentDictionary<Signal, Color> buffer = new();
+        ConcurrentDictionary<Signal, int> minimum = new();
         
         public override void MIDIProcess(List<Signal> n) => InvokeExit(n.SelectMany(s => {
             Signal k = s.With(color: new Color(0));

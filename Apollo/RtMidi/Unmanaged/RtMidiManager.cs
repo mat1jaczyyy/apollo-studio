@@ -11,7 +11,7 @@ namespace Apollo.RtMidi.Unmanaged {
     internal class RtMidiManager: IDisposable {
         public static RtMidiManager Default => DefaultHolder.Value;
 
-        public static readonly Lazy<RtMidiManager> DefaultHolder = new Lazy<RtMidiManager>(() => new RtMidiManager());
+        public static readonly Lazy<RtMidiManager> DefaultHolder = new(() => new RtMidiManager());
 
         readonly RtMidiInputDevice _defaultInputDevice;
         readonly RtMidiOutputDevice _defaultOutputDevice;

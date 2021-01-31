@@ -29,9 +29,9 @@ namespace Apollo.Devices {
             public FadeInfo WithTime(double time) => new FadeInfo(Color, time, IsHold);
         }
 
-        List<Color> _colors = new List<Color>();
-        List<double> _positions = new List<double>();
-        List<FadeType> _types = new List<FadeType>();
+        List<Color> _colors = new();
+        List<double> _positions = new();
+        List<FadeType> _types = new();
         List<FadeInfo> fade;
 
         public Color GetColor(int index) => _colors[index];
@@ -62,7 +62,7 @@ namespace Apollo.Devices {
             }
         }
 
-        static Dictionary<FadeType, Func<double, double>> TimeEasing = new Dictionary<FadeType, Func<double, double>>() { 
+        static Dictionary<FadeType, Func<double, double>> TimeEasing = new() { 
             {FadeType.Fast, proportion => Math.Pow(proportion, 2)},
             {FadeType.Slow, proportion => 1 - Math.Pow(1 - proportion, 2)},
             {FadeType.Sharp, proportion => (proportion < 0.5)
@@ -156,12 +156,12 @@ namespace Apollo.Devices {
             if (_colors.Count < 2 || _positions.Count < 2) return;
             if (_types.Count < _colors.Count - 1) return;
 
-            List<Color> _steps = new List<Color>();
-            List<int> _counts = new List<int>();
-            List<int> _cutoffs = new List<int>(){0};
+            List<Color> _steps = new();
+            List<int> _counts = new();
+            List<int> _cutoffs = new() {0};
 
             for (int i = 0; i < _colors.Count - 1; i++) {
-                int max = new int[] {
+                int max = new [] {
                     Math.Abs(_colors[i].Red - _colors[i + 1].Red),
                     Math.Abs(_colors[i].Green - _colors[i + 1].Green),
                     Math.Abs(_colors[i].Blue - _colors[i + 1].Blue),
@@ -199,7 +199,7 @@ namespace Apollo.Devices {
                 _cutoffs.Add(1 + _cutoffs.Last());
             }
 
-            List<FadeInfo> fullFade = new List<FadeInfo>() {
+            List<FadeInfo> fullFade = new() {
                 new FadeInfo(_steps[0], 0, _types[0] == FadeType.Hold)
             };
 
@@ -218,7 +218,9 @@ namespace Apollo.Devices {
                 }
             }
             
-            fade = new List<FadeInfo>();
+            if (fade != null) fade.Clear();
+            else fade = new List<FadeInfo>();
+
             fade.Add(fullFade.First());
 
             for (int i = 1; i < fullFade.Count; i++) {
@@ -295,7 +297,7 @@ namespace Apollo.Devices {
                 Program.Project.BPMChanged += Generate;
         }
 
-        ConcurrentDictionary<Signal, Signal> buffer = new ConcurrentDictionary<Signal, Signal>();
+        ConcurrentDictionary<Signal, Signal> buffer = new();
 
         public override void MIDIProcess(List<Signal> n)
             => InvokeExit(n.SelectMany(i => {
@@ -328,6 +330,8 @@ namespace Apollo.Devices {
                             InvokeExit(new List<Signal>() {i.With(color: fade[index].Color.Clone())});
                         }
                     };
+
+                    if (fade == null) Initialize();
 
                     Schedule(Next, start += fade[1].Time - fade[0].Time);
 

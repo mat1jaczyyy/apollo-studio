@@ -339,7 +339,7 @@ namespace Apollo.Core {
         public static long Time => BaseTime + (long)Program.TimeSpent.Elapsed.TotalSeconds;
 
         public static event Changed RecentsCleared;
-        public static List<string> Recents = new List<string>();
+        public static List<string> Recents = new();
 
         public static void RecentsAdd(string path) {
             if (Recents.Contains(path)) Recents.Remove(path);
@@ -363,7 +363,7 @@ namespace Apollo.Core {
             Save();
         }
         
-        public static List<int> VirtualLaunchpads = new List<int>();
+        public static List<int> VirtualLaunchpads = new();
 
         public static void VirtualLaunchpadsToggle(int index) {
             if (VirtualLaunchpads.Contains(index)) VirtualLaunchpads.Remove(index);

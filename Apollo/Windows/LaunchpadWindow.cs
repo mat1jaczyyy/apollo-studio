@@ -30,7 +30,7 @@ namespace Apollo.Windows {
             Grid = this.Get<LaunchpadGrid>("Grid");
         }
 
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
 
         Launchpad _launchpad;
         LaunchpadGrid Grid;
