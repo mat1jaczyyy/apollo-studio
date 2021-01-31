@@ -17,7 +17,7 @@ namespace Apollo.Structures {
         public int Layer;
         public BlendingType BlendingMode;
         int _range = 200;
-        public Stack<List<int>> MultiTarget = new Stack<List<int>>();
+        public Stack<List<int>> MultiTarget = new();
         public bool HashIndex = true;
 
         public byte Index {

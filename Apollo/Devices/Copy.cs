@@ -200,30 +200,14 @@ namespace Apollo.Devices {
                 offset.Changed += OffsetChanged;
         }
 
-        class DoubleTuple {
-            public double X;
-            public double Y;
-
-            public DoubleTuple(double x = 0, double y = 0) {
-                X = x;
-                Y = y;
-            }
-
+        record DoubleTuple(double X, double Y) {
             public IntTuple Round() => new IntTuple((int)Math.Round(X), (int)Math.Round(Y));
 
             public static DoubleTuple operator *(DoubleTuple t, double f) => new DoubleTuple(t.X * f, t.Y * f);
             public static DoubleTuple operator +(DoubleTuple a, DoubleTuple b) => new DoubleTuple(a.X + b.X, a.Y + b.Y);
         };
 
-        class IntTuple {
-            public int X;
-            public int Y;
-
-            public IntTuple(int x, int y) {
-                X = x;
-                Y = y;
-            }
-
+        record IntTuple(int X, int Y) {
             public IntTuple Apply(Func<int, int> action) => new IntTuple(
                 action.Invoke(X),
                 action.Invoke(Y)
@@ -249,10 +233,10 @@ namespace Apollo.Devices {
                 p.Y + t * b.Y
             );
         
-        ConcurrentDictionary<Signal, int> buffer = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, int> screen = new ConcurrentDictionary<Signal, int>();
-        ConcurrentDictionary<Signal, object> locker = new ConcurrentDictionary<Signal, object>();
-        ConcurrentHashSet<Signal> offbuf = new ConcurrentHashSet<Signal>();
+        ConcurrentDictionary<Signal, int> buffer = new();
+        ConcurrentDictionary<Signal, int> screen = new();
+        ConcurrentDictionary<Signal, object> locker = new();
+        ConcurrentHashSet<Signal> offbuf = new();
         
         void ScreenOutput(IEnumerable<Signal> n, bool output = true) {
             List<Signal> data = n.SelectMany(s => {
@@ -285,7 +269,7 @@ namespace Apollo.Devices {
             int px = s.Index % 10;
             int py = s.Index / 10;
 
-            List<int> validOffsets = new List<int>() {s.Index};
+            List<int> validOffsets = new() {s.Index};
 
             for (int i = 0; i < Offsets.Count; i++) {
                 if (Offsets[i].Apply(s.Index, GridMode, Wrap, out int _x, out int _y, out int result) && CopyMode != CopyType.Interpolate)

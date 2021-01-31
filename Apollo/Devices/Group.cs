@@ -40,7 +40,7 @@ namespace Apollo.Devices {
             }
         }
 
-        public List<Chain> Chains = new List<Chain>();
+        public List<Chain> Chains = new();
         protected virtual void Reroute() {
             for (int i = 0; i < Chains.Count; i++) {
                 Chains[i].Parent = this;

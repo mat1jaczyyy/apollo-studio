@@ -76,7 +76,7 @@ namespace Apollo.Windows {
             CollapseButton = this.Get<CollapseButton>("CollapseButton");
         }
 
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
 
         Pattern _pattern;
         Track _track;

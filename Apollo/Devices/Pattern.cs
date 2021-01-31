@@ -261,15 +261,15 @@ namespace Apollo.Devices {
             Schedule(Next, start += (ApplyPinch(total) - ApplyPinch(total - time * _gate)));
         }
         
-        ConcurrentDictionary<Signal, PlayingState> buffer = new ConcurrentDictionary<Signal, PlayingState>();
-        ConcurrentHashSet<PlayingState> poly = new ConcurrentHashSet<PlayingState>();
-        
         class PlayingState {
             public Signal Root;
             public int Frame = 0;
             
             public PlayingState(Signal init) => Root = init;
         }
+        
+        ConcurrentDictionary<Signal, PlayingState> buffer = new();
+        ConcurrentHashSet<PlayingState> poly = new();
         
         void Stop(Signal k, Signal r, List<Signal> ret) {
             if (buffer.ContainsKey(k))
@@ -282,7 +282,7 @@ namespace Apollo.Devices {
         public override void MIDIProcess(List<Signal> n) {
             if (Frames.Count == 0 || !n.Any()) return;
             
-            List<Signal> ret = new List<Signal>();
+            List<Signal> ret = new();
             
             Signal root = n.LastOrDefault(i => i.Color.Lit);
             
@@ -310,7 +310,7 @@ namespace Apollo.Devices {
                         void Next() {
                             if (!poly.Contains(state)) return;
                             
-                            List<Signal> ret = new List<Signal>();
+                            List<Signal> ret = new();
                            
                             if (++state.Frame < Frames.Count * AdjustedRepeats) {
                                 RenderFrameDifference(ret, state.Frame, state.Root);
@@ -337,7 +337,7 @@ namespace Apollo.Devices {
                     void Next() {
                         if (!ReferenceEquals(buffer[root].Root, root)) return;
                         
-                        List<Signal> ret = new List<Signal>();
+                        List<Signal> ret = new();
                         
                         if (++buffer[root].Frame < Frames.Count * AdjustedRepeats) {
                             RenderFrameDifference(ret, buffer[root].Frame, root);

@@ -14,7 +14,7 @@ namespace Apollo.Core {
 
         public static void DoneIdentifying() => DevicesUpdated?.Invoke();
 
-        static List<Launchpad> _devices = new List<Launchpad>();
+        static List<Launchpad> _devices = new();
         public static List<Launchpad> Devices {
             get => _devices;
             set {

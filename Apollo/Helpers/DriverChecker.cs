@@ -9,8 +9,8 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public static class DriverChecker {
-        static readonly string[] Drivers = new string[] { "novationusbmidi.inf", "nvnusbaudio.inf" };
-        static readonly int[] BuildPositions = new int[] { 2, 3 };
+        static readonly string[] Drivers = new [] { "novationusbmidi.inf", "nvnusbaudio.inf" };
+        static readonly int[] BuildPositions = new [] { 2, 3 };
 
         class DriverVersion: IComparable {
             public int Minor { get; private set; }

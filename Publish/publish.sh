@@ -5,7 +5,7 @@ rm -rf bin
 rm -rf obj
 dotnet clean
 dotnet publish -r osx-x64 -c Release
-fileicon set bin/Release/netcoreapp3.1/osx-x64/publish/Apollo icon.ico
+fileicon set bin/Release/net5.0/osx-x64/publish/Apollo icon.ico
 
 echo
 
@@ -14,7 +14,7 @@ rm -rf bin
 rm -rf obj
 dotnet clean
 dotnet publish -r osx-x64 -c Release
-fileicon set bin/Release/netcoreapp3.1/osx-x64/publish/ApolloUpdate icon.ico
+fileicon set bin/Release/net5.0/osx-x64/publish/ApolloUpdate icon.ico
 
 echo
 echo Merging...
@@ -28,8 +28,8 @@ mkdir Apollo
 mkdir M4L
 mkdir Update
 
-cp -r ../Apollo/bin/Release/netcoreapp3.1/osx-x64/publish/* Apollo
-cp -r ../ApolloUpdate/bin/Release/netcoreapp3.1/osx-x64/publish/* Update
+cp -r ../Apollo/bin/Release/net5.0/osx-x64/publish/* Apollo
+cp -r ../ApolloUpdate/bin/Release/net5.0/osx-x64/publish/* Update
 
 cp ../M4L/*.amxd M4L
 

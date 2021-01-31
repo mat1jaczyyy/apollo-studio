@@ -9,7 +9,7 @@ namespace Apollo.RtMidi {
     public sealed class MidiDeviceManager: IDisposable {
         public static MidiDeviceManager Default => DefaultHolder.Value;
 
-        static readonly Lazy<MidiDeviceManager> DefaultHolder = new Lazy<MidiDeviceManager>(() => new MidiDeviceManager());
+        static readonly Lazy<MidiDeviceManager> DefaultHolder = new(() => new MidiDeviceManager());
 
         readonly RtMidiManager _rtDeviceManager;
         bool _disposed;

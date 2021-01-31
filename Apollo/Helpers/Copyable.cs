@@ -14,7 +14,7 @@ using Apollo.Windows;
 
 namespace Apollo.Helpers {
     public class Copyable {
-        public List<ISelect> Contents = new List<ISelect>();
+        public List<ISelect> Contents = new();
 
         public Type Type => Contents.FirstOrDefault()?.GetType();
 
@@ -43,7 +43,7 @@ namespace Apollo.Helpers {
             char[] arr = input.ToCharArray();
 
             char current = '\0';
-            List<Seq> data = new List<Seq>();
+            List<Seq> data = new();
 
             foreach (char c in arr) {
                 if (c == current) data.Last().n++;

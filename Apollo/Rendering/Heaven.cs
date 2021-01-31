@@ -10,10 +10,10 @@ using Apollo.Structures;
 
 namespace Apollo.Rendering {
     public static class Heaven { 
-        static ConcurrentQueue<List<Signal>> signalQueue = new ConcurrentQueue<List<Signal>>();
+        static ConcurrentQueue<List<Signal>> signalQueue = new();
 
-        static SortedDictionary<long, List<Action>> jobs = new SortedDictionary<long, List<Action>>();
-        static ConcurrentQueue<(long, Action)> jobQueue = new ConcurrentQueue<(long, Action)>();
+        static SortedDictionary<long, List<Action>> jobs = new();
+        static ConcurrentQueue<(long, Action)> jobQueue = new();
 
         static long prev, lastRender = -1, renderAt = -1;
 

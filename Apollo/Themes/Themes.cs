@@ -11,7 +11,7 @@ namespace Apollo.Themes {
             AvaloniaXamlLoader.Load(this);
         }
 
-        static readonly double[] NovationCoordinates = new double[] { 0.916, 0.073, 0.029, 0.96, 0.989, 0.087, 0.48, 0.509, 0.044, 0.713, 0.247, 0.291, 0.684, 0.887, 0.553, 0.873, 0.596, 0.858, 0.625, 0.829, 0.655, 0.538, 0.931, 0.335, 0.727, 0.756, 0.815, 0.349, 0.844, 0.378, 0.407, 0.451, 0.902, 0.524 }; 
+        static readonly double[] NovationCoordinates = new [] { 0.916, 0.073, 0.029, 0.96, 0.989, 0.087, 0.48, 0.509, 0.044, 0.713, 0.247, 0.291, 0.684, 0.887, 0.553, 0.873, 0.596, 0.858, 0.625, 0.829, 0.655, 0.538, 0.931, 0.335, 0.727, 0.756, 0.815, 0.349, 0.844, 0.378, 0.407, 0.451, 0.902, 0.524 }; 
         
         double GetResource(string name) => (double)this.Resources[$"LPGrid_{name}"];
         void SetResource(string name, Geometry data) => this.Resources[$"LPGrid_{name}"] = data;

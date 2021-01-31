@@ -88,7 +88,7 @@ namespace Apollo.Elements {
             MIDIExit?.Invoke(n);
         }
 
-        public List<Device> Devices = new List<Device>();
+        public List<Device> Devices = new();
         Action<List<Signal>> _chainenter = null;
 
         void Reroute() {

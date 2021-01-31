@@ -107,7 +107,7 @@ namespace Apollo.Elements {
 
         protected virtual void Stopped() {}
 
-        ConcurrentHashSet<Action> jobs = new ConcurrentHashSet<Action>();
+        ConcurrentHashSet<Action> jobs = new();
 
         protected void Schedule(Action job, double time) {
             void Job() {

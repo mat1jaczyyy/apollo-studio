@@ -46,7 +46,7 @@ namespace Apollo.Devices {
         }
 
         bool choked = true;
-        ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new ConcurrentDictionary<(Launchpad, int, int), Signal>();
+        ConcurrentDictionary<(Launchpad, int, int), Signal> signals = new();
 
         void HandleChoke(Choke sender, int index) {
             if (Target == index && sender != this && !choked) {

@@ -83,7 +83,7 @@ namespace Apollo.Helpers {
                         using (JsonTextReader reader = new JsonTextReader(file))
                             while (reader.Read())
                                 if (reader.TokenType == JsonToken.String &&
-                                    reader.Path.StartsWith("targets['.NETCoreApp,Version=v3.1") &&
+                                    reader.Path.StartsWith("targets['.NETCoreApp,Version=v5.0") &&
                                     reader.Path.EndsWith("']['Apollo/1.0.0'].dependencies.Avalonia")) {
                                         
                                     avalonia = (string)reader.Value;

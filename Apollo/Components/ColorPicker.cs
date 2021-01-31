@@ -51,7 +51,7 @@ namespace Apollo.Components {
             Ready
         }
         
-        HashSet<IDisposable> observables = new HashSet<IDisposable>();
+        HashSet<IDisposable> observables = new();
         
         public delegate void ColorChangedEventHandler(Color value, Color old);
         public event ColorChangedEventHandler ColorChanged;

@@ -9,8 +9,7 @@ namespace Apollo.Rendering {
         class Pixel {
             byte Index;
             
-            SortedList<int, Signal> _signals = new SortedList<int, Signal>();
-            
+            SortedList<int, Signal> _signals = new();
             Color state = new Color(0);
 
             object locker = new object();
@@ -72,7 +71,7 @@ namespace Apollo.Rendering {
         Color[] snapshot = new Color[101];
 
         void Snapshot() {
-            List<RawUpdate> ret = new List<RawUpdate>();
+            List<RawUpdate> ret = new();
 
             for (int i = 0; i < 101; i++) {
                 Color n = _screen[i].GetColor();

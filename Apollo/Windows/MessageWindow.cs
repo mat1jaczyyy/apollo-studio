@@ -17,7 +17,7 @@ namespace Apollo.Windows {
 
         Button Default;
 
-        public TaskCompletionSource<string> Completed = new TaskCompletionSource<string>();
+        public TaskCompletionSource<string> Completed = new();
         
         void UpdateTopmost(bool value) => Topmost = value;
 

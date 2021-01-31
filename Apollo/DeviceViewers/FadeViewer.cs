@@ -53,7 +53,7 @@ namespace Apollo.DeviceViewers {
         ColorPicker Picker;
         Rectangle Gradient;
 
-        List<FadeThumb> thumbs = new List<FadeThumb>();
+        List<FadeThumb> thumbs = new();
         List<Fade.FadeInfo> fullFade;
 
         public void Contents_Insert(int index, Color color) {

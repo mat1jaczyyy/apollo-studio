@@ -13,7 +13,7 @@ namespace Apollo.Undo {
         public static Type DecodeID(BinaryReader reader) => id[reader.ReadUInt16()];
         public static void EncodeID(BinaryWriter writer, Type type) => writer.Write((ushort)Array.IndexOf(id, type));
 
-        public static readonly Type[] id = new Type[] { // Only non-abstract UndoEntries go here
+        public static readonly Type[] id = new [] { // Only non-abstract UndoEntries go here
             typeof(UndoEntry),
             
             typeof(Chain.DeviceInsertedUndoEntry),

@@ -21,7 +21,7 @@ namespace Apollo.Helpers {
         static object locker = new object();
         static bool handlingFileOpen;
 
-        static Dictionary<IPEndPoint, AbletonLaunchpad> portMap = new Dictionary<IPEndPoint, AbletonLaunchpad>();
+        static Dictionary<IPEndPoint, AbletonLaunchpad> portMap = new();
 
         static void Receive(IAsyncResult result) {
             lock (locker) {
@@ -36,7 +36,7 @@ namespace Apollo.Helpers {
 
                 if (!portMap.ContainsKey(source)) {
                     if (message[0] == 247) {
-                        App.Args = new string[] { Encoding.UTF8.GetString(message.Skip(1).ToArray()) };
+                        App.Args = new [] { Encoding.UTF8.GetString(message.Skip(1).ToArray()) };
 
                         if (handlingFileOpen) return;
                         handlingFileOpen = true;

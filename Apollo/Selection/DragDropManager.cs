@@ -49,10 +49,10 @@ namespace Apollo.Selection {
         }
 
         IDroppable Host;
-        HashSet<IControl> Subscribed = new HashSet<IControl>();
+        HashSet<IControl> Subscribed = new();
 
         public delegate bool DropHandler(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e);
-        Dictionary<string, DropHandler> DropHandlers = new Dictionary<string, DropHandler>();
+        Dictionary<string, DropHandler> DropHandlers = new();
 
         static bool DefaultDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
             List<ISelect> moving = (List<ISelect>)e.Data.Get(format);

@@ -31,7 +31,7 @@ namespace Apollo.Devices {
         }
 
         int current = -1;
-        ConcurrentDictionary<Signal, List<int>> buffer = new ConcurrentDictionary<Signal, List<int>>();
+        ConcurrentDictionary<Signal, List<int>> buffer = new();
 
         Random RNG = new Random();
 
@@ -69,7 +69,7 @@ namespace Apollo.Devices {
                 if (!buffer.ContainsKey(i)) {
                     if (!m.Color.Lit) return Enumerable.Empty<Signal>();
 
-                    List<int> target = new List<int>();
+                    List<int> target = new();
 
                     if (Mode == MultiType.Forward) {
                         if (++current >= Chains.Count) current = 0;
@@ -110,12 +110,12 @@ namespace Apollo.Devices {
                 InvokeExit(n);
             
             } else {
-                Dictionary<int, List<Signal>> output = new Dictionary<int, List<Signal>>();
+                Dictionary<int, List<Signal>> output = new();
                 
                 foreach (Signal i in n) {
                     foreach (int j in i.MultiTarget.Pop()) {
                         if (!output.ContainsKey(j))
-                            output[j] = new List<Signal>();
+                            output[j] = new();
                             
                         output[j].Add(i.Clone());
                     }
