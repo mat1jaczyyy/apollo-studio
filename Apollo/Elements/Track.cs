@@ -144,7 +144,7 @@ namespace Apollo.Elements {
         void MIDIEnter(Signal n) {
             if (ParentIndex != null && Enabled) {
                 try {
-                    Chain?.MIDIEnter(n);
+                    Chain?.MIDIEnter(n.Clone());
                 } catch (KeyNotFoundException) {} // Ignore KeyNotFound race conditions in devices that have dictionaries
             }
         }
