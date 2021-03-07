@@ -254,7 +254,7 @@ namespace Apollo.Windows {
 
             if (result != null) {
                 Position = new PixelPoint(result.Bounds.X, Position.Y);
-                Width = result.Bounds.Width;
+                Width = result.Bounds.Width / result.PixelDensity;
             }
         }
 
