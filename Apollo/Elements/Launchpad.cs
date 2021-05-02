@@ -290,7 +290,7 @@ namespace Apollo.Elements {
                     return LaunchpadType.Unknown;
                 
                 if (response.CheckSysExHeader(new byte[] {0x00, 0x20, 0x29, 0x00}) && response.Data[5] == 0x70) {
-                    int versionInt = int.Parse(string.Join("", response.Data.SkipLast(2).TakeLast(3)));
+                    int versionInt = int.Parse(string.Join("", response.Data.SkipLast(3).TakeLast(3)));
 
                     if (versionInt < 171) // Old Firmware
                         MK2FirmwareOld.Set();
