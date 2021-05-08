@@ -138,7 +138,7 @@ namespace Apollo.Selection {
             while (!Host.DropAreas.Contains(source.Name)) {
                 source = source.Parent;
                 
-                if (source == this) {
+                if (source == Host) {
                     e.Handled = false;
                     return;
                 }
