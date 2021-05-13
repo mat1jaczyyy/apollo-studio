@@ -284,19 +284,16 @@ namespace Apollo.Devices {
             
             List<Signal> ret = new();
             
-            Signal root = n.LastOrDefault(i => i.Color.Lit)?.Clone();
+            Signal root = n.LastOrDefault(i => i.Color.Lit);
             
-            n = n.Select(s => {
+            n.ForEach(s => {
                 bool lit = s.Color.Lit;
-
-                Signal i = s.With(color: new Color());
-                i.HashIndex = false;
+                s.HashIndex = false;
+                s.Color = new Color();
                 
                 if ((Mode == PlaybackType.Mono && lit) || Mode == PlaybackType.Loop)
                     Stop(s, root, ret);
-
-                return i;
-            }).ToList();
+            });
             
             if (!(root is null)) {
                 RenderFrame(ret, 0, root);
