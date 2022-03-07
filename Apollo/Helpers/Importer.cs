@@ -145,28 +145,27 @@ namespace Apollo.Helpers {
 
         static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
 
-        static bool DecodeImageFrame(SKCodec codec, out Frame decoded, int index = -1) {
+        static bool DecodeImageFrame(SKCodec codec, SKBitmap bitmap, out Frame decoded, int index = -1) {
             decoded = null;
-            SKBitmap frame = new SKBitmap(codec.Info);
 
             if ((
-                (index == -1)
-                    ? codec.GetPixels(codec.Info, frame.GetPixels())
-                    : codec.GetPixels(codec.Info, frame.GetPixels(), new SKCodecOptions(index))
+                (index < 0)
+                    ? codec.GetPixels(codec.Info, bitmap.GetPixels())
+                    : codec.GetPixels(codec.Info, bitmap.GetPixels(), new SKCodecOptions(index, index - 1))
                 ) == SKCodecResult.Success) {
 
-                frame = frame.Resize(targetInfo, SKFilterQuality.High);
+                SKBitmap resized = bitmap.Resize(targetInfo, SKFilterQuality.High);
 
                 decoded = new Frame(new Time(
                     false,
-                    free: (index == -1)
+                    free: (index < 0)
                         ? 1000
                         : codec.FrameInfo[index].Duration
                 ));
 
                 for (int x = 0; x <= 9; x++) {
                     for (int y = 0; y <= 9; y++) {
-                        SKColor color = frame.GetPixel(x, 9 - y);
+                        SKColor color = resized.GetPixel(x, 9 - y);
                         decoded.Screen[y * 10 + x] = new Color(
                             (byte)(color.Red >> 2),
                             (byte)(color.Green >> 2),
@@ -188,17 +187,18 @@ namespace Apollo.Helpers {
             using (SKCodec codec = SKCodec.Create(path)){
                 if (codec == null) return false;
 
+                SKBitmap bitmap = new SKBitmap(codec.Info);
                 ret = new List<Frame>();
                 
                 if (codec.FrameCount > 0)
                     for (int i = 0; i < codec.FrameCount; i++) {
-                        if (DecodeImageFrame(codec, out Frame frame, i))
+                        if (DecodeImageFrame(codec, bitmap, out Frame frame, i))
                             ret.Add(frame);
                         
                         else return false;
                     }
 
-                else if (DecodeImageFrame(codec, out Frame frame))
+                else if (DecodeImageFrame(codec, bitmap, out Frame frame))
                     ret.Add(frame);
                 
                 else return false;
