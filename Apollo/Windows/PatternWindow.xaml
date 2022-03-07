@@ -45,7 +45,14 @@
         <Grid ColumnDefinitions="125,*,190">
           <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto">
             <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">
-              <Button Margin="7" Content="Import" x:Name="Import" Click="ImportDialog" />
+              <Grid Margin="7">
+                <Button Content="Import" x:Name="Import" Click="ImportDialog" />
+
+                <Grid IsVisible="false" x:Name="CancelImportGrid">
+                  <Button Content="Cancel" Click="CancelImport" />
+                  <ProgressBar Margin="1" IsHitTestVisible="false" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinWidth="0" MinHeight="0" Height="2" x:Name="ImportProgress" />
+                </Grid>
+              </Grid>
             </Border>
 
             <ScrollViewer Grid.Row="1" Padding="5 0" VerticalScrollBarVisibility="Visible" x:Name="FrameList">
