@@ -113,6 +113,18 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning XFirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Xs are running a version of\n" + 
+            "the official Novation firmware which is not compatible with \n" +
+            "Apollo Studio due to having a broken Legacy mode.\n\n" +
+            "Update these to the latest working version of the firmware using the\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
         public static PortWarning MiniMK3FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad Mini MK3s are running an older version of\n" + 
             "the official Novation firmware. While they will work with Apollo Studio,\n" +
@@ -136,6 +148,18 @@ namespace Apollo.Elements {
             "While they will work with Apollo Studio, the official firmware\n" +
             "performs slightly worse than the faster, modded stock firmware.\n\n" +
             "Update these to the faster, modded firmware using the\n" +
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
+            )
+        );
+
+        public static PortWarning MiniMK3FirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Mini MK3s are running a version of\n" + 
+            "the official Novation firmware which is not compatible with \n" +
+            "Apollo Studio due to having a broken Legacy mode.\n\n" +
+            "Update these to the latest working version of the firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -169,8 +193,10 @@ namespace Apollo.Elements {
                 if (CFWIncompatible.DisplayWarning(sender)) return;
                 if (XFirmwareOld.DisplayWarning(sender)) return;
                 if (XFirmwareStock.DisplayWarning(sender)) return;
+                if (XFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
+                if (MiniMK3FirmwareUnsupported.DisplayWarning(sender)) return;
                 ProMK3FirmwareUnsupported.DisplayWarning(sender);
             }, DispatcherPriority.MinValue);
         }
@@ -353,6 +379,11 @@ namespace Apollo.Elements {
                         if (versionInt < 351) // Old Firmware
                             XFirmwareOld.Set();
                         
+                        if (versionInt == 408) { // Broken Legacy mode
+                            XFirmwareUnsupported.Set();
+                            return LaunchpadType.Unknown;
+                        }
+                        
                         if (versionInt == 352)
                             SupportsCompression = true;
 
@@ -367,6 +398,11 @@ namespace Apollo.Elements {
                         if (versionInt < 407) // Old Firmware
                             MiniMK3FirmwareOld.Set();
                         
+                        if (versionInt == 454) { // Broken Legacy mode
+                            MiniMK3FirmwareUnsupported.Set();
+                            return LaunchpadType.Unknown;
+                        }
+
                         if (versionInt == 408)
                             SupportsCompression = true;
 
