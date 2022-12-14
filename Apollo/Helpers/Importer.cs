@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Apollo.Core;
 using Apollo.Structures;
@@ -64,7 +65,7 @@ namespace Apollo.Helpers {
             }
         }
         
-        public static bool FramesFromMIDI(string path, out List<Frame> ret) {
+        public static bool FramesFromMIDI(string path, out List<Frame> ret, CancellationToken? ct = null, Action<int, int> progress = null) {
             ret = null;
 
             if (!File.Exists(path)) return false;
@@ -84,7 +85,11 @@ namespace Apollo.Helpers {
                 long end = reader.BaseStream.Position + BitConverter.ToInt32(reader.ReadBytes(4).Reverse().ToArray()); // Track length
                 ret = new List<Frame>() {new Frame()};
 
+                progress?.Invoke((int)reader.BaseStream.Position, (int)end);
+
                 while (reader.BaseStream.Position < end) {
+                    if (ct?.IsCancellationRequested == true) return false;
+
                     int delta = MIDIReadVariableLength(reader);
                     if (delta > 0) {
                         ret.Last().Time = new Time(false, free: (int)(delta * 60000 / beatsize / Program.Project.BPM));
@@ -136,6 +141,9 @@ namespace Apollo.Helpers {
                             }
                             break;
                     }
+
+                    if (delta > 0)
+                        progress?.Invoke((int)reader.BaseStream.Position, (int)end);
                 }
 
                 if (ret.Count > 1) ret.RemoveAt(ret.Count - 1);
@@ -145,28 +153,27 @@ namespace Apollo.Helpers {
 
         static readonly SKImageInfo targetInfo = new SKImageInfo(10, 10);
 
-        static bool DecodeImageFrame(SKCodec codec, out Frame decoded, int index = -1) {
+        static bool DecodeImageFrame(SKCodec codec, SKBitmap bitmap, out Frame decoded, int index = -1) {
             decoded = null;
-            SKBitmap frame = new SKBitmap(codec.Info);
 
             if ((
-                (index == -1)
-                    ? codec.GetPixels(codec.Info, frame.GetPixels())
-                    : codec.GetPixels(codec.Info, frame.GetPixels(), new SKCodecOptions(index))
+                (index < 0)
+                    ? codec.GetPixels(codec.Info, bitmap.GetPixels())
+                    : codec.GetPixels(codec.Info, bitmap.GetPixels(), new SKCodecOptions(index, index - 1))
                 ) == SKCodecResult.Success) {
 
-                frame = frame.Resize(targetInfo, SKFilterQuality.High);
+                SKBitmap resized = bitmap.Resize(targetInfo, SKFilterQuality.High);
 
                 decoded = new Frame(new Time(
                     false,
-                    free: (index == -1)
+                    free: (index < 0)
                         ? 1000
                         : codec.FrameInfo[index].Duration
                 ));
 
                 for (int x = 0; x <= 9; x++) {
                     for (int y = 0; y <= 9; y++) {
-                        SKColor color = frame.GetPixel(x, 9 - y);
+                        SKColor color = resized.GetPixel(x, 9 - y);
                         decoded.Screen[y * 10 + x] = new Color(
                             (byte)(color.Red >> 2),
                             (byte)(color.Green >> 2),
@@ -180,7 +187,7 @@ namespace Apollo.Helpers {
             } else return false;
         }
 
-        public static bool FramesFromImage(string path, out List<Frame> ret) {
+        public static bool FramesFromImage(string path, out List<Frame> ret, CancellationToken? ct = null, Action<int, int> progress = null) {
             ret = null;
             
             if (!File.Exists(path)) return false;
@@ -188,20 +195,23 @@ namespace Apollo.Helpers {
             using (SKCodec codec = SKCodec.Create(path)){
                 if (codec == null) return false;
 
+                SKBitmap bitmap = new SKBitmap(codec.Info);
                 ret = new List<Frame>();
                 
                 if (codec.FrameCount > 0)
                     for (int i = 0; i < codec.FrameCount; i++) {
-                        if (DecodeImageFrame(codec, out Frame frame, i))
+                        if (ct?.IsCancellationRequested != true && DecodeImageFrame(codec, bitmap, out Frame frame, i)) {
                             ret.Add(frame);
-                        
-                        else return false;
+                            progress?.Invoke(i + 1, codec.FrameCount);
+
+                        } else return false;
                     }
 
-                else if (DecodeImageFrame(codec, out Frame frame))
+                else if (DecodeImageFrame(codec, bitmap, out Frame frame)) {
                     ret.Add(frame);
+                    progress?.Invoke(1, 1);
                 
-                else return false;
+                } else return false;
 
                 return true;
             }

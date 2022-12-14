@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -60,6 +62,9 @@ namespace Apollo.Windows {
             Infinite = this.Get<CheckBox>("Infinite");
 
             ImportButton = this.Get<Button>("Import");
+            CancelImportGrid = this.Get<Grid>("CancelImportGrid");
+            ImportProgress = this.Get<ProgressBar>("ImportProgress");
+
             Play = this.Get<Button>("Play");
             Fire = this.Get<Button>("Fire");
 
@@ -129,11 +134,17 @@ namespace Apollo.Windows {
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Wrap, Infinite;
         CollapseButton CollapseButton;
+        Grid CancelImportGrid;
+        ProgressBar ImportProgress;
 
         int origin = -1;
         int gesturePoint = -1;
         bool gestureUsed = false;
         bool historyShowing = false;
+
+        CancellationTokenSource ImportCTS;
+
+        bool importing = false;
 
         bool _locked = false;
         public bool Locked {
@@ -298,6 +309,8 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, CancelEventArgs e) {
             if (historyShowing) MIDI.ClearState(force: true);
+
+            if (importing) CancelImport(sender, null);
 
             Locked = false;
 
@@ -1027,17 +1040,69 @@ namespace Apollo.Windows {
             Selection.Select(_pattern[0]);
         }
 
-        async void ImportFile(string filepath) {
-            if (!Importer.FramesFromMIDI(filepath, out List<Frame> frames) && !Importer.FramesFromImage(filepath, out frames)) {
-                await MessageWindow.CreateReadError(this);
-                return;
-            }
+        void CancelImport(object sender, RoutedEventArgs e) {
+            if (importing)
+                ImportCTS?.Cancel();
+        }
 
-            Program.Project.Undo.AddAndExecute(new Pattern.ImportUndoEntry(
-                _pattern,
-                Path.GetFileNameWithoutExtension(filepath),
-                new Pattern(frames: frames.Select(i => i.Clone()).ToList())
-            ));
+        void Progress(int value, int max) {
+            Dispatcher.UIThread.InvokeAsync(() => {
+                if ((long)(value * ImportProgress.Bounds.Width * 4 / max) == (long)(ImportProgress.Value * ImportProgress.Bounds.Width * 4 / ImportProgress.Maximum))
+                    return;
+
+                ImportProgress.Maximum = max;
+                ImportProgress.Value = value;
+            });
+        }
+
+        async void ImportFile(string filepath) {
+            Locked = true;
+            importing = true;
+            CancelImportGrid.IsVisible = true;
+            
+            ImportCTS?.Dispose();
+            ImportCTS = new CancellationTokenSource();
+
+            Progress(0, 1);
+
+            List<Frame> frames = await Task.Run(() => 
+                (
+                    Importer.FramesFromMIDI(filepath, out List<Frame> midiFrames, ImportCTS.Token, Progress)
+                        ? midiFrames
+                        : null
+                )?? (
+                    Importer.FramesFromImage(filepath, out List<Frame> imageFrames, ImportCTS.Token, Progress)
+                        ? imageFrames
+                        : null
+                )
+            );
+
+            CancelImportGrid.IsVisible = false;
+
+            if (ImportCTS?.IsCancellationRequested != true && frames != null) {
+                object oldText = ImportButton.Content;
+                ImportButton.Content = "Finishing up...";
+
+                await Task.Delay(100); // Couldn't find a way to wait for next UI frame, it is what it is...
+
+                ImportButton.Content = oldText;
+            }
+            
+            importing = false;
+            Locked = false;
+
+            if (ImportCTS?.IsCancellationRequested != true) {
+                if (frames == null) {
+                    await MessageWindow.CreateReadError(this);
+                    
+                } else {
+                    Program.Project.Undo.AddAndExecute(new Pattern.ImportUndoEntry(
+                        _pattern,
+                        Path.GetFileNameWithoutExtension(filepath),
+                        new Pattern(frames: frames.Select(i => i.Clone()).ToList())
+                    ));
+                }
+            }
         }
 
         async void ImportDialog(object sender, RoutedEventArgs e) {
