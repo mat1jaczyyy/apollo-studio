@@ -5,6 +5,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -34,10 +35,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Switch(Target, Value) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Target, Value };
 
         public Switch(int target = 1, int value = 1): base("switch") {
             Target = target;

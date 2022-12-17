@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -78,10 +79,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new ColorFilter(Hue, Saturation, Value, HueTolerance, SaturationTolerance, ValueTolerance) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Hue, Saturation, Value, HueTolerance, SaturationTolerance, ValueTolerance };
 
         public ColorFilter(double hue = 0, double saturation = 1, double value = 1, double hue_t = 0.05, double saturation_t = 0.05, double value_t = 0.05): base("colorfilter", "Color Filter") {
             Hue = hue;

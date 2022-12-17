@@ -175,10 +175,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Copy(_time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, Offsets.Select(i => i.Clone()).ToList(), Angles.ToList()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { _time.Clone(), _gate, Pinch, Bilateral, Reverse, Infinite, CopyMode, GridMode, Wrap, Offsets.Select(i => i.Clone()).ToList(), Angles.ToList() };
 
         public Copy(Time time = null, double gate = 1, double pinch = 0, bool bilateral = false, bool reverse = false, bool infinite = false, CopyType copymode = CopyType.Static, GridType gridmode = GridType.Full, bool wrap = false, List<Offset> offsets = null, List<int> angles = null): base("copy") {
             Time = time?? new Time(free: 500);
@@ -613,7 +611,7 @@ namespace Apollo.Devices {
             
             OffsetRemoveUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 index = reader.ReadInt32();
-                offset = Decoder.Decode<Offset>(reader, version);
+                offset = Decoder.Decode<Offset>(reader, version, PurposeType.Passive);
                 angle = reader.ReadInt32();
             }
             

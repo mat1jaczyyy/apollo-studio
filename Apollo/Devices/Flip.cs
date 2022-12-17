@@ -31,10 +31,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Flip(Mode, Bypass) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Mode, Bypass };
 
         public Flip(FlipType mode = FlipType.Horizontal, bool bypass = false): base("flip") {
             Mode = mode;

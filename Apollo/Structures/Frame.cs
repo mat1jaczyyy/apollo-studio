@@ -2,6 +2,7 @@ using System.Linq;
 
 using Apollo.Components;
 using Apollo.Devices;
+using Apollo.Enums;
 using Apollo.Selection;
 
 namespace Apollo.Structures {
@@ -18,7 +19,7 @@ namespace Apollo.Structures {
             get => ParentIndex;
         }
         
-        public ISelect IClone() => (ISelect)Clone();
+        public ISelect IClone(PurposeType purpose) => (ISelect)Clone();
         
         Color[] _screen;
         public Color[] Screen {

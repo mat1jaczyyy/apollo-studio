@@ -301,7 +301,7 @@ namespace Apollo.Elements {
 
         public Color GetColor(int index) => (PatternWindow == null)
             ? screen.GetColor(index)
-            : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
+            : PatternWindow.PatternDevice.Frames[PatternWindow.PatternDevice.Expanded].Screen[index].Clone();
 
         static readonly byte[] DeviceInquiry = new byte[] {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
         static readonly byte[] VersionInquiry = new byte[] {0xF0, 0x00, 0x20, 0x29, 0x00, 0x70, 0xF7};

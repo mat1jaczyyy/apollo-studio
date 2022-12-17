@@ -23,7 +23,7 @@ namespace Apollo.Binary {
 
         static Type DecodeID(BinaryReader reader) => Common.id[reader.ReadByte()];
 
-        static void Decode(Stream input, Action<BinaryReader, int> decoder) {
+        static void Decode(Stream input, PurposeType purpose, Action<BinaryReader, int, PurposeType> decoder) {
             using (BinaryReader reader = new BinaryReader(input)) {
                 if (!DecodeHeader(reader)) throw new InvalidDataException();
 
@@ -33,11 +33,11 @@ namespace Apollo.Binary {
 
                 if (typeof(Preferences) != DecodeID(reader)) throw new InvalidDataException();
 
-                decoder?.Invoke(reader, version);
+                decoder?.Invoke(reader, version, purpose);
             }
         }
 
-        public static void DecodeConfig(Stream input) => Decode(input, (reader, version) => {
+        public static void DecodeConfig(Stream input) => Decode(input, PurposeType.Unknown, (reader, version, purpose) => {
             Preferences.AlwaysOnTop = reader.ReadBoolean();
             Preferences.CenterTrackContents = reader.ReadBoolean();
 
@@ -96,7 +96,7 @@ namespace Apollo.Binary {
 
             if (version >= 7) {
                 Preferences.PaletteName = reader.ReadString();
-                Preferences.CustomPalette = new Palette(Enumerable.Range(0, 128).Select(i => Decode<Color>(reader, version)).ToArray());
+                Preferences.CustomPalette = new Palette(Enumerable.Range(0, 128).Select(i => Decode<Color>(reader, version, purpose)).ToArray());
                 Preferences.ImportPalette = (Palettes)reader.ReadInt32();
 
                 Preferences.Theme = (ThemeType)reader.ReadInt32();
@@ -121,11 +121,11 @@ namespace Apollo.Binary {
             Preferences.DiscordFilename = reader.ReadBoolean();
 
             ColorHistory.Set(
-                Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Color>(reader, version)).ToList()
+                Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Color>(reader, version, purpose)).ToList()
             );
 
             if (version >= 2)
-                MIDI.Devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Launchpad>(reader, version)).ToList();
+                MIDI.Devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Launchpad>(reader, version, purpose)).ToList();
 
             if (version >= 15) {
                 Preferences.Recents = Enumerable.Range(0, reader.ReadInt32()).Select(i => reader.ReadString()).ToList();
@@ -152,12 +152,12 @@ namespace Apollo.Binary {
                 Preferences.BaseTime = reader.ReadInt64();
         });
         
-        public static void DecodeStats(Stream input) => Decode(input, (reader, version) => {
+        public static void DecodeStats(Stream input) => Decode(input, PurposeType.Unknown, (reader, version, purpose) => {
             if (version >= 29)
                 Preferences.BaseTime = reader.ReadInt64();
         });
 
-        public static async Task<T> Decode<T>(Stream input) {
+        public static async Task<T> Decode<T>(Stream input, PurposeType purpose) {
             using (BinaryReader reader = new BinaryReader(input)) {
                 if (!DecodeHeader(reader)) throw new InvalidDataException();
 
@@ -170,11 +170,11 @@ namespace Apollo.Binary {
                     new string[] { "Yes", "No" }, null
                 ) == "No") throw new InvalidDataException();
 
-                return Decode<T>(reader, version);
+                return Decode<T>(reader, version, purpose);
             }
         }
 
-        public static T DecodeAnything<T>(BinaryReader reader, int version) {
+        public static T DecodeAnything<T>(BinaryReader reader, int version, PurposeType purpose) {
             Type type = typeof(T);
             bool nullable = Nullable.GetUnderlyingType(type) != null;
             Type returnType = nullable? Nullable.GetUnderlyingType(type) : type;
@@ -201,41 +201,41 @@ namespace Apollo.Binary {
                 
                 dynamic decodedList = typeof(Decoder).GetMethod("DecodeEnumerable", BindingFlags.NonPublic | BindingFlags.Static)
                     .MakeGenericMethod(EnumerableType)
-                    .Invoke(null, new object[] { reader, version });
+                    .Invoke(null, new object[] { reader, version, purpose });
                 
                 return type.IsArray
                     ? decodedList.ToArray()
                     : decodedList;
 
             } else if (typeof(Device).IsAssignableFrom(type))
-                return (T)(object)Decode<Device>(reader, version);
+                return (T)(object)Decode<Device>(reader, version, purpose);
 
-            else return Decode<T>(reader, version);
+            else return Decode<T>(reader, version, purpose);
         }
         
-        static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version)
+        static IEnumerable<T> DecodeEnumerable<T>(BinaryReader reader, int version, PurposeType purpose)
             => Enumerable.Range(0, reader.ReadInt32())
-                .Select(i => DecodeAnything<T>(reader, version)).ToList();
+                .Select(i => DecodeAnything<T>(reader, version, purpose)).ToList();
         
-        public static T Decode<T>(BinaryReader reader, int version)
+        public static T Decode<T>(BinaryReader reader, int version, PurposeType purpose)
             => (T)(typeof(T) == typeof(ISelect)
-                ? Decode(reader, version)
-                : Decode(reader, version, typeof(T))
+                ? Decode(reader, version, purpose)
+                : Decode(reader, version, purpose, typeof(T))
             );
         
-        static dynamic Decode(BinaryReader reader, int version, Type ensure = null) { 
+        static dynamic Decode(BinaryReader reader, int version, PurposeType purpose, Type ensure = null) { 
             Type t = DecodeID(reader);
             if (ensure != null && ensure != t) throw new InvalidDataException();
 
             if (t == typeof(Copyable))
                 return new Copyable() {
-                    Contents = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<ISelect>(reader, version)).ToList()
+                    Contents = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<ISelect>(reader, version, purpose)).ToList()
                 };
 
             else if (t == typeof(Project)) {
                 int bpm = reader.ReadInt32();
                 int[] macros = (version >= 25)? Enumerable.Range(0, 4).Select(i => reader.ReadInt32()).ToArray() : new int[4] {reader.ReadInt32(), 1, 1, 1};
-                List<Track> tracks = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Track>(reader, version)).ToList();
+                List<Track> tracks = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Track>(reader, version, purpose)).ToList();
 
                 string author = "";
                 long time = 0;
@@ -249,14 +249,14 @@ namespace Apollo.Binary {
 
                 UndoManager undo = null;
                 if (version >= 30) {
-                    undo = Decode<UndoManager>(reader, version);
+                    undo = Decode<UndoManager>(reader, version, purpose);
                 }
 
                 return new Project(bpm, macros, tracks, author, time, started, undo);
             
             } else if (t == typeof(Track)) {
-                Chain chain = Decode<Chain>(reader, version);
-                Launchpad lp = Decode<Launchpad>(reader, version);
+                Chain chain = Decode<Chain>(reader, version, purpose);
+                Launchpad lp = Decode<Launchpad>(reader, version, purpose);
                 string name = reader.ReadString();
 
                 bool enabled = true;
@@ -269,7 +269,7 @@ namespace Apollo.Binary {
                 };
 
             } else if (t == typeof(Chain)) {
-                List<Device> devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Device>(reader, version)).ToList();
+                List<Device> devices = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Device>(reader, version, purpose)).ToList();
                 string name = reader.ReadString();
 
                 bool enabled = true;
@@ -297,7 +297,7 @@ namespace Apollo.Binary {
                     enabled = reader.ReadBoolean();
                 }
 
-                Device ret = (Device)Decode(reader, version); // This needs to be a cast!
+                Device ret = (Device)Decode(reader, version, purpose); // This needs to be a cast!
                 ret.Collapsed = collapsed;
                 ret.Enabled = enabled;
 
@@ -332,42 +332,43 @@ namespace Apollo.Binary {
                 return ret;
 
             } else if (t == typeof(Group))
-                return new Group(
-                    Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Chain>(reader, version)).ToList(),
-                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null
-                );
+                return Device.Create<Group>(purpose, new object[] {
+                    Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Chain>(reader, version, purpose)).ToList(),
+                    reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
+                    Type.Missing
+                });
 
             else if (t == typeof(Choke))
-                return new Choke(
+                return Device.Create<Choke>(purpose, new object[] {
                     reader.ReadInt32(),
-                    Decode<Chain>(reader, version)
-                );
+                    Decode<Chain>(reader, version, purpose)
+                });
 
             else if (t == typeof(Clear))
-                return new Clear(
+                return Device.Create<Clear>(purpose, new object[] {
                     (ClearType)reader.ReadInt32()
-                );
+                });
 
             else if (t == typeof(ColorFilter))
-                return new ColorFilter(
+                return Device.Create<ColorFilter>(purpose, new object[] {
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble()
-                );
+                });
 
             else if (t == typeof(Copy)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(
                         reader.ReadBoolean(),
-                        Decode(reader, version),
+                        Decode<Length>(reader, version, purpose),
                         reader.ReadInt32()
                     );
                 } else {
-                    time = Decode(reader, version);
+                    time = Decode<Time>(reader, version, purpose);
                 }
 
                 double gate;
@@ -402,21 +403,23 @@ namespace Apollo.Binary {
                 bool wrap = reader.ReadBoolean();
 
                 int count;
-                List<Offset> offsets = Enumerable.Range(0, count = reader.ReadInt32()).Select(i => Decode<Offset>(reader, version)).ToList();
+                List<Offset> offsets = Enumerable.Range(0, count = reader.ReadInt32()).Select(i => Decode<Offset>(reader, version, purpose)).ToList();
                 List<int> angles = Enumerable.Range(0, count).Select(i => (version >= 25)? reader.ReadInt32() : 0).ToList();
 
-                return new Copy(time, gate, pinch, bilateral, reverse, infinite, copyType, gridType, wrap, offsets, angles);
+                return Device.Create<Copy>(purpose, new object[] {
+                    time, gate, pinch, bilateral, reverse, infinite, copyType, gridType, wrap, offsets, angles
+                });
             
             } else if (t == typeof(Delay)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(
                         reader.ReadBoolean(),
-                        Decode(reader, version),
+                        Decode<Length>(reader, version, purpose),
                         reader.ReadInt32()
                     );
                 } else {
-                    time = Decode(reader, version);
+                    time = Decode<Time>(reader, version, purpose);
                 }
 
                 double gate;
@@ -426,18 +429,20 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
-                return new Delay(time, gate);
+                return Device.Create<Delay>(purpose, new object[] {
+                    time, gate
+                });
             
             } else if (t == typeof(Fade)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(
                         reader.ReadBoolean(),
-                        Decode(reader, version),
+                        Decode<Length>(reader, version, purpose),
                         reader.ReadInt32()
                     );
                 } else {
-                    time = Decode(reader, version);
+                    time = Decode<Time>(reader, version, purpose);
                 }
 
                 double gate;
@@ -450,7 +455,7 @@ namespace Apollo.Binary {
                 FadePlaybackType playmode = (FadePlaybackType)reader.ReadInt32();
 
                 int count;
-                List<Color> colors = Enumerable.Range(0, count = reader.ReadInt32()).Select(i => Decode<Color>(reader, version)).ToList();
+                List<Color> colors = Enumerable.Range(0, count = reader.ReadInt32()).Select(i => Decode<Color>(reader, version, purpose)).ToList();
                 List<double> positions = Enumerable.Range(0, count).Select(i => (version <= 13)? (double)reader.ReadDecimal() : reader.ReadDouble()).ToList();
                 List<FadeType> types = Enumerable.Range(0, count - 1).Select(i => (version <= 24) ? FadeType.Linear : (FadeType)reader.ReadInt32()).ToList();
 
@@ -459,24 +464,26 @@ namespace Apollo.Binary {
                     expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 }
 
-                return new Fade(time, gate, playmode, colors, positions, types, expanded);
+                return Device.Create<Fade>(purpose, new object[] {
+                    time, gate, playmode, colors, positions, types, expanded
+                });
 
             } else if (t == typeof(Flip))
-                return new Flip(
+                return Device.Create<Flip>(purpose, new object[] {
                     (FlipType)reader.ReadInt32(),
                     reader.ReadBoolean()
-                );
+                });
             
             else if (t == typeof(Hold)) {
                 Time time;
                 if (version <= 2) {
                     time = new Time(
                         reader.ReadBoolean(),
-                        Decode(reader, version),
+                        Decode<Length>(reader, version, purpose),
                         reader.ReadInt32()
                     );
                 } else {
-                    time = Decode(reader, version);
+                    time = Decode<Time>(reader, version, purpose);
                 }
 
                 double gate;
@@ -493,12 +500,9 @@ namespace Apollo.Binary {
                     holdmode = (HoldType)reader.ReadInt32();
                 }
 
-                return new Hold(
-                    time,
-                    gate,
-                    holdmode,
-                    reader.ReadBoolean()
-                );
+                return Device.Create<Hold>(purpose, new object[] {
+                    time, gate, holdmode
+                });
                 
             } else if (t == typeof(KeyFilter)) {
                 bool[] filter;
@@ -509,7 +513,9 @@ namespace Apollo.Binary {
                 } else
                     filter = Enumerable.Range(0, 101).Select(i => reader.ReadBoolean()).ToArray();
 
-                return new KeyFilter(filter);
+                return Device.Create<KeyFilter>(purpose, new object[] {
+                    filter
+                });
 
             } else if (t == typeof(Layer)) {
                 int target = reader.ReadInt32();
@@ -529,34 +535,36 @@ namespace Apollo.Binary {
                 if (version >= 21)
                     range = reader.ReadInt32();
 
-                return new Layer(target, blending, range);
+                return Device.Create<Layer>(purpose, new object[] {
+                    target, blending, range
+                });
 
             } else if (t == typeof(LayerFilter))
-                return new LayerFilter(
+                return Device.Create<LayerFilter>(purpose, new object[] {
                     reader.ReadInt32(),
                     reader.ReadInt32()
-                );
+                });
 
             else if (t == typeof(Loop))
-                return new Loop(
-                    Decode(reader, version),
+                return Device.Create<Loop>(purpose, new object[] {
+                    Decode<Time>(reader, version, purpose),
                     reader.ReadDouble(),
                     reader.ReadInt32(),
                     reader.ReadBoolean()
-                );
+                });
                 
             else if (t == typeof(Move))
-                return new Move(
-                    Decode(reader, version),
+                return Device.Create<Move>(purpose, new object[] {
+                    Decode<Offset>(reader, version, purpose),
                     (GridType)reader.ReadInt32(),
                     reader.ReadBoolean()
-                );
+                });
             
             else if (t == typeof(Multi)) {
-                Chain preprocess = Decode(reader, version);
+                Chain preprocess = Decode<Chain>(reader, version, purpose);
 
                 int count = reader.ReadInt32();
-                List<Chain> init = Enumerable.Range(0, count).Select(i => Decode<Chain>(reader, version)).ToList();
+                List<Chain> init = Enumerable.Range(0, count).Select(i => Decode<Chain>(reader, version, purpose)).ToList();
 
                 if (version == 28) {
                     List<bool[]> filters = Enumerable.Range(0, count).Select(i =>
@@ -570,23 +578,25 @@ namespace Apollo.Binary {
                 int? expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 MultiType mode = (MultiType)reader.ReadInt32();
                 
-                return new Multi(preprocess, init, expanded, mode);
+                return Device.Create<Multi>(purpose, new object[] {
+                    preprocess, init, expanded, mode
+                });
             
             } else if (t == typeof(Output))
-                return new Output(
+                return Device.Create<Output>(purpose, new object[] {
                     reader.ReadInt32()
-                );
+                });
             
             else if (t == typeof(MacroFilter))
-                return new MacroFilter(
+                return Device.Create<MacroFilter>(purpose, new object[] {
                     (version >= 25)? reader.ReadInt32() : 1,
                     Enumerable.Range(0, 100).Select(i => reader.ReadBoolean()).ToArray()
-                );
+                });
             
             else if (t == typeof(Paint))
-                return new Paint(
-                    Decode(reader, version)
-                );
+                return Device.Create<Paint>(purpose, new object[] {
+                    Decode<Color>(reader, version, purpose)
+                });
             
             else if (t == typeof(Pattern)) {
                 int repeats = 1;
@@ -611,7 +621,7 @@ namespace Apollo.Binary {
                     bilateral = reader.ReadBoolean();
                 }
 
-                List<Frame> frames = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Frame>(reader, version)).ToList();
+                List<Frame> frames = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Frame>(reader, version, purpose)).ToList();
                 PlaybackType mode = (PlaybackType)reader.ReadInt32();
 
                 bool chokeenabled = false;
@@ -645,49 +655,65 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = new Pattern(repeats, gate, pinch, bilateral, frames, mode, infinite, rootkey, wrap, expanded);
+                Pattern ret = Device.Create<Pattern>(purpose, new object[] {
+                    repeats, gate, pinch, bilateral, frames, mode, infinite, rootkey, wrap, expanded
+                });
 
                 if (chokeenabled) {
-                    return new Choke(choke, new Chain(new List<Device>() {ret}));
+                    return Device.Create<Choke>(purpose, new object[] {
+                        choke,
+                        new Chain(new List<Device>() {ret})
+                    });
                 }
 
                 return ret;
             
             } else if (t == typeof(Preview))
-                return new Preview();
+                return Device.Create<Preview>(purpose, new object[0]);
             
             else if (t == typeof(Rotate))
-                return new Rotate(
+                return Device.Create<Rotate>(purpose, new object[] {
                     (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
-                );
+                });
 
             else if (t == typeof(Refresh)) 
-                return new Refresh(
+                return Device.Create<Refresh>(purpose, new object[] {
                     Enumerable.Range(0, 4).Select(i => reader.ReadBoolean()).ToArray()
-                );
+                });
             
             else if (t == typeof(Switch)) {
                 int target = (version >= 25)? reader.ReadInt32() : 1;
                 int value = reader.ReadInt32();
 
                 if (18 <= version && version <= 21 && reader.ReadBoolean())
-                    return new Group(new List<Chain>() {
-                        new Chain(new List<Device>() {
-                            new Switch(1, value), new Clear(ClearType.Multi)
-                        }, "Switch Reset")
+                    return Device.Create<Group>(purpose, new object[] {
+                        new List<Chain>() {
+                            new Chain(new List<Device>() {
+                                Device.Create<Switch>(purpose, new object[] {
+                                    1, value
+                                }),
+                                Device.Create<Clear>(purpose, new object[] {
+                                    ClearType.Multi
+                                })
+                            }, "Switch Reset")
+                        },
+                        Type.Missing,
+                        Type.Missing
                     });
 
-                return new Switch(target, value);
+                return Device.Create<Switch>(purpose, new object[] {
+                    target, value
+                });
             
             } else if (t == typeof(Tone))
-                return new Tone(
+                return Device.Create<Tone>(purpose, new object[] {
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble()
-                );
+                });
             
             else if (t == typeof(Color)) {
                 byte red = reader.ReadByte();
@@ -707,20 +733,20 @@ namespace Apollo.Binary {
                 if (version <= 2) {
                     time = new Time(
                         reader.ReadBoolean(),
-                        Decode(reader, version),
+                        Decode<Length>(reader, version, purpose),
                         reader.ReadInt32()
                     );
                 } else {
-                    time = Decode(reader, version);
+                    time = Decode<Time>(reader, version, purpose);
                 }
 
                 Color[] screen;
                 if (version <= 19) {
-                    List<Color> oldScreen = Enumerable.Range(0, 100).Select(i => Decode<Color>(reader, version)).ToList();
+                    List<Color> oldScreen = Enumerable.Range(0, 100).Select(i => Decode<Color>(reader, version, purpose)).ToList();
                     oldScreen.Insert(99, new Color(0));
                     screen = oldScreen.ToArray();
                 } else
-                    screen = Enumerable.Range(0, 101).Select(i => Decode<Color>(reader, version)).ToArray();
+                    screen = Enumerable.Range(0, 101).Select(i => Decode<Color>(reader, version, purpose)).ToArray();
 
                 return new Frame(time, screen);
             
@@ -747,7 +773,7 @@ namespace Apollo.Binary {
             } else if (t == typeof(Time))
                 return new Time(
                     reader.ReadBoolean(),
-                    Decode(reader, version),
+                    Decode<Length>(reader, version, purpose),
                     reader.ReadInt32()
                 );
             

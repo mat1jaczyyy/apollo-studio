@@ -79,6 +79,10 @@ namespace Apollo.Enums {
         Linear, Smooth, Sharp, Fast, Slow, Hold, Release
     }
 
+    public enum PurposeType {
+        Unknown, Active, Passive, Unrelated
+    }
+
     public static class EnumExtensions {
         public static bool HasNovationLED(this LaunchpadModels model)
             => model == LaunchpadModels.X || model == LaunchpadModels.ProMK3;

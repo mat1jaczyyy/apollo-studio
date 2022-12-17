@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Rendering;
 using Apollo.Selection;
@@ -29,12 +30,13 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
         
-        public ISelect IClone() => (ISelect)Clone();
+        public ISelect IClone(PurposeType purpose) => (ISelect)Clone(purpose);
 
         public DeviceViewer Viewer { get; set; }
         
         public Chain Parent;
         public int? ParentIndex;
+        public PurposeType Purpose;
 
         public bool Collapsed = false;
         
@@ -50,9 +52,26 @@ namespace Apollo.Elements {
             }
         }
 
-        public abstract Device Clone();
+        protected abstract object[] CloneParameters(PurposeType purpose);
+
+        public Device Clone(PurposeType purpose) {
+            if (purpose == PurposeType.Unknown)
+                Program.Log("WARNING: Purpose is unknown while cloning device!");
+
+            Device device = Create(this.GetType(), purpose, CloneParameters(purpose));
+
+            device.Collapsed = Collapsed;
+            device.Enabled = Enabled;
+
+            return device;
+        }
         
         protected Device(string identifier, string name = null) {
+            string s = $"constructing device {identifier}";
+            Program.Log(s);
+            if (Purpose == PurposeType.Unknown)
+                throw new Exception($"Purpose is unknown while {s}");
+
             DeviceIdentifier = identifier;
             Name = name?? this.GetType().ToString().Split(".").Last();
         }
@@ -62,7 +81,18 @@ namespace Apollo.Elements {
         protected virtual void Initialized() {}
 
         public void Initialize() {
+            if (Purpose == PurposeType.Unknown)
+                throw new Exception("Purpose is unknown while initializing device!");
+
+            if (Purpose == PurposeType.Passive)
+                return;
+
             if (!Disposed) {
+                if (Purpose == PurposeType.Unrelated) {
+                    Initialized();
+                    return;
+                }
+
                 if (Program.Project == null) {
                     Program.ProjectLoaded += Initialize;
                     ListeningToProjectLoaded = true;
@@ -134,19 +164,27 @@ namespace Apollo.Elements {
             Disposed = true;
         }
 
-        public static Device Create(Type device, Chain parent) {
+        public static Device Create(Type device, PurposeType purpose, object[] parameters = null) {
             object obj = FormatterServices.GetUninitializedObject(device);
-            device.GetField("Parent").SetValue(obj, parent);
+            device.GetField("Purpose").SetValue(obj, purpose);
 
             ConstructorInfo ctor = device.GetConstructors()[0];
+            int cnt = ctor.GetParameters().Length;
+
+            if (parameters != null && parameters.Length != cnt)
+                throw new Exception($"Expected {cnt} parameters, got {parameters.Length} for type {device}");
+
             ctor.Invoke(
                 obj,
                 BindingFlags.OptionalParamBinding,
-                null, Enumerable.Repeat(Type.Missing, ctor.GetParameters().Count()).ToArray(),
+                null, parameters?? Enumerable.Repeat(Type.Missing, ctor.GetParameters().Count()).ToArray(),
                 CultureInfo.CurrentCulture
             );
             
             return (Device)obj;
         }
+
+        public static T Create<T>(PurposeType purpose, object[] parameters = null) where T: Device
+            => (T)Create(typeof(T), purpose, parameters);
     }
 }

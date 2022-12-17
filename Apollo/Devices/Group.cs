@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Apollo.Binary;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
@@ -86,10 +87,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Group(Chains.Select(i => i.Clone()).ToList(), Expanded) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Chains.Select(i => i.Clone(purpose)).ToList(), Expanded };
 
         public Group(List<Chain> init = null, int? expanded = null, string identifier = "group"): base(identifier) {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
@@ -122,20 +121,20 @@ namespace Apollo.Devices {
             Chain chain;
 
             protected override void UndoPath(params Group[] items) => items[0].Remove(index);
-            protected override void RedoPath(params Group[] items) => items[0].Insert(index, chain.Clone());
+            protected override void RedoPath(params Group[] items) => items[0].Insert(index, chain.Clone(PurposeType.Active));
             
             protected override void OnDispose() => chain.Dispose();
             
             public ChainInsertedUndoEntry(Group group, int index, Chain chain)
             : base($"{group.Name} Chain {index + 1} Inserted", group) {
                 this.index = index;
-                this.chain = chain.Clone();
+                this.chain = chain.Clone(PurposeType.Passive);
             }
             
             ChainInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                chain = Decoder.Decode<Chain>(reader, version);
+                chain = Decoder.Decode<Chain>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) { 

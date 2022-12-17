@@ -84,10 +84,8 @@ namespace Apollo.Devices {
 
         bool ActualRelease => HoldMode == HoldType.Minimum? false : Release;
 
-        public override Device Clone() => new Hold(_time.Clone(), _gate, HoldMode, Release) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { _time.Clone(), _gate, HoldMode, Release };
 
         public Hold(Time time = null, double gate = 1, HoldType holdmode = HoldType.Trigger, bool release = false): base("hold") {
             Time = time?? new Time();

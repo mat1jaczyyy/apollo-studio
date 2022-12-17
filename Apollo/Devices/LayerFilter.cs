@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -34,10 +35,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new LayerFilter(Target, Range) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Target, Range };
 
         public LayerFilter(int target = 0, int range = 0): base("layerfilter", "Layer Filter") {
             Target = target;
