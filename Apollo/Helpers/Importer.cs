@@ -87,12 +87,18 @@ namespace Apollo.Helpers {
 
                 progress?.Invoke((int)reader.BaseStream.Position, (int)end);
 
+                double totalTime = 0;
+
                 while (reader.BaseStream.Position < end) {
                     if (ct?.IsCancellationRequested == true) return false;
 
                     int delta = MIDIReadVariableLength(reader);
+                    
+                    double prev = totalTime;
+                    totalTime += delta * 60000 / beatsize / Program.Project.BPM;
+
                     if (delta > 0) {
-                        ret.Last().Time = new Time(false, free: (int)(delta * 60000 / beatsize / Program.Project.BPM));
+                        ret.Last().Time = new Time(false, free: (int)(Math.Round(totalTime) - Math.Round(prev)));
                         ret.Add(ret.Last().Clone());
                     }
                     
