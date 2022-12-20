@@ -15,7 +15,7 @@ using Apollo.Elements;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Version 1.8.8";
+        public static readonly string Version = "Version 1.8.9";
 
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
