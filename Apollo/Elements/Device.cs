@@ -55,9 +55,6 @@ namespace Apollo.Elements {
         protected abstract object[] CloneParameters(PurposeType purpose);
 
         public Device Clone(PurposeType purpose) {
-            if (purpose == PurposeType.Unknown)
-                Program.Log("WARNING: Purpose is unknown while cloning device!");
-
             Device device = Create(this.GetType(), purpose, CloneParameters(purpose));
 
             device.Collapsed = Collapsed;
@@ -67,10 +64,8 @@ namespace Apollo.Elements {
         }
         
         protected Device(string identifier, string name = null) {
-            string s = $"constructing device {identifier}";
-            Program.Log(s);
             if (Purpose == PurposeType.Unknown)
-                throw new Exception($"Purpose is unknown while {s}");
+                throw new Exception($"Purpose is unknown while constructing device {identifier}");
 
             DeviceIdentifier = identifier;
             Name = name?? this.GetType().ToString().Split(".").Last();
