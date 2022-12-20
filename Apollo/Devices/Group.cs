@@ -88,7 +88,7 @@ namespace Apollo.Devices {
         }
 
         protected override object[] CloneParameters(PurposeType purpose)
-            => new object[] { Chains.Select(i => i.Clone(purpose)).ToList(), Expanded };
+            => new object[] { Chains.Select(i => i.Clone(purpose)).ToList(), Expanded, Type.Missing };
 
         public Group(List<Chain> init = null, int? expanded = null, string identifier = "group"): base(identifier) {
             foreach (Chain chain in init?? new List<Chain>()) Chains.Add(chain);
