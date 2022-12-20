@@ -401,6 +401,9 @@ namespace Apollo.Core {
             if (Loading) return;
             if (!Directory.Exists(Program.UserPath)) Directory.CreateDirectory(Program.UserPath);
 
+            if (File.Exists(StatsPath)) File.SetAttributes(StatsPath, FileAttributes.Normal);
+            if (File.Exists(FilePath)) File.SetAttributes(FilePath, FileAttributes.Normal);
+
             try {
                 // Save stats first in case config saving fails
                 File.WriteAllBytes(StatsPath, Encoder.EncodeStats());
