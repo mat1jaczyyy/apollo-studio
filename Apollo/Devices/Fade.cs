@@ -287,7 +287,7 @@ namespace Apollo.Devices {
         }
 
         protected override void Initialized() {
-            if (Purpose != PurposeType.Active || Purpose != PurposeType.Unrelated) return;
+            if (Purpose != PurposeType.Active && Purpose != PurposeType.Unrelated) return;
 
             Generate();
 
