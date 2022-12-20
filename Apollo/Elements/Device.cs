@@ -88,14 +88,15 @@ namespace Apollo.Elements {
                     return;
                 }
 
+                // Purpose is always Active at this point
+
                 if (Program.Project == null) {
                     Program.ProjectLoaded += Initialize;
                     ListeningToProjectLoaded = true;
                     return;
                 }
 
-                if (Track.Get(this) != null)
-                    Initialized();
+                Initialized();
             }
 
             if (ListeningToProjectLoaded) {

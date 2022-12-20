@@ -333,7 +333,8 @@ namespace Apollo.Devices {
                         }
                     };
 
-                    if (fade == null) Initialize();
+                    if (fade == null)
+                        throw new Exception("Fade was never initialized");
 
                     Schedule(Next, start += fade[1].Time - fade[0].Time);
 
