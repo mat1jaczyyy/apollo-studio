@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Apollo.Binary;
 using Apollo.Devices;
 using Apollo.DeviceViewers;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Undo;
@@ -31,7 +32,7 @@ namespace Apollo.Elements {
 
         public void IInsert(int index, ISelect item) => Insert(index, (Device)item);
         
-        public ISelect IClone() => (ISelect)Clone();
+        public ISelect IClone(PurposeType purpose) => (ISelect)Clone(purpose);
 
         public ISelectParentViewer IViewer {
             get => Viewer;
@@ -160,7 +161,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public Chain Clone() => new Chain(Devices.Select(i => i.Clone()).ToList(), Name, SecretMultiFilter.ToArray()) {
+        public Chain Clone(PurposeType purpose) => new Chain(Devices.Select(i => i.Clone(purpose)).ToList(), Name, SecretMultiFilter.ToArray()) {
             Enabled = Enabled
         };
 
@@ -223,20 +224,20 @@ namespace Apollo.Elements {
             Device device;
 
             protected override void UndoPath(params Chain[] items) => items[0].Remove(index);
-            protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone());
+            protected override void RedoPath(params Chain[] items) => items[0].Insert(index, device.Clone(PurposeType.Active));
             
             protected override void OnDispose() => device.Dispose();
             
             public DeviceInsertedUndoEntry(Chain chain, int index, Device device)
             : base($"Device ({device.Name}) Inserted", chain) {
                 this.index = index;
-                this.device = device.Clone();
+                this.device = device.Clone(PurposeType.Passive);
             }
             
             DeviceInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                device = Decoder.Decode<Device>(reader, version);
+                device = Decoder.Decode<Device>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {

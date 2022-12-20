@@ -2,6 +2,7 @@
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Structures;
 using Apollo.Rendering;
@@ -22,7 +23,7 @@ namespace Apollo.Elements {
             get => ParentIndex;
         }
         
-        public ISelect IClone() => (ISelect)Clone();
+        public ISelect IClone(PurposeType purpose) => (ISelect)Clone(purpose);
 
         public TrackInfo Info;
         public TrackWindow Window;
@@ -128,7 +129,7 @@ namespace Apollo.Elements {
             }
         }
 
-        public Track Clone() => new Track(Chain.Clone(), Launchpad, Name) {
+        public Track Clone(PurposeType purpose) => new Track(Chain.Clone(purpose), Launchpad, Name) {
             Enabled = Enabled
         };
 

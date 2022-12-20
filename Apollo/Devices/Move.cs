@@ -37,10 +37,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Move(Offset.Clone(), GridMode, Wrap) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Offset.Clone(), GridMode, Wrap };
 
         public Move(Offset offset = null, GridType gridmode = GridType.Full, bool wrap = false): base("move") {
             Offset = offset?? new Offset();

@@ -3,6 +3,7 @@ using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -65,10 +66,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Tone(Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Hue, SaturationHigh, SaturationLow, ValueHigh, ValueLow };
 
         public Tone(double hue = 0, double saturation_high = 1, double saturation_low = 0, double value_high = 1, double value_low = 0): base("tone") {
             Hue = hue;

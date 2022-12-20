@@ -4,6 +4,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -21,11 +22,9 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new KeyFilter(_filter.ToArray()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
-
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { _filter.ToArray() };
+        
         public bool this[int index] {
             get => _filter[index];
             set {

@@ -20,6 +20,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Viewers;
 
@@ -206,7 +207,7 @@ namespace Apollo.Windows {
             try {
                 try {
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        loaded = await Decoder.Decode<Project>(file);
+                        loaded = await Decoder.Decode<Project>(file, PurposeType.Active);
 
                     if (!recovery) {
                         loaded.FilePath = path;
@@ -219,7 +220,7 @@ namespace Apollo.Windows {
 
                 } catch (InvalidDataException) {
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        imported = await Decoder.Decode<Copyable>(file);
+                        imported = await Decoder.Decode<Copyable>(file, PurposeType.Active);
 
                     Program.Project?.Dispose();
                     Program.Project = new Project(
@@ -227,7 +228,13 @@ namespace Apollo.Windows {
                             ? imported.Contents.Cast<Track>().ToList()
                             : new List<Track>() {
                                 new Track(new Chain((imported.Type == typeof(Chain))
-                                    ? new List<Device>() { new Group(imported.Contents.Cast<Chain>().ToList()) }
+                                    ? new List<Device>() {
+                                        Device.Create<Group>(PurposeType.Active, new object[] {
+                                            imported.Contents.Cast<Chain>().ToList(),
+                                            Type.Missing,
+                                            Type.Missing
+                                        })
+                                    }
                                     : imported.Contents.Cast<Device>().ToList()
                                 ))
                             }

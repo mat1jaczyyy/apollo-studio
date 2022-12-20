@@ -5,6 +5,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -34,10 +35,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new MacroFilter(Macro, _filter.ToArray()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Macro, _filter.ToArray() };
 
         public bool this[int index] {
             get => _filter[index];

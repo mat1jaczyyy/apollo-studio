@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -33,7 +34,7 @@ namespace Apollo.Selection {
             for (int i = 0; i < source.Count; i++) {
                 if (!copy) source[i].IParent.Remove(source[i].IParentIndex.Value, false);
 
-                source[i] = copy? source[i].IClone() : source[i];
+                source[i] = copy? source[i].IClone(PurposeType.Active) : source[i];
 
                 if (source[i] is Pattern pattern)
                     pattern.Window?.Close();

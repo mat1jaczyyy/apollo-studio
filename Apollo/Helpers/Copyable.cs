@@ -9,6 +9,7 @@ using Avalonia;
 using Avalonia.Controls;
 
 using Apollo.Binary;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Windows;
 
@@ -138,7 +139,7 @@ namespace Apollo.Helpers {
 
             try {
                 using (MemoryStream ms = new MemoryStream(FromCompressedBase64(b64)))
-                    return await Decoder.Decode<Copyable>(ms);
+                    return await Decoder.Decode<Copyable>(ms, PurposeType.Passive);
             } catch (Exception) {
                 return null;
             }
@@ -152,7 +153,7 @@ namespace Apollo.Helpers {
                     Copyable copyable;
 
                     using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read))
-                        copyable = await Decoder.Decode<Copyable>(file);
+                        copyable = await Decoder.Decode<Copyable>(file, PurposeType.Passive);
 
                     if (!ensure.IsAssignableFrom(copyable.Type))
                         throw new InvalidDataException();

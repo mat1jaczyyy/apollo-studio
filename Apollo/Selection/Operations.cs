@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using Apollo.Binary;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Undo;
 
@@ -50,7 +52,7 @@ namespace Apollo.Selection {
 
             protected override void Redo(ISelectParent parent) {
                 for (int i = 0; i < init.Count; i++)
-                    parent.IInsert(right + i + 1, init[i].IClone());
+                    parent.IInsert(right + i + 1, init[i].IClone(PurposeType.Active));
 
                 parent.Selection?.Select(parent.IChildren[right + 1], true);
             }
@@ -71,7 +73,7 @@ namespace Apollo.Selection {
             : base(reader, version) {
                 right = reader.ReadInt32();
 
-                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version)).ToList();
+                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version, PurposeType.Passive)).ToList();
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -124,7 +126,7 @@ namespace Apollo.Selection {
 
             protected override void Undo(ISelectParent parent) {
                 for (int i = left; i <= right; i++)
-                    parent.IInsert(i, init[i - left].IClone());
+                    parent.IInsert(i, init[i - left].IClone(PurposeType.Active));
             }
 
             protected override void Redo(ISelectParent parent) {
@@ -142,7 +144,7 @@ namespace Apollo.Selection {
                 this.left = left;
                 this.right = right;
 
-                init = Enumerable.Range(left, right - left + 1).Select(i => parent.IChildren[i].IClone()).ToList();
+                init = Enumerable.Range(left, right - left + 1).Select(i => parent.IChildren[i].IClone(PurposeType.Passive)).ToList();
             }
             
             DeleteUndoEntry(BinaryReader reader, int version)
@@ -150,7 +152,7 @@ namespace Apollo.Selection {
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
                 
-                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version)).ToList();
+                init = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.DecodeAnything<ISelect>(reader, version, PurposeType.Passive)).ToList();
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -233,7 +235,7 @@ namespace Apollo.Selection {
 
             protected override void Redo(ISelectParent parent) {
                 for (int i = 0; i <= right - left; i++)
-                    parent.IInsert(right + i + 1, parent.IChildren[left + i].IClone());
+                    parent.IInsert(right + i + 1, parent.IChildren[left + i].IClone(PurposeType.Active));
             
                 parent.Selection?.Select(parent.IChildren[right + 1], true);
             }
@@ -271,7 +273,7 @@ namespace Apollo.Selection {
                 chain.Remove(left);
 
                 for (int i = left; i <= right; i++)
-                    chain.Insert(i, init[i - left].Clone());
+                    chain.Insert(i, init[i - left].Clone(PurposeType.Active));
                 
                 chain.Selection?.Select(chain[left]);
                 chain.Selection?.Select(chain[right], true);
@@ -281,7 +283,7 @@ namespace Apollo.Selection {
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
                 
-                chain.Insert(left, Encapsulate(init.Clone()));
+                chain.Insert(left, Encapsulate(init.Clone(PurposeType.Active)));
             }
 
             protected override void OnDispose() {
@@ -297,7 +299,7 @@ namespace Apollo.Selection {
                 init = new Chain();
 
                 for (int i = left; i <= right; i++)
-                    init.Add(chain[i].Clone());
+                    init.Add(chain[i].Clone(PurposeType.Passive));
             }
         
             protected DeviceEncapsulationUndoEntry(BinaryReader reader, int version)
@@ -305,7 +307,7 @@ namespace Apollo.Selection {
                 left = reader.ReadInt32();
                 right = reader.ReadInt32();
                 
-                init = Decoder.Decode<Chain>(reader, version);
+                init = Decoder.Decode<Chain>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -328,7 +330,7 @@ namespace Apollo.Selection {
                 for (int i = index + GetChain(init).Count - 1; i >= index; i--)
                     chain.Remove(i);
                 
-                chain.Insert(index, init.Clone());
+                chain.Insert(index, init.Clone(PurposeType.Active));
             }
 
             protected override void Redo(Chain chain) {
@@ -337,7 +339,7 @@ namespace Apollo.Selection {
                 chain.Remove(index);
             
                 for (int i = 0; i < items.Count; i++)
-                    chain.Insert(index + i, items[i].Clone());
+                    chain.Insert(index + i, items[i].Clone(PurposeType.Active));
 
                 chain.Selection?.Select(chain[index], true);
             }
@@ -348,13 +350,13 @@ namespace Apollo.Selection {
             : base($"{chain.ChildString} {action}", chain) {
                 this.index = index;
 
-                init = (T)chain[index].Clone();
+                init = (T)chain[index].Clone(PurposeType.Passive);
             }
         
             protected DeviceDecapsulationUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                init = (T)Decoder.Decode<Device>(reader, version);
+                init = (T)Decoder.Decode<Device>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -367,7 +369,11 @@ namespace Apollo.Selection {
 
         public class GroupUndoEntry: DeviceEncapsulationUndoEntry {
             protected override Device Encapsulate(Chain chain)
-                => new Group(new List<Chain>() {chain}) {Expanded = 0};
+                => Device.Create<Group>(PurposeType.Active, new object[] {
+                    new List<Chain>() {chain},
+                    0,
+                    Type.Missing
+                });
 
             public GroupUndoEntry(Chain chain, int left, int right)
             : base(chain, left, right, "Grouped") {}
@@ -400,7 +406,10 @@ namespace Apollo.Selection {
         
         public class ChokeUndoEntry: DeviceEncapsulationUndoEntry {
             protected override Device Encapsulate(Chain chain)
-                => new Choke(chain: chain.Clone());
+                => Device.Create<Choke>(PurposeType.Active, new object[] {
+                    Type.Missing,
+                    chain
+                });
 
             public ChokeUndoEntry(Chain chain, int left, int right)
             : base(chain, left, right, "Choked") {}

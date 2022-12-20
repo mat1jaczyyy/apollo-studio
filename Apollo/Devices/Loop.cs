@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
@@ -80,7 +81,8 @@ namespace Apollo.Devices {
             }
         }
                
-        public override Device Clone() => new Loop(Rate.Clone(), Gate, Repeats, Hold);
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Rate.Clone(), Gate, Repeats, Hold };
         
         public Loop(Time rate = null, double gate = 1, int repeats = 2, bool hold = false): base("loop") {
             Rate = rate?? new Time();

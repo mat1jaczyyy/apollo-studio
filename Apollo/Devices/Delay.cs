@@ -3,6 +3,7 @@ using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
@@ -56,10 +57,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Delay(_time.Clone(), _gate) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { _time.Clone(), _gate };
 
         public Delay(Time time = null, double gate = 1): base("delay") {
             Time = time?? new Time();

@@ -10,6 +10,7 @@ using Avalonia.Input;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Undo;
 using Apollo.Windows;
@@ -300,20 +301,20 @@ namespace Apollo.Elements {
             Track track;
 
             protected override void OnUndo() => Program.Project.Remove(index);
-            protected override void OnRedo() => Program.Project.Insert(index, track.Clone());
+            protected override void OnRedo() => Program.Project.Insert(index, track.Clone(PurposeType.Active));
 
             protected override void OnDispose() => track.Dispose();
             
             public TrackInsertedUndoEntry(int index, Track track)
             : base($"Track {index + 1} Inserted") {
                 this.index = index;
-                this.track = track.Clone();
+                this.track = track.Clone(PurposeType.Passive);
             }
             
             TrackInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                track = Decoder.Decode<Track>(reader, version);
+                track = Decoder.Decode<Track>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {

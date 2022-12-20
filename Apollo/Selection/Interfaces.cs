@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
 
+using Apollo.Enums;
+
 namespace Apollo.Selection {
     public interface ISelect {
         ISelectViewer IInfo { get; }
@@ -11,7 +13,7 @@ namespace Apollo.Selection {
         ISelectParent IParent { get; }
         int? IParentIndex { get; }
 
-        ISelect IClone();
+        ISelect IClone(PurposeType purpose);
         
         void Dispose();
     }

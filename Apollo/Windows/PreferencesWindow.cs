@@ -91,9 +91,11 @@ namespace Apollo.Windows {
         DispatcherTimer Timer;
         LaunchpadGrid Preview;
 
-        Fade fade = new Fade(
+        Fade fade = Device.Create<Fade>(PurposeType.Unrelated, new object[] {
             new Time(false),
-            colors: new List<Color>() {
+            Type.Missing,
+            Type.Missing,
+            new List<Color>() {
                 new Color(1, 0, 0),
                 new Color(63, 0, 0),
                 new Color(63, 63, 0),
@@ -104,10 +106,10 @@ namespace Apollo.Windows {
                 new Color(63, 0, 0),
                 new Color(1, 0, 0)
             },
-            positions: new List<double>() {
+            new List<double>() {
                 0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1
             },
-            types: new List<FadeType>{
+            new List<FadeType>{
                 FadeType.Linear,
                 FadeType.Linear,
                 FadeType.Linear,
@@ -117,8 +119,9 @@ namespace Apollo.Windows {
                 FadeType.Linear,
                 FadeType.Linear,
                 FadeType.Linear
-            }
-        );
+            },
+            Type.Missing
+        });
 
         void UpdateTopmost(bool value) => AlwaysOnTop.IsChecked = Topmost = value;
 
