@@ -244,7 +244,7 @@ namespace Apollo.Devices {
         public int Count => _colors.Count;
 
         protected override object[] CloneParameters(PurposeType purpose)
-            => new object[] { _time.Clone(), _gate, PlayMode, _colors.Select(i => i.Clone()).ToList(), _positions.ToList(), _types.ToList() };
+            => new object[] { _time.Clone(), _gate, PlayMode, _colors.Select(i => i.Clone()).ToList(), _positions.ToList(), _types.ToList(), Type.Missing };
 
         public void Insert(int index, Color color, double position, FadeType type) {
             _colors.Insert(index, color);
