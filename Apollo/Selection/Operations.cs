@@ -267,7 +267,7 @@ namespace Apollo.Selection {
             int left, right;
             Chain init;
 
-            protected abstract Device Encapsulate(Chain chain);
+            protected abstract Device Encapsulate(Chain chain, Chain parent);
 
             protected override void Undo(Chain chain) {
                 chain.Remove(left);
@@ -283,7 +283,7 @@ namespace Apollo.Selection {
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
                 
-                chain.Insert(left, Encapsulate(init.Clone(PurposeType.Active)));
+                chain.Insert(left, Encapsulate(chain, init.Clone(PurposeType.Active)));
             }
 
             protected override void OnDispose() {
@@ -368,8 +368,8 @@ namespace Apollo.Selection {
         }
 
         public class GroupUndoEntry: DeviceEncapsulationUndoEntry {
-            protected override Device Encapsulate(Chain chain)
-                => Device.Create<Group>(PurposeType.Active, new object[] {
+            protected override Device Encapsulate(Chain chain, Chain parent)
+                => Device.Create<Group>(PurposeType.Active, parent, new object[] {
                     new List<Chain>() {chain},
                     0,
                     Type.Missing
@@ -405,8 +405,8 @@ namespace Apollo.Selection {
         }
         
         public class ChokeUndoEntry: DeviceEncapsulationUndoEntry {
-            protected override Device Encapsulate(Chain chain)
-                => Device.Create<Choke>(PurposeType.Active, new object[] {
+            protected override Device Encapsulate(Chain chain, Chain parent)
+                => Device.Create<Choke>(PurposeType.Active, parent, new object[] {
                     Type.Missing,
                     chain
                 });

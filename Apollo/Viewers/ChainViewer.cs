@@ -94,7 +94,7 @@ namespace Apollo.Viewers {
 
         public void Expand(int? index) {}
 
-        void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, PurposeType.Passive));
+        void Device_Insert(int index, Type device) => Device_Insert(index, Device.Create(device, PurposeType.Passive, _chain));
         void Device_InsertStart(Type device) => Device_Insert(0, device);
 
         void Device_Insert(int index, Device device) {

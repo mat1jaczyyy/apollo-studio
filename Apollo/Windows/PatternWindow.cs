@@ -1099,7 +1099,7 @@ namespace Apollo.Windows {
                     Program.Project.Undo.AddAndExecute(new Pattern.ImportUndoEntry(
                         _pattern,
                         Path.GetFileNameWithoutExtension(filepath),
-                        Device.Create<Pattern>(PurposeType.Passive, new object[] {
+                        Device.Create<Pattern>(PurposeType.Passive, null, new object[] {
                             Type.Missing,
                             Type.Missing,
                             Type.Missing,

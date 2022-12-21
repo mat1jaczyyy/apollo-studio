@@ -229,7 +229,7 @@ namespace Apollo.Windows {
                             : new List<Track>() {
                                 new Track(new Chain((imported.Type == typeof(Chain))
                                     ? new List<Device>() {
-                                        Device.Create<Group>(PurposeType.Active, new object[] {
+                                        Device.Create<Group>(PurposeType.Active, null, new object[] {
                                             imported.Contents.Cast<Chain>().ToList(),
                                             Type.Missing,
                                             Type.Missing

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +63,12 @@ namespace Apollo.Devices {
             => new object[] { Target };
 
         public Output(int target = -1): base("output") {
-            if (target < 0) target = Track.Get(this).ParentIndex.Value;
+            if (target < 0) {
+                if (Parent == null)
+                    throw new Exception("Output device was created fresh without a parent to help find target Track");
+
+                target = Track.Get(this).ParentIndex.Value;
+            }
             _target = target;
 
             if (Program.Project?.TrackOperation == true) Program.Project.TrackOperationFinished += Initialize;

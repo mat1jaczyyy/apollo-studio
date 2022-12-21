@@ -91,7 +91,7 @@ namespace Apollo.Windows {
         DispatcherTimer Timer;
         LaunchpadGrid Preview;
 
-        Fade fade = Device.Create<Fade>(PurposeType.Unrelated, new object[] {
+        Fade fade = Device.Create<Fade>(PurposeType.Unrelated, null, new object[] {
             new Time(false),
             Type.Missing,
             Type.Missing,

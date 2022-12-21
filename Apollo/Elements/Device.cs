@@ -55,7 +55,7 @@ namespace Apollo.Elements {
         protected abstract object[] CloneParameters(PurposeType purpose);
 
         public Device Clone(PurposeType purpose) {
-            Device device = Create(this.GetType(), purpose, CloneParameters(purpose));
+            Device device = Create(this.GetType(), purpose, null, CloneParameters(purpose));
 
             device.Collapsed = Collapsed;
             device.Enabled = Enabled;
@@ -160,9 +160,12 @@ namespace Apollo.Elements {
             Disposed = true;
         }
 
-        public static Device Create(Type device, PurposeType purpose, object[] parameters = null) {
+        public static Device Create(Type device, PurposeType purpose, Chain parent, object[] parameters = null) {
             object obj = FormatterServices.GetUninitializedObject(device);
             device.GetField("Purpose").SetValue(obj, purpose);
+
+            // Parent is guaranteed to be set only if the device is brand new, and is not being cloned or decoded
+            device.GetField("Parent").SetValue(obj, parent);
 
             ConstructorInfo ctor = device.GetConstructors()[0];
             int cnt = ctor.GetParameters().Length;
@@ -180,7 +183,7 @@ namespace Apollo.Elements {
             return (Device)obj;
         }
 
-        public static T Create<T>(PurposeType purpose, object[] parameters = null) where T: Device
-            => (T)Create(typeof(T), purpose, parameters);
+        public static T Create<T>(PurposeType purpose, Chain parent, object[] parameters = null) where T: Device
+            => (T)Create(typeof(T), purpose, parent, parameters);
     }
 }

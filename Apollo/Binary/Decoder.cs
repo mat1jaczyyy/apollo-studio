@@ -332,25 +332,25 @@ namespace Apollo.Binary {
                 return ret;
 
             } else if (t == typeof(Group))
-                return Device.Create<Group>(purpose, new object[] {
+                return Device.Create<Group>(purpose, null, new object[] {
                     Enumerable.Range(0, reader.ReadInt32()).Select(i => Decode<Chain>(reader, version, purpose)).ToList(),
                     reader.ReadBoolean()? (int?)reader.ReadInt32() : null,
                     Type.Missing
                 });
 
             else if (t == typeof(Choke))
-                return Device.Create<Choke>(purpose, new object[] {
+                return Device.Create<Choke>(purpose, null, new object[] {
                     reader.ReadInt32(),
                     Decode<Chain>(reader, version, purpose)
                 });
 
             else if (t == typeof(Clear))
-                return Device.Create<Clear>(purpose, new object[] {
+                return Device.Create<Clear>(purpose, null, new object[] {
                     (ClearType)reader.ReadInt32()
                 });
 
             else if (t == typeof(ColorFilter))
-                return Device.Create<ColorFilter>(purpose, new object[] {
+                return Device.Create<ColorFilter>(purpose, null, new object[] {
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
@@ -406,7 +406,7 @@ namespace Apollo.Binary {
                 List<Offset> offsets = Enumerable.Range(0, count = reader.ReadInt32()).Select(i => Decode<Offset>(reader, version, purpose)).ToList();
                 List<int> angles = Enumerable.Range(0, count).Select(i => (version >= 25)? reader.ReadInt32() : 0).ToList();
 
-                return Device.Create<Copy>(purpose, new object[] {
+                return Device.Create<Copy>(purpose, null, new object[] {
                     time, gate, pinch, bilateral, reverse, infinite, copyType, gridType, wrap, offsets, angles
                 });
             
@@ -429,7 +429,7 @@ namespace Apollo.Binary {
                     gate = reader.ReadDouble();
                 }
 
-                return Device.Create<Delay>(purpose, new object[] {
+                return Device.Create<Delay>(purpose, null, new object[] {
                     time, gate
                 });
             
@@ -464,12 +464,12 @@ namespace Apollo.Binary {
                     expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 }
 
-                return Device.Create<Fade>(purpose, new object[] {
+                return Device.Create<Fade>(purpose, null, new object[] {
                     time, gate, playmode, colors, positions, types, expanded
                 });
 
             } else if (t == typeof(Flip))
-                return Device.Create<Flip>(purpose, new object[] {
+                return Device.Create<Flip>(purpose, null, new object[] {
                     (FlipType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 });
@@ -500,7 +500,7 @@ namespace Apollo.Binary {
                     holdmode = (HoldType)reader.ReadInt32();
                 }
 
-                return Device.Create<Hold>(purpose, new object[] {
+                return Device.Create<Hold>(purpose, null, new object[] {
                     time, gate, holdmode
                 });
                 
@@ -513,7 +513,7 @@ namespace Apollo.Binary {
                 } else
                     filter = Enumerable.Range(0, 101).Select(i => reader.ReadBoolean()).ToArray();
 
-                return Device.Create<KeyFilter>(purpose, new object[] {
+                return Device.Create<KeyFilter>(purpose, null, new object[] {
                     filter
                 });
 
@@ -535,18 +535,18 @@ namespace Apollo.Binary {
                 if (version >= 21)
                     range = reader.ReadInt32();
 
-                return Device.Create<Layer>(purpose, new object[] {
+                return Device.Create<Layer>(purpose, null, new object[] {
                     target, blending, range
                 });
 
             } else if (t == typeof(LayerFilter))
-                return Device.Create<LayerFilter>(purpose, new object[] {
+                return Device.Create<LayerFilter>(purpose, null, new object[] {
                     reader.ReadInt32(),
                     reader.ReadInt32()
                 });
 
             else if (t == typeof(Loop))
-                return Device.Create<Loop>(purpose, new object[] {
+                return Device.Create<Loop>(purpose, null, new object[] {
                     Decode<Time>(reader, version, purpose),
                     reader.ReadDouble(),
                     reader.ReadInt32(),
@@ -554,7 +554,7 @@ namespace Apollo.Binary {
                 });
                 
             else if (t == typeof(Move))
-                return Device.Create<Move>(purpose, new object[] {
+                return Device.Create<Move>(purpose, null, new object[] {
                     Decode<Offset>(reader, version, purpose),
                     (GridType)reader.ReadInt32(),
                     reader.ReadBoolean()
@@ -578,23 +578,23 @@ namespace Apollo.Binary {
                 int? expanded = reader.ReadBoolean()? (int?)reader.ReadInt32() : null;
                 MultiType mode = (MultiType)reader.ReadInt32();
                 
-                return Device.Create<Multi>(purpose, new object[] {
+                return Device.Create<Multi>(purpose, null, new object[] {
                     preprocess, init, expanded, mode
                 });
             
             } else if (t == typeof(Output))
-                return Device.Create<Output>(purpose, new object[] {
+                return Device.Create<Output>(purpose, null, new object[] {
                     reader.ReadInt32()
                 });
             
             else if (t == typeof(MacroFilter))
-                return Device.Create<MacroFilter>(purpose, new object[] {
+                return Device.Create<MacroFilter>(purpose, null, new object[] {
                     (version >= 25)? reader.ReadInt32() : 1,
                     Enumerable.Range(0, 100).Select(i => reader.ReadBoolean()).ToArray()
                 });
             
             else if (t == typeof(Paint))
-                return Device.Create<Paint>(purpose, new object[] {
+                return Device.Create<Paint>(purpose, null, new object[] {
                     Decode<Color>(reader, version, purpose)
                 });
             
@@ -655,12 +655,12 @@ namespace Apollo.Binary {
 
                 int expanded = reader.ReadInt32();
 
-                Pattern ret = Device.Create<Pattern>(purpose, new object[] {
+                Pattern ret = Device.Create<Pattern>(purpose, null, new object[] {
                     repeats, gate, pinch, bilateral, frames, mode, infinite, rootkey, wrap, expanded
                 });
 
                 if (chokeenabled) {
-                    return Device.Create<Choke>(purpose, new object[] {
+                    return Device.Create<Choke>(purpose, null, new object[] {
                         choke,
                         new Chain(new List<Device>() {ret})
                     });
@@ -669,16 +669,16 @@ namespace Apollo.Binary {
                 return ret;
             
             } else if (t == typeof(Preview))
-                return Device.Create<Preview>(purpose, new object[0]);
+                return Device.Create<Preview>(purpose, null, new object[0]);
             
             else if (t == typeof(Rotate))
-                return Device.Create<Rotate>(purpose, new object[] {
+                return Device.Create<Rotate>(purpose, null, new object[] {
                     (RotateType)reader.ReadInt32(),
                     reader.ReadBoolean()
                 });
 
             else if (t == typeof(Refresh)) 
-                return Device.Create<Refresh>(purpose, new object[] {
+                return Device.Create<Refresh>(purpose, null, new object[] {
                     Enumerable.Range(0, 4).Select(i => reader.ReadBoolean()).ToArray()
                 });
             
@@ -687,13 +687,13 @@ namespace Apollo.Binary {
                 int value = reader.ReadInt32();
 
                 if (18 <= version && version <= 21 && reader.ReadBoolean())
-                    return Device.Create<Group>(purpose, new object[] {
+                    return Device.Create<Group>(purpose, null, new object[] {
                         new List<Chain>() {
                             new Chain(new List<Device>() {
-                                Device.Create<Switch>(purpose, new object[] {
+                                Device.Create<Switch>(purpose, null, new object[] {
                                     1, value
                                 }),
-                                Device.Create<Clear>(purpose, new object[] {
+                                Device.Create<Clear>(purpose, null, new object[] {
                                     ClearType.Multi
                                 })
                             }, "Switch Reset")
@@ -702,12 +702,12 @@ namespace Apollo.Binary {
                         Type.Missing
                     });
 
-                return Device.Create<Switch>(purpose, new object[] {
+                return Device.Create<Switch>(purpose, null, new object[] {
                     target, value
                 });
             
             } else if (t == typeof(Tone))
-                return Device.Create<Tone>(purpose, new object[] {
+                return Device.Create<Tone>(purpose, null, new object[] {
                     reader.ReadDouble(),
                     reader.ReadDouble(),
                     reader.ReadDouble(),
