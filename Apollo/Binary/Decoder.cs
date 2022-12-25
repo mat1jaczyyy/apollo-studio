@@ -500,8 +500,10 @@ namespace Apollo.Binary {
                     holdmode = (HoldType)reader.ReadInt32();
                 }
 
+                bool release = reader.ReadBoolean();
+
                 return Device.Create<Hold>(purpose, null, new object[] {
-                    time, gate, holdmode
+                    time, gate, holdmode, release
                 });
                 
             } else if (t == typeof(KeyFilter)) {
