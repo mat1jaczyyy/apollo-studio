@@ -283,7 +283,7 @@ namespace Apollo.Selection {
                 for (int i = right; i >= left; i--)
                     chain.Remove(i);
                 
-                chain.Insert(left, Encapsulate(chain, init.Clone(PurposeType.Active)));
+                chain.Insert(left, Encapsulate(init.Clone(PurposeType.Active), chain));
             }
 
             protected override void OnDispose() {
