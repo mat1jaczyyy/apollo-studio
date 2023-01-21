@@ -247,8 +247,8 @@ namespace Apollo.Elements {
             {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03}).ToArray()},
             {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03}).ToArray()},
             {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()},
-            {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x6F}).ToArray()},
-            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x6F}).ToArray()}
+            {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
+            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()}
         };
 
         static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
