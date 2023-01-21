@@ -225,6 +225,7 @@ namespace Apollo.Elements {
         static byte[] SysExStart = new byte[] { 0xF0 };
         static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
+        static byte[] MatrixHeader = new byte[] {0x00, 0x02, 0x03, 0x4D, 0x58};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
@@ -245,7 +246,8 @@ namespace Apollo.Elements {
             {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
             {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).Concat(
                 Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
-            ).ToArray()}
+            ).ToArray()},
+            {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()}
         };
 
         InputType _format = InputType.DrumRack;
@@ -309,6 +311,7 @@ namespace Apollo.Elements {
         bool doingMK2VersionInquiry = false;
 
         LaunchpadType AttemptIdentify(MidiMessage response) {
+
             if (doingMK2VersionInquiry) {
                 doingMK2VersionInquiry = false;
 
@@ -420,8 +423,32 @@ namespace Apollo.Elements {
                         }
 
                         return LaunchpadType.ProMK3;
+                } 
+            } 
+            else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03) { // Manufacturer = 203 Electronics
+                    IEnumerable<byte> version = response.Data.SkipLast(2).TakeLast(3);
+                    byte releaseVer = response.Data.SkipLast(1).Last();
+                    
+                    // Stable Release Firmware 
+                    string versionStr = string.Join(".", version.Select(i => (char)i));
+                    int versionInt = (version.ElementAt(0) << 16) + (version.ElementAt(1) << 8) + version.ElementAt(2);
+
+                    // None Stable Release Firmware
+                    if(releaseVer != 0) 
+                    {
+                        String[] releaseVerStr = {"Release", "InDev", "Release Candiate", "Beta", "Nightly"};
+                        versionStr = String.Format("{0}.{1} {2} {3}", version.ElementAt(0), version.ElementAt(1), releaseVerStr[releaseVer], version.ElementAt(2));
+                        versionInt &= 0xFFFF00; // Drop last byte
+                    }
+
+                    if(response.Data[8] == 0x4D && response.Data[9] == 0x58) // Matrix Family
+                    {   
+                        if (versionInt >= 240) { //Matrix OS 2.4.0 and above
+                            SupportsCompression = true;
+                            return LaunchpadType.Matrix;
+                        }
+                    }
                 }
-            }
 
             return LaunchpadType.Unknown;
         }
@@ -523,6 +550,10 @@ namespace Apollo.Elements {
                         if (i.Index == 0 || i.Index == 9 || i.Index == 100) return ret;
                         if (1 <= i.Index && i.Index <= 8) ret = ret.Append(new RawUpdate(i, 100));
                         break;
+
+                    case LaunchpadType.Matrix:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99 || i.Index == 100) return ret;
+                        break;
                 }
                 
                 i.Offset(offset);
@@ -563,6 +594,7 @@ namespace Apollo.Elements {
             {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
             {LaunchpadType.MiniMK3, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
+            {LaunchpadType.Matrix, new HashSet<byte>() {0, 9, 90, 99}},
         };
 
         bool Optimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
@@ -576,7 +608,14 @@ namespace Apollo.Elements {
             IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
             if (Type.IsPro() && colors.Count() > 79) return false; // CFW Hard Limit
 
-            ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
+            ret = SysExStart;
+
+            if (Type.IsMatrix())
+            {
+                ret = ret.Concat(MatrixHeader);
+            }
+
+            ret = ret.Concat(new byte[] { 0x5F }).Concat(
                 colors.SelectMany(i => {
                     IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index);
                     if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);

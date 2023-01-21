@@ -60,7 +60,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, Matrix, Unknown
     }
 
     public enum InputType {
@@ -112,6 +112,9 @@ namespace Apollo.Enums {
 
         public static bool IsPro(this LaunchpadType type)
             => LaunchpadType.Pro <= type && type <= LaunchpadType.CFW;
+
+        public static bool IsMatrix(this LaunchpadType type)
+            => type == LaunchpadType.Matrix;
 
         public static bool IsGenerationX(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.ProMK3;
