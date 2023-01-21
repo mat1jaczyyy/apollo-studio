@@ -11,6 +11,7 @@ namespace Apollo.Enums {
         Hex, RGB
     }
 
+    // TODO Add Matrix/Matrix Pro here for 8x8 LaunchpadGrid UI control
     public enum LaunchpadModels {
         MK2, Pro, X, ProMK3, All
     }
@@ -60,7 +61,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, Matrix, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, Matrix, MatrixPro, Unknown
     }
 
     public enum InputType {
@@ -113,14 +114,14 @@ namespace Apollo.Enums {
         public static bool IsPro(this LaunchpadType type)
             => LaunchpadType.Pro <= type && type <= LaunchpadType.CFW;
 
-        public static bool IsMatrix(this LaunchpadType type)
-            => type == LaunchpadType.Matrix;
-
         public static bool IsGenerationX(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.ProMK3;
 
         public static bool HasProgrammerFwHack(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.MiniMK3;
+
+        public static bool IsMatrix(this LaunchpadType type)
+            => LaunchpadType.Matrix <= type && type <= LaunchpadType.MatrixPro;
 
         public static bool SupportsRange(this BlendingType type)
             => type != BlendingType.Normal;
