@@ -444,13 +444,8 @@ namespace Apollo.Elements {
             // Manufacturer = 203 Electronics, Family = Matrix
             } else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03 && response.Data[8] == 0x4D && response.Data[9] == 0x58) {
                 IEnumerable<byte> version = response.Data.SkipLast(2).TakeLast(3);
-                uint versionInt = BitConverter.ToUInt32(version.Reverse().ToArray());
                 byte versionKind = response.Data.SkipLast(1).Last();
-
-                if(versionKind != 0) //Non release firmware
-                {
-                    versionInt &= ~0xFFu; //Remove the last byte from versionInt since they are not patch versions
-                }
+                int versionInt = (version.ElementAt(0) << 16) | (version.ElementAt(1) << 8) | (versionKind == 0? version.ElementAt(2) : 0); // Remove patch ver if build mode isn't stable
 
                 // Matrix Block Version
                 switch (response.Data[10]) {
@@ -463,7 +458,7 @@ namespace Apollo.Elements {
                             MatrixProFirmwareUnsupported.Set();
                             return LaunchpadType.Unknown;
                         }
-                        SupportsCompression = true;
+                        // SupportsCompression = true;
                         return LaunchpadType.MatrixPro;
                 }
             }
