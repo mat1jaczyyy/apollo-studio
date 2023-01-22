@@ -444,19 +444,25 @@ namespace Apollo.Elements {
             // Manufacturer = 203 Electronics, Family = Matrix
             } else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03 && response.Data[8] == 0x4D && response.Data[9] == 0x58) {
                 IEnumerable<byte> version = response.Data.SkipLast(2).TakeLast(3);
-                int versionInt = BitConverter.ToInt32(version.Reverse().ToArray());
+                uint versionInt = BitConverter.ToUInt32(version.Reverse().ToArray());
                 byte versionKind = response.Data.SkipLast(1).Last();
 
-                switch (response.Data[10]) {
-                    // TODO case for Matrix Standard
+                if(versionKind != 0) //Non release firmware
+                {
+                    versionInt &= ~0xFFu; //Remove the last byte from versionInt since they are not patch versions
+                }
 
-                    case 0x06: // Matrix Pro
-                        // TODO Better firmware version comparison
-                        if (versionInt < 0x020400) { // Old Firmware
+                // Matrix Block Version
+                switch (response.Data[10]) {
+                    case 0x00: // Matrix Founder Edition (Matrix Block 5 - Standard Varient) 
+                    return LaunchpadType.Unknown;
+                    case 0x10: // Matrix (Matrix Block 6 - Standard Varient) 
+                    return LaunchpadType.Unknown;
+                    case 0x11: // Matrix Pro (Matrix Block 6 - Pro Varient) 
+                        if (versionInt < 0x020401) { // Old Firmware
                             MatrixProFirmwareUnsupported.Set();
                             return LaunchpadType.Unknown;
                         }
-
                         SupportsCompression = true;
                         return LaunchpadType.MatrixPro;
                 }
