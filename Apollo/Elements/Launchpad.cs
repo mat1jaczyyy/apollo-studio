@@ -445,7 +445,18 @@ namespace Apollo.Elements {
             } else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03 && response.Data[8] == 0x4D && response.Data[9] == 0x58) {
                 IEnumerable<byte> version = response.Data.SkipLast(2).TakeLast(3);
                 byte versionKind = response.Data.SkipLast(1).Last();
-                int versionInt = (version.ElementAt(0) << 16) | (version.ElementAt(1) << 8) | (versionKind == 0? version.ElementAt(2) : 0); // Remove patch ver if build mode isn't stable
+                int versionInt = (version.ElementAt(0) << 16) + (version.ElementAt(1) << 8) + (version.ElementAt(0)); // Remove patch ver if build mode isn't stable
+
+                String versionStr = String.Format("{0}.{1}.{2}", version.ElementAt(0), version.ElementAt(1), version.ElementAt(2));
+                if (versionKind == 0x1F) //Nighty
+                {
+                    versionStr += " Nightly";
+                }
+                else if(versionKind != 0)
+                {
+                    String[] releaseVerStr = {"Release", "InDev", "Release Candiate", "Beta"};
+                    versionStr += String.Format(" {0} {1}", releaseVerStr[(versionKind >> 5) & 0x03], versionKind & 0x1F);
+                }
 
                 // Matrix Block Version
                 switch (response.Data[10]) {
