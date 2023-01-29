@@ -184,10 +184,9 @@ namespace Apollo.Elements {
             )
         );
 
-        // TODO Clean this up
         public static PortWarning MatrixFEFirmwareUnsupported { get; private set; } = new PortWarning(
-            "One or more connected Founder Edition Matrixes are running an older version of\n" + 
-            "the official firmware which is not compatible with \n" +
+            "One or more connected Founder Edition Matrixes are running an\n" + 
+            "older version of the official firmware which is not compatible with\n" +
             "Apollo Studio due lack of support.\n\n" +
             "Update these to the latest version of the firmware.",
             new PortWarning.Option(
