@@ -486,7 +486,7 @@ namespace Apollo.Elements {
                 // 13 => Minor version
                 // 14 => Patch version (ignored if build mode isn't stable)
                 // 15 => Build mode
-                int versionInt = (response.Data[12] << 16) | (response.Data[13] << 8) | (response.Data[15] == 0? response.Data[14] : 0);
+                int versionInt = (response.Data[12] << 16) | (response.Data[13] << 8) | response.Data[14];
 
                 LaunchpadType type = MatrixDevices.GetValueOrDefault(response.Data[10], LaunchpadType.Unknown);
                 
