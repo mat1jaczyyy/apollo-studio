@@ -61,7 +61,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, Matrix, MatrixPro, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Matrix, MatrixPro, Unknown
     }
 
     public enum InputType {
@@ -121,7 +121,7 @@ namespace Apollo.Enums {
             => LaunchpadType.X <= type && type <= LaunchpadType.MiniMK3;
 
         public static bool IsMatrix(this LaunchpadType type)
-            => LaunchpadType.Matrix <= type && type <= LaunchpadType.MatrixPro;
+            => LaunchpadType.MatrixFE <= type && type <= LaunchpadType.MatrixPro;
 
         public static bool SupportsRange(this BlendingType type)
             => type != BlendingType.Normal;
