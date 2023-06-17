@@ -71,23 +71,19 @@ namespace Apollo.Components {
             Grid?.Children.Clear();
 
             int buttons = Preferences.LaunchpadModel.GridSize();
+            int xoffset = Preferences.LaunchpadModel.GridOffsetX();
+            int yoffset = Preferences.LaunchpadModel.GridOffsetY();
 
-            IEnumerable<string> ones = Enumerable.Range(0, buttons).Select(i => "*");
-            IEnumerable<string> zeros = Enumerable.Range(0, 10 - buttons).Select(i => "0");
+            string[] rowList = new string[10];
+            string[] columnList = new string[10];
+            for (int i = 0; i < 10; i++) {
+                rowList[i] = yoffset <= i && i < yoffset + buttons? "*" : "0";
+                columnList[i] = xoffset <= i && i < xoffset + buttons? "*" : "0";
+            }
 
             View.Child = Grid = new Grid() {
-                RowDefinitions = RowDefinitions.Parse(
-                    String.Join(
-                        ",",
-                        ones.Concat(zeros).ToArray()
-                    )
-                ),
-                ColumnDefinitions = ColumnDefinitions.Parse(
-                    String.Join(
-                        ",",
-                        zeros.Concat(ones).ToArray()
-                    )
-                )
+                RowDefinitions = RowDefinitions.Parse(string.Join(",", rowList)),
+                ColumnDefinitions = ColumnDefinitions.Parse(string.Join(",", columnList))
             };
 
             for (int i = 0; i < 100; i++) {

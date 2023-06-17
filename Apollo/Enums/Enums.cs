@@ -11,9 +11,8 @@ namespace Apollo.Enums {
         Hex, RGB
     }
 
-    // TODO Add Matrix/Matrix Pro here for 8x8 LaunchpadGrid UI control
     public enum LaunchpadModels {
-        MK2, Pro, X, ProMK3, All
+        MK2, Pro, X, ProMK3, All, Matrix
     }
 
     public enum LaunchpadStyles {
@@ -87,11 +86,22 @@ namespace Apollo.Enums {
     public static class EnumExtensions {
         public static bool HasNovationLED(this LaunchpadModels model)
             => model == LaunchpadModels.X || model == LaunchpadModels.ProMK3;
+
+        public static int GridSize(this LaunchpadModels model) {
+            if (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
+                return 10;
+            
+            if (model == LaunchpadModels.Matrix)
+                return 8;
+                
+            return 9;
+        }
         
-        public static int GridSize(this LaunchpadModels model)
-            => (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
-                ? 10
-                : 9;
+        public static int GridOffsetX(this LaunchpadModels model)
+            => model.GridSize() == 10? 0 : 1;
+        
+        public static int GridOffsetY(this LaunchpadModels model)
+            => model.GridSize() == 8? 1 : 0;
         
         public static bool HasModeLight(this LaunchpadModels model)
             => model == LaunchpadModels.Pro || model == LaunchpadModels.All;
