@@ -196,10 +196,8 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Pattern(Repeats, Gate, Pinch, Bilateral, Frames.Select(i => i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Repeats, Gate, Pinch, Bilateral, Frames.Select(i => i.Clone()).ToList(), Mode, Infinite, RootKey, Wrap, Expanded };
 
         int _expanded;
         public int Expanded {
@@ -418,7 +416,7 @@ namespace Apollo.Devices {
             FrameInsertedUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {
                 index = reader.ReadInt32();
-                frame = Decoder.Decode<Frame>(reader, version);
+                frame = Decoder.Decode<Frame>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -482,8 +480,8 @@ namespace Apollo.Devices {
         
             protected DurationUndoEntry(BinaryReader reader, int version): base(reader, version) {
                 left = reader.ReadInt32();
-                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.Decode<Time>(reader, version)).ToList();
-                r = Decoder.DecodeAnything<I>(reader, version);
+                u = Enumerable.Range(0, reader.ReadInt32()).Select(i => Decoder.Decode<Time>(reader, version, PurposeType.Passive)).ToList();
+                r = Decoder.DecodeAnything<I>(reader, version, PurposeType.Passive);
             }
             
             public override void Encode(BinaryWriter writer) {
@@ -697,7 +695,7 @@ namespace Apollo.Devices {
             }
             
             public ImportUndoEntry(Pattern pattern, string filename, Pattern r)
-            : base($"Pattern File Imported from {filename}", pattern, (Pattern)pattern.Clone(), r) {}
+            : base($"Pattern File Imported from {filename}", pattern, (Pattern)pattern.Clone(PurposeType.Passive), r) {}
             
             ImportUndoEntry(BinaryReader reader, int version)
             : base(reader, version) {}

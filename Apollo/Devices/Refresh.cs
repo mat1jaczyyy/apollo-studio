@@ -5,6 +5,7 @@ using System.Linq;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -19,10 +20,8 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((RefreshViewer)Viewer.SpecificViewer).SetMacro(index, macro);
         }
         
-        public override Device Clone() => new Refresh(_macros.ToArray()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { _macros.ToArray() };
 
         public Refresh(bool[] macros = null): base("refresh") {
             if (macros == null || macros.Length != 4) macros = new bool[4];

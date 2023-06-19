@@ -108,6 +108,7 @@
                     <ComboBoxItem>X</ComboBoxItem>
                     <ComboBoxItem>Pro MK3</ComboBoxItem>
                     <ComboBoxItem>All</ComboBoxItem>
+                    <ComboBoxItem>Matrix</ComboBoxItem>
                   </ComboBox>
                 </StackPanel>
 
@@ -189,7 +190,7 @@
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0">
               <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock HorizontalAlignment="Center" Text="2018 - 2022 mat1jaczyyy" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 - 2023 mat1jaczyyy" />
             </StackPanel>
 
             <Components:Patreon Grid.Column="1" VerticalAlignment="Center" />

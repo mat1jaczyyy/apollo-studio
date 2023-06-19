@@ -283,10 +283,10 @@ namespace Apollo.DeviceViewers {
             if (Program.Project.IsDisposing) return;
             
             fullFade = points;
-
-            LinearGradientBrush gradient = (LinearGradientBrush)Gradient.Fill;
             
             Dispatcher.UIThread.InvokeAsync(() => {
+                LinearGradientBrush gradient = (LinearGradientBrush)Gradient.Fill;
+
                 gradient.GradientStops.Clear();
 
                 if (_fade == null) return;

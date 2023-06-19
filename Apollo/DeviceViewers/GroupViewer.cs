@@ -12,6 +12,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Viewers;
 
@@ -136,9 +137,9 @@ namespace Apollo.DeviceViewers {
             Chain chain = new Chain();
 
             if (_group.GetType() == typeof(Group)) {
-                if (Preferences.AutoCreateMacroFilter) chain.Add(new MacroFilter());
-                if (Preferences.AutoCreateKeyFilter) chain.Add(new KeyFilter());
-                if (Preferences.AutoCreatePattern) chain.Add(new Pattern());
+                if (Preferences.AutoCreateMacroFilter) chain.Add(Device.Create<MacroFilter>(PurposeType.Active, chain));
+                if (Preferences.AutoCreateKeyFilter) chain.Add(Device.Create<KeyFilter>(PurposeType.Active, chain));
+                if (Preferences.AutoCreatePattern) chain.Add(Device.Create<Pattern>(PurposeType.Active, chain));
             }
 
             Chain_Insert(index, chain);

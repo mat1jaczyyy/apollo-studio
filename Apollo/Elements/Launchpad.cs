@@ -184,6 +184,39 @@ namespace Apollo.Elements {
             )
         );
 
+        public static PortWarning MatrixFEFirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Founder Edition Matrixes are running an\n" + 
+            "older version of the official firmware which is not compatible with\n" +
+            "Apollo Studio due lack of support.\n\n" +
+            "Update these to the latest version of the firmware.",
+            new PortWarning.Option(
+                "203Electronics MatrixOS Releases",
+                "https://github.com/203Electronics/MatrixOS/releases"
+            )
+        );
+
+        public static PortWarning MatrixFirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Matrixes are running an older version of\n" + 
+            "the official firmware which is not compatible with \n" +
+            "Apollo Studio due lack of support.\n\n" +
+            "Update these to the latest version of the firmware.",
+            new PortWarning.Option(
+                "203Electronics MatrixOS Releases",
+                "https://github.com/203Electronics/MatrixOS/releases"
+            )
+        );
+
+        public static PortWarning MatrixProFirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Matrix Pros are running an older version of\n" + 
+            "the official firmware which is not compatible with \n" +
+            "Apollo Studio due lack of support.\n\n" +
+            "Update these to the latest version of the firmware.",
+            new PortWarning.Option(
+                "203Electronics MatrixOS Releases",
+                "https://github.com/203Electronics/MatrixOS/releases"
+            )
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
@@ -197,7 +230,10 @@ namespace Apollo.Elements {
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareUnsupported.DisplayWarning(sender)) return;
-                ProMK3FirmwareUnsupported.DisplayWarning(sender);
+                if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
+                if (MatrixFEFirmwareUnsupported.DisplayWarning(sender)) return;
+                if (MatrixFirmwareUnsupported.DisplayWarning(sender)) return;
+                if (MatrixProFirmwareUnsupported.DisplayWarning(sender)) return;
             }, DispatcherPriority.MinValue);
         }
 
@@ -225,6 +261,7 @@ namespace Apollo.Elements {
         static byte[] SysExStart = new byte[] { 0xF0 };
         static byte[] SysExEnd = new byte[] { 0xF7 };
         static byte[] NovationHeader = new byte[] {0x00, 0x20, 0x29, 0x02};
+        static byte[] MatrixHeader = new byte[] {0x00, 0x02, 0x03, 0x4D, 0x58};
 
         static Dictionary<LaunchpadType, byte[]> RGBHeader = new() {
             {LaunchpadType.MK2, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x18, 0x0B}).ToArray()},
@@ -232,7 +269,10 @@ namespace Apollo.Elements {
             {LaunchpadType.CFW, SysExStart.Concat(new byte[] {0x6F}).ToArray()},
             {LaunchpadType.X, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0C, 0x03}).ToArray()},
             {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x03}).ToArray()},
-            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()}
+            {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()},
+            {LaunchpadType.MatrixFE, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
+            {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
+            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()}
         };
 
         static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
@@ -245,9 +285,24 @@ namespace Apollo.Elements {
             {LaunchpadType.MiniMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0D, 0x02, 0x00}).ToArray()},
             {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).Concat(
                 Enumerable.Range(0, 109).SelectMany(i => new byte[] {0x00, (byte)i, 0x00})
-            ).ToArray()}
+            ).ToArray()},
+            {LaunchpadType.MatrixFE, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()},
+            {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()},
+            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()}
         };
 
+        static Dictionary<byte, LaunchpadType> MatrixDevices = new() {
+            {0x00, LaunchpadType.MatrixFE},  // Matrix Founder Edition (Matrix Block 5 - Standard)
+            {0x10, LaunchpadType.Matrix},    // Matrix                 (Matrix Block 6 - Standard)
+            {0x11, LaunchpadType.MatrixPro}  // Matrix Pro             (Matrix Block 6 - Pro)
+        };
+
+        static Dictionary<LaunchpadType, PortWarning> MatrixPortWarnings = new() {
+            {LaunchpadType.MatrixFE, MatrixFEFirmwareUnsupported},
+            {LaunchpadType.Matrix, MatrixFirmwareUnsupported},
+            {LaunchpadType.MatrixPro, MatrixProFirmwareUnsupported}
+        };
+        
         InputType _format = InputType.DrumRack;
         public InputType InputFormat {
             get => _format;
@@ -301,7 +356,7 @@ namespace Apollo.Elements {
 
         public Color GetColor(int index) => (PatternWindow == null)
             ? screen.GetColor(index)
-            : PatternWindow.Device.Frames[PatternWindow.Device.Expanded].Screen[index].Clone();
+            : PatternWindow.PatternDevice.Frames[PatternWindow.PatternDevice.Expanded].Screen[index].Clone();
 
         static readonly byte[] DeviceInquiry = new byte[] {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
         static readonly byte[] VersionInquiry = new byte[] {0xF0, 0x00, 0x20, 0x29, 0x00, 0x70, 0xF7};
@@ -333,7 +388,8 @@ namespace Apollo.Elements {
             if (response.Data[1] != 0x7E || response.Data[3] != 0x06 || response.Data[4] != 0x02)
                 return LaunchpadType.Unknown;
 
-            if (response.Data[5] == 0x00 && response.Data[6] == 0x20 && response.Data[7] == 0x29) { // Manufacturer = Novation
+            // Manufacturer = Novation
+            if (response.Data[5] == 0x00 && response.Data[6] == 0x20 && response.Data[7] == 0x29) {
                 IEnumerable<byte> version = response.Data.SkipLast(1).TakeLast(3);
                 string versionStr = string.Join("", version.Select(i => (char)i));
                 int versionInt = int.Parse(string.Join("", version));
@@ -420,7 +476,29 @@ namespace Apollo.Elements {
                         }
 
                         return LaunchpadType.ProMK3;
+                } 
+
+            // Manufacturer = 203 Electronics, Family = Matrix
+            } else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03 && response.Data[8] == 0x4D && response.Data[9] == 0x58) {
+                // Only Matrix OS devices are supported, so there is a common data structure
+                // 12 => Major version
+                // 13 => Minor version
+                // 14 => Patch version (ignored if build mode isn't stable)
+                // 15 => Build mode
+                int versionInt = (response.Data[12] << 16) | (response.Data[13] << 8) | response.Data[14];
+
+                LaunchpadType type = MatrixDevices.GetValueOrDefault(response.Data[10], LaunchpadType.Unknown);
+                
+                if (type == LaunchpadType.Unknown)
+                    return LaunchpadType.Unknown;
+
+                if (versionInt < 0x020401) { // Old Firmware
+                    MatrixPortWarnings[type].Set();
+                    return LaunchpadType.Unknown;
                 }
+
+                SupportsCompression = true;
+                return type;
             }
 
             return LaunchpadType.Unknown;
@@ -523,6 +601,15 @@ namespace Apollo.Elements {
                         if (i.Index == 0 || i.Index == 9 || i.Index == 100) return ret;
                         if (1 <= i.Index && i.Index <= 8) ret = ret.Append(new RawUpdate(i, 100));
                         break;
+                
+                    case LaunchpadType.MatrixFE:
+                    case LaunchpadType.Matrix:
+                        if (i.Index % 10 == 0 || i.Index % 10 == 9 || i.Index < 11 || i.Index > 88 || i.Index == 100) return ret;
+                        break;
+
+                    case LaunchpadType.MatrixPro:
+                        if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99 || i.Index == 100) return ret;
+                        break;
                 }
                 
                 i.Offset(offset);
@@ -558,11 +645,16 @@ namespace Apollo.Elements {
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
+
+        // TODO for later: this can be implemented a lot better
         static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new() {
             {LaunchpadType.MK2, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99}},
             {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
             {LaunchpadType.MiniMK3, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
+            {LaunchpadType.MatrixFE, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
+            {LaunchpadType.Matrix, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
+            {LaunchpadType.MatrixPro, new HashSet<byte>() {100, 0, 9, 90, 99}},
         };
 
         bool Optimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {
@@ -576,7 +668,12 @@ namespace Apollo.Elements {
             IEnumerable<Color> colors = filteredUpdates.Select(i => i.Color).Distinct();
             if (Type.IsPro() && colors.Count() > 79) return false; // CFW Hard Limit
 
-            ret = SysExStart.Concat(new byte[] { 0x5F }).Concat(
+            ret = SysExStart;
+
+            if (Type.IsMatrix())
+                ret = ret.Concat(MatrixHeader);
+
+            ret = ret.Concat(new byte[] { 0x5F }).Concat(
                 colors.SelectMany(i => {
                     IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index);
                     if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);
@@ -806,6 +903,7 @@ namespace Apollo.Elements {
         }
 
         void HandleCC(byte key, byte vel) {
+            // TODO handle Multi Reset more universally
             switch (Type) {
                 case LaunchpadType.MK2:
                     if (104 <= key && key <= 111)
@@ -832,6 +930,13 @@ namespace Apollo.Elements {
                         key -= 100;
 
                     HandleSignal(key, vel);
+                    break;
+                
+                case LaunchpadType.MatrixFE:
+                case LaunchpadType.Matrix:
+                case LaunchpadType.MatrixPro:
+                    if (key == 121)
+                        Multi.InvokeReset();
                     break;
             }
         }

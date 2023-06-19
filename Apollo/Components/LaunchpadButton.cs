@@ -109,6 +109,16 @@ namespace Apollo.Components {
                     else if (Index == 44 || Index == 45 || Index == 54 || Index == 55) AddClass("corner");
                     else AddClass("square");
                     break;
+
+                case LaunchpadModels.Matrix:
+                    if (Index == 0 || Index == 9 || Index == 90 || Index == 99) AddClass("empty");
+                    else {
+                        ret++;
+                        
+                        if (Index == 44 || Index == 45 || Index == 54 || Index == 55) AddClass("corner");
+                        else AddClass("square");
+                    }
+                    break;
             }
 
             return ret;

@@ -43,10 +43,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Layer(Target, BlendingMode, Range) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Target, BlendingMode, Range };
 
         public Layer(int target = 0, BlendingType blending = BlendingType.Normal, int range = 200): base("layer") {
             Target = target;

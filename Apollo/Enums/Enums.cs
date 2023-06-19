@@ -12,7 +12,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadModels {
-        MK2, Pro, X, ProMK3, All
+        MK2, Pro, X, ProMK3, All, Matrix
     }
 
     public enum LaunchpadStyles {
@@ -60,7 +60,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Matrix, MatrixPro, Unknown
     }
 
     public enum InputType {
@@ -79,14 +79,29 @@ namespace Apollo.Enums {
         Linear, Smooth, Sharp, Fast, Slow, Hold, Release
     }
 
+    public enum PurposeType {
+        Unknown, Active, Passive, Unrelated
+    }
+
     public static class EnumExtensions {
         public static bool HasNovationLED(this LaunchpadModels model)
             => model == LaunchpadModels.X || model == LaunchpadModels.ProMK3;
+
+        public static int GridSize(this LaunchpadModels model) {
+            if (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
+                return 10;
+            
+            if (model == LaunchpadModels.Matrix)
+                return 8;
+                
+            return 9;
+        }
         
-        public static int GridSize(this LaunchpadModels model)
-            => (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
-                ? 10
-                : 9;
+        public static int GridOffsetX(this LaunchpadModels model)
+            => model.GridSize() == 10? 0 : 1;
+        
+        public static int GridOffsetY(this LaunchpadModels model)
+            => model.GridSize() == 8? 1 : 0;
         
         public static bool HasModeLight(this LaunchpadModels model)
             => model == LaunchpadModels.Pro || model == LaunchpadModels.All;
@@ -114,6 +129,9 @@ namespace Apollo.Enums {
 
         public static bool HasProgrammerFwHack(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.MiniMK3;
+
+        public static bool IsMatrix(this LaunchpadType type)
+            => LaunchpadType.MatrixFE <= type && type <= LaunchpadType.MatrixPro;
 
         public static bool SupportsRange(this BlendingType type)
             => type != BlendingType.Normal;

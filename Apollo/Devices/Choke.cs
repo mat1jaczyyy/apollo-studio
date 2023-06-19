@@ -5,6 +5,7 @@ using System.Linq;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -61,10 +62,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Choke(Target, Chain.Clone()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Target, Chain.Clone(purpose) };
 
         public Choke(int target = 1, Chain chain = null): base("choke") {
             Target = target;

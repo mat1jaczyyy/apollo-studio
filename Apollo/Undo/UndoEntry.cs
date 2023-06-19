@@ -8,6 +8,7 @@ using System.Reflection;
 using Avalonia.Controls;
 
 using Apollo.Binary;
+using Apollo.Enums;
 using Apollo.Selection;
 
 namespace Apollo.Undo {
@@ -62,7 +63,7 @@ namespace Apollo.Undo {
                 UndoBinary.DecodeID(reader),
                 BindingFlags.NonPublic | BindingFlags.Instance,
                 null,
-                new object[] { reader, version },
+                new object[] { reader, version }, // All UndoEntries always assume PurposeType.Passive!
                 null
             );
     }
@@ -85,8 +86,8 @@ namespace Apollo.Undo {
 
         protected SimpleUndoEntry(BinaryReader reader, int version)
         : base(reader, version) {
-            u = Decoder.DecodeAnything<I>(reader, version);
-            r = Decoder.DecodeAnything<I>(reader, version);
+            u = Decoder.DecodeAnything<I>(reader, version, PurposeType.Passive);
+            r = Decoder.DecodeAnything<I>(reader, version, PurposeType.Passive);
         }
 
         public override void Encode(BinaryWriter writer) {
@@ -175,8 +176,8 @@ namespace Apollo.Undo {
 
         protected SimplePathUndoEntry(BinaryReader reader, int version)
         : base(reader, version) {
-            u = Decoder.DecodeAnything<I>(reader, version);
-            r = Decoder.DecodeAnything<I>(reader, version);
+            u = Decoder.DecodeAnything<I>(reader, version, PurposeType.Passive);
+            r = Decoder.DecodeAnything<I>(reader, version, PurposeType.Passive);
         }
 
         public override void Encode(BinaryWriter writer) {

@@ -21,10 +21,8 @@ namespace Apollo.Devices {
             }
         }
         
-        public override Device Clone() => new Clear(Mode) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Mode };
 
         public Clear(ClearType mode = ClearType.Lights): base("clear") => Mode = mode;
 

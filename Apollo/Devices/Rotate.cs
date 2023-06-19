@@ -31,10 +31,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Rotate(Mode, Bypass) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Mode, Bypass };
 
         public Rotate(RotateType mode = RotateType.D90, bool bypass = false): base("rotate") {
             Mode = mode;

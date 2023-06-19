@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Rendering;
 using Apollo.Structures;
 
@@ -19,10 +20,8 @@ namespace Apollo.Devices {
             if (Viewer?.SpecificViewer != null) ((PreviewViewer)Viewer.SpecificViewer).Clear();
         }
 
-        public override Device Clone() => new Preview() {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[0];
 
         public Preview(): base("preview") {
             screen = new Screen() { ScreenExit = PreviewExit };

@@ -86,7 +86,7 @@ namespace Apollo.Windows {
         Pattern _pattern;
         Track _track;
 
-        public Pattern Device { get => _pattern; }
+        public Pattern PatternDevice { get => _pattern; }
         
         Launchpad _launchpad;
         Launchpad Launchpad {
@@ -1099,7 +1099,18 @@ namespace Apollo.Windows {
                     Program.Project.Undo.AddAndExecute(new Pattern.ImportUndoEntry(
                         _pattern,
                         Path.GetFileNameWithoutExtension(filepath),
-                        new Pattern(frames: frames.Select(i => i.Clone()).ToList())
+                        Device.Create<Pattern>(PurposeType.Passive, null, new object[] {
+                            Type.Missing,
+                            Type.Missing,
+                            Type.Missing,
+                            Type.Missing,
+                            frames.Select(i => i.Clone()).ToList(),
+                            Type.Missing,
+                            Type.Missing,
+                            Type.Missing,
+                            Type.Missing,
+                            Type.Missing,
+                        })
                     ));
                 }
             }

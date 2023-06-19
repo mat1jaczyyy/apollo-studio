@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Reflection;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -57,13 +59,16 @@ namespace Apollo.Devices {
 
         public Launchpad Launchpad => Program.Project.Tracks[Target].Launchpad;
 
-        public override Device Clone() => new Output(Target) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Target };
 
         public Output(int target = -1): base("output") {
-            if (target < 0) target = Track.Get(this).ParentIndex.Value;
+            if (target < 0) {
+                if (Parent == null)
+                    throw new Exception("Output device was created fresh without a parent to help find target Track");
+
+                target = Track.Get(this).ParentIndex.Value;
+            }
             _target = target;
 
             if (Program.Project?.TrackOperation == true) Program.Project.TrackOperationFinished += Initialize;
@@ -71,6 +76,8 @@ namespace Apollo.Devices {
         }
 
         protected override void Initialized() {
+            if (Purpose != PurposeType.Active) return;
+
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;
             Program.Project.Tracks[_target].Disposing += IndexRemoved;
         }
@@ -83,9 +90,11 @@ namespace Apollo.Devices {
         public override void Dispose() {
             if (Disposed) return;
 
-            if (Program.Project.Tracks.ElementAtOrDefault(_target) is Track track) {
-                track.ParentIndexChanged -= IndexChanged;
-                track.Disposing -= IndexRemoved;
+            if (Purpose == PurposeType.Active) {
+                if (Program.Project.Tracks.ElementAtOrDefault(_target) is Track track) {
+                    track.ParentIndexChanged -= IndexChanged;
+                    track.Disposing -= IndexRemoved;
+                }
             }
 
             base.Dispose();

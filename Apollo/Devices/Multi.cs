@@ -44,10 +44,8 @@ namespace Apollo.Devices {
             base.Reroute();
         }
 
-        public override Device Clone() => new Multi(Preprocess.Clone(), Chains.Select(i => i.Clone()).ToList(), Expanded, Mode) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Preprocess.Clone(purpose), Chains.Select(i => i.Clone(purpose)).ToList(), Expanded, Mode };
 
         void HandleReset() => current = -1;
 

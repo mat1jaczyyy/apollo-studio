@@ -3,6 +3,7 @@ using System.IO;
 
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
@@ -20,10 +21,8 @@ namespace Apollo.Devices {
             }
         }
 
-        public override Device Clone() => new Paint(Color.Clone()) {
-            Collapsed = Collapsed,
-            Enabled = Enabled
-        };
+        protected override object[] CloneParameters(PurposeType purpose)
+            => new object[] { Color.Clone() };
 
         public Paint(Color color = null): base("paint") => Color = color?? new Color();
 
