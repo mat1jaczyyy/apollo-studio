@@ -111,7 +111,7 @@ namespace Apollo.Components {
                     break;
 
                 case LaunchpadModels.Matrix:
-                    if (Index == 0 || Index == 9 || Index == 90 || Index == 99) AddClass("empty");
+                    if (x == 0 || x == 9 || y == 0 || y == 9) AddClass("empty");
                     else {
                         ret++;
                         
