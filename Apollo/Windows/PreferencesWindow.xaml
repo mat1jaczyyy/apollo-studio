@@ -193,7 +193,7 @@
               <TextBlock HorizontalAlignment="Center" Text="2018 - 2023 mat1jaczyyy" />
             </StackPanel>
 
-            <Components:Patreon Grid.Column="1" VerticalAlignment="Center" />
+            <Components:PayPal Grid.Column="1" VerticalAlignment="Center" />
           </Grid>
         </Border>
       </Grid>

@@ -21,6 +21,6 @@ namespace Apollo.Components {
 
         void Website() => App.URL("https://apollo.mat1jaczyyy.com");
 
-        void Patron() => App.URL(Patreon.URL);
+        void Donate() => App.URL(PayPal.URL);
     }
 }

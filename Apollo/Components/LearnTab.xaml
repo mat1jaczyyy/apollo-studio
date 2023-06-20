@@ -103,11 +103,11 @@
       </Components:LearnButton.Icon>
     </Components:LearnButton>
     
-    <Components:LearnButton Text="Become a Patron" Click="Patron">
+    <Components:LearnButton Text="Make a Donation" Click="Donate">
       <Components:LearnButton.Icon>
         <Canvas>
-          <Path Data="M 0,0.4 L 0,19.6 3.6,19.6 3.6,0.4 Z" />
-          <Ellipse Canvas.Left="5.6" Canvas.Top="0.4" Width="14.4" Height="14.4" />
+          <Path Data="F0 M 0,0 C -0.96,-1.12 -2.56,-1.44 -4.64,-1.44 L -10.88,-1.44 C -11.36,-1.44 -11.68,-1.28 -11.84,-0.8 L -14.4,15.68 C -14.4,16 -14.24,16.32 -13.92,16.32 L -10.08,16.32 -9.12,10.08 -9.12,10.4 C -8.96,9.92 -8.64,9.6 -8.16,9.6 L -6.4,9.6 C -2.88,9.6 0,8.16 0.8,4 0.8,3.84 0.8,3.68 0.96,3.52 1.12,2.08 0.96,0.96 0,0 z" RenderTransform="1,0,0,1,15.84,1.44" />
+		  <Path Opacity="0.7" Data="F0 M 0,0 C -0.96,4.16 -3.84,6.4 -8.32,6.4 L -9.76,6.4 -10.88,12.96 -12.16,12.96 -12.16,13.44 C -12.32,13.76 -12,14.08 -11.68,14.08 L -8.48,14.08 C -8.16,14.08 -7.84,13.76 -7.68,13.28 L -7.68,13.12 -7.04,9.28 -7.04,9.12 C -7.04,8.8 -6.72,8.48 -6.24,8.48 L -5.76,8.48 C -2.72,8.48 -0.16,7.2 0.48,3.52 0.8,2.08 0.64,0.96 0,0 L 0,0 z" RenderTransform="1,0,0,1,17.76,5.92" Clip="M -12.32,0 L 0.96,0 0.96,13.76 -12.32,13.76 z" />
         </Canvas>
       </Components:LearnButton.Icon>
     </Components:LearnButton>
