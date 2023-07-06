@@ -202,10 +202,14 @@ namespace Apollo.Windows {
                 Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
 
             } else if (e.Key == Key.Down) {
+                if (Selection.Start is Pattern pattern)
+                    return;
+
                 if (Selection.Start is Choke choke) {
                     if (choke.Chain.Count > 0) Selection.Select(choke.Chain[0]);
                     return;
                 }
+                
                 Selection.MoveChild();
             }
         }
