@@ -5,8 +5,8 @@ using Avalonia.Media;
 using Apollo.Core;
 
 namespace Apollo.Components {
-    public class PayPal: IconButton {
-        public static readonly string URL = "https://paypal.me/mat1jaczyyy";
+    public class KoFi: IconButton {
+        public static readonly string URL = "https://ko-fi.com/mat1jaczyyy";
 
         void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
@@ -15,7 +15,7 @@ namespace Apollo.Components {
             set => this.Resources["Brush"] = value;
         }
 
-        public PayPal() {
+        public KoFi() {
             InitializeComponent();
 
             base.MouseLeave(this, null);
