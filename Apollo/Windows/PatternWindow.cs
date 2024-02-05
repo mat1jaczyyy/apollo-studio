@@ -517,6 +517,8 @@ namespace Apollo.Windows {
         Color[] oldScreen;
         
         void PadStarted(int index) {
+            if (_pattern == null) return;
+
             drawingState = (_pattern[_pattern.Expanded].Screen[LaunchpadGrid.GridToSignal(index)] == ColorPicker.Color)
                 ? new Color(0)
                 : ColorPicker.Color;
@@ -525,6 +527,7 @@ namespace Apollo.Windows {
         }
     
         void PadPressed(int index, KeyModifiers mods = KeyModifiers.None) {
+            if (_pattern == null) return;
             if (Locked) return;
 
             int signalIndex = LaunchpadGrid.GridToSignal(index);

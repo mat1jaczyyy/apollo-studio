@@ -120,12 +120,16 @@ namespace Apollo.Elements {
         bool savingCrash;
 
         public async void WriteCrashBackup() {
+            if (Program.Project?.IsDisposing != false) return;
+
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
             
             if (savingCrash) return;
 
             savingCrash = true;
-            await WriteFile(null, Program.CrashProject, false);
+            try {
+                await WriteFile(null, Program.CrashProject, false);
+            } catch (NullReferenceException) {}
             savingCrash = false;
         }
 
