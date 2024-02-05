@@ -8,12 +8,13 @@ using System.Reflection;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Elements.Purpose;
 using Apollo.Enums;
 using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    public class Output: Device {
+    public class Output: Device, IInitializable {
         int _target;
         public int Target {
             get => _target;
@@ -71,11 +72,11 @@ namespace Apollo.Devices {
             }
             _target = target;
 
-            if (Program.Project?.TrackOperation == true) Program.Project.TrackOperationFinished += Initialize;
-            else Initialize();
+            if (Program.Project?.TrackOperation == true) Program.Project.TrackOperationFinished += (this as IInitializable).Initialize;
+            else (this as IInitializable).Initialize();
         }
 
-        protected override void Initialized() {
+        public void Initialized() {
             if (Purpose != PurposeType.Active) return;
 
             Program.Project.Tracks[_target].ParentIndexChanged += IndexChanged;

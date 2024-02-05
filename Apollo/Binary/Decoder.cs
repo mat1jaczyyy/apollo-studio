@@ -264,7 +264,7 @@ namespace Apollo.Binary {
                     enabled = reader.ReadBoolean();
                 }
 
-                return new Track(chain, lp, name) {
+                return new Track(purpose, chain, lp, name) {
                     Enabled = enabled
                 };
 

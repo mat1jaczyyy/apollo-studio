@@ -8,13 +8,14 @@ using Apollo.Binary;
 using Apollo.Core;
 using Apollo.DeviceViewers;
 using Apollo.Elements;
+using Apollo.Elements.Purpose;
 using Apollo.Enums;
 using Apollo.Rendering;
 using Apollo.Structures;
 using Apollo.Undo;
 
 namespace Apollo.Devices {
-    public class Fade: Device {
+    public class Fade: Device, IInitializable {
         public class FadeInfo {
             public Color Color;
             public double Time;
@@ -283,10 +284,10 @@ namespace Apollo.Devices {
             _types = types?? new List<FadeType>() {FadeType.Linear};
             Expanded = expanded;
 
-            Initialize();
+            (this as IInitializable).Initialize();
         }
 
-        protected override void Initialized() {
+        public void Initialized() {
             if (Purpose != PurposeType.Active && Purpose != PurposeType.Unrelated) return;
 
             Generate();

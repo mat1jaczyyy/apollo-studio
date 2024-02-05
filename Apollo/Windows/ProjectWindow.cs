@@ -197,13 +197,11 @@ namespace Apollo.Windows {
         
         public void Expand(int? index) {}
 
-        void Track_Insert(int index) => Track_Insert(index, new Track());
         void Track_InsertStart() => Track_Insert(0);
 
-        void Track_Insert(int index, Track track) {
+        void Track_Insert(int index) {
             Program.Project.Undo.AddAndExecute(new Project.TrackInsertedUndoEntry(
-                index,
-                track
+                index
             ));
         }
 

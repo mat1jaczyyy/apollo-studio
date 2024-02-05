@@ -227,15 +227,17 @@ namespace Apollo.Windows {
                         tracks: (imported.Type == typeof(Track))
                             ? imported.Contents.Cast<Track>().ToList()
                             : new List<Track>() {
-                                new Track(new Chain((imported.Type == typeof(Chain))
-                                    ? new List<Device>() {
-                                        Device.Create<Group>(PurposeType.Active, null, new object[] {
-                                            imported.Contents.Cast<Chain>().ToList(),
-                                            Type.Missing,
-                                            Type.Missing
-                                        })
-                                    }
-                                    : imported.Contents.Cast<Device>().ToList()
+                                new Track(
+                                    PurposeType.Active,
+                                    new Chain((imported.Type == typeof(Chain))
+                                        ? new List<Device>() {
+                                            Device.Create<Group>(PurposeType.Active, null, new object[] {
+                                                imported.Contents.Cast<Chain>().ToList(),
+                                                Type.Missing,
+                                                Type.Missing
+                                            })
+                                        }
+                                        : imported.Contents.Cast<Device>().ToList()
                                 ))
                             }
                     );

@@ -36,7 +36,7 @@ namespace Apollo.Elements {
         
         public Chain Parent;
         public int? ParentIndex;
-        public PurposeType Purpose;
+        public PurposeType Purpose { get; protected set; }
 
         public bool Collapsed = false;
         
@@ -69,40 +69,6 @@ namespace Apollo.Elements {
 
             DeviceIdentifier = identifier;
             Name = name?? this.GetType().ToString().Split(".").Last();
-        }
-
-        bool ListeningToProjectLoaded = false;
-
-        protected virtual void Initialized() {}
-
-        public void Initialize() {
-            if (Purpose == PurposeType.Unknown)
-                throw new Exception("Purpose is unknown while initializing device!");
-
-            if (Purpose == PurposeType.Passive)
-                return;
-
-            if (!Disposed) {
-                if (Purpose == PurposeType.Unrelated) {
-                    Initialized();
-                    return;
-                }
-
-                // Purpose is always Active at this point
-
-                if (Program.Project == null) {
-                    Program.ProjectLoaded += Initialize;
-                    ListeningToProjectLoaded = true;
-                    return;
-                }
-
-                Initialized();
-            }
-
-            if (ListeningToProjectLoaded) {
-                Program.ProjectLoaded -= Initialize;
-                ListeningToProjectLoaded = false;
-            }
         }
 
         public void InvokeExit(List<Signal> n) {
@@ -162,7 +128,7 @@ namespace Apollo.Elements {
 
         public static Device Create(Type device, PurposeType purpose, Chain parent, object[] parameters = null) {
             object obj = FormatterServices.GetUninitializedObject(device);
-            device.GetField("Purpose").SetValue(obj, purpose);
+            device.GetProperty("Purpose").SetValue(obj, purpose);
 
             // Parent is guaranteed to be set only if the device is brand new, and is not being cloned or decoded
             device.GetField("Parent").SetValue(obj, parent);
