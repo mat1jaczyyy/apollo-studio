@@ -192,7 +192,7 @@
 
             <StackPanel Grid.Column="1">
               <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock HorizontalAlignment="Center" Text="2018 - 2024 mat1jaczyyy" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 – 2024 mat1jaczyyy" />
             </StackPanel>
 
             <Components:KoFi Grid.Column="2" VerticalAlignment="Center" />

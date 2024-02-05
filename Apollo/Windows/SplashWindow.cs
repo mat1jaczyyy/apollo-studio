@@ -87,7 +87,7 @@ namespace Apollo.Windows {
                 return;
             }
             
-            ReleaseVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
+            ReleaseVersion.Text = $"{latest.Name} – published {latest.PublishedAt.Humanize()}";
             ReleaseBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
             ReleaseLink.Opacity = 1;
             ReleaseLink.IsHitTestVisible = true;
@@ -160,7 +160,7 @@ namespace Apollo.Windows {
                     await window.Completed.Task;
                 
                 Dispatcher.UIThread.Post(async () => {
-                    UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
+                    UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} – {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
                     MinHeight = MaxHeight += 30;
                 }, DispatcherPriority.MinValue);
             }

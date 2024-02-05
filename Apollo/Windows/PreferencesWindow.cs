@@ -190,7 +190,7 @@ namespace Apollo.Windows {
 
             Monochrome.IsChecked = Preferences.ImportPalette == Palettes.Monochrome;
             NovationPalette.IsChecked = Preferences.ImportPalette == Palettes.NovationPalette;
-            CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
+            CustomPalette.Content = $"Custom Retina Palette – {Preferences.PaletteName}";
             CustomPalette.IsChecked = Preferences.ImportPalette == Palettes.CustomPalette;
 
             Dark.IsChecked = Preferences.Theme == ThemeType.Dark;
@@ -315,7 +315,7 @@ namespace Apollo.Windows {
                 
                 if (loaded != null) {
                     Preferences.CustomPalette = loaded;
-                    CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
+                    CustomPalette.Content = $"Custom Retina Palette – {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
                     CustomPalette.IsChecked = true;
                     Preferences.ImportPalette = Palettes.CustomPalette;
                 }

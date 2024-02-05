@@ -45,7 +45,7 @@ namespace Apollo.Windows {
         void UpdateTitle(int index) => UpdateTitle(index, _track.ProcessedName);
         void UpdateTitle(string name) => UpdateTitle(_track.ParentIndex.Value, name);
         void UpdateTitle(int index, string name)
-            => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "")? $" - {Program.Project.FileName}" : "")}";
+            => Title = TitleText.Text = TitleCenter.Text = $"{name}{((Program.Project.FilePath != "")? $" – {Program.Project.FileName}" : "")}";
 
         void UpdateTopmost(bool value) => Topmost = value;
 
