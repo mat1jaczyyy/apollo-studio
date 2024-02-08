@@ -48,13 +48,12 @@ namespace Apollo.Helpers {
                       "computer.\n\n"
                 ) +
                 "Please install at least version 2.22.0.10 of the driver before using Apollo Studio.",
-                new string[] {"Download Driver", "OK"}
+                new string[] {"Download Driver", "OK"},
+                result => {
+                    if (result == "Download Driver")
+                        App.URL("https://github.com/mat1jaczyyy/apollo-studio/raw/master/Publish/novationusbmidi.exe");
+                }
             );
-
-            ret.Completed.Task.ContinueWith(result => {
-                if (result.Result == "Download Driver")
-                    App.URL("https://github.com/mat1jaczyyy/apollo-studio/raw/master/Publish/novationusbmidi.exe");
-            });
 
             return ret;
         }

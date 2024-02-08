@@ -17,13 +17,14 @@ namespace Apollo.Windows {
 
         Button Default;
 
+        public Action<string> OnComplete;
         public TaskCompletionSource<string> Completed = new();
         
         void UpdateTopmost(bool value) => Topmost = value;
 
         public MessageWindow() => new InvalidOperationException();
 
-        public MessageWindow(string message, string[] options = null) {
+        public MessageWindow(string message, string[] options = null, Action<string> oncomplete = null) {
             InitializeComponent();
             #if DEBUG
                 this.AttachDevTools();
@@ -44,6 +45,8 @@ namespace Apollo.Windows {
                 Buttons.Children.Add(btn);
                 return btn;
             }).ToList().Last();  // ToList required otherwise Last will only resolve Select on the last item
+
+            OnComplete = oncomplete;
         }
 
         void Loaded(object sender, EventArgs e) {
@@ -56,7 +59,7 @@ namespace Apollo.Windows {
 
         void Unloaded(object sender, CancelEventArgs e) {
             if (!Completed.Task.IsCompleted)
-                Completed.SetResult((string)Default.Content);
+                Result((string)Default.Content);
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             
@@ -68,8 +71,13 @@ namespace Apollo.Windows {
             this.Content = null;
         }
 
+        void Result(string result) {
+            OnComplete?.Invoke(result);
+            Completed.SetResult(result);
+        }
+
         void Complete(object sender, EventArgs e) {
-            Completed.SetResult((string)((Button)sender).Content);
+            Result((string)((Button)sender).Content);
             Close();
         }
 
