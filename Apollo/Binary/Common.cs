@@ -3,6 +3,7 @@ using System;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Helpers;
 using Apollo.Structures;
 using Apollo.Undo;

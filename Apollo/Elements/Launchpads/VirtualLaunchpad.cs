@@ -6,7 +6,7 @@ using Apollo.Rendering;
 using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 
-namespace Apollo.Elements {
+namespace Apollo.Elements.Launchpads {
     public class VirtualLaunchpad: Launchpad {
         public int VirtualIndex = 0;
 

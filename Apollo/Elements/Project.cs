@@ -10,6 +10,7 @@ using Avalonia.Input;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Undo;

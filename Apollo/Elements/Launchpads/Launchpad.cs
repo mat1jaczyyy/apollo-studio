@@ -19,7 +19,7 @@ using Apollo.Structures;
 using Apollo.Viewers;
 using Apollo.Windows;
 
-namespace Apollo.Elements {
+namespace Apollo.Elements.Launchpads {
     public class Launchpad {
         public static PortWarning MK2FirmwareOld { get; private set; } = new PortWarning(
             "One or more connected Launchpad MK2s are running an older version of the\n" + 

@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using Apollo.Components;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Rendering;
 using Apollo.Structures;
 
