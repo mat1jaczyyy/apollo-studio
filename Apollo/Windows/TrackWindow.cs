@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -243,9 +244,14 @@ namespace Apollo.Windows {
         void Expand(PointerEventArgs e) {
             Point pointerRelative = e.GetPosition(this);
 
+            double scaling = this.PlatformImpl.Scaling;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                scaling = 1;
+
             PixelPoint pointerAbsolute = new PixelPoint(
-                (int)(Position.X + pointerRelative.X),
-                (int)(Position.Y + pointerRelative.Y)
+                (int)(Position.X + pointerRelative.X * scaling),
+                (int)(Position.Y + pointerRelative.Y * scaling)
             );
 
             Screen result = null;
@@ -257,8 +263,13 @@ namespace Apollo.Windows {
                 }
 
             if (result != null) {
+                double density = result.PixelDensity;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    density = 1;
+
                 Position = new PixelPoint(result.Bounds.X, Position.Y);
-                Width = result.Bounds.Width / result.PixelDensity;
+                Width = result.Bounds.Width / density;
             }
         }
 
