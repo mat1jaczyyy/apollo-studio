@@ -197,30 +197,41 @@ namespace Apollo.Windows {
         
         public void Expand(int? index) {}
 
-        void Track_Insert(int index) => Track_Insert(index, new Track());
         void Track_InsertStart() => Track_Insert(0);
 
-        void Track_Insert(int index, Track track) {
+        void Track_Insert(int index) {
             Program.Project.Undo.AddAndExecute(new Project.TrackInsertedUndoEntry(
-                index,
-                track
+                index
             ));
         }
 
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                e.Handled = true;
                 return;
+            }
 
             if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
-            if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
-            else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+            if (e.Key == Key.Up) {
+                Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+                e.Handled = true;
+                return;
 
-            else if (e.Key == Key.Enter)
+            } else if (e.Key == Key.Down) {
+                Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+                e.Handled = true;
+                return;
+
+            } else if (e.Key == Key.Enter) {
                 foreach (ISelect i in Selection.Selection)
                     TrackWindow.Create((Track)i, this);
+                
+                e.Handled = true;
+                return;
+            }
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

@@ -57,6 +57,8 @@ namespace Apollo.Undo {
         }
 
         public void Add(UndoEntry entry, bool execute = false) {
+            if (Program.Project?.IsDisposing != false) return;
+
             for (int i = History.Count - 1; i > Position; i--)
                 Remove(i);
             
@@ -75,6 +77,8 @@ namespace Apollo.Undo {
         public void AddAndExecute(UndoEntry entry) => Add(entry, true);
 
         public void Select(int index) {
+            if (Program.Project?.IsDisposing != false) return;
+
             lock (locker) {
                 if (index < Position)
                     for (int i = Position; i > index; i--)

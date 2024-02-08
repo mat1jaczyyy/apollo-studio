@@ -16,19 +16,19 @@ Apollo Studio solves all the problems we experience every day in Live including 
 Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apollo Studio. See for yourself what our software is capable of.
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=a-MwTVH-wX8" title="Terravita x Chime x Akylla - Go Higher">
+  <a href="https://www.youtube.com/watch?v=a-MwTVH-wX8" title="Terravita x Chime x Akylla – Go Higher">
     <img src="http://img.youtube.com/vi/a-MwTVH-wX8/mqdefault.jpg">
   </a>
 
-  <a href="https://www.youtube.com/watch?v=DDJ0JPgd8fw" title="Owl City - Fireflies">
+  <a href="https://www.youtube.com/watch?v=DDJ0JPgd8fw" title="Owl City – Fireflies">
     <img src="http://img.youtube.com/vi/DDJ0JPgd8fw/mqdefault.jpg">
   </a>
 
-  <a href="https://www.youtube.com/watch?v=yA-bFsYRG4I" title="Borgeous, Taylr Renee - Sweeter Without You">
+  <a href="https://www.youtube.com/watch?v=yA-bFsYRG4I" title="Borgeous, Taylr Renee – Sweeter Without You">
     <img src="http://img.youtube.com/vi/yA-bFsYRG4I/mqdefault.jpg">
   </a>
 
-  <a href="https://www.youtube.com/watch?v=caiNv3bC5YI" title="Jonas Aden, Castion, Danny Leax - Tell Me A Lie">
+  <a href="https://www.youtube.com/watch?v=caiNv3bC5YI" title="Jonas Aden, Castion, Danny Leax – Tell Me A Lie">
     <img src="http://img.youtube.com/vi/caiNv3bC5YI/mqdefault.jpg">
   </a>
 </p>

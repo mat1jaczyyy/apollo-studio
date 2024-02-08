@@ -3,6 +3,7 @@ using System.Linq;
 
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.RtMidi;
 using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;

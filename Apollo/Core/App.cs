@@ -11,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Structures;

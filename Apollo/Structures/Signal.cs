@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Apollo.Core;
-using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
-using Apollo.Helpers;
 
 namespace Apollo.Structures {
     public class Signal {

@@ -10,6 +10,7 @@ using Avalonia.Input;
 
 using Apollo.Binary;
 using Apollo.Core;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Undo;
@@ -120,12 +121,16 @@ namespace Apollo.Elements {
         bool savingCrash;
 
         public async void WriteCrashBackup() {
+            if (Program.Project?.IsDisposing != false) return;
+
             if (!Directory.Exists(Program.CrashDir)) Directory.CreateDirectory(Program.CrashDir);
             
             if (savingCrash) return;
 
             savingCrash = true;
-            await WriteFile(null, Program.CrashProject, false);
+            try {
+                await WriteFile(null, Program.CrashProject, false);
+            } catch (NullReferenceException) {}
             savingCrash = false;
         }
 
@@ -244,14 +249,14 @@ namespace Apollo.Elements {
 
             BPM = bpm;
             Macros = macros?? new int[4] {1, 1, 1, 1};
-            Tracks = tracks?? MIDI.UsableDevices.Select(i => new Track() { Launchpad = i }).ToList();
+            Tracks = tracks?? MIDI.UsableDevices.Select(i => new Track(PurposeType.Active, launchpad: i)).ToList();
             Author = author;
             BaseTime = basetime;
             FilePath = path;
             Started = (started == 0)? DateTimeOffset.UtcNow : DateTimeOffset.FromUnixTimeSeconds(started);
             Undo = undo?? new UndoManager();
 
-            if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track());
+            if (Tracks.Count == 0 && tracks == null) Tracks.Insert(0, new Track(PurposeType.Active));
 
             Reroute();
         }
@@ -305,10 +310,10 @@ namespace Apollo.Elements {
 
             protected override void OnDispose() => track.Dispose();
             
-            public TrackInsertedUndoEntry(int index, Track track)
+            public TrackInsertedUndoEntry(int index)
             : base($"Track {index + 1} Inserted") {
                 this.index = index;
-                this.track = track.Clone(PurposeType.Passive);
+                this.track = new Track(PurposeType.Passive);
             }
             
             TrackInsertedUndoEntry(BinaryReader reader, int version)

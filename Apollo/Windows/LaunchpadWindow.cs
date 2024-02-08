@@ -11,7 +11,7 @@ using Avalonia.Threading;
 
 using Apollo.Components;
 using Apollo.Core;
-using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Helpers;
 using Apollo.Rendering;
 using Apollo.Structures;
@@ -111,8 +111,15 @@ namespace Apollo.Windows {
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
-                Program.Project?.Undo.HandleKey(e);
+            if (App.WindowKey(this, e)) {
+                e.Handled = true;
+                return;
+            }
+            
+            if (Program.Project != null && (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e))) {
+                e.Handled = true;
+                return;
+            }
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

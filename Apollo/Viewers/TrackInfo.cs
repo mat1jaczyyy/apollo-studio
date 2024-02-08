@@ -12,6 +12,7 @@ using Avalonia.VisualTree;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Selection;
 using Apollo.Windows;
 

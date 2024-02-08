@@ -20,6 +20,7 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.Viewers;
@@ -87,7 +88,7 @@ namespace Apollo.Windows {
                 return;
             }
             
-            ReleaseVersion.Text = $"{latest.Name} - published {latest.PublishedAt.Humanize()}";
+            ReleaseVersion.Text = $"{latest.Name} – published {latest.PublishedAt.Humanize()}";
             ReleaseBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
             ReleaseLink.Opacity = 1;
             ReleaseLink.IsHitTestVisible = true;
@@ -160,7 +161,7 @@ namespace Apollo.Windows {
                     await window.Completed.Task;
                 
                 Dispatcher.UIThread.Post(async () => {
-                    UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} - {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
+                    UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} – {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
                     MinHeight = MaxHeight += 30;
                 }, DispatcherPriority.MinValue);
             }
@@ -227,15 +228,17 @@ namespace Apollo.Windows {
                         tracks: (imported.Type == typeof(Track))
                             ? imported.Contents.Cast<Track>().ToList()
                             : new List<Track>() {
-                                new Track(new Chain((imported.Type == typeof(Chain))
-                                    ? new List<Device>() {
-                                        Device.Create<Group>(PurposeType.Active, null, new object[] {
-                                            imported.Contents.Cast<Chain>().ToList(),
-                                            Type.Missing,
-                                            Type.Missing
-                                        })
-                                    }
-                                    : imported.Contents.Cast<Device>().ToList()
+                                new Track(
+                                    PurposeType.Active,
+                                    new Chain((imported.Type == typeof(Chain))
+                                        ? new List<Device>() {
+                                            Device.Create<Group>(PurposeType.Active, null, new object[] {
+                                                imported.Contents.Cast<Chain>().ToList(),
+                                                Type.Missing,
+                                                Type.Missing
+                                            })
+                                        }
+                                        : imported.Contents.Cast<Device>().ToList()
                                 ))
                             }
                     );
@@ -323,6 +326,8 @@ namespace Apollo.Windows {
         }
 
         void HandleKey(object sender, KeyEventArgs e) {
+            e.Handled = true;
+
             if (App.Dragging) return;
 
             if (App.WindowKey(this, e)) return;

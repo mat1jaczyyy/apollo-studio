@@ -7,7 +7,7 @@ using Avalonia.VisualTree;
 
 using Apollo.Components;
 using Apollo.Core;
-using Apollo.Elements;
+using Apollo.Elements.Launchpads;
 using Apollo.Enums;
 using Apollo.Windows;
 

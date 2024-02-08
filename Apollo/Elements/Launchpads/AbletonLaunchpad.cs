@@ -10,7 +10,7 @@ using Apollo.RtMidi.Devices.Infos;
 using Apollo.Structures;
 using Apollo.Windows;
 
-namespace Apollo.Elements {
+namespace Apollo.Elements.Launchpads {
     public class AbletonLaunchpad: Launchpad {
         public int Version = 0;
 

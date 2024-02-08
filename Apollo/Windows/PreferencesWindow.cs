@@ -19,6 +19,8 @@ using Apollo.Components;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Elements.Launchpads;
+using Apollo.Elements.Purpose;
 using Apollo.Enums;
 using Apollo.Helpers;
 using Apollo.RtMidi;
@@ -162,7 +164,7 @@ namespace Apollo.Windows {
             ToolTip.SetTip(this.Get<TextBlock>("LaunchpadHeader"), $"RtMidi APIs:\n{string.Join("- \n", MidiDeviceManager.Default.GetAvailableMidiApis())}");
 
             fade.MIDIExit = FadeExit;
-            fade.Initialize();
+            (fade as IInitializable).Initialize();
 
             AlwaysOnTop.IsChecked = Preferences.AlwaysOnTop;
             CenterTrackContents.IsChecked = Preferences.CenterTrackContents;
@@ -189,7 +191,7 @@ namespace Apollo.Windows {
 
             Monochrome.IsChecked = Preferences.ImportPalette == Palettes.Monochrome;
             NovationPalette.IsChecked = Preferences.ImportPalette == Palettes.NovationPalette;
-            CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName}";
+            CustomPalette.Content = $"Custom Retina Palette – {Preferences.PaletteName}";
             CustomPalette.IsChecked = Preferences.ImportPalette == Palettes.CustomPalette;
 
             Dark.IsChecked = Preferences.Theme == ThemeType.Dark;
@@ -314,7 +316,7 @@ namespace Apollo.Windows {
                 
                 if (loaded != null) {
                     Preferences.CustomPalette = loaded;
-                    CustomPalette.Content = $"Custom Retina Palette - {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
+                    CustomPalette.Content = $"Custom Retina Palette – {Preferences.PaletteName = Path.GetFileNameWithoutExtension(result[0])}";
                     CustomPalette.IsChecked = true;
                     Preferences.ImportPalette = Palettes.CustomPalette;
                 }
@@ -377,8 +379,15 @@ namespace Apollo.Windows {
         async void HandleKey(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (!App.WindowKey(this, e) && Program.Project != null && !await Program.Project.HandleKey(this, e))
-                Program.Project?.Undo.HandleKey(e);
+            if (App.WindowKey(this, e)) {
+                e.Handled = true;
+                return;
+            }
+            
+            if (Program.Project != null && (await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e))) {
+                e.Handled = true;
+                return;
+            }
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {

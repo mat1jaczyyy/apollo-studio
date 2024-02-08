@@ -187,13 +187,15 @@
         </ScrollViewer>
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 1 0 0" Padding="20 15">
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Grid.Column="0">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Components:mat1jaczyyy Grid.Column="0" VerticalAlignment="Center" />
+
+            <StackPanel Grid.Column="1">
               <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock HorizontalAlignment="Center" Text="2018 - 2023 mat1jaczyyy" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 – 2024 mat1jaczyyy" />
             </StackPanel>
 
-            <Components:PayPal Grid.Column="1" VerticalAlignment="Center" />
+            <Components:KoFi Grid.Column="2" VerticalAlignment="Center" />
           </Grid>
         </Border>
       </Grid>

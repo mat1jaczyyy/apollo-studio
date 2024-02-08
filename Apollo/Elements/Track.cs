@@ -2,6 +2,8 @@
 
 using Apollo.Core;
 using Apollo.Devices;
+using Apollo.Elements.Launchpads;
+using Apollo.Elements.Purpose;
 using Apollo.Enums;
 using Apollo.Selection;
 using Apollo.Structures;
@@ -10,7 +12,7 @@ using Apollo.Viewers;
 using Apollo.Windows;
 
 namespace Apollo.Elements {
-    public class Track: ISelect, IChainParent, IMutable, IName {
+    public class Track: ISelect, IChainParent, IMutable, IName, IInitializable {
         public ISelectViewer IInfo {
             get => Info;
         }
@@ -79,20 +81,31 @@ namespace Apollo.Elements {
             }
         }
 
+        public PurposeType Purpose { get; protected set; }
+
         public Chain Chain;
         Launchpad _launchpad;
+
+        public void SetLaunchpadWithoutReceive(Launchpad value) {
+            if (_launchpad != null) _launchpad.Receive -= MIDIEnter;
+
+            if (value == null) value = MIDI.NoOutput;
+            _launchpad = value;
+
+            Info?.PortSelector.Update(_launchpad);
+        }
+
+        void AddReceive() {
+            if (Disposed) return;
+            
+            if (_launchpad != null) _launchpad.Receive += MIDIEnter;
+        }
 
         public Launchpad Launchpad {
             get => _launchpad;
             set {
-                if (_launchpad != null) _launchpad.Receive -= MIDIEnter;
-
-                if (value == null) value = MIDI.NoOutput;
-                _launchpad = value;
-
-                if (_launchpad != null) _launchpad.Receive += MIDIEnter;
-
-                Info?.PortSelector.Update(_launchpad);
+                SetLaunchpadWithoutReceive(value);
+                AddReceive();
             }
         }
         
@@ -129,26 +142,37 @@ namespace Apollo.Elements {
             }
         }
 
-        public Track Clone(PurposeType purpose) => new Track(Chain.Clone(purpose), Launchpad, Name) {
+        public Track Clone(PurposeType purpose) => new Track(purpose, Chain.Clone(purpose), Launchpad, Name) {
             Enabled = Enabled
         };
 
-        public Track(Chain init = null, Launchpad launchpad = null, string name = "Track #") {
+        public Track(PurposeType purpose, Chain init = null, Launchpad launchpad = null, string name = "Track #") {
+            Purpose = purpose;
+
             Chain = init?? new Chain();
             Chain.Parent = this;
             Chain.MIDIExit = Heaven.MIDIEnter;
 
-            Launchpad = launchpad;
+            SetLaunchpadWithoutReceive(launchpad);
             Name = name;
+
+            if (_launchpad != null)
+                (this as IInitializable).Initialize();
+        }
+
+        public void Initialized() {
+            AddReceive();
         }
 
         void MIDIEnter(Signal n) {
-            if (ParentIndex != null && Enabled) {
+            if (!Disposed && ParentIndex != null && Enabled) {
                 try {
                     Chain?.MIDIEnter(n.Clone());
                 } catch (KeyNotFoundException) {} // Ignore KeyNotFound race conditions in devices that have dictionaries
             }
         }
+
+        public bool Disposed { get; private set; } = false;
 
         public void Dispose() {
             IsDisposing = true;
@@ -167,6 +191,8 @@ namespace Apollo.Elements {
             Chain = null;
 
             if (Launchpad != null) Launchpad.Receive -= MIDIEnter;
+
+            Disposed = true;
         }
     }
 }

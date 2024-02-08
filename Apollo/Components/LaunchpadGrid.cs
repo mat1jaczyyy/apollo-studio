@@ -50,7 +50,7 @@ namespace Apollo.Components {
                 if (IsArrangeValid) ModeLight.Fill = color;
                 else this.Resources["ModeBrush"] = color;
 
-            } else Buttons[index].SetColor(color);
+            } else Buttons?[index]?.SetColor(color);
         }
 
         public void RawUpdate(RawUpdate n) => Dispatcher.UIThread.InvokeAsync(() => {
