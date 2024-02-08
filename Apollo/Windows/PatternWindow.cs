@@ -445,52 +445,84 @@ namespace Apollo.Windows {
                 KeyModifiers mods = e.KeyModifiers & ~App.ControlKey;
                 int start = ((e.KeyModifiers & ~KeyModifiers.Shift) == App.ControlKey)? _pattern.Expanded : 0;
 
-                if (mods == KeyModifiers.Shift) PatternFire(start);
-                else if (mods == KeyModifiers.None) PatternPlay(Play, start);
+                if (mods == KeyModifiers.Shift) {
+                    PatternFire(start);
+                    e.Handled = true;
+
+                } else if (mods == KeyModifiers.None) {
+                    PatternPlay(Play, start);
+                    e.Handled = true;
+                }
+            
                 return;
             }
 
             if (Locked) return;
             
-            if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) Frame_Insert(_pattern.Expanded + 1);
-            else if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) Selection.Action("Delete");
+            if (e.Key == Key.Insert || e.Key == Key.Add || e.Key == Key.OemPlus) {
+                Frame_Insert(_pattern.Expanded + 1);
+                e.Handled = true;
+                return;
+            }
 
-            else {
-                if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
-                    this.Focus();
-                    return;
-                }
+            if (e.Key == Key.Delete || e.Key == Key.Back || e.Key == Key.Subtract || e.Key == Key.OemMinus) {
+                Selection.Action("Delete");
+                e.Handled = true;
+                return;
+            }
 
-                if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                this.Focus();
+                e.Handled = true;
+                return;
+            }
 
-                bool shift = e.KeyModifiers == KeyModifiers.Shift;
+            if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
-                if (e.Key == Key.Up || e.Key == Key.Left) {
-                    if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
-                    else Frame_Insert(0);
+            bool shift = e.KeyModifiers == KeyModifiers.Shift;
 
-                } else if (e.Key == Key.Down || e.Key == Key.Right) {
-                    if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
-                    else Frame_Insert(_pattern.Count);
-
-                } else if (e.Key == Key.Home) {
-                    Selection.Select(_pattern[0], shift);
-                    Frame_Select(0);
-
-                } else if (e.Key == Key.End) {
-                    Selection.Select(_pattern[_pattern.Count - 1], shift);
-                    Frame_Select(_pattern.Count - 1);
-
-                } else if (e.Key == Key.PageUp) {
-                    int target = Math.Max(0, Selection.Start.IParentIndex.Value - (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
-                    Selection.Select(_pattern[target], shift);
-                    Frame_Select(target);
-                    
-                } else if (e.Key == Key.PageDown) {
-                    int target = Math.Min(_pattern.Count - 1, Selection.Start.IParentIndex.Value + (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
-                    Selection.Select(_pattern[target], shift);
-                    Frame_Select(target);
-                }
+            if (e.Key == Key.Up || e.Key == Key.Left) {
+                if (Selection.Move(false, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
+                else Frame_Insert(0);
+                e.Handled = true;
+                return;
+            }
+            
+            if (e.Key == Key.Down || e.Key == Key.Right) {
+                if (Selection.Move(true, shift) || shift) Frame_Select(Selection.Start.IParentIndex.Value);
+                else Frame_Insert(_pattern.Count);
+                e.Handled = true;
+                return;
+            }
+            
+            if (e.Key == Key.Home) {
+                Selection.Select(_pattern[0], shift);
+                Frame_Select(0);
+                e.Handled = true;
+                return;
+            }
+            
+            if (e.Key == Key.End) {
+                Selection.Select(_pattern[_pattern.Count - 1], shift);
+                Frame_Select(_pattern.Count - 1);
+                e.Handled = true;
+                return;
+            }
+            
+            if (e.Key == Key.PageUp) {
+                int target = Math.Max(0, Selection.Start.IParentIndex.Value - (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                Selection.Select(_pattern[target], shift);
+                Frame_Select(target);
+                e.Handled = true;
+                return;
+            }
+            
+            if (e.Key == Key.PageDown) {
+                int target = Math.Min(_pattern.Count - 1, Selection.Start.IParentIndex.Value + (int)(FrameList.Bounds.Height / Contents[1].Bounds.Height));
+                Selection.Select(_pattern[target], shift);
+                Frame_Select(target);
+                e.Handled = true;
+                return;
             }
         }
 

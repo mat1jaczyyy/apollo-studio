@@ -107,11 +107,18 @@ namespace Apollo.Windows {
 
             if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e)) {
                 this.Focus();
+                e.Handled = true;
                 return;
             }
 
-            if (e.Key == Key.Up) Program.Project.Undo.Undo();
-            else if (e.Key == Key.Down) Program.Project.Undo.Redo();
+            if (e.Key == Key.Up) {
+                Program.Project.Undo.Undo();
+                e.Handled = true;
+
+            } else if (e.Key == Key.Down) {
+                Program.Project.Undo.Redo();
+                e.Handled = true;
+            }
 
             this.Focus();
         }

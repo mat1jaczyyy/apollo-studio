@@ -150,31 +150,55 @@ namespace Apollo.Windows {
                 if (_track.Launchpad.Available || _track.Launchpad.Window != null)
                     LaunchpadWindow.Create(_track.Launchpad, this);
                 
+                e.Handled = true;
                 return;
             }
 
             if (e.KeyModifiers == (App.ControlKey | KeyModifiers.Shift) && e.Key == Key.R) {
                 _track.Launchpad.Reconnect();
+                e.Handled = true;
                 return;
             }
 
-            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e))
+            if (App.WindowKey(this, e) || await Program.Project.HandleKey(this, e) || Program.Project.Undo.HandleKey(e) || Selection.HandleKey(e)) {
+                e.Handled = true;
                 return;
+            }
 
             if (e.KeyModifiers != KeyModifiers.None && e.KeyModifiers != KeyModifiers.Shift) return;
 
             bool vertical = Selection.Start is Chain;
 
             if (vertical) {
-                if (e.Key == Key.Up) Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
-                else if (e.Key == Key.Down) Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
-                else if (e.Key == Key.Right) Selection.MoveChild();
-                else if (e.Key == Key.Enter) Selection.Expand();
-                else if (e.Key == Key.Left && Selection.Start.IParent is Multi multi)
+                if (e.Key == Key.Up) {
+                    Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+                    e.Handled = true;
+                    return;
+                    
+                } else if (e.Key == Key.Down) {
+                    Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+                    e.Handled = true;
+                    return;
+                    
+                } else if (e.Key == Key.Right) {
+                    Selection.MoveChild();
+                    e.Handled = true;
+                    return;
+                    
+                } else if (e.Key == Key.Enter) {
+                    Selection.Expand();
+                    e.Handled = true;
+                    return;
+                    
+                } else if (e.Key == Key.Left && Selection.Start.IParent is Multi multi) {
                     Selection.Select(multi.Preprocess.Devices.Last());
+                    e.Handled = true;
+                    return;
+                }
 
             } else if (e.Key == Key.Left) {
                 ISelect left = Selection.Selection.First();
+                e.Handled = true;
 
                 if (left.IParentIndex.Value == 0) {
                     if (InChoke()) {
@@ -185,9 +209,11 @@ namespace Apollo.Windows {
                 }
                 
                 Selection.Move(false, e.KeyModifiers == KeyModifiers.Shift);
+                return;
             
             } else if (e.Key == Key.Right) {
                 ISelect right = Selection.Selection.Last();
+                e.Handled = true;
 
                 if (right.IParentIndex.Value == right.IParent.IChildren.Count - 1) {
                     if (InChoke()) {
@@ -201,8 +227,11 @@ namespace Apollo.Windows {
                 }
                 
                 Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+                return;
 
             } else if (e.Key == Key.Down) {
+                e.Handled = true;
+
                 if (Selection.Start is Pattern pattern)
                     return;
 
@@ -212,6 +241,7 @@ namespace Apollo.Windows {
                 }
                 
                 Selection.MoveChild();
+                return;
             }
         }
 

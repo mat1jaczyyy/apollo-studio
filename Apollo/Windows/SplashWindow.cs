@@ -326,6 +326,8 @@ namespace Apollo.Windows {
         }
 
         void HandleKey(object sender, KeyEventArgs e) {
+            e.Handled = true;
+
             if (App.Dragging) return;
 
             if (App.WindowKey(this, e)) return;
