@@ -5,7 +5,7 @@ rd /S /Q bin
 rd /S /Q obj
 dotnet clean
 dotnet publish -r win-x64 -c Release
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\net5.0\win-x64\publish\Apollo.exe >nul 2>&1
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\net5.0\win-x64\publish\Apollo.exe
 
 echo.
 
@@ -14,7 +14,7 @@ rd /S /Q bin
 rd /S /Q obj
 dotnet clean
 dotnet publish -r win-x64 -c Release
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\net5.0\win-x64\publish\ApolloUpdate.exe >nul 2>&1
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\bin\Hostx64\x64\editbin.exe" /subsystem:windows bin\Release\net5.0\win-x64\publish\ApolloUpdate.exe
 
 echo.
 echo Merging...
