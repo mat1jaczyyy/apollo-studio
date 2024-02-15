@@ -273,9 +273,9 @@ namespace Apollo.Windows {
                     Program.Project.BPM = value;
                     BPM_Ignore = false;
                     
-                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    BPM_Update = () => { BPM.Foreground = App.GetResource<IBrush>("ThemeForegroundBrush"); };
                 } else {
-                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    BPM_Update = () => { BPM.Foreground = App.GetResource<IBrush>("ErrorBrush"); };
                 }
 
                 BPM_Update += () => { 
@@ -284,7 +284,7 @@ namespace Apollo.Windows {
 
                     if (value > 999) {
                         text = "999";
-                        BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                        BPM.Foreground = App.GetResource<IBrush>("ThemeForegroundBrush");
                     }
                     
                     BPM.Text = text;
@@ -383,7 +383,7 @@ namespace Apollo.Windows {
             if (!force && Program.Project.Tracks.FirstOrDefault(i => i.Window != null) != null) return true;
 
             string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
-                "You have unsaved changes. Do you want to save before closing?\n",
+                "You have unsaved changes. Do you want to save before closing?\n ",
                 new string[] {"Yes", "No", "Cancel"}, this
             );
 

@@ -923,7 +923,7 @@ namespace Apollo.Windows {
 
             if (index != null) RootKey.SetColor(
                 LaunchpadGrid.SignalToGrid(index.Value),
-                (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush")
+                App.GetResource<SolidColorBrush>("ThemeAccentBrush")
             );
         }
 

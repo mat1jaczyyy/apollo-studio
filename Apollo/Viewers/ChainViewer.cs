@@ -80,7 +80,7 @@ namespace Apollo.Viewers {
             
             if (backgroundBorder) {
                 this.Get<Grid>("Root").Children.Insert(0, new DeviceBackground());
-                Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush");
+                Background = App.GetResource<IBrush>("ThemeControlDarkenBrush");
             }
         }
 
