@@ -687,7 +687,7 @@ namespace Apollo.Elements.Launchpads {
                     } else {
                         finalPos = positions.ToList();
 
-                        for (int j = Convert.ToInt32(!Type.IsPro()); j < 10; j++) {
+                        for (int j = Convert.ToInt32(!Type.Is10x10()); j < 10; j++) {
                             IEnumerable<byte> row = rowMap(j);
                             IEnumerable<byte> col = colMap(j);
 

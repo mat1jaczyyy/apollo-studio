@@ -121,6 +121,9 @@ namespace Apollo.Enums {
         public static bool UsesKeySelector(this MultiType type)
             => type == MultiType.Key;
 
+        public static bool Is10x10(this LaunchpadType type)
+            => type.IsPro() || type == LaunchpadType.MatrixPro;
+
         public static bool IsPro(this LaunchpadType type)
             => LaunchpadType.Pro <= type && type <= LaunchpadType.CFW;
 
