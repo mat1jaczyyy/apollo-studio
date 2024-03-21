@@ -48,6 +48,33 @@
       <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
     </Style>
 
+    <Style Selector="Path.corner44">
+      <Setter Property="Data" Value="{DynamicResource LPGrid_44CornerGeometry}" />
+    </Style>
+
+    <Style Selector="Path.corner45">
+      <Setter Property="Data" Value="{DynamicResource LPGrid_45CornerGeometry}" />
+    </Style>
+
+    <Style Selector="Path.corner54">
+      <Setter Property="Data" Value="{DynamicResource LPGrid_54CornerGeometry}" />
+    </Style>
+
+    <Style Selector="Path.corner55">
+      <Setter Property="Data" Value="{DynamicResource LPGrid_55CornerGeometry}" />
+    </Style>
+
+    <Style Selector="Canvas.arcade">
+      <Setter Property="Width" Value="{DynamicResource LPGrid_PadSize}" />
+      <Setter Property="Height" Value="{DynamicResource LPGrid_PadSize}" />
+    </Style>
+    <Style Selector="Path.arcade">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="{DynamicResource LPGrid_ArcadePadThickness}" />
+      <Setter Property="Stroke" Value="{DynamicResource ThemeForegroundLowBrush}" />
+      <Setter Property="Data" Value="{DynamicResource LPGrid_ArcadeGeometry}" />
+    </Style>
+
     <Style Selector="Canvas.hidden">
       <Setter Property="Width" Value="{DynamicResource LPGrid_HiddenSize}" />
       <Setter Property="Height" Value="{DynamicResource LPGrid_HiddenSize}" />

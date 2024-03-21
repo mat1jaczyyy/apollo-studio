@@ -216,6 +216,17 @@ namespace Apollo.Elements.Launchpads {
             )
         );
 
+        public static PortWarning MF64FirmwareUnsupported { get; private set; } = new PortWarning(
+            "One or more connected Midi Fighter 64s are running the official\n" + 
+            "firmware which is not compatible with Apollo Studio.\n\n" +
+            "Update these to the latest version of the custom firmware using the\n" +
+            "MIDI Fighter Utility to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Custom Firmware Guide",
+                "https://github.com/mat1jaczyyy/mf64-performance-cfw/blob/master/README.md#installation"
+            )
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
@@ -233,6 +244,7 @@ namespace Apollo.Elements.Launchpads {
                 if (MatrixFEFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MatrixFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MatrixProFirmwareUnsupported.DisplayWarning(sender)) return;
+                if (MF64FirmwareUnsupported.DisplayWarning(sender)) return;
             }, DispatcherPriority.MinValue);
         }
 
@@ -271,7 +283,8 @@ namespace Apollo.Elements.Launchpads {
             {LaunchpadType.ProMK3, SysExStart.Concat(NovationHeader).Concat(new byte[] {0x0E, 0x03}).ToArray()},
             {LaunchpadType.MatrixFE, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
             {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
-            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()}
+            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5E}).ToArray()},
+            {LaunchpadType.MF64, SysExStart.Concat(new byte[] {0x6F}).ToArray()}
         };
 
         static byte[] ProGridMessage = SysExStart.Concat(NovationHeader).Concat(new byte[] {0x10, 0x0F, 0x00}).ToArray();
@@ -287,7 +300,8 @@ namespace Apollo.Elements.Launchpads {
             ).ToArray()},
             {LaunchpadType.MatrixFE, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()},
             {LaunchpadType.Matrix, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()},
-            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()}
+            {LaunchpadType.MatrixPro, SysExStart.Concat(MatrixHeader).Concat(new byte[] {0x5F, 0x00, 0x00, 0x40, 0x00}).ToArray()},
+            {LaunchpadType.MF64, SysExStart.Concat(new byte[] {0x6E}).ToArray()}
         };
 
         static Dictionary<byte, LaunchpadType> MatrixDevices = new() {
@@ -498,6 +512,23 @@ namespace Apollo.Elements.Launchpads {
 
                 SupportsCompression = true;
                 return type;
+            
+            // Manufacturer = DJTechTools
+            } else if (response.Data[5] == 0x00 && response.Data[6] == 0x01 && response.Data[7] == 0x79 ) {
+                ushort family = (ushort)(response.Data[9] << 8 | response.Data[8]);
+                ushort model = (ushort)(response.Data[11] << 8 | response.Data[10]);
+                uint version = (ushort)(response.Data[12] << 24 | response.Data[13] << 16 | response.Data[14] << 8 | response.Data[15]);
+
+                if (family == 0x0006 && model == 0x0001) { // Midi Fighter 64
+                    if (response.Data[12] != 0x30) { // Not CFW
+                        MF64FirmwareUnsupported.Set();
+                        return LaunchpadType.Unknown;
+                    }
+
+                    return LaunchpadType.MF64;
+                }
+
+                return LaunchpadType.Unknown;
             }
 
             return LaunchpadType.Unknown;
@@ -577,18 +608,16 @@ namespace Apollo.Elements.Launchpads {
             List<RawUpdate> output = n.SelectMany(i => {              
                 IEnumerable<RawUpdate> ret = Enumerable.Empty<RawUpdate>();
 
-                int offset = 0;
-
                 switch (Type) {
                     case LaunchpadType.MK2:
                         if (i.Index % 10 == 0 || i.Index < 11 || i.Index == 99 || i.Index == 100) return ret;
-                        if (91 <= i.Index && i.Index <= 98) offset = 13;
+                        if (91 <= i.Index && i.Index <= 98) i.Offset(13);
                         break;
                     
                     case LaunchpadType.Pro:
                     case LaunchpadType.CFW:
                         if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99) return ret;
-                        else if (i.Index == 100) offset = -1;
+                        else if (i.Index == 100) i.Offset(-1);
                         break;
 
                     case LaunchpadType.X:
@@ -609,9 +638,13 @@ namespace Apollo.Elements.Launchpads {
                     case LaunchpadType.MatrixPro:
                         if (i.Index == 0 || i.Index == 9 || i.Index == 90 || i.Index == 99 || i.Index == 100) return ret;
                         break;
+
+                    case LaunchpadType.MF64:
+                        if (i.Index % 10 == 0 || i.Index % 10 == 9 || i.Index < 11 || i.Index > 88 || i.Index == 100) return ret;
+                        i.Index = Converter.XYtoMF64(i.Index);
+                        break;
                 }
                 
-                i.Offset(offset);
                 return ret.Append(i).ToArray();
 
             }).ToList();
@@ -654,6 +687,7 @@ namespace Apollo.Elements.Launchpads {
             {LaunchpadType.MatrixFE, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
             {LaunchpadType.Matrix, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
             {LaunchpadType.MatrixPro, new HashSet<byte>() {100, 0, 9, 90, 99}},
+            {LaunchpadType.MF64, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
         };
 
         bool Optimize(List<RawUpdate> updates, out IEnumerable<byte> ret) {

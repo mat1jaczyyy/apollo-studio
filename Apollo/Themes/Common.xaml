@@ -39,14 +39,18 @@
     <sys:Double x:Key="LPGrid_NovationSize">33</sys:Double>
     <sys:Double x:Key="LPGrid_HiddenSize">21</sys:Double>
     <sys:Double x:Key="LPGrid_PadThickness">3</sys:Double>
+    <sys:Double x:Key="LPGrid_ArcadePadThickness">7.5</sys:Double>
     <sys:Double x:Key="LPGrid_PadCut1">9</sys:Double>
     <sys:Double x:Key="LPGrid_PadCut2">36</sys:Double>
     <sys:Double x:Key="LPGrid_ModeWidth">12</sys:Double>
     <sys:Double x:Key="LPGrid_ModeHeight">6</sys:Double>
     <CornerRadius x:Key="LPGrid_CornerRadius">3</CornerRadius>
     <Thickness x:Key="LPGrid_TopMargin">21</Thickness>
-    <sys:Double x:Key="LPGrid_PadSpacing">3</sys:Double>
     <Thickness x:Key="LPGrid_PadMargin">3</Thickness>
+    <CornerRadius x:Key="LPGrid_MF64CornerRadius">27</CornerRadius>
+    <Thickness x:Key="LPGrid_MF64TopMargin">16</Thickness>
+    <Thickness x:Key="LPGrid_MF64PadMargin">5</Thickness>
+    <sys:Double x:Key="LPGrid_PadSpacing">3</sys:Double>
 
     <media:StreamGeometry x:Key="LPGrid_SquareGeometry" />
     <media:StreamGeometry x:Key="LPGrid_SplitGeometry" />

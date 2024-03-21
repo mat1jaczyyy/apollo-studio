@@ -26,20 +26,25 @@ namespace Apollo.Components {
             Canvas.Classes.Add(name);
             Path.Classes.Add(name);
 
-            if (name == "corner")
-                Path.Data = (StreamGeometry)Application.Current.Styles.FindResource($"LPGrid_{Index}CornerGeometry");
+            if (name.StartsWith("corner"))
+                Path.Classes.Add($"corner{Index}");
         }
 
         public bool Empty => Canvas.Classes.Contains("empty");
 
         bool IsPhantom() {
-            if (Preferences.LaunchpadModel.HasNovationLED() && Index == 9) return false;
+            if (Preferences.LaunchpadModel == LaunchpadModels.MF64)
+                return true;
+
+            if (Preferences.LaunchpadModel.HasNovationLED() && Index == 9)
+                return false;
 
             if (Preferences.LaunchpadStyle == LaunchpadStyles.Stock) {
                 int x = Index % 10;
                 int y = Index / 10;
 
-                if (x == 0 || x == 9 || y == 0 || y == 9) return true;
+                if (x == 0 || x == 9 || y == 0 || y == 9)
+                    return true;
             }
 
             return Preferences.LaunchpadStyle == LaunchpadStyles.Phantom;
@@ -54,7 +59,7 @@ namespace Apollo.Components {
 
             Canvas.Classes.Clear();
             Path.Classes.Clear();
-
+            
             switch (Preferences.LaunchpadModel) {
                 case LaunchpadModels.MK2:
                     if (x == 0 || y == 9 || Index == 9) AddClass("empty");
@@ -119,16 +124,28 @@ namespace Apollo.Components {
                         else AddClass("square");
                     }
                     break;
+                
+                case LaunchpadModels.MF64:
+                    if (x == 0 || x == 9 || y == 0 || y == 9) AddClass("empty");
+                    else {
+                        ret++;
+                        AddClass("arcade");
+                    }
+                    break;
             }
 
             return ret;
         }
 
         public void UpdateStyle()
-            => Path.Fill = IsPhantom()? SolidColorBrush.Parse("Transparent") : Path.Stroke;
+            => Path.Fill = IsPhantom()
+                ? (SolidColorBrush)Application.Current.Styles.FindResource("ThemePhantomBrush")
+                : Path.Stroke;
 
         public void SetColor(SolidColorBrush color)
-            => Path.Stroke = IsPhantom()? color : Path.Fill = color;
+            => Path.Stroke = IsPhantom()
+                ? color
+                : Path.Fill = color;
 
         public LaunchpadButton() => throw new InvalidOperationException();
 
