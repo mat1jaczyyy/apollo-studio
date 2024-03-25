@@ -525,6 +525,7 @@ namespace Apollo.Elements.Launchpads {
                         return LaunchpadType.Unknown;
                     }
 
+                    SupportsCompression = true;
                     return LaunchpadType.MF64;
                 }
 
@@ -675,8 +676,11 @@ namespace Apollo.Elements.Launchpads {
         static IEnumerable<byte> allMap = Enumerable.Range(1, 98).Except(new int[] {9, 90}).Select(i => (byte)i);
         static IEnumerable<byte> rowMap(int index) => Enumerable.Range(1, 8).Select(i => (byte)(index * 10 + i));
         static IEnumerable<byte> colMap(int index) => Enumerable.Range(0, 8).Select(i => (byte)(index + 10 + i * 10));
+
         static IEnumerable<byte> cols = Enumerable.Range(111, 8).Select(i => (byte)i);
         static IEnumerable<byte> squares = Enumerable.Range(101, 8).Select(i => (byte)i).Concat(cols);
+        static IEnumerable<byte> mf64cols = Enumerable.Range(104, 8).Select(i => (byte)i);
+        static IEnumerable<byte> mf64squares = Enumerable.Range(96, 8).Select(i => (byte)i).Concat(mf64cols);
 
         // TODO for later: this can be implemented a lot better
         static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new() {
@@ -706,45 +710,102 @@ namespace Apollo.Elements.Launchpads {
             if (Type.IsMatrix())
                 ret = ret.Concat(MatrixHeader);
 
-            ret = ret.Concat(new byte[] { 0x5F }).Concat(
-                colors.SelectMany(i => {
-                    IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index);
-                    if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);
+            ret = ret
+                .Concat(new byte[] { 0x5F })
+                .Concat(
+                    colors.SelectMany(i => {
+                        IEnumerable<byte> positions = filteredUpdates.Where(j => j.Color == i).Select(j => j.Index);
+                        if (Type.IsPro()) positions = positions.Select(j => j == 100? (byte)99 : j);
 
-                    IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
-                    List<byte> chunk = new() { i.Red, i.Green, i.Blue };
+                        IEnumerable<byte> finalPos = Enumerable.Empty<byte>();
+                        List<byte> chunk = new() { i.Red, i.Green, i.Blue };
 
-                    if (positions.Intersect(allMap).Count() == 100 - excludedIndexes[Type].Count + Convert.ToInt32(excludedIndexes[Type].Contains(100))) {
-                        finalPos = finalPos.Append((byte)0);
-                        if (Type.IsPro() && positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
-                    
-                    } else {
-                        finalPos = positions.ToList();
+                        if (Type == LaunchpadType.MF64) {
+                            finalPos = positions.ToList();
 
-                        for (int j = Convert.ToInt32(!Type.Is10x10()); j < 10; j++) {
-                            IEnumerable<byte> row = rowMap(j);
-                            IEnumerable<byte> col = colMap(j);
+                            for (int j = 1; j < 9; j++) {
+                                IEnumerable<byte> row = rowMap(j);
+                                IEnumerable<byte> col = colMap(j);
 
-                            if (positions.Intersect(row).Count() == 8)
-                                finalPos = finalPos.Except(row).Append((byte)(100 + j));
+                                if (positions.Intersect(row).Count() == 8)
+                                    finalPos = finalPos.Except(row).Append((byte)(96 + j - 1));
+                                    
+                                if (positions.Intersect(col).Count() == 8)
+                                    finalPos = finalPos.Except(col).Append((byte)(104 + j - 1));
+                            }
 
-                            if (positions.Intersect(col).Count() == 8)
-                                finalPos = finalPos.Except(col).Append((byte)(110 + j));
+                            if (finalPos.Intersect(mf64squares).Count() == 16)
+                                finalPos = finalPos.Except(mf64cols);
+
+                            finalPos = finalPos.ToList();
+
+                            HashSet<byte> except = new HashSet<byte>();
+
+                            List<byte> mf64Pos = finalPos
+                                .Where(j => j < 90)
+                                .Select(j => Converter.XYtoMF64(j))
+                                .ToList();
+
+                            mf64Pos = mf64Pos.Select(j => {
+                                byte _j = (byte)(~j & 0b00111111);
+
+                                if (j < 32 && mf64Pos.Contains(_j)) {
+                                    except.Add(_j);
+
+                                    byte m1 = (byte)((j & 0b00011100) | (_j & 0b00100011));
+                                    byte m2 = (byte)((j & 0b00100011) | (_j & 0b00011100));
+
+                                    if (j < 16 && mf64Pos.Contains(m1) && mf64Pos.Contains(m2)) {
+                                        except.Add((byte)(m2 | 0b01000000));
+                                        except.Add(m1);
+                                        except.Add(m2);
+                                        return (byte)(~j & 0b01111111);
+                                    }
+
+                                    return (byte)(j | 0b01000000);
+                                }
+                                
+                                return j;
+                            }).ToList();
+
+                            finalPos = finalPos
+                                .Where(j => j >= 90)
+                                .Concat(mf64Pos.Except(except));
+
+                        } else {
+                            if (positions.Intersect(allMap).Count() == 100 - excludedIndexes[Type].Count + Convert.ToInt32(excludedIndexes[Type].Contains(100))) {
+                                finalPos = finalPos.Append((byte)0);
+                                if (Type.IsPro() && positions.Contains((byte)99)) finalPos = finalPos.Append((byte)99); // Mode light
+                            
+                            } else {
+                                finalPos = positions.ToList();
+
+                                for (int j = Convert.ToInt32(!Type.Is10x10()); j < 10; j++) {
+                                    IEnumerable<byte> row = rowMap(j);
+                                    IEnumerable<byte> col = colMap(j);
+
+                                    if (positions.Intersect(row).Count() == 8)
+                                        finalPos = finalPos.Except(row).Append((byte)(100 + j));
+
+                                    if (positions.Intersect(col).Count() == 8)
+                                        finalPos = finalPos.Except(col).Append((byte)(110 + j));
+                                }
+
+                                if (finalPos.Intersect(squares).Count() == 16)
+                                    finalPos = finalPos.Except(cols);
+                            }
                         }
+                        
+                        if (finalPos.Count() > 7) chunk.Add((byte)finalPos.Count());
+                        else for (int j = 0; j < 3; j++)
+                            chunk[j] = (byte)(chunk[j] | ((finalPos.Count() & (4 >> j)) > 0? 0x40 : 0));
 
-                        if (finalPos.Intersect(squares).Count() == 16)
-                            finalPos = finalPos.Except(cols);
-                    }
-                    
-                    if (finalPos.Count() > 7) chunk.Add((byte)finalPos.Count());
-                    else for (int j = 0; j < 3; j++)
-                        chunk[j] = (byte)(chunk[j] | ((finalPos.Count() & (4 >> j)) > 0? 0x40 : 0));
-
-                    chunk.AddRange(finalPos);
-                    
-                    return chunk;
-                })
-            );
+                        chunk.AddRange(finalPos);
+                        
+                        return chunk;
+                    })
+                )
+                .ToList();
 
             return Type.IsPro()? ret.Count() <= 319 : true; // CFW Hard limit is 320 but this doesn't include SysExEnd
         }
