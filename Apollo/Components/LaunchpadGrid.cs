@@ -70,6 +70,18 @@ namespace Apollo.Components {
         void Update_LaunchpadModel() {
             Grid?.Children.Clear();
 
+            bool isMF64 = Preferences.LaunchpadModel == LaunchpadModels.MF64;
+
+            Back.CornerRadius = (CornerRadius)Application.Current.Styles.FindResource(
+                isMF64? "LPGrid_MF64CornerRadius" : "LPGrid_CornerRadius"
+            );
+            Back.BorderThickness = (Thickness)Application.Current.Styles.FindResource(
+                isMF64? "LPGrid_MF64PadMargin" : "LPGrid_PadMargin"
+            );
+            View.Margin = (Thickness)Application.Current.Styles.FindResource(
+                isMF64? "LPGrid_MF64TopMargin" : "LPGrid_TopMargin"
+            );
+
             int buttons = Preferences.LaunchpadModel.GridSize();
             int xoffset = Preferences.LaunchpadModel.GridOffsetX();
             int yoffset = Preferences.LaunchpadModel.GridOffsetY();

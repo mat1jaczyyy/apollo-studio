@@ -6,5 +6,6 @@ namespace Apollo.Helpers {
 
         public static byte DRtoXY(int dr) => _DRtoXY[dr];
         public static byte XYtoDR(int xy) => (byte)Array.IndexOf(_DRtoXY, (byte)xy);
+        public static byte XYtoMF64(int xy) => (byte)(XYtoDR(xy) - 36);
     }
 }

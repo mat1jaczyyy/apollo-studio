@@ -109,6 +109,7 @@
                     <ComboBoxItem>Pro MK3</ComboBoxItem>
                     <ComboBoxItem>All</ComboBoxItem>
                     <ComboBoxItem>Matrix</ComboBoxItem>
+                    <ComboBoxItem>MF64</ComboBoxItem>
                   </ComboBox>
                 </StackPanel>
 

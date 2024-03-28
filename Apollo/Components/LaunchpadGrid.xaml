@@ -12,9 +12,9 @@
                             PointerMoved="MouseMove" PointerReleased="MouseUp">
       
       <Grid>
-        <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" Background="{DynamicResource ThemeControlLowBrush}" BorderThickness="{DynamicResource LPGrid_PadMargin}" CornerRadius="{DynamicResource LPGrid_CornerRadius}" x:Name="Back" />
+        <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" Background="{DynamicResource ThemeControlLowBrush}" x:Name="Back" />
 
-        <Border Margin="{DynamicResource LPGrid_TopMargin}" x:Name="View" />
+        <Border x:Name="View" />
 
         <Rectangle Margin="{DynamicResource LPGrid_ModeMargin}" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Bottom" Fill="{DynamicResource ModeBrush}" Width="{DynamicResource LPGrid_ModeWidth}" Height="{DynamicResource LPGrid_ModeHeight}" x:Name="ModeLight"
                    PointerPressed="MouseDown" />

@@ -1,3 +1,5 @@
+using Apollo.Elements.Launchpads;
+
 namespace Apollo.Enums {
     public enum Palettes {
         Monochrome, NovationPalette, CustomPalette
@@ -12,7 +14,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadModels {
-        MK2, Pro, X, ProMK3, All, Matrix
+        MK2, Pro, X, ProMK3, All, Matrix, MF64
     }
 
     public enum LaunchpadStyles {
@@ -60,7 +62,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Matrix, MatrixPro, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Matrix, MatrixPro, MF64, Unknown
     }
 
     public enum InputType {
@@ -91,7 +93,7 @@ namespace Apollo.Enums {
             if (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
                 return 10;
             
-            if (model == LaunchpadModels.Matrix)
+            if (model == LaunchpadModels.Matrix || model == LaunchpadModels.MF64)
                 return 8;
                 
             return 9;
