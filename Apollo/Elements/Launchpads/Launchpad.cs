@@ -220,10 +220,10 @@ namespace Apollo.Elements.Launchpads {
             "One or more connected Midi Fighter 64s are running the official\n" + 
             "firmware which is not compatible with Apollo Studio.\n\n" +
             "Update these to the latest version of the custom firmware using the\n" +
-            "MIDI Fighter Utility to avoid any potential issues with Apollo Studio.",
+            "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
-                "Custom Firmware Guide",
-                "https://github.com/mat1jaczyyy/mf64-performance-cfw/blob/master/README.md#installation"
+                "Launch Firmware Utility",
+                "https://fw.mat1jaczyyy.com"
             )
         );
 
