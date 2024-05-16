@@ -26,6 +26,7 @@
     <Color x:Key="ThemeButtonOverColor">#FF787878</Color>
     <Color x:Key="ThemeButtonEnabledColor">#FF505050</Color>
     <Color x:Key="ThemeButtonDisabledColor">#FF242424</Color>
+    <Color x:Key="ThemePhantomColor">#FF0A0A0A</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeSplashBrush" Color="{DynamicResource ThemeSplashColor}"></SolidColorBrush>
@@ -47,5 +48,6 @@
     <SolidColorBrush x:Key="ThemeButtonOverBrush" Color="{DynamicResource ThemeButtonOverColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeButtonEnabledBrush" Color="{DynamicResource ThemeButtonEnabledColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemeButtonDisabledBrush" Color="{DynamicResource ThemeButtonDisabledColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemePhantomBrush" Color="{DynamicResource ThemePhantomColor}"></SolidColorBrush>
   </Style.Resources>
 </Style>
