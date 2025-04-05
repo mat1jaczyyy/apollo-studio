@@ -127,6 +127,30 @@
             </StackPanel>
             
             <Border />
+            
+            <TextBlock Classes="heading" Text="User Interface Motion" />
+            <Grid ColumnDefinitions="Auto,*">
+              <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                <TextBlock VerticalAlignment="Center" Text="Motion:" />
+                <ComboBox VerticalAlignment="Center" x:Name="UIMotion" SelectionChanged="UIMotion_Changed">
+                  <ComboBoxItem>Off</ComboBoxItem>
+                  <ComboBoxItem>Reduced</ComboBoxItem>
+                  <ComboBoxItem>Full</ComboBoxItem>
+                </ComboBox>
+              </StackPanel>
+              <TextBlock Grid.Column="1" Classes="heading" Margin="5 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="UIMotionWarning" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock VerticalAlignment="Center" Text="Hover Time:" />
+              <ComboBox VerticalAlignment="Center" x:Name="UIHoverTime" SelectionChanged="UIHoverTime_Changed">
+                <ComboBoxItem>None</ComboBoxItem>
+                <ComboBoxItem>Short</ComboBoxItem>
+                <ComboBoxItem>Medium</ComboBoxItem>
+                <ComboBoxItem>Long</ComboBoxItem>
+              </ComboBox>
+            </StackPanel>
+            
+            <Border />
 
             <TextBlock Classes="heading" Text="Group Behavior" />
             <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create Key Filter in new Group Chain</CheckBox>
@@ -193,7 +217,7 @@
 
             <StackPanel Grid.Column="1">
               <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock HorizontalAlignment="Center" Text="2018 – 2024 mat1jaczyyy" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 – 2025 mat1jaczyyy" />
             </StackPanel>
 
             <Components:KoFi Grid.Column="2" VerticalAlignment="Center" />

@@ -39,6 +39,8 @@ namespace Apollo.Windows {
             DeviceSignalIndicators = this.Get<CheckBox>("DeviceSignalIndicators");
             
             ColorDisplayFormat = this.Get<ComboBox>("ColorDisplayFormat");
+            UIMotion = this.Get<ComboBox>("UIMotion");
+            UIHoverTime = this.Get<ComboBox>("UIHoverTime");
 
             LaunchpadStyle = this.Get<ComboBox>("LaunchpadStyle");
             LaunchpadGridRotation = this.Get<ComboBox>("LaunchpadGridRotation");
@@ -63,6 +65,7 @@ namespace Apollo.Windows {
             CustomPalette = this.Get<RadioButton>("CustomPalette");
 
             ThemeHeader = this.Get<TextBlock>("ThemeHeader");
+            UIMotionWarning = this.Get<TextBlock>("UIMotionWarning");
             Dark = this.Get<RadioButton>("Dark");
             Light = this.Get<RadioButton>("Light");
 
@@ -85,8 +88,8 @@ namespace Apollo.Windows {
         }
 
         CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, RememberPatternPosition, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
-        ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
-        TextBlock ThemeHeader, CurrentSession, AllTime;
+        ComboBox ColorDisplayFormat, UIMotion, UIHoverTime, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
+        TextBlock ThemeHeader, UIMotionWarning, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
         HorizontalDial FPSLimit;
         Controls Contents;
@@ -173,6 +176,8 @@ namespace Apollo.Windows {
             DeviceSignalIndicators.IsChecked = Preferences.DeviceSignalIndicators;
             
             ColorDisplayFormat.SelectedIndex = (int)Preferences.ColorDisplayFormat;
+            UIMotion.SelectedIndex = (int)Preferences.UIMotion;
+            UIHoverTime.SelectedIndex = (int)Preferences.UIHoverTime;
 
             LaunchpadStyle.SelectedIndex = (int)Preferences.LaunchpadStyle;
             LaunchpadGridRotation.SelectedIndex = Convert.ToInt32(Preferences.LaunchpadGridRotation);
@@ -259,6 +264,13 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
+
+        void UIMotion_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            Preferences.UIMotion = (UIMotionType)UIMotion.SelectedIndex;
+            UIMotionWarning.Text = Preferences.UIMotion == UIMotionType.Off ? "Some features may not be accessible\nwith UI Motion disabled." : "";
+        }
+        void UIHoverTime_Changed(object sender, SelectionChangedEventArgs e) => Preferences.UIHoverTime = (UIHoverTimeType) UIHoverTime.SelectedIndex;
 
         void ColorDisplayFormat_Changed(object sender, SelectionChangedEventArgs e) => Preferences.ColorDisplayFormat = (ColorDisplayType)ColorDisplayFormat.SelectedIndex;
         

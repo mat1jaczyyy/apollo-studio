@@ -77,6 +77,31 @@ namespace Apollo.Core {
                 ColorDisplayFormatChanged?.Invoke();
                 Save();
             }
+        }        
+        public static event Changed UIMotionChanged;
+        static UIMotionType _UIMotion = UIMotionType.Full;
+        public static UIMotionType UIMotion {
+            get => _UIMotion;
+            set {
+                if (_UIMotion == value) return;
+
+                _UIMotion = value;
+                UIMotionChanged?.Invoke();
+                Save();
+            }
+        }        
+        
+        public static event Changed UIHoverTimeChanged;
+        static UIHoverTimeType _UIHoverTime = UIHoverTimeType.Medium;
+        public static UIHoverTimeType UIHoverTime {
+            get => _UIHoverTime;
+            set {
+                if (_UIHoverTime == value) return;
+
+                _UIHoverTime = value;
+                UIHoverTimeChanged?.Invoke();
+                Save();
+            }
         }
 
         public static event Changed LaunchpadModelChanged;

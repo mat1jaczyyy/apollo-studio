@@ -84,6 +84,14 @@ namespace Apollo.Enums {
     public enum PurposeType {
         Unknown, Active, Passive, Unrelated
     }
+    
+    public enum UIMotionType {
+        Off, Reduced, Full
+    }
+    
+    public enum UIHoverTimeType {
+        None, Short, Medium, Long
+    }
 
     public static class EnumExtensions {
         public static bool HasNovationLED(this LaunchpadModels model)

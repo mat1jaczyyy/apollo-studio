@@ -53,6 +53,12 @@ namespace Apollo.Binary {
                 Preferences.ColorDisplayFormat = (ColorDisplayType)reader.ReadInt32();
             }
 
+            if (version >= 33)
+            {
+                Preferences.UIMotion = (UIMotionType)reader.ReadInt32();
+                Preferences.UIHoverTime = (UIHoverTimeType)reader.ReadInt32();
+            }
+
             if (version >= 9) {
                 Preferences.LaunchpadStyle = (LaunchpadStyles)reader.ReadInt32();
             }
