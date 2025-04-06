@@ -68,31 +68,38 @@ namespace Apollo.Core {
         
         public static event Changed ColorDisplayFormatChanged;
         static ColorDisplayType _ColorDisplayFormat = ColorDisplayType.Hex;
-        public static ColorDisplayType ColorDisplayFormat {
+
+        public static ColorDisplayType ColorDisplayFormat
+        {
             get => _ColorDisplayFormat;
-            set {
+            set
+            {
                 if (_ColorDisplayFormat == value) return;
 
                 _ColorDisplayFormat = value;
                 ColorDisplayFormatChanged?.Invoke();
                 Save();
             }
-        }        
+        }
+        
         public static event Changed UIMotionChanged;
-        static UIMotionType _UIMotion = UIMotionType.Full;
-        public static UIMotionType UIMotion {
+        static UIMotionType _UIMotion = UIMotionType.Off;
+
+        public static UIMotionType UIMotion
+        {
             get => _UIMotion;
-            set {
+            set
+            {
                 if (_UIMotion == value) return;
 
                 _UIMotion = value;
                 UIMotionChanged?.Invoke();
                 Save();
             }
-        }        
-        
+        }
+
         public static event Changed UIHoverTimeChanged;
-        static UIHoverTimeType _UIHoverTime = UIHoverTimeType.Medium;
+        static UIHoverTimeType _UIHoverTime = UIHoverTimeType.Normal;
         public static UIHoverTimeType UIHoverTime {
             get => _UIHoverTime;
             set {

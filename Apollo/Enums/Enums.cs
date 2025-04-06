@@ -90,7 +90,7 @@ namespace Apollo.Enums {
     }
     
     public enum UIHoverTimeType {
-        None, Short, Medium, Long
+        Instant, Fast, Normal, Slow
     }
 
     public static class EnumExtensions {

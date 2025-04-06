@@ -268,7 +268,7 @@ namespace Apollo.Windows {
         void UIMotion_Changed(object sender, SelectionChangedEventArgs e)
         {
             Preferences.UIMotion = (UIMotionType)UIMotion.SelectedIndex;
-            UIMotionWarning.Text = Preferences.UIMotion == UIMotionType.Off ? "Some features may not be accessible\nwith UI Motion disabled." : "";
+            UIMotionWarning.Text = Preferences.UIMotion == UIMotionType.Off ? "Some features may not be accessible with UI Motion\ndisabled. Recommended for advanced users only." : "";
         }
         void UIHoverTime_Changed(object sender, SelectionChangedEventArgs e) => Preferences.UIHoverTime = (UIHoverTimeType) UIHoverTime.SelectedIndex;
 
