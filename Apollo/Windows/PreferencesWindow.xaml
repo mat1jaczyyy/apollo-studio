@@ -127,6 +127,40 @@
             </StackPanel>
             
             <Border />
+            
+            <TextBlock Classes="heading" Text="Accessibility" />
+            <Grid ColumnDefinitions="Auto,*">
+              <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                <TextBlock VerticalAlignment="Center" Text="Motion:">
+                  <ToolTip.Tip>
+                    <StackPanel>
+                      <TextBlock>Adjusts animations in Apollo's UI.</TextBlock>
+                      <TextBlock>Full: All animations enabled. (Default)</TextBlock>
+                      <TextBlock>Reduced: Disables animations. You can still hover between devices or chains to insert new ones.</TextBlock>
+                      <TextBlock>Off: Disables all hover interactions. Use drag and drop to move or add devices and chains.</TextBlock>
+                    </StackPanel>
+                  </ToolTip.Tip>
+                </TextBlock>
+                
+                <ComboBox VerticalAlignment="Center" x:Name="UIMotion" SelectionChanged="UIMotion_Changed">
+                  <ComboBoxItem>Off</ComboBoxItem>
+                  <ComboBoxItem>Reduced</ComboBoxItem>
+                  <ComboBoxItem>Full</ComboBoxItem>
+                </ComboBox>
+              </StackPanel>
+              <TextBlock Grid.Column="1" Classes="heading" Margin="5 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="UIMotionWarning" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock VerticalAlignment="Center" Text="Hover Time:" ToolTip.Tip="Changes how long you need to hover, for the add button to show up between devices or chains." />
+              <ComboBox VerticalAlignment="Center" x:Name="UIHoverTime" SelectionChanged="UIHoverTime_Changed">
+                <ComboBoxItem>Instant</ComboBoxItem>
+                <ComboBoxItem>Short</ComboBoxItem>
+                <ComboBoxItem>Medium</ComboBoxItem>
+                <ComboBoxItem>Long</ComboBoxItem>
+              </ComboBox>
+            </StackPanel>
+            
+            <Border />
 
             <TextBlock Classes="heading" Text="Group Behavior" />
             <CheckBox Click="AutoCreateKeyFilter_Changed" x:Name="AutoCreateKeyFilter">Auto create Key Filter in new Group Chain</CheckBox>
@@ -193,7 +227,7 @@
 
             <StackPanel Grid.Column="1">
               <TextBlock HorizontalAlignment="Center" Text="Apollo Studio / " x:Name="Version" />
-              <TextBlock HorizontalAlignment="Center" Text="2018 – 2024 mat1jaczyyy" />
+              <TextBlock HorizontalAlignment="Center" Text="2018 – 2025 mat1jaczyyy" />
             </StackPanel>
 
             <Components:KoFi Grid.Column="2" VerticalAlignment="Center" />
