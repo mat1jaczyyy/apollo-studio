@@ -292,17 +292,11 @@ namespace Apollo.Windows {
 
         void CustomPalette_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
-        async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
-            OpenFileDialog ofd = new OpenFileDialog() {
+        async void BrowseCustomPalette(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog()
+            {
                 AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "*"
-                        },
-                        Name = "Retina Palette File"
-                    }
-                },
                 Title = "Select Retina Palette"
             };
 
