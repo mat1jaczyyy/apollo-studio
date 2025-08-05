@@ -1,3 +1,7 @@
+# This is copy of https://github.com/mat1jaczyyy/apollo-studio 
+# This is just a fan made build for Linux 
+
+
 # Apollo Studio
 
 ### Fly your Launchpad to the moon. ☆.。.:*・°☆
@@ -35,7 +39,7 @@ Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apo
 
 ## Getting Started
 
-Download Apollo Studio from the [Releases](https://github.com/mat1jaczyyy/apollo-studio/releases) page. Configure your Launchpads in the Preferences and start a new Project to begin working. We recommend you read the [Documentation](https://github.com/mat1jaczyyy/apollo-studio/wiki) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
+Download Apollo Studio from the [Releases](https://github.com/Jacobeagle/apollo-studio-Linux/releases) page. Configure your Launchpads in the Preferences and start a new Project to begin working. We recommend you read the [Documentation](https://github.com/mat1jaczyyy/apollo-studio/wiki) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
 ## Documentation and Support
 
