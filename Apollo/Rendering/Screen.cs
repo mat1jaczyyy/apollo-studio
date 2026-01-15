@@ -10,7 +10,6 @@ namespace Apollo.Rendering {
             byte Index;
             
             SortedList<int, Signal> _signals = new();
-            Color state = new Color(0);
 
             object locker = new object();
 

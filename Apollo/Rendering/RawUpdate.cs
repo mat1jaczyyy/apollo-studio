@@ -19,5 +19,8 @@ namespace Apollo.Rendering {
             Index = (byte)(n.Index + offset);
             Color = n.Color.Clone();
         }
+
+        public override string ToString()
+            => $"[{Index}: {Color}]";
     }
 }

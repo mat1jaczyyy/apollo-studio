@@ -14,6 +14,7 @@ namespace Apollo.Rendering {
 
         static SortedDictionary<long, List<Action>> jobs = new();
         static ConcurrentQueue<(long, Action)> jobQueue = new();
+        static bool askedToTick = false;
 
         static long prev, lastRender = -1, renderAt = -1;
 
@@ -26,6 +27,11 @@ namespace Apollo.Rendering {
         
         public static void Schedule(Action job, double time) {
             jobQueue.Enqueue((MSToTicks(time), job));
+            Wake();
+        }
+
+        public static void PlsTick() {
+            askedToTick = true;
             Wake();
         }
 
@@ -47,7 +53,7 @@ namespace Apollo.Rendering {
             RenderThread = Task.Run(() => {
                 prev = Program.TimeSpent.ElapsedTicks - 1;
                 
-                while (renderAt >= 0 || jobQueue.Any() || jobs.Any() || signalQueue.Any()) {
+                while (renderAt >= 0 || jobQueue.Any() || jobs.Any() || signalQueue.Any() || askedToTick) {
                     while (jobQueue.TryDequeue(out (long Time, Action Job) task)) {
                         long target = task.Time;
 
@@ -76,13 +82,14 @@ namespace Apollo.Rendering {
                             }
                         });
 
-                    if (changed && renderAt < 0)
+                    if ((changed || askedToTick) && renderAt < 0) {
                         renderAt = Math.Max(
                             prev + MSToTicks(250.0 / Preferences.FPSLimit),         // Buffer for collecting extra signals
                             lastRender + MSToTicks(1000.0 / Preferences.FPSLimit)   // FPS limit
                         );
+                        askedToTick = false;
 
-                    else if (renderAt >= 0 && prev > renderAt) {  
+                    } else if (renderAt >= 0 && prev > renderAt) {  
                         Screen.Draw();
                         lastRender = prev;
                         renderAt = -1;

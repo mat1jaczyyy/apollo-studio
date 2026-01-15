@@ -36,6 +36,7 @@ namespace Apollo.Devices {
 
         public override void MIDIProcess(List<Signal> n) {
             n.ForEach(screen.MIDIEnter);
+            Heaven.PlsTick();
             InvokeExit(n);
         }
 
