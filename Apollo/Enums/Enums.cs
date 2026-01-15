@@ -14,7 +14,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadModels {
-        MK2, Pro, X, ProMK3, All, Matrix, MF64
+        MK2, Pro, X, ProMK3, All, Mystrix, MF64
     }
 
     public enum LaunchpadStyles {
@@ -62,7 +62,7 @@ namespace Apollo.Enums {
     }
 
     public enum LaunchpadType {
-        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Matrix, MatrixPro, MF64, Unknown
+        MK2, Pro, CFW, X, MiniMK3, ProMK3, MatrixFE, Mystrix, MystrixPro, MF64, Unknown
     }
 
     public enum InputType {
@@ -93,7 +93,7 @@ namespace Apollo.Enums {
             if (model == LaunchpadModels.Pro || model == LaunchpadModels.ProMK3 || model == LaunchpadModels.All)
                 return 10;
             
-            if (model == LaunchpadModels.Matrix || model == LaunchpadModels.MF64)
+            if (model == LaunchpadModels.Mystrix || model == LaunchpadModels.MF64)
                 return 8;
                 
             return 9;
@@ -124,7 +124,7 @@ namespace Apollo.Enums {
             => type == MultiType.Key;
 
         public static bool Is10x10(this LaunchpadType type)
-            => type.IsPro() || type == LaunchpadType.MatrixPro;
+            => type.IsPro() || type == LaunchpadType.MystrixPro;
 
         public static bool IsPro(this LaunchpadType type)
             => LaunchpadType.Pro <= type && type <= LaunchpadType.CFW;
@@ -135,8 +135,8 @@ namespace Apollo.Enums {
         public static bool HasProgrammerFwHack(this LaunchpadType type)
             => LaunchpadType.X <= type && type <= LaunchpadType.MiniMK3;
 
-        public static bool IsMatrix(this LaunchpadType type)
-            => LaunchpadType.MatrixFE <= type && type <= LaunchpadType.MatrixPro;
+        public static bool IsMatrixOS(this LaunchpadType type)
+            => LaunchpadType.MatrixFE <= type && type <= LaunchpadType.MystrixPro;
 
         public static bool SupportsRange(this BlendingType type)
             => type != BlendingType.Normal;
