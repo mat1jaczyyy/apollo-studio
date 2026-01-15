@@ -91,7 +91,7 @@ namespace Apollo.Elements.Launchpads {
             "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-x/firmware"
+                "https://components.novationmusic.com/launchpad-x/updates"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
@@ -133,7 +133,7 @@ namespace Apollo.Elements.Launchpads {
             "any potential issues with Apollo Studio.",
             new PortWarning.Option(
                 "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-mini-mk3/firmware"
+                "https://components.novationmusic.com/launchpad-mini-mk3/updates"
             ),
             new PortWarning.Option(
                 "Launch Firmware Utility",
