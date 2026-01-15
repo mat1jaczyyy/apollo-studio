@@ -114,7 +114,7 @@ namespace Apollo.Elements.Launchpads {
 
         public static PortWarning XFirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Xs are running a version of\n" + 
-            "the official Novation firmware which is not compatible with \n" +
+            "the official Novation firmware which is not compatible with\n" +
             "Apollo Studio due to having a broken Legacy mode.\n\n" +
             "Update these to the latest working version of the firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
@@ -156,7 +156,7 @@ namespace Apollo.Elements.Launchpads {
 
         public static PortWarning MiniMK3FirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Mini MK3s are running a version of\n" + 
-            "the official Novation firmware which is not compatible with \n" +
+            "the official Novation firmware which is not compatible with\n" +
             "Apollo Studio due to having a broken Legacy mode.\n\n" +
             "Update these to the latest working version of the firmware using the\n" +
             "Launchpad Firmware Utility to avoid any potential issues with Apollo Studio.",
@@ -166,20 +166,28 @@ namespace Apollo.Elements.Launchpads {
             )
         );
 
+        public static PortWarning ProMK3FirmwareStock { get; private set; } = new PortWarning(
+            "One or more connected Launchpad Pro MK3s are running\n" + 
+            "the official Novation firmware.\n" + 
+            "While they will work with Apollo Studio, the official firmware\n" +
+            "performs considerably worse than the optimized custom firmware.\n\n" +
+            "Update these to the latest version of anthonyhfm's custom firmware using the\n" +
+            "Launchpad Injection Tool to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Injection Tool",
+                "https://fw.anthonyhfm.dev/"
+            )
+        );
+
         public static PortWarning ProMK3FirmwareUnsupported { get; private set; } = new PortWarning(
             "One or more connected Launchpad Pro MK3s are running an older version of\n" + 
-            "the official Novation firmware which is not compatible with \n" +
+            "the official Novation firmware which is not compatible with\n" +
             "Apollo Studio due to not having a dedicated Legacy mode.\n\n" +
-            "Update these to the latest version of the firmware using the\n" +
-            "Launchpad Firmware Utility (or Novation Components) to avoid\n" +
-            "any potential issues with Apollo Studio.",
+            "Update these to the latest version of anthonyhfm's custom firmware using the\n" +
+            "Launchpad Injection Tool to avoid any potential issues with Apollo Studio.",
             new PortWarning.Option(
-                "Launch Components Online",
-                "https://components.novationmusic.com/launchpad-pro-mk3/firmware"
-            ),
-            new PortWarning.Option(
-                "Launch Firmware Utility",
-                "https://fw.mat1jaczyyy.com"
+                "Launch Injection Tool",
+                "https://fw.anthonyhfm.dev/"
             )
         );
 
@@ -227,6 +235,18 @@ namespace Apollo.Elements.Launchpads {
             )
         );
 
+        public static PortWarning anthonyhfmIncompatible { get; private set; } = new PortWarning(
+            "One or more connected Launchpads are running an older version of\n" + 
+            "anthonyhfm's custom firmware which is not compatible with\n" +
+            "Apollo Studio.\n\n" +
+            "Update these to the latest version of the custom firmware using the\n" +
+            "Launchpad Injection Tool to avoid any potential issues with Apollo Studio.",
+            new PortWarning.Option(
+                "Launch Injection Tool",
+                "https://fw.anthonyhfm.dev/"
+            )
+        );
+
         public static void DisplayWarnings(Window sender) {
             Dispatcher.UIThread.Post(() => {
                 if (MK2FirmwareOld.DisplayWarning(sender)) return;
@@ -240,11 +260,13 @@ namespace Apollo.Elements.Launchpads {
                 if (MiniMK3FirmwareOld.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareStock.DisplayWarning(sender)) return;
                 if (MiniMK3FirmwareUnsupported.DisplayWarning(sender)) return;
+                if (ProMK3FirmwareStock.DisplayWarning(sender)) return;
                 if (ProMK3FirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MatrixFEFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MystrixFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MystrixProFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MF64FirmwareUnsupported.DisplayWarning(sender)) return;
+                if (anthonyhfmIncompatible.DisplayWarning(sender)) return;
             }, DispatcherPriority.MinValue);
         }
 
@@ -372,24 +394,77 @@ namespace Apollo.Elements.Launchpads {
             : PatternWindow.PatternDevice.Frames[PatternWindow.PatternDevice.Expanded].Screen[index].Clone();
 
         static readonly byte[] DeviceInquiry = new byte[] {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
-        static readonly byte[] VersionInquiry = new byte[] {0xF0, 0x00, 0x20, 0x29, 0x00, 0x70, 0xF7};
 
-        bool doingMK2VersionInquiry = false;
+        enum DoingVersionInquiry {
+            No,
+            MK2,
+            anthonyhfm
+        }
+
+        static readonly Dictionary<DoingVersionInquiry, byte[]> VersionInquiry = new Dictionary<DoingVersionInquiry, byte[]>() {
+            { DoingVersionInquiry.MK2, new byte[] {0xF0, 0x00, 0x20, 0x29, 0x00, 0x70, 0xF7} },
+            { DoingVersionInquiry.anthonyhfm, new byte[] {0xF0, 0x00, 0x20, 0x29, 0x02, 0x7F, 0x00, 0xF7} }
+        };
+
+        DoingVersionInquiry doingVersionInquiry = DoingVersionInquiry.No;
 
         LaunchpadType AttemptIdentify(MidiMessage response) {
-            if (doingMK2VersionInquiry) {
-                doingMK2VersionInquiry = false;
+            if (doingVersionInquiry != DoingVersionInquiry.No) {
+                DoingVersionInquiry inquiring = doingVersionInquiry;
+                doingVersionInquiry = DoingVersionInquiry.No;
 
-                if (response.Data.Length != 19)
-                    return LaunchpadType.Unknown;
-                
-                if (response.CheckSysExHeader(new byte[] {0x00, 0x20, 0x29, 0x00}) && response.Data[5] == 0x70) {
-                    int versionInt = int.Parse(string.Join("", response.Data.SkipLast(3).TakeLast(3)));
-
-                    if (versionInt < 171) // Old Firmware
-                        MK2FirmwareOld.Set();
+                if (inquiring == DoingVersionInquiry.MK2) {
+                    if (response.Data.Length != 19)
+                        return LaunchpadType.Unknown;
                     
-                    return LaunchpadType.Unknown; // Bootloader
+                    if (response.CheckSysExHeader(new byte[] {0x00, 0x20, 0x29, 0x00}) && response.Data[5] == 0x70) {
+                        int versionInt = int.Parse(string.Join("", response.Data.SkipLast(3).TakeLast(3)));
+
+                        if (versionInt < 171) // Old Firmware
+                            MK2FirmwareOld.Set();
+                        
+                        return LaunchpadType.Unknown; // Bootloader
+                    }
+                
+                } else if (inquiring == DoingVersionInquiry.anthonyhfm) {
+                    if (response.Data.Length == 11) {
+                        anthonyhfmIncompatible.Set();
+                        return LaunchpadType.Unknown;
+                    }
+
+                    if (response.Data.Length != 12)
+                        return LaunchpadType.Unknown;
+
+                    if (response.CheckSysExHeader(NovationHeader) && response.Data[5] == 0x7F && response.Data[6] == 0x01) {
+                        int versionInt = response.Data[8] << 16 | response.Data[9] << 8 | response.Data[10];
+
+                        if (versionInt < 0x000101) { // < 0.1.1
+                            anthonyhfmIncompatible.Set();
+                            return LaunchpadType.Unknown;
+                        }
+
+                        switch (response.Data[7]) {
+                            case 0x69: // Launchpad MK2
+                                SupportsCompression = true;
+                                return LaunchpadType.MK2;
+                            
+                            case 0x51: // Launchpad Pro
+                                SupportsCompression = true;
+                                return LaunchpadType.Pro;
+
+                            case 0x03: // Launchpad X
+                                SupportsCompression = true;
+                                return LaunchpadType.X;
+                            
+                            case 0x13: // Launchpad Mini MK3
+                                SupportsCompression = true;
+                                return LaunchpadType.MiniMK3;
+                            
+                            case 0x23: // Launchpad Pro MK3
+                                SupportsCompression = true;
+                                return LaunchpadType.ProMK3;
+                        }
+                    }
                 }
                 
                 return LaunchpadType.Unknown;
@@ -407,10 +482,16 @@ namespace Apollo.Elements.Launchpads {
                 string versionStr = string.Join("", version.Select(i => (char)i));
                 int versionInt = int.Parse(string.Join("", version));
 
+                // anthonyhfm's Custom Firmware uses version "999" and need to do additional version inquiry
+                if (versionInt == 999) {
+                    doingVersionInquiry = DoingVersionInquiry.anthonyhfm;
+                    return LaunchpadType.Unknown;
+                }
+
                 switch (response.Data[8]) {
                     case 0x69: // Launchpad MK2
                         if (versionInt < 171) { // Old Firmware or Bootloader?
-                            doingMK2VersionInquiry = true;
+                            doingVersionInquiry = DoingVersionInquiry.MK2;
                             return LaunchpadType.Unknown;
                         }
                         
@@ -488,8 +569,9 @@ namespace Apollo.Elements.Launchpads {
                             return LaunchpadType.Unknown;
                         }
 
+                        ProMK3FirmwareStock.Set();
                         return LaunchpadType.ProMK3;
-                } 
+                }
 
             // Manufacturer = 203 Electronics, Family = Matrix / Mystrix
             } else if (response.Data[5] == 0x00 && response.Data[6] == 0x02 && response.Data[7] == 0x03 && response.Data[8] == 0x4D && response.Data[9] == 0x58) {
@@ -550,7 +632,7 @@ namespace Apollo.Elements.Launchpads {
             } else {
                 Task.Delay(1500).ContinueWith(_ => {
                     if (Available && Type == LaunchpadType.Unknown)
-                        Output.Send(doingMK2VersionInquiry? VersionInquiry : DeviceInquiry);
+                        Output.Send(doingVersionInquiry != DoingVersionInquiry.No ? VersionInquiry[doingVersionInquiry] : DeviceInquiry);
                 });
             }
         }
@@ -685,9 +767,11 @@ namespace Apollo.Elements.Launchpads {
         // TODO for later: this can be implemented a lot better
         static Dictionary<LaunchpadType, HashSet<byte>> excludedIndexes = new() {
             {LaunchpadType.MK2, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99}},
+            {LaunchpadType.Pro, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.CFW, new HashSet<byte>() {0, 9, 90, 99}},
             {LaunchpadType.X, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
             {LaunchpadType.MiniMK3, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90}},
+            {LaunchpadType.ProMK3, new HashSet<byte>() {100, 0, 9}},
             {LaunchpadType.MatrixFE, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
             {LaunchpadType.Mystrix, new HashSet<byte>() {100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99}},
             {LaunchpadType.MystrixPro, new HashSet<byte>() {100, 0, 9, 90, 99}},
@@ -890,7 +974,7 @@ namespace Apollo.Elements.Launchpads {
             Program.Log($"MIDI Connected {Name}");
 
             Type = LaunchpadType.Unknown;
-            doingMK2VersionInquiry = false;
+            doingVersionInquiry = DoingVersionInquiry.No;
 
             StartIdentification();
         }
