@@ -115,7 +115,7 @@ namespace Apollo.Components {
                     else AddClass("square");
                     break;
 
-                case LaunchpadModels.Matrix:
+                case LaunchpadModels.Mystrix:
                     if (x == 0 || x == 9 || y == 0 || y == 9) AddClass("empty");
                     else {
                         ret++;

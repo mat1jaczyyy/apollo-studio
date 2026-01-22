@@ -295,16 +295,21 @@ namespace Apollo.Windows {
         async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog() {
                 AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
+                Title = "Select Retina Palette"
+            };
+
+            // On newer OSX versions, filtering for files with no extension is broken
+            // https://github.com/AvaloniaUI/Avalonia/issues/7759
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                ofd.Filters = new List<FileDialogFilter>() {
                     new FileDialogFilter() {
                         Extensions = new List<string>() {
                             "*"
                         },
                         Name = "Retina Palette File"
                     }
-                },
-                Title = "Select Retina Palette"
-            };
+                };
+            }
 
             string[] result = await ofd.ShowAsync(this);
 

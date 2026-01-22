@@ -69,7 +69,7 @@ namespace Apollo.Components {
                                 if (i == 0 || i == 9) continue;
                                 break;
                             
-                            case LaunchpadModels.Matrix:
+                            case LaunchpadModels.Mystrix:
                             case LaunchpadModels.MF64:
                                 if (x == 0 || y == 0 || x == 9 || y == 9) continue;
                                 break;

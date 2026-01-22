@@ -15,10 +15,11 @@ using Apollo.Elements;
 
 namespace Apollo.Core {
     class Program {
-        public static readonly string Version = "Version 1.8.16";
+        public static readonly string Version = "Version 1.8.17";
 
-        public static AppBuilder BuildAvaloniaApp()
+        static AppBuilder BuildAvaloniaApp(bool useGpu)
             => AppBuilder.Configure<App>()
+                .With(new AvaloniaNativePlatformOptions { UseGpu = useGpu })
                 .UsePlatformDetect();
 
         public static string GetBaseFolder(string folder) => Path.Combine(
@@ -131,11 +132,17 @@ namespace Apollo.Core {
                 Preferences.Save();
             };
 
-            TimeSpent.Start();
-            
+            bool useGpu = !args.Contains("--nogpu");
+            if (!useGpu) {
+                Program.Log("Running without GPU");
+                args = args.Where(i => i != "--nogpu").ToArray();
+            }
+
             App.Args = args;
-            
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(null);
+
+            TimeSpent.Start();
+
+            BuildAvaloniaApp(useGpu).StartWithClassicDesktopLifetime(null);
 
             TimeSpent.Stop();
 
