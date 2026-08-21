@@ -57,6 +57,7 @@
                 <CheckBox Click="CenterTrackContents_Changed" x:Name="CenterTrackContents">Center Track Contents</CheckBox>
                 <CheckBox Click="ChainSignalIndicators_Changed" x:Name="ChainSignalIndicators">Chain Signal Indicators</CheckBox>
                 <CheckBox Click="DeviceSignalIndicators_Changed" x:Name="DeviceSignalIndicators">Device Signal Indicators</CheckBox>
+                <CheckBox Click="CollapseAddDeviceButton_Changed" x:Name="CollapseAddDeviceButton">Collapse +-Button</CheckBox>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                   <TextBlock VerticalAlignment="Center" Text="Color Display Format:" />
                   <ComboBox VerticalAlignment="Center" x:Name="ColorDisplayFormat" SelectionChanged="ColorDisplayFormat_Changed">

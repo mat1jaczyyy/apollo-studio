@@ -7,6 +7,8 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
+using Apollo.Core;
+
 namespace Apollo.Components {
     public class DeviceAdd: AddButton {
         void InitializeComponent() {
@@ -15,6 +17,9 @@ namespace Apollo.Components {
             Root = this.Get<Grid>("Root");
             Path = this.Get<Path>("Path");
             Icon = this.Get<Canvas>("Icon");
+
+            Preferences.CollapseAddDeviceButtonChanged += CollapsePreferenceChanged;
+            this.ApplyAlwaysShowing();
         }
 
         public new delegate void AddedEventHandler(Type device);
@@ -25,12 +30,23 @@ namespace Apollo.Components {
 
         Canvas Icon;
 
+        void CollapsePreferenceChanged() => ApplyAlwaysShowing();
+
+        bool requestedAlwaysShowing;
+
+        void ApplyAlwaysShowing() {
+            bool forceExpanded = !Preferences.CollapseAddDeviceButton;
+            bool effective = forceExpanded || requestedAlwaysShowing;
+
+            if (effective == _always) return;
+            _always = effective;
+            Root.MinWidth = _always ? 30 : 0;
+        }
+
         public override bool AlwaysShowing {
             set {
-                if (value != _always) {
-                    _always = value;
-                    Root.MinWidth = _always? 30 : 0;
-                }
+                requestedAlwaysShowing = value;
+                ApplyAlwaysShowing();
             }
         }
 
@@ -45,6 +61,8 @@ namespace Apollo.Components {
         protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
             Action = null;
+
+            Preferences.CollapseAddDeviceButtonChanged -= CollapsePreferenceChanged;
 
             base.Unloaded(sender, e);
         }

@@ -37,6 +37,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators = this.Get<CheckBox>("ChainSignalIndicators");
             DeviceSignalIndicators = this.Get<CheckBox>("DeviceSignalIndicators");
+
+            CollapseAddDeviceButton = this.Get<CheckBox>("CollapseAddDeviceButton");
             
             ColorDisplayFormat = this.Get<ComboBox>("ColorDisplayFormat");
 
@@ -84,7 +86,7 @@ namespace Apollo.Windows {
             Preview = this.Get<LaunchpadGrid>("Preview");
         }
 
-        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, RememberPatternPosition, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
+        CheckBox AlwaysOnTop, CenterTrackContents, ChainSignalIndicators, DeviceSignalIndicators, CollapseAddDeviceButton, AutoCreateKeyFilter, AutoCreateMacroFilter, AutoCreatePattern, CopyPreviousFrame, CaptureLaunchpad, EnableGestures, RememberPatternPosition, Backup, Autosave, UndoLimit, DiscordPresence, DiscordFilename, CheckForUpdates;
         ComboBox ColorDisplayFormat, LaunchpadStyle, LaunchpadGridRotation, LaunchpadModel;
         TextBlock ThemeHeader, CurrentSession, AllTime;
         RadioButton Monochrome, NovationPalette, CustomPalette, Dark, Light;
@@ -171,6 +173,8 @@ namespace Apollo.Windows {
 
             ChainSignalIndicators.IsChecked = Preferences.ChainSignalIndicators;
             DeviceSignalIndicators.IsChecked = Preferences.DeviceSignalIndicators;
+
+            CollapseAddDeviceButton.IsChecked = Preferences.CollapseAddDeviceButton;
             
             ColorDisplayFormat.SelectedIndex = (int)Preferences.ColorDisplayFormat;
 
@@ -259,6 +263,8 @@ namespace Apollo.Windows {
         void ChainSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.ChainSignalIndicators = ChainSignalIndicators.IsChecked.Value;
 
         void DeviceSignalIndicators_Changed(object sender, RoutedEventArgs e) => Preferences.DeviceSignalIndicators = DeviceSignalIndicators.IsChecked.Value;
+        
+        void CollapseAddDeviceButton_Changed(object sender, RoutedEventArgs e) => Preferences.CollapseAddDeviceButton = CollapseAddDeviceButton.IsChecked.Value;
 
         void ColorDisplayFormat_Changed(object sender, SelectionChangedEventArgs e) => Preferences.ColorDisplayFormat = (ColorDisplayType)ColorDisplayFormat.SelectedIndex;
         

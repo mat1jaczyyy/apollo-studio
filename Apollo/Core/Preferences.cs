@@ -65,7 +65,20 @@ namespace Apollo.Core {
                 Save();
             }
         }
-        
+
+        public static event Changed CollapseAddDeviceButtonChanged;
+        static bool _CollapseAddDeviceButton = true;
+        public static bool CollapseAddDeviceButton {
+            get => _CollapseAddDeviceButton;
+            set {
+                if (_CollapseAddDeviceButton == value) return;
+
+                _CollapseAddDeviceButton = value;
+                CollapseAddDeviceButtonChanged?.Invoke();
+                Save();
+            }
+        }
+
         public static event Changed ColorDisplayFormatChanged;
         static ColorDisplayType _ColorDisplayFormat = ColorDisplayType.Hex;
         public static ColorDisplayType ColorDisplayFormat {
