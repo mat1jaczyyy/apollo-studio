@@ -151,6 +151,9 @@ namespace Apollo.Binary {
 
             if (17 <= version && version <= 28)
                 Preferences.BaseTime = reader.ReadInt64();
+
+            if(version >= 32)
+                Preferences.CollapseAddDeviceButton = reader.ReadBoolean();
         });
         
         public static void DecodeStats(Stream input) => Decode(input, PurposeType.Unknown, (reader, version, purpose) => {

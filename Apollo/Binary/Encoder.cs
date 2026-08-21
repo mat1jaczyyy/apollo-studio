@@ -99,6 +99,8 @@ namespace Apollo.Binary {
             writer.Write(Preferences.CrashPath);
             
             writer.Write(Preferences.CheckForUpdates);
+
+            writer.Write(Preferences.CollapseAddDeviceButton);
         });
 
         public static byte[] EncodeStats() => Encode(writer => {
