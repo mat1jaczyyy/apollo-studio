@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -27,7 +27,7 @@ namespace Apollo.Viewers {
             this.Get<TextBlock>("Description").Text = _entry.Description;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Selected = null;
             _entry = null;
         }

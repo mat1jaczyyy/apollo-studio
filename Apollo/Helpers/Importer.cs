@@ -168,7 +168,7 @@ namespace Apollo.Helpers {
                     : codec.GetPixels(codec.Info, bitmap.GetPixels(), new SKCodecOptions(index, index - 1))
                 ) == SKCodecResult.Success) {
 
-                SKBitmap resized = bitmap.Resize(targetInfo, SKFilterQuality.High);
+                using SKBitmap resized = bitmap.Resize(targetInfo, new SKSamplingOptions(SKCubicResampler.Mitchell));
 
                 decoded = new Frame(new Time(
                     false,

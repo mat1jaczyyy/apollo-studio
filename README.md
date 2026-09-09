@@ -37,6 +37,14 @@ Here are a few Launchpad covers created by Launchpad enthusiasts entirely in Apo
 
 Download Apollo Studio from the [Releases](https://github.com/mat1jaczyyy/apollo-studio/releases) page. Configure your Launchpads in the Preferences and start a new Project to begin working. We recommend you read the [Documentation](https://github.com/mat1jaczyyy/apollo-studio/wiki) or check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).
 
+## Building from source
+
+This branch targets .NET 10 and Avalonia 12. Install the SDK specified in `global.json`, then run `dotnet build Apollo/Apollo.csproj`. Run the application with `dotnet run --project Apollo/Apollo.csproj`; `-- --nogpu` selects software rendering. Debug builds integrate with Avalonia's current developer tools through `AvaloniaUI.DiagnosticsSupport`.
+
+The existing publishing scripts produce self-contained builds, including the updater. For a standalone Windows build, use `dotnet publish Apollo/Apollo.csproj -c Release -r win-x64 --self-contained true -p:OutputType=WinExe`.
+
+See [the regression scenario guide](Tests/README.md) for native master comparisons and headless UI tests that work without computer-use automation.
+
 ## Documentation and Support
 
 You can take a look at the [GitHub Wikis](https://github.com/mat1jaczyyy/apollo-studio/wiki) for all documentation on Apollo Studio. Everything you might ask for should be documented there. If it isn't, feel free to ask in our Discord server, or open an issue. You can also check out the [Video Tutorials](https://www.youtube.com/playlist?list=PLKC4R3X00beY0aB_f_ZIa3shqJX7do4mH).

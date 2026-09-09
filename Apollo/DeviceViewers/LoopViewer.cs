@@ -48,7 +48,7 @@ namespace Apollo.DeviceViewers {
             Hold.IsChecked = _loop.Hold;
         }
         
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _loop = null;
 
         void Rate_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)

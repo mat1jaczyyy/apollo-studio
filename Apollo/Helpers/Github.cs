@@ -1,10 +1,9 @@
 using System;
-using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
 using Octokit;
 
 using Apollo.Core;
@@ -18,7 +17,6 @@ namespace Apollo.Helpers {
         static RepositoryContent blogpost = null;
         static Release release = null;
         static ReleaseAsset download = null;
-        static string avalonia = "";
 
         public static bool UpdateChecked = false;
 
@@ -74,27 +72,9 @@ namespace Apollo.Helpers {
             return Preferences.CheckForUpdates && release.Name != Program.Version && download != null;
         }
 
-        static readonly string DepsPath = $"{AppDomain.CurrentDomain.BaseDirectory}Apollo.deps.json";
-
-        public static string AvaloniaVersion() {
-            if (avalonia == "" && File.Exists(DepsPath)) {
-                try {
-                    using (StreamReader file = File.OpenText(DepsPath))
-                        using (JsonTextReader reader = new JsonTextReader(file))
-                            while (reader.Read())
-                                if (reader.TokenType == JsonToken.String &&
-                                    reader.Path.StartsWith("targets['.NETCoreApp,Version=v5.0") &&
-                                    reader.Path.EndsWith("']['Apollo/1.0.0'].dependencies.Avalonia")) {
-                                        
-                                    avalonia = (string)reader.Value;
-                                    break;
-                                }
-                } catch {
-                    avalonia = "";
-                }
-            }
-
-            return avalonia;
-        }
+        public static string AvaloniaVersion() =>
+            typeof(Avalonia.Application).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion.Split('+')[0]
+            ?? typeof(Avalonia.Application).Assembly.GetName().Version.ToString();
     }
 }

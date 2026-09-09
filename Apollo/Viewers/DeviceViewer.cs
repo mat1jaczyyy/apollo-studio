@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +23,7 @@ namespace Apollo.Viewers {
             Root = this.Get<StackPanel>("Root");
             Border = this.Get<Border>("Border");
             Header = this.Get<Border>("Header");
-            
+
             DeviceAdd = this.Get<DeviceAdd>("DropZoneAfter");
             Draggable = this.Get<Grid>("Draggable");
 
@@ -34,13 +34,13 @@ namespace Apollo.Viewers {
             ChokeMute = this.Get<MenuItem>("ChokeMute");
         }
 
-        static IControl GetSpecificViewer(DeviceViewer sender, Device device) {
+        static Control GetSpecificViewer(DeviceViewer sender, Device device) {
             foreach (Type deviceViewer in Assembly.GetExecutingAssembly().GetTypes().Where(i => i.ReflectedType == null && i.Namespace.StartsWith("Apollo.DeviceViewers")))
                 if ((string)deviceViewer.GetField("DeviceIdentifier").GetValue(null) == device.DeviceIdentifier) {
                     if (device.DeviceIdentifier == "group" || device.DeviceIdentifier == "multi" || device.DeviceIdentifier == "choke")
-                        return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
-                    
-                    return (IControl)Activator.CreateInstance(deviceViewer, new object[] {device});
+                        return (Control)Activator.CreateInstance(deviceViewer, new object[] {device, sender});
+
+                    return (Control)Activator.CreateInstance(deviceViewer, new object[] {device});
                 }
 
             return null;
@@ -56,11 +56,11 @@ namespace Apollo.Viewers {
             Added = null;
             DeviceCollapsed = null;
         }
-        
+
         protected Device _device;
         public bool Selected { get; protected set; } = false;
 
-        public IControl SpecificViewer { get; protected set; }
+        public Control SpecificViewer { get; protected set; }
 
         public StackPanel Root;
         public Border Border, Header;
@@ -73,7 +73,7 @@ namespace Apollo.Viewers {
         protected MenuItem DeviceMute, GroupMute, ChokeMute;
 
         protected virtual void ApplyHeaderBrush(string resource) {
-            IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
+            IBrush brush = (IBrush)Apollo.Core.App.FindResource(resource);
 
             if (Root.Children[0] is DeviceHead targetHead) {
                 if (IsArrangeValid) targetHead.Header.Background = brush;
@@ -113,18 +113,18 @@ namespace Apollo.Viewers {
             DeviceContextMenu = (ApolloContextMenu)this.Resources["DeviceContextMenu"];
             GroupContextMenu = (ApolloContextMenu)this.Resources["GroupContextMenu"];
             ChokeContextMenu = (ApolloContextMenu)this.Resources["ChokeContextMenu"];
-            
+
             DragDrop = new DragDropManager(this);
 
             SpecificViewer = GetSpecificViewer(this, _device);
 
             if (SpecificViewer != null)
                 this.Get<Grid>("Contents").Children.Add(SpecificViewer);
-            
+
             SetEnabled();
         }
 
-        protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected virtual void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ResetEvents();
 
             SpecificViewer = null;
@@ -138,9 +138,9 @@ namespace Apollo.Viewers {
         }
 
         public virtual void SetEnabled() {
-            Border.Background = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeControlHighBrush" : "ThemeControlMidBrush");
-            Border.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
-            TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+            Border.Background = (IBrush)Apollo.Core.App.FindResource(_device.Enabled? "ThemeControlHighBrush" : "ThemeControlMidBrush");
+            Border.BorderBrush = (IBrush)Apollo.Core.App.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
+            TitleText.Foreground = (IBrush)Apollo.Core.App.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
             if (Root.Children[0] is DeviceHead targetHead)
                 targetHead.SetEnabled(_device.Enabled);
@@ -168,7 +168,7 @@ namespace Apollo.Viewers {
         public List<string> DropAreas => new List<string>() {"DropZoneHead", "Contents", "DropZoneTail", "DropZoneAfter"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {DragFormat, null}
         };
 
@@ -177,7 +177,7 @@ namespace Apollo.Viewers {
 
         public void DragFailed(PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
-            
+
             if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                 ApolloContextMenu menu = DeviceContextMenu;
                 List<ISelect> selection = Track.Get(_device)?.Window?.Selection.Selection;
@@ -189,11 +189,11 @@ namespace Apollo.Viewers {
                     else if (selection[0] is Choke)
                         menu = ChokeContextMenu;
                 }
-                
+
                 DeviceMute.Header = GroupMute.Header = ChokeMute.Header = ((Device)selection.First()).Enabled? "Mute" : "Unmute";
 
                 menu.Open(Draggable);
-            
+
             } else if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) {
                 _device.Collapsed = !_device.Collapsed;
                 DeviceCollapsed?.Invoke(_device.ParentIndex.Value);
@@ -202,7 +202,7 @@ namespace Apollo.Viewers {
 
         public void Drag(object sender, PointerPressedEventArgs e) => DragDrop.Drag(Track.Get(_device)?.Window?.Selection, e);
 
-        public bool DropLeft(IControl source, DragEventArgs e) 
+        public bool DropLeft(Control source, DragEventArgs e)
             => source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2);
     }
 }

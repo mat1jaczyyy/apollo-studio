@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Avalonia;
@@ -158,7 +158,7 @@ namespace Apollo.Components {
             Draw();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
             HistoryChanged -= Draw;
         }
@@ -166,7 +166,7 @@ namespace Apollo.Components {
         void Clicked(object sender, PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
-            int index = Grid.Children.IndexOf((IControl)sender);
+            int index = Grid.Children.IndexOf((Control)sender);
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) Input(index);
             else if (MouseButton == PointerUpdateKind.RightButtonReleased) {

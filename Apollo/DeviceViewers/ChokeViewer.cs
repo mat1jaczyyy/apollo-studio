@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -39,7 +39,7 @@ namespace Apollo.DeviceViewers {
             parent.Root.Children.Insert(2, new DeviceTail(_choke, parent));
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _choke = null;
 
         void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value) 

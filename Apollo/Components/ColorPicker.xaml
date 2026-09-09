@@ -1,7 +1,7 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.ColorPicker"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <Grid RowDefinitions="*,Auto" Width="170">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto">

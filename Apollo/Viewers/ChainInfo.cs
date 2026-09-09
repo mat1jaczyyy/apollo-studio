@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,7 +53,7 @@ namespace Apollo.Viewers {
         }
 
         public void Select() {
-            ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
+            ApplyHeaderBrush((IBrush)Apollo.Core.App.FindResource("ThemeAccentBrush2"));
             Selected = true;
         }
 
@@ -81,7 +81,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ChainAdded = null;
             ChainExpanded = null;
 
@@ -96,7 +96,7 @@ namespace Apollo.Viewers {
             DragDrop = null;
         }
 
-        public void SetEnabled() => NameText.Foreground = (IBrush)Application.Current.Styles.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+        public void SetEnabled() => NameText.Foreground = (IBrush)Apollo.Core.App.FindResource(_chain.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
 
         void Chain_Action(string action) => Track.Get(_chain)?.Window?.Selection.Action(action, (ISelectParent)_chain.Parent, _chain.ParentIndex.Value);
     
@@ -109,8 +109,8 @@ namespace Apollo.Viewers {
                 Track.Get(_chain)?.Window?.Selection.Select(_chain, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
         }
 
-        public static bool DeviceAsChainDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
-            List<Device> moving = ((List<ISelect>)e.Data.Get(format)).Cast<Device>().ToList();
+        public static bool DeviceAsChainDrop(Control source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
+            List<Device> moving = ((List<ISelect>)e.DataTransfer.TryGetValue(DragDropManager.SelectionFormat(format))).Cast<Device>().ToList();
 
             Chain source_chain = moving[0].Parent;
             Chain target_chain = (Chain)child;
@@ -193,7 +193,7 @@ namespace Apollo.Viewers {
         public List<string> DropAreas => new List<string>() {"DropZone", "DropZoneAfter"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {DragFormat, null},
             {"Device", DeviceAsChainDrop}
         };

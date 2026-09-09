@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -36,7 +36,7 @@ namespace Apollo.Components {
             Preferences.LaunchpadModelChanged += Draw;
         }
         
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _frame = null;
 
             Preferences.LaunchpadModelChanged -= Draw;

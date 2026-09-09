@@ -56,7 +56,7 @@ namespace Apollo.Helpers {
                 Launchpad.DisplayWarnings(sender);
             };
 
-            if (dispatcher) Dispatcher.UIThread.Post(DisplayMessage, DispatcherPriority.MinValue);
+            if (dispatcher) Dispatcher.UIThread.Post(DisplayMessage, DispatcherPriority.Background);
             else DisplayMessage.Invoke();
 
             return true;

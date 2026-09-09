@@ -12,8 +12,8 @@ using Apollo.Core;
 using Apollo.Elements.Launchpads;
 
 namespace Apollo.Components {
-    public class PortSelector: ComboBox, IStyleable {
-        Type IStyleable.StyleKey => typeof(ComboBox);
+    public class PortSelector: ComboBox {
+        protected override Type StyleKeyOverride => typeof(ComboBox);
 
         public delegate void PortChangedEventHandler(Launchpad lp);
         public event PortChangedEventHandler PortChanged;
@@ -44,7 +44,7 @@ namespace Apollo.Components {
 
             ports.Add(MIDI.NoOutput);
 
-            Items = ports;
+            ItemsSource = ports;
             SelectedIndex = -1;
             SelectedItem = selected;
         }
@@ -58,7 +58,7 @@ namespace Apollo.Components {
             MIDI.DevicesUpdated += Update;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             MIDI.DevicesUpdated -= Update;
 
             PortChanged = null;

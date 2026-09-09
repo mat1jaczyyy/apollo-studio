@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -32,7 +32,7 @@ namespace Apollo.DeviceViewers {
             Picker.SetColor(_paint.Color);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _paint = null;
         
         void Color_Changed(Color color, Color old) {
             if (old != null)

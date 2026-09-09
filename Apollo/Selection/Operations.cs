@@ -1,3 +1,4 @@
+using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -507,21 +508,20 @@ namespace Apollo.Selection {
                 renamable.Rename.StartInput(left, right);
         }
 
-        static List<FileDialogFilter> CreateFilters(ISelectParent parent) => new List<FileDialogFilter>() {
-            new FileDialogFilter() {
-                Extensions = new List<string>() {parent.ChildFileExtension},
-                Name = $"Apollo {parent.ChildString} Preset"
+        static List<FilePickerFileType> CreateFilters(ISelectParent parent) => new List<FilePickerFileType>() {
+            new FilePickerFileType($"Apollo {parent.ChildString} Preset") { Patterns = new List<string>() {"*." + parent.ChildFileExtension}
             }
         };
 
-        static SaveFileDialog CreateSFD(ISelectParent parent) => new SaveFileDialog() {
-            Filters = CreateFilters(parent),
+        static FilePickerSaveOptions CreateSFD(ISelectParent parent) => new FilePickerSaveOptions() {
+            DefaultExtension = parent.ChildFileExtension,
+            FileTypeChoices = CreateFilters(parent),
             Title = $"Export {parent.ChildString} Preset"
         };
 
-        static OpenFileDialog CreateOFD(ISelectParent parent) => new OpenFileDialog() {
+        static FilePickerOpenOptions CreateOFD(ISelectParent parent) => new FilePickerOpenOptions() {
             AllowMultiple = true,
-            Filters = CreateFilters(parent),
+            FileTypeFilter = CreateFilters(parent),
             Title = $"Import {parent.ChildString} Preset"
         };
 
@@ -530,7 +530,7 @@ namespace Apollo.Selection {
 
             Window sender = parent.IWindow;
             
-            string result = await CreateSFD(parent).ShowAsync(sender);
+            string result = await FileDialogs.Save(sender, CreateSFD(parent));
 
             if (result != null) {
                 string[] file = result.Split(Path.DirectorySeparatorChar);
@@ -545,7 +545,7 @@ namespace Apollo.Selection {
 
             Window sender = parent.IWindow;
 
-            paths = paths?? await CreateOFD(parent).ShowAsync(sender);
+            paths = paths?? await FileDialogs.Open(sender, CreateOFD(parent));
             
             if (!paths.Any()) return;
         

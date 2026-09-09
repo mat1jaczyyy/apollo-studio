@@ -1,3 +1,5 @@
+using Apollo.Helpers;
+using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -174,19 +176,18 @@ namespace Apollo.Elements {
         }
 
         public async Task<bool> Save(Window sender, bool store) {
-            SaveFileDialog sfd = new SaveFileDialog() {
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "approj"
-                        },
-                        Name = "Apollo Project"
+            FilePickerSaveOptions sfd = new FilePickerSaveOptions() {
+                DefaultExtension = "approj",
+                FileTypeChoices = new List<FilePickerFileType>() {
+                    new FilePickerFileType("Apollo Project") { Patterns = new List<string>() {
+                            "*.approj"
+                        }
                     }
                 },
                 Title = "Save Project"
             };
             
-            string result = await sfd.ShowAsync(sender);
+            string result = await FileDialogs.Save(sender, sfd);
             
             bool ret = (result != null)
                 ? await WriteFile(sender, result, store)

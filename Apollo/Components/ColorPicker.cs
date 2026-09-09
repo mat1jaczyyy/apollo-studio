@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Avalonia;
@@ -83,7 +83,7 @@ namespace Apollo.Components {
             Red.IsVisible = Green.IsVisible = Blue.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.RGB;
             Hex.IsVisible = Preferences.ColorDisplayFormat == ColorDisplayType.Hex;
 
-            ((Window)this.GetVisualRoot())?.Focus();
+            ((Window)TopLevel.GetTopLevel(this))?.Focus();
         }
 
         bool hexValidation, rgbValidation;
@@ -110,7 +110,7 @@ namespace Apollo.Components {
             Update_ColorDisplayFormat();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ColorChanged = null;
             
             Preferences.ColorDisplayFormatChanged -= Update_ColorDisplayFormat;
@@ -120,7 +120,7 @@ namespace Apollo.Components {
         }
 
         public void Bounds_Updated(Rect bounds) {
-            if (!bounds.IsEmpty) InitCanvas();
+            if (bounds.Width > 0 && bounds.Height > 0) InitCanvas();
         }
 
         void InitCanvas() {
@@ -168,7 +168,7 @@ namespace Apollo.Components {
             Preview.Fill = Color.ToScreenBrush();
 
             UpdateText();
-            Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+            Hex.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush");
         }
 
         void UpdateCanvas() {
@@ -345,14 +345,14 @@ namespace Apollo.Components {
         bool Hex_Dirty, RGB_Dirty = false;
 
         Action HexAction(string text) {
-            Action update = () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+            Action update = () => Hex.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush");
 
             foreach (char i in text)
                 if (!"0123456789ABCDEF".Contains(i))
                     return update + (() => UpdateText());
 
             if (text.Length > 6) return update + (() => UpdateText());
-            if (text.Length < 6) return () => Hex.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush");
+            if (text.Length < 6) return () => Hex.Foreground = (IBrush)Apollo.Core.App.FindResource("ErrorBrush");
 
             int r = Convert.ToInt32(text.Substring(0, 2), 16);
             int g = Convert.ToInt32(text.Substring(2, 2), 16);
@@ -458,13 +458,13 @@ namespace Apollo.Components {
                 if (textBox == Blue) ((e.KeyModifiers == KeyModifiers.Shift)? Green : Red).Focus();
             }
             
-            e.Key = Key.None;
+            e.Handled = true;
         }
         
         void Hex_KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Hex_Unfocus(object sender, RoutedEventArgs e) {

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
+using Apollo.Core;
 
 using Apollo.Binary;
 using Apollo.Enums;
@@ -27,7 +29,7 @@ namespace Apollo.Helpers {
         }
 
         public async void StoreToClipboard()
-            => await Application.Current.Clipboard.SetTextAsync(ToCompressedBase64(Encoder.Encode(this)));
+            => await App.Clipboard.SetTextAsync(ToCompressedBase64(Encoder.Encode(this)));
             
         class Seq {
             public char c;
@@ -133,7 +135,7 @@ namespace Apollo.Helpers {
         }
 
         public static async Task<Copyable> DecodeClipboard() {
-            string b64 = await Application.Current.Clipboard.GetTextAsync();
+            string b64 = await App.Clipboard.TryGetTextAsync();
 
             if (b64 == null) return null;
 

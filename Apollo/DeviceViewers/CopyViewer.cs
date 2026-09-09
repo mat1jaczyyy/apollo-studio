@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -36,7 +36,7 @@ namespace Apollo.DeviceViewers {
         Copy _copy;
 
         Dial Rate, Gate;
-        PinchDial Pinch;
+        new PinchDial Pinch;
         ComboBox CopyMode, GridMode;
         CheckBox Wrap, Reverse, Infinite;
 
@@ -85,7 +85,7 @@ namespace Apollo.DeviceViewers {
                 Contents_Insert(i, _copy.Offsets[i], _copy.GetAngle(i));
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _copy = null;
 
         void Rate_ValueChanged(Dial sender, double value, double? old) {
             if (old != null && old != value) 

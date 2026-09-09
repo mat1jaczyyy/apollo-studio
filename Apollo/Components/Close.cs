@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -36,8 +36,8 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            base.Unloaded(sender, e);
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.HandleUnloaded(sender, e);
             Clicked = null;
         }
 

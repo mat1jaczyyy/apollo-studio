@@ -3,7 +3,7 @@
              x:Class="Apollo.DeviceViewers.LoopViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <Grid RowDefinitions="*,*" Width="125">
     <Border Grid.Row="0" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="0 0 0 1">

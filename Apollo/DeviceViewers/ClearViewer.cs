@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -31,7 +31,7 @@ namespace Apollo.DeviceViewers {
             ClearMode.SelectedIndex = (int)_clear.Mode;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _clear = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _clear = null;
 
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             ClearType selected = (ClearType)ClearMode.SelectedIndex;

@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Viewers.RecentProjectInfo"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
              
   <UserControl.Resources>
     <Components:ApolloContextMenu x:Key="InfoContextMenu" MenuAction="ContextMenu_Action">
@@ -12,7 +12,7 @@
   </UserControl.Resources>
   
   <Grid Margin="5 0" Background="Transparent" Cursor="Hand"
-        PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+        PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="5">
       <TextBlock x:Name="Filename" />
       <TextBlock Foreground="{DynamicResource ThemeControlHighlightMidBrush}" x:Name="Folder" />

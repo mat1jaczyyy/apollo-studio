@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,7 +65,7 @@ namespace Apollo.Components {
             Base.AddHandler(InputElement.PointerReleasedEvent, MouseUp, RoutingStrategies.Tunnel);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Moved = null;
             Focused = null;
             Deleted = null;
@@ -80,7 +80,7 @@ namespace Apollo.Components {
         bool dragged = false;
 
         void DragStarted(object sender, VectorEventArgs e) {
-            ((Window)this.GetVisualRoot()).Focus();
+            ((Window)TopLevel.GetTopLevel(this)).Focus();
             dragged = false;
         }
 
@@ -94,7 +94,7 @@ namespace Apollo.Components {
 
             if (MouseButton != PointerUpdateKind.LeftButtonPressed) e.Handled = true;
             
-            ((Window)this.GetVisualRoot()).Focus();
+            ((Window)TopLevel.GetTopLevel(this)).Focus();
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) {

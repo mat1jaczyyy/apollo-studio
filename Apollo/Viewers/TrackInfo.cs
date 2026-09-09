@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -49,7 +49,7 @@ namespace Apollo.Viewers {
         void UpdateText(int index) => Rename.UpdateText();
         
         void ApplyHeaderBrush(string resource) {
-            IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
+            IBrush brush = (IBrush)Apollo.Core.App.FindResource(resource);
 
             if (IsArrangeValid) DropZone.Background = brush;
             else this.Resources["BackgroundBrush"] = brush;
@@ -86,7 +86,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
 
             _track.ParentIndexChanged -= UpdateText;
@@ -100,7 +100,7 @@ namespace Apollo.Viewers {
             DragDrop = null;
         }
 
-        public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+        public virtual void SetEnabled() => NameText.Foreground = PortSelector.Foreground = (IBrush)Apollo.Core.App.FindResource(_track.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
         
         void Track_Action(string action) => Program.Project.Window?.Selection.Action(action, Program.Project, _track.ParentIndex.Value);
 
@@ -119,7 +119,7 @@ namespace Apollo.Viewers {
         public List<string> DropAreas => new List<string>() {"DropZone", "DropZoneAfter"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {DragFormat, null},
         };
 
@@ -130,7 +130,7 @@ namespace Apollo.Viewers {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
                 
             if (MouseButton == PointerUpdateKind.LeftButtonPressed && e.ClickCount == 2) 
-                TrackWindow.Create(_track, (Window)this.GetVisualRoot());
+                TrackWindow.Create(_track, (Window)TopLevel.GetTopLevel(this));
             
             if (MouseButton == PointerUpdateKind.RightButtonPressed) {
                 MuteItem.Header = ((Track)Program.Project.Window?.Selection.Selection.First()).Enabled? "Mute" : "Unmute";

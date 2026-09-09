@@ -1,23 +1,33 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Core.App"
+             xmlns:Components="clr-namespace:Apollo.Components"
+             xmlns:Viewers="clr-namespace:Apollo.Viewers"
+             xmlns:DeviceViewers="clr-namespace:Apollo.DeviceViewers"
              Name="Apollo Studio">
 
   <Application.Resources>
-    <FontFamily x:Key="Font">/Resources/#Open Sans</FontFamily>
+    <FontFamily x:Key="Font">avares://Apollo/Resources#Open Sans</FontFamily>
   </Application.Resources>
 
   <Application.Styles>
-    <StyleInclude Source="resm:Avalonia.Themes.Default.DefaultTheme.xaml?assembly=Avalonia.Themes.Default" />
+    <SimpleTheme />
     <StyleInclude Source="avares://Apollo/Themes/Common.xaml" />
 
     <Style Selector="Window">
       <Setter Property="FontFamily" Value="{DynamicResource Font}" />
-      <Setter Property="HasSystemDecorations" Value="false" />
+      <Setter Property="WindowDecorations" Value="None" />
     </Style>
 
     <Style Selector=":is(Control)">
       <Setter Property="Focusable" Value="false"/>
+    </Style>
+
+    <!-- Modern Avalonia also checks Focusable for explicit Focus() calls. These
+         controls accept text or finish an edit by taking focus from its input. -->
+    <Style Selector=":is(Window), TextBox, :is(Components|Dial), Components|MoveDial, Components|ColorPicker, Viewers|TrackInfo, Viewers|ChainInfo, DeviceViewers|FadeViewer">
+      <Setter Property="Focusable" Value="true" />
+      <Setter Property="KeyboardNavigation.IsTabStop" Value="false" />
     </Style>
 
     <Style Selector="Button">
@@ -43,6 +53,10 @@
 
     <Style Selector="ComboBox">
       <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
     </Style>
 
     <Style Selector="ScrollBar /template/ RepeatButton.repeat">

@@ -13,7 +13,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 
 using Humanizer;
-using Humanizer.Localisation;
+
 
 using Apollo.Components;
 using Apollo.Core;
@@ -106,9 +106,6 @@ namespace Apollo.Windows {
         
         public ProjectWindow() {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -146,7 +143,7 @@ namespace Apollo.Windows {
             observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
         
-        void Loaded(object sender, EventArgs e) {
+        void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
             
             Program.Project.PathChanged += UpdateTitle;
@@ -156,7 +153,7 @@ namespace Apollo.Windows {
             UpdateMacro();
         }
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             if (!SafeClose) {
                 e.Cancel = true;
 
@@ -187,7 +184,7 @@ namespace Apollo.Windows {
         }
         
         public void Bounds_Updated(Rect bounds) {
-            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+            if ((Bounds.Width <= 0 || Bounds.Height <= 0) || (TitleText.Bounds.Width <= 0 || TitleText.Bounds.Height <= 0) || (TitleCenter.Bounds.Width <= 0 || TitleCenter.Bounds.Height <= 0) || (CenteringLeft.Bounds.Width <= 0 || CenteringLeft.Bounds.Height <= 0) || (CenteringRight.Bounds.Width <= 0 || CenteringRight.Bounds.Height <= 0)) return;
 
             int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
 
@@ -238,12 +235,12 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void Window_LostFocus(object sender, RoutedEventArgs e) {
-            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
+            if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() == typeof(ComboBox))
                 this.Focus();
         }
 
@@ -273,9 +270,9 @@ namespace Apollo.Windows {
                     Program.Project.BPM = value;
                     BPM_Ignore = false;
                     
-                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    BPM_Update = () => { BPM.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    BPM_Update = () => { BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    BPM_Update = () => { BPM.Foreground = (IBrush)Apollo.Core.App.FindResource("ErrorBrush"); };
                 }
 
                 BPM_Update += () => { 
@@ -284,7 +281,7 @@ namespace Apollo.Windows {
 
                     if (value > 999) {
                         text = "999";
-                        BPM.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush");
+                        BPM.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush");
                     }
                     
                     BPM.Text = text;
@@ -305,13 +302,13 @@ namespace Apollo.Windows {
             if (e.Key == Key.Return) 
                 this.Focus();
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Text_KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void BPM_Unfocus(object sender, RoutedEventArgs e) {
@@ -445,7 +442,7 @@ namespace Apollo.Windows {
         public List<string> DropAreas => new List<string>() {"DropZoneAfter", "TrackAdd"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {"Track", null},
         };
 

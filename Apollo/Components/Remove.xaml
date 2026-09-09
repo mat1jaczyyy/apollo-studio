@@ -1,10 +1,10 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Remove"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <Canvas HorizontalAlignment="Left" VerticalAlignment="Center" Width="8" Height="8" Background="Transparent" ClipToBounds="true" Cursor="Hand" x:Name="Icon"
-          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+          PointerEntered="MouseEnter" PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Path StrokeThickness="1.5" x:Name="Path"
           Data="M 1,1 L 7,7 M 7,1 L 1,7" />
   </Canvas>

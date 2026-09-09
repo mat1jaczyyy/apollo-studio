@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -139,7 +139,7 @@ namespace Apollo.Components {
 
         public void UpdateStyle()
             => Path.Fill = IsPhantom()
-                ? (SolidColorBrush)Application.Current.Styles.FindResource("ThemePhantomBrush")
+                ? (SolidColorBrush)Apollo.Core.App.FindResource("ThemePhantomBrush")
                 : Path.Stroke;
 
         public void SetColor(SolidColorBrush color)

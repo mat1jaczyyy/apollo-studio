@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.UndoWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         Title="Undo History" Icon="/Resources/WindowIcon.png"
         Width="280" MinWidth="280" MaxWidth="280"
         Height="180" MinHeight="100"
-        Opened="Loaded" Closing="Unloaded"
+        Opened="HandleLoaded" Closing="HandleUnloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
 
   <Grid>

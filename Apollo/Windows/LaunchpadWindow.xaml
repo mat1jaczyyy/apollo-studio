@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.LaunchpadWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="402" MinWidth="202"
         Height="432" MinHeight="232"
-        Closing="Unloaded"
+        Closing="HandleUnloaded"
         KeyDown="Window_KeyDown">
 
   <Grid>

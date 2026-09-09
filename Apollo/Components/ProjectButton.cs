@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -28,6 +28,6 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => ProjectWindow.Create((Window)this.GetVisualRoot());
+        protected override void Click(PointerReleasedEventArgs e) => ProjectWindow.Create((Window)TopLevel.GetTopLevel(this));
     }
 }

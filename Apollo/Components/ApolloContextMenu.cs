@@ -7,8 +7,8 @@ using Avalonia.Styling;
 using Avalonia.VisualTree;
 
 namespace Apollo.Components {
-    public class ApolloContextMenu: ContextMenu, IStyleable {
-        Type IStyleable.StyleKey => typeof(ContextMenu);
+    public class ApolloContextMenu: ContextMenu {
+        protected override Type StyleKeyOverride => typeof(ContextMenu);
 
         public delegate void MenuActionEventHandler(string action);
         public event MenuActionEventHandler MenuAction;
@@ -39,12 +39,12 @@ namespace Apollo.Components {
 
         Window owner;
 
-        void Closed(object sender, RoutedEventArgs e) {
+        void HandleClosed(object sender, RoutedEventArgs e) {
             if (header != "Rename") owner?.Focus();
         }
 
         public new void Open(Control control) {
-            owner = (Window)control.GetVisualRoot();
+            owner = (Window)TopLevel.GetTopLevel(control);
 
             base.Open(control);
         }

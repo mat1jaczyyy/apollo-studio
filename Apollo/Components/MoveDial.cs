@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Avalonia;
@@ -139,7 +139,7 @@ namespace Apollo.Components {
             DrawPoint();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Changed = null;
             AbsoluteChanged = null;
             Switched = null;
@@ -259,9 +259,9 @@ namespace Apollo.Components {
             if (int.TryParse(text, out int value)) {
                 if ((AbsoluteCanvas.IsVisible? 0 : -9) <= value && value <= 9) {
                     RawValue = value;
-                    Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ErrorBrush"); };
                 }
 
                 Update += () => {
@@ -293,9 +293,8 @@ namespace Apollo.Components {
                 InputX.Text = CurrentX.ToString();
                 InputY.Text = CurrentY.ToString();
 
-                InputX.SelectionStart = 0;
-                InputX.SelectionEnd = InputX.Text.Length;
                 InputX.CaretIndex = InputX.Text.Length;
+                InputX.SelectAll();
 
                 Display.Opacity = 0;
                 Display.IsHitTestVisible = false;
@@ -346,20 +345,19 @@ namespace Apollo.Components {
 
                 TextBox i = (textBox == InputX)? InputY : InputX;
                 
-                i.SelectionStart = 0;
-                i.SelectionEnd = i.Text.Length;
                 i.CaretIndex = i.Text.Length;
+                i.SelectAll();
 
                 i.Focus();
             }
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Input_KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Input_MouseDown(object sender, PointerPressedEventArgs e) {

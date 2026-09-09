@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PreferencesWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="460" MinWidth="460" MaxWidth="460"
         Height="640" MinHeight="640" MaxHeight="640"
-        Opened="Loaded" Closing="Unloaded"
+        Opened="HandleLoaded" Closing="HandleUnloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus" LostFocus="Window_LostFocus">
   
   <Grid RowDefinitions="Auto,*">

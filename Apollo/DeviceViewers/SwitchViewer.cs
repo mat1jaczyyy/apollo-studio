@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -35,7 +35,7 @@ namespace Apollo.DeviceViewers {
             Value.RawValue = _switch.Value;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _switch = null;
 
         void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -58,7 +58,7 @@ namespace Apollo.Components {
         });
 
         public void Clear() {
-            SolidColorBrush color = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeForegroundLowBrush");
+            SolidColorBrush color = (SolidColorBrush)Apollo.Core.App.FindResource("ThemeForegroundLowBrush");
             for (int i = -1; i < 100; i++) SetColor(i, color);
         }
 
@@ -72,13 +72,13 @@ namespace Apollo.Components {
 
             bool isMF64 = Preferences.LaunchpadModel == LaunchpadModels.MF64;
 
-            Back.CornerRadius = (CornerRadius)Application.Current.Styles.FindResource(
+            Back.CornerRadius = (CornerRadius)Apollo.Core.App.FindResource(
                 isMF64? "LPGrid_MF64CornerRadius" : "LPGrid_CornerRadius"
             );
-            Back.BorderThickness = (Thickness)Application.Current.Styles.FindResource(
+            Back.BorderThickness = (Thickness)Apollo.Core.App.FindResource(
                 isMF64? "LPGrid_MF64PadMargin" : "LPGrid_PadMargin"
             );
-            View.Margin = (Thickness)Application.Current.Styles.FindResource(
+            View.Margin = (Thickness)Apollo.Core.App.FindResource(
                 isMF64? "LPGrid_MF64TopMargin" : "LPGrid_TopMargin"
             );
 
@@ -133,7 +133,7 @@ namespace Apollo.Components {
             Clear();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             PadStarted = null;
             PadFinished = null;
             PadPressed = null;
@@ -158,7 +158,7 @@ namespace Apollo.Components {
         }
 
         bool mouseHeld = false;
-        IControl mouseOver = null;
+        Control mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -169,7 +169,7 @@ namespace Apollo.Components {
                 e.Pointer.Capture(Root);
                 Root.Cursor = new Cursor(StandardCursorType.Hand);
 
-                PadStarted?.Invoke(Array.IndexOf(Buttons, (IControl)sender));
+                PadStarted?.Invoke(Array.IndexOf(Buttons, (Control)sender));
                 MouseMove(sender, e);
             }
         }
@@ -179,7 +179,7 @@ namespace Apollo.Components {
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) {
                 MouseMove(sender, e);
-                PadFinished?.Invoke(Array.IndexOf(Buttons, (IControl)sender));
+                PadFinished?.Invoke(Array.IndexOf(Buttons, (Control)sender));
 
                 mouseHeld = false;
                 if (mouseOver != null) MouseLeave(mouseOver);
@@ -190,26 +190,26 @@ namespace Apollo.Components {
             }
         }
 
-        void MouseEnter(IControl control, KeyModifiers mods) {
+        void MouseEnter(Control control, KeyModifiers mods) {
             int index = Array.IndexOf(Buttons, control);
             PadPressed?.Invoke(index);
             PadModsPressed?.Invoke(index, mods);
         }
 
-        void MouseLeave(IControl control) => PadReleased?.Invoke(Array.IndexOf(Buttons, control));
+        void MouseLeave(Control control) => PadReleased?.Invoke(Array.IndexOf(Buttons, control));
 
         void MouseMove(object sender, PointerEventArgs e) {
             if (mouseHeld) {
                 IInputElement _over = Root.InputHitTest(e.GetPosition(Root));
 
                 if (_over is Shape overPath && !(_over is Rectangle))
-                    _over = overPath.Parent;
+                    _over = overPath.Parent as IInputElement;
 
                 if (_over is Canvas overCanvas)
-                    _over = overCanvas.Parent;
+                    _over = overCanvas.Parent as IInputElement;
                 
                 if (_over is LaunchpadButton || _over is Rectangle) {
-                    IControl over = (IControl)_over;
+                    Control over = (Control)_over;
 
                     if (mouseOver == null) MouseEnter(over, e.KeyModifiers);
                     else if (mouseOver != over) {

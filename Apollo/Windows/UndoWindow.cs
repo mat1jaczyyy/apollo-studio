@@ -55,9 +55,6 @@ namespace Apollo.Windows {
 
         public UndoWindow() {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -70,9 +67,9 @@ namespace Apollo.Windows {
             HighlightPosition(Program.Project.Undo.Position);
         }
 
-        void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+        void HandleLoaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             Program.Project.Undo.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -89,14 +86,14 @@ namespace Apollo.Windows {
                 ((UndoEntryInfo)(Contents.Children[saved.Value])).Background = SolidColorBrush.Parse("Transparent");
 
             if ((saved = index).HasValue && index != current)
-                ((UndoEntryInfo)(Contents.Children[saved.Value])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeControlVeryHighBrush");
+                ((UndoEntryInfo)(Contents.Children[saved.Value])).Background = (SolidColorBrush)Apollo.Core.App.FindResource("ThemeControlVeryHighBrush");
         }
 
         public void HighlightPosition(int index) {
             if (current.HasValue)
                 ((UndoEntryInfo)(Contents.Children[current.Value])).Background = SolidColorBrush.Parse("Transparent");
             
-            ((UndoEntryInfo)(Contents.Children[(current = index).Value])).Background = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2");
+            ((UndoEntryInfo)(Contents.Children[(current = index).Value])).Background = (SolidColorBrush)Apollo.Core.App.FindResource("ThemeAccentBrush2");
         
             if (Program.Project.Undo.SavedPosition.HasValue)
                 HighlightSaved(Program.Project.Undo.SavedPosition.Value);
@@ -127,7 +124,7 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 

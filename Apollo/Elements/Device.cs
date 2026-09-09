@@ -127,7 +127,7 @@ namespace Apollo.Elements {
         }
 
         public static Device Create(Type device, PurposeType purpose, Chain parent, object[] parameters = null) {
-            object obj = FormatterServices.GetUninitializedObject(device);
+            object obj = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(device);
             device.GetProperty("Purpose").SetValue(obj, purpose);
 
             // Parent is guaranteed to be set only if the device is brand new, and is not being cloned or decoded

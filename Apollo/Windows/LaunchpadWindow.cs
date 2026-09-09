@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -44,9 +44,6 @@ namespace Apollo.Windows {
 
         public LaunchpadWindow(Launchpad launchpad) {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -65,7 +62,7 @@ namespace Apollo.Windows {
             observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             _launchpad.Window = null;
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
@@ -84,7 +81,7 @@ namespace Apollo.Windows {
         }
 
         public void Bounds_Updated(Rect bounds) {
-            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+            if ((Bounds.Width <= 0 || Bounds.Height <= 0) || (TitleText.Bounds.Width <= 0 || TitleText.Bounds.Height <= 0) || (TitleCenter.Bounds.Width <= 0 || TitleCenter.Bounds.Height <= 0) || (CenteringLeft.Bounds.Width <= 0 || CenteringLeft.Bounds.Height <= 0) || (CenteringRight.Bounds.Width <= 0 || CenteringRight.Bounds.Height <= 0)) return;
 
             int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
 
@@ -126,7 +123,7 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 

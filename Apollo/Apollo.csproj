@@ -1,10 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RuntimeFrameworkVersion>5.0.2</RuntimeFrameworkVersion>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
-    <LangVersion>9.0</LangVersion>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -16,20 +15,23 @@
   
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
+    <!-- Preserve .NET 5's invariant-mode support for named cultures used by Humanizer. -->
+    <RuntimeHostConfigurationOption Include="System.Globalization.PredefinedCulturesOnly" Value="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.9.999-cibuild0006058-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.9.999-cibuild0006058-beta" />
-    <PackageReference Include="DiscordRichPresence" Version="1.0.121">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
-    <PackageReference Include="Humanizer.Core" Version="2.6.2" />
-    <PackageReference Include="Octokit" Version="0.32.0" />
-    <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
+    <PackageReference Include="Avalonia" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.1.2" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" Condition="'$(Configuration)' == 'Debug'" PrivateAssets="all" />
+    <PackageReference Include="DiscordRichPresence" Version="1.143.0" />
+    <PackageReference Include="Humanizer.Core" Version="3.0.10" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   
   <ItemGroup>
+    <InternalsVisibleTo Include="Apollo.Scenarios" />
     <Compile Update="**/*.cs">
       <DependentUpon>%(Filename).xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Avalonia;
@@ -118,7 +118,7 @@ namespace Apollo.DeviceViewers {
             _fade.Generate();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _fade.Generated -= Gradient_Generate;
             _fade = null;
 
@@ -371,9 +371,9 @@ namespace Apollo.DeviceViewers {
 
                 if (min <= value && value <= max) {
                     _fade.SetPosition(_fade.Expanded.Value, value / 100);
-                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    Input_Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    Input_Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ErrorBrush"); };
                 }
 
                 Input_Update += () => {
@@ -405,9 +405,8 @@ namespace Apollo.DeviceViewers {
                 oldValue = Math.Round(_fade.GetPosition(_fade.Expanded.Value) * 1000) / 10;
                 Input.Text = oldValue.ToString();
 
-                Input.SelectionStart = 0;
-                Input.SelectionEnd = Input.Text.Length;
                 Input.CaretIndex = Input.Text.Length;
+                Input.SelectAll();
 
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
@@ -439,13 +438,13 @@ namespace Apollo.DeviceViewers {
             if (e.Key == Key.Return)
                 this.Focus();
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Input_KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Avalonia;
@@ -9,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 
 using Apollo.Elements;
 using Apollo.Elements.Launchpads;
@@ -25,6 +27,10 @@ namespace Apollo.Core {
         public static Window MainWindow => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).MainWindow;
         public static IReadOnlyList<Window> Windows => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Windows;
         public static void Shutdown() => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Shutdown();
+
+        public static Avalonia.Input.Platform.IClipboard Clipboard =>
+            (Windows.FirstOrDefault(window => window.IsActive) ?? Windows.FirstOrDefault(window => window.IsVisible))?.Clipboard
+            ?? throw new InvalidOperationException("No window is available for the clipboard.");
         
         public static readonly KeyModifiers ControlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)? KeyModifiers.Meta : KeyModifiers.Control;
 
@@ -75,17 +81,27 @@ namespace Apollo.Core {
             UseShellExecute = true
         });
 
+        public static object FindResource(string key) {
+            if (Current.TryGetResource(key, Current.ActualThemeVariant, out var value)) return value;
+            throw new KeyNotFoundException($"Application resource '{key}' was not found.");
+        }
+
         public override void Initialize() {
             AvaloniaXamlLoader.Load(this);
 
             instance = this;
 
+            RequestedThemeVariant = Preferences.Theme == ThemeType.Light ? ThemeVariant.Light : ThemeVariant.Dark;
             if (Preferences.Theme == ThemeType.Dark) Styles.Add(new Dark());
             else if (Preferences.Theme == ThemeType.Light) Styles.Add(new Light());
         }
 
         public override void OnFrameworkInitializationCompleted() {
             if (!(ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)) throw new ApplicationException("Invalid ApplicationLifetime");
+
+            // Project and track windows replace one another; the original splash is not
+            // the lifetime owner. Keep running until the final window has closed.
+            lifetime.ShutdownMode = ShutdownMode.OnLastWindowClose;
 
             if (Args.Length > 0 && Args[0] == "--update") lifetime.MainWindow = new UpdateWindow();
             else {

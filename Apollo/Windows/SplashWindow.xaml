@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.SplashWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -7,7 +7,7 @@
         Width="640" MinWidth="640" MaxWidth="640"
         Height="320" MinHeight="320" MaxHeight="320"
         DragDrop.AllowDrop="true"
-        Opened="Loaded" Closing="Unloaded"
+        Opened="HandleLoaded" Closing="HandleUnloaded"
         KeyDown="Window_KeyDown">
 
   <StackPanel>

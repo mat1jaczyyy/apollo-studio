@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -64,7 +64,7 @@ namespace Apollo.Viewers {
             }
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _launchpad.Info = null;
             _launchpad = null;
         }
@@ -86,7 +86,7 @@ namespace Apollo.Viewers {
         }
 
         void Launchpad_Popout() {
-            LaunchpadWindow.Create(_launchpad, (Window)this.GetVisualRoot());
+            LaunchpadWindow.Create(_launchpad, (Window)TopLevel.GetTopLevel(this));
             Popout.IsVisible = false;
         }
 

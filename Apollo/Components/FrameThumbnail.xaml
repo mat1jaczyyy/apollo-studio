@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" 
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Apollo.Components.FrameThumbnail" 
+             x:Class="Apollo.Components.FrameThumbnail"
              Cursor="Hand"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <StackPanel Spacing="2" Background="Transparent" Orientation="Horizontal">
     <Image x:Name="FrameImage" Width="10" Height="10"/>

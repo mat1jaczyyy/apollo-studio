@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -89,7 +89,7 @@ namespace Apollo.DeviceViewers {
             if (_group.Expanded != null) Expand_Insert(_group.Expanded.Value);
         }
 
-        protected void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             DragDrop.Dispose();
             DragDrop = null;
 
@@ -174,7 +174,7 @@ namespace Apollo.DeviceViewers {
         public List<string> DropAreas => new List<string>() {"DropZoneAfter", "ChainAdd"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {"Chain", null},
             {"Device", ChainInfo.DeviceAsChainDrop}
         };

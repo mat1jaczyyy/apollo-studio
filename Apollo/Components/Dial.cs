@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -315,7 +315,7 @@ namespace Apollo.Components {
 
             Arc.StrokeThickness = stroke * _scale;
             if (!overrideBase) {
-                Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
+                Arc.Stroke = (IBrush)Apollo.Core.App.FindResource(Enabled? color : "ThemeForegroundLowBrush");
                 Display.Text = (Enabled || !DisplayDisabledText)? ValueString : DisabledText;
             }
             
@@ -362,7 +362,7 @@ namespace Apollo.Components {
             DrawArcBase();
         }
 
-        protected void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Started = null;
             ValueChanged = null;
             StepChanged = null;
@@ -373,7 +373,9 @@ namespace Apollo.Components {
             observable.Dispose();
         }
 
-        protected void LayoutChanged(object sender, EventArgs e) => DrawArcAuto();
+        // Setting Path.Data invalidates layout in current Avalonia. Recreate geometry
+        // when attached or when a value changes, never in response to every layout pass.
+        protected void HandleAttached(object sender, VisualTreeAttachmentEventArgs e) => DrawArcAuto();
 
         bool mouseHeld = false;
         double oldValue;
@@ -464,9 +466,9 @@ namespace Apollo.Components {
             if (double.TryParse(text, out double value)) {
                 if (Minimum <= value && value <= Maximum) {
                     RawValue = value;
-                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ThemeForegroundBrush"); };
+                    Input_Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ThemeForegroundBrush"); };
                 } else {
-                    Input_Update = () => { Input.Foreground = (IBrush)Application.Current.Styles.FindResource("ErrorBrush"); };
+                    Input_Update = () => { Input.Foreground = (IBrush)Apollo.Core.App.FindResource("ErrorBrush"); };
                 }
 
                 Input_Update += () => {
@@ -504,9 +506,8 @@ namespace Apollo.Components {
                 Input.Text = RawValue.ToString();
                 oldValue = RawValue;
 
-                Input.SelectionStart = 0;
-                Input.SelectionEnd = Input.Text.Length;
                 Input.CaretIndex = Input.Text.Length;
+                Input.SelectAll();
 
                 Input.Opacity = 1;
                 Input.IsHitTestVisible = true;
@@ -533,13 +534,13 @@ namespace Apollo.Components {
             if (e.Key == Key.Return)
                 this.Focus();
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         protected void Input_KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         protected void Input_MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;

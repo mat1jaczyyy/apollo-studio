@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.GroupViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
   
   <UserControl.Resources>
     <Components:ApolloContextMenu x:Key="ChainContextMenu" MenuAction="ContextMenu_Action">

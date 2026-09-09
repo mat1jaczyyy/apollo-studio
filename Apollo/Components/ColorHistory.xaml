@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.ColorHistory"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <Viewbox Stretch="None">
     <UniformGrid Rows="8" Columns="8" VerticalAlignment="Center" x:Name="Grid">

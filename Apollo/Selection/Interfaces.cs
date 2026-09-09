@@ -50,7 +50,7 @@ namespace Apollo.Selection {
         void Expand(int? index);
     }
     
-    public interface IDroppable: IControl {
+    public interface IDroppable {
         List<string> DropAreas { get; }
 
         Dictionary<string, DragDropManager.DropHandler> DropHandlers { get; }
@@ -58,7 +58,7 @@ namespace Apollo.Selection {
         ISelect Item { get; }
         ISelectParent ItemParent { get; }
 
-        public bool DropLeft(IControl source, DragEventArgs e)
+        public bool DropLeft(Control source, DragEventArgs e)
             => source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2;
     }
 
@@ -77,7 +77,7 @@ namespace Apollo.Selection {
         string ProcessedName { get; }
     }
 
-    public interface IRenamable: IControl, ISelectViewer {
+    public interface IRenamable: ISelectViewer {
         RenameManager Rename { get; }
 
         ISelect Item { get; }

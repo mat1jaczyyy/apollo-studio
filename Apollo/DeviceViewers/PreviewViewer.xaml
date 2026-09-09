@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.PreviewViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="4 0"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <Components:LaunchpadGrid x:Name="Grid" PadPressed="PadPressed" PadReleased="PadReleased" />
 </UserControl>

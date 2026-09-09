@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.PatternWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="990" MinWidth="890"
         Height="700" MinHeight="600"
-        Opened="Loaded" Closing="Unloaded"
+        Opened="HandleLoaded" Closing="HandleUnloaded"
         KeyDown="Window_KeyDown" PointerPressed="Window_Focus">
   
   <Window.Resources>

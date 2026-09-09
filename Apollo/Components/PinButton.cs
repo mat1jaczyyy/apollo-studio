@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -40,15 +40,15 @@ namespace Apollo.Components {
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            base.Unloaded(sender, e);
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.HandleUnloaded(sender, e);
 
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
         }
         
         protected override void Click(PointerReleasedEventArgs e) {
             Preferences.AlwaysOnTop = !Preferences.AlwaysOnTop;
-            ((Window)this.GetVisualRoot()).Activate();
+            ((Window)TopLevel.GetTopLevel(this)).Activate();
         }
     }
 }

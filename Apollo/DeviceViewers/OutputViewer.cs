@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -38,7 +38,7 @@ namespace Apollo.DeviceViewers {
             SetTarget(_output.Target);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Program.Project.TrackCountChanged -= Update_Maximum;
 
             _output = null;

@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.MessageWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         CanResize="false" SizeToContent="Height"
         Title="" Icon="/Resources/WindowIcon.png"
         Width="510" MinWidth="510" MaxWidth="510"
-        Opened="Loaded" Closing="Unloaded"
+        Opened="HandleLoaded" Closing="HandleUnloaded"
         PointerPressed="Window_Focus">
 
   <Grid>

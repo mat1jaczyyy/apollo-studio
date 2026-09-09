@@ -59,15 +59,15 @@ namespace Apollo.Selection {
             if (App.Dragging) return;
 
             if (e.Key == Key.Return)
-                Host.Focus();
+                ((Control)Host).Focus();
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void KeyUp(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            e.Key = Key.None;
+            e.Handled = true;
         }
 
         void MouseUp(object sender, PointerReleasedEventArgs e) => e.Handled = true;
@@ -81,9 +81,8 @@ namespace Apollo.Selection {
                 Clean.Add(((IName)Host.ItemParent.IChildren[i]).Name);
             
             Host.Input.Text = ((IName)Host.Item).Name;
-            Host.Input.SelectionStart = 0;
-            Host.Input.SelectionEnd = Host.Input.Text.Length;
             Host.Input.CaretIndex = Host.Input.Text.Length;
+            Host.Input.SelectAll();
 
             Host.Input.Opacity = 1;
             Host.Input.IsHitTestVisible = true;

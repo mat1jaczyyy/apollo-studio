@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Avalonia;
@@ -34,7 +34,7 @@ namespace Apollo.Components {
             Timer = new Courier(200, _ => SetIndicator(0), false);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Disposed = true;
 
             lock (locker) {

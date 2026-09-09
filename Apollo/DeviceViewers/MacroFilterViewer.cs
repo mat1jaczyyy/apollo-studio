@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Avalonia;
@@ -27,7 +27,7 @@ namespace Apollo.DeviceViewers {
         UniformGrid MacrosGrid;
         Dial MacroDial;
 
-        void SetColor(MacroRectangle rect, bool value) => rect.Fill = (IBrush)Application.Current.Styles.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
+        void SetColor(MacroRectangle rect, bool value) => rect.Fill = (IBrush)Apollo.Core.App.FindResource(value? "ThemeExtraBrush" : "ThemeForegroundLowBrush");
 
         public MacroFilterViewer() => new InvalidOperationException();
 
@@ -45,7 +45,7 @@ namespace Apollo.DeviceViewers {
             }
         }
         
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         void Target_Changed(Dial sender, double value, double? old){
             if (old != null && old != value)
@@ -61,7 +61,7 @@ namespace Apollo.DeviceViewers {
         bool drawingState;
         bool[] old;        
         bool mouseHeld = false;
-        IControl mouseOver = null;
+        Control mouseOver = null;
 
         void MouseDown(object sender, PointerPressedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
@@ -72,7 +72,7 @@ namespace Apollo.DeviceViewers {
                 e.Pointer.Capture(MacrosGrid);
                 MacrosGrid.Cursor = new Cursor(StandardCursorType.Hand);
 
-                int index = MacrosGrid.Children.IndexOf((IControl)sender);
+                int index = MacrosGrid.Children.IndexOf((Control)sender);
                 drawingState = !_filter[index];
                 old = _filter.Filter.ToArray();
 
@@ -109,7 +109,7 @@ namespace Apollo.DeviceViewers {
             if (mouseHeld) {
                 IInputElement over = MacrosGrid.InputHitTest(e.GetPosition(MacrosGrid));
 
-                if (over is Grid grid) over = grid.Parent;
+                if (over is Grid grid) over = grid.Parent as IInputElement;
 
                 if (over is MacroRectangle rect) {
                     if (mouseOver == null || mouseOver != rect)

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -21,7 +21,7 @@ namespace Apollo.Components {
 
                 mouseHeld = false;
 
-                Fill = (IBrush)Application.Current.Styles.FindResource(Enabled
+                Fill = (IBrush)Apollo.Core.App.FindResource(Enabled
                     ? (mouseOver
                         ? "ThemeButtonOverBrush"
                         : "ThemeButtonEnabledBrush"
@@ -30,18 +30,18 @@ namespace Apollo.Components {
             }
         }
 
-        protected virtual void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => Clicked = null;
+        protected virtual void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => Clicked = null;
 
         bool mouseHeld = false;
         bool mouseOver = false;
 
         protected void MouseEnter(object sender, PointerEventArgs e) {
-            if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");
+            if (Enabled) Fill = (IBrush)Apollo.Core.App.FindResource(mouseHeld? "ThemeButtonDownBrush" : "ThemeButtonOverBrush");
             mouseOver = true;
         }
 
         protected void MouseLeave(object sender, PointerEventArgs e) {
-            if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonEnabledBrush");
+            if (Enabled) Fill = (IBrush)Apollo.Core.App.FindResource("ThemeButtonEnabledBrush");
             mouseHeld = mouseOver = false;
         }
 
@@ -51,7 +51,7 @@ namespace Apollo.Components {
             if (MouseButton == PointerUpdateKind.LeftButtonPressed || (AllowRightClick && MouseButton == PointerUpdateKind.RightButtonPressed)) {
                 mouseHeld = true;
 
-                if (Enabled) Fill = (IBrush)Application.Current.Styles.FindResource("ThemeButtonDownBrush");
+                if (Enabled) Fill = (IBrush)Apollo.Core.App.FindResource("ThemeButtonDownBrush");
             }
         }
 

@@ -5,6 +5,7 @@ using System.Linq;
 
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Platform.Storage;
 
 using Apollo.Core;
 using Apollo.Devices;
@@ -15,6 +16,17 @@ using Apollo.Undo;
 
 namespace Apollo.Selection {
     public class DragDropManager {
+        public const string FileNames = "Files";
+        static readonly Dictionary<string, DataFormat<List<ISelect>>> formats = new();
+        public static DataFormat<List<ISelect>> SelectionFormat(string name) {
+            if (!formats.TryGetValue(name, out var format))
+                formats.Add(name, format = DataFormat.CreateInProcessFormat<List<ISelect>>(name));
+            return format;
+        }
+
+        static bool Contains(DragEventArgs e, string format) => format == FileNames
+            ? e.DataTransfer.Contains(DataFormat.File)
+            : e.DataTransfer.Contains(SelectionFormat(format));
         public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy, out Path<ISelectParent> premove) {
             premove = null;
             
@@ -50,13 +62,13 @@ namespace Apollo.Selection {
         }
 
         IDroppable Host;
-        HashSet<IControl> Subscribed = new();
+        HashSet<Control> Subscribed = new();
 
-        public delegate bool DropHandler(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e);
+        public delegate bool DropHandler(Control source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e);
         Dictionary<string, DropHandler> DropHandlers = new();
 
-        static bool DefaultDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
-            List<ISelect> moving = (List<ISelect>)e.Data.Get(format);
+        static bool DefaultDrop(Control source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
+            List<ISelect> moving = (List<ISelect>)e.DataTransfer.TryGetValue(DragDropManager.SelectionFormat(format));
             ISelectParent source_parent = moving[0].IParent;
             int before = moving[0].IParentIndex.Value - 1;
 
@@ -77,8 +89,8 @@ namespace Apollo.Selection {
             return result;
         }
 
-        static bool FileDrop(IControl source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
-            string[] paths = e.Data.GetFileNames()?.ToArray();
+        static bool FileDrop(Control source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
+            string[] paths = e.DataTransfer.TryGetFiles()?.Select(file => file.TryGetLocalPath()).Where(path => path != null)?.ToArray();
 
             if (paths != null) Operations.Import(parent, after, paths);
 
@@ -91,16 +103,16 @@ namespace Apollo.Selection {
             foreach (KeyValuePair<string, DropHandler> entry in Host.DropHandlers)
                 DropHandlers.Add(
                     entry.Key,
-                    entry.Value?? ((entry.Key == DataFormats.FileNames)
+                    entry.Value?? ((entry.Key == DragDropManager.FileNames)
                         ? new DropHandler(FileDrop)
                         : DefaultDrop
                     )
                 );
 
-            Subscribe(Host);
+            Subscribe((Control)Host);
         }
 
-        public void Subscribe(IControl control) {
+        public void Subscribe(Control control) {
             Subscribed.Add(control);
             
             control.AddHandler(DragDrop.DragOverEvent, DragOver);
@@ -112,12 +124,18 @@ namespace Apollo.Selection {
 
             if (!drag.Selected) drag.Select(e);
 
-            DataObject dragData = new DataObject();
-            dragData.Set(drag.DragFormat, selection.Selection);
+            using var dragData = new DataTransfer();
+            var dragItem = new DataTransferItem();
+            dragItem.Set(SelectionFormat(drag.DragFormat), selection.Selection);
+            dragData.Add(dragItem);
 
             App.Dragging = true;
-            DragDropEffects result = await DragDrop.DoDragDrop(e, dragData, DragDropEffects.Move);
-            App.Dragging = false;
+            DragDropEffects result;
+            try {
+                result = await DragDrop.DoDragDropAsync(e, dragData, DragDropEffects.Move);
+            } finally {
+                App.Dragging = false;
+            }
 
             if (result == DragDropEffects.None) {
                 if (drag.Selected) drag.Select(e);
@@ -128,16 +146,16 @@ namespace Apollo.Selection {
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
             
-            if (!e.Data.GetDataFormats().Any(DropHandlers.Keys.Contains))
+            if (!DropHandlers.Keys.Any(format => Contains(e, format)))
                 e.DragEffects = DragDropEffects.None; 
         }
 
         void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
-            IControl source = (IControl)e.Source;
+            Control source = (Control)e.Source;
             while (!Host.DropAreas.Contains(source.Name)) {
-                source = source.Parent;
+                source = source.Parent as Control;
                 
                 if (source == Host) {
                     e.Handled = false;
@@ -150,7 +168,7 @@ namespace Apollo.Selection {
 
             bool result = false;
 
-            foreach (string format in DropHandlers.Keys.Where(i => e.Data.Contains(i)))
+            foreach (string format in DropHandlers.Keys.Where(i => Contains(e, i)))
                 if (result = DropHandlers[format].Invoke(source, Host.ItemParent, Host.Item, after, format, e))
                     break;
             
@@ -158,7 +176,7 @@ namespace Apollo.Selection {
         }
 
         public void Dispose() {
-            foreach (IControl control in Subscribed) {
+            foreach (Control control in Subscribed) {
                 control.RemoveHandler(DragDrop.DragOverEvent, DragOver);
                 control.RemoveHandler(DragDrop.DropEvent, Drop);
             }

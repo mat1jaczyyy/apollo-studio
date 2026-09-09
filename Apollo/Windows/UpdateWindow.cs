@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -19,7 +19,7 @@ using Apollo.Helpers;
 
 namespace Apollo.Windows {
     public class UpdateWindow: Window {
-        static Image UpdateImage = (Image)Application.Current.Styles.FindResource("UpdateImage");
+        static Image UpdateImage = (Image)Apollo.Core.App.FindResource("UpdateImage");
 
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
@@ -69,14 +69,11 @@ namespace Apollo.Windows {
                 throw new InvalidOperationException("Auto-updating is not supported on Linux");
 
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             Root.Children.Add(UpdateImage);
         }
 
-        async void Loaded(object sender, EventArgs e) {
+        async void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             State.Text = "Downloading...";
@@ -87,7 +84,7 @@ namespace Apollo.Windows {
             downloader.DownloadDataAsync(new Uri((await Github.LatestDownload()).BrowserDownloadUrl));
         }
         
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             if (!exiting) {
                 e.Cancel = true;
                 return;

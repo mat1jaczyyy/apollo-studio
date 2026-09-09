@@ -1,5 +1,5 @@
-﻿<ClearButton xmlns="https://github.com/avaloniaui"
+<ClearButton xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.UndoClearButton"
              ToolTip.Tip="Clear History"
-             DetachedFromVisualTree="Unloaded" />
+             DetachedFromVisualTree="HandleUnloaded" />

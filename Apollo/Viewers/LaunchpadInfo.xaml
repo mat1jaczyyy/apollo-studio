@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Viewers.LaunchpadInfo"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
   
   <Grid Margin="5 0">
     <Grid ColumnDefinitions="Auto,Auto,*,Auto,93" VerticalAlignment="Center">

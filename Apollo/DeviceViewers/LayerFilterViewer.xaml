@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.DeviceViewers.LayerFilterViewer"
              xmlns:Components="clr-namespace:Apollo.Components"
              Margin="10 5"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
   
   <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
       <Components:Dial Grid.Column="0" x:Name="Target" Title="Target" Minimum="-100" Maximum="100" Default="100" Exponent="1" Round="0" Unit="" Centered="true"

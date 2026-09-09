@@ -1,7 +1,7 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.HorizontalAdd"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <UserControl.Styles>
     <Style Selector="Grid.collapsible">
@@ -31,7 +31,7 @@
   </UserControl.Styles>
 
   <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible"
-        PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+        PointerEntered="MouseEnter" PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="12" Height="12" Background="Transparent" ClipToBounds="true" x:Name="Icon">
       <Path StrokeThickness="2" x:Name="Path"
             Data="M 0,6 L 12,6 M 6,0 L 6,12" />

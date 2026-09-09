@@ -1,12 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RuntimeFrameworkVersion>5.0.2</RuntimeFrameworkVersion>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64</RuntimeIdentifiers>
     <PublishTrimmed>true</PublishTrimmed>
-    <!--<PublishReadyToRun>true</PublishReadyToRun> this broke in .NET 5.0-->
-    <LangVersion>9.0</LangVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <StartupObject>ApolloUpdate.Program</StartupObject>
@@ -15,10 +12,6 @@
   
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
   </ItemGroup>
   
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
@@ -30,8 +30,8 @@ namespace Apollo.Components {
             Update_Position(Program.Project.Undo.Position);
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            base.Unloaded(sender, e);
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.HandleUnloaded(sender, e);
 
             if (Program.Project.Undo != null)
                 Program.Project.Undo.PositionChanged -= Update_Position;
@@ -41,7 +41,7 @@ namespace Apollo.Components {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
 
             if (MouseButton == PointerUpdateKind.LeftButtonReleased) Program.Project.Undo.Undo();
-            else if (MouseButton == PointerUpdateKind.RightButtonReleased) UndoWindow.Create((Window)this.GetVisualRoot());
+            else if (MouseButton == PointerUpdateKind.RightButtonReleased) UndoWindow.Create((Window)TopLevel.GetTopLevel(this));
         }
     }
 }

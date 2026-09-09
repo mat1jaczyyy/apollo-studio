@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -35,7 +35,7 @@ namespace Apollo.DeviceViewers {
             Bypass.IsChecked = _flip.Bypass;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _flip = null;
 
         void Mode_Changed(object sender, SelectionChangedEventArgs e) {
             FlipType selected = (FlipType)FlipMode.SelectedIndex;

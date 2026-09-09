@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -33,9 +33,9 @@ namespace Apollo.Components {
 
             base.MouseLeave(this, null);
 
-            Hole.Fill = (SolidColorBrush)Application.Current.Styles.FindResource("ThemeBorderMidBrush");
+            Hole.Fill = (SolidColorBrush)Apollo.Core.App.FindResource("ThemeBorderMidBrush");
         }
 
-        protected override void Click(PointerReleasedEventArgs e) => PreferencesWindow.Create((Window)this.GetVisualRoot());
+        protected override void Click(PointerReleasedEventArgs e) => PreferencesWindow.Create((Window)TopLevel.GetTopLevel(this));
     }
 }

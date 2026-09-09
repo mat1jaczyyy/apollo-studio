@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Avalonia;
@@ -32,7 +32,7 @@ namespace Apollo.DeviceViewers {
                 Macros[i].IsChecked = _refresh.GetMacro(i);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _refresh = null;
 
         void Macro_Changed(object sender, RoutedEventArgs e) {
             CheckBox source = (CheckBox)sender;

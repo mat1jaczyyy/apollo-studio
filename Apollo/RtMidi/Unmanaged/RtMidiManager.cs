@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -59,22 +59,22 @@ namespace Apollo.RtMidi.Unmanaged {
                     case 1:
                         byte[] bytes = new byte[count];
                         Marshal.Copy(apisPtr, bytes, 0, bytes.Length);
-                        return bytes.Cast<RtMidiApi>();
+                        return bytes.Select(value => (RtMidiApi)value);
 
                     case 2:
                         short[] shorts = new short[count];
                         Marshal.Copy(apisPtr, shorts, 0, shorts.Length);
-                        return shorts.Cast<RtMidiApi>();
+                        return shorts.Select(value => (RtMidiApi)value);
 
                     case 4:
                         int[] ints = new int[count];
                         Marshal.Copy(apisPtr, ints, 0, ints.Length);
-                        return ints.Cast<RtMidiApi>();
+                        return ints.Select(value => (RtMidiApi)value);
 
                     case 8:
                         long[] longs = new long[count];
                         Marshal.Copy(apisPtr, longs, 0, longs.Length);
-                        return longs.Cast<RtMidiApi>();
+                        return longs.Select(value => (RtMidiApi)value);
 
                     default:
                         throw new NotSupportedException($"Unexpected size of RtMidiApi enum {enumSize}");

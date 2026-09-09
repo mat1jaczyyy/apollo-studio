@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -36,19 +36,19 @@ namespace Apollo.Components {
             Update_Saved(Program.Project.Undo.Saved);
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
-            base.Unloaded(sender, e);
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
+            base.HandleUnloaded(sender, e);
             
             if (Program.Project.Undo != null)
                 Program.Project.Undo.SavedChanged -= Update_Saved;
         }
 
-        async void ContextMenu_Action(string action) => await Program.Project.Save((Window)this.GetVisualRoot(), action == "Save as...");
+        async void ContextMenu_Action(string action) => await Program.Project.Save((Window)TopLevel.GetTopLevel(this), action == "Save as...");
 
         protected override async void Click(PointerReleasedEventArgs e) {
             PointerUpdateKind MouseButton = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
             
-            if (MouseButton == PointerUpdateKind.LeftButtonReleased) await Program.Project.Save((Window)this.GetVisualRoot());
+            if (MouseButton == PointerUpdateKind.LeftButtonReleased) await Program.Project.Save((Window)TopLevel.GetTopLevel(this));
             else if (MouseButton == PointerUpdateKind.RightButtonReleased) ((ApolloContextMenu)this.Resources["SaveContextMenu"]).Open(this);
         }
     }

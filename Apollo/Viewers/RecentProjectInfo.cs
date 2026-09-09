@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -41,7 +41,7 @@ namespace Apollo.Viewers {
             Folder.Text = $"({Path.GetFileName(Path.GetDirectoryName(_path))})";
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Opened = null;
             Showed = null;
             Removed = null;
@@ -52,7 +52,7 @@ namespace Apollo.Viewers {
             "You may not have sufficient privileges to read from the destination folder, or\n" +
             "the file you're attempting to locate has been moved.\n\n" +
             "Would you like to remove it from the Recent Projects list?",
-            new string[] {"Yes", "No"}, (Window)this.GetVisualRoot()
+            new string[] {"Yes", "No"}, (Window)TopLevel.GetTopLevel(this)
         ) == "Yes";
 
         async void ContextMenu_Action(string action) {

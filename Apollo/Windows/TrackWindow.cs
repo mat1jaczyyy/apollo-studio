@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -61,9 +61,6 @@ namespace Apollo.Windows {
 
         public TrackWindow(Track track) {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
 
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -90,7 +87,7 @@ namespace Apollo.Windows {
             observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
-        void Loaded(object sender, EventArgs e) {
+        void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             Program.Project.PathChanged += UpdateTitle;
@@ -99,7 +96,7 @@ namespace Apollo.Windows {
             UpdateTitle();
         }
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             _track.Window = null;
             _track.ParentIndexChanged -= UpdateTitle;
             _track.NameChanged -= UpdateTitle;
@@ -122,7 +119,7 @@ namespace Apollo.Windows {
         }
         
         public void Bounds_Updated(Rect bounds) {
-            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+            if ((Bounds.Width <= 0 || Bounds.Height <= 0) || (TitleText.Bounds.Width <= 0 || TitleText.Bounds.Height <= 0) || (TitleCenter.Bounds.Width <= 0 || TitleCenter.Bounds.Height <= 0) || (CenteringLeft.Bounds.Width <= 0 || CenteringLeft.Bounds.Height <= 0) || (CenteringRight.Bounds.Width <= 0 || CenteringRight.Bounds.Height <= 0)) return;
 
             int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
 
@@ -130,7 +127,7 @@ namespace Apollo.Windows {
             TitleCenter.Opacity = 1 - result;
         }
 
-        public virtual void SetEnabled() => Background = (IBrush)Application.Current.Styles.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
+        public virtual void SetEnabled() => Background = (IBrush)Apollo.Core.App.FindResource(_track.Enabled? "ThemeControlMidBrush" : "ThemeControlLowBrush");
 
         void Track_Scroll(object sender, PointerWheelEventArgs e) => Contents.Offset = Contents.Offset.WithX(Contents.Offset.X - e.Delta.Y * 20);
 
@@ -212,13 +209,14 @@ namespace Apollo.Windows {
                 return;
             
             } else if (e.Key == Key.Right) {
+                bool extendSelection = e.KeyModifiers == KeyModifiers.Shift;
                 ISelect right = Selection.Selection.Last();
                 e.Handled = true;
 
                 if (right.IParentIndex.Value == right.IParent.IChildren.Count - 1) {
                     if (InChoke()) {
                         Selection.Select((ISelect)((Chain)Selection.Start.IParent).Parent, e.KeyModifiers == KeyModifiers.Shift);
-                        e.KeyModifiers = KeyModifiers.None;
+                        extendSelection = false;
 
                     } else if (InMultiPreprocess()) {
                         Selection.Select((ISelect)((ISelect)Selection.Start.IParent).IParent, e.KeyModifiers == KeyModifiers.Shift);
@@ -226,7 +224,7 @@ namespace Apollo.Windows {
                     }
                 }
                 
-                Selection.Move(true, e.KeyModifiers == KeyModifiers.Shift);
+                Selection.Move(true, extendSelection);
                 return;
 
             } else if (e.Key == Key.Down) {
@@ -249,12 +247,12 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void Window_LostFocus(object sender, RoutedEventArgs e) {
-            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
+            if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() == typeof(ComboBox))
                 this.Focus();
         }
 
@@ -274,7 +272,7 @@ namespace Apollo.Windows {
         void Expand(PointerEventArgs e) {
             Point pointerRelative = e.GetPosition(this);
 
-            double scaling = this.PlatformImpl.Scaling;
+            double scaling = RenderScaling;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 scaling = 1;
@@ -293,7 +291,7 @@ namespace Apollo.Windows {
                 }
 
             if (result != null) {
-                double density = result.PixelDensity;
+                double density = result.Scaling;
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     density = 1;

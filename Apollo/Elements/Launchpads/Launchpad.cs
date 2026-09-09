@@ -267,7 +267,7 @@ namespace Apollo.Elements.Launchpads {
                 if (MystrixProFirmwareUnsupported.DisplayWarning(sender)) return;
                 if (MF64FirmwareUnsupported.DisplayWarning(sender)) return;
                 if (anthonyhfmIncompatible.DisplayWarning(sender)) return;
-            }, DispatcherPriority.MinValue);
+            }, DispatcherPriority.Background);
         }
 
         public LaunchpadWindow Window;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 
 using Avalonia;
@@ -42,11 +42,11 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Added = null;
             Action = null;
 
-            base.Unloaded(sender, e);
+            base.HandleUnloaded(sender, e);
         }
 
         void AddContextMenu_Action(string action) => Added?.Invoke(Assembly.GetExecutingAssembly().GetType($"Apollo.Devices.{action.Replace(" ", "")}"));

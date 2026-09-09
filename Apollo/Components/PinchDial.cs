@@ -56,7 +56,7 @@ namespace Apollo.Components {
             ArcBase.StrokeThickness = stroke * Scale;
             ArcBase.IsVisible = Enabled;
 
-            Arc.Stroke = (IBrush)Application.Current.Styles.FindResource(Enabled? color : "ThemeForegroundLowBrush");
+            Arc.Stroke = (IBrush)Apollo.Core.App.FindResource(Enabled? color : "ThemeForegroundLowBrush");
             Arc.StrokeThickness = stroke * Scale / 2;
             
             ArcBase.Data = Arc.Data = CreateGeometry(IsBilateral? "C {2} {3} {4} {5}" : "Q {2} {3}", value);

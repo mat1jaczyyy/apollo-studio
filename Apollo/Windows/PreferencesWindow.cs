@@ -1,3 +1,4 @@
+using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
 using Humanizer;
-using Humanizer.Localisation;
+
 
 using Apollo.Components;
 using Apollo.Core;
@@ -146,9 +147,6 @@ namespace Apollo.Windows {
 
         public PreferencesWindow() {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -231,9 +229,9 @@ namespace Apollo.Windows {
             MIDI.DevicesUpdated += HandlePorts;
         }
 
-        void Loaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
+        void HandleLoaded(object sender, EventArgs e) => Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             Preferences.Window = null;
 
             Timer.Stop();
@@ -293,7 +291,7 @@ namespace Apollo.Windows {
         void CustomPalette_Changed(object sender, RoutedEventArgs e) => Preferences.ImportPalette = Palettes.CustomPalette;
 
         async void BrowseCustomPalette(object sender, RoutedEventArgs e) {
-            OpenFileDialog ofd = new OpenFileDialog() {
+            FilePickerOpenOptions ofd = new FilePickerOpenOptions() {
                 AllowMultiple = false,
                 Title = "Select Retina Palette"
             };
@@ -301,17 +299,15 @@ namespace Apollo.Windows {
             // On newer OSX versions, filtering for files with no extension is broken
             // https://github.com/AvaloniaUI/Avalonia/issues/7759
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-                ofd.Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
+                ofd.FileTypeFilter = new List<FilePickerFileType>() {
+                    new FilePickerFileType("Retina Palette File") { Patterns = new List<string>() {
                             "*"
-                        },
-                        Name = "Retina Palette File"
+                        }
                     }
                 };
             }
 
-            string[] result = await ofd.ShowAsync(this);
+            string[] result = await FileDialogs.Open(this, ofd);
 
             if (result.Length > 0) {
                 Palette loaded;
@@ -399,12 +395,12 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void Window_LostFocus(object sender, RoutedEventArgs e) {
-            if (FocusManager.Instance.Current?.GetType() == typeof(ComboBox))
+            if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() == typeof(ComboBox))
                 this.Focus();
         }
 

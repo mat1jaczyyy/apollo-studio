@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -29,7 +29,7 @@ namespace Apollo.Viewers {
         }
 
         protected override void ApplyHeaderBrush(string resource) {
-            IBrush brush = (IBrush)Application.Current.Styles.FindResource(resource);
+            IBrush brush = (IBrush)Apollo.Core.App.FindResource(resource);
 
             if (IsArrangeValid) Header.Background = brush;
             else this.Resources["TitleBrush"] = brush;
@@ -53,7 +53,7 @@ namespace Apollo.Viewers {
             SetEnabled();
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             base.ResetEvents();
 
             SpecificViewer = null;
@@ -67,8 +67,8 @@ namespace Apollo.Viewers {
         }
 
         public override void SetEnabled() {
-            Header.BorderBrush = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
-            TitleText.Foreground = (IBrush)Application.Current.Styles.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
+            Header.BorderBrush = (IBrush)Apollo.Core.App.FindResource(_device.Enabled? "ThemeBorderMidBrush" : "ThemeBorderLowBrush");
+            TitleText.Foreground = (IBrush)Apollo.Core.App.FindResource(_device.Enabled? "ThemeForegroundBrush" : "ThemeForegroundLowBrush");
         }
     }
 }

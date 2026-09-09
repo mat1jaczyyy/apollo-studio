@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -50,7 +50,7 @@ namespace Apollo.Components {
             Angle.Enabled = copy.CopyMode.SupportsAngle();
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             OffsetAdded = null;
             OffsetRemoved = null;
 

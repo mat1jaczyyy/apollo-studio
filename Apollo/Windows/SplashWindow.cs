@@ -1,4 +1,5 @@
-﻿using System;
+using Avalonia.Platform.Storage;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -27,11 +28,11 @@ using Apollo.Viewers;
 
 namespace Apollo.Windows {
     public class SplashWindow: Window {
-        static Image SplashImage = (Image)Application.Current.Styles.FindResource("SplashImage");
+        static Image SplashImage = (Image)Apollo.Core.App.FindResource("SplashImage");
 
         void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
-            
+
             Root = this.Get<Grid>("Root");
 
             CrashPanel = this.Get<Grid>("CrashPanel");
@@ -49,7 +50,7 @@ namespace Apollo.Windows {
 
             UpdateButton = this.Get<UpdateButton>("UpdateButton");
         }
-        
+
         IDisposable observable;
 
         Grid Root, CrashPanel;
@@ -73,7 +74,7 @@ namespace Apollo.Windows {
 
             BlogpostBody.Text = $"{latest.Content.Replace("\r", "").Split('\n').First().Replace("# ", "").Replace("#", "")}\n" +
                 $" published {DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(Path.GetFileNameWithoutExtension(latest.Name))).Humanize()}";
-            
+
             BlogpostLink.Opacity = 1;
             BlogpostLink.IsHitTestVisible = true;
         }
@@ -87,7 +88,7 @@ namespace Apollo.Windows {
                 ReleaseBody.Text = "Failed to fetch release data from GitHub.";
                 return;
             }
-            
+
             ReleaseVersion.Text = $"{latest.Name} – published {latest.PublishedAt.Humanize()}";
             ReleaseBody.Text = String.Join('\n', latest.Body.Replace("\r", "").Split('\n').SkipWhile(i => i.Trim() == "Changes:" || i.Trim() == "").Take(3));
             ReleaseLink.Opacity = 1;
@@ -96,22 +97,19 @@ namespace Apollo.Windows {
 
         public SplashWindow() {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
-            
+
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
 
             Preferences.RecentsCleared += Clear;
 
             observable = TabControl.GetObservable(SelectingItemsControl.SelectedIndexProperty).Subscribe(TabChanged);
-            
+
             this.AddHandler(DragDrop.DropEvent, Drop);
             this.AddHandler(DragDrop.DragOverEvent, DragOver);
 
             this.Get<PreferencesButton>("PreferencesButton").HoleFill = Background;
-            
+
             Root.Children.Add(SplashImage);
 
             if (Program.HadCrashed)
@@ -123,14 +121,14 @@ namespace Apollo.Windows {
                 } else ResolveCrash();
         }
 
-        void Loaded(object sender, EventArgs e) {
+        void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             Launchpad.DisplayWarnings(this);
 
             if (App.Args?.Length > 0)
                 ReadFile(App.Args[0]);
-            
+
             App.Args = null;
 
             UpdateBlogpost();
@@ -138,13 +136,13 @@ namespace Apollo.Windows {
 
             if (!Program.HadCrashed) CheckUpdate();
         }
-        
-        void Unloaded(object sender, CancelEventArgs e) {
+
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             Root.Children.Remove(SplashImage);
 
             this.RemoveHandler(DragDrop.DropEvent, Drop);
             this.RemoveHandler(DragDrop.DragOverEvent, DragOver);
-            
+
             Preferences.AlwaysOnTopChanged -= UpdateTopmost;
             Preferences.RecentsCleared += Clear;
 
@@ -159,11 +157,11 @@ namespace Apollo.Windows {
             if (await Github.ShouldUpdate()) {
                 while (App.Windows.OfType<MessageWindow>().Where(i => !i.Completed.Task.IsCompleted).FirstOrDefault() is MessageWindow window)
                     await window.Completed.Task;
-                
+
                 Dispatcher.UIThread.Post(async () => {
                     UpdateButton.Enable($"Updates are available for Apollo Studio ({(await Github.LatestRelease()).Name} – {(await Github.LatestDownload()).Size.Bytes().Humanize("#.##")}).");
                     MinHeight = MaxHeight += 30;
-                }, DispatcherPriority.MinValue);
+                }, DispatcherPriority.Background);
             }
         }
 
@@ -188,7 +186,7 @@ namespace Apollo.Windows {
 
                     Recents.Children.Add(viewer);
                 }
-            
+
             } else Recents.Children.Clear();
         }
 
@@ -215,7 +213,7 @@ namespace Apollo.Windows {
                         loaded.Undo.SavePosition();
                         Preferences.RecentsAdd(path);
                     }
-                    
+
                     Program.Project?.Dispose();
                     Program.Project = loaded;
 
@@ -250,37 +248,35 @@ namespace Apollo.Windows {
 
                 return;
             }
-            
+
             ProjectWindow.Create(this);
             Close();
         }
 
         async void Open(object sender, RoutedEventArgs e) {
-            OpenFileDialog ofd = new OpenFileDialog() {
+            FilePickerOpenOptions ofd = new FilePickerOpenOptions() {
                 AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "approj"
-                        },
-                        Name = "Apollo Project"
+                FileTypeFilter = new List<FilePickerFileType>() {
+                    new FilePickerFileType("Apollo Project") { Patterns = new List<string>() {
+                            "*.approj"
+                        }
                     }
                 },
                 Title = "Open Project"
             };
 
-            string[] result = await ofd.ShowAsync(this);
+            string[] result = await FileDialogs.Open(this, ofd);
 
             if (result.Length > 0)
                 ReadFile(result[0]);
         }
 
-        void Clear() => Dispatcher.UIThread.Post(() => Recents.Children.Clear(), DispatcherPriority.MinValue);
+        void Clear() => Dispatcher.UIThread.Post(() => Recents.Children.Clear(), DispatcherPriority.Background);
 
         void Remove(RecentProjectInfo sender, string path) {
             Preferences.RecentsRemove(path);
 
-            Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.MinValue);
+            Dispatcher.UIThread.Post(() => Recents.Children.Remove(sender), DispatcherPriority.Background);
         }
 
         async void Blogpost(object sender, PointerReleasedEventArgs e)
@@ -292,7 +288,7 @@ namespace Apollo.Windows {
         void ResolveCrash() {
             if (File.Exists(Program.CrashProject))
                 File.Delete(Program.CrashProject);
-                
+
             Program.HadCrashed = false;
         }
 
@@ -305,7 +301,7 @@ namespace Apollo.Windows {
 
             ReadFile(Program.CrashProject, true);
 
-            if (Program.Project != null) 
+            if (Program.Project != null)
                 Program.Project.FilePath = originalPath;
 
             ResolveCrash();
@@ -341,21 +337,21 @@ namespace Apollo.Windows {
         void Window_KeyDown(object sender, KeyEventArgs e) {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
-            
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
         void DragOver(object sender, DragEventArgs e) {
             e.Handled = true;
-            if (CrashPanel.IsHitTestVisible || !e.Data.Contains(DataFormats.FileNames)) e.DragEffects = DragDropEffects.None; 
+            if (CrashPanel.IsHitTestVisible || !e.DataTransfer.Contains(DataFormat.File)) e.DragEffects = DragDropEffects.None;
         }
 
         void Drop(object sender, DragEventArgs e) {
             e.Handled = true;
 
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                string path = e.Data.GetFileNames().FirstOrDefault();
+            if (e.DataTransfer.Contains(DataFormat.File)) {
+                string path = e.DataTransfer.TryGetFiles()?.Select(file => file.TryGetLocalPath()).Where(path => path != null).FirstOrDefault();
 
                 if (path != null) ReadFile(path);
 
@@ -364,12 +360,12 @@ namespace Apollo.Windows {
         }
 
         void MoveWindow(object sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
-        
+
         void Minimize() => WindowState = WindowState.Minimized;
 
         public static void Create(Window owner) {
             SplashWindow window = new SplashWindow();
-        
+
             if (owner == null || owner.WindowState != WindowState.Minimized) {
                 window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 window.Owner = owner;

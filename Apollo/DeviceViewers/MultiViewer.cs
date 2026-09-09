@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Avalonia;
@@ -36,7 +36,7 @@ namespace Apollo.DeviceViewers {
         LaunchpadGrid Grid;
         Border GridContainer;
 
-        SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+        SolidColorBrush GetColor(bool value) => (SolidColorBrush)Apollo.Core.App.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
 
         public MultiViewer() => new InvalidOperationException();
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -36,7 +36,7 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), new Color(0).ToScreenBrush());
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _preview = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _preview = null;
 
         void PadChanged(int index, bool state) {
             Launchpad lp = Track.Get(_preview)?.Launchpad;

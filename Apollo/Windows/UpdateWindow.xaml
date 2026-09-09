@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apollo.Windows.UpdateWindow"
         xmlns:Components="clr-namespace:Apollo.Components"
@@ -6,7 +6,7 @@
         Icon="/Resources/WindowIcon.png"
         Width="360" MinWidth="360" MaxWidth="360"
         Height="120" MinHeight="120" MaxHeight="120"
-        Opened="Loaded" Closing="Unloaded">
+        Opened="HandleLoaded" Closing="HandleUnloaded">
 
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
     <Grid>

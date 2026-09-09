@@ -1,14 +1,14 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.Expand"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <UserControl.Resources>
     <SolidColorBrush x:Key="Brush" />
   </UserControl.Resources>
 
   <Canvas HorizontalAlignment="Center" Width="16" Height="16" Background="Transparent" x:Name="Icon"
-          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+          PointerEntered="MouseEnter" PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Path Stroke="{DynamicResource Brush}" StrokeThickness="1.5"
           Data="M 14,2 L 2,14" />
     <Path Fill="{DynamicResource Brush}"

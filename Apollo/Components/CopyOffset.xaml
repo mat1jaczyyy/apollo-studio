@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.CopyOffset"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
   
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" MaxHeight="223">
     <Grid RowDefinitions="*,*" Width="64">

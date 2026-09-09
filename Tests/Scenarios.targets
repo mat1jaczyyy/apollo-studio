@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <StartupObject>Apollo.Tests.Scenarios</StartupObject>
+    <DefineConstants Condition="'$(TestLegacy)' == 'true'">$(DefineConstants);LEGACY_AVALONIA</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Scenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EditorScenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InputScenarios.cs" />
+  </ItemGroup>
+</Project>

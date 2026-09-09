@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Avalonia;
@@ -45,7 +45,7 @@ namespace Apollo.Components {
         }
 
         public void Select() {
-            ApplyHeaderBrush((IBrush)Application.Current.Styles.FindResource("ThemeAccentBrush2"));
+            ApplyHeaderBrush((IBrush)Apollo.Core.App.FindResource("ThemeAccentBrush2"));
             Selected = true;
         }
 
@@ -66,7 +66,7 @@ namespace Apollo.Components {
             DragDrop = new DragDropManager(this);
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             FrameAdded = null;
             FrameRemoved = null;
             FrameSelected = null;

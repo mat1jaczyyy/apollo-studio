@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,9 +26,6 @@ namespace Apollo.Windows {
 
         public MessageWindow(string message, string[] options = null, Action<string> oncomplete = null) {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
             
             if (Owner == null) WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
@@ -49,7 +46,7 @@ namespace Apollo.Windows {
             OnComplete = oncomplete;
         }
 
-        void Loaded(object sender, EventArgs e) {
+        void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             foreach (Window window in App.Windows)
@@ -57,7 +54,7 @@ namespace Apollo.Windows {
                     window.IsVisible = false;
         }
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             if (!Completed.Task.IsCompleted)
                 Result((string)Default.Content);
 

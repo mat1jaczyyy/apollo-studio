@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -40,7 +40,7 @@ namespace Apollo.DeviceViewers {
             ValueLow.RawValue = _tone.ValueLow * 100;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _tone = null;
 
         void Hue_Changed(Dial sender, double value, double? old) {
             if (old != null && old != value)

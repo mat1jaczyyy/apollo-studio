@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Avalonia;
@@ -23,7 +23,7 @@ namespace Apollo.DeviceViewers {
         KeyFilter _filter;
         LaunchpadGrid Grid;
 
-        SolidColorBrush GetColor(bool value) => (SolidColorBrush)Application.Current.Styles.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
+        SolidColorBrush GetColor(bool value) => (SolidColorBrush)Apollo.Core.App.FindResource(value? "ThemeAccentBrush" : "ThemeForegroundLowBrush");
 
         public KeyFilterViewer() => new InvalidOperationException();
 
@@ -36,7 +36,7 @@ namespace Apollo.DeviceViewers {
                 Grid.SetColor(LaunchpadGrid.SignalToGrid(i), GetColor(_filter[i]));
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _filter = null;
 
         bool drawingState;
         bool[] old;

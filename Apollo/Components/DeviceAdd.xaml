@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.DeviceAdd"
              xmlns:Components="clr-namespace:Apollo.Components"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <UserControl.Resources>
     <Components:ApolloContextMenu x:Key="AddContextMenu" MenuAction="AddContextMenu_Action">
@@ -86,7 +86,7 @@
   </UserControl.Styles>
 
   <Grid ColumnDefinitions="7,Auto,7" Background="Transparent" Cursor="Hand" x:Name="Root" Classes="collapsible"
-        PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+        PointerEntered="MouseEnter" PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Canvas Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Background="Transparent" ClipToBounds="true" x:Name="Icon">
       <Path StrokeThickness="2" x:Name="Path"
             Data="M 0,8 L 16,8 M 8,0 L 8,16" />

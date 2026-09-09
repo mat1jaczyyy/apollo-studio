@@ -26,6 +26,8 @@
     <!-- TODO: Unify these when Avalonia fixes double styling bug: Selector="Path, Ellipse" -->
 
     <Style Selector="Path">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="20" />
       <Setter Property="Fill" Value="{DynamicResource ThemeForegroundBrush}" />
     </Style>
 

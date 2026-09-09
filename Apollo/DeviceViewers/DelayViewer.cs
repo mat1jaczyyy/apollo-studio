@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -46,7 +46,7 @@ namespace Apollo.DeviceViewers {
                 ));
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) => _delay = null;
 
         public void SetDurationValue(int duration) => Duration.RawValue = duration;
 

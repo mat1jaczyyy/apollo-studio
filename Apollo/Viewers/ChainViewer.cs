@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -80,11 +80,11 @@ namespace Apollo.Viewers {
             
             if (backgroundBorder) {
                 this.Get<Grid>("Root").Children.Insert(0, new DeviceBackground());
-                Background = (IBrush)Application.Current.Styles.FindResource("ThemeControlDarkenBrush");
+                Background = (IBrush)Apollo.Core.App.FindResource("ThemeControlDarkenBrush");
             }
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             _chain.Viewer = null;
             _chain = null;
             
@@ -133,7 +133,7 @@ namespace Apollo.Viewers {
         public List<string> DropAreas => new List<string>() {"DropZoneBefore", "DropZoneAfter", "DeviceAdd"};
 
         public Dictionary<string, DragDropManager.DropHandler> DropHandlers => new Dictionary<string, DragDropManager.DropHandler>() {
-            {DataFormats.FileNames, null},
+            {DragDropManager.FileNames, null},
             {"Device", null}
         };
 

@@ -1,4 +1,5 @@
-﻿using System;
+using Avalonia.Platform.Storage;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -131,7 +132,7 @@ namespace Apollo.Windows {
         ColorPicker ColorPicker;
         ColorHistory ColorHistory;
         Dial Duration, Gate, Repeats;
-        PinchDial Pinch;
+        new PinchDial Pinch;
         Button ImportButton, Play, Fire, Reverse, Invert;
         CheckBox Wrap, Infinite;
         CollapseButton CollapseButton;
@@ -239,9 +240,6 @@ namespace Apollo.Windows {
 
         public PatternWindow(Pattern pattern) {
             InitializeComponent();
-            #if DEBUG
-                this.AttachDevTools();
-            #endif
 
             UpdateTopmost(Preferences.AlwaysOnTop);
             Preferences.AlwaysOnTopChanged += UpdateTopmost;
@@ -292,7 +290,7 @@ namespace Apollo.Windows {
             observables.Add(CenteringRight.GetObservable(Visual.BoundsProperty).Subscribe(Bounds_Updated));
         }
 
-        void Loaded(object sender, EventArgs e) {
+        void HandleLoaded(object sender, EventArgs e) {
             if (Preferences.RememberPatternPosition && _x.HasValue) {
                 Position = new PixelPoint(_x.Value, _y);
                 Width = _w;
@@ -308,7 +306,7 @@ namespace Apollo.Windows {
             ColorHistory.HistoryChanged += RenderHistory;
         }
 
-        void Unloaded(object sender, CancelEventArgs e) {
+        void HandleUnloaded(object sender, WindowClosingEventArgs e) {
             if (historyShowing) MIDI.ClearState(force: true);
 
             if (importing) CancelImport(sender, null);
@@ -354,7 +352,7 @@ namespace Apollo.Windows {
         }
 
         public void Bounds_Updated(Rect bounds) {
-            if (Bounds.IsEmpty || TitleText.Bounds.IsEmpty || TitleCenter.Bounds.IsEmpty || CenteringLeft.Bounds.IsEmpty || CenteringRight.Bounds.IsEmpty) return;
+            if ((Bounds.Width <= 0 || Bounds.Height <= 0) || (TitleText.Bounds.Width <= 0 || TitleText.Bounds.Height <= 0) || (TitleCenter.Bounds.Width <= 0 || TitleCenter.Bounds.Height <= 0) || (CenteringLeft.Bounds.Width <= 0 || CenteringLeft.Bounds.Height <= 0) || (CenteringRight.Bounds.Width <= 0 || CenteringRight.Bounds.Height <= 0)) return;
 
             int result = Convert.ToInt32((Bounds.Width - TitleText.Bounds.Width) / 2 <= Math.Max(CenteringLeft.Bounds.Width, CenteringRight.Bounds.Width) + 10);
 
@@ -530,7 +528,7 @@ namespace Apollo.Windows {
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
-            if (windows.SequenceEqual(App.Windows) && FocusManager.Instance.Current?.GetType() != typeof(TextBox))
+            if (windows.SequenceEqual(App.Windows) && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()?.GetType() != typeof(TextBox))
                 this.Focus();
         }
 
@@ -923,7 +921,7 @@ namespace Apollo.Windows {
 
             if (index != null) RootKey.SetColor(
                 LaunchpadGrid.SignalToGrid(index.Value),
-                (SolidColorBrush)Application.Current.Styles.FindResource("ThemeAccentBrush")
+                (SolidColorBrush)Apollo.Core.App.FindResource("ThemeAccentBrush")
             );
         }
 
@@ -1155,46 +1153,38 @@ namespace Apollo.Windows {
         async void ImportDialog(object sender, RoutedEventArgs e) {
             if (Locked) return;
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            FilePickerOpenOptions ofd = new FilePickerOpenOptions() {
                 AllowMultiple = false,
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "mid",
-                            "gif",
-                            "jpg",
-                            "jpeg",
-                            "png",
-                            "bmp",
-                        },
-                        Name = "All Supported Files"
+                FileTypeFilter = new List<FilePickerFileType>() {
+                    new FilePickerFileType("All Supported Files") { Patterns = new List<string>() {
+                            "*.mid",
+                            "*.gif",
+                            "*.jpg",
+                            "*.jpeg",
+                            "*.png",
+                            "*.bmp",
+                        }
                     },
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "mid"
-                        },
-                        Name = "MIDI Files"
+                    new FilePickerFileType("MIDI Files") { Patterns = new List<string>() {
+                            "*.mid"
+                        }
                     },
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "gif"
-                        },
-                        Name = "Animated GIF Images"
+                    new FilePickerFileType("Animated GIF Images") { Patterns = new List<string>() {
+                            "*.gif"
+                        }
                     },
-                    new FileDialogFilter() {
-                        Extensions = new List<string>() {
-                            "jpg",
-                            "jpeg",
-                            "png",
-                            "bmp"
-                        },
-                        Name = "Static JPG, PNG or BMP images"
+                    new FilePickerFileType("Static JPG, PNG or BMP images") { Patterns = new List<string>() {
+                            "*.jpg",
+                            "*.jpeg",
+                            "*.png",
+                            "*.bmp"
+                        }
                     }
                 },
                 Title = "Import Pattern"
             };
 
-            string[] result = await ofd.ShowAsync(this);
+            string[] result = await FileDialogs.Open(this, ofd);
             if (result.Length > 0) ImportFile(result[0]);
         }
 

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -56,11 +56,11 @@ namespace Apollo.Components {
             base.MouseLeave(this, null);
         }
 
-        protected override void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        protected override void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             ActionContextMenu = null;
             
             Action = null;
-            base.Unloaded(sender, e);
+            base.HandleUnloaded(sender, e);
         }
 
         void ContextMenu_Action(string action) => Action?.Invoke(action);

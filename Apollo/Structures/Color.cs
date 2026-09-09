@@ -166,7 +166,7 @@ namespace Apollo.Structures {
 
             double max = new double[] {fr, fg, fb}.Max() / 255;
 
-            AvaloniaColor bg = (AvaloniaColor)Application.Current.Styles.FindResource("ThemeForegroundLowColor");
+            AvaloniaColor bg = (AvaloniaColor)Apollo.Core.App.FindResource("ThemeForegroundLowColor");
 
             return new SolidColorBrush(new AvaloniaColor(
                 255,
@@ -181,13 +181,8 @@ namespace Apollo.Structures {
         public override string ToString() => $"({Red}, {Green}, {Blue})";
         
         public uint ToUInt32(){
-            uint generatedColor = this.ToScreenBrush().Color.ToUint32();
-
-            byte r = (byte)(generatedColor >> 16);
-            byte g = (byte)(generatedColor >> 8);
-            byte b = (byte)generatedColor;
-
-            return (uint)(255 << 24 | b << 16 | g << 8 | r);
+            var color = ToScreenBrush().Color;
+            return (uint)(255 << 24 | color.B << 16 | color.G << 8 | color.R);
         }
     }
 }

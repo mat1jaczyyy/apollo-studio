@@ -1,15 +1,15 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Apollo.Components.LargePopout"
              ToolTip.Tip="Show Pattern Editor"
-             DetachedFromVisualTree="Unloaded">
+             DetachedFromVisualTree="HandleUnloaded">
 
   <UserControl.Resources>
     <SolidColorBrush x:Key="Brush" />
   </UserControl.Resources>
 
   <Canvas Width="30" Height="30" Background="Transparent" x:Name="Icon"
-          PointerEnter="MouseEnter" PointerLeave="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
+          PointerEntered="MouseEnter" PointerExited="MouseLeave" PointerPressed="MouseDown" PointerReleased="MouseUp">
     <Path Stroke="{DynamicResource Brush}" StrokeThickness="4"
           Data="M 2,15 L 2,2 28,2 28,28 15,28 M 2,28 L 16,14" />
     <Path Fill="{DynamicResource Brush}"

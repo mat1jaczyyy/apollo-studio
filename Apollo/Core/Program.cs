@@ -17,10 +17,18 @@ namespace Apollo.Core {
     class Program {
         public static readonly string Version = "Version 1.8.17";
 
-        static AppBuilder BuildAvaloniaApp(bool useGpu)
-            => AppBuilder.Configure<App>()
-                .With(new AvaloniaNativePlatformOptions { UseGpu = useGpu })
-                .UsePlatformDetect();
+        internal static AppBuilder BuildAvaloniaApp(bool useGpu) {
+            var builder = AppBuilder.Configure<App>().UsePlatformDetect();
+            #if DEBUG
+                builder.WithDeveloperTools();
+            #endif
+            if (!useGpu) {
+                builder.With(new AvaloniaNativePlatformOptions { RenderingMode = new[] { AvaloniaNativeRenderingMode.Software } });
+                builder.With(new Win32PlatformOptions { RenderingMode = new[] { Win32RenderingMode.Software } });
+                builder.With(new X11PlatformOptions { RenderingMode = new[] { X11RenderingMode.Software } });
+            }
+            return builder;
+        }
 
         public static string GetBaseFolder(string folder) => Path.Combine(
             Directory.GetParent(

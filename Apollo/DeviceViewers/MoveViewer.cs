@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -46,7 +46,7 @@ namespace Apollo.DeviceViewers {
             Wrap.IsChecked = _move.Wrap;
         }
 
-        void Unloaded(object sender, VisualTreeAttachmentEventArgs e) {
+        void HandleUnloaded(object sender, VisualTreeAttachmentEventArgs e) {
             Offset.Changed -= Offset_Changed;
             Offset.AbsoluteChanged -= Offset_AbsoluteChanged;
             Offset.Switched -= Offset_Switched;
