@@ -97,6 +97,28 @@ Before closing the GitHub issue, smoke-test Command+Q, menu Quit and Dock Quit o
 The original regression suites also passed after this fix: 70 native checks with zero scenario/window differences against master and identical hashes for all 24 presets, plus 83 headless checks. Evidence: `artifacts/quit/regression-native/run` and `artifacts/quit/regression-headless`.
 
 A normal self-contained macOS x64 publish is available locally at `artifacts/quit/publish/osx-x64`. Its assembly entry point was verified as `Apollo.Core.Program.Main`, with no `Apollo.Tests` types included. This is a cross-published build for a macOS smoke test, not a record of running on macOS.
+## Separate macOS architecture targets
+
+Branch `codex/macos-arm64` is stacked on Quit fix `9f8740e0`. Both Apollo and ApolloUpdate declare `osx-x64` and `osx-arm64`. The Intel native MIDI binary is unchanged; ARM builds compile the pinned fork in `Native/rtmidi` on macOS, or accept a previously built thin ARM dylib through `RtMidiArm64Library` when cross-publishing. Build guards reject missing native libraries, Intel libraries and incompatible Mach-O file types.
+
+Run the release-selection checks without starting the UI or contacting GitHub:
+
+```powershell
+$env:APOLLO_TEST_RELEASE_ASSETS = '1'
+dotnet run --project Tests/Apollo.Scenarios.csproj -c Release -- artifacts/release-selection
+Remove-Item Env:APOLLO_TEST_RELEASE_ASSETS
+python Tests/test_mac_package.py
+```
+
+The 11 release-selection cases cover both architectures, Windows, historical versioned names, missing architecture assets, unsupported platforms/CPUs and misleading filename suffixes. Installer checks validate separate payload/output paths, host-architecture declarations, preservation of installation settings and resources, and an unchanged source template.
+
+The `macOS builds` GitHub Actions workflow uses separate Intel and ARM runners. It publishes the app/updater, validates native Mach-O architectures, runs `Tests/native_rtmidi_smoke.py` against a virtual CoreMIDI connection, and runs the release/installer checks. It preserves executable permissions in its uploaded zip. Its native tests do not substitute for physical Launchpad tests or actual installation/update smoke tests.
+
+Local Windows verification (2026-09-10): release selection 11/11 and installer project tests 2/2 passed. Missing ARM RtMidi and an intentionally supplied Intel dylib were both rejected. The Intel app and both updater architectures cross-published successfully; executable headers match their targets. These outputs and logs are under `artifacts/mac-targets`, with release-selection results under `artifacts/mac-arm-release-tests`.
+
+The final Windows native regression passed all 70 checks with zero scenario/window differences against master and identical hashes for all 24 presets (`artifacts/mac-targets/windows-regression-2/run`). The final release-selection fixture also passed all 11 cases (`artifacts/mac-targets/release-selection-final`).
+
+An ARM app build/run, actual Packages installer builds, and the new macOS CI jobs have not been executed from this Windows workspace. On a Mac, use the publishing commands in the main README and check MIDI input/output, graceful Quit, installer launch and an update staying on the same architecture.
 ## Review regression pass (2026-09-10)
 
 The pointer suite now drives Apollo's custom drag loop: the first-item/no-op boundary, Escape cancellation, cursor restoration, moves and copies with undo/redo, transfer between track windows, and removal of the source viewer during a drag. Horizontal resize handles are exercised at 100% and 150% scaling. Headless screen conversion ignores window positions, so the cross-window fixture uses disjoint hit regions; native monitor offsets and window stacking still need a desktop test.

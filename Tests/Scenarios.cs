@@ -39,6 +39,10 @@ namespace Apollo.Tests {
         [STAThread]
         static int Main(string[] args) {
             if (args.Length != 1) throw new ArgumentException("Pass an empty test output directory.");
+            #if !LEGACY_AVALONIA
+            if (Environment.GetEnvironmentVariable("APOLLO_TEST_RELEASE_ASSETS") == "1")
+                return RunReleaseAssetChecks(Path.GetFullPath(args[0]));
+            #endif
             ConfigureOfflineGithub();
             output = Path.GetFullPath(args[0]);
             Directory.CreateDirectory(output);

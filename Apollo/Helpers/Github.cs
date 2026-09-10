@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -40,14 +41,23 @@ namespace Apollo.Helpers {
                     await Client.Repository.Release.GetAll("mat1jaczyyy", "apollo-studio")
                 ).First(i => i.Prerelease == false);
                 
-                download = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? null
-                    : release.Assets.FirstOrDefault(i => i.Name.Contains(
-                        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "Win.zip" : "Mac.zip"
-                    ));
+                var platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? OSPlatform.Windows
+                    : RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? OSPlatform.OSX : OSPlatform.Linux;
+                var name = DownloadAssetName(release.Assets.Select(asset => asset.Name), platform, RuntimeInformation.ProcessArchitecture);
+                download = release.Assets.FirstOrDefault(asset => asset.Name == name);
             }
 
             return release;
+        }
+
+        internal static string DownloadAssetName(IEnumerable<string> names, OSPlatform platform, Architecture architecture) {
+            // Match the running build, including Intel builds running under Rosetta.
+            // Never replace an ARM installation with an Intel-only update.
+            string suffix = platform == OSPlatform.Windows && architecture == Architecture.X64 ? "-Win.zip"
+                : platform == OSPlatform.OSX && architecture == Architecture.X64 ? "-Mac.zip"
+                : platform == OSPlatform.OSX && architecture == Architecture.Arm64 ? "-Mac-arm64.zip"
+                : null;
+            return suffix == null ? null : names.FirstOrDefault(name => name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
         }
 
         public static async Task<ReleaseAsset> LatestDownload() {

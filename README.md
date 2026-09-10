@@ -43,6 +43,12 @@ This branch targets .NET 10 and Avalonia 12. Install the SDK specified in `globa
 
 The existing publishing scripts produce self-contained builds, including the updater. For a standalone Windows build, use `dotnet publish Apollo/Apollo.csproj -c Release -r win-x64 --self-contained true -p:OutputType=WinExe`.
 
+macOS has separate Intel (`osx-x64`) and Apple Silicon (`osx-arm64`) targets for both Apollo and its updater. On a Mac, run `sh Publish/publish.sh osx-x64`, `sh Publish/publish.sh osx-arm64`, or `sh Publish/publish.sh all` from the repository root. Omitting the argument retains the Intel default. Packaging requires the pinned .NET SDK, Xcode Command Line Tools, Python 3, `fileicon`, and WhiteBox Packages (`packagesbuild`).
+
+Each target has its own `Build/<rid>` payload. Intel produces `Dist/Apollo-Mac.pkg` and `Dist/Apollo-Mac.zip`; Apple Silicon produces `Dist/Apollo-Mac-arm64.pkg` and `Dist/Apollo-Mac-arm64.zip`. The updater selects the archive for the running process architecture, so an Intel installation under Rosetta continues to receive Intel updates. ARM installations wait for an ARM release asset instead of falling back to Intel. Both installers use the existing installation location and are alternatives, not side-by-side installations.
+
+ARM builds compile the compatible native MIDI library automatically on macOS. Cross-publishing the ARM app from Windows/Linux requires an already-built ARM dylib; see [native dependency instructions](Native/README.md). A plain RID change with the existing Intel-only MIDI library is insufficient. The macOS CI workflow builds and checks each architecture on a matching runner and uploads build archives; local packaging remains available through the script above.
+
 See [the regression scenario guide](Tests/README.md) for native master comparisons and headless UI tests that work without computer-use automation.
 
 ## Documentation and Support

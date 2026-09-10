@@ -1,0 +1,59 @@
+name: macOS builds
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'Apollo/**'
+      - 'ApolloUpdate/**'
+      - 'Native/**'
+      - 'Publish/**'
+      - 'Tests/**'
+      - 'global.json'
+      - '.github/workflows/macos-build.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            rid: osx-x64
+            arch: x86_64
+          - runner: macos-15
+            rid: osx-arm64
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Publish app and updater
+        run: |
+          dotnet publish Apollo/Apollo.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o artifacts/mac/Apollo
+          dotnet publish ApolloUpdate/ApolloUpdate.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o artifacts/mac/Update
+      - name: Verify native architecture and MIDI loopback
+        run: |
+          xcrun lipo -verify_arch ${{ matrix.arch }} artifacts/mac/Apollo/Apollo
+          xcrun lipo -verify_arch ${{ matrix.arch }} artifacts/mac/Update/ApolloUpdate
+          for library in artifacts/mac/Apollo/*.dylib artifacts/mac/Update/*.dylib; do
+            xcrun lipo -verify_arch ${{ matrix.arch }} "$library"
+          done
+          python3 Tests/native_rtmidi_smoke.py artifacts/mac/Apollo/librtmidi.dylib
+      - name: Verify release selection and installer projects
+        run: |
+          APOLLO_TEST_RELEASE_ASSETS=1 dotnet run --project Tests/Apollo.Scenarios.csproj -c Release -- artifacts/release-tests
+          python3 Tests/test_mac_package.py
+      - name: Archive build preserving executable permissions
+        run: |
+          mkdir artifacts/mac/M4L
+          cp M4L/*.amxd artifacts/mac/M4L/
+          ditto -c -k --sequesterRsrc --rsrc --keepParent artifacts/mac artifacts/Apollo-${{ matrix.rid }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Apollo-${{ matrix.rid }}
+          path: artifacts/Apollo-${{ matrix.rid }}.zip
+          if-no-files-found: error

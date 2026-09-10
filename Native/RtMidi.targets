@@ -1,0 +1,41 @@
+<Project>
+  <PropertyGroup>
+    <UseArm64RtMidi Condition="'$(RuntimeIdentifier)' == 'osx-arm64' or ('$(RuntimeIdentifier)' == '' and '$(NETCoreSdkRuntimeIdentifier)' == 'osx-arm64')">true</UseArm64RtMidi>
+    <RtMidiArm64Library Condition="'$(RtMidiArm64Library)' == ''">$(MSBuildThisFileDirectory)../artifacts/native/osx-arm64/librtmidi.dylib</RtMidiArm64Library>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseArm64RtMidi)' == 'true'">
+    <None Include="$(RtMidiArm64Library)" Link="librtmidi.dylib" TargetPath="librtmidi.dylib" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)rtmidi/LICENSE.txt" Link="RtMidi-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <UsingTask TaskName="VerifyArm64RtMidi" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <LibraryPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        if (!File.Exists(LibraryPath)) {
+            Log.LogError("ARM64 RtMidi is missing. Build on macOS with Xcode Command Line Tools, or supply -p:RtMidiArm64Library=/absolute/path/to/a/previously-built/arm64/librtmidi.dylib.");
+            return false;
+        }
+        using (var file = File.OpenRead(LibraryPath))
+        using (var reader = new BinaryReader(file)) {
+            if (file.Length < 32 || reader.ReadUInt32() != 0xfeedfacf || reader.ReadUInt32() != 0x0100000c) {
+                Log.LogError("RtMidiArm64Library must be a thin macOS ARM64 dylib; refusing to publish an incompatible MIDI library: " + LibraryPath);
+                return false;
+            }
+            reader.ReadUInt32();
+            if (reader.ReadUInt32() != 6) {
+                Log.LogError("RtMidiArm64Library is not a Mach-O dynamic library: " + LibraryPath);
+                return false;
+            }
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+  <Target Name="PrepareArm64RtMidi" BeforeTargets="PrepareForBuild;ComputeFilesToPublish" Condition="'$(UseArm64RtMidi)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <Exec Condition="$([MSBuild]::IsOSPlatform('OSX'))" Command="sh &quot;$(MSBuildThisFileDirectory)build-rtmidi-macos.sh&quot; &quot;$(RtMidiArm64Library)&quot;" />
+    <VerifyArm64RtMidi LibraryPath="$(RtMidiArm64Library)" />
+  </Target>
+</Project>

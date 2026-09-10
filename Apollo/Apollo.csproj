@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;osx-x64;osx-arm64;linux-x64</RuntimeIdentifiers>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ServerGarbageCollection>false</ServerGarbageCollection>
@@ -42,7 +42,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="librtmidi.dylib">
+    <None Update="librtmidi.dylib" Condition="'$(RuntimeIdentifier)' != 'osx-arm64' and !('$(RuntimeIdentifier)' == '' and '$(NETCoreSdkRuntimeIdentifier)' == 'osx-arm64')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="librtmidi.so">
@@ -55,4 +55,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <Import Project="../Native/RtMidi.targets" />
 </Project>
