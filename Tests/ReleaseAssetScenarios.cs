@@ -39,6 +39,18 @@ namespace Apollo.Tests {
                 Console.WriteLine((actual == expected ? "PASS " : "FAIL ") + name);
                 passed &= actual == expected;
             }
+            foreach (var (name, names, architecture, expected) in new[] {
+                ("bundle-intel", new[] { "Apollo-Mac.zip", "Apollo-Mac-app.zip" }, Architecture.X64, "Apollo-Mac-app.zip"),
+                ("bundle-arm", new[] { "Apollo-Mac-arm64.zip", "Apollo-Mac-arm64-app.zip" }, Architecture.Arm64, "Apollo-Mac-arm64-app.zip"),
+                ("bundle-no-legacy-fallback", new[] { "Apollo-Mac.zip" }, Architecture.X64, (string)null),
+                ("bundle-no-other-architecture", new[] { "Apollo-Mac-app.zip" }, Architecture.Arm64, (string)null),
+                ("bundle-versioned-name", new[] { "Apollo-1.8.17-Mac-arm64-app.zip" }, Architecture.Arm64, "Apollo-1.8.17-Mac-arm64-app.zip")
+            }) {
+                var actual = Github.DownloadAssetName(names, OSPlatform.OSX, architecture, true);
+                checks.Add(new ReleaseAssetResult { scenario = name, passed = actual == expected, expected = expected, actual = actual });
+                Console.WriteLine((actual == expected ? "PASS " : "FAIL ") + name);
+                passed &= actual == expected;
+            }
             File.WriteAllText(Path.Combine(directory, "results.json"), JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true }));
             return passed ? 0 : 1;
         }

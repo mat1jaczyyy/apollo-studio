@@ -43,19 +43,19 @@ namespace Apollo.Helpers {
                 
                 var platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? OSPlatform.Windows
                     : RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? OSPlatform.OSX : OSPlatform.Linux;
-                var name = DownloadAssetName(release.Assets.Select(asset => asset.Name), platform, RuntimeInformation.ProcessArchitecture);
+                var name = DownloadAssetName(release.Assets.Select(asset => asset.Name), platform, RuntimeInformation.ProcessArchitecture, Core.Program.BundlePath != null);
                 download = release.Assets.FirstOrDefault(asset => asset.Name == name);
             }
 
             return release;
         }
 
-        internal static string DownloadAssetName(IEnumerable<string> names, OSPlatform platform, Architecture architecture) {
+        internal static string DownloadAssetName(IEnumerable<string> names, OSPlatform platform, Architecture architecture, bool bundle = false) {
             // Match the running build, including Intel builds running under Rosetta.
             // Never replace an ARM installation with an Intel-only update.
             string suffix = platform == OSPlatform.Windows && architecture == Architecture.X64 ? "-Win.zip"
-                : platform == OSPlatform.OSX && architecture == Architecture.X64 ? "-Mac.zip"
-                : platform == OSPlatform.OSX && architecture == Architecture.Arm64 ? "-Mac-arm64.zip"
+                : platform == OSPlatform.OSX && architecture == Architecture.X64 ? (bundle ? "-Mac-app.zip" : "-Mac.zip")
+                : platform == OSPlatform.OSX && architecture == Architecture.Arm64 ? (bundle ? "-Mac-arm64-app.zip" : "-Mac-arm64.zip")
                 : null;
             return suffix == null ? null : names.FirstOrDefault(name => name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
         }

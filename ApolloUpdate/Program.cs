@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using Microsoft.Win32;
+using Apollo.Platform;
 
 namespace ApolloUpdate {
     class Program {
@@ -47,6 +48,19 @@ namespace ApolloUpdate {
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 throw new InvalidOperationException("Auto-updating is not supported on Linux");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && args.Length == 2 && args[0] == "--mac-bundle-update") {
+                try {
+                    MacBundle.ApplyUpdate(args[1]);
+                } catch (Exception error) {
+                    Directory.CreateDirectory(CrashDir);
+                    File.WriteAllText(Path.Combine(CrashDir, "bundle-update.log"), error.ToString());
+                    // A hidden helper must report failures without opening Terminal.
+                    MacBundle.Run("/usr/bin/osascript", "-e", "on run argv\n display alert \"Apollo Studio update failed\" message (item 1 of argv)\nend run", error.Message);
+                    Environment.ExitCode = 1;
+                }
+                return;
+            }
             
             string temppath = Program.GetBaseFolder("Temp");
 

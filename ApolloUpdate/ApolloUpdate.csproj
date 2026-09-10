@@ -15,6 +15,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Compile Include="../Shared/MacBundle.cs" Link="Platform/MacBundle.cs" />
     <None Update="handle64.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -31,6 +31,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Compile Include="../Shared/MacBundle.cs" Link="Platform/MacBundle.cs" />
     <InternalsVisibleTo Include="Apollo.Scenarios" />
     <Compile Update="**/*.cs">
       <DependentUpon>%(Filename).xaml</DependentUpon>

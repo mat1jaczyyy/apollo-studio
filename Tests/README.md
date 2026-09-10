@@ -119,6 +119,26 @@ Local Windows verification (2026-09-10): release selection 11/11 and installer p
 The final Windows native regression passed all 70 checks with zero scenario/window differences against master and identical hashes for all 24 presets (`artifacts/mac-targets/windows-regression-2/run`). The final release-selection fixture also passed all 11 cases (`artifacts/mac-targets/release-selection-final`).
 
 An ARM app build/run, actual Packages installer builds, and the new macOS CI jobs have not been executed from this Windows workspace. On a Mac, use the publishing commands in the main README and check MIDI input/output, graceful Quit, installer launch and an update staying on the same architecture.
+
+## macOS app bundle publishing
+
+Branch `codex/macos-app-bundle` is stacked on ARM publishing commit `36223cc7`. The default Mac artifacts now include a normal `.app`, DMG and separate `*-app.zip` update archive. Legacy archive names/layouts remain available for existing executable installations. See [publishing research, cost constraints and native test plan](../Publish/MACOS.md).
+
+Run portable packaging checks with:
+
+```sh
+python -B Tests/test_mac_bundle.py
+python -B Tests/test_mac_package.py
+dotnet run --project Tests/Packaging/Packaging.csproj -c Release
+```
+
+`APOLLO_TEST_RELEASE_ASSETS=1` now runs 16 cases, including bundle/legacy format selection for both CPUs. The separate packaging runner covers 28 cases for bundle discovery/identity, CPU checks, user and legacy connector preservation, ZIP paths/symlinks, replacement, rollback, staging boundaries and shell-free updater invocation. Its file operations only use an isolated temporary directory; no real app is replaced and no Mac helper command is run by those portable tests.
+
+Verified locally on 2026-09-10: 28 packaging checks, 16 release-selection checks, two Python bundle tests (both architecture subcases), and two legacy installer-project tests passed. Windows native regression: 70 checks, zero scenario/window differences from master, and all 24 preset files byte-identical. Headless regression: 83 checks passed. Evidence: `artifacts/bundle-packaging-tests.log`, `artifacts/bundle/release-selection`, `artifacts/bundle/native/run`, and `artifacts/bundle/headless`.
+
+Normal Intel app and Intel/ARM updater publishes passed. An unsigned Intel bundle preview is at `artifacts/bundle/preview/Apollo Studio.app`; PE metadata verifies its entry point is `Apollo.Core.Program.Main`, with no `Apollo.Tests` types. It is a structural preview assembled on Windows, not a signed/distribution-ready artifact or a record of Mac execution.
+
+The future MacBook Air M3 on macOS 15.2 is not connected yet. Actual ARM app execution, signing/verification, DMG creation, browser-quarantined first launch, Finder/Dock behavior, native MIDI, and bundle-update handoff remain pending. The updated macOS CI workflow has not been pushed or executed.
 ## Review regression pass (2026-09-10)
 
 The pointer suite now drives Apollo's custom drag loop: the first-item/no-op boundary, Escape cancellation, cursor restoration, moves and copies with undo/redo, transfer between track windows, and removal of the source viewer during a drag. Horizontal resize handles are exercised at 100% and 150% scaling. Headless screen conversion ignores window positions, so the cross-window fixture uses disjoint hit regions; native monitor offsets and window stacking still need a desktop test.

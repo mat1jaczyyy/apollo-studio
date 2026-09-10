@@ -16,6 +16,7 @@ using Humanizer;
 
 using Apollo.Core;
 using Apollo.Helpers;
+using Apollo.Platform;
 
 namespace Apollo.Windows {
     public class UpdateWindow: Window {
@@ -91,7 +92,7 @@ namespace Apollo.Windows {
 
             try {
                 var result = await Download();
-                PrepareUpdate(result);
+                await PrepareUpdate(result);
                 Program.LaunchUpdater = true;
                 exiting = true;
                 App.Shutdown();
@@ -139,7 +140,12 @@ namespace Apollo.Windows {
             return candidates[0];
         }
 
-        void PrepareUpdate(byte[] result) {
+        async Task PrepareUpdate(byte[] result) {
+            if (Program.BundlePath != null) {
+                State.Text = "Preparing update...";
+                Program.BundleUpdateManifest = await Task.Run(() => MacBundle.PrepareUpdate(result, Program.BundlePath, Program.UserPath));
+                return;
+            }
             // Check the entire archive before clearing any existing staging folders.
             using var zip = new ZipArchive(new MemoryStream(result));
             ValidateArchive(zip);

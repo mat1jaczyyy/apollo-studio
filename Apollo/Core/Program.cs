@@ -9,6 +9,7 @@ using Avalonia;
 
 using Apollo.Binary;
 using Apollo.Elements;
+using Apollo.Platform;
 
 // Suppresses readonly suggestion
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier")]
@@ -30,7 +31,11 @@ namespace Apollo.Core {
             return builder;
         }
 
-        public static string GetBaseFolder(string folder) => Path.Combine(
+        internal static string BundlePath => RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+            ? MacBundle.Find(AppDomain.CurrentDomain.BaseDirectory) : null;
+
+        public static string GetBaseFolder(string folder) => folder == "M4L" && BundlePath != null
+            ? MacBundle.ConnectorFolder(BundlePath, UserPath, "/Applications/Apollo Studio/M4L") : Path.Combine(
             Directory.GetParent(
                 Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory)
             ).FullName,
@@ -53,6 +58,7 @@ namespace Apollo.Core {
 
         public static bool LaunchAdmin = false;
         public static bool LaunchUpdater = false;
+        internal static string BundleUpdateManifest;
         
         public static Stopwatch TimeSpent = new Stopwatch();
         public static void Log(string text) => Console.WriteLine($"[{TimeSpent.Elapsed.ToString()}] {text}");
@@ -169,7 +175,8 @@ namespace Apollo.Core {
                     );
                 
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    Process.Start(Path.Combine(Program.GetBaseFolder("Update"), "ApolloUpdate"));
+                    Process.Start(BundleUpdateManifest != null ? MacBundle.UpdateStart(BundleUpdateManifest)
+                        : new ProcessStartInfo(Path.Combine(Program.GetBaseFolder("Update"), "ApolloUpdate")) { UseShellExecute = false });
             }
         }
     }
