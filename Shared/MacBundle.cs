@@ -153,7 +153,7 @@ namespace Apollo.Platform {
             try {
                 File.Delete(Path.Combine(session, "update.zip"));
                 Directory.Delete(Path.Combine(session, "Payload"), true);
-            } catch (IOException) { }
+            } catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { }
         }
     }
 }

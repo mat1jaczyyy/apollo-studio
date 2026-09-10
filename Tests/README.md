@@ -99,7 +99,7 @@ The original regression suites also passed after this fix: 70 native checks with
 A normal self-contained macOS x64 publish is available locally at `artifacts/quit/publish/osx-x64`. Its assembly entry point was verified as `Apollo.Core.Program.Main`, with no `Apollo.Tests` types included. This is a cross-published build for a macOS smoke test, not a record of running on macOS.
 ## Separate macOS architecture targets
 
-Branch `codex/macos-arm64` is stacked on Quit fix `9f8740e0`. Both Apollo and ApolloUpdate declare `osx-x64` and `osx-arm64`. The Intel native MIDI binary is unchanged; ARM builds compile the pinned fork in `Native/rtmidi` on macOS, or accept a previously built thin ARM dylib through `RtMidiArm64Library` when cross-publishing. Build guards reject missing native libraries, Intel libraries and incompatible Mach-O file types.
+Branch `codex/macos-arm64` is stacked on `codex/214-graceful-quit`. Both Apollo and ApolloUpdate declare `osx-x64` and `osx-arm64`. The Intel native MIDI binary is unchanged; ARM builds compile the pinned fork in `Native/rtmidi` on macOS, or accept a previously built thin ARM dylib through `RtMidiArm64Library` when cross-publishing. Build guards reject missing native libraries, Intel libraries and incompatible Mach-O file types.
 
 Run the release-selection checks without starting the UI or contacting GitHub:
 
@@ -122,7 +122,7 @@ An ARM app build/run, actual Packages installer builds, and the new macOS CI job
 
 ## macOS app bundle publishing
 
-Branch `codex/macos-app-bundle` is stacked on ARM publishing commit `36223cc7`. The default Mac artifacts now include a normal `.app`, DMG and separate `*-app.zip` update archive. Legacy archive names/layouts remain available for existing executable installations. See [publishing research, cost constraints and native test plan](../Publish/MACOS.md).
+Branch `codex/macos-app-bundle` is stacked on `codex/macos-arm64`. The default Mac artifacts now include a normal `.app`, DMG and separate `*-app.zip` update archive. Legacy archive names/layouts remain available for existing executable installations. See [publishing research, cost constraints and native test plan](../Publish/MACOS.md).
 
 Run portable packaging checks with:
 
@@ -138,11 +138,14 @@ Verified locally on 2026-09-10: 28 packaging checks, 16 release-selection checks
 
 Normal Intel app and Intel/ARM updater publishes passed. An unsigned Intel bundle preview is at `artifacts/bundle/preview/Apollo Studio.app`; PE metadata verifies its entry point is `Apollo.Core.Program.Main`, with no `Apollo.Tests` types. It is a structural preview assembled on Windows, not a signed/distribution-ready artifact or a record of Mac execution.
 
-The future MacBook Air M3 on macOS 15.2 is not connected yet. Actual ARM app execution, signing/verification, DMG creation, browser-quarantined first launch, Finder/Dock behavior, native MIDI, and bundle-update handoff remain pending. The updated macOS CI workflow has not been pushed or executed.
+The future MacBook Air M3 on macOS 15.2 is not connected yet. Actual ARM app execution, signing/verification, DMG creation, browser-quarantined first launch, Finder/Dock behavior, native MIDI, and bundle-update handoff remain pending. The macOS CI workflow exists on the pushed branch stack, but no macOS run was recorded when checked during this review; the new review commits remain local.
 ## Review regression pass (2026-09-10)
 
 The pointer suite now drives Apollo's custom drag loop: the first-item/no-op boundary, Escape cancellation, cursor restoration, moves and copies with undo/redo, transfer between track windows, and removal of the source viewer during a drag. Horizontal resize handles are exercised at 100% and 150% scaling. Headless screen conversion ignores window positions, so the cross-window fixture uses disjoint hit regions; native monitor offsets and window stacking still need a desktop test.
 
-Both native and headless suites additionally cover a missing compatible release asset, failed/cancelled downloads, invalid ZIP data, closing each failed update window, and rejection of unsafe archive paths. They substitute download data and never install an update. The native suite now has 84 checks; use `-AllowAdditionalScenarios` with `Compare-Runs.ps1` to compare all 70 historical scenarios and their window states while also requiring the added checks to pass.
+Both native and headless suites additionally cover a missing compatible release asset, failed/cancelled downloads, invalid ZIP data, closing each failed update window, and rejection of unsafe archive paths. They substitute download data and never install an update. The native suite now has 86 checks (including two legacy ZIP payload checks added later in the review); use `-AllowAdditionalScenarios` with `Compare-Runs.ps1` to compare all 70 historical scenarios and their window states while also requiring the added checks to pass.
 
 Review evidence: `artifacts/review/base-native/run` and `artifacts/review/base-headless-2`. The original first-item drop crash and Escape cancellation failure are captured in `artifacts/review-pointer-before-3.log` and `artifacts/review-pointer-cancel-before.log`.
+
+
+See [the consolidated review, current validation and complete deferred-work inventory](REVIEW-AND-DEFERRED.md). The final stack passes 123 headless checks and 86 native checks; 16 release-selection checks and 28 packaging checks are separate suites.
