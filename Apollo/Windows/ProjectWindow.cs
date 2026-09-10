@@ -18,6 +18,7 @@ using Humanizer;
 using Apollo.Components;
 using Apollo.Core;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Viewers;
 
@@ -145,7 +146,7 @@ namespace Apollo.Windows {
         
         void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
-            
+
             Program.Project.PathChanged += UpdateTitle;
             UpdateTitle();
 
@@ -398,9 +399,9 @@ namespace Apollo.Windows {
             if (SafeClose = await CheckClose(force)) base.Close();
         }
 
-        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North, e);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.North, e);
 
-        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South, e);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.South, e);
 
         public static void Create(Window owner) {
             if (Program.Project.Window == null) {

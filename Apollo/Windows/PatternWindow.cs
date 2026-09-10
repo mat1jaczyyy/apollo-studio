@@ -1222,14 +1222,14 @@ namespace Apollo.Windows {
             Activate();
         }
 
-        void ResizeNorthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest, e);
-        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North, e);
-        void ResizeNorthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast, e);
-        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West, e);
-        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East, e);
-        void ResizeSouthWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest, e);
-        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South, e);
-        void ResizeSouthEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast, e);
+        void ResizeNorthWest(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.NorthWest, e);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.North, e);
+        void ResizeNorthEast(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.NorthEast, e);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.West, e);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.East, e);
+        void ResizeSouthWest(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.SouthWest, e);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.South, e);
+        void ResizeSouthEast(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.SouthEast, e);
 
         public static void Create(Pattern pattern, Window owner) {
             if (pattern.Window == null) {

@@ -11,6 +11,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 
 using Apollo.Core;
+using Apollo.Helpers;
 using Apollo.Undo;
 using Apollo.Viewers;
 
@@ -134,9 +135,9 @@ namespace Apollo.Windows {
         
         void Minimize() => WindowState = WindowState.Minimized;
 
-        void ResizeNorth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North, e);
+        void ResizeNorth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.North, e);
 
-        void ResizeSouth(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South, e);
+        void ResizeSouth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.South, e);
 
         public static void Create(Window owner) {
             if (Program.Project.Undo.Window == null) {

@@ -15,6 +15,7 @@ using Avalonia.Platform;
 using Apollo.Core;
 using Apollo.Devices;
 using Apollo.Elements;
+using Apollo.Helpers;
 using Apollo.Selection;
 using Apollo.Viewers;
 
@@ -301,9 +302,9 @@ namespace Apollo.Windows {
             }
         }
 
-        void ResizeWest(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West, e);
+        void ResizeWest(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.West, e);
 
-        void ResizeEast(object sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East, e);
+        void ResizeEast(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.East, e);
 
         public static void Create(Track track, Window owner) {
             if (track.Window == null) {
