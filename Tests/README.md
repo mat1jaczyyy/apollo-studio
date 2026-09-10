@@ -70,6 +70,31 @@ Target: Avalonia 12.1.2; .NET SDK 10.0.401 / runtime 10.0.12. Other package upda
 
 Local evidence is under ignored `artifacts/`: `baseline/final/run`, `migrated/final/run`, `headless/light`, `headless/run7` (dark), and `publish`. The portable SDK is in `artifacts/dotnet`; it is not installed globally or committed. These artifacts are local to the migration workspace; use the commands above to reproduce them elsewhere.
 
+## Graceful application Quit (#214)
+
+The `codex/214-graceful-quit` branch is based on migration commit `ec3d3029` on `avalonia-12.1.2`. It handles the desktop lifetime's `ShutdownRequested` event, used by Avalonia's macOS native Quit menu/Command+Q and native application termination callback. The initial synchronous request is cancelled while Apollo asks about unsaved work. After approval and a successful save when requested, it closes all windows, suppresses normal replacement windows, disposes the project and runs normal exit cleanup.
+
+Ordinary window close retains its previous behavior. Repeated Quit requests share the pending decision; if an unrelated message or an ordinary close prompt is already open, Quit activates that dialog so it can be completed first. Cancel, closing the confirmation, cancelling the save picker and an unsuccessful save all leave the workspace open.
+
+Run each mode with a fresh output directory and the normal Apollo app closed:
+
+```powershell
+./Tests/Run-Quit.ps1 -Mode Headless -Output artifacts/quit-headless
+./Tests/Run-Quit.ps1 -Mode Native -Output artifacts/quit-native
+```
+
+Pass `-Dotnet C:/path/to/dotnet.exe` for a portable SDK. Restore the relevant projects first. Each mode builds once and launches a separate process per case, with a 20-second timeout, isolated profile, and per-case logs/results. `-Case saved`, for example, runs only that case.
+
+The eight cases cover splash-only exit with auxiliary windows, a saved project with track/pattern/undo/preferences/virtual Launchpad windows, unsaved discard after cancellation and repeated requests, saving a text edit still in focus, a track-only workspace, save-picker cancellation, a locked-file save error followed by successful retry, and an existing ordinary project-close prompt. Exit checks verify zero remaining/replacement windows, project disposal, crash-backup removal, cleared crash state, and saved file contents.
+
+The picker test substitutes a test-only storage-provider proxy; it exercises Apollo's actual asynchronous Save flow, but does not operate a native file-picker dialog. These tests invoke `TryShutdown`, the same public entry point as Avalonia's native Quit menu. Native mode here means real Windows windows, not automated macOS interaction.
+
+Verified on 2026-09-10: all eight cases passed headlessly and with real Windows windows (93 checks per mode). Evidence is in `artifacts/quit/native-1`, `artifacts/quit/headless-2` (first seven cases), and `artifacts/quit/headless-pending-3` (the corrected existing-close fixture).
+
+Before closing the GitHub issue, smoke-test Command+Q, menu Quit and Dock Quit on macOS, including saved/unsaved projects, track-only workspaces, minimized windows, Save/Discard/Cancel, and a cancelled native save picker. Activity Monitor's normal Quit can also be checked; Force Quit is outside graceful shutdown.
+The original regression suites also passed after this fix: 70 native checks with zero scenario/window differences against master and identical hashes for all 24 presets, plus 83 headless checks. Evidence: `artifacts/quit/regression-native/run` and `artifacts/quit/regression-headless`.
+
+A normal self-contained macOS x64 publish is available locally at `artifacts/quit/publish/osx-x64`. Its assembly entry point was verified as `Apollo.Core.Program.Main`, with no `Apollo.Tests` types included. This is a cross-published build for a macOS smoke test, not a record of running on macOS.
 ## Review regression pass (2026-09-10)
 
 The pointer suite now drives Apollo's custom drag loop: the first-item/no-op boundary, Escape cancellation, cursor restoration, moves and copies with undo/redo, transfer between track windows, and removal of the source viewer during a drag. Horizontal resize handles are exercised at 100% and 150% scaling. Headless screen conversion ignores window positions, so the cross-window fixture uses disjoint hit regions; native monitor offsets and window stacking still need a desktop test.

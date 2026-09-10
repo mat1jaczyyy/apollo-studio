@@ -143,7 +143,7 @@ namespace Apollo.Elements {
                 if (!Directory.Exists(Path.GetDirectoryName(path))) throw new UnauthorizedAccessException();
                 File.WriteAllBytes(path, Encoder.Encode(this));
 
-            } catch (UnauthorizedAccessException) {
+            } catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException) {
                 if (sender != null) await MessageWindow.CreateWriteError(sender);
                 return false;
             }
@@ -282,6 +282,16 @@ namespace Apollo.Elements {
         public async Task AskClose(Window sender = null) {
             if (Window == null) ProjectWindow.Create(sender?? App.Windows.FirstOrDefault(i => i.IsFocused));
             await Window.CloseForce(true);
+        }
+
+        internal async Task<bool> ConfirmClose(Window owner) {
+            if (Undo.Saved) return true;
+
+            string result = await MessageWindow.Create(
+                "You have unsaved changes. Do you want to save before closing?\n",
+                new string[] {"Yes", "No", "Cancel"}, owner
+            );
+            return result == "No" || (result == "Yes" && await Save(owner));
         }
 
         public void Dispose() {

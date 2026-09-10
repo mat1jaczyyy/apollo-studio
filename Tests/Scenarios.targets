@@ -8,6 +8,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)OfflineGithubFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EditorScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputScenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)QuitScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UpdateScenarios.cs" />
   </ItemGroup>
 </Project>

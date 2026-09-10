@@ -68,6 +68,13 @@ namespace Apollo.Tests {
                 Dispatcher.UIThread.Post(async () => {
                     try {
                         MIDI.Stop();
+                        #if !LEGACY_AVALONIA
+                        var quitCase = Environment.GetEnvironmentVariable("APOLLO_TEST_QUIT_CASE");
+                        if (quitCase != null) {
+                            await RunQuit(quitCase);
+                            return;
+                        }
+                        #endif
                         await Run();
                         finished = true;
                         // The last splash close must end the real desktop loop on its own.
@@ -91,6 +98,12 @@ namespace Apollo.Tests {
                 failure = ex;
                 Console.Error.WriteLine(ex);
             }
+            #if !LEGACY_AVALONIA
+            if (failure == null && Environment.GetEnvironmentVariable("APOLLO_TEST_QUIT_CASE") != null) {
+                try { CheckQuitExit(); }
+                catch (Exception ex) { failure = ex; Console.Error.WriteLine(ex); }
+            }
+            #endif
             results.Add(new ScenarioResult { scenario = "process-exit", passed = finished && failure == null && !Preferences.Crashed && App.Windows.Count == 0,
                 crashFlag = Preferences.Crashed, remainingWindows = App.Windows.Count });
             File.WriteAllText(Path.Combine(output, "results.json"), JsonSerializer.Serialize(results,

@@ -155,7 +155,7 @@ namespace Apollo.Windows {
         }
 
         void HandleUnloaded(object sender, WindowClosingEventArgs e) {
-            if (!SafeClose) {
+            if (!SafeClose && !App.IsQuitting) {
                 e.Cancel = true;
 
                 _ = CloseForce(false);
@@ -381,12 +381,7 @@ namespace Apollo.Windows {
         async Task<bool> CheckClose(bool force = false) {
             if (!force && Program.Project.Tracks.FirstOrDefault(i => i.Window != null) != null) return true;
 
-            string result = Program.Project.Undo.Saved? "No" : await MessageWindow.Create(
-                "You have unsaved changes. Do you want to save before closing?\n",
-                new string[] {"Yes", "No", "Cancel"}, this
-            );
-
-            if (result == "No" || (result == "Yes" && await Program.Project.Save(this))) {
+            if (await Program.Project.ConfirmClose(this)) {
                 if (force)
                     foreach (Track track in Program.Project.Tracks) track.Window?.Close();
 

@@ -11,6 +11,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using Avalonia.Threading;
 
 using Apollo.Elements;
 using Apollo.Elements.Launchpads;
@@ -26,7 +27,45 @@ namespace Apollo.Core {
 
         public static Window MainWindow => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).MainWindow;
         public static IReadOnlyList<Window> Windows => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Windows;
-        public static void Shutdown() => ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Shutdown();
+        public static void Shutdown() {
+            IsQuitting = true;
+            ((ClassicDesktopStyleApplicationLifetime)instance.ApplicationLifetime).Shutdown();
+        }
+
+        internal static bool IsQuitting { get; private set; }
+        bool quitPending;
+
+        void HandleShutdownRequested(object sender, ShutdownRequestedEventArgs e) {
+            if (IsQuitting || Windows.Count == 0) return;
+
+            // Native Quit is synchronous. Cancel this request while the user decides,
+            // then finish shutdown after the prompt and any save picker have closed.
+            e.Cancel = true;
+            var message = Windows.OfType<MessageWindow>().LastOrDefault();
+            if (quitPending || message != null) {
+                message?.Activate();
+                return;
+            }
+
+            quitPending = true;
+            Dispatcher.UIThread.Post(async () => {
+                try {
+                    var owner = Windows.FirstOrDefault(window => window.IsActive)
+                        ?? Windows.FirstOrDefault(window => window.IsVisible);
+                    // Commit text edits before inspecting the project's saved state.
+                    owner?.Focus();
+                    var project = Program.Project;
+                    if (project != null && !await project.ConfirmClose(owner)) return;
+
+                    // MessageWindow completes its task before its button handler closes
+                    // the window. Avoid re-entering that close handler during shutdown.
+                    await System.Threading.Tasks.Task.Yield();
+                    Shutdown();
+                } finally {
+                    quitPending = false;
+                }
+            });
+        }
 
         public static Avalonia.Input.Platform.IClipboard Clipboard =>
             (Windows.FirstOrDefault(window => window.IsActive) ?? Windows.FirstOrDefault(window => window.IsVisible))?.Clipboard
@@ -49,6 +88,8 @@ namespace Apollo.Core {
         }
 
         public static void WindowClosed(Window sender) {
+            if (IsQuitting) return;
+
             if (Program.Project != null) {
                 if (Program.Project.Window != null) return;
 
@@ -102,6 +143,7 @@ namespace Apollo.Core {
             // Project and track windows replace one another; the original splash is not
             // the lifetime owner. Keep running until the final window has closed.
             lifetime.ShutdownMode = ShutdownMode.OnLastWindowClose;
+            lifetime.ShutdownRequested += HandleShutdownRequested;
 
             if (Args.Length > 0 && Args[0] == "--update") lifetime.MainWindow = new UpdateWindow();
             else {
@@ -157,6 +199,7 @@ namespace Apollo.Core {
 
                 lifetime.Exit += (_, __) => {
                     autosave.Dispose();
+                    Program.Project = null;
                     MIDI.Stop();
                     Discord.Set(false);
                     AbletonConnector.Dispose();
