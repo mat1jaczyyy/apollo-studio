@@ -130,6 +130,15 @@ namespace Apollo.Windows {
             }
         }
 
+        internal static string FindLegacyPayload(string directory) {
+            var candidates = Directory.EnumerateDirectories(directory).Where(path =>
+                new[] { "Apollo", "Update", "M4L" }.All(folder => Directory.Exists(Path.Combine(path, folder))))
+                .ToArray();
+            if (candidates.Length != 1)
+                throw new InvalidDataException("The update archive must contain exactly one Apollo installation.");
+            return candidates[0];
+        }
+
         void PrepareUpdate(byte[] result) {
             // Check the entire archive before clearing any existing staging folders.
             using var zip = new ZipArchive(new MemoryStream(result));
@@ -162,11 +171,12 @@ namespace Apollo.Windows {
                 process.WaitForExit();
                 if (process.ExitCode != 0) throw new IOException("Could not unpack the update archive.");
 
-                string foldername = Directory.GetDirectories(zippath)[0];
+                // ditto may also extract a __MACOSX resource-metadata directory.
+                string foldername = FindLegacyPayload(zippath);
 
-                ExtractMac(Path.Combine(zippath, foldername, "Update"), updatepath);
-                ExtractMac(Path.Combine(zippath, foldername, "Apollo"), temppath);
-                ExtractMac(Path.Combine(zippath, foldername, "M4L"), tempm4lpath);
+                ExtractMac(Path.Combine(foldername, "Update"), updatepath);
+                ExtractMac(Path.Combine(foldername, "Apollo"), temppath);
+                ExtractMac(Path.Combine(foldername, "M4L"), tempm4lpath);
 
                 Directory.Delete(zippath, true);
             }

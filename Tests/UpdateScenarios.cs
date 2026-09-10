@@ -44,6 +44,18 @@ namespace Apollo.Tests {
                 }
             } finally { cache.SetValue(null, previous); }
 
+            var unpacked = Path.Combine(output, "legacy-update-fixture");
+            Directory.CreateDirectory(Path.Combine(unpacked, "__MACOSX"));
+            foreach (var folder in new[] { "Apollo", "Update", "M4L" })
+                Directory.CreateDirectory(Path.Combine(unpacked, "osx-arm64", folder));
+            Check(UpdateWindow.FindLegacyPayload(unpacked) == Path.Combine(unpacked, "osx-arm64"),
+                "legacy-update-ignores-metadata-directory");
+            foreach (var folder in new[] { "Apollo", "Update", "M4L" })
+                Directory.CreateDirectory(Path.Combine(unpacked, "duplicate", folder));
+            bool ambiguous = false;
+            try { UpdateWindow.FindLegacyPayload(unpacked); }
+            catch (InvalidDataException) { ambiguous = true; }
+            Check(ambiguous, "legacy-update-rejects-ambiguous-payloads");
             foreach (var path in new[] { "Apollo/Apollo/file", "../escape", "Apollo/Update/../../escape", "/absolute", "C:/escape", "Apollo/Update/..\\escape" }) {
                 using var stream = new MemoryStream();
                 using (var writer = new ZipArchive(stream, ZipArchiveMode.Create, true)) writer.CreateEntry(path);
