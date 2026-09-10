@@ -203,6 +203,14 @@ namespace Apollo.Viewers {
         public void Drag(object sender, PointerPressedEventArgs e) => DragDrop.Drag(Track.Get(_device)?.Window?.Selection, e);
 
         public bool DropLeft(Control source, DragEventArgs e)
-            => source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 2);
+            => source.Name == "DropZoneHead" || (source.Name == "Contents" && e.GetPosition(source).X < source.Bounds.Width / 4);
+
+        public bool DropApplies(Control source, DragEventArgs e) {
+            if (source.Name != "Contents") return true;
+
+            double x = e.GetPosition(source).X;
+            double width = source.Bounds.Width;
+            return x <= width / 4 || x >= width * 3 / 4;
+        }
     }
 }

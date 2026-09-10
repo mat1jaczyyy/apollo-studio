@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 
 using Apollo.Core;
@@ -27,9 +30,7 @@ namespace Apollo.Selection {
         static bool Contains(DragEventArgs e, string format) => format == FileNames
             ? e.DataTransfer.Contains(DataFormat.File)
             : e.DataTransfer.Contains(SelectionFormat(format));
-        public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy, out Path<ISelectParent> premove) {
-            premove = null;
-            
+        public static bool CanMove(List<ISelect> source, ISelectParent target, int position, bool copy) {
             if (!(source[0] is Track) && !copy && Track.PathContains((ISelect)target, source)) return false;
 
             if (!copy && ((source[0] is Frame && source[0].IParent != target && source[0].IParent.Count == source.Count) ||
@@ -38,6 +39,36 @@ namespace Apollo.Selection {
                     : source.Contains(target.IChildren[position]) || (source[0].IParent == target && source[0].IParentIndex == position + 1)
                 )
             )) return false;
+
+            return true;
+        }
+
+        static int AdjustAfter(List<ISelect> source, ISelectParent target, int after, bool copy) {
+            if (source == null || source.Count == 0 || CanMove(source, target, after, copy))
+                return after;
+            if (copy || source[0].IParent != target)
+                return after;
+
+            if (after >= 0 && after < target.Count && source.Contains(target.IChildren[after])) {
+                int next = source.Max(s => s.IParentIndex.Value) + 1;
+                if (next < target.Count && CanMove(source, target, next, copy))
+                    return next;
+                return after;
+            }
+
+            if (source[0].IParentIndex == after + 1) {
+                int prev = after - 1;
+                if (CanMove(source, target, prev, copy))
+                    return prev;
+            }
+
+            return after;
+        }
+
+        public static bool Move(List<ISelect> source, ISelectParent target, int position, bool copy, out Path<ISelectParent> premove) {
+            premove = null;
+
+            if (!CanMove(source, target, position, copy)) return false;
 
             premove = new Path<ISelectParent>(target);
 
@@ -119,20 +150,81 @@ namespace Apollo.Selection {
             control.AddHandler(DragDrop.DropEvent, Drop);
         }
 
+        static bool MovedPastThreshold(Point start, Point current) {
+            Vector delta = current - start;
+            return Math.Abs(delta.X) >= 4 || Math.Abs(delta.Y) >= 4;
+        }
+
+        static async Task<bool> WaitForDrag(Control control, PointerPressedEventArgs e) {
+            IPointer pointer = e.Pointer;
+            Point start = e.GetPosition(control);
+            TaskCompletionSource<bool> tcs = new();
+
+            void Moved(object sender, PointerEventArgs ev) {
+                if (ev.Pointer == pointer && MovedPastThreshold(start, ev.GetPosition(control)))
+                    tcs.TrySetResult(true);
+            }
+
+            void Released(object sender, PointerReleasedEventArgs ev) {
+                if (ev.Pointer == pointer)
+                    tcs.TrySetResult(false);
+            }
+
+            void CaptureLost(object sender, PointerCaptureLostEventArgs ev) {
+                if (ev.Pointer == pointer)
+                    tcs.TrySetResult(false);
+            }
+
+            void Detached(object sender, VisualTreeAttachmentEventArgs ev) => tcs.TrySetResult(false);
+
+            pointer.Capture(control);
+            control.PointerMoved += Moved;
+            control.PointerReleased += Released;
+            control.PointerCaptureLost += CaptureLost;
+            control.DetachedFromVisualTree += Detached;
+
+            try {
+                return await tcs.Task;
+            } finally {
+                control.PointerMoved -= Moved;
+                control.PointerReleased -= Released;
+                control.PointerCaptureLost -= CaptureLost;
+                control.DetachedFromVisualTree -= Detached;
+                if (pointer.Captured == control)
+                    pointer.Capture(null);
+            }
+        }
+
         public async void Drag(SelectionManager selection, PointerPressedEventArgs e) {
             if (!(Host is IDraggable drag)) return;
 
             if (!drag.Selected) drag.Select(e);
+
+            PointerUpdateKind mouseButton = e.GetCurrentPoint((Control)Host).Properties.PointerUpdateKind;
+
+            if (e.ClickCount > 1 || mouseButton != PointerUpdateKind.LeftButtonPressed) {
+                if (drag.Selected) drag.Select(e);
+                drag.DragFailed(e);
+                return;
+            }
+
+            if (!await WaitForDrag((Control)Host, e)) {
+                if (drag.Selected) drag.Select(e);
+                drag.DragFailed(e);
+                return;
+            }
 
             using var dragData = new DataTransfer();
             var dragItem = new DataTransferItem();
             dragItem.Set(SelectionFormat(drag.DragFormat), selection.Selection);
             dragData.Add(dragItem);
 
+            if (App.Dragging) return;
+
             App.Dragging = true;
             DragDropEffects result;
             try {
-                result = await DragDrop.DoDragDropAsync(e, dragData, DragDropEffects.Move);
+                result = await DoInProcessDrag((Control)Host, e, dragData);
             } finally {
                 App.Dragging = false;
             }
@@ -143,34 +235,211 @@ namespace Apollo.Selection {
             }
         }
 
-        void DragOver(object sender, DragEventArgs e) {
-            e.Handled = true;
-            
-            if (!DropHandlers.Keys.Any(format => Contains(e, format)))
-                e.DragEffects = DragDropEffects.None; 
+        static Interactive HitTest(Control origin, PointerEventArgs ev) {
+            PixelPoint screen = origin.PointToScreen(ev.GetPosition(origin));
+
+            IEnumerable<Window> windows = App.Windows.Where(window => window.IsVisible)
+                .OrderByDescending(window => window.IsActive);
+
+            foreach (Window window in windows) {
+                Point local = window.PointToClient(screen);
+                Size size = window.Bounds.Size;
+                if (local.X < 0 || local.Y < 0 || local.X > size.Width || local.Y > size.Height)
+                    continue;
+
+                if (window.InputHitTest(local) is Interactive hit)
+                    return hit;
+            }
+
+            return null;
         }
 
-        void Drop(object sender, DragEventArgs e) {
-            e.Handled = true;
+        static readonly Cursor DropCursor = new(StandardCursorType.DragCopy);
+        static readonly Cursor NoneCursor = new(StandardCursorType.No);
+        static readonly Cursor ArrowCursor = new(StandardCursorType.Arrow);
+        static bool DragActive;
 
-            Control source = (Control)e.Source;
-            while (!Host.DropAreas.Contains(source.Name)) {
-                source = source.Parent as Control;
-                
-                if (source == Host) {
-                    e.Handled = false;
-                    return;
+        static void SetDragCursor(DragDropEffects effects) {
+            if (!DragActive) return;
+
+            Cursor cursor = effects == DragDropEffects.None? NoneCursor : DropCursor;
+
+            foreach (Window window in App.Windows)
+                window.Cursor = cursor;
+        }
+
+        static void ClearDragCursor() {
+            DragActive = false;
+            foreach (Window window in App.Windows)
+                window.Cursor = ArrowCursor;
+        }
+
+        static Interactive DragTarget(Interactive hit, PointerEventArgs ev, out Point local) {
+            for (Control control = hit as Control; control != null; control = control.Parent as Control) {
+                string name = control.Name;
+                if (name == "DropZone" || name == "DropZoneAfter" || name == "DropZoneBefore" ||
+                    name == "DropZoneHead" || name == "DropZoneTail" || name == "Contents" || name == "TrackAdd") {
+                    local = ev.GetPosition(control);
+                    return control;
                 }
             }
 
-            int after = (Host.Item?.IParentIndex - Convert.ToInt32(Host.DropLeft(source, e)))?? 
+            local = ev.GetPosition((Visual)hit);
+            return hit;
+        }
+
+        static DragDropEffects RaiseDrag(RoutedEvent<DragEventArgs> routed, Control origin, PointerEventArgs ev, IDataTransfer data) {
+            Interactive hit = HitTest(origin, ev);
+            if (hit == null) {
+                SetDragCursor(DragDropEffects.None);
+                return DragDropEffects.None;
+            }
+
+            Interactive target = DragTarget(hit, ev, out Point local);
+            DragEventArgs args = new(routed, data, target, local, ev.KeyModifiers) {
+                DragEffects = DragDropEffects.Move
+            };
+            target.RaiseEvent(args);
+            DragDropEffects effects = args.Handled? args.DragEffects : DragDropEffects.None;
+            if (routed != DragDrop.DropEvent)
+                SetDragCursor(effects);
+            return effects;
+        }
+
+        static async Task<DragDropEffects> DoInProcessDrag(Control origin, PointerEventArgs start, IDataTransfer data) {
+            IPointer pointer = start.Pointer;
+            TaskCompletionSource<DragDropEffects> tcs = new();
+            DragActive = true;
+            DragDropEffects lastEffects = RaiseDrag(DragDrop.DragOverEvent, origin, start, data);
+
+            void Moved(object sender, PointerEventArgs ev) {
+                if (ev.Pointer == pointer)
+                    lastEffects = RaiseDrag(DragDrop.DragOverEvent, origin, ev, data);
+            }
+
+            void Released(object sender, PointerReleasedEventArgs ev) {
+                if (ev.Pointer != pointer) return;
+                lastEffects = RaiseDrag(DragDrop.DropEvent, origin, ev, data);
+                tcs.TrySetResult(lastEffects);
+            }
+
+            void CaptureLost(object sender, PointerCaptureLostEventArgs ev) {
+                if (ev.Pointer == pointer)
+                    tcs.TrySetResult(DragDropEffects.None);
+            }
+
+            void Detached(object sender, VisualTreeAttachmentEventArgs ev) => tcs.TrySetResult(lastEffects);
+
+            pointer.Capture(origin);
+            origin.PointerMoved += Moved;
+            origin.PointerReleased += Released;
+            origin.PointerCaptureLost += CaptureLost;
+            origin.DetachedFromVisualTree += Detached;
+
+            try {
+                return await tcs.Task;
+            } finally {
+                try {
+                    origin.PointerMoved -= Moved;
+                    origin.PointerReleased -= Released;
+                    origin.PointerCaptureLost -= CaptureLost;
+                    origin.DetachedFromVisualTree -= Detached;
+                    if (pointer.Captured == origin)
+                        pointer.Capture(null);
+                } catch {}
+                ClearDragCursor();
+            }
+        }
+
+        bool TryFindDropArea(DragEventArgs e, out Control source) {
+            source = (Control)e.Source;
+
+            while (source != null) {
+                if (Host.DropAreas.Contains(source.Name))
+                    return true;
+
+                if (source == Host || (source is IDroppable && source != Host))
+                    break;
+
+                source = source.Parent as Control;
+            }
+
+            source = null;
+            return false;
+        }
+
+        bool TryResolveDrop(DragEventArgs e, out Control source, out int after) {
+            after = -1;
+            if (!TryFindDropArea(e, out source) || !Host.DropApplies(source, e)) {
+                source = null;
+                return false;
+            }
+
+            after = (Host.Item?.IParentIndex - Convert.ToInt32(Host.DropLeft(source, e)))??
+                ((source.Name == "DropZoneAfter")? Host.ItemParent.Count - 1 : -1);
+            return true;
+        }
+
+        void DragOver(object sender, DragEventArgs e) {
+            if (!TryFindDropArea(e, out Control source))
+                return;
+
+            e.Handled = true;
+
+            bool applies = Host.DropApplies(source, e);
+            int after = (Host.Item?.IParentIndex - Convert.ToInt32(Host.DropLeft(source, e)))??
                 ((source.Name == "DropZoneAfter")? Host.ItemParent.Count - 1 : -1);
 
-            bool result = false;
+            if (!applies || !DropHandlers.Keys.Any(format => Contains(e, format))) {
+                e.DragEffects = DragDropEffects.None;
+                return;
+            }
 
-            foreach (string format in DropHandlers.Keys.Where(i => Contains(e, i)))
-                if (result = DropHandlers[format].Invoke(source, Host.ItemParent, Host.Item, after, format, e))
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
+            bool allowed = false;
+            int slot = after;
+
+            foreach (string format in DropHandlers.Keys.Where(i => Contains(e, i))) {
+                if (format == FileNames) {
+                    allowed = true;
                     break;
+                }
+
+                List<ISelect> items = (List<ISelect>)e.DataTransfer.TryGetValue(SelectionFormat(format));
+                if (items == null) continue;
+
+                slot = DropHandlers[format] == DefaultDrop
+                    ? AdjustAfter(items, Host.ItemParent, after, copy)
+                    : after;
+
+                if (DropHandlers[format] != DefaultDrop || CanMove(items, Host.ItemParent, slot, copy)) {
+                    allowed = true;
+                    break;
+                }
+            }
+
+            if (!allowed) e.DragEffects = DragDropEffects.None;
+        }
+
+        void Drop(object sender, DragEventArgs e) {
+            if (!TryResolveDrop(e, out Control source, out int after))
+                return;
+
+            e.Handled = true;
+
+            bool result = false;
+            bool copy = e.KeyModifiers.HasFlag(App.ControlKey);
+
+            foreach (string format in DropHandlers.Keys.Where(i => Contains(e, i))) {
+                int slot = after;
+                if (format != FileNames && DropHandlers[format] == DefaultDrop) {
+                    List<ISelect> moving = (List<ISelect>)e.DataTransfer.TryGetValue(SelectionFormat(format));
+                    slot = AdjustAfter(moving, Host.ItemParent, after, copy);
+                }
+
+                if (result = DropHandlers[format].Invoke(source, Host.ItemParent, Host.Item, slot, format, e))
+                    break;
+            }
             
             if (!result) e.DragEffects = DragDropEffects.None;
         }

@@ -60,6 +60,8 @@ namespace Apollo.Selection {
 
         public bool DropLeft(Control source, DragEventArgs e)
             => source.Name == "DropZone" && e.GetPosition(source).Y < source.Bounds.Height / 2;
+
+        public bool DropApplies(Control source, DragEventArgs e) => true;
     }
 
     public interface IDraggable: IDroppable, ISelectViewer {
