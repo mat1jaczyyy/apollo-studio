@@ -1,12 +1,19 @@
 param(
     [Parameter(Mandatory)][string]$Baseline,
-    [Parameter(Mandatory)][string]$Migrated
+    [Parameter(Mandatory)][string]$Migrated,
+    [switch]$AllowAdditionalScenarios
 )
 $ErrorActionPreference = 'Stop'
 $Baseline = (Resolve-Path -LiteralPath $Baseline).Path
 $Migrated = (Resolve-Path -LiteralPath $Migrated).Path
 $before = @(Get-Content -LiteralPath (Join-Path $Baseline 'results.json') -Raw | ConvertFrom-Json)
 $after = @(Get-Content -LiteralPath (Join-Path $Migrated 'results.json') -Raw | ConvertFrom-Json)
+$additional = @()
+if ($AllowAdditionalScenarios) {
+    $additional = @($after | Where-Object { $_.scenario -notin $before.scenario })
+    if ($additional | Where-Object { !$_.passed }) { throw 'An additional scenario failed.' }
+    $after = @($after | Where-Object { $_.scenario -in $before.scenario })
+}
 $differences = @()
 if ($before.Count -ne $after.Count) { $differences += 'Scenario count differs' }
 for ($index = 0; $index -lt [Math]::Min($before.Count, $after.Count); $index++) {
@@ -33,6 +40,7 @@ if ($presets.Count -ne @(Get-ChildItem -LiteralPath $Migrated -Filter '*.apdevic
 }
 [pscustomobject]@{
     Scenarios = $before.Count
+    AdditionalScenarios = $additional.Count
     IdenticalPresets = $presets.Count
     Differences = $differences
 } | ConvertTo-Json

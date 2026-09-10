@@ -20,6 +20,7 @@ namespace Apollo.Tests {
             control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), window).Value;
 
         static async Task ExerciseInput(Project project, Window trackWindow) {
+            await ExercisePointerGestures(project, trackWindow);
             var window = project.Window;
             var dial = window.Get<Dial>("Macro1");
             var display = dial.Get<TextBlock>("Display");

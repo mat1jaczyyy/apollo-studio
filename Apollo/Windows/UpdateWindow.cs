@@ -1,11 +1,11 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -27,11 +27,13 @@ namespace Apollo.Windows {
             Root = this.Get<Grid>("Root");
             State = this.Get<TextBlock>("State");
             DownloadProgress = this.Get<ProgressBar>("DownloadProgress");
+            CloseButton = this.Get<Button>("CloseButton");
         }
 
         Grid Root;
         TextBlock State;
         ProgressBar DownloadProgress;
+        Button CloseButton;
 
         Stopwatch time = new Stopwatch();
         bool exiting = false;
@@ -73,15 +75,32 @@ namespace Apollo.Windows {
             Root.Children.Add(UpdateImage);
         }
 
+        protected virtual async Task<byte[]> Download() {
+            var asset = await Github.LatestDownload();
+            if (asset == null || !Uri.TryCreate(asset.BrowserDownloadUrl, UriKind.Absolute, out var uri))
+                throw new IOException("No compatible update is available for this installation.");
+            using var downloader = new WebClient();
+            downloader.DownloadProgressChanged += Progress;
+            return await downloader.DownloadDataTaskAsync(uri);
+        }
+
         async void HandleLoaded(object sender, EventArgs e) {
             Position = new PixelPoint(Position.X, Math.Max(0, Position.Y));
 
             State.Text = "Downloading...";
 
-            WebClient downloader = new WebClient();
-            downloader.DownloadProgressChanged += Progress;
-            downloader.DownloadDataCompleted += Downloaded;
-            downloader.DownloadDataAsync(new Uri((await Github.LatestDownload()).BrowserDownloadUrl));
+            try {
+                var result = await Download();
+                PrepareUpdate(result);
+                Program.LaunchUpdater = true;
+                exiting = true;
+                App.Shutdown();
+            } catch (Exception error) {
+                State.Text = "Update failed: " + error.Message;
+                DownloadProgress.IsVisible = false;
+                CloseButton.IsVisible = true;
+                exiting = true;
+            }
         }
         
         void HandleUnloaded(object sender, WindowClosingEventArgs e) {
@@ -102,16 +121,24 @@ namespace Apollo.Windows {
             State.Text = $"Downloading... ({(e.BytesReceived * 1000.0 / (time.ElapsedMilliseconds + 50)).Bytes().Humanize("#.#")}/s)";
         }
 
-        void Downloaded(object sender, AsyncCompletedEventArgs e) {
-            byte[] result = ((DownloadDataCompletedEventArgs)e).Result;
-                
+        internal static void ValidateArchive(ZipArchive zip) {
+            foreach (var entry in zip.Entries) {
+                string name = entry.FullName;
+                if (name.StartsWith('/') || name.Contains('\\') || name.Contains(':') || name.Split('/').Contains("..")
+                    || ((entry.ExternalAttributes >> 16) & 0xf000) == 0xa000)
+                    throw new InvalidDataException("The update archive contains an unsafe path or symbolic link.");
+            }
+        }
+
+        void PrepareUpdate(byte[] result) {
+            // Check the entire archive before clearing any existing staging folders.
+            using var zip = new ZipArchive(new MemoryStream(result));
+            ValidateArchive(zip);
             string updatepath = Program.GetBaseFolder("Update");
             string temppath = Program.GetBaseFolder("Temp");
             string tempm4lpath = Program.GetBaseFolder("TempM4L");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-                ZipArchive zip = new ZipArchive(new MemoryStream(result));
-
                 ExtractWin(GetZipFolder(zip, "Update"), updatepath);
                 ExtractWin(GetZipFolder(zip, "Apollo"), temppath);
                 ExtractWin(GetZipFolder(zip, "M4L"), tempm4lpath);
@@ -128,9 +155,12 @@ namespace Apollo.Windows {
             
                 File.WriteAllBytes(zipfile, result);
 
-                Process.Start(new ProcessStartInfo(
-                    "ditto", $"-x -k --sequesterRsrc --rsrc \"{zipfile}\" \"{zippath}\""
-                )).WaitForExit();
+                var start = new ProcessStartInfo("/usr/bin/ditto") { UseShellExecute = false };
+                foreach (var argument in new[] { "-x", "-k", "--sequesterRsrc", "--rsrc", zipfile, zippath })
+                    start.ArgumentList.Add(argument);
+                using var process = Process.Start(start);
+                process.WaitForExit();
+                if (process.ExitCode != 0) throw new IOException("Could not unpack the update archive.");
 
                 string foldername = Directory.GetDirectories(zippath)[0];
 
@@ -141,11 +171,9 @@ namespace Apollo.Windows {
                 Directory.Delete(zippath, true);
             }
 
-            Program.LaunchUpdater = true;
-
-            exiting = true;
-            App.Shutdown();
         }
+
+        void CloseUpdate(object sender, Avalonia.Interactivity.RoutedEventArgs e) => Close();
         
         void Minimize() => WindowState = WindowState.Minimized;
 

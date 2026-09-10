@@ -121,6 +121,9 @@ namespace Apollo.Tests {
             Check(App.Windows.Count == 1 && App.Windows[0] is SplashWindow, "startup-splash");
             var splash = App.Windows.OfType<SplashWindow>().Single();
             await Capture(splash, "01-splash");
+            #if !LEGACY_AVALONIA
+            await ExerciseUpdateFailures();
+            #endif
             splash.Get<TabControl>("TabControl").SelectedIndex = 1;
             await Capture(splash, "01b-learn");
             splash.Get<TabControl>("TabControl").SelectedIndex = 0;

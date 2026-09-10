@@ -55,3 +55,11 @@ Target: Avalonia 12.1.2; .NET SDK 10.0.401 / runtime 10.0.12. Other package upda
 - NuGet's vulnerability audit reported no vulnerable packages, including transitive dependencies. The existing updater download code still produces a WebClient obsolescence warning; its download/install flow was retained.
 
 Local evidence is under ignored `artifacts/`: `baseline/final/run`, `migrated/final/run`, `headless/light`, `headless/run7` (dark), and `publish`. The portable SDK is in `artifacts/dotnet`; it is not installed globally or committed. These artifacts are local to the migration workspace; use the commands above to reproduce them elsewhere.
+
+## Review regression pass (2026-09-10)
+
+The pointer suite now drives Apollo's custom drag loop: the first-item/no-op boundary, Escape cancellation, cursor restoration, moves and copies with undo/redo, transfer between track windows, and removal of the source viewer during a drag. Horizontal resize handles are exercised at 100% and 150% scaling. Headless screen conversion ignores window positions, so the cross-window fixture uses disjoint hit regions; native monitor offsets and window stacking still need a desktop test.
+
+Both native and headless suites additionally cover a missing compatible release asset, failed/cancelled downloads, invalid ZIP data, closing each failed update window, and rejection of unsafe archive paths. They substitute download data and never install an update. The native suite now has 84 checks; use `-AllowAdditionalScenarios` with `Compare-Runs.ps1` to compare all 70 historical scenarios and their window states while also requiring the added checks to pass.
+
+Review evidence: `artifacts/review/base-native/run` and `artifacts/review/base-headless-2`. The original first-item drop crash and Escape cancellation failure are captured in `artifacts/review-pointer-before-3.log` and `artifacts/review-pointer-cancel-before.log`.

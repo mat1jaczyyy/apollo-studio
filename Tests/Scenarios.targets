@@ -7,5 +7,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Scenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EditorScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputScenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateScenarios.cs" />
   </ItemGroup>
 </Project>

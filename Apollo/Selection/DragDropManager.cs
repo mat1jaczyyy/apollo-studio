@@ -31,6 +31,9 @@ namespace Apollo.Selection {
             ? e.DataTransfer.Contains(DataFormat.File)
             : e.DataTransfer.Contains(SelectionFormat(format));
         public static bool CanMove(List<ISelect> source, ISelectParent target, int position, bool copy) {
+            if (source == null || source.Count == 0 || target == null || position < -1 || position >= target.Count)
+                return false;
+
             if (!(source[0] is Track) && !copy && Track.PathContains((ISelect)target, source)) return false;
 
             if (!copy && ((source[0] is Frame && source[0].IParent != target && source[0].IParent.Count == source.Count) ||
@@ -100,6 +103,7 @@ namespace Apollo.Selection {
 
         static bool DefaultDrop(Control source, ISelectParent parent, ISelect child, int after, string format, DragEventArgs e) {
             List<ISelect> moving = (List<ISelect>)e.DataTransfer.TryGetValue(DragDropManager.SelectionFormat(format));
+            if (moving == null || moving.Count == 0) return false;
             ISelectParent source_parent = moving[0].IParent;
             int before = moving[0].IParentIndex.Value - 1;
 
@@ -144,7 +148,7 @@ namespace Apollo.Selection {
         }
 
         public void Subscribe(Control control) {
-            Subscribed.Add(control);
+            if (!Subscribed.Add(control)) return;
             
             control.AddHandler(DragDrop.DragOverEvent, DragOver);
             control.AddHandler(DragDrop.DropEvent, Drop);
@@ -166,7 +170,7 @@ namespace Apollo.Selection {
             }
 
             void Released(object sender, PointerReleasedEventArgs ev) {
-                if (ev.Pointer == pointer)
+                if (ev.Pointer == pointer && ev.InitialPressMouseButton == MouseButton.Left)
                     tcs.TrySetResult(false);
             }
 
@@ -177,11 +181,19 @@ namespace Apollo.Selection {
 
             void Detached(object sender, VisualTreeAttachmentEventArgs ev) => tcs.TrySetResult(false);
 
+            void KeyDown(object sender, KeyEventArgs ev) {
+                if (ev.Key != Key.Escape) return;
+                ev.Handled = true;
+                tcs.TrySetResult(false);
+            }
+
+            var window = TopLevel.GetTopLevel(control);
             pointer.Capture(control);
             control.PointerMoved += Moved;
             control.PointerReleased += Released;
             control.PointerCaptureLost += CaptureLost;
             control.DetachedFromVisualTree += Detached;
+            window?.AddHandler(InputElement.KeyDownEvent, KeyDown, RoutingStrategies.Tunnel);
 
             try {
                 return await tcs.Task;
@@ -190,13 +202,14 @@ namespace Apollo.Selection {
                 control.PointerReleased -= Released;
                 control.PointerCaptureLost -= CaptureLost;
                 control.DetachedFromVisualTree -= Detached;
+                window?.RemoveHandler(InputElement.KeyDownEvent, KeyDown);
                 if (pointer.Captured == control)
                     pointer.Capture(null);
             }
         }
 
         public async void Drag(SelectionManager selection, PointerPressedEventArgs e) {
-            if (!(Host is IDraggable drag)) return;
+            if (App.Dragging || selection == null || !(Host is IDraggable drag)) return;
 
             if (!drag.Selected) drag.Select(e);
 
@@ -209,8 +222,10 @@ namespace Apollo.Selection {
             }
 
             if (!await WaitForDrag((Control)Host, e)) {
-                if (drag.Selected) drag.Select(e);
-                drag.DragFailed(e);
+                if (Host != null) {
+                    if (drag.Selected) drag.Select(e);
+                    drag.DragFailed(e);
+                }
                 return;
             }
 
@@ -229,7 +244,7 @@ namespace Apollo.Selection {
                 App.Dragging = false;
             }
 
-            if (result == DragDropEffects.None) {
+            if (result == DragDropEffects.None && Host != null) {
                 if (drag.Selected) drag.Select(e);
                 drag.DragFailed(e);
             }
@@ -238,7 +253,7 @@ namespace Apollo.Selection {
         static Interactive HitTest(Control origin, PointerEventArgs ev) {
             PixelPoint screen = origin.PointToScreen(ev.GetPosition(origin));
 
-            IEnumerable<Window> windows = App.Windows.Where(window => window.IsVisible)
+            IEnumerable<Window> windows = App.Windows.Where(window => window.IsVisible && window.WindowState != WindowState.Minimized)
                 .OrderByDescending(window => window.IsActive);
 
             foreach (Window window in windows) {
@@ -254,24 +269,29 @@ namespace Apollo.Selection {
             return null;
         }
 
-        static readonly Cursor DropCursor = new(StandardCursorType.DragCopy);
+        static readonly Cursor CopyCursor = new(StandardCursorType.DragCopy);
+        static readonly Cursor MoveCursor = new(StandardCursorType.DragMove);
         static readonly Cursor NoneCursor = new(StandardCursorType.No);
-        static readonly Cursor ArrowCursor = new(StandardCursorType.Arrow);
+        static readonly Dictionary<Window, Cursor> OriginalCursors = new();
         static bool DragActive;
 
         static void SetDragCursor(DragDropEffects effects) {
             if (!DragActive) return;
 
-            Cursor cursor = effects == DragDropEffects.None? NoneCursor : DropCursor;
+            Cursor cursor = effects == DragDropEffects.None ? NoneCursor
+                : effects.HasFlag(DragDropEffects.Copy) ? CopyCursor : MoveCursor;
 
-            foreach (Window window in App.Windows)
+            foreach (Window window in App.Windows) {
+                OriginalCursors.TryAdd(window, window.Cursor);
                 window.Cursor = cursor;
+            }
         }
 
         static void ClearDragCursor() {
             DragActive = false;
-            foreach (Window window in App.Windows)
-                window.Cursor = ArrowCursor;
+            foreach (var entry in OriginalCursors)
+                entry.Key.Cursor = entry.Value;
+            OriginalCursors.Clear();
         }
 
         static Interactive DragTarget(Interactive hit, PointerEventArgs ev, out Point local) {
@@ -309,6 +329,7 @@ namespace Apollo.Selection {
         static async Task<DragDropEffects> DoInProcessDrag(Control origin, PointerEventArgs start, IDataTransfer data) {
             IPointer pointer = start.Pointer;
             TaskCompletionSource<DragDropEffects> tcs = new();
+            bool dropping = false;
             DragActive = true;
             DragDropEffects lastEffects = RaiseDrag(DragDrop.DragOverEvent, origin, start, data);
 
@@ -318,23 +339,38 @@ namespace Apollo.Selection {
             }
 
             void Released(object sender, PointerReleasedEventArgs ev) {
-                if (ev.Pointer != pointer) return;
-                lastEffects = RaiseDrag(DragDrop.DropEvent, origin, ev, data);
-                tcs.TrySetResult(lastEffects);
+                if (ev.Pointer != pointer || ev.InitialPressMouseButton != MouseButton.Left) return;
+                // Moving an item removes its old viewer during Drop. That detach/capture
+                // loss must not complete the gesture before the drop handler finishes.
+                dropping = true;
+                try {
+                    lastEffects = RaiseDrag(DragDrop.DropEvent, origin, ev, data);
+                    tcs.TrySetResult(lastEffects);
+                } finally { dropping = false; }
             }
 
             void CaptureLost(object sender, PointerCaptureLostEventArgs ev) {
-                if (ev.Pointer == pointer)
+                if (ev.Pointer == pointer && !dropping)
                     tcs.TrySetResult(DragDropEffects.None);
             }
 
-            void Detached(object sender, VisualTreeAttachmentEventArgs ev) => tcs.TrySetResult(lastEffects);
+            void Detached(object sender, VisualTreeAttachmentEventArgs ev) {
+                if (!dropping) tcs.TrySetResult(DragDropEffects.None);
+            }
 
+            void KeyDown(object sender, KeyEventArgs ev) {
+                if (ev.Key != Key.Escape) return;
+                ev.Handled = true;
+                tcs.TrySetResult(DragDropEffects.None);
+            }
+
+            var window = TopLevel.GetTopLevel(origin);
             pointer.Capture(origin);
             origin.PointerMoved += Moved;
             origin.PointerReleased += Released;
             origin.PointerCaptureLost += CaptureLost;
             origin.DetachedFromVisualTree += Detached;
+            window?.AddHandler(InputElement.KeyDownEvent, KeyDown, RoutingStrategies.Tunnel);
 
             try {
                 return await tcs.Task;
@@ -344,6 +380,7 @@ namespace Apollo.Selection {
                     origin.PointerReleased -= Released;
                     origin.PointerCaptureLost -= CaptureLost;
                     origin.DetachedFromVisualTree -= Detached;
+                    window?.RemoveHandler(InputElement.KeyDownEvent, KeyDown);
                     if (pointer.Captured == origin)
                         pointer.Capture(null);
                 } catch {}
@@ -418,7 +455,8 @@ namespace Apollo.Selection {
                 }
             }
 
-            if (!allowed) e.DragEffects = DragDropEffects.None;
+            e.DragEffects = !allowed ? DragDropEffects.None : copy || Contains(e, FileNames)
+                ? DragDropEffects.Copy : DragDropEffects.Move;
         }
 
         void Drop(object sender, DragEventArgs e) {
@@ -441,7 +479,8 @@ namespace Apollo.Selection {
                     break;
             }
             
-            if (!result) e.DragEffects = DragDropEffects.None;
+            e.DragEffects = !result ? DragDropEffects.None : copy || Contains(e, FileNames)
+                ? DragDropEffects.Copy : DragDropEffects.Move;
         }
 
         public void Dispose() {

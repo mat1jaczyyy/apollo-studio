@@ -5,7 +5,7 @@
         Title="Apollo Studio" Background="{DynamicResource ThemeSplashBrush}" Topmost="true" WindowStartupLocation="CenterScreen"
         Icon="/Resources/WindowIcon.png"
         Width="360" MinWidth="360" MaxWidth="360"
-        Height="120" MinHeight="120" MaxHeight="120"
+        MinHeight="120" SizeToContent="Height"
         Opened="HandleLoaded" Closing="HandleUnloaded">
 
   <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
@@ -15,9 +15,10 @@
 
         <Grid Grid.Column="1" Margin="5 0 0 0">
           <StackPanel VerticalAlignment="Center" Spacing="5">
-            <TextBlock Text="Initializing..." x:Name="State" />
+            <TextBlock Text="Initializing..." TextWrapping="Wrap" x:Name="State" />
 
             <ProgressBar HorizontalAlignment="Stretch" x:Name="DownloadProgress" />
+            <Button Content="Close" x:Name="CloseButton" IsVisible="False" Click="CloseUpdate" />
           </StackPanel>
         </Grid>
       </Grid>
