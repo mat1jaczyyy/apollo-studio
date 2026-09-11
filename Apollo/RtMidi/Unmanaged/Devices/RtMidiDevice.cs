@@ -114,9 +114,17 @@ namespace Apollo.RtMidi.Unmanaged.Devices {
             if (IsOpen)
                 Close();
 
-            if (Handle != IntPtr.Zero) 
+            if (Handle != IntPtr.Zero)
                 DestroyDevice();
 
+            _disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        // Drop a physically-removed device without any native call: on newer Windows,
+        // closing/freeing a vanished WinMM device faults in the driver
+        public void Abandon() {
+            IsOpen = false;
             _disposed = true;
             GC.SuppressFinalize(this);
         }

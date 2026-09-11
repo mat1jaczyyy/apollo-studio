@@ -9,6 +9,7 @@ namespace Apollo.RtMidi.Devices {
 
         bool Open();
         void Close();
+        void Abandon();
     }
 
     public abstract class MidiDevice: IMidiDevice {
@@ -24,7 +25,19 @@ namespace Apollo.RtMidi.Devices {
         public string Name { get; private set; }
         public bool Open() => _rtMidiDevice.Open();
         public void Close() => _rtMidiDevice.Close();
-        
+
+        public void Abandon() {
+            if (_disposed) return;
+
+            try {
+                Disposing();
+                _rtMidiDevice.Abandon();
+
+            } finally {
+                _disposed = true;
+            }
+        }
+
         public void Dispose() {
             if (_disposed) return;
 

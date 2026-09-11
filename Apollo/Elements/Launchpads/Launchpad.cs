@@ -981,11 +981,11 @@ namespace Apollo.Elements.Launchpads {
 
         public virtual void Disconnect(bool actuallyClose = true) {
             if (actuallyClose) {
-                if (Input.IsOpen) Input.Close();
-                Input.Dispose();
-
-                if (Output.IsOpen) Output.Close();
-                Output.Dispose();
+                // Device is already physically gone here (MIDI.Disconnect only
+                // reaches once no matching port remains), and closing a vanished
+                // WinMM device crashes newer Windows. Drop it without closing
+                Input.Abandon();
+                Output.Abandon();
             }
 
             Dispatcher.UIThread.InvokeAsync(() => Window?.Close());
