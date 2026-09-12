@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using Apollo.Platform;
 
 namespace Apollo.PackagingTests {
-    static class Program {
+    static partial class Program {
         static int checks;
         static void Check(bool value, string name) {
             if (!value) throw new Exception(name);
@@ -46,6 +46,8 @@ namespace Apollo.PackagingTests {
             MacBundle.ValidateArchive(stream);
         }
         static int Main(string[] args) {
+            if (args.Length == 6 && args[0] == "--native-mac-failures")
+                return NativeMacFailures(args[1], args[2], args[3], args[4], args[5]);
             if (args.Length == 2 && args[0] == "--verify-publish") {
                 using var file = File.OpenRead(args[1]);
                 using var pe = new PEReader(file);
