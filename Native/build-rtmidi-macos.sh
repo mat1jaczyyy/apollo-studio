@@ -21,8 +21,8 @@ if [ "$rebuild" = true ]; then
         "$native_dir/rtmidi/RtMidi.cpp" "$native_dir/rtmidi/rtmidi_c.cpp" \
         -framework CoreMIDI -framework CoreAudio -framework CoreFoundation -framework CoreServices \
         -Wl,-install_name,@rpath/librtmidi.dylib -o "$temporary"
-    xcrun lipo -verify_arch arm64 "$temporary"
+    xcrun lipo "$temporary" -verify_arch arm64
     codesign --force --sign - "$temporary"
     mv -f "$temporary" "$output"
 fi
-xcrun lipo -verify_arch arm64 "$output"
+xcrun lipo "$output" -verify_arch arm64

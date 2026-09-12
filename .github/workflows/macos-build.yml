@@ -37,16 +37,20 @@ jobs:
           dotnet publish ApolloUpdate/ApolloUpdate.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o artifacts/mac/Update
       - name: Verify native architecture and MIDI loopback
         run: |
-          xcrun lipo -verify_arch ${{ matrix.arch }} artifacts/mac/Apollo/Apollo
-          xcrun lipo -verify_arch ${{ matrix.arch }} artifacts/mac/Update/ApolloUpdate
+          xcrun lipo artifacts/mac/Apollo/Apollo -verify_arch ${{ matrix.arch }}
+          xcrun lipo artifacts/mac/Update/ApolloUpdate -verify_arch ${{ matrix.arch }}
           for library in artifacts/mac/Apollo/*.dylib artifacts/mac/Update/*.dylib; do
-            xcrun lipo -verify_arch ${{ matrix.arch }} "$library"
+            xcrun lipo "$library" -verify_arch ${{ matrix.arch }}
           done
           python3 Tests/native_rtmidi_smoke.py artifacts/mac/Apollo/librtmidi.dylib
       - name: Verify release selection and installer projects
         run: |
           APOLLO_TEST_RELEASE_ASSETS=1 dotnet run --project Tests/Apollo.Scenarios.csproj -c Release -- artifacts/release-tests
           python3 Tests/test_mac_package.py
+      - name: Verify editor input and graceful Quit
+        run: |
+          python3 Tests/run-scenarios.py --output artifacts/headless
+          python3 Tests/run-scenarios.py --suite quit --output artifacts/quit-headless
       - name: Archive build preserving executable permissions
         run: |
           mkdir artifacts/mac/M4L

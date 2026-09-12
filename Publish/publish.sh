@@ -33,9 +33,9 @@ for rid in $targets; do
     dotnet publish Apollo/Apollo.csproj --self-contained true -r "$rid" -c Release
     dotnet publish ApolloUpdate/ApolloUpdate.csproj --self-contained true -r "$rid" -c Release
     # Catch mixed-architecture app hosts and native MIDI libraries before packaging.
-    xcrun lipo -verify_arch "$arch" "$app/Apollo"
-    xcrun lipo -verify_arch "$arch" "$app/librtmidi.dylib"
-    xcrun lipo -verify_arch "$arch" "$updater/ApolloUpdate"
+    xcrun lipo "$app/Apollo" -verify_arch "$arch"
+    xcrun lipo "$app/librtmidi.dylib" -verify_arch "$arch"
+    xcrun lipo "$updater/ApolloUpdate" -verify_arch "$arch"
     fileicon set "$app/Apollo" Apollo/icon.ico
     fileicon set "$updater/ApolloUpdate" ApolloUpdate/icon.ico
 
