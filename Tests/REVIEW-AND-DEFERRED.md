@@ -1,8 +1,10 @@
 # Branch review and deferred work — 2026-09-10
 
-**Mac follow-up, 2026-09-12:** Native validation ran locally on the M3 MacBook Air with macOS 15.2. Build/signing/input failures were reproduced and fixed; both architecture packages, CoreMIDI loopback, editor/Quit suites and several native UI paths passed. Finder launch at the tested Unicode installation path remains unresolved. See [MACOS-VALIDATION.md](MACOS-VALIDATION.md) for exact results, updater qualification and the remaining matrix. The historical results below remain evidence from the Windows review, not claims that every deferred item is still untouched.
+**Current follow-up, 2026-09-12:** Finder `.approj` registration/activation is implemented. Cold/warm Finder double-click, Unicode project filenames and native Save/Cancel decisions passed; 34 activation checks passed in native/headless Mac modes. Final Mac editor/Quit runs passed, as did 23 signed updater failure/recovery observations. The fresh Unicode **installation-path** launch still fails before Apollo starts. Windows independently passed 814 assertions without Computer Use, reproduced unsafe legacy updater failure modes and a native WinMM cleanup defect, and returned test-only fixtures for integration. See [MACOS-VALIDATION.md](MACOS-VALIDATION.md) and [WINDOWS-VALIDATION.md](WINDOWS-VALIDATION.md) for evidence and limits. The September 10 counts below are historical.
 
-This is the current consolidated handoff for the Avalonia 12.1.2 / .NET 10 migration and its three follow-up branches. It supersedes older statements that the macOS branches had not been pushed. The branches existed on origin before this review; the new review commits are local.
+**Newly confirmed deferred fixes:** Windows updater partial deletion, unbounded retries, missing rollback and malformed/incomplete staging; exception-safe/idempotent native WinMM cleanup with safe callback/buffer ownership. PR #486 was reviewed but not integrated: its unconditional `Abandon` workaround leaks native resources and does not establish callback quiescence. Physical unplug/shipped-DLL behavior still needs validation. These are retained legacy behaviors, not new Finder regressions.
+
+This preserves the September 10 review of the Avalonia 12.1.2 / .NET 10 migration and its three follow-up branches. The current follow-up summaries above and their linked reports supersede its pending-validation statements. The user requested coordinated publication of the new commits with linear rebases of the stack.
 
 ## Review findings and fixes
 
@@ -49,7 +51,7 @@ The detailed GitHub evidence and repro steps are in GITHUB-ISSUE-TRIAGE.md. Thes
 
 ## Deferred MIDI, Ableton and other integrations
 
-- Compile and run the ARM64 native RtMidi library on a Mac and run the CoreMIDI virtual-loopback smoke test. Missing/wrong-architecture guards and cross-published updater binaries do not establish ARM app runtime functionality.
+- ARM64 compilation and CoreMIDI virtual loopback now pass on Mac, as does Intel loopback under Rosetta. Physical-device behavior remains below.
 - Test physical Launchpad input/output, LED correctness, latency/timing, sustained high input, USB drivers, multiple applications sharing MIDI ports, hot-plugging/reconnect (#397), and more than ten devices (#480).
 - Reproduce #407's garbled effects/freezing with the original project, hardware, cables and load; compare editor-open/editor-closed behavior.
 - Test Ableton Live and the M4L connector on the actual platforms, including finding/importing connectors after moving to the app bundle.
@@ -58,21 +60,21 @@ The detailed GitHub evidence and repro steps are in GITHUB-ISSUE-TRIAGE.md. Thes
 
 ## Deferred macOS build, distribution and update validation
 
-- Run the GitHub macOS build matrix on both Intel and ARM runners. A read-only check during this review found no recorded macOS workflow run and no PR for this branch stack. Existing branches are pushed; the new review commits still need publication/integration before remote CI can validate them.
-- On macOS, produce and verify the ad-hoc signatures, app ZIPs and DMGs; run the native MIDI smoke test and launch both architecture targets. Windows-created bundle previews and fake Mach-O fixtures are structural tests only.
+- Run the GitHub macOS build matrix on both Intel and ARM runners. The read-only checks found no recorded macOS workflow run or stack PR. This workflow triggers on pull requests/manual dispatch, not ordinary branch pushes; remote CI remains unverified.
+- Native Mac ad-hoc signatures, both app ZIPs/DMGs, both architecture launches and virtual MIDI now pass. Windows-created previews/fake fixtures remain structural evidence only.
 - On the unavailable M3 MacBook Air / macOS 15.2: download the ARM DMG through a browser, install it, exercise Gatekeeper's per-app approval, and verify Finder/Dock launch and updater relaunch without Terminal. Test the Intel build on an Intel Mac or under Rosetta as appropriate.
-- Verify the app signature before and after ordinary use; projects, preferences, caches and editable M4L connectors must remain outside the sealed bundle.
-- Exercise a real bundle-to-bundle update from paths with spaces/non-ASCII characters, including user and legacy connectors, settings preservation, writable/non-writable installation locations, mounted-DMG and App Translocation rejection, interruption, failed staging/replacement/relaunch and recovery of the previous app.
+- Signature checks before/after tested ordinary use pass; projects/preferences/editable M4L connectors stayed outside the sealed bundle. Broader integration use remains untested.
+- Real bundle replacement/relaunch at an ASCII path with spaces, connector/settings preservation, read-only installation/real mounted-DMG rejection, invalid signed staging, rename failure and injected launch-failure rollback now have Mac coverage. Unicode installation relaunch, real App Translocation, interruption during swap, helper error UI and late-crash/manual recovery remain open.
 - A successful open command does not prove the new UI stays running. Late startup crashes require checking the retained previous bundle and manual recovery path.
 - Test the legacy macOS executable update path and the optional Packages installer, including actual package creation/installation and its Terminal-based launch. This intentionally retains the old layout; it is not the new default app installation.
-- Test the Windows updater's real handoff, permissions/UAC/elevation, file locks, installation replacement and relaunch. The legacy installer still has its existing replacement strategy; the new failure tests only cover downloading/staging and do not certify installation.
+- Instrumented Windows transactions now cover real staging/replacement/relaunch and locks. Real UAC/elevation, ACL denial, Sysinternals handle closure and the normal trimmed updater transaction remain open. Confirmed partial-deletion/retry/rollback defects need production fixes; passing observation assertions do not certify safe recovery.
 - Publish the intended release assets for each architecture/layout, then verify that installed clients discover the right artifact and remain on their architecture/layout. No release, installer deployment or end-user update was published in this review.
 
 See ../Publish/MACOS.md for the publishing commands and platform test plan.
 
 ## Deliberately deferred implementation or out-of-scope work
 
-- Finder document associations and activation-event handling. Registering .approj associations before implementing activation would be incomplete.
+- Finder associations and activation are implemented and tested as recorded above. Remaining desktop integration variants (Dock, external drag/drop, multiple installed versions) are still validation work.
 - Sparkle/native updater integration, appcast hosting and release-key management.
 - Developer ID signing, notarization and App Store distribution. The chosen path remains free ad-hoc signing; no Apple membership/enrollment/payment has been performed. A free Personal Team does not supply the required distribution identity/notarization. An organizational fee waiver would require actual eligibility.
 - Automatic migration/removal of legacy executable installations. Users install the new app explicitly; legacy layouts remain supported. Custom connector folders outside the old standard install location need manual migration.

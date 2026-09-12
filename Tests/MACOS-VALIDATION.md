@@ -8,10 +8,10 @@ Recovered all 12 turns across both history pages of the connected Windows task *
 
 - Avalonia 12.1.2, .NET SDK 10.0.401 / runtime 10.0.12; retain Apollo's custom project/track/window lifecycle. Whole-application Quit suppresses replacement windows, while ordinary window close retains them.
 - Separate Intel and Apple Silicon app/updater targets, using Apollo's pinned custom RtMidi fork; stock RtMidi is not an ABI-compatible replacement.
-- Free ad-hoc signed app bundles, DMGs and app ZIPs alongside the existing legacy archives. Whole-bundle replacement retains the previous app for recovery. Developer ID, notarization, Sparkle and Finder document activation remain deferred.
+- Free ad-hoc signed app bundles, DMGs and app ZIPs alongside the existing legacy archives. Whole-bundle replacement retains the previous app for recovery. Developer ID, notarization and Sparkle remain deferred; Finder document activation was implemented in the follow-up below.
 - Preserve the friend's resize/drag changes and the rebased linear stack: `avalonia-12.1.2` → `codex/214-graceful-quit` → `codex/macos-arm64` → `codex/macos-app-bundle`.
 
-Validation began in `/Users/mat1jaczyyy/Code/apollo-studio` on the existing `codex/macos-app-bundle` branch at `d082c369`. At the user's subsequent request, the changes were committed to their owning branches and the higher branches were rebased upward. Before this bookkeeping update, all 355 final file hashes matched the validation snapshot after rebuilding the stack. No Git state was transferred, no branches were reset or merged, and nothing was pushed.
+Validation began in `/Users/mat1jaczyyy/Code/apollo-studio` on the existing `codex/macos-app-bundle` branch at `d082c369`. The first pass distributed commits to their owning branches and rebased the higher branches; all 355 final file hashes matched its validation snapshot. Those commits were subsequently pushed, and this follow-up started at `0c9936cc`. The user requested another coordinated commit/rebase/push pass. The Mac task owns publication; Windows supplied test-only patches from a detached worktree. No Git state was transferred between machines, and no branch was reset or merged.
 
 The pinned SDK was installed under ignored `artifacts/dotnet`; its CLI home and NuGet cache are under `artifacts/tooling`. No global SDK installation was needed. Tests and desktop copies use isolated profiles under their output directories, with updates, Discord, autosave and backups disabled. The profile override is process-local `AppContext` data; HOME is unchanged. The user's existing profile was not used for this validation.
 
@@ -82,15 +82,46 @@ The production `MacBundle.PrepareUpdate` extracted and validated a signed local 
 
 A repeat using the production bundle identity under **`Updater ASCII spaces/` passed replacement and verified relaunch**. Before attaching desktop automation, `ps` identified the replacement's exact `Contents/MacOS/Apollo` path (PID 16896). Its splash and Preferences UI responded; dark theme, always-on-top off, Discord off, updates off, autosave off and backups off matched the seeded settings. Command+Q then exited normally. The replacement marker, signed previous bundle, unchanged project/custom-connector hashes and staging cleanup all passed. Evidence: `update-ascii-prepare.log`, `update-ascii-run.log`, `update-ascii-source/preserved-sha256.json` and the desktop observations. Configuration bytes are not compared after startup because Apollo writes session state; the settings were checked in the UI. These tests used locally prepared signed payloads, without downloading a GitHub release or changing an installed user app.
 
-The 28 portable packaging tests exercise replacement/rollback using test fixtures. Actual read-only installation, mounted-DMG/App Translocation rejection, interruption, permission failures, relaunch failure and recovery on a Mac remain a separate distribution matrix.
+The 28 portable packaging tests exercise replacement/rollback using test fixtures. The follow-up below adds signed-bundle failure tests; actual translocation, interruption during the swap and late startup-crash recovery remain separate distribution checks.
+
+## Finder activation and coordinated follow-up
+
+The bundle now exports the Apollo Project document type and registers `.approj` with the Editor role. The app subscribes to Avalonia file activation before startup, queues events until the splash is ready, deduplicates pending/current-document requests, and serializes project replacement around existing messages, Quit decisions, native pickers and a pending startup crash-recovery choice. Save/Discard/Cancel applies to the current workspace. Cancel clears the batch; unreadable files leave the current project and recovery data intact. Old project, track, Pattern and Undo windows close without triggering replacement windows or terminating the app. Reopen restores a minimized project. Windows/Linux command-line opening remains available.
+
+Evidence in this section is under ignored `artifacts/mac-followup/`:
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Activation, headless and native Mac | 34/34 each | `activation-recovery-headless/run`, `activation-recovery-native/run` |
+| Editor regression, headless dark | 135/135 | `regression-final-headless/run` |
+| Editor regression, native light/software | 86/86 | `native-final/regression` |
+| Quit, headless dark and native light/software | 8 cases / 93 checks each | `quit-final-headless`, `native-final/quit-*` |
+| Signed native Mac failure/recovery matrix | 23/23 observations | `native-update-failures-final.log` |
+| Intel/ARM production publishes and package verification | Passed; no test entry points | `publish-final.log`, `package-final.log`, packaging executable output |
+| Portable bundle/update checks | 28/28; Python bundle/legacy checks 2/2 each | `packaging-portable.log`, test commands |
+
+The activation suite covers startup queuing and waiting for an existing crash-recovery choice, Unicode paths, duplicate requests, all unsaved decisions, focused text, recovery snapshots, unreadable/missing files, waiting for a picker, cancelling a picker opened during activation, old editor disposal, ordered batches and Reopen. Its picker and storage-item objects are test proxies. An early added recovery assertion incorrectly expected a filename inside the project binary; the format stores it in preferences. The corrected check verifies project contents. The native failure harness initially omitted `InvalidDataException` from its expected-exception filter; the product correctly rejected the opposite architecture. Both test-fixture failures are retained in the initial run logs.
+
+Separate Finder desktop observations used the signed production app under `Finder activation/` with an isolated profile and unique bundle identifier:
+
+- Double-clicking `First project ž.approj` in Finder opened it in the running app with BPM 121. Finder showed the registered Apollo document icon.
+- Command+Q followed by double-clicking `Second project.approj` started a new process (PID 33467, replacing PID 27316) at the exact expected app path. The project appeared with BPM 142, without Terminal or a stray splash. Process identity was checked before attaching UI automation.
+- Typing BPM 167 while the field remained focused, then opening the other file in Finder, produced the unsaved prompt. Cancel kept BPM 167. Repeating and choosing Yes opened the other project; reopening the saved file through Finder showed BPM 167.
+- A fresh signed app at `Finder ž/`, with a new bundle identifier, still failed before process creation. CoreServicesUIAgent displayed the same error and RunningBoard again reported invalid `LSApplicationProxy` / Launch Services `-10810`. Evidence: `finder-unicode-launch.log`. The alert and validation Finder window were closed; the original Finder window was preserved.
+
+The 23 native updater observations use real signed bundles and tools. Read-only parent permissions and an actual read-only DMG mount reject updates before replacement. Wrong-architecture, corrupt ZIP and tampered signed payloads preserve the installed app. Stopping before helper handoff leaves it usable. A file blocking the backup rename leaves both installed and candidate bundles intact; an injected relaunch callback exception restores the signed previous bundle. The translocation guard uses a synthetic path, and launch failure is injected at the callback: neither proves actual translocation or late process-crash recovery. No user installation was replaced.
+
+The connected Windows task used no Computer Use or OS input automation. It passed 814 regression/Quit assertions and returned an offline GitHub fixture after finding that splash metadata fetching could contaminate the missing-asset test. Its instrumented real updater transactions confirmed success and several unsafe legacy failure behaviors; native WinMM fault injection reproduced repeat-close heap corruption. See [WINDOWS-VALIDATION.md](WINDOWS-VALIDATION.md) for exact substitutions, artifact locations, PR #486 assessment and deferred fixes. The Windows pass predates the concurrent Finder production changes.
+
+To conserve disk space, some rebuildable earlier binaries/extracted packages were removed; logs, results, screenshots, profiles and diagnostic launch copies remain. No source, user project or profile was removed. No release artifacts, installers, Apple identities or security exceptions were published/created.
 
 ## Remaining work
 
-- Resolve/qualify the Unicode installation launch failure and repeat the updater at that path with exact process evidence. Test failure/recovery cases with signed bundles, including non-writable installs, mounted DMGs and App Translocation.
+- Resolve/qualify the Unicode installation launch failure and repeat the updater at that path with exact process evidence. Actual App Translocation, interruption during swap, helper error UI and late startup-crash/manual recovery remain untested; read-only installs, mounted-DMG rejection and the signed failure cases above now have coverage.
 - Browser-download the ARM DMG, install through Finder and exercise per-app Gatekeeper approval, Finder/Dock launch and a released update. No release assets were uploaded, no Apple account/signing identity was created, and no security settings were changed in this pass.
 - Complete graceful Quit through Dock and Activity Monitor, with minimized and track-only workspaces; complete native overwrite/cancel/long-path dialog coverage, focus/activation, clipboard and external file drag/drop.
 - Test QWERTZ/QWERTY and text shortcuts (#466), M1 sustained rendering (#437), reliable minimize/restore (#385), mixed-DPI/offset displays and menus (#444), fullscreen and a broader Pattern Editor reopen run (#370), and native dragging/resizing under occlusion and across monitors.
 - Physical Launchpad input/output, hot-plugging, LEDs, load/latency, multiple devices, #407's original reproducer, Ableton/M4L import/use and Discord reconnect require their actual integrations/hardware. Virtual MIDI and locating connector files do not establish these.
-- Run the modified GitHub macOS CI matrix after the changes are published. Test physical Intel hardware and OS boundary versions; macOS 12/13 compatibility remains unverified. Linux, legacy `.pkg` installation and the Windows updater transaction remain deferred as recorded in the Windows handoff.
+- Run the modified GitHub macOS CI matrix: the workflow triggers on pull requests/manual dispatch, not ordinary branch pushes, and no stack PR or recorded workflow run was available. Test physical Intel hardware and OS boundary versions; macOS 12/13 compatibility remains unverified. Linux and legacy `.pkg` installation remain deferred. Windows updater fixes, real elevation/handle closure, trimmed runtime transactions and physical MIDI remain deferred as qualified in the new Windows report.
 
 See [README.md](README.md#portable-runner-and-mac-desktop-validation) for repeatable commands and [Publish/MACOS.md](../Publish/MACOS.md) for the distribution design. These results do not close existing GitHub issues without their remaining targeted checks and, where needed, a same-machine master comparison.

@@ -20,11 +20,17 @@ python3 Tests/run-scenarios.py --mode native --output artifacts/native
 python3 Tests/run-scenarios.py --mode native --theme Light --software --output artifacts/native-light
 python3 Tests/run-scenarios.py --suite quit --output artifacts/quit-headless
 python3 Tests/run-scenarios.py --mode native --suite quit --output artifacts/quit-native
+python3 Tests/run-scenarios.py --suite activation --output artifacts/activation-headless
+python3 Tests/run-scenarios.py --mode native --suite activation --output artifacts/activation-native
 ```
 
 Pass `--dotnet /absolute/path/to/dotnet` for a portable SDK. Every output directory must be fresh. The runner builds once and runs each child sequentially, with a 60-second per-process timeout. Native mode needs a desktop; both modes need Apollo's local single-instance socket, and Mac MIDI checks need CoreMIDI access. A sandbox denying these services is not an application failure.
 
 The migrated harness sets the `Apollo.UserPath` AppContext value before Apollo initializes and checks that the resulting profile is isolated. It does not change HOME. The Windows legacy harness retains its original USERPROFILE redirection. Mac shortcut fixtures use Command and account for the native desktop's point coordinates. The input regressions also check that printable key events remain unhandled so the native Mac backend can deliver text, while window shortcuts do not act on a focused text field.
+
+The migrated runner also seeds offline GitHub splash metadata before startup and clears the download cache. Disabling update checks alone does not suppress the splash's metadata requests; previously a cached real asset could contaminate the missing-asset test. The legacy baseline keeps its original startup behavior.
+
+The activation suite calls the real Avalonia activation handler with storage-item proxies. It covers requests before readiness or a pending crash-recovery choice, Unicode paths, duplicate/current-document requests, Save/Discard/Cancel, focused text, native-picker waiting/cancellation through a storage-provider proxy, unreadable files, recovery data, ordered batches, project/track/Pattern/Undo disposal, minimized-window Reopen and ordinary close afterward. It does not establish Finder association delivery by itself; those separate desktop observations are in [MACOS-VALIDATION.md](MACOS-VALIDATION.md).
 
 After `sh Publish/publish.sh all`, verify actual archive signatures and read-only DMG contents with:
 
@@ -54,6 +60,19 @@ dotnet run --project Tests/Packaging/Packaging.csproj -c Release -- \
 ```
 
 The first checks the production entry point and excludes test types. The second stages a real signed update for the isolated installed copy and writes the manifest path into the final argument's file. Once the preparation process and test app have exited, run the manifest's staged `Runner.app/Contents/MacOS/ApolloUpdate` with `--mac-bundle-update` and the manifest path. This performs replacement; use only the disposable validation installation. Verify both signatures, retained previous app, user-file hashes and the exact relaunched process/UI. Successful preparation or an `open` exit code does not establish a successful UI relaunch.
+
+Run the signed local failure matrix on an ARM Mac after publishing both architectures:
+
+```sh
+dotnet run --project Tests/Packaging/Packaging.csproj -c Release -- \
+  --native-mac-failures "Build/osx-arm64-app/Apollo Studio.app" \
+  Dist/Apollo-Mac-arm64-app.zip Dist/Apollo-Mac-app.zip Dist/Apollo-Mac-arm64.dmg \
+  artifacts/native-mac-failures
+```
+
+On Intel, swap the architecture-specific bundle/ZIP/DMG arguments. The fresh output holds only disposable installations. These 23 checks use real signatures, filesystem permissions, ZIP extraction and a read-only DMG mount. They cover wrong-architecture/corrupt/tampered payloads, stopping before handoff, a blocked rename and rollback after an injected relaunch callback failure. The App Translocation check uses a synthetic path; this does not reproduce actual quarantine/translocation or a late process crash.
+
+Windows-only transaction and native fault helpers are documented in [WindowsUpdater/README.md](WindowsUpdater/README.md) and [WindowsMidi/README.md](WindowsMidi/README.md). Their explicit substitutions and known failing product behavior are summarized in [WINDOWS-VALIDATION.md](WINDOWS-VALIDATION.md).
 
 ## Native Windows scenarios
 
@@ -177,4 +196,4 @@ Both native and headless suites additionally cover a missing compatible release 
 Review evidence: `artifacts/review/base-native/run` and `artifacts/review/base-headless-2`. The original first-item drop crash and Escape cancellation failure are captured in `artifacts/review-pointer-before-3.log` and `artifacts/review-pointer-cancel-before.log`.
 
 
-See [the consolidated review, current validation and complete deferred-work inventory](REVIEW-AND-DEFERRED.md). The final stack passes 123 headless checks and 86 native checks; 16 release-selection checks and 28 packaging checks are separate suites.
+See [the consolidated review, current validation and complete deferred-work inventory](REVIEW-AND-DEFERRED.md). The September 10 stack passed 123 headless and 86 native checks. The current Mac follow-up passes 135 headless editor checks, 86 native editor checks, 34 activation checks per mode and 93 Quit checks per mode; 16 release-selection, 28 portable packaging and 23 native signed-failure checks are separate suites.
