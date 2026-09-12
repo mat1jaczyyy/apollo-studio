@@ -35,7 +35,13 @@ class MacBundleTests(unittest.TestCase):
                 self.assertEqual(info["LSArchitecturePriority"], [architecture])
                 self.assertEqual(info["LSMinimumSystemVersion"], "12.0")
                 self.assertNotIn("LSUIElement", info)
-                self.assertNotIn("CFBundleDocumentTypes", info)  # No unimplemented Finder document handlers.
+                document = info["CFBundleDocumentTypes"][0]
+                exported = info["UTExportedTypeDeclarations"][0]
+                self.assertEqual(document["CFBundleTypeRole"], "Editor")
+                self.assertEqual(document["LSHandlerRank"], "Owner")
+                self.assertEqual(document["LSItemContentTypes"], [exported["UTTypeIdentifier"]])
+                self.assertEqual(exported["UTTypeTagSpecification"]["public.filename-extension"], ["approj"])
+                self.assertEqual(exported["UTTypeConformsTo"], ["public.data"])
                 self.assertTrue(info["NSHighResolutionCapable"])
                 self.assertEqual((contents / "MacOS/Apollo.dll").read_bytes(), b"Apollo.dll")
                 self.assertFalse((contents / "MacOS/rtmidi.dll").exists())
@@ -43,7 +49,10 @@ class MacBundleTests(unittest.TestCase):
                 self.assertEqual((contents / "Resources/Apollo.icns").read_bytes(), b"icns")
                 self.assertEqual((contents / "Resources/M4L/Apollo.amxd").read_bytes(), b"connector")
                 helper = contents / "Helpers/Apollo Updater.app/Contents"
-                self.assertTrue(plistlib.loads((helper / "Info.plist").read_bytes())["LSUIElement"])
+                helper_info = plistlib.loads((helper / "Info.plist").read_bytes())
+                self.assertTrue(helper_info["LSUIElement"])
+                self.assertNotIn("CFBundleDocumentTypes", helper_info)
+                self.assertNotIn("UTExportedTypeDeclarations", helper_info)
                 self.assertTrue((helper / "MacOS/ApolloUpdate.dll").is_file())
                 self.assertFalse((helper / "MacOS/handle64.exe").exists())
                 self.assertTrue((app / "rtmidi.dll").exists())  # Original legacy output is intact.

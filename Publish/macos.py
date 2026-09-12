@@ -57,6 +57,17 @@ def make_bundle(app, updater, destination, rid, *, icon=None, connectors=None, b
     shutil.copy2(ROOT / "Native/rtmidi/LICENSE.txt", resources / "RtMidi-LICENSE.txt")
     info = metadata("Apollo", "Apollo Studio", IDENTIFIER, build_version, architecture)
     info.update({"CFBundleIconFile": "Apollo.icns", "LSApplicationCategoryType": "public.app-category.music"})
+    project_type = IDENTIFIER + ".project"
+    info["CFBundleDocumentTypes"] = [{
+        "CFBundleTypeName": "Apollo Project", "CFBundleTypeRole": "Editor",
+        "LSHandlerRank": "Owner", "LSItemContentTypes": [project_type],
+        "CFBundleTypeIconFile": "Apollo.icns",
+    }]
+    info["UTExportedTypeDeclarations"] = [{
+        "UTTypeIdentifier": project_type, "UTTypeDescription": "Apollo Project",
+        "UTTypeConformsTo": ["public.data"],
+        "UTTypeTagSpecification": {"public.filename-extension": ["approj"]},
+    }]
     with (contents / "Info.plist").open("wb") as output:
         plistlib.dump(info, output)
     info = metadata("ApolloUpdate", "Apollo Updater", IDENTIFIER + ".updater", build_version, architecture)

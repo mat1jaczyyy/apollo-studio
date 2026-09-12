@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 
@@ -33,6 +34,10 @@ namespace Apollo.Core {
         }
 
         internal static bool IsQuitting { get; private set; }
+        internal static bool IsReplacingProject { get; set; }
+        internal static bool IsQuitPending => instance.quitPending;
+        internal static DocumentOpen Documents => instance.documents;
+        readonly DocumentOpen documents = new();
         bool quitPending;
 
         void HandleShutdownRequested(object sender, ShutdownRequestedEventArgs e) {
@@ -42,7 +47,7 @@ namespace Apollo.Core {
             // then finish shutdown after the prompt and any save picker have closed.
             e.Cancel = true;
             var message = Windows.OfType<MessageWindow>().LastOrDefault();
-            if (quitPending || message != null) {
+            if (quitPending || message != null || documents.IsOpening) {
                 message?.Activate();
                 return;
             }
@@ -88,7 +93,7 @@ namespace Apollo.Core {
         }
 
         public static void WindowClosed(Window sender) {
-            if (IsQuitting) return;
+            if (IsQuitting || IsReplacingProject) return;
 
             if (Program.Project != null) {
                 if (Program.Project.Window != null) return;
@@ -144,6 +149,10 @@ namespace Apollo.Core {
             // the lifetime owner. Keep running until the final window has closed.
             lifetime.ShutdownMode = ShutdownMode.OnLastWindowClose;
             lifetime.ShutdownRequested += HandleShutdownRequested;
+            if (this.TryGetFeature<IActivatableLifetime>() is { } activatable) {
+                activatable.Activated += HandleActivation;
+                lifetime.Exit += (_, __) => activatable.Activated -= HandleActivation;
+            }
 
             if (Args.Length > 0 && Args[0] == "--update") lifetime.MainWindow = new UpdateWindow();
             else {
@@ -210,6 +219,21 @@ namespace Apollo.Core {
 
                 lifetime.MainWindow = new SplashWindow();
                 base.OnFrameworkInitializationCompleted();
+            }
+        }
+
+        internal void HandleActivation(object sender, ActivatedEventArgs args) {
+            if (args is FileActivatedEventArgs files) {
+                var paths = files.Files.Select(file => file.TryGetLocalPath()).Where(path => path != null).ToArray();
+                Dispatcher.UIThread.Post(() => {
+                    if (IsQuitting) return;
+                    if (!AbletonConnector.Connected) {
+                        foreach (string path in paths) AbletonConnector.NewInstanceFile(path);
+                        Shutdown();
+                    } else documents.Enqueue(paths);
+                });
+            } else if (args.Kind == ActivationKind.Reopen) {
+                Dispatcher.UIThread.Post(() => { if (!IsQuitting) DocumentOpen.BringForward(); });
             }
         }
     }

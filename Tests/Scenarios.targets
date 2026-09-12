@@ -11,5 +11,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)QuitScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReleaseAssetScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UpdateScenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ActivationScenarios.cs" />
   </ItemGroup>
 </Project>

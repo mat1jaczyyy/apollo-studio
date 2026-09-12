@@ -54,6 +54,7 @@ jobs:
         run: |
           python3 Tests/run-scenarios.py --output artifacts/headless
           python3 Tests/run-scenarios.py --suite quit --output artifacts/quit-headless
+          python3 Tests/run-scenarios.py --suite activation --output artifacts/activation-headless
       - uses: actions/upload-artifact@v4
         with:
           name: Apollo-${{ matrix.rid }}

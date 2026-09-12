@@ -126,10 +126,13 @@ namespace Apollo.Windows {
 
             Launchpad.DisplayWarnings(this);
 
-            if (App.Args?.Length > 0)
-                ReadFile(App.Args[0]);
-
+            var args = App.Args;
             App.Args = null;
+            if (args?.Length > 0) {
+                if (args[0].EndsWith(".approj", StringComparison.OrdinalIgnoreCase)) App.Documents.Enqueue(args.Take(1));
+                else ReadFile(args[0]);
+            }
+            App.Documents.Start();
 
             UpdateBlogpost();
             UpdateRelease();

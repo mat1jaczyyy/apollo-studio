@@ -79,6 +79,10 @@ namespace Apollo.Tests {
                             return;
                         }
                         #endif
+                        #if !LEGACY_AVALONIA
+                        if (Environment.GetEnvironmentVariable("APOLLO_TEST_ACTIVATION") == "1") await RunActivation();
+                        else
+                        #endif
                         await Run();
                         finished = true;
                         // The last splash close must end the real desktop loop on its own.

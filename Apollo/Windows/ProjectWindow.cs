@@ -395,6 +395,11 @@ namespace Apollo.Windows {
             if (SafeClose = await CheckClose(force)) base.Close();
         }
 
+        internal void CloseForReplacement() {
+            SafeClose = true;
+            base.Close();
+        }
+
         void ResizeNorth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.North, e);
 
         void ResizeSouth(object sender, PointerPressedEventArgs e) => WindowResizer.Begin(this, WindowEdge.South, e);
