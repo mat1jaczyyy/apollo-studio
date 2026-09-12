@@ -2,6 +2,9 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Xml.Linq;
 using Apollo.Platform;
 
@@ -42,7 +45,34 @@ namespace Apollo.PackagingTests {
             stream.Position = 0;
             MacBundle.ValidateArchive(stream);
         }
-        static int Main() {
+        static int Main(string[] args) {
+            if (args.Length == 2 && args[0] == "--verify-publish") {
+                using var file = File.OpenRead(args[1]);
+                using var pe = new PEReader(file);
+                var metadata = pe.GetMetadataReader();
+                var method = metadata.GetMethodDefinition(MetadataTokens.MethodDefinitionHandle(
+                    pe.PEHeaders.CorHeader.EntryPointTokenOrRelativeVirtualAddress & 0x00ffffff));
+                var owner = metadata.GetTypeDefinition(method.GetDeclaringType());
+                var entry = metadata.GetString(owner.Namespace) + "." + metadata.GetString(owner.Name) + "." + metadata.GetString(method.Name);
+                Check(entry == "Apollo.Core.Program.Main", "production app entry point");
+                foreach (var handle in metadata.TypeDefinitions) {
+                    var definition = metadata.GetTypeDefinition(handle);
+                    if (metadata.GetString(definition.Namespace).StartsWith("Apollo.Tests"))
+                        throw new Exception("Scenario code was included in the production app.");
+                }
+                Check(true, "production app excludes scenario types");
+                return 0;
+            }
+            // Stage a real, signed local update. The caller runs the staged helper
+            // after this process and the desktop test app have exited.
+            if (args.Length == 5 && args[0] == "--prepare-mac-update") {
+                if (!OperatingSystem.IsMacOS()) throw new PlatformNotSupportedException();
+                var manifest = MacBundle.PrepareUpdate(File.ReadAllBytes(args[2]), Path.GetFullPath(args[1]), Path.GetFullPath(args[3]));
+                File.WriteAllText(args[4], manifest);
+                Console.WriteLine("PASS native extraction, signature validation and helper staging: " + manifest);
+                return 0;
+            }
+            if (args.Length != 0) throw new ArgumentException("Use --verify-publish <Apollo.dll>, --prepare-mac-update <installed.app> <archive.zip> <profile> <manifest-output>, or no arguments.");
             string root = Path.Combine(Path.GetTempPath(), "apollo-packaging-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(root);
             try {

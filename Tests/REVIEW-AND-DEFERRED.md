@@ -1,5 +1,7 @@
 # Branch review and deferred work — 2026-09-10
 
+**Mac follow-up, 2026-09-12:** Native validation ran locally on the M3 MacBook Air with macOS 15.2. Build/signing/input failures were reproduced and fixed; both architecture packages, CoreMIDI loopback, editor/Quit suites and several native UI paths passed. Finder launch at the tested Unicode installation path remains unresolved. See [MACOS-VALIDATION.md](MACOS-VALIDATION.md) for exact results, updater qualification and the remaining matrix. The historical results below remain evidence from the Windows review, not claims that every deferred item is still untouched.
+
 This is the current consolidated handoff for the Avalonia 12.1.2 / .NET 10 migration and its three follow-up branches. It supersedes older statements that the macOS branches had not been pushed. The branches existed on origin before this review; the new review commits are local.
 
 ## Review findings and fixes
@@ -12,7 +14,7 @@ This is the current consolidated handoff for the Avalonia 12.1.2 / .NET 10 migra
 - **Legacy macOS ZIP metadata:** selecting the first extracted directory could choose __MACOSX instead of the installation. Selection now requires exactly one directory containing Apollo, Update and M4L. Tests include a metadata directory and ambiguous payloads. The ditto exit code is checked.
 - **Bundle cleanup reporting:** a permission failure deleting staging files after a successful swap/relaunch no longer reports the completed update as failed. Cleanup remains best effort; this small change was identified by code review rather than a native Mac reproduction.
 
-The friend's drag/reorder and resize-handle fixes are retained. The shared fixes are on avalonia-12.1.2 and merged through codex/214-graceful-quit, codex/macos-arm64 and codex/macos-app-bundle. Existing published commits were not rewritten. No issue was closed and no review changes were pushed.
+The friend's drag/reorder and resize-handle fixes are retained. After this review, the follow-up task rebased the stack at the user's request, removing its merge commits while preserving every branch's file contents and the friend's commits. The Mac checkout contains the resulting linear stack: avalonia-12.1.2 → codex/214-graceful-quit → codex/macos-arm64 → codex/macos-app-bundle. The Mac validation uses that existing branch; no Git state was transferred and no branch was reset or merged.
 
 ## What was verified in this pass
 

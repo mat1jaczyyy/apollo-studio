@@ -2,6 +2,8 @@
 
 Reviewed 2026-09-10 against `avalonia-12.1.2` (Avalonia 12.1.2, .NET 10). Reviewed all 19 open Apollo issues, relevant discussions, and linked Avalonia issues/PRs. These are retest candidates, not claims that the reported bugs have been reproduced and fixed on their original platforms.
 
+**Mac follow-up, 2026-09-12:** [Local M3/macOS 15.2 validation](MACOS-VALIDATION.md) now covers native Command+Q/menu Quit, Save/Discard/Cancel and the native save picker, plus two maximize/close/reopen Pattern Editor cycles. It also fixed a separately reproduced native text-entry regression. Alternate keyboard layouts, Dock/Activity Monitor Quit, fullscreen, M1 stress and multiple displays remain pending. No same-Mac master comparison was performed, so these observations do not close the historical issues below.
+
 ## Primary retest candidates
 
 | Issue | Assessment and evidence | Targeted check |

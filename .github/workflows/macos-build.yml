@@ -49,6 +49,7 @@ jobs:
           python3 Tests/test_mac_package.py
           python3 Tests/test_mac_bundle.py
           dotnet run --project Tests/Packaging/Packaging.csproj -c Release
+          dotnet run --project Tests/Packaging/Packaging.csproj -c Release -- --verify-publish Build/${{ matrix.rid }}/Apollo/Apollo.dll
       - name: Verify editor input and graceful Quit
         run: |
           python3 Tests/run-scenarios.py --output artifacts/headless

@@ -70,12 +70,20 @@ def sign_bundle(bundle, rid):
     bundle = Path(bundle)
     # Sign native code inside out. --deep is used for verification, never signing.
     magic = {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca"}
+    hosts = {bundle / "Contents/MacOS/Apollo",
+             bundle / "Contents/Helpers/Apollo Updater.app/Contents/MacOS/ApolloUpdate"}
     for path in sorted(bundle.rglob("*")):
         if path.is_file():
             with path.open("rb") as source:
                 native = source.read(4) in magic
             if native:
-                subprocess.run(["xcrun", "lipo", "-verify_arch", ARCHITECTURES[rid], str(path)], check=True)
+                subprocess.run(["xcrun", "lipo", str(path), "-verify_arch", ARCHITECTURES[rid]], check=True)
+            # codesign treats all files directly in MacOS as nested code, including
+            # managed DLLs and JSON. Non-Mach-O signatures use extended attributes,
+            # preserved by our ditto archives.
+            # Signing a main executable signs its enclosing bundle, so defer both
+            # apphosts until every dependency (and the nested helper) is sealed.
+            if path not in hosts and (native or path.suffix == ".dll" or path.parent.name == "MacOS"):
                 subprocess.run(["codesign", "--force", "--sign", "-", str(path)], check=True)
     for path in (bundle / "Contents/Helpers/Apollo Updater.app", bundle):
         subprocess.run(["codesign", "--force", "--sign", "-", "--entitlements", str(ROOT / "Publish/macos-entitlements.plist"), str(path)], check=True)

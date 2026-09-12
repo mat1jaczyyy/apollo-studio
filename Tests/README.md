@@ -26,6 +26,35 @@ Pass `--dotnet /absolute/path/to/dotnet` for a portable SDK. Every output direct
 
 The migrated harness sets the `Apollo.UserPath` AppContext value before Apollo initializes and checks that the resulting profile is isolated. It does not change HOME. The Windows legacy harness retains its original USERPROFILE redirection. Mac shortcut fixtures use Command and account for the native desktop's point coordinates. The input regressions also check that printable key events remain unhandled so the native Mac backend can deliver text, while window shortcuts do not act on a focused text field.
 
+After `sh Publish/publish.sh all`, verify actual archive signatures and read-only DMG contents with:
+
+```sh
+python3 Tests/verify-mac-packages.py artifacts/package-verification
+```
+
+To prepare a signed copy of the production app for computer-use validation without touching existing preferences, first run a scenario suite to create its isolated configuration, then:
+
+```sh
+python3 Tests/prepare-mac-validation.py osx-arm64 artifacts/manual-mac \
+  --seed-profile artifacts/native/run/profile/.apollostudio
+```
+
+This changes the copied app and updater runtimeconfig files to use a profile inside the chosen directory, then signs the copy again. The production entry points and assemblies are retained. **Do not distribute this validation copy:** its runtime configuration contains a machine-specific data path. Normal Build/Dist artifacts have no profile override. See [Mac validation results and remaining checks](MACOS-VALIDATION.md).
+
+For desktop launch comparisons, pass `--identifier com.mat1jaczyyy.apollostudio.macvalidation` to distinguish the copy from the normal product. Quit each copy before opening another, and verify the exact process path before attaching automation: acquiring an app by a cached path may launch that copy, masking a failed Finder launch or creating a second instance. Omit the identifier override for updater tests, whose validator requires the production bundle identity.
+
+The packaging executable also supports these local validation commands:
+
+```sh
+dotnet run --project Tests/Packaging/Packaging.csproj -c Release -- \
+  --verify-publish Build/osx-arm64/Apollo/Apollo.dll
+dotnet run --project Tests/Packaging/Packaging.csproj -c Release -- \
+  --prepare-mac-update "artifacts/manual-mac/Apollo Studio.app" \
+  artifacts/local-update.zip artifacts/manual-mac/profile/.apollostudio artifacts/update-manifest-path.txt
+```
+
+The first checks the production entry point and excludes test types. The second stages a real signed update for the isolated installed copy and writes the manifest path into the final argument's file. Once the preparation process and test app have exited, run the manifest's staged `Runner.app/Contents/MacOS/ApolloUpdate` with `--mac-bundle-update` and the manifest path. This performs replacement; use only the disposable validation installation. Verify both signatures, retained previous app, user-file hashes and the exact relaunched process/UI. Successful preparation or an `open` exit code does not establish a successful UI relaunch.
+
 ## Native Windows scenarios
 
 From the repository root, restore the selected project first, then run:

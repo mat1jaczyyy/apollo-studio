@@ -21,7 +21,7 @@ namespace ApolloUpdate {
 
         static string Handle64Path => $"{AppDomain.CurrentDomain.BaseDirectory}handle64.exe";
 
-        public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
+        public static readonly string UserPath = AppContext.GetData("Apollo.UserPath") as string ?? Path.Combine(Environment.GetEnvironmentVariable(
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
         ), ".apollostudio");
 
