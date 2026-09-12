@@ -49,6 +49,8 @@ This changes the copied app and updater runtimeconfig files to use a profile ins
 
 For desktop launch comparisons, pass `--identifier com.mat1jaczyyy.apollostudio.macvalidation` to distinguish the copy from the normal product. Quit each copy before opening another, and verify the exact process path before attaching automation: acquiring an app by a cached path may launch that copy, masking a failed Finder launch or creating a second instance. Omit the identifier override for updater tests, whose validator requires the production bundle identity.
 
+The Unicode installation-path investigation and minimal native Finder-launch reproducer are in [Packaging/UNICODE-LAUNCH.md](Packaging/UNICODE-LAUNCH.md). On the tested macOS 15.2 machine, NFD installation launch/update passed, while fresh NFC controls exposed Launch Services failures or selection of another registered copy.
+
 The packaging executable also supports these local validation commands:
 
 ```sh
