@@ -37,7 +37,8 @@ namespace Apollo.Core {
             folder
         );
 
-        public static readonly string UserPath = Path.Combine(Environment.GetEnvironmentVariable(
+        // The scenario entry point supplies a process-local path before Apollo starts.
+        public static readonly string UserPath = AppContext.GetData("Apollo.UserPath") as string ?? Path.Combine(Environment.GetEnvironmentVariable(
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "USERPROFILE" : "HOME"
         ), ".apollostudio"
             #if PRERELEASE

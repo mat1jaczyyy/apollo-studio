@@ -1,14 +1,28 @@
 # Migration regression scenarios
 
-These command-line scenarios close the testing loop on Windows 10 without desktop automation. Native runs build a separate executable with a test entry point, then invoke Apollo's real startup and desktop lifetime. The same source runs against the original master and the migrated branch. Headless runs use Avalonia's input driver and real Skia rendering.
+These command-line scenarios close the testing loop without desktop automation. Native runs build a separate executable with a test entry point, then invoke Apollo's real startup and desktop lifetime. The same source runs against the original Windows master and the migrated branch. Headless runs use Avalonia's input driver and real Skia rendering.
 
 All runs use a process-local test profile beneath their output directory. Updates, Discord presence, backups, and autosave are disabled. MIDI scanning stops once startup completes. Run suites sequentially, with normal Apollo instances closed, because Apollo's single-instance socket is intentionally preserved. Use a fresh output directory each time.
 
 ## Requirements
 
-- Windows 10, .NET SDK pinned by `global.json` (10.0.401), and PowerShell.
+- .NET SDK pinned by `global.json` (10.0.401), and either Python 3 for the portable runner or PowerShell for the original Windows runner. macOS ARM builds also require Xcode Command Line Tools.
 - For master comparisons: a separate checkout/archive of commit `fca034e0bad8430bc3802fa01530b404627f23e0`, .NET SDK 5.0.102 and runtime 5.0.2, and its historical NuGet packages. The original Avalonia CI build may require an existing package cache; the migrated app restores entirely from nuget.org.
 - These are integration executables, not `dotnet test` projects. A nonzero process exit or missing `results.json` means failure.
+
+## Portable runner and Mac desktop validation
+
+From the repository root, with the pinned SDK on PATH:
+
+```sh
+python3 Tests/run-scenarios.py --output artifacts/headless
+python3 Tests/run-scenarios.py --mode native --output artifacts/native
+python3 Tests/run-scenarios.py --mode native --theme Light --software --output artifacts/native-light
+```
+
+Pass `--dotnet /absolute/path/to/dotnet` for a portable SDK. Every output directory must be fresh. The runner builds once and runs each child sequentially, with a 60-second per-process timeout. Native mode needs a desktop; both modes need Apollo's local single-instance socket, and Mac MIDI checks need CoreMIDI access. A sandbox denying these services is not an application failure.
+
+The migrated harness sets the `Apollo.UserPath` AppContext value before Apollo initializes and checks that the resulting profile is isolated. It does not change HOME. The Windows legacy harness retains its original USERPROFILE redirection. Mac shortcut fixtures use Command and account for the native desktop's point coordinates. The input regressions also check that printable key events remain unhandled so the native Mac backend can deliver text, while window shortcuts do not act on a focused text field.
 
 ## Native Windows scenarios
 

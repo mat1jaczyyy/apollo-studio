@@ -44,7 +44,12 @@ namespace Apollo.Tests {
             var profile = Path.Combine(output, "profile");
             Directory.CreateDirectory(profile);
             // Process-local redirection before any Apollo static initialization.
+            #if LEGACY_AVALONIA
+            // The historical baseline runner is Windows-only.
             Environment.SetEnvironmentVariable("USERPROFILE", profile);
+            #else
+            AppContext.SetData("Apollo.UserPath", Path.Combine(profile, ".apollostudio"));
+            #endif
             Preferences.Theme = Environment.GetEnvironmentVariable("APOLLO_TEST_THEME") == "Light"
                 ? Apollo.Enums.ThemeType.Light : Apollo.Enums.ThemeType.Dark;
             Preferences.DiscordPresence = false;
@@ -52,6 +57,9 @@ namespace Apollo.Tests {
             Preferences.Backup = false;
             Preferences.Autosave = false;
             Preferences.AlwaysOnTop = false;
+
+            if (Program.UserPath != Path.Combine(profile, ".apollostudio"))
+                throw new InvalidOperationException("The scenario profile was not isolated before startup.");
 
             Console.WriteLine("Scenario runner starting with profile " + profile);
             _ = Task.Run(async () => {
