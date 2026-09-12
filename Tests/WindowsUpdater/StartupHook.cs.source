@@ -1,0 +1,144 @@
+// Test-only startup hook. Compiled outside the source tree by Build.ps1.
+// Production entry points remain unchanged. No screen/input automation is used.
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+public static class StartupHook {
+    static string root = "";
+    static string mode = "";
+    static Assembly apollo = null!;
+    static IntPtr hive;
+    [DllImport("advapi32.dll", CharSet=CharSet.Unicode)]
+    static extern int RegLoadAppKey(string file, out IntPtr key, int access, int options, int reserved);
+    [DllImport("advapi32.dll")]
+    static extern int RegOverridePredefKey(IntPtr predefined, IntPtr key);
+    [DllImport("advapi32.dll")]
+    static extern int RegCloseKey(IntPtr key);
+    [DllImport("advapi32.dll", CharSet=CharSet.Unicode)]
+    static extern int RegCreateKeyEx(IntPtr key, string name, int reserved, string? className, int options, int access, IntPtr security, out IntPtr result, out int disposition);
+    [DllImport("kernel32.dll")]
+    static extern uint SetErrorMode(uint mode);
+    static readonly IntPtr Hkcu = new IntPtr(unchecked((int)0x80000001));
+
+    public static void Initialize() {
+        root = Path.GetFullPath(Environment.GetEnvironmentVariable("APOLLO_WINDOWS_TEST_ROOT")
+            ?? throw new Exception("Missing disposable test root"));
+        mode = Environment.GetEnvironmentVariable("APOLLO_WINDOWS_TEST_MODE") ?? "";
+        if (!File.Exists(Path.Combine(root, ".windows-updater-test")))
+            throw new Exception("Missing disposable-root marker");
+        SetErrorMode(2); // Prevent an unhandled test-child crash from opening a system dialog.
+        var entry = Assembly.GetEntryAssembly()!;
+        var name = entry.GetName().Name;
+        if (name == "WindowsUpdaterProbe") return;
+        if (mode != "offline" && !Path.GetFullPath(AppContext.BaseDirectory).StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new Exception("Entry point is outside the disposable installation");
+        if (name == "ApolloUpdate") {
+            int code = RegLoadAppKey(Path.Combine(root, "registry.dat"), out hive, 0xF003F, 0, 0);
+            if (code != 0) throw new Exception("RegLoadAppKey failed: " + code);
+            code = RegCreateKeyEx(hive, "SOFTWARE", 0, null, 0, 0xF003F, IntPtr.Zero, out var software, out _);
+            if (code != 0) throw new Exception("Private SOFTWARE key creation failed: " + code);
+            RegCloseKey(software);
+            code = RegOverridePredefKey(Hkcu, hive);
+            if (code != 0) throw new Exception("RegOverridePredefKey failed: " + code);
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => {
+                RegOverridePredefKey(Hkcu, IntPtr.Zero);
+                RegCloseKey(hive);
+            };
+            SetProfile();
+            Write("updater-hook.json", new { entry=entry.EntryPoint!.DeclaringType!.FullName, registry="private application hive", profile=AppContext.GetData("Apollo.UserPath") });
+            return;
+        }
+        apollo = name == "Apollo" ? entry : Assembly.Load("Apollo");
+        SeedGithub();
+        if (mode == "offline") return;
+        SetProfile();
+        var prefs = apollo.GetType("Apollo.Core.Preferences", true)!;
+        foreach (var key in new[] { "CheckForUpdates", "DiscordPresence", "Backup", "Autosave", "AlwaysOnTop" })
+            prefs.GetProperty(key)!.SetValue(null, false);
+        Task.Run(ObserveApp);
+    }
+    static void SetProfile() {
+        string profile = Path.Combine(root, "profile");
+        Directory.CreateDirectory(profile);
+        Environment.SetEnvironmentVariable("USERPROFILE", profile);
+        AppContext.SetData("Apollo.UserPath", Path.Combine(profile, ".apollostudio"));
+    }
+    static void Set(object obj, string name, object? value) {
+        for (var type = obj.GetType(); type != null; type = type.BaseType) {
+            var field = type.GetField("<" + name + ">k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field != null) { field.SetValue(obj, value); return; }
+        }
+        throw new Exception("Fixture property not found: " + obj.GetType().FullName + "." + name);
+    }
+    static void SeedGithub() {
+        var octokit = Assembly.Load("Octokit");
+        var release = RuntimeHelpers.GetUninitializedObject(octokit.GetType("Octokit.Release", true)!);
+        Set(release, "Name", "Version 1.8.17");
+        Set(release, "Body", "Offline Windows validation");
+        Set(release, "PublishedAt", (DateTimeOffset?)DateTimeOffset.Parse("2026-09-12T00:00:00Z"));
+        var blog = RuntimeHelpers.GetUninitializedObject(octokit.GetType("Octokit.RepositoryContent", true)!);
+        Set(blog, "Name", "1789171200.md");
+        Set(blog, "Encoding", "base64");
+        Set(blog, "EncodedContent", Convert.ToBase64String(Encoding.UTF8.GetBytes("# Offline Windows validation")));
+        var github = apollo.GetType("Apollo.Helpers.Github", true)!;
+        github.GetField("release", BindingFlags.Static | BindingFlags.NonPublic)!.SetValue(null, release);
+        github.GetField("download", BindingFlags.Static | BindingFlags.NonPublic)!.SetValue(null, null);
+        github.GetField("blogpost", BindingFlags.Static | BindingFlags.NonPublic)!.SetValue(null, blog);
+    }
+    static async Task ObserveApp() {
+        try {
+            var app = apollo.GetType("Apollo.Core.App", true)!;
+            var controls = Assembly.Load("Avalonia.Controls");
+            var application = controls.GetType("Avalonia.Application", true)!;
+            object? current = null;
+            for (int i = 0; i < 300; i++) {
+                current = application.GetProperty("Current")!.GetValue(null);
+                if (current != null && application.GetProperty("ApplicationLifetime")!.GetValue(current) != null) break;
+                await Task.Delay(50);
+            }
+            var avaloniaBase = Assembly.Load("Avalonia.Base");
+            var dispatchType = avaloniaBase.GetType("Avalonia.Threading.Dispatcher", true)!;
+            var priorityType = avaloniaBase.GetType("Avalonia.Threading.DispatcherPriority", true)!;
+            object dispatcher = dispatchType.GetProperty("UIThread")!.GetValue(null)!;
+            var post = dispatchType.GetMethod("Post", new[] { typeof(Action), priorityType })!;
+            Action action = async () => {
+                try {
+                    string[] windows = Array.Empty<string>();
+                    for (int i = 0; i < 100; i++) {
+                        windows = ((IEnumerable)app.GetProperty("Windows")!.GetValue(null)!).Cast<object>()
+                            .Select(w => w.GetType().Name).ToArray();
+                        if (windows.Contains("SplashWindow")) break;
+                        await Task.Delay(50);
+                    }
+                    apollo.GetType("Apollo.Core.MIDI", true)!.GetMethod("Stop")!.Invoke(null, null);
+                    if (!windows.Contains("SplashWindow")) throw new Exception("No native splash appeared");
+                    if (mode == "stage") {
+                        object update = Activator.CreateInstance(apollo.GetType("Apollo.Windows.UpdateWindow", true)!)!;
+                        var prepare = update.GetType().GetMethod("PrepareUpdate", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                        await (Task)prepare.Invoke(update, new object[] {
+                            File.ReadAllBytes(Environment.GetEnvironmentVariable("APOLLO_WINDOWS_TEST_ZIP")!) })!;
+                        Write("staging.json", new { passed=true, windows, entry=apollo.EntryPoint!.DeclaringType!.FullName });
+                    } else {
+                        Write("app-probe.json", new { passed=true, windows, entry=apollo.EntryPoint!.DeclaringType!.FullName, profile=AppContext.GetData("Apollo.UserPath"), pid=Environment.ProcessId });
+                    }
+                } catch (Exception error) {
+                    Write(mode == "stage" ? "staging.json" : "app-probe.json", new { passed=false, error=error.ToString() });
+                } finally { app.GetMethod("Shutdown")!.Invoke(null, null); }
+            };
+            post.Invoke(dispatcher, new[] { action, Activator.CreateInstance(priorityType) });
+        } catch (Exception error) {
+            Write("hook-failure.json", new { error=error.ToString() });
+            Environment.Exit(98);
+        }
+    }
+    static void Write(string file, object value) =>
+        File.WriteAllText(Path.Combine(root, file), JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented=true }));
+}
