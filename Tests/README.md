@@ -18,6 +18,8 @@ From the repository root, with the pinned SDK on PATH:
 python3 Tests/run-scenarios.py --output artifacts/headless
 python3 Tests/run-scenarios.py --mode native --output artifacts/native
 python3 Tests/run-scenarios.py --mode native --theme Light --software --output artifacts/native-light
+python3 Tests/run-scenarios.py --suite quit --output artifacts/quit-headless
+python3 Tests/run-scenarios.py --mode native --suite quit --output artifacts/quit-native
 ```
 
 Pass `--dotnet /absolute/path/to/dotnet` for a portable SDK. Every output directory must be fresh. The runner builds once and runs each child sequentially, with a 60-second per-process timeout. Native mode needs a desktop; both modes need Apollo's local single-instance socket, and Mac MIDI checks need CoreMIDI access. A sandbox denying these services is not an application failure.
