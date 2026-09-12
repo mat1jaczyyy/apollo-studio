@@ -2,7 +2,9 @@
 
 **Current follow-up, 2026-09-12–13:** Finder `.approj` registration/activation is implemented. Cold/warm Finder double-click, Unicode project filenames and native Save/Cancel decisions passed; 34 activation checks passed in native/headless Mac modes. Final Mac editor/Quit runs passed, as did 23 signed updater failure/recovery observations. Unicode **installation-path** testing now distinguishes NFD launch/update success from fresh NFC Launch Services failures or selection of another registered copy; a minimal native control reproduces the issue without Apollo/.NET. See [normalization investigation](Packaging/UNICODE-LAUNCH.md). Windows independently passed 814 assertions without Computer Use, reproduced unsafe legacy updater failure modes and a native WinMM cleanup defect, and returned test-only fixtures for integration. See [MACOS-VALIDATION.md](MACOS-VALIDATION.md) and [WINDOWS-VALIDATION.md](WINDOWS-VALIDATION.md) for evidence and limits. The September 10 counts below are historical.
 
-**Newly confirmed deferred fixes:** Windows updater partial deletion, unbounded retries, missing rollback and malformed/incomplete staging; exception-safe/idempotent native WinMM cleanup with safe callback/buffer ownership. PR #486 was reviewed but not integrated: its unconditional `Abandon` workaround leaks native resources and does not establish callback quiescence. Physical unplug/shipped-DLL behavior still needs validation. These are retained legacy behaviors, not new Finder regressions.
+**Newly confirmed deferred updater fixes:** Windows updater partial deletion, unbounded retries, missing rollback and malformed/incomplete staging. These are retained legacy behaviors, not new Finder regressions.
+
+**Out of scope by user clarification (September 13):** native MIDI cleanup from the PR #486 investigation. The fault fixture reproduced a defect in existing vendored source without applying PR #486; it did not establish a migration regression or reproduce the shipped Windows DLL/physical unplug behavior. PR #486 was reviewed but not integrated. Its proposed workaround and the native cleanup/ABI-compatible DLL work belong to that separate follow-up, not this migration's remaining implementation work. The report and test fixture are retained as evidence.
 
 This preserves the September 10 review of the Avalonia 12.1.2 / .NET 10 migration and its three follow-up branches. The current follow-up summaries above and their linked reports supersede its pending-validation statements. The user requested coordinated publication of the new commits with linear rebases of the stack.
 
@@ -74,6 +76,7 @@ See ../Publish/MACOS.md for the publishing commands and platform test plan.
 
 ## Deliberately deferred implementation or out-of-scope work
 
+- PR #486 and its associated native MIDI cleanup investigation/fix, including callback/buffer ownership and a Windows DLL rebuild. This is explicitly outside the migration scope; do not treat it as a migration completion requirement. Ordinary physical MIDI compatibility validation remains a separate unverified area.
 - Finder associations and activation are implemented and tested as recorded above. Remaining desktop integration variants (Dock, external drag/drop, multiple installed versions) are still validation work.
 - Sparkle/native updater integration, appcast hosting and release-key management.
 - Developer ID signing, notarization and App Store distribution. The chosen path remains free ad-hoc signing; no Apple membership/enrollment/payment has been performed. A free Personal Team does not supply the required distribution identity/notarization. An organizational fee waiver would require actual eligibility.

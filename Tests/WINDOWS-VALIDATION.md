@@ -71,6 +71,8 @@ Evidence:
 
 ## PR #486 assessment
 
+**Scope clarification, September 13:** the user excluded PR #486 and its associated native cleanup work from this migration. The assessment and fault-injection evidence below are retained for that separate follow-up. The defect was reproduced without applying the PR, but was not established as a migration regression; a production fix or Windows DLL rebuild is not required to complete this migration.
+
 Reviewed open [PR #486](https://github.com/mat1jaczyyy/apollo-studio/pull/486), head f9833da8547fa63a6313c85b2d1aee3d011cc143. No production changes from it were integrated.
 
 The proposed Abandon path can avoid entering a native cleanup path after device disappearance. It is understandable as an emergency workaround, but I would not integrate it unchanged:
@@ -106,7 +108,7 @@ Evidence: winmm-build.log, winmm-{healthy,error-state,repeated-close}.{stdout,st
 - Real elevate.exe/UAC approval and ACL-denied locations; actual Sysinternals handle enumeration/closure; a full normal-trimmed updater transaction.
 - Redesign/fix of the confirmed Windows partial-deletion, retry, malformed-payload, connector-directory and rollback behavior.
 - Physical Launchpad unplug/reconnect on affected Windows versions/drivers, sustained MIDI traffic, pending callbacks, device counts, Ableton and the shipped DLL's native call stack.
-- A production native RtMidi fix and a controlled ABI-compatible Windows DLL build. Keep the pinned custom C ABI; substituting an arbitrary stock RtMidi build is unsafe.
+- Outside this migration's scope: a production native RtMidi cleanup fix and a controlled ABI-compatible Windows DLL build associated with PR #486. The evidence above is retained for separate work.
 - Native pickers, real mouse/keyboard and cross-application drag/drop, compositor/GPU artifacts, mixed-monitor DPI/occlusion and appearance comparisons. None were bypassed using another UI automation mechanism.
 - Windows checks for subsequent Mac Finder-activation code: this report validates production tree 0c9936cc, plus the isolated offline test fixture, not later concurrent production edits.
 
