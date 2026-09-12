@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Scenarios.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OfflineGithubFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EditorScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputScenarios.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UpdateScenarios.cs" />

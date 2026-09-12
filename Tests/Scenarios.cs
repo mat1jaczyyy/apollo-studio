@@ -39,6 +39,7 @@ namespace Apollo.Tests {
         [STAThread]
         static int Main(string[] args) {
             if (args.Length != 1) throw new ArgumentException("Pass an empty test output directory.");
+            ConfigureOfflineGithub();
             output = Path.GetFullPath(args[0]);
             Directory.CreateDirectory(output);
             var profile = Path.Combine(output, "profile");
