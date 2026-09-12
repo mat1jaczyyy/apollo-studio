@@ -1,6 +1,7 @@
 #if HEADLESS_AVALONIA
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -72,8 +73,8 @@ namespace Apollo.Tests {
 
             await StartDrag(paint);
             end = Center(trailing, window);
-            window.MouseMove(end, RawInputModifiers.LeftMouseButton | RawInputModifiers.Control);
-            window.MouseUp(end, MouseButton.Left, RawInputModifiers.Control);
+            window.MouseMove(end, RawInputModifiers.LeftMouseButton | ShortcutModifier);
+            window.MouseUp(end, MouseButton.Left, ShortcutModifier);
             await Settle();
             Check(chain.Count == 3 && chain[2] is Apollo.Devices.Paint && !ReferenceEquals(chain[2], paint), "pointer-control-drag-copies");
             project.Undo.Undo();
@@ -133,7 +134,9 @@ namespace Apollo.Tests {
                 edge = new Point(2, window.Bounds.Height / 2);
                 window.MouseDown(edge, MouseButton.Left);
                 window.MouseMove(edge + new Vector(40, 0), RawInputModifiers.LeftMouseButton);
-                Check(Math.Abs(window.Width - width + 40) < 1 && window.Position.X == position.X + (int)(40 * scale),
+                // macOS desktop positions use points even on a Retina display.
+                var positionDelta = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? 40 : (int)(40 * scale);
+                Check(Math.Abs(window.Width - width + 40) < 1 && window.Position.X == position.X + positionDelta,
                     "west-resize-keeps-opposite-edge-at-scale-" + scale);
                 window.MouseUp(edge, MouseButton.Left);
                 window.Width = width;

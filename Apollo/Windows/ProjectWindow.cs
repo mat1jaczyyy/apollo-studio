@@ -233,6 +233,7 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Source is TextBox) return;
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             
@@ -300,10 +301,10 @@ namespace Apollo.Windows {
         void Text_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (e.Key == Key.Return) 
+            if (e.Key == Key.Return) {
                 this.Focus();
-
-            e.Handled = true;
+                e.Handled = true;
+            }
         }
 
         void Text_KeyUp(object sender, KeyEventArgs e) {

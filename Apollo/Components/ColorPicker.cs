@@ -449,16 +449,17 @@ namespace Apollo.Components {
         void Text_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return) {
                 this.Focus();
+                e.Handled = true;
+            }
             
             if (e.Key == Key.Tab && sender is TextBox textBox) {
                 if (textBox == Red) ((e.KeyModifiers == KeyModifiers.Shift)? Blue : Green).Focus();
                 if (textBox == Green) ((e.KeyModifiers == KeyModifiers.Shift)? Red : Blue).Focus();
                 if (textBox == Blue) ((e.KeyModifiers == KeyModifiers.Shift)? Green : Red).Focus();
+                e.Handled = true;
             }
-            
-            e.Handled = true;
         }
         
         void Hex_KeyUp(object sender, KeyEventArgs e) {

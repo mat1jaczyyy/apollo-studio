@@ -337,8 +337,10 @@ namespace Apollo.Components {
         void Input_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return) {
                 this.Focus();
+                e.Handled = true;
+            }
             
             if (e.Key == Key.Tab && sender is TextBox textBox) {
                 SkipLostFocus = true;
@@ -349,9 +351,8 @@ namespace Apollo.Components {
                 i.SelectAll();
 
                 i.Focus();
+                e.Handled = true;
             }
-
-            e.Handled = true;
         }
 
         void Input_KeyUp(object sender, KeyEventArgs e) {

@@ -531,10 +531,10 @@ namespace Apollo.Components {
         protected void Input_KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return) {
                 this.Focus();
-
-            e.Handled = true;
+                e.Handled = true;
+            }
         }
 
         protected void Input_KeyUp(object sender, KeyEventArgs e) {

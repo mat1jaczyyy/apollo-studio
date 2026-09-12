@@ -525,6 +525,7 @@ namespace Apollo.Windows {
         }
 
         void Window_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Source is TextBox) return;
             List<Window> windows = App.Windows.ToList();
             HandleKey(sender, e);
             

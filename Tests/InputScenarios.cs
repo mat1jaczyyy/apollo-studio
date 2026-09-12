@@ -16,6 +16,18 @@ using Apollo.Helpers;
 
 namespace Apollo.Tests {
     internal static partial class Scenarios {
+        static RawInputModifiers ShortcutModifier => App.ControlKey == KeyModifiers.Meta
+            ? RawInputModifiers.Meta : RawInputModifiers.Control;
+
+        static void CheckTextKeyRouting(TextBox input, string name) {
+            // macOS dispatches text input only when the preceding key was not
+            // consumed. KeyTextInput alone bypasses this native-backend condition.
+            foreach (var key in new[] { Key.A, Key.Space, Key.OemPlus, Key.OemMinus }) {
+                var args = new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = key };
+                input.RaiseEvent(args);
+                Check(!args.Handled && input.IsFocused, name + "-text-key-reaches-native-input-" + key);
+            }
+        }
         static Point Center(Control control, Window window) =>
             control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), window).Value;
 
@@ -32,6 +44,7 @@ namespace Apollo.Tests {
             var input = dial.Get<TextBox>("Input");
             Check(input.IsFocused, "dial-double-click-edit");
             Check(input.SelectedText == input.Text, "dial-edit-selects-value");
+            CheckTextKeyRouting(input, "dial");
             window.KeyTextInput("42");
             window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, "\r");
             window.KeyRelease(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, "\r");
@@ -40,13 +53,14 @@ namespace Apollo.Tests {
             var originalName = project[0].Name;
             Operations.Rename(project, 0, 0);
             await Settle();
+            CheckTextKeyRouting(project[0].Info.Input, "rename");
             window.KeyTextInput("Renamed track");
             window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, "\r");
             window.KeyRelease(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, "\r");
             Check(project[0].Name == "Renamed track" && project[0].Info.Input.Opacity == 0, "rename-enter-commits");
             window.Focus();
-            window.KeyPress(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
-            window.KeyRelease(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+            window.KeyPress(Key.Z, ShortcutModifier, PhysicalKey.Z, "z");
+            window.KeyRelease(Key.Z, ShortcutModifier, PhysicalKey.Z, "z");
             Check(project[0].Name == originalName, "keyboard-undo");
 
             var chain = project[0].Chain;

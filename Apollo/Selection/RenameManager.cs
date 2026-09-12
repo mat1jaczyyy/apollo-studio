@@ -58,10 +58,10 @@ namespace Apollo.Selection {
         void KeyDown(object sender, KeyEventArgs e) {
             if (App.Dragging) return;
 
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return) {
                 ((Control)Host).Focus();
-
-            e.Handled = true;
+                e.Handled = true;
+            }
         }
 
         void KeyUp(object sender, KeyEventArgs e) {

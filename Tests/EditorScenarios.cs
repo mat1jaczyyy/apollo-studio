@@ -59,6 +59,7 @@ namespace Apollo.Tests {
             author.Focus();
             Check(author.IsFocused, "author-focus");
             #if HEADLESS_AVALONIA
+            CheckTextKeyRouting(author, "author");
             author.SelectAll();
             project.Window.KeyTextInput("Typed author");
             Check(project.Author == "Typed author", "keyboard-text-input");
